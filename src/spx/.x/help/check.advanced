@@ -1,0 +1,42 @@
+CHECK ADVANCED
+
+When authoring JMESPath queries, take note of the grammar when selecting
+identifiers as evaluations will have different interpretations based
+on the tokens used. https://jmespath.org/specification.html#grammar
+
+For example, given this JSON object
+
+  {
+    "connection.message.received": "true"
+  }
+
+We could write three different queries:
+
+  "connection.message.received" == "true"
+  "connection.message.received" == 'true'
+  "connection.message.received" == `true`
+
+If we evaluate each of the identifiers:
+  "true" - evaluates to `null`, as there is no such key named "true" in the JSON object
+  'true' - is evaluated to a string with contents "true"
+  `true` - is the boolean literal value, `true`
+
+  "connection.message.received" - gives the value of a key lookup (if it exists in the JSON object, otherwise is null). 
+                                  In our example it does exist, and the value is a string with contents "true"
+
+And so the three queries would evaluate to:
+
+  "connection.message.received" == "true" - false
+  "connection.message.received" == 'true' - true
+  "connection.message.received" == `true` - false
+
+Knowing this, given the above example JSON object and a non-existant key, 
+it's possible to author a query that evaluates to success when a failure is expected
+
+  "connection.TYPO.message.received" == "true" 
+
+  Is intepreted as query:
+
+    null == null
+
+  Which evaluates to a final value of `true`

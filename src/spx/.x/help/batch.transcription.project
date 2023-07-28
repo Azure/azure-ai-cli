@@ -1,0 +1,35 @@
+BATCH TRANSCRIPTION PROJECT
+
+  The `--project` specifies the PROJECT with which to associate a transcription.
+
+USAGE: spx batch transcription [...] --project PROJECT-ID
+   OR: spx batch transcription [...] --project PROJECT-URL
+   OR: spx batch transcription [...] --project @FILENAME
+   OR: spx batch transcription [...] @CONFIG-FILENAME
+
+  WHERE: PROJECT-ID is the project ID
+     OR: PROJECT-URL is the project URL
+     OR: FILENAME is a single line text file containing the project ID or URL
+     OR: CONFIG-FILENAME is a single line text file in the following form:
+
+            batch.project.id=ID-or-URL
+
+EXAMPLES
+
+  spx batch transcription [...] --project 01234567-89ab-cdef-fedc-ba9876543210
+
+  spx config @my.project --set 01234567-89ab-cdef-fedc-ba9876543210
+  spx batch transcription [...] --project @my.project
+
+  spx csr project create [...] --output url @@my.project
+  spx batch transcription [...] --project @my.project
+
+  spx config @transcription.details --set name "My transcription"
+  spx config @transcription.details --add project 01234567-89ab-cdef-fedc-ba9876543210
+  spx batch transcription [...] @transcription.details
+
+SEE ALSO
+
+  spx help csr project create
+  spx help batch transcription create
+  spx help batch transcription update

@@ -1,0 +1,34 @@
+RECOGNIZE REGION
+
+@include.the.recognize.command
+
+@include.the.region.option
+
+USAGE: spx recognize [...] --region REGION
+   OR: spx recognize [...] --region @FILENAME
+   OR: spx recognize [...] @CONFIG-FILENAME
+
+@include.the.region.option.where
+
+EXAMPLES
+
+  spx config recognize @region --set westus2
+  spx config recognize @key --set 436172626F6E20697320636F6F6C2121
+  spx recognize --nodefaults --region @region --key @key --file hello.wav
+
+  spx config recognize @default.config --clear
+  spx config recognize @default.config --add key @key
+  spx config recognize @default.config --add region @region
+  spx recognize --file hello.wav
+
+  spx config recognize @key --set 436172626F6E20697320636F6F6C2121 --region westus2
+  spx config recognize @key --set 436172626F6E20697320636F6F6C2020 --region eastus
+  spx recognize --foreach region in eastus;westus2 --key @@key --file hello.wav
+
+SEE ALSO
+
+  spx help setup
+  spx help region overview
+  spx help recognize connection
+  spx help recognize key
+  spx help recognize

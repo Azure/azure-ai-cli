@@ -1,0 +1,41 @@
+   ___ ____  ___  _____
+  / _ /_  / / _ |/_  _/
+ / __ |/ /_/ __ |_/ /_  
+/_/ |_/___/_/ |_/____/  
+
+USAGE: ai <command> [...]
+
+HELP
+
+  ai help
+  ai help setup
+
+COMMANDS
+
+  ai init [...]             (see: ai help init)
+  ai config [...]           (see: ai help config)
+
+  ai chat [...]             (see: ai help chat)
+  ai complete [...]         (see: ai help complete)
+
+  ai speech [...]           (see: ai help speech)
+  ai vision [...]           (see: ai help vision)
+  ai language [...]         (see: ai help language)
+  ai translation [...]      (see: ai help translation)
+
+  ai scenario [...]         (see: ai help scenario)
+  ai snippet [...]          (see: ai help snippet)
+
+  ai run [...]              (see: ai help run)
+
+ADDITIONAL TOPICS
+
+  ai help examples
+
+  ai help find "prompt"
+  ai help find "prompt" --expand
+
+  ai help find topics "examples"
+  ai help list topics
+
+  ai help documentation

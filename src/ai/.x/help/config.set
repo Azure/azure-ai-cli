@@ -1,0 +1,29 @@
+CONFIG SET
+
+@include.the.config.command
+
+  The `--set` option sets AI configuration data in a new
+  ai configuration datastore file, or overwrite configuration data in an
+  existing AI configuration datastore file.
+
+USAGE: ai config --set NAME VALUE
+   OR: ai config @NAME --set VALUE
+   OR: ai config @CONFIG-FILENAME --set NAME VALUE
+
+  WHERE: NAME represents the name of the VALUE
+    AND: VALUE represents the value to be set
+     OR: CONFIG-FILENAME is the name of the configuration file
+
+   NOTE: If no HIVE is specified, the first HIVE found will be used.
+
+EXAMPLES
+
+  ai config --set region westus2
+  ai config --set key 436172626F6E20697320636F6F6C2121
+
+SEE ALSO
+
+  ai help config
+  ai help config add
+  ai help config clear
+  ai help config hive

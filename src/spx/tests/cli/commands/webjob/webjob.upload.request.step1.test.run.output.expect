@@ -1,0 +1,16 @@
+﻿(?# ---------- BANNER)
+^SPX - Azure Speech CLI, Version [1]\.[0-9]{2}[^\r]+\r?$\n
+^Copyright \(c\) 202[0-9] Microsoft Corporation\. All Rights Reserved\.\r?$\n
+^\r?$\n
+
+
+\r?\nUploading webjob \.\.\.\r?$\n
+^PUT https://endpoint\.scm\.azurewebsites\.net/api/triggeredwebjobs/echo\.zip HTTP/1\.1\r?$\n
+^Accept: application/json\r?$\n
+^Content-Type: application/zip\r?$\n
+^Content-Disposition: attachment; filename="echo\.zip"\r?$\n
+^Host: endpoint\.scm\.azurewebsites\.net\r?$\n
+^Connection: Keep-Alive\r?$\n
+^\r?$\n
+^PK
+\r?\n  ERROR!! The remote server returned an error: \(401\) Unauthorized\.\r?$\n

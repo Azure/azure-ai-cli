@@ -1,0 +1,2 @@
+service.config.region=@region
+service.config.key=@key

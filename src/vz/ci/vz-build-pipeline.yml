@@ -1,0 +1,488 @@
+# -----------------------------------------------------------------------------
+# CI/CD pipeline for VZ tool
+# -----------------------------------------------------------------------------
+trigger:
+- master
+
+variables:
+  SIGN_PARAMS_DLL: |
+    [
+      {
+        "keyCode": "CP-230012",
+        "operationSetCode": "SigntoolSign",
+        "parameters": [
+          {
+            "parameterName": "OpusName",
+            "parameterValue": "Microsoft"
+          },
+          {
+            "parameterName": "OpusInfo",
+            "parameterValue": "http://www.microsoft.com"
+          },
+          {
+            "parameterName": "PageHash",
+            "parameterValue": "/NPH"
+          },
+          {
+            "parameterName": "FileDigest",
+            "parameterValue": "/fd sha256"
+          },
+          {
+            "parameterName": "TimeStamp",
+            "parameterValue": "/tr \"http://rfc3161.gtm.corp.microsoft.com/TSS/HttpTspServer\" /td sha256"
+          }
+        ],
+        "toolName": "signtool.exe",
+        "toolVersion": "6.2.9304.0"
+      },
+      {
+          "keyCode": "CP-230012",
+          "operationSetCode": "SigntoolVerify",
+          "parameters": [ ],
+          "toolName": "signtool.exe",
+          "toolVersion": "6.2.9304.0"
+       }
+    ]
+  
+  SIGN_PARAMS_NUGET: |
+    [ 
+      {
+          "keyCode": "CP-401405",
+          "operationSetCode": "NuGetSign",
+          "parameters": [ ],
+          "toolName": "sign",
+          "toolVersion": "1.0"
+      },
+      {
+          "keyCode": "CP-401405",
+          "operationSetCode": "NuGetVerify",
+          "parameters": [ ],
+          "toolName": "sign",
+          "toolVersion": "1.0"
+      }
+    ]
+
+jobs:
+
+# -----------------------------------------------------------------------------
+# Build job, definition, and all steps
+# -----------------------------------------------------------------------------
+- job: Build
+  condition: true
+
+  pool:
+      name: SkymanWS2022Compliant
+
+  steps:
+
+  # -----------------------------------------------------------------------------
+  # Restore version variables if triggered from SDK Build
+  # -----------------------------------------------------------------------------
+  - script: 'env | sort'
+    displayName: "echo Environment variables"
+  - bash: |
+      set +x
+      echo "##vso[task.setvariable variable=TRIGGEREDBY_VISIONSDK_VERSION]${BUILD_TRIGGEREDBY_BUILDNUMBER}"
+      echo "##vso[task.setvariable variable=TRIGGEREDBY_VISIONSDK_VERSION_SUFFIX_ONLY]-${BUILD_TRIGGEREDBY_BUILDNUMBER##*-}"
+      echo "##vso[task.setvariable variable=TRIGGEREDBY_VISIONSDK_VERSION_VERSION_ONLY]${BUILD_TRIGGEREDBY_BUILDNUMBER%%-*}"
+    displayName: 'Restore version variables from triggering build (part 1)'
+    condition: eq(variables['Build.Reason'], 'BuildCompletion')
+  - bash: |
+      set +x
+      echo TRIGGEREDBY_VISIONSDK_VERSION=${TRIGGEREDBY_VISIONSDK_VERSION}
+      echo TRIGGEREDBY_VISIONSDK_VERSION_VERSION_ONLY=${TRIGGEREDBY_VISIONSDK_VERSION_VERSION_ONLY}
+      echo TRIGGEREDBY_VISIONSDK_VERSION_SUFFIX_ONLY=${TRIGGEREDBY_VISIONSDK_VERSION_SUFFIX_ONLY}
+      echo "##vso[task.setvariable variable=VisionSDKVersion]$(TRIGGEREDBY_VISIONSDK_VERSION)"
+      echo "##vso[task.setvariable variable=vz.version]$(TRIGGEREDBY_VISIONSDK_VERSION_VERSION_ONLY)"
+      echo "##vso[task.setvariable variable=vz.version.suffix]$(TRIGGEREDBY_VISIONSDK_VERSION_SUFFIX_ONLY)"
+    displayName: 'Restore version variables from triggering build (part 2)'
+    condition: eq(variables['Build.Reason'], 'BuildCompletion')
+  - script: 'env | sort'
+    displayName: "echo Environment variables 2"
+    condition: eq(variables['Build.Reason'], 'BuildCompletion')
+
+  # -----------------------------------------------------------------------------
+  # Install NuGet and run NuGet restore
+  # -----------------------------------------------------------------------------
+  - task: NuGetToolInstaller@0
+    displayName: 'Use NuGet 5.5.1'
+    inputs:
+      versionSpec: 5.5.1
+
+  - task: NuGetCommand@2
+    displayName: 'NuGet restore'
+    inputs:
+      includeNuGetOrg: false
+      feedsToUse: config
+      nugetConfigPath: 'vz/NuGet.Config'
+      restoreSolution: '$(Parameters.solution)'
+
+  # -----------------------------------------------------------------------------
+  # Restore, build, and publish for Windows dotnet core
+  # -----------------------------------------------------------------------------
+  - task: DotNetCoreCLI@2
+    displayName: 'dotnet restore windows'
+    inputs:
+      command: restore
+      publishWebProjects: false
+      projects: '**/vz-cli.csproj'
+      arguments: '/p:VersionAssembly=$(vz.version) /p:Version=$(vz.version) /p:AssemblyVersion=$(vz.version) /p:VersionSuffix=$(vz.version.suffix) /p:VisionSDKVersion=$(VisionSDKVersion) -r win-x64'
+      workingDirectory: vz
+      zipAfterPublish: false
+      includeNuGetOrg: false
+      feedsToUse: config
+      nugetConfigPath: 'vz/NuGet.Config'
+      noCache: true
+
+  - task: DotNetCoreCLI@2
+    displayName: 'dotnet build windows'
+    inputs:
+      command: build
+      publishWebProjects: false
+      projects: '**/vz-cli.csproj'
+      arguments: '/p:VersionAssembly=$(vz.version) /p:Version=$(vz.version) /p:AssemblyVersion=$(vz.version) /p:VersionSuffix=$(vz.version.suffix) --version-suffix $(vz.version.suffix) /p:VisionSDKVersion=$(VisionSDKVersion) -r win-x64 -c $(BuildConfiguration) --no-restore'
+      workingDirectory: vz
+      zipAfterPublish: false
+      includeNuGetOrg: false
+      feedsToUse: config
+      nugetConfigPath: 'vz/NuGet.Config'
+
+  - task: DotNetCoreCLI@2
+    displayName: 'dotnet publish windows'
+    inputs:
+      command: publish
+      publishWebProjects: false
+      projects: '**/vz-cli.csproj'
+      arguments: '/p:VersionAssembly=$(vz.version) /p:Version=$(vz.version) /p:AssemblyVersion=$(vz.version) /p:VersionSuffix=$(vz.version.suffix) --version-suffix $(vz.version.suffix) /p:VisionSDKVersion=$(VisionSDKVersion) -r win-x64 -c $(BuildConfiguration) --no-restore --no-build /p:IncludeSymbols=false /p:PublishProfile="Properties\PublishProfiles\folder publish vz-cli release (win-x64).pubxml"'
+      workingDirectory: vz
+      zipAfterPublish: false
+      modifyOutputPath: true
+      includeNuGetOrg: false
+      feedsToUse: config
+      nugetConfigPath: 'vz/NuGet.Config'
+
+  # -----------------------------------------------------------------------------
+  # Restore, build, and publish Linux dotnet core
+  # -----------------------------------------------------------------------------
+  - task: DotNetCoreCLI@2
+    displayName: 'dotnet restore linux'
+    inputs:
+      command: restore
+      publishWebProjects: false
+      projects: '**/vz-cli.csproj'
+      arguments: '/p:VersionAssembly=$(vz.version) /p:Version=$(vz.version) /p:AssemblyVersion=$(vz.version) /p:VersionSuffix=$(vz.version.suffix) /p:VisionSDKVersion=$(VisionSDKVersion) -r linux-x64'
+      workingDirectory: vz
+      zipAfterPublish: false
+      includeNuGetOrg: false
+      feedsToUse: config
+      nugetConfigPath: 'vz/NuGet.Config'
+      noCache: true
+
+  - task: DotNetCoreCLI@2
+    displayName: 'dotnet build linux'
+    inputs:
+      command: build
+      publishWebProjects: false
+      projects: '**/vz-cli.csproj'
+      arguments: '/p:VersionAssembly=$(vz.version) /p:Version=$(vz.version) /p:AssemblyVersion=$(vz.version) /p:VersionSuffix=$(vz.version.suffix) --version-suffix $(vz.version.suffix) /p:VisionSDKVersion=$(VisionSDKVersion) -r linux-x64 -c $(BuildConfiguration) --no-restore /p:IncludeSymbols=false'
+      workingDirectory: vz
+      # outputDir: linux
+      zipAfterPublish: false
+      modifyOutputPath: true
+      includeNuGetOrg: false
+      feedsToUse: config
+      nugetConfigPath: 'vz/NuGet.Config'
+
+  - task: DotNetCoreCLI@2
+    displayName: 'dotnet publish linux'
+    inputs:
+      command: publish
+      publishWebProjects: false
+      projects: '**/vz-cli.csproj'
+      arguments: '/p:VersionAssembly=$(vz.version) /p:Version=$(vz.version) /p:AssemblyVersion=$(vz.version) /p:VersionSuffix=$(vz.version.suffix) --version-suffix $(vz.version.suffix) /p:VisionSDKVersion=$(VisionSDKVersion) -r linux-x64 -c $(BuildConfiguration) --no-restore --no-build /p:PublishProfile="Properties\PublishProfiles\folder publish vz-cli release (linux-x64).pubxml"'
+      workingDirectory: vz
+      # outputDir: linux
+      zipAfterPublish: false
+      modifyOutputPath: true
+      includeNuGetOrg: false
+      feedsToUse: config
+      nugetConfigPath: 'vz/NuGet.Config'
+
+  # -----------------------------------------------------------------------------
+  # Copy all build ARTIFACTS for VZ to the staging directory
+  # -----------------------------------------------------------------------------
+  - task: CopyFiles@2
+    displayName: 'Copy Files to: $(build.artifactstagingdirectory) (vz)'
+    inputs:
+      SourceFolder: '$(system.defaultworkingdirectory)'
+      Contents: |
+        vz\**
+        !**/*.pdb
+      CleanTargetFolder: true
+      TargetFolder: '$(build.artifactstagingdirectory)'
+    condition: succeededOrFailed()
+
+  # -----------------------------------------------------------------------------
+  # Prepare the linux-x64 dotnet core binaries
+  # -----------------------------------------------------------------------------
+  - task: CopyFiles@2
+    displayName: 'Copy Files to: $(build.artifactstagingdirectory) (linux-x64 dotnet core binaries)'
+    inputs:
+      SourceFolder: '$(system.defaultworkingdirectory)'
+      FlattenFolders: true
+      Contents: |
+        # vz\bin\Release\netcoreapp3.1\publish\linux-x64\libMicrosoft.CognitiveServices.Speech.core.so
+        # vz\bin\Release\netcoreapp3.1\publish\linux-x64\libMicrosoft.CognitiveServices.Speech.extension.kws.so
+        # vz\bin\Release\netcoreapp3.1\publish\linux-x64\libMicrosoft.CognitiveServices.Speech.extension.lu.so
+        # vz\bin\Release\netcoreapp3.1\publish\linux-x64\libMicrosoft.CognitiveServices.Speech.extension.codec.so
+        # vz\bin\Release\netcoreapp3.1\publish\linux-x64\libMicrosoft.CognitiveServices.Speech.extension.silk_codec.so
+        # vz\bin\Release\netcoreapp3.1\publish\linux-x64\libMicrosoft.CognitiveServices.Speech.extension.audio.sys.so
+        # vz\bin\Release\netcoreapp3.1\publish\linux-x64\Microsoft.CognitiveServices.Speech.csharp.dll
+        vz\bin\Release\netcoreapp3.1\publish\linux-x64\Newtonsoft.Json.dll
+        vz\bin\Release\netcoreapp3.1\publish\linux-x64\vz
+        vz\bin\Release\netcoreapp3.1\publish\linux-x64\vz.dll
+        vz\bin\Release\netcoreapp3.1\publish\linux-x64\vz.runtimeconfig.json
+        vz\bin\Release\netcoreapp3.1\publish\linux-x64\System.Linq.Async.dll
+        vz\bin\Release\netcoreapp3.1\publish\linux-x64\System.Interactive.Async.dll
+        vz\LICENSE.txt
+        vz\THIRD_PARTY_NOTICE.txt
+      TargetFolder: '$(build.artifactstagingdirectory)\vz-netcore31-linux-x64'
+      preserveTimestamp: true
+
+  # -----------------------------------------------------------------------------
+  # Sign VZ binaries.
+  # -----------------------------------------------------------------------------
+  - task: SFP.build-tasks.custom-build-task-1.EsrpCodeSigning@1
+    displayName: 'Sign VZ (linux-x64 dotnet core binaries)'
+    inputs:
+      ConnectedServiceName: 'Speech SDK ESRP Signing Alternate'
+      FolderPath: '$(build.artifactstagingdirectory)\vz-netcore31-linux-x64'
+      Pattern: 'vz.dll'
+      signConfigType: inlineSignParams
+      inlineOperation: $(SIGN_PARAMS_DLL)
+    condition: succeeded()
+
+  # -----------------------------------------------------------------------------
+  # Prepare the win-x64 dotnet core binaries
+  # -----------------------------------------------------------------------------
+  - task: CopyFiles@2
+    displayName: 'Copy Files to: $(build.artifactstagingdirectory) (win-x64 dotnet core binaries)'
+    inputs:
+      SourceFolder: '$(system.defaultworkingdirectory)'
+      FlattenFolders: true
+      Contents: |
+        vz\bin\Release\netcoreapp3.1\publish\win-x64\Azure-AI-Vision-Native.dll
+        vz\bin\Release\netcoreapp3.1\publish\win-x64\Azure.AI.Vision.dll
+        vz\bin\Release\netcoreapp3.1\publish\win-x64\Newtonsoft.Json.dll
+        vz\bin\Release\netcoreapp3.1\publish\win-x64\vz.exe
+        vz\bin\Release\netcoreapp3.1\publish\win-x64\vz.dll
+        vz\bin\Release\netcoreapp3.1\publish\win-x64\vz.runtimeconfig.json
+        vz\bin\Release\netcoreapp3.1\publish\win-x64\System.Linq.Async.dll
+        vz\bin\Release\netcoreapp3.1\publish\win-x64\System.Interactive.Async.dll
+        vz\LICENSE.txt
+        vz\THIRD_PARTY_NOTICE.txt     
+      TargetFolder: '$(build.artifactstagingdirectory)\vz-netcore31-win-x64'
+      preserveTimestamp: true
+
+  # -----------------------------------------------------------------------------
+  # Sign VZ binaries.
+  # -----------------------------------------------------------------------------
+  - task: SFP.build-tasks.custom-build-task-1.EsrpCodeSigning@1
+    displayName: 'Sign VZ (win-x64 dotnet core binaries)'
+    inputs:
+      ConnectedServiceName: 'Speech SDK ESRP Signing Alternate'
+      FolderPath: '$(build.artifactstagingdirectory)\vz-netcore31-win-x64'
+      Pattern: 'vz.exe,vz.dll'
+      signConfigType: inlineSignParams
+      inlineOperation: $(SIGN_PARAMS_DLL)
+    condition: succeeded()
+
+  - task: DotNetCoreCLI@2
+    displayName: 'Create NuGet package (win-x64 dotnet core)'
+    inputs:
+      command: 'custom'
+      custom: 'pack'
+      arguments: '"vz-cli.csproj" /p:Version=$(vz.version) /p:PackageVersion=$(vz.version) --version-suffix $(vz.version.suffix) -c $(BuildConfiguration) -o $(Build.ArtifactStagingDirectory)/nupkg -p:IncludeSymbols=false --no-restore'
+      workingDirectory: vz
+      modifyOutputPath: true
+      includeNuGetOrg: false
+      feedsToUse: config
+      nugetConfigPath: 'vz/NuGet.Config'
+
+  # -----------------------------------------------------------------------------
+  # Sign VZ NuGet
+  # -----------------------------------------------------------------------------
+  - task: SFP.build-tasks.custom-build-task-1.EsrpCodeSigning@1
+    displayName: 'Sign VZ NuGet package'
+    inputs:
+      ConnectedServiceName: 'Speech SDK ESRP Signing Alternate'
+      FolderPath: '$(build.artifactstagingdirectory)/nupkg'
+      Pattern: 'Azure-AI-Vision-CLI-$(vz.version).nupkg'
+      signConfigType: inlineSignParams
+      inlineOperation: $(SIGN_PARAMS_NUGET)
+    condition: succeeded()
+
+  # -----------------------------------------------------------------------------
+  # Publish NuGet artifacts
+  # -----------------------------------------------------------------------------
+  - task: PublishBuildArtifacts@1
+    displayName: 'Publish Artifact: vz NuGet'
+    inputs:
+      PathtoPublish: '$(build.artifactstagingdirectory)/nupkg'
+      artifactName: Azure-AI-Vision-CLI-$(vz.version).nupkg
+    condition: succeededOrFailed()
+
+  # -----------------------------------------------------------------------------
+  # Create zip ARCHIVEs
+  - task: ArchiveFiles@2
+    inputs:
+      rootFolderOrFile: '$(build.artifactstagingdirectory)\vz-netcore31-linux-x64'
+      includeRootFolder: false
+      archiveType: 'zip'
+      archiveFile: '$(Build.ArtifactStagingDirectory)/zips/vz-netcore31-linux-x64.zip'
+      replaceExistingArchive: true
+
+  - task: ArchiveFiles@2
+    inputs:
+      rootFolderOrFile: '$(build.artifactstagingdirectory)\vz-netcore31-win-x64'
+      includeRootFolder: false
+      archiveType: 'zip'
+      archiveFile: '$(Build.ArtifactStagingDirectory)/zips/vz-netcore31-win-x64.zip'
+      replaceExistingArchive: true
+
+  # -----------------------------------------------------------------------------
+  # Publish ZIP artifacts
+  # -----------------------------------------------------------------------------
+  - task: PublishBuildArtifacts@1
+    displayName: 'Publish Artifact: zips'
+    inputs:
+      PathtoPublish: '$(build.artifactstagingdirectory)/zips'
+      artifactName: vz-zips
+    condition: succeededOrFailed()
+
+  # -----------------------------------------------------------------------------
+  # Publish **ALL** artifacts
+  # -----------------------------------------------------------------------------
+  - task: PublishBuildArtifacts@1
+    displayName: 'Publish Artifact: release'
+    inputs:
+      PathtoPublish: '$(build.artifactstagingdirectory)'
+      artifactName: vz-artifacts
+    condition: and(succeededOrFailed(), eq(variables['Debug.PublishArtifacts'], 'true'))
+
+  # -----------------------------------------------------------------------------
+  # Create top level zip file.
+  # -----------------------------------------------------------------------------
+  - task: ArchiveFiles@2
+    displayName: 'Create top level zip file.'
+    inputs:
+      rootFolderOrFile: '$(Build.ArtifactStagingDirectory)/zips'
+      includeRootFolder: false
+      archiveType: 'zip'
+      archiveFile: '$(Build.ArtifactStagingDirectory)/zips/vz-zips.zip'
+      replaceExistingArchive: true
+    condition: succeeded()
+
+  # Publish zip file to public drop folder in BlobStorage.
+  - task: AzureCLI@2
+    displayName: 'Publish zip file to drop folder in BlobStorage.'
+    condition: and(succeeded(), eq(variables['Publish.AzureBlob'], 'true'))
+    inputs:
+      azureSubscription: 'Carbon Dropper (CSSpeechStorage Drop)'
+      scriptType: batch
+      scriptLocation: inlineScript
+      inlineScript: |
+        for /f %%f in ('dir /q /b dir $(Build.ArtifactStagingDirectory)\zips\*.zip') do (
+          call az storage blob upload --subscription "Speech Services - DEV - Transcription" --account-name csspeechstorage --container-name "drop" -n "vz/$(vz.version).$(Build.BuildNumber)/%%f" -f "$(Build.ArtifactStagingDirectory)\zips\%%f"
+        )
+        if "$(UpdateLatest)" == "true" (
+          call az storage blob upload --subscription "Speech Services - DEV - Transcription" --account-name csspeechstorage --container-name "drop" -n "vz/latest/vz-zips.zip" -f "$(Build.ArtifactStagingDirectory)\zips\vz-zips.zip"
+        )
+
+# -----------------------------------------------------------------------------
+# Docker build and publish job, defintion, and all steps
+# -----------------------------------------------------------------------------
+- job: DockerBuildAndPush
+
+  dependsOn: Build
+  condition: and(succeeded(), eq(variables['build.docker'], 'true'))
+
+  pool:
+    name: SkymanUbuntu2004Hosted
+
+  steps:
+  - checkout: self
+
+  # -----------------------------------------------------------------------------
+  # Restore version variables if triggered from SDK Build
+  # -----------------------------------------------------------------------------
+  - script: 'env | sort'
+    displayName: "echo Environment variables"
+  - bash: |
+      set +x
+      echo "##vso[task.setvariable variable=TRIGGEREDBY_VISIONSDK_VERSION]${BUILD_TRIGGEREDBY_BUILDNUMBER}"
+      echo "##vso[task.setvariable variable=TRIGGEREDBY_VISIONSDK_VERSION_SUFFIX_ONLY]-${BUILD_TRIGGEREDBY_BUILDNUMBER##*-}"
+      echo "##vso[task.setvariable variable=TRIGGEREDBY_VISIONSDK_VERSION_VERSION_ONLY]${BUILD_TRIGGEREDBY_BUILDNUMBER%%-*}"
+    displayName: 'Restore version variables from triggering build (part 1)'
+    condition: eq(variables['Build.Reason'], 'BuildCompletion')
+  - bash: |
+      set +x
+      echo TRIGGEREDBY_VISIONSDK_VERSION=${TRIGGEREDBY_VISIONSDK_VERSION}
+      echo TRIGGEREDBY_VISIONSDK_VERSION_VERSION_ONLY=${TRIGGEREDBY_VISIONSDK_VERSION_VERSION_ONLY}
+      echo TRIGGEREDBY_VISIONSDK_VERSION_SUFFIX_ONLY=${TRIGGEREDBY_VISIONSDK_VERSION_SUFFIX_ONLY}
+      echo "##vso[task.setvariable variable=VisionSDKVersion]$(TRIGGEREDBY_VISIONSDK_VERSION)"
+      echo "##vso[task.setvariable variable=vz.version]$(TRIGGEREDBY_VISIONSDK_VERSION_VERSION_ONLY)"
+      echo "##vso[task.setvariable variable=vz.version.suffix]$(TRIGGEREDBY_VISIONSDK_VERSION_SUFFIX_ONLY)"
+    displayName: 'Restore version variables from triggering build (part 2)'
+    condition: eq(variables['Build.Reason'], 'BuildCompletion')
+  - script: 'env | sort'
+    displayName: "echo Environment variables 2"
+    condition: eq(variables['Build.Reason'], 'BuildCompletion')
+
+  # -----------------------------------------------------------------------------
+  # Login into docker registry
+  # -----------------------------------------------------------------------------
+  - task: Docker@2
+    displayName: Docker Login
+    inputs:
+      command: login
+      containerRegistry: $(DockerRegistryServiceConnection)
+
+  # -----------------------------------------------------------------------------
+  # Build the docker image
+  # -----------------------------------------------------------------------------
+  - task: Docker@2
+    displayName: Build VZ docker images
+    inputs:
+      command: build
+      containerRegistry: '$(DockerRegistryServiceConnection)'
+      repository: '$(DockerRepositoryName)'
+      arguments: --build-arg VZ_Version=$(vz.version).$(Build.BuildNumber)
+      tags: |
+        latest
+        $(vz.version).$(Build.BuildNumber)
+
+  # -----------------------------------------------------------------------------
+  # Publish the versioned docker image
+  # -----------------------------------------------------------------------------
+  - task: Docker@2
+    displayName: Push "versioned" VZ docker image
+    inputs:
+      command: push
+      containerRegistry: '$(DockerRegistryServiceConnection)'
+      repository: '$(DockerRepositoryName)'
+      tags: |
+        $(vz.version).$(Build.BuildNumber)        
+
+  # -----------------------------------------------------------------------------
+  # Publish the latest docker image
+  # -----------------------------------------------------------------------------
+  - task: Docker@2
+    displayName: Push "latest" VZ docker image
+    condition: and(succeeded(), eq(variables['UpdateLatest'], 'true'))
+    inputs:
+      command: push
+      containerRegistry: '$(DockerRegistryServiceConnection)'
+      repository: '$(DockerRepositoryName)'
+      tags: |
+        latest        

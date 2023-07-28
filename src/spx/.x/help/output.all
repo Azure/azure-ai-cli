@@ -1,0 +1,72 @@
+OUTPUT ALL help topic NOT YET WRITTEN (completely)!
+
+OUTPUT ALL
+
+  --output [all] file [name] FILENAME
+  --output [all] file type (json | tsv)
+
+  --output [all] tsv [file] has header (true | false)
+
+  --output [all] [audio] [input] id
+
+  --output [all] [recognizer] [session] [started] sessionid
+  --output [all] [recognizer] [session] stopped sessionid
+  --output [all] [recognizer] session [event] sessionid
+  --output [all] recognizer [event] sessionid
+  --output [all] [connection] connected sessionid
+  --output [all] [connection] disconnected sessionid
+  --output [all] connection [event] sessionid
+  --output all [event] sessionid
+
+  --output [all] [recognizer] recognizing sessionid
+  --output [all] [recognizer] recognizing [result] resultid
+  --output [all] [recognizer] recognizing [result] reason
+  --output [all] [recognizer] recognizing [result] text
+  --output [all] [recognizer] recognizing [result] offset
+  --output [all] [recognizer] recognizing [result] duration
+  --output [all] [recognizer] recognizing [result] latency
+  --output [all] [recognizer] recognizing [result] json
+  --output [all] [recognizer] recognized sessionid
+  --output [all] [recognizer] [recognized] [result] resultid
+  --output [all] [recognizer] [recognized] [result] reason
+  --output [all] [recognizer] [recognized] [result] text
+  --output [all] [recognizer] [recognized] [result] itn text
+  --output [all] [recognizer] [recognized] [result] lexical text
+  --output [all] [recognizer] [recognized] [result] offset
+  --output [all] [recognizer] [recognized] [result] duration
+  --output [all] [recognizer] [recognized] [result] latency
+  --output [all] [recognizer] [recognized] [result] json
+  --output [all] [recognizer] [canceled] error code
+  --output [all] [recognizer] [canceled] error details
+  --output [all] [recognizer] canceled error
+  --output [all] [recognizer] canceled reason
+
+  --output [all] [connection] message [received] path
+  --output [all] [connection] message [received] is binary message
+  --output [all] [connection] message [received] binary message size
+  --output [all] [connection] message [received] binary message
+  --output [all] [connection] message [received] is text message
+  --output [all] [connection] message [received] text [message]
+  --output [all] [connection] message [received] request id
+  --output [all] [connection] message [received] content type
+
+  --output [all] [recognizer] [session] started [events]
+  --output [all] [recognizer] [session] stopped [events]
+  --output [all] [recognizer] session [events]
+  --output [all] [connection] connected [events]
+  --output [all] [connection] disconnected [events]
+  --output [all] [connection] message received events
+  --output [all] connection [events]
+  --output [all] [recognizer] recognizing [events]
+  --output [all] [recognizer] recognized [events]
+  --output [all] [recognizer] canceled [events]
+  --output [all] recognizer [events]
+  --output all events
+
+  --output all [result] resultid
+  --output all [result] reason
+  --output all [result] text
+  --output all [result] offset
+  --output all [result] duration
+  --output all [result] latency
+  --output all [result] json

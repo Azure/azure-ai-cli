@@ -1,0 +1,18 @@
+TRANSCRIBE EXAMPLES
+
+  spx config transcribe @region --command transcribe --set centralus
+  spx config transcribe @key --command transcribe --region centralus --key PUT-YOUR-KEY-HERE
+
+  spx transcribe --conversation id GUID --file 8-channel-audio.wav
+
+PREVIEW NOTE
+
+  The Azure Conversational Transcription Service is currently in
+  PREVIEW. As a result, CTS does not support all regions or languages.
+
+    Supported regions: centralus, eastasia
+    Supported languages: en-US, zh-CN
+
+ADDITIONAL TOPICS
+
+  spx help transcribe

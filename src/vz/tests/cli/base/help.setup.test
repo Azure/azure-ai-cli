@@ -1,0 +1,4 @@
+﻿x.command=run
+run.input.vz.command=vz help setup
+run.input.process=vz
+run.output.expect=@help.setup.test.run.output.expected

@@ -1,0 +1,28 @@
+BATCH PROCESSES
+
+  The `--processes` option specifies the maximum number of
+  sub-processes to use when parallelizing tasks.
+
+  The `--ramp processes every` option can optionally be used to control
+  how quickly each new sub-process will be added to the pool. If this option
+  is not specified, the default will be 0 ms, and thus the maximum number of
+  processes will immediately be available to the pool.
+
+USAGE: spx batch [...] --processes NUMBER
+   OR: spx batch [...] --processes NUMBER --ramp processes every MILLISECONDS
+
+  WHERE: NUMBER represents the maximum number of processes to use/pool
+    AND: MILLISECONDS represents the number of milliseconds to wait before
+         ... adding each new process
+
+EXAMPLES
+
+  spx batch transcription list [...] --files --output urls @@file.urls.txt
+  spx batch transcription download --foreach file in @file.urls.txt --processes 10
+
+SEE ALSO
+
+  spx help batch foreach
+  spx help batch threads
+  spx help batch
+  

@@ -1,0 +1,3 @@
+﻿x.command=run
+run.input.spx.command=run --script echo --zip echo.zip
+run.input.process=spx

@@ -1,0 +1,20 @@
+CUSTOM SPEECH RECOGNITION PROJECT STATUS
+
+@include.the.csr.project.status.command
+
+USAGE: spx csr project status [...]
+
+CONNECTION                      (see: spx help csr connection)
+  --key KEY                     (see: spx help csr key)
+  --region REGION               (see: spx help csr region)
+
+STATUS
+  --project URL                 (see: spx help csr project status project)
+
+ADVANCED
+  --input path PATH             (see: spx help csr input path)
+  --output path PATH            (see: spx help csr output path)
+  --output json FILENAME        (see: spx help csr output json)
+  --foreach in @FILENAME        (see: spx help csr foreach)
+  --save FILENAME               (see: spx help csr save)
+  --zip ZIPFILE                 (see: spx help csr zip)

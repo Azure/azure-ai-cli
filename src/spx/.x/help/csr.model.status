@@ -1,0 +1,23 @@
+CUSTOM SPEECH RECOGNITION MODEL STATUS
+
+@include.the.csr.model.status.command
+
+USAGE: spx csr model status [...]
+
+CONNECTION                      (see: spx help csr connection)
+  --key KEY                     (see: spx help csr key)
+  --region REGION               (see: spx help csr region)
+
+STATUS
+  --model URL                   (see: spx help csr model status model)
+
+OUTPUT                          (see: spx help csr output)
+  --output json FILENAME        (see: spx help csr output json)
+  --wait [TIMEOUT]              (see: spx help csr wait)
+
+ADVANCED
+  --input path PATH             (see: spx help csr input path)
+  --output path PATH            (see: spx help csr output path)
+  --foreach in @FILENAME        (see: spx help csr foreach)
+  --save FILENAME               (see: spx help csr save)
+  --zip ZIPFILE                 (see: spx help csr zip)

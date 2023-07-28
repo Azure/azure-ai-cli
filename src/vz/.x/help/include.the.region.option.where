@@ -1,0 +1,5 @@
+  WHERE: REGION is the region for the vision resource
+     OR: FILENAME is a single line text file containing the REGION
+     OR: CONFIG-FILENAME is a single line text file in the following form:
+
+            service.config.region=REGION

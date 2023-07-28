@@ -1,0 +1,37 @@
+BATCH DOWNLOAD FILE
+
+  The `--file` option specifies which file to download from the service.
+
+USAGE: spx batch download [...] --file FILE-SELF-URL
+   OR: spx batch download [...] --file @FILENAME
+   OR: spx batch download [...] @CONFIG-FILENAME
+
+  WHERE: FILE-URL is the file identity reference found in FILE-JSON
+     OR: FILENAME is a single line text file containing the FILE-SELF-URL
+     OR: CONFIG-FILENAME is a single line text file in the following form:
+
+            batch.download.file=FILE-URL
+
+  NOTE: The FILE-URL is the "self" link in FILE-JSON:
+
+          { "self": "FILE-URL", ... }
+
+        FILE-JSON returned from the Azure Speech Service looks like:
+
+          { "values": [ FILE-JSON1, FILE-JSON2, ... ] }
+
+EXAMPLE
+
+  spx batch transcription list --output last url @@transcription-url.txt
+  spx batch transcription list --files --transcription @transcription-url.txt --output last url @@file-url.txt
+
+  spx batch transcription download --url @file-url.txt --output json file.json
+  spx batch transcription download --file @file-url.txt --output file file.contents
+
+SEE ALSO
+
+  spx help batch transcription list
+  spx help batch transcription download
+  spx help batch output
+  spx help batch
+  

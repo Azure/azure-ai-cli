@@ -1,0 +1,34 @@
+TRANSLATE REGION
+
+@include.the.translate.command
+
+@include.the.region.option
+
+USAGE: spx translate [...] --region REGION
+   OR: spx translate [...] --region @FILENAME
+   OR: spx translate [...] @CONFIG-FILENAME
+
+@include.the.region.option.where
+
+EXAMPLES
+
+  spx config translate @region --set westus2
+  spx config translate @key --set 436172626F6E20697320636F6F6C2121
+  spx translate --nodefaults --region @region --key @key --file hello.wav --target de
+
+  spx config translate @default.config --clear
+  spx config translate @default.config --add key @key
+  spx config translate @default.config --add region @region
+  spx translate --file hello.wav --target de
+
+  spx config translate @key --set 436172626F6E20697320636F6F6C2121 --region westus2
+  spx config translate @key --set 436172626F6E20697320636F6F6C2020 --region eastus
+  spx translate --foreach region in eastus;westus2 --key @@key --file hello.wav --target de
+
+SEE ALSO
+
+  spx help setup
+  spx help region overview
+  spx help translate connection
+  spx help translate key
+  spx help translate

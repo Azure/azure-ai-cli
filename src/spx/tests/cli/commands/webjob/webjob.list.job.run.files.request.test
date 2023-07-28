@@ -1,0 +1,4 @@
+﻿x.command=run
+run.input.spx.command=webjob list --endpoint ENDPOINT --password PASSWORD --user USERNAME --name JOBNAME --id ID --output request -
+run.input.process=spx
+run.output.expect=@webjob.list.job.run.files.request.test.run.output.expect

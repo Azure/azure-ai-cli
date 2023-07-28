@@ -1,0 +1,23 @@
+PROFILE OUTPUT
+
+@include.the.profile.command
+
+  The `--output` option specifies an output file path to be created/overwritten
+  with the data from the profile operation response
+
+USAGE: spx profile create [...] --output id PATH
+   OR: spx profile list [...] --output file PATH
+   OR: spx profile status [...] --output json PATH
+
+  WHERE: PATH represents a filename/path to be created or overwritten
+
+EXAMPLES
+
+  spx profile create --output id @my.id --kind TextIndependentVerification
+  spx profile list --output file @my.profile.ids --kind TextIndependentVerification
+  spx profile status --output json @my.id.status --kind TextIndependentVerification
+
+SEE ALSO
+
+  spx help profile
+  spx help profile examples

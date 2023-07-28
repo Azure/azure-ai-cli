@@ -1,0 +1,22 @@
+INTENT WORD LEVEL TIMING
+
+@include.the.intent.command
+
+  The `--word level timing` option requests word level timing
+  details in intent recognition results.
+
+USAGE: spx intent [...] --word level timing
+   OR: spx intent [...] @CONFIG-FILENAME
+
+  WHERE: CONFIG-FILENAME is a single line text file in the following form:
+
+      service.output.config.word.level.timing=true
+
+EXAMPLE
+
+  spx intent --file hello.wav --word level timing --output json
+
+SEE ALSO
+
+  see help intent output json
+  spx help intent

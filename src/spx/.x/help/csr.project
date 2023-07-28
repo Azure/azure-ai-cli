@@ -1,0 +1,21 @@
+CUSTOM SPEECH RECOGNITION PROJECT
+
+@include.the.csr.project.command
+
+USAGE: spx csr project <command> [...]
+
+COMMANDS
+
+  spx csr project create [...]        (see: spx help csr project create)
+  spx csr project status [...]        (see: spx help csr project status)
+  spx csr project list [...]          (see: spx help csr project list)
+
+  spx csr project update [...]        (see: spx help csr project update)
+  spx csr project delete [...]        (see: spx help csr project delete)
+
+ADDITIONAL TOPICS
+
+  spx help csr examples
+  spx help csr project examples
+  spx help csr list projects
+  spx help documentation

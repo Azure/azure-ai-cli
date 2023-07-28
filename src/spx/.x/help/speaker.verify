@@ -1,0 +1,27 @@
+SPEAKER VERIFY
+
+IMPORTANT: The verification audio sample must contain between 1 to 15 seconds of speech to be successful.
+
+  The `speaker verify` command verifies a speaker in a given audio sample against a voice profile. The returned JSON will have a "result" field with an "Accept" or "Reject" value.
+
+USAGE: spx speaker verify --id ID --file AUDIO_SAMPLE_FILE
+
+  CONNECTION                      (see: spx help speaker connection)
+    --key KEY                     (see: spx help speaker key)
+    --region REGION               (see: spx help speaker region)
+
+  INPUT
+    --id ID                       (see: spx help speaker id)
+    --file FILE                   (see: spx help speaker file)
+    --kind KIND                   (see: spx help speaker kind)
+
+  ADVANCED
+    --log FILENAME                (see: spx help speaker log)
+    --foreach in @ITEMS.txt       (see: spx help speaker foreach)
+    --threads NUMBER              (see: spx help speaker threads)
+
+SEE ALSO
+
+  spx help speaker identify
+  spx help speaker examples
+  spx help find topics speaker

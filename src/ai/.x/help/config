@@ -1,0 +1,22 @@
+CONFIG
+
+@include.the.config.command
+
+USAGE: ai config [HIVE] [COMMAND] [@FILE] [...]
+
+  --set [NAME=]VALUE            (see: ai help config set)
+  --clear NAME                  (see: ai help config clear)
+
+EXAMPLES
+
+  ai config @key
+  ai config --set key 436172626F6E20697320636F6F6C2121
+  ai config --set region westus2
+
+SEE ALSO
+
+  ai help init
+  ai help setup
+  ai help config advanced
+  ai help config examples
+  ai help find topics config

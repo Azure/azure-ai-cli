@@ -1,0 +1,30 @@
+# IMAGE EXAMPLES
+# 
+#   `INIT`: Automatically setup vz with REGION, KEY and ENDPOINT default values
+# 
+#     vz init
+# 
+#   `SETUP`: Manually setup vz with REGION, KEY, and ENDPOINT default values
+# 
+#     vz config image --set region westus2
+#     vz config image --set key 436172626F6E20697320636F6F6C2121
+#     vz config image --set endpoint https://...
+# 
+#   `EXAMPLE 1`: Recognizes text found in an image captured from default device camera
+# 
+#     vz image read --camera --once
+# 
+#   `EXAMPLE 2`: Recognizes text found in an image from a local JPG file
+# 
+#     vz image read --file image1.jpg
+# 
+#   `EXAMPLE 3`: Recognizes text found in images from multiple files using wildcards
+# 
+#     vz image read --files *.jpg
+# 
+# ADDITIONAL TOPICS
+# 
+#   vz help setup
+#   vz help image read
+#   vz help image read advanced
+# 

@@ -1,0 +1,187 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+
+  <PropertyGroup>
+    <DefaultPublicVisionSDKVersion>0.6.0</DefaultPublicVisionSDKVersion>
+    <VisionSDKVersion Condition="'$(VisionSDKVersion)' == ''">$(DefaultPublicVisionSDKVersion)</VisionSDKVersion>
+    <ErrorOnDuplicatePublishOutputFiles>false</ErrorOnDuplicatePublishOutputFiles>
+  </PropertyGroup>
+
+  <Choose>
+    <When Condition="'$(LocalBuildSDKBinPath)' == ''">
+      <ItemGroup>
+        <PackageReference Include="Azure.AI.Vision.ImageAnalysis" Version="[$(VisionSDKVersion)]" />
+        <PackageReference Include="Azure.AI.Vision.CustomAnalysis" Version="[$(VisionSDKVersion)]" />
+        <PackageReference Include="Azure.AI.Vision.FaceAnalysis" Version="[$(VisionSDKVersion)]" />
+      </ItemGroup>
+    </When>
+    <Otherwise>
+      <Choose>
+        <When Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+          <ItemGroup>
+            <Reference Include="Azure.AI.Vision.Common">
+              <HintPath Condition="Exists('$(LocalBuildSDKBinPath)\Release\Azure.AI.Vision.Common.dll')">$(LocalBuildSDKBinPath)\Release\Azure.AI.Vision.Common.dll</HintPath>
+              <HintPath Condition="!Exists('$(LocalBuildSDKBinPath)\Release\Azure.AI.Vision.Common.dll')">$(LocalBuildSDKBinPath)\Release\netstandard2.0\Azure.AI.Vision.Common.dll</HintPath>
+            </Reference>
+            <Reference Include="Azure.AI.Vision.ImageAnalysis">
+              <HintPath Condition="Exists('$(LocalBuildSDKBinPath)\Release\Azure.AI.Vision.ImageAnalysis.dll')">$(LocalBuildSDKBinPath)\Release\Azure.AI.Vision.ImageAnalysis.dll</HintPath>
+              <HintPath Condition="!Exists('$(LocalBuildSDKBinPath)\Release\Azure.AI.Vision.ImageAnalysis.dll')">$(LocalBuildSDKBinPath)\Release\netstandard2.0\Azure.AI.Vision.ImageAnalysis.dll</HintPath>
+            </Reference>
+            <Reference Include="Azure.AI.Vision.CustomAnalysis">
+              <HintPath Condition="Exists('$(LocalBuildSDKBinPath)\Release\Azure.AI.Vision.CustomAnalysis.dll')">$(LocalBuildSDKBinPath)\Release\Azure.AI.Vision.CustomAnalysis.dll</HintPath>
+              <HintPath Condition="!Exists('$(LocalBuildSDKBinPath)\Release\Azure.AI.Vision.CustomAnalysis.dll')">$(LocalBuildSDKBinPath)\Release\netstandard2.0\Azure.AI.Vision.CustomAnalysis.dll</HintPath>
+            </Reference>
+            <Reference Include="Azure.AI.Vision.FaceAnalysis">
+              <HintPath Condition="Exists('$(LocalBuildSDKBinPath)\Release\Azure.AI.Vision.FaceAnalysis.dll')">$(LocalBuildSDKBinPath)\Release\Azure.AI.Vision.FaceAnalysis.dll</HintPath>
+              <HintPath Condition="!Exists('$(LocalBuildSDKBinPath)\Release\Azure.AI.Vision.FaceAnalysis.dll')">$(LocalBuildSDKBinPath)\Release\netstandard2.0\Azure.AI.Vision.FaceAnalysis.dll</HintPath>
+            </Reference>
+            <None Include="$(LocalBuildSDKBinPath)\Release\Azure-AI-Vision-Native.*">
+              <Link>%(Filename)%(Extension)</Link>
+              <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+            </None>
+            <None Include="$(LocalBuildSDKBinPath)\Release\Azure-AI-Vision-extension*.*">
+              <Link>%(Filename)%(Extension)</Link>
+              <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+            </None>
+            <None Include="$(LocalBuildSDKBinPath)\Release\Azure-AI-Vision-Input*.*">
+              <Link>%(Filename)%(Extension)</Link>
+              <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+            </None>
+            <None Include="$(LocalBuildSDKBinPath)\Release\Vision*.*">
+              <Link>%(Filename)%(Extension)</Link>
+              <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+            </None>
+            <None Include="$(LocalBuildSDKBinPath)\Release\turbojpeg*.*">
+              <Link>%(Filename)%(Extension)</Link>
+              <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+            </None>
+          </ItemGroup>
+        </When>
+        <When Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+          <ItemGroup>
+            <Reference Include="Azure.AI.Vision.Common">
+              <HintPath Condition="Exists('$(LocalBuildSDKBinPath)\Debug\Azure.AI.Vision.Common.dll')">$(LocalBuildSDKBinPath)\Debug\Azure.AI.Vision.Common.dll</HintPath>
+              <HintPath Condition="!Exists('$(LocalBuildSDKBinPath)\Debug\Azure.AI.Vision.Common.dll')">$(LocalBuildSDKBinPath)\Debug\netstandard2.0\Azure.AI.Vision.Common.dll</HintPath>
+            </Reference>
+            <Reference Include="Azure.AI.Vision.ImageAnalysis">
+              <HintPath Condition="Exists('$(LocalBuildSDKBinPath)\Debug\Azure.AI.Vision.ImageAnalysis.dll')">$(LocalBuildSDKBinPath)\Debug\Azure.AI.Vision.ImageAnalysis.dll</HintPath>
+              <HintPath Condition="!Exists('$(LocalBuildSDKBinPath)\Debug\Azure.AI.Vision.ImageAnalysis.dll')">$(LocalBuildSDKBinPath)\Debug\netstandard2.0\Azure.AI.Vision.ImageAnalysis.dll</HintPath>
+            </Reference>
+            <Reference Include="Azure.AI.Vision.CustomAnalysis">
+              <HintPath Condition="Exists('$(LocalBuildSDKBinPath)\Debug\Azure.AI.Vision.CustomAnalysis.dll')">$(LocalBuildSDKBinPath)\Debug\Azure.AI.Vision.CustomAnalysis.dll</HintPath>
+              <HintPath Condition="!Exists('$(LocalBuildSDKBinPath)\Debug\Azure.AI.Vision.CustomAnalysis.dll')">$(LocalBuildSDKBinPath)\Debug\netstandard2.0\Azure.AI.Vision.CustomAnalysis.dll</HintPath>
+            </Reference>
+            <Reference Include="Azure.AI.Vision.FaceAnalysis">
+              <HintPath Condition="Exists('$(LocalBuildSDKBinPath)\Debug\Azure.AI.Vision.FaceAnalysis.dll')">$(LocalBuildSDKBinPath)\Debug\Azure.AI.Vision.FaceAnalysis.dll</HintPath>
+              <HintPath Condition="!Exists('$(LocalBuildSDKBinPath)\Debug\Azure.AI.Vision.FaceAnalysis.dll')">$(LocalBuildSDKBinPath)\Debug\netstandard2.0\Azure.AI.Vision.FaceAnalysis.dll</HintPath>
+            </Reference>
+            <None Include="$(LocalBuildSDKBinPath)\Debug\Azure-AI-Vision-Native*.*">
+              <Link>%(Filename)%(Extension)</Link>
+              <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+            </None>
+            <None Include="$(LocalBuildSDKBinPath)\Debug\Azure-AI-Vision-extension*.*">
+              <Link>%(Filename)%(Extension)</Link>
+              <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+            </None>
+            <None Include="$(LocalBuildSDKBinPath)\Debug\Azure-AI-Vision-Input*.*">
+              <Link>%(Filename)%(Extension)</Link>
+              <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+            </None>
+            <None Include="$(LocalBuildSDKBinPath)\Debug\Vision*.*">
+              <Link>%(Filename)%(Extension)</Link>
+              <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+            </None>
+            <None Include="$(LocalBuildSDKBinPath)\Debug\turbojpeg*.*">
+              <Link>%(Filename)%(Extension)</Link>
+              <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+            </None>
+          </ItemGroup>
+        </When>
+        <When Condition="$(Configuration.Contains('ReleaseUnixOS'))">
+          <ItemGroup>
+            <Reference Include="Azure.AI.Vision.Common">
+              <HintPath>$(LocalBuildSDKBinPath)/ReleaseUnixOS/netstandard2.0/Azure.AI.Vision.Common.dll</HintPath>
+            </Reference>
+            <Reference Include="Azure.AI.Vision.ImageAnalysis">
+              <HintPath>$(LocalBuildSDKBinPath)/ReleaseUnixOS/netstandard2.0/Azure.AI.Vision.ImageAnalysis.dll</HintPath>
+            </Reference>
+            <Reference Include="Azure.AI.Vision.CustomAnalysis">
+              <HintPath>$(LocalBuildSDKBinPath)/ReleaseUnixOS/netstandard2.0/Azure.AI.Vision.CustomAnalysis.dll</HintPath>
+            </Reference>
+            <Reference Include="Azure.AI.Vision.FaceAnalysis">
+              <HintPath>$(LocalBuildSDKBinPath)/ReleaseUnixOS/netstandard2.0/Azure.AI.Vision.FaceAnalysis.dll</HintPath>
+            </Reference>
+            <None Include="$(LocalBuildSDKBinPath)/../lib/*Azure-AI-Vision-Native*.*">
+              <Link>%(Filename)%(Extension)</Link>
+              <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+            </None>
+            <None Include="$(LocalBuildSDKBinPath)/../lib/*Azure-AI-Vision-extension*.*">
+              <Link>%(Filename)%(Extension)</Link>
+              <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+            </None>
+            <None Include="$(LocalBuildSDKBinPath)/../lib/*Azure-AI-Vision-Input*.*">
+              <Link>%(Filename)%(Extension)</Link>
+              <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+            </None>
+            <None Include="$(LocalBuildSDKBinPath)/../lib/*Vision*.*">
+              <Link>%(Filename)%(Extension)</Link>
+              <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+            </None>
+            <None Include="$(LocalBuildSDKBinPath)/../lib/*turbojpeg*.*">
+              <Link>%(Filename)%(Extension)</Link>
+              <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+            </None>
+          </ItemGroup>
+        </When>
+        <When Condition="$(Configuration.Contains('DebugUnixOS'))">
+          <ItemGroup>
+            <Reference Include="Azure.AI.Vision.Common">
+              <HintPath>$(LocalBuildSDKBinPath)/DebugUnixOS/netstandard2.0/Azure.AI.Vision.Common.dll</HintPath>
+            </Reference>
+            <Reference Include="Azure.AI.Vision.ImageAnalysis">
+              <HintPath>$(LocalBuildSDKBinPath)/DebugUnixOS/netstandard2.0/Azure.AI.Vision.ImageAnalysis.dll</HintPath>
+            </Reference>
+            <Reference Include="Azure.AI.Vision.CustomAnalysis">
+              <HintPath>$(LocalBuildSDKBinPath)/DebugUnixOS/netstandard2.0/Azure.AI.Vision.CustomAnalysis.dll</HintPath>
+            </Reference>
+            <Reference Include="Azure.AI.Vision.FaceAnalysis">
+              <HintPath>$(LocalBuildSDKBinPath)/DebugUnixOS/netstandard2.0/Azure.AI.Vision.FaceAnalysis.dll</HintPath>
+            </Reference>
+            <None Include="$$(LocalBuildSDKBinPath)/../lib/*Azure-AI-Vision-Native*.*">
+              <Link>%(Filename)%(Extension)</Link>
+              <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+            </None>
+            <None Include="$(LocalBuildSDKBinPath)/../lib/*Azure-AI-Vision-extension*.*">
+              <Link>%(Filename)%(Extension)</Link>
+              <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+            </None>
+            <None Include="$(LocalBuildSDKBinPath)/../lib/*Azure-AI-Vision-Input*.*">
+              <Link>%(Filename)%(Extension)</Link>
+              <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+            </None>
+            <None Include="$(LocalBuildSDKBinPath)/../lib/*Vision*.*">
+              <Link>%(Filename)%(Extension)</Link>
+              <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+            </None>
+            <None Include="$(LocalBuildSDKBinPath)/../lib/*turbojpeg*.*">
+              <Link>%(Filename)%(Extension)</Link>
+              <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+            </None>
+          </ItemGroup>
+        </When>
+      </Choose>
+    </Otherwise>
+  </Choose>
+
+  <PropertyGroup>
+    <CLIAssemblyVersion Condition="'$(CLIAssemblyVersion)' == ''">$(VisionSDKVersion)</CLIAssemblyVersion>
+    <CLIAssemblyInformationalVersion Condition="'$(CLIAssemblyInformationalVersion)' == ''">$(CLIAssemblyVersion)</CLIAssemblyInformationalVersion>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <FileVersion>$(CLIAssemblyVersion)</FileVersion>
+    <AssemblyVersion>$(CLIAssemblyVersion)</AssemblyVersion>
+    <InformationalVersion>$(CLIAssemblyInformationalVersion)</InformationalVersion>
+  </PropertyGroup>
+
+</Project>

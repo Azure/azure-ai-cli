@@ -1,0 +1,25 @@
+INTENT PATTERN
+
+@include.the.intent.command
+
+  The `--pattern` option specifies a single intent PATTERN to recognize,
+  optionally containing one or more ENTITIES.
+
+USAGE: spx intent [...] --pattern PATTERN
+   OR: spx intent [...] --pattern INTENTID=PATTERN
+
+  WHERE: PATTERN represents a phrase to be recognized
+     OR: INTENTID represents the identifier that will symbolize the pattern
+
+  NOTE: ENTITIES are indicated by enclosing the ENTITY name inside `{` and `}`
+
+EXAMPLES
+
+  spx intent --pattern "Start {app}" --output app entity
+  spx intent --pattern "START=Start {app}" --output intentid --output app entity
+
+SEE ALSO
+
+  spx help intent patterns
+  spx help intent output
+  spx help intent

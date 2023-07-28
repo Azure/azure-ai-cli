@@ -1,0 +1,171 @@
+RECOGNIZE OUTPUT EXAMPLES
+
+  spx recognize [...] --output all audio id
+  spx recognize [...] --output all sessionid
+  spx recognize [...] --output all resultid
+  spx recognize [...] --output all reason
+  spx recognize [...] --output all text
+  spx recognize [...] --output all itn text
+  spx recognize [...] --output all lexical text
+  spx recognize [...] --output all offset
+  spx recognize [...] --output all duration
+  spx recognize [...] --output all latency
+  spx recognize [...] --output all json
+
+  spx recognize [...] --output each audio id
+  spx recognize [...] --output each sessionid
+  spx recognize [...] --output each resultid
+  spx recognize [...] --output each reason
+  spx recognize [...] --output each text
+  spx recognize [...] --output each itn text
+  spx recognize [...] --output each lexical text
+  spx recognize [...] --output each offset
+  spx recognize [...] --output each duration
+  spx recognize [...] --output each latency
+  spx recognize [...] --output each json
+
+  spx recognize [...] --output all result resultid
+  spx recognize [...] --output all result reason
+  spx recognize [...] --output all result text
+  spx recognize [...] --output all result offset
+  spx recognize [...] --output all result duration
+  spx recognize [...] --output all result latency
+  spx recognize [...] --output all result json
+
+  spx recognize [...] --output each result resultid
+  spx recognize [...] --output each result reason
+  spx recognize [...] --output each result text
+  spx recognize [...] --output each result offset
+  spx recognize [...] --output each result duration
+  spx recognize [...] --output each result latency
+  spx recognize [...] --output each result json
+
+  spx recognize [...] --output all events
+  spx recognize [...] --output all event sessionid
+
+  spx recognize [...] --output each event
+  spx recognize [...] --output each event sessionid
+
+  spx recognize [...] --output all connection events
+  spx recognize [...] --output all connection event sessionid
+  spx recognize [...] --output all connection connected events
+  spx recognize [...] --output all connection connected sessionid
+  spx recognize [...] --output all connection disconnected events
+  spx recognize [...] --output all connection disconnected sessionid
+
+  spx recognize [...] --output each connection event
+  spx recognize [...] --output each connection event sessionid
+  spx recognize [...] --output each connection connected event
+  spx recognize [...] --output each connection connected sessionid
+  spx recognize [...] --output each connection disconnected event
+  spx recognize [...] --output each connection disconnected sessionid
+
+  spx recognize [...] --output all recognizer events
+  spx recognize [...] --output all recognizer event sessionid
+
+  spx recognize [...] --output each recognizer event
+  spx recognize [...] --output each recognizer event sessionid
+
+  spx recognize [...] --output all recognizer session events
+  spx recognize [...] --output all recognizer session event sessionid
+  spx recognize [...] --output all recognizer session started events
+  spx recognize [...] --output all recognizer session started sessionid
+  spx recognize [...] --output all recognizer session stopped events
+  spx recognize [...] --output all recognizer session stopped sessionid
+
+  spx recognize [...] --output each recognizer session event
+  spx recognize [...] --output each recognizer session event sessionid
+  spx recognize [...] --output each recognizer session started event
+  spx recognize [...] --output each recognizer session started sessionid
+  spx recognize [...] --output each recognizer session stopped event
+  spx recognize [...] --output each recognizer session stopped sessionid
+
+  spx recognize [...] --output all connection message received events
+  spx recognize [...] --output all connection message received binary message
+  spx recognize [...] --output all connection message received binary message size
+  spx recognize [...] --output all connection message received content type
+  spx recognize [...] --output all connection message received is binary message
+  spx recognize [...] --output all connection message received is text message
+  spx recognize [...] --output all connection message received path
+  spx recognize [...] --output all connection message received request id
+  spx recognize [...] --output all connection message received text message
+
+  spx recognize [...] --output each connection message received event
+  spx recognize [...] --output each connection message received binary message
+  spx recognize [...] --output each connection message received binary message size
+  spx recognize [...] --output each connection message received content type
+  spx recognize [...] --output each connection message received is binary message
+  spx recognize [...] --output each connection message received is text message
+  spx recognize [...] --output each connection message received path
+  spx recognize [...] --output each connection message received request id
+  spx recognize [...] --output each connection message received text message
+
+  spx recognize [...] --output all recognizer canceled events
+  spx recognize [...] --output all recognizer canceled error
+  spx recognize [...] --output all recognizer canceled error code
+  spx recognize [...] --output all recognizer canceled error details
+  spx recognize [...] --output all recognizer canceled reason
+
+  spx recognize [...] --output each recognizer canceled event
+  spx recognize [...] --output each recognizer canceled error
+  spx recognize [...] --output each recognizer canceled error code
+  spx recognize [...] --output each recognizer canceled error details
+  spx recognize [...] --output each recognizer canceled reason
+
+  spx recognize [...] --output all recognizer recognized events
+  spx recognize [...] --output all recognizer recognized sessionid
+  spx recognize [...] --output all recognizer recognized result resultid
+  spx recognize [...] --output all recognizer recognized result reason
+  spx recognize [...] --output all recognizer recognized result text
+  spx recognize [...] --output all recognizer recognized result itn text
+  spx recognize [...] --output all recognizer recognized result lexical text
+  spx recognize [...] --output all recognizer recognized result offset
+  spx recognize [...] --output all recognizer recognized result duration
+  spx recognize [...] --output all recognizer recognized result latency
+  spx recognize [...] --output all recognizer recognized result json
+
+  spx recognize [...] --output each recognizer recognized event
+  spx recognize [...] --output each recognizer recognized sessionid
+  spx recognize [...] --output each recognizer recognized result resultid
+  spx recognize [...] --output each recognizer recognized result reason
+  spx recognize [...] --output each recognizer recognized result text
+  spx recognize [...] --output each recognizer recognized result itn text
+  spx recognize [...] --output each recognizer recognized result lexical text
+  spx recognize [...] --output each recognizer recognized result offset
+  spx recognize [...] --output each recognizer recognized result duration
+  spx recognize [...] --output each recognizer recognized result latency
+  spx recognize [...] --output each recognizer recognized result json
+
+  spx recognize [...] --output all recognizer recognizing events
+  spx recognize [...] --output all recognizer recognizing sessionid
+  spx recognize [...] --output all recognizer recognizing result resultid
+  spx recognize [...] --output all recognizer recognizing result reason
+  spx recognize [...] --output all recognizer recognizing result text
+  spx recognize [...] --output all recognizer recognizing result offset
+  spx recognize [...] --output all recognizer recognizing result duration
+  spx recognize [...] --output all recognizer recognizing result latency
+  spx recognize [...] --output all recognizer recognizing result json
+
+  spx recognize [...] --output each recognizer recognizing event
+  spx recognize [...] --output each recognizer recognizing sessionid
+  spx recognize [...] --output each recognizer recognizing result resultid
+  spx recognize [...] --output each recognizer recognizing result reason
+  spx recognize [...] --output each recognizer recognizing result text
+  spx recognize [...] --output each recognizer recognizing result offset
+  spx recognize [...] --output each recognizer recognizing result duration
+  spx recognize [...] --output each recognizer recognizing result latency
+  spx recognize [...] --output each recognizer recognizing result json
+
+  spx recognize [...] --output all file type json
+  spx recognize [...] --output all file output.json
+
+  spx recognize [...] --output each file type json
+  spx recognize [...] --output each file output.json
+
+  spx recognize [...] --output all file type tsv 
+  spx recognize [...] --output all file output.tsv
+  spx recognize [...] --output all tsv file has header false
+
+  spx recognize [...] --output each file type tsv
+  spx recognize [...] --output each file output.tsv
+  spx recognize [...] --output each tsv file has header false

@@ -1,0 +1,27 @@
+CONFIG CLEAR
+
+@include.the.config.command
+
+  The `--clear` option removes AI configuration data from
+  an existing AI configuration datastore file.
+
+USAGE: ai config --clear NAME
+   OR: ai config @NAME --clear
+   OR: ai config @CONFIG-FILENAME --clear
+
+  WHERE: NAME represents the name of the VALUE to clear
+     OR: CONFIG-FILENAME is the name of the configuration file to remove
+
+EXAMPLES
+
+  ai config @my.files --clear
+  ai config @my.files --add prompt1.txt
+  ai config @my.files --add prompt2.txt
+  ai complete --files @my.files
+
+SEE ALSO
+
+  ai help config
+  ai help config add
+  ai help config set
+  ai help config hive

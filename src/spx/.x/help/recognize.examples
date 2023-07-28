@@ -1,0 +1,55 @@
+RECOGNIZE EXAMPLES
+
+  `INIT`: Automatically setup spx with REGION and KEY default values
+
+    spx init
+
+  `SETUP`: Manually setup spx with REGION and KEY default values
+
+    spx config recognize @region --set westus2
+    spx config recognize @key --set 436172626F6E20697320636F6F6C2121
+
+  `EXAMPLE 1`: Recognize speech from a microphone
+  
+    spx recognize --microphone
+
+  `EXAMPLE 2`: Recognize speech from local WAV file, or remote MP3 file
+
+    spx recognize --file hello.wav
+    spx recognize --file https://crbn.us/hello.mp3 --format mp3
+
+  `EXAMPLE 3`: Recognize speech from multiple files using wildcards
+
+    spx recognize --files *.wav
+
+  `EXAMPLE 4`: Recognize speech in audio file content piped thru STDIN
+
+    spx synthesize --text "Hello" --audio output - --quiet | spx recognize --file -
+
+  `EXAMPLE 5`: Improve speech recognition accuracy with phrase lists
+
+    spx recognize --files *.wav --phrases "Hello;Hi;Howya doin"
+
+  `EXAMPLE 6`: Recognize multiple files from TSV file with file names and transcriptions
+
+    spx recognize --foreach file;transcript in @filelist.txt --check wer eq 0
+
+    WHERE: `filelist.txt` is the filename for a file containing tab delimited content:
+
+      audioFileName1 \t transcript1
+      audioFileName2 \t transcript2
+
+  `EXAMPLE 7`: Recognize multiple files listed in a TSV file with file ids and transcriptions
+
+    spx recognize --foreach id;transcript in @filelist.txt --check wer eq 0
+
+    WHERE: `filelist.txt` is the filename for a file containing tab delimited content:
+
+      audioFileNameNoExtension1 \t transcript1
+      audioFileNameNoExtension2 \t transcript2
+
+ADDITIONAL TOPICS
+
+  spx help setup
+  spx help recognize advanced
+  spx help recognize

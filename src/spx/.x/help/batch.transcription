@@ -1,0 +1,30 @@
+  ______ ___ _  __
+ /  ___// _ \ \/ /
+ \___ \/ ___/   <
+/____ /_/  /__/\_\
+
+USAGE: spx batch transcription <command> [...]
+
+BATCH TRANSCRIPTION
+
+  The `spx batch transcription` command manages Azure Speech Service
+  batch transcriptions.
+
+COMMANDS
+
+  spx batch transcription create [...]          (see: spx help batch transcription create)
+  spx batch transcription status [...]          (see: spx help batch transcription status)
+
+  spx batch transcription list [...]            (see: spx help batch transcription list)
+  spx batch transcription download [...]        (see: spx help batch transcription download)
+
+  spx batch transcription update [...]          (see: spx help batch transcription update)
+  spx batch transcription delete [...]          (see: spx help batch transcription delete)
+
+  spx batch transcription onprem [...]          (see: spx help batch transcription onprem)
+
+ADDITIONAL TOPICS
+
+  spx help setup
+  spx help batch transcription examples
+  spx help find topics batch transcription

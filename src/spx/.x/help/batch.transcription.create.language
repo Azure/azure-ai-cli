@@ -1,0 +1,36 @@
+BATCH TRANSCRIPTION CREATE LANGUAGE
+
+  The `spx batch transcription create` command creates new
+  requests to transcribe remote audio streams.
+
+  The `--language` option specifies a single spoken LANGUAGE in BCP-47 format. 
+  
+  For a full list of supported languages, see https://aka.ms/speech/languages
+
+  If no language is specified, the default will be en-US.
+
+USAGE: spx batch transcription create [...] --language LANGUAGE
+   OR: spx batch transcription create [...] --language @FILENAME
+   OR: spx batch transcription create [...] @CONFIG-FILENAME
+
+  WHERE: LANGUAGE is the spoken language in BCP-47 format
+     OR: FILENAME is a single line text file containing the LANGUAGE
+     OR: CONFIG-FILENAME is a single line text file in the following form:
+
+            batch.transcription.language=LANGUAGE
+
+EXAMPLES
+
+  spx batch transcription create [...] --language de-DE
+
+  spx config @my.language --set de-DE
+  spx batch transcription create [...] --language @my.language
+
+  spx config @transcription.details --set name "My transcription"
+  spx config @transcription.details --add language de-DE
+  spx batch transcription create @transcription.details --content http://crbn.us/hello.wav
+
+SEE ALSO
+
+  spx help config advanced
+  spx help batch transcription create

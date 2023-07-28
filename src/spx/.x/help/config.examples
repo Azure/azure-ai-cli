@@ -1,0 +1,40 @@
+CONFIG EXAMPLES
+
+  `EXAMPLE 1`: Set the default subscription key and region
+
+    spx config @key --set 436172626F6E20697320636F6F6C2121
+    spx config @region --set westus2
+
+  `EXAMPLE 2`: Recognize multiple files from a file list
+
+    spx config @my.files --clear
+    spx config @my.files --add hello.wav
+    spx config @my.files --add howareyou.wav
+    spx recognize @defaults --files @my.files
+
+  `EXAMPLE 3`: Set the default subscription keys for specific regions
+
+    spx config @key --set 436172626F6E20697320636F6F6C2121 --region westus2
+    spx config @key --set 436172626F6E20697320636F6F6C2020 --region eastus
+
+    spx config @region --set westus2
+    spx config recognize @region --set eastus
+
+  `EXAMPLE 4`: Set the default subscription keys for a specific command
+
+    spx config synthesize @region --set westus2
+    spx config synthesize @key --set 436172626F6E20697320636F6F6C2121
+    
+  `EXAMPLE 5`: Update default.output for recognize command
+
+    spx config recognize @default.output --clear
+    spx config recognize @default.output --add output.id true
+    spx config recognize @default.output --add output.text true
+
+  `EXAMPLE 6`: Disable all defaults for all commands
+
+    spx config @spx.defaults --set @@none
+
+ADDITIONAL TOPICS
+
+  spx help config

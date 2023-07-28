@@ -1,0 +1,33 @@
+FACE VERIFY
+
+@include.the.face.verify.command.long
+
+USAGE: vz face verify [...]
+
+  CONNECTION                      (see: vz help face verify connection)
+    --key KEY                     (see: vz help face verify key)
+    --region REGION               (see: vz help face verify region)
+    --endpoint ENDPOINT           (see: vz help face verify endpoint)
+
+  INPUT                           (see: vz help face verify input)
+    --camera                      (see: vz help face verify camera)
+    --file FILE                   (see: vz help face verify file)
+    --files PATTERN               (see: vz help face verify files)
+    --files @FILELIST.txt         (see: vz help face verify files)
+
+  ANALYSIS
+    --once[+]                     (see: vz help face verify once)
+    --continuous                  (see: vz help face verify continuous)
+
+  ADVANCED
+    --log FILENAME                (see: vz help face verify log)
+    --proxy HOSTNAME              (see: vz help face verify proxy)
+    --foreach in @ITEMS.txt       (see: vz help face verify foreach)
+    --threads NUMBER              (see: vz help face verify threads)
+
+SEE ALSO
+
+  vz help setup
+  vz help face verify examples
+  vz help face verify output
+  vz help find topics face verify

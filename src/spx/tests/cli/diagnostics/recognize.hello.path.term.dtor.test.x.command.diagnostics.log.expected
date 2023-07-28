@@ -1,0 +1,20 @@
+﻿usp_connection\.cpp.* Response Message: path: turn\.start
+usp_connection\.cpp.* Response Message: path: speech\.startDetected
+usp_connection\.cpp:.* Response Message: path: speech\.hypothesis
+usp_connection\.cpp:.* Response Message: path: speech\.phrase
+usp_connection\.cpp:.* Response Message: path: speech\.endDetected
+usp_connection\.cpp:.* Response Message: path: speech\.phrase
+usp_connection\.cpp:.* Response Message: path: turn\.end
+_ENTER:.* CSpxRecognizer::~CSpxRecognizer
+.._ENTER:.* CSpxRecognizer::TermDefaultSession
+...._ENTER:.* CSpxAudioStreamSession::Term
+......_ENTER:.* Terminating CSpxUspRecoEngineAdapter
+........CSpxUspRecoEngineAdapter::Term
+........_ENTER:.*CSpxWebSocket::~CSpxWebSocket
+........_EXIT:.* CSpxWebSocket::~CSpxWebSocket
+......_EXIT:.* Terminating CSpxUspRecoEngineAdapter
+......_ENTER:.* CSpxUspRecoEngineAdapter::~CSpxUspRecoEngineAdapter
+......_EXIT:.* CSpxUspRecoEngineAdapter::~CSpxUspRecoEngineAdapter
+...._EXIT:.* CSpxAudioStreamSession::Term
+.._EXIT:.* CSpxRecognizer::TermDefaultSession
+_EXIT:.* CSpxRecognizer::~CSpxRecognizer\r?$\n

@@ -1,0 +1,22 @@
+USAGE: spx dialog customcommands [...]
+
+    CONNECTION                          (see: spx help dialog connection)
+        --key KEY                       (see: spx help dialog key)
+        --region REGION                 (see: spx help dialog region)
+        --appId ID                      (see: spx help dialog customcommands appId)
+
+    INPUT                               (see: spx help dialog input)
+        --microphone
+
+    OUTPUT
+        --speakers                      (see: spx help dialog audio output)
+
+    RECOGNITION
+        --once                          (see: spx help dialog customcommands once)
+        --continuous                    (see: spx help dialog customcommands continuous)
+        --keyword FILENAME              (see: spx help dialog customcommands keyword)
+
+SEE ALSO
+
+    spx help setup
+    spx help dialog examples

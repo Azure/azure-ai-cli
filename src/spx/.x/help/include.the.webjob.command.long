@@ -1,0 +1,2 @@
+  The `spx webjob` manages Azure WebJob operations, enabling SPX zip
+  packages to be executed remotely as Azure Triggered WebJobs.

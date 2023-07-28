@@ -1,0 +1,31 @@
+BATCH OUTPUT JSON
+
+  The `--output json` option writes the service JSON response into the file specified.
+
+  Use this option to save the service JSON response.
+
+USAGE: spx batch [...] --output json FILE.json
+   OR: spx batch [...] @CONFIG-FILENAME
+
+  WHERE: FILE.json is the file to store the JSON output from the batch operation
+     OR: FILENAME is a single line text file containing FILE.json filename
+     OR: CONFIG-FILENAME is a single line text file in the following form:
+
+            batch.output.json.file=FILE.json
+
+EXAMPLES
+
+  spx batch transcription list --output json @transcription-list.json
+
+  spx config @transcription.job --set name "My transcription"
+  spx config @transcription.job --add content http://crbn.us/hello.wav
+  spx config @transcription.job --add batch.output.json.file create-operation-output.json
+  spx batch transcription create @transcription.details
+
+SEE ALSO
+
+  spx help batch output
+  spx help batch output request
+  spx help batch transcription
+  spx help batch
+  

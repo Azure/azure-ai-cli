@@ -1,0 +1,29 @@
+SPEAKER EXAMPLES
+
+  `INIT`: Automatically setup spx with REGION and KEY default values
+
+    spx init
+
+  `SETUP`: Manually setup spx with REGION and KEY default values
+
+    spx config speaker @region --set westus2
+    spx config speaker @key --set 436172626F6E20697320636F6F6C2121
+
+  `EXAMPLE 1`: Identify a file against a speaker identification profile id
+
+    spx speaker identify --id @my.id --file FILENAME
+
+  `EXAMPLE 2`: Verify a file against a independent verification profile id
+
+    spx speaker verify --id @my.id --file FILENAME
+
+  `EXAMPLE 3`: Verify a file against a dependent verification profile id
+
+    spx speaker verify --id @my.id --file FILENAME --kind textdependentverification
+
+ADDITIONAL TOPICS
+
+  spx help setup
+  spx help speaker 
+  spx help speaker identify
+  spx help speaker verify

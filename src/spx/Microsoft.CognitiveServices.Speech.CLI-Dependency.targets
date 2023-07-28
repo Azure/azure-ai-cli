@@ -1,0 +1,17 @@
+<Project>
+  <ItemGroup>
+    <Files Include="$(MSBuildThisFileDirectory)/../contentFiles/*.*" />
+    <Linux-Executable Include="$(MSBuildThisFileDirectory)/../tools/linux-x64/*.*" />
+    <Win-Executable Include="$(MSBuildThisFileDirectory)/../tools/win-x64/*.*" />
+  </ItemGroup>
+  <Target Name="CopyFiles" AfterTargets="Build">
+    <Copy SourceFiles="@(Files)" DestinationFolder="$(TargetDir)" />
+    <Copy SourceFiles="@(Files)" DestinationFolder="$(PublishDir)" />
+  </Target>
+  <Target Name="CopyWinExe" AfterTargets="Build" Condition="'$(OS)' == 'Windows_NT'">
+    <Copy SourceFiles="@(Win-Executable)" DestinationFolder="$(PublishDir)" />
+  </Target>
+  <Target Name="CopyLinuxExe" AfterTargets="Build" Condition=" '$(OS)' != 'Windows_NT' ">
+    <Copy SourceFiles="@(Linux-Executable)" DestinationFolder="$(PublishDir)" />
+  </Target>
+</Project>

@@ -1,0 +1,4 @@
+﻿x.command=run
+run.input.spx.command=config local @name227266 --add goodbye
+run.input.process=spx
+run.output.expect=@config.local.name227266.4.add.test.run.output.expected

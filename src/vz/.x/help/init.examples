@@ -1,0 +1,19 @@
+INIT EXAMPLES
+
+  `EXAMPLE 1`: interactively select or create an Azure Vision resource
+
+    vz init
+
+  `EXAMPLE 2`: interactively select a resource matching a set of criteria
+
+    vz init --name "vision-us" --region westus2
+
+  `EXAMPLE 3`: non-interactively select or create a resource by specifying all parameters
+
+    vz init --interactive false --subscription "Pay-As-You-Go" --region westus2 --group "vision-westus2-436172626F6E"
+
+SEE ALSO
+
+  vz help init
+  vz help init advanced
+  

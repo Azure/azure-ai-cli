@@ -1,0 +1,39 @@
+SYNTHESIZE
+
+@include.the.synthesize.command.long
+
+USAGE: spx synthesize [...]
+
+  CONNECTION                      (see: spx help synthesize connection)
+    --key KEY                     (see: spx help synthesize key)
+    --region REGION               (see: spx help synthesize region)
+
+  VOICEs
+    --voice NAME                  (see: spx help synthesize voice)
+    --voices                      (see: spx help synthesize list voices)
+
+  INPUT                           (see: spx help synthesize input)
+    --interactive                 (see: spx help synthesize interactive)
+    --text TEXT                   (see: spx help synthesize text)
+    --ssml SSML                   (see: spx help synthesize ssml)
+    --file FILE                   (see: spx help synthesize file)
+    --files PATTERN               (see: spx help synthesize files)
+    --files @FILELIST.txt         (see: spx help synthesize files)
+    --format FORMAT               (see: spx help synthesize format)
+
+  AUDIO OUTPUT                    (see: spx help synthesize output)
+    --speakers                    (see: spx help synthesize speakers)
+    --audio output FILENAME       (see: spx help synthesize output)
+
+  ADVANCED
+    --log FILENAME                (see: spx help synthesize log)
+    --proxy HOSTNAME              (see: spx help synthesize proxy)
+    --foreach in @ITEMS.txt       (see: spx help synthesize foreach)
+    --threads NUMBER              (see: spx help synthesize threads)
+
+SEE ALSO
+
+  spx help setup
+  spx help synthesize advanced
+  spx help synthesize examples
+  spx help find topics synthesize

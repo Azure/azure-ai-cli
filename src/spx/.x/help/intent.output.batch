@@ -1,0 +1,31 @@
+INTENT OUTPUT BATCH
+
+@include.the.intent.command
+
+  The `--output batch json` option indicates that intent recognition results should
+  be output in the same format as `spx batch` transcriptions.
+
+  The `--output batch file` option specifies the name of the file to use. If 
+  this option is not specified, a default filename will be provided.
+
+USAGE: spx intent [...] --output batch json
+   OR: spx intent [...] --output batch file FILENAME
+
+   WHERE: FILENAME represents a local text file writable by the current user
+     OR: FILE is `-` represents STDOUT, where TSV or JSON data will be saved
+
+EXAMPLES
+
+  spx intent --file hello.wav --output batch json
+  spx intent --file hello.wav --output batch file hello.json
+
+  spx config intent @default.output --clear
+  spx config intent @default.output --add output.batch.json true
+  spx config intent @default.output --add output.batch.file output.{id}.{run.time}.json
+
+SEE ALSO
+
+  spx help intent output
+  spx help batch transcription
+  spx help intent
+  

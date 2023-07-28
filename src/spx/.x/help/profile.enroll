@@ -1,0 +1,32 @@
+PROFILE ENROLL
+
+IMPORTANT: For TextIndependentIdentification, the enrollment audio sample must contain 30 seconds or more of speech to be successful. 
+  For TextIndependentVerification, three or more samples with a combined 15 seconds or more of speech are required.
+
+@include.the.profile.command.long
+
+  The `profile enroll` function enrolls a given voice profile using an audio sample.
+
+USAGE: spx profile enroll --id ID --file AUDIO_SAMPLE_FILE --kind KIND
+
+CONNECTION                      (see: spx help profile connection)
+  --key KEY                     (see: spx help profile key)
+  --region REGION               (see: spx help profile region)
+
+ID
+  --id ID                       (see: spx help profile id)
+
+FILE
+  --file FILE                   (see: spx help profile file)
+
+KIND
+  --kind KIND                   (see: spx help profile kind)
+
+ADVANCED                        
+  --output file PATH            (see: spx help profile output file)
+  --output json PATH            (see: spx help profile output json)
+
+SEE ALSO
+
+  spx help profile
+  spx help profile kind

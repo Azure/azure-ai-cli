@@ -1,0 +1,20 @@
+RUN EXAMPLES
+
+  `EXAMPLE 1`: Create and run `vz image analyze` job
+
+    vz image analyze --file image1.jpg --save analyze1.job
+    vz run --job analyze1.job
+
+  `EXAMPLE 2`: Create and run `vz image read` job
+
+    vz image read --file image1.jpg --save read1.job
+    vz run --job read1.job
+
+  `EXAMPLE 3`: Run multiple jobs
+
+    vz run --jobs *1*.job
+  
+ADDITIONAL TOPICS
+
+  vz help run advanced
+  vz help run

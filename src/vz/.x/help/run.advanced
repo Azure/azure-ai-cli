@@ -1,0 +1,53 @@
+RUN
+
+@include.the.run.command
+
+USAGE: vz run [...]
+
+  RUN VZ
+    --command COMMAND
+    --job FILE
+    --jobs FILE1;FILE2[;...]
+    --jobs @FILELIST.txt
+    --jobs PATTERN
+
+  PROCESS
+    --process PROCESS
+    --bash
+    --wsl
+    --cmd
+
+  SCRIPTS
+    --script FILE
+    --scripts FILE1;FILE2[;...]
+    --scripts @FILELIST.txt
+    --scripts PATTERN
+    --script "SCRIPT"
+
+  FILES
+    --file FILE
+    --files FILE1;FILE2[;...]
+    --files @FILELIST.txt
+    --files PATTERN
+
+  ARGUMENTS
+    --line LINE
+    --item ITEM
+    --[pre/post] args ARGS
+    --[pre/post] script args ARGS
+    --[pre/post] file args ARGS
+    --[pre/post] line args ARGS
+    --[pre/post] item args ARGS
+
+  ADVANCED
+    --foreach in @ITEMS.txt
+    --foreach OPT in @ITEMS.txt
+    --foreach OPT1;OPT2 in @ITEMS.txt
+    --threads NUMBER
+    --processes NUMBER
+
+EXAMPLES
+
+  vz config @run.cmd --add "vz image analyze --file image1.jpg"
+  vz config @run.cmd --add "vz image analyze --file image2.jpg"
+  vz run --vz --foreach command in @run.cmd

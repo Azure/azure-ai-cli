@@ -1,0 +1,21 @@
+PROFILE ID
+
+@include.the.profile.command
+
+  The `--id` option specifies a voice profile id or a file containing such an id 
+  to be sent to the service for recognition operations.
+
+USAGE: spx profile [...] --id 12341234-1234-1234-1234-01234567 [...] 
+   OR: spx profile [...] --id @FILENAME [...]
+
+  WHERE: FILENAME is a single line text file containing a identification/verification profile id
+
+EXAMPLES
+
+  spx profile status --id @my.id --kind TextIndependentVerification
+  spx profile delete --id @my.id
+
+SEE ALSO
+
+  spx help profile
+  spx help profile examples

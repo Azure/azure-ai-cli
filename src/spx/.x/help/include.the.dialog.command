@@ -1,0 +1,1 @@
+    The `spx dialog` command connects to a speech enabled dialog.

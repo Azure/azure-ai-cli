@@ -1,0 +1,14 @@
+INTENT LUIS ALLINTENTS
+
+@include.the.intent.command
+
+@include.the.luis.option
+
+Recognize against all intents of the LUIS model in use
+
+USAGE: spx intent [...] --luis allintents true
+
+SEE ALSO
+
+  spx help intent
+  spx help intent luis 

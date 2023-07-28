@@ -1,0 +1,22 @@
+TRANSLATE CONTINUOUS
+
+@include.the.translate.command
+
+  The `--continuous` option translates streaming audio continuously,
+  optimized for interactive conversations and audio files.
+
+  The `--timeout` option can be used to limit the amount of audio translated.
+  If not specified, there is effectively no timeout.
+
+USAGE: spx translate [...] --continuous
+   OR: spx translate [...] --continuous --timeout [MILLISECONDS]
+
+EXAMPLES
+
+  spx translate --microphone --continuous --source en-US --target de
+  spx translate --file hello.wav --continuous --timeout 30000 --source en-US --target de
+
+SEE ALSO
+
+  spx help translate once
+  spx help translate

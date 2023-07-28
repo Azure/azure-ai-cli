@@ -1,0 +1,25 @@
+ENDPOINT OVERVIEW
+
+  For most scenarios, use "wss://" or "ws://" instead of "https://". For a
+  full list of supported endpoints, see https://aka.ms/speech/endpoints
+
+USAGE: spx <command> [...] --endpoint "ENDPOINT"
+   OR: spx <command> [...] --endpoint @FILENAME
+   OR: spx <command> [...] @CONFIG-FILENAME
+
+WHERE: ENDPOINT represents the ENDPOINT uri as text (don't forget to add quotes)
+   OR: FILENAME is a single line text file containing the ENDPOINT
+   OR: CONFIG-FILENAME is a single line text file in the following form:
+
+       service.config.endpoint=wss://...
+
+EXAMPLES
+
+  spx synthesize --endpoint @my.synth.endpoint --text Hello
+  spx recognize --endpoint @my.reco.endpoint --file hello.wav
+  spx translate --endpoint @my.mt.endpoint --file hello.wav --source en-US --target de
+
+SEE ALSO
+
+  spx help init
+  spx help setup

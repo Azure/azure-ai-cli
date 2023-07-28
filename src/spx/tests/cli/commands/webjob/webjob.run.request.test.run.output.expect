@@ -1,0 +1,15 @@
+﻿(?# ---------- BANNER)
+^SPX - Azure Speech CLI, Version [1]\.[0-9]{2}[^\r]+\r?$\n
+^Copyright \(c\) 202[0-9] Microsoft Corporation\. All Rights Reserved\.\r?$\n
+^\r?$\n
+
+
+\r?\nTriggering job JOBNAME \.\.\.\r?$\n
+^POST https://endpoint\.scm\.azurewebsites\.net/api/triggeredwebjobs/JOBNAME/run HTTP/1\.1\r?$\n
+^Accept: application/json\r?$\n
+^Host: endpoint\.scm\.azurewebsites\.net\r?$\n
+^Connection: Keep-Alive\r?$\n
+^\r?$\n
+^\r?$\n
+^\r?$\n
+^  ERROR!! The remote server returned an error: \(401\) Unauthorized\.\r?$\n

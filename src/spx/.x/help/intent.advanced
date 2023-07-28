@@ -1,0 +1,89 @@
+INTENT
+
+@include.the.intent.command.long
+
+USAGE: spx intent [...]
+
+  CONNECTION                      (see: spx help intent connection)
+    --key KEY                     (see: spx help intent key)
+    --region REGION               (see: spx help intent region)
+    --endpoint URI                (see: spx help intent endpoint)
+    --token VALUE                 (see: spx help intent token)
+
+  SERVICE
+    --traffic type test           (see: spx help traffic type)
+    --http header name=value      (see: spx help http header)
+    --query string name=value     (see: spx help query string)
+
+  PATTERNS
+    --pattern PATTERN             (see: spx help intent pattern)
+    --pattern INTENTID=PATTERN
+    --patterns PATTERN1;PATTERN2  (see: spx help intent patterns)
+    --patterns @PATTERNS.txt
+
+  LUIS                            (see: spx help intent luis)
+    --luis key KEY                (see: spx help intent luis key)
+    --luis region REGION          (see: spx help intent luis region)
+    --luis appid APPID            (see: spx help intent luis appid)
+    --luis intent INTENTID        (see: spx help intent luis intent)
+    --luis allintents true        (see: spx help intent luis allintents)
+
+  INPUT                           (see: spx help intent input)
+    --microphone                  (see: spx help intent microphone)
+    --file FILE                   (see: spx help intent file)
+    --files PATTERN               (see: spx help intent files)
+    --files @FILELIST.txt         (see: spx help intent files)
+    --url URL                     (see: spx help intent url)
+    --urls URL                    (see: spx help intent urls)
+    --urls @URLLIST.txt           (see: spx help intent urls)
+    --format FORMAT               (see: spx help intent format)
+    --id url URL                  (see: spx help input id)
+    --id ID                       (see: spx help input id)
+
+  RECOGNITION
+    --language LANGUAGE           (see: spx help intent language)
+    --timeout MILLISECONDS        (see: spx help intent continuous)
+
+  ACCURACY                        (see: spx help intent improve accuracy)
+    --endpoint id ID              (see: spx help intent custom speech)
+    --phrases @PHRASELIST.txt     (see: spx help intent phrases)
+
+  TESTING                         (see: spx help intent testing)
+    --transcript TEXT             (see: spx help intent transcript)
+    --check wer NUMOP NUMBER      (see: spx help intent check wer)
+    --check text TEXTOP TEXT      (see: spx help intent check text)
+
+  OUTPUT                          (see: spx help intent output)
+    --output all [<item>]         (see: spx help intent output all)
+    --output each [<item>]        (see: spx help intent output each)
+    --output batch json           (see: spx help intent output batch json)
+    --output batch file FILENAME  (see: spx help intent output batch file)
+    --output each file FILENAME   (see: spx help intent output each file)
+    --output all file FILENAME    (see: spx help intent output all file)
+    --output vtt file FILENAME    (see: spx help intent output vtt file)
+    --word level timing           (see: spx help intent word level timing)
+    --profanity OPTION            (see: spx help intent profanity)
+
+  LOGGING                         (see: spx help intent log)
+    --log FILENAME
+    --content logging
+
+  PARALLEL PROCESSING
+    --threads NUMBER              (see: spx help intent threads)
+    --processes NUMBER            (see: spx help intent processes)
+    --repeat NUMBER
+    --max NUMBER
+
+  ADVANCED
+    --proxy HOSTNAME              (see: spx help intent proxy)
+    --property NAME=VALUE         (see: spx help intent property)
+    --properties @PROPLIST.txt    (see: spx help intent properties)
+    --foreach in @ITEMS.txt       (see: spx help intent foreach)
+    --save FILENAME               (see: spx help intent save)
+    --zip ZIPFILE                 (see: spx help intent zip)
+
+SEE ALSO
+
+  spx help setup
+  spx help intent examples
+  spx help find topics intent

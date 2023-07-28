@@ -1,0 +1,3 @@
+  The `--region` option specifies the REGION for an existing resource.
+
+  For a full list of supported regions, see https://aka.ms/vision/regions.

@@ -1,0 +1,36 @@
+CONFIG
+
+@include.the.config.command
+
+USAGE: spx config [HIVE] [COMMAND] [@FILE] [...]
+
+  OPTIONs
+    --set [NAME=]VALUE            (see: spx help config set)
+    --add [NAME=]VALUE            (see: spx help config add)
+    --find NAME                   (see: spx help config find)
+    --clear [NAME]                (see: spx help config clear)
+
+  ADANCED
+    --hive HIVE                   (see: spx help config hive)
+    --region REGION               (see: spx help config region)
+    --command COMMAND             (see: spx help config command)
+
+EXAMPLES                          (see: spx help config examples)
+
+  spx config @region --set westus2
+  spx config @key --set 436172626F6E20697320636F6F6C2121
+
+  spx config synthesize @region --set westus2
+  spx config synthesize @key --set 436172626F6E20697320636F6F6C2121
+
+  spx config recognize @region --set eastus
+  spx config recognize @key --set 436172626F6E20697320636F6F6C2020
+
+  spx config recognize --find key
+
+SEE ALSO
+
+  spx help setup
+  spx help config scope
+  spx help config hive
+  spx help find topics config

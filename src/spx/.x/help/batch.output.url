@@ -1,0 +1,26 @@
+BATCH OUTPUT URL
+
+  The `--output url` option writes the batch resource reference into the SPX
+  datastore configuration file specified.
+    
+  Use this option to chain together multiple batch commands
+  in sequence, or to subsequently use the reference
+  without parsing the service JSON response. 
+  
+USAGE: spx batch [...] --output url @@FILE
+
+  WHERE: FILE is the name of the SPX configuration datastore file
+
+EXAMPLE
+
+  spx batch transcription create [...] --output url @@created.url.txt
+  spx batch transcription status --transcription @created.url.txt --wait
+
+SEE ALSO
+
+  spx help batch transcription create
+  spx help batch transcription status
+  spx help batch output json
+  spx help batch output id
+  spx help batch output
+  spx help batch

@@ -1,0 +1,4 @@
+﻿x.command=run
+run.output.expect=@webjob.upload.request.test.run.output.expect
+run.input.spx.command=webjob upload --endpoint ENDPOINT --password PASSWORD --user USERNAME --file echo.zip --output request -
+run.input.process=spx

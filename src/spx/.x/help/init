@@ -1,0 +1,39 @@
+INIT
+
+@include.the.init.command.long
+
+USAGE: spx init [...]
+
+  AZURE
+    --subscription SUBSCRIPTION   (see: spx help init subscription)
+
+  INTERACTIVE
+    --interactive BOOL            (see: spx help init interactive)
+
+  RESOURCE
+    --region region               (see: spx help init region)
+    --group GROUP                 (see: spx help init group)
+    --name NAME                   (see: spx help init name)
+
+EXAMPLES
+
+  `EXAMPLE 1`: interactively select or create an Azure Speech resource
+
+    spx init
+
+  `EXAMPLE 2`: interactively select a resource matching a set of criteria
+
+    spx init --name "speech-us" --region westus2
+
+  `EXAMPLE 3`: non-interactively select or create a resource by specifying all parameters
+
+    spx init --interactive false --subscription "Pay-As-You-Go" --region westus2 --group "speech-4372626e-rg" --name "speech-4372626e"
+
+SEE ALSO
+
+  spx help setup
+  spx help config
+  spx help config hive
+  spx help init advanced
+  spx help init examples
+  spx help find topics init

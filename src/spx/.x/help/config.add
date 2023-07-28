@@ -1,0 +1,30 @@
+CONFIG ADD
+
+@include.the.config.command
+
+  The `--add` option adds SPX configuration data to a new or an
+  existing SPX configuration datastore file.
+
+USAGE: spx config --add NAME VALUE
+   OR: spx config @NAME --add VALUE
+   OR: spx config @CONFIG-FILENAME --add NAME VALUE
+
+  WHERE: NAME represents the name of the VALUE
+    AND: VALUE represents the value to be added
+     OR: CONFIG-FILENAME is the name of the configuration file
+
+   NOTE: If no HIVE is specified, the first configuration file found
+         will be used. If no existing configuration file is found,
+         the first HIVE found will be used.
+
+EXAMPLES
+
+  spx config @my.files --clear
+  spx config @my.files --add hello.wav
+  spx config @my.files --add howareyou.wav
+  spx recognize --files @my.files
+
+SEE ALSO
+
+  spx help config
+  spx help config hive

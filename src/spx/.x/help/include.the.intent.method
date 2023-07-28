@@ -1,0 +1,4 @@
+  Streaming audio can be recognized in several modes:
+  (1) Continuous - recognize audio continuously, optimized for conversations
+  (2) Once+ - recognize audio continuously, optimized for non-interactive use cases
+  (3) Once - recognize a single phrase, optimized for interactive use cases

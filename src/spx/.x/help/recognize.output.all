@@ -1,0 +1,48 @@
+RECOGNIZE OUTPUT ALL
+
+@include.the.recognize.command
+
+  The `--output all` option specifies an ITEM to accumulate and
+  aggregate into a TSV or JSON output file, combined across all events.
+
+  The `--output all file` option specifies the output filename. 
+
+  The `--output all file type` option specifies the output file type,
+  either JSON or TSV (tab separated values). If no file type is provided,
+  the output file will be TSV by default.
+
+USAGE: spx recognize [...] --output all ITEM
+   OR: spx recognize [...] --output all file FILENAME
+   OR: spx recognize [...] --output all file type TYPE
+
+   WHERE: FILENAME represents a local text file writable by the current user
+     OR: FILE is `-` represents STDOUT, where TSV or JSON data will be saved
+
+  NOTE: Default output uses the `@output.all.standard` preset template
+
+    output.all.audio.input.id=true
+    output.all.recognizer.session.started.sessionid=true
+    output.all.recognizer.recognized.result.text=true
+
+EXAMPLES
+
+  spx recognize --once --output all text
+  spx recognize --once --output all text --output all file output.tsv
+  spx recognize --once --output all text --output all file type json
+
+  spx config recognize @default.output --set @@output.all.standard
+  spx config recognize @default.output --set @@output.all.detailed
+  spx config recognize @default.output --set @@output.all.latency
+  spx config recognize @default.output --set @@output.all.transcript.display
+  spx config recognize @default.output --set @@output.all.transcript.lexical
+
+  spx config recognize @default.output --clear
+  spx config recognize @default.output --add output.all.id true
+  spx config recognize @default.output --add output.all.sessionid true
+  spx config recognize @default.output --add output.all.text true
+
+SEE ALSO
+
+  spx help recognize output overview
+  spx help recognize output examples
+  spx help recognize

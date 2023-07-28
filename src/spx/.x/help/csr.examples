@@ -1,0 +1,45 @@
+CUSTOM SPEECH RECOGNITION EXAMPLES
+
+  `INIT`: Automatically setup spx with REGION and KEY default values
+
+    spx init
+
+  `SETUP`: Manually setup spx with REGION and KEY default values
+
+    spx config csr @region --set westus2
+    spx config csr @key --set 436172626F6E20697320636F6F6C2121
+
+  `EXAMPLE 1`: Use new endpoint with custom speech recognition model
+
+    spx csr endpoint create --name "LM example" --text @sentences.txt --output id @my.cid.txt
+    spx csr endpoint status --endpoint @my.cid.txt --wait
+    spx recognize --files test.wav --endpoint id @my.cid
+
+  `EXAMPLE 2`: List custom speech recognition projects or endpoints
+
+    spx csr project list --projects
+    spx csr endpoint list --endpoints
+
+  `EXAMPLE 3`: Use new custom speech recognition model in batch transcription
+
+    spx csr model create --name "LM example" --text @sentences.txt --output url @my.model.txt
+    spx batch transcription create --name "Example 3" --model @my.model.txt --output url @my.trx.txt
+    spx batch transcription status --transcription @my.trx.txt --wait
+
+  `EXAMPLE 4`: Create custom speech recognition model using text and audio datasets
+
+    spx csr dataset create --name "LM" --kind Language --content https://crbn.us/data.txt --output url @my.datasets.txt
+    spx csr dataset create --name "AM" --kind Acoustic --content https://crbn.us/audio.zip --output add url @my.datasets.txt
+    spx csr model create --name "Example 4" --datasets @my.datasets.txt --output url @my.model.txt
+    spx csr model status --model @my.model.txt --wait
+
+  `EXAMPLE 5`: Create custom speech recognition model using uploaded text dataset
+
+    spx csr dataset upload --name "LM data" --kind Language --data data.txt --output url @my.dataset.txt
+    spx csr model create --name "Example 5" --dataset @my.dataset.txt --output url @my.model.txt
+    spx csr model status --model @my.model.txt --wait
+   
+ADDITIONAL TOPICS
+
+  spx help setup
+  spx help csr

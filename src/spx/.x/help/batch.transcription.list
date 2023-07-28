@@ -1,0 +1,25 @@
+BATCH TRANSCRIPTION LIST
+
+  The `spx batch transcription list` command lists details about 
+  existing batch transcriptions.
+
+USAGE: spx batch transcription list [...]
+
+  CONNECTION                      (see: spx help batch connection)
+    --key KEY                     (see: spx help batch key)
+    --region REGION               (see: spx help batch region)
+
+  LIST
+    --transcriptions              (see: spx help batch transcription list transcriptions)
+    --languages                   (see: spx help batch transcription list languages)
+
+  TRANSCRIPT FILES
+    --transcription URL           (see: spx help batch transcription reference)
+    --files                       (see: spx help batch transcription list files)
+
+SEE ALSO
+
+  spx help batch output
+  spx help batch transcription list advanced
+  spx help batch transcription examples
+  

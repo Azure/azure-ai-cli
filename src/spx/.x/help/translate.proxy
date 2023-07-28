@@ -1,0 +1,31 @@
+TRANSLATE PROXY
+
+@include.the.translate.command
+
+  The `--proxy` option specifies a HTTP proxy host name. 
+  The `--proxy port` option specifies the HTTP proxy port.
+
+USAGE: spx translate [...] --proxy PROXY
+   OR: spx translate [...] --proxy PROXY --proxy port PORT
+   OR: spx translate [...] @CONFIG-FILENAME
+
+  WHERE: PROXY represents the PROXY host (e.g. localhost)
+     OR: PORT represents the PROXY port (e.g. 80, which is the default)
+     OR: CONFIG-FILENAME is a multi-line text file as follows:
+
+            connection.proxy.host=HOST
+            connection.proxy.port=PORT
+
+EXAMPLES
+
+  spx translate --file hello.wav --proxy localhost --proxy port 8888 --source en-US --target de
+
+  spx config translate @fiddler --set proxy.host localhost
+  spx config translate @fiddler --add proxy.port 8888
+
+  spx translate --file hello.wav @fiddler --source en-US --target de
+
+SEE ALSO
+
+  spx help translate
+  spx help config

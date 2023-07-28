@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+
+  <PropertyGroup>
+    <DefaultPublicSpeechSDKVersion>1.23.0</DefaultPublicSpeechSDKVersion>
+    <DefaultSpxPackageId>Microsoft.CognitiveServices.Speech.CLI</DefaultSpxPackageId>
+    <DefaultSpxPackageType>DotnetTool</DefaultSpxPackageType>
+    <SpeechSDKVersion Condition="'$(SpeechSDKVersion)' == ''">$(DefaultPublicSpeechSDKVersion)</SpeechSDKVersion>
+    <PackageId Condition="'$(PackageId)' == ''">$(DefaultSpxPackageId)</PackageId>
+    <PackageType Condition="'$(PackageType)' == ''">$(DefaultSpxPackageType)</PackageType>
+    <PackAsTool Condition="'$(PackageId)' == '$(DefaultSpxPackageId)'">true</PackAsTool>
+    <ErrorOnDuplicatePublishOutputFiles>false</ErrorOnDuplicatePublishOutputFiles>
+  </PropertyGroup>
+
+  <Choose>
+    <When Condition="'$(LocalBuildSDKBinPath)' == ''">
+      <ItemGroup>
+        <PackageReference Include="Microsoft.CognitiveServices.Speech" Version="[$(SpeechSDKVersion)]" />
+      </ItemGroup>
+    </When>
+    <Otherwise>
+      <Choose>
+        <When Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+          <ItemGroup>
+            <Reference Include="Microsoft.CognitiveServices.Speech">
+              <HintPath Condition="Exists('$(LocalBuildSDKBinPath)\Release\Microsoft.CognitiveServices.Speech.csharp.dll')">$(LocalBuildSDKBinPath)\Release\Microsoft.CognitiveServices.Speech.csharp.dll</HintPath>
+              <HintPath Condition="!Exists('$(LocalBuildSDKBinPath)\Release\Microsoft.CognitiveServices.Speech.csharp.dll')">$(LocalBuildSDKBinPath)\Release\netstandard2.0\Microsoft.CognitiveServices.Speech.csharp.dll</HintPath>
+            </Reference>
+            <None Include="$(LocalBuildSDKBinPath)\Release\Microsoft.CognitiveServices.Speech.core.*">
+              <Link>%(Filename)%(Extension)</Link>
+              <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+            </None>
+            <None Include="$(LocalBuildSDKBinPath)\Release\Microsoft.CognitiveServices.Speech.extension*.*">
+              <Link>%(Filename)%(Extension)</Link>
+              <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+            </None>
+          </ItemGroup>
+        </When>
+        <When Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+          <ItemGroup>
+            <Reference Include="Microsoft.CognitiveServices.Speech">
+              <HintPath Condition="Exists('$(LocalBuildSDKBinPath)\Debug\Microsoft.CognitiveServices.Speech.csharp.dll')">$(LocalBuildSDKBinPath)\Debug\Microsoft.CognitiveServices.Speech.csharp.dll</HintPath>
+              <HintPath Condition="!Exists('$(LocalBuildSDKBinPath)\Debug\Microsoft.CognitiveServices.Speech.csharp.dll')">$(LocalBuildSDKBinPath)\Debug\netstandard2.0\Microsoft.CognitiveServices.Speech.csharp.dll</HintPath>
+            </Reference>
+            <None Include="$(LocalBuildSDKBinPath)\Debug\Microsoft.CognitiveServices.Speech.core.*">
+              <Link>%(Filename)%(Extension)</Link>
+              <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+            </None>
+            <None Include="$(LocalBuildSDKBinPath)\Debug\Microsoft.CognitiveServices.Speech.extension*.*">
+              <Link>%(Filename)%(Extension)</Link>
+              <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+            </None>
+          </ItemGroup>
+        </When>
+        <When Condition="$(Configuration.Contains('ReleaseUnixOS'))">
+          <ItemGroup>
+            <Reference Include="Microsoft.CognitiveServices.Speech">
+              <HintPath>$(LocalBuildSDKBinPath)/ReleaseUnixOS/netstandard2.0/Microsoft.CognitiveServices.Speech.csharp.dll</HintPath>
+            </Reference>
+            <None Include="$(LocalBuildSDKBinPath)/../lib/*Microsoft.CognitiveServices.Speech.core.*">
+              <Link>%(Filename)%(Extension)</Link>
+              <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+            </None>
+            <None Include="$(LocalBuildSDKBinPath)/../lib/*Microsoft.CognitiveServices.Speech.extension*.*">
+              <Link>%(Filename)%(Extension)</Link>
+              <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+            </None>
+          </ItemGroup>
+        </When>
+        <When Condition="$(Configuration.Contains('DebugUnixOS'))">
+          <ItemGroup>
+            <Reference Include="Microsoft.CognitiveServices.Speech">
+              <HintPath>$(LocalBuildSDKBinPath)/DebugUnixOS/netstandard2.0/Microsoft.CognitiveServices.Speech.csharp.dll</HintPath>
+            </Reference>
+            <None Include="$$(LocalBuildSDKBinPath)/../lib/*Microsoft.CognitiveServices.Speech.core.*">
+              <Link>%(Filename)%(Extension)</Link>
+              <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+            </None>
+            <None Include="$(LocalBuildSDKBinPath)/../lib/Microsoft.CognitiveServices.Speech.extension*.*">
+              <Link>%(Filename)%(Extension)</Link>
+              <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+            </None>
+          </ItemGroup>
+        </When>
+      </Choose>
+    </Otherwise>
+  </Choose>
+
+  <!-- This group, along with the *Dependency.targets file, ensures the necessary config files are 
+        copied to the build output of the nupkg-consuming client project when it builds -->
+  <Choose>
+    <When Condition="'$(PackageType)' == 'Dependency'">
+      <ItemGroup>
+        <Content Include="Microsoft.CognitiveServices.Speech.CLI-Dependency.targets" PackagePath="build/Microsoft.CognitiveServices.Speech.CLI-Dependency.targets" />
+        <Content Include="$(OutputPath)\spx.exe">
+          <PackagePath>tools\win-x64</PackagePath>
+          <pack>true</pack>
+        </Content>
+        <Content Condition="Exists('$(OutputPath)/spx')" Include="$(OutputPath)/spx">
+          <PackagePath>tools\linux-x64</PackagePath>
+          <pack>true</pack>
+        </Content>
+      </ItemGroup>
+    </When>
+  </Choose>
+
+  <PropertyGroup>
+    <CLIAssemblyVersion Condition="'$(CLIAssemblyVersion)' == ''">$(SpeechSDKVersion)</CLIAssemblyVersion>
+    <CLIAssemblyInformationalVersion Condition="'$(CLIAssemblyInformationalVersion)' == ''">$(CLIAssemblyVersion)</CLIAssemblyInformationalVersion>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <FileVersion>$(CLIAssemblyVersion)</FileVersion>
+    <AssemblyVersion>$(CLIAssemblyVersion)</AssemblyVersion>
+    <InformationalVersion>$(CLIAssemblyInformationalVersion)</InformationalVersion>
+  </PropertyGroup>
+
+</Project>

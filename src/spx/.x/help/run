@@ -1,0 +1,27 @@
+RUN
+
+@include.the.run.command
+
+USAGE: spx run [...]
+
+  RUN
+    --command COMMAND
+    --args ARG1;ARG2[;...]
+    --args @FILENAME
+    --args "ARGS"
+
+  JOBs
+    --job FILE
+    --jobs FILE1;FILE2[;...]
+    --jobs @FILELIST.txt
+
+EXAMPLE
+
+    spx synthesize --text Hello --audio output hello.wav --save tts.hello.job
+    spx run --job tts.hello.job
+
+SEE ALSO
+
+  spx help run advanced
+  spx help run examples
+  spx help find topics run

@@ -1,0 +1,137 @@
+INTENT OUTPUT EXAMPLES
+
+  spx intent [...] --output all audio id
+  spx intent [...] --output all sessionid
+  spx intent [...] --output all resultid
+  spx intent [...] --output all reason
+  spx intent [...] --output all text
+  spx intent [...] --output all itn text
+  spx intent [...] --output all lexical text
+  spx intent [...] --output all offset
+  spx intent [...] --output all duration
+  spx intent [...] --output all latency
+  spx intent [...] --output all json
+
+  spx intent [...] --output each audio id
+  spx intent [...] --output each sessionid
+  spx intent [...] --output each resultid
+  spx intent [...] --output each reason
+  spx intent [...] --output each text
+  spx intent [...] --output each itn text
+  spx intent [...] --output each lexical text
+  spx intent [...] --output each offset
+  spx intent [...] --output each duration
+  spx intent [...] --output each latency
+  spx intent [...] --output each json
+
+  spx intent [...] --output all result resultid
+  spx intent [...] --output all result reason
+  spx intent [...] --output all result text
+  spx intent [...] --output all result offset
+  spx intent [...] --output all result duration
+  spx intent [...] --output all result latency
+  spx intent [...] --output all result json
+
+  spx intent [...] --output each result resultid
+  spx intent [...] --output each result reason
+  spx intent [...] --output each result text
+  spx intent [...] --output each result offset
+  spx intent [...] --output each result duration
+  spx intent [...] --output each result latency
+  spx intent [...] --output each result json
+
+  spx intent [...] --output all events
+  spx intent [...] --output all event sessionid
+
+  spx intent [...] --output each event
+  spx intent [...] --output each event sessionid
+
+  spx intent [...] --output all recognizer events
+  spx intent [...] --output all recognizer event sessionid
+
+  spx intent [...] --output each recognizer event
+  spx intent [...] --output each recognizer event sessionid
+
+  spx intent [...] --output all recognizer session events
+  spx intent [...] --output all recognizer session event sessionid
+  spx intent [...] --output all recognizer session started events
+  spx intent [...] --output all recognizer session started sessionid
+  spx intent [...] --output all recognizer session stopped events
+  spx intent [...] --output all recognizer session stopped sessionid
+
+  spx intent [...] --output each recognizer session event
+  spx intent [...] --output each recognizer session event sessionid
+  spx intent [...] --output each recognizer session started event
+  spx intent [...] --output each recognizer session started sessionid
+  spx intent [...] --output each recognizer session stopped event
+  spx intent [...] --output each recognizer session stopped sessionid
+
+  spx intent [...] --output all recognizer canceled events
+  spx intent [...] --output all recognizer canceled error
+  spx intent [...] --output all recognizer canceled error code
+  spx intent [...] --output all recognizer canceled error details
+  spx intent [...] --output all recognizer canceled reason
+
+  spx intent [...] --output each recognizer canceled event
+  spx intent [...] --output each recognizer canceled error
+  spx intent [...] --output each recognizer canceled error code
+  spx intent [...] --output each recognizer canceled error details
+  spx intent [...] --output each recognizer canceled reason
+
+  spx intent [...] --output all recognizer recognized events
+  spx intent [...] --output all recognizer recognized sessionid
+  spx intent [...] --output all recognizer recognized result resultid
+  spx intent [...] --output all recognizer recognized result reason
+  spx intent [...] --output all recognizer recognized result text
+  spx intent [...] --output all recognizer recognized result itn text
+  spx intent [...] --output all recognizer recognized result lexical text
+  spx intent [...] --output all recognizer recognized result offset
+  spx intent [...] --output all recognizer recognized result duration
+  spx intent [...] --output all recognizer recognized result latency
+  spx intent [...] --output all recognizer recognized result json
+
+  spx intent [...] --output each recognizer recognized event
+  spx intent [...] --output each recognizer recognized sessionid
+  spx intent [...] --output each recognizer recognized result resultid
+  spx intent [...] --output each recognizer recognized result reason
+  spx intent [...] --output each recognizer recognized result text
+  spx intent [...] --output each recognizer recognized result itn text
+  spx intent [...] --output each recognizer recognized result lexical text
+  spx intent [...] --output each recognizer recognized result offset
+  spx intent [...] --output each recognizer recognized result duration
+  spx intent [...] --output each recognizer recognized result latency
+  spx intent [...] --output each recognizer recognized result json
+
+  spx intent [...] --output all recognizer recognizing events
+  spx intent [...] --output all recognizer recognizing sessionid
+  spx intent [...] --output all recognizer recognizing result resultid
+  spx intent [...] --output all recognizer recognizing result reason
+  spx intent [...] --output all recognizer recognizing result text
+  spx intent [...] --output all recognizer recognizing result offset
+  spx intent [...] --output all recognizer recognizing result duration
+  spx intent [...] --output all recognizer recognizing result latency
+  spx intent [...] --output all recognizer recognizing result json
+
+  spx intent [...] --output each recognizer recognizing event
+  spx intent [...] --output each recognizer recognizing sessionid
+  spx intent [...] --output each recognizer recognizing result resultid
+  spx intent [...] --output each recognizer recognizing result reason
+  spx intent [...] --output each recognizer recognizing result text
+  spx intent [...] --output each recognizer recognizing result offset
+  spx intent [...] --output each recognizer recognizing result duration
+  spx intent [...] --output each recognizer recognizing result latency
+  spx intent [...] --output each recognizer recognizing result json
+
+  spx intent [...] --output all file type json
+  spx intent [...] --output all file output.json
+
+  spx intent [...] --output each file type json
+  spx intent [...] --output each file output.json
+
+  spx intent [...] --output all file type tsv 
+  spx intent [...] --output all file output.tsv
+  spx intent [...] --output all tsv file has header false
+
+  spx intent [...] --output each file type tsv
+  spx intent [...] --output each file output.tsv
+  spx intent [...] --output each tsv file has header false

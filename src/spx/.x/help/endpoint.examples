@@ -1,0 +1,11 @@
+ENDPOINT EXAMPLES
+
+  --endpoint "wss://westus.stt.speech.microsoft.com/speech/recognition/interactive/cognitiveservices/v1"
+  --endpoint "wss://westus.stt.speech.microsoft.com/speech/recognition/conversation/cognitiveservices/v1"
+  --endpoint "wss://westus.stt.speech.microsoft.com/speech/recognition/dictation/cognitiveservices/v1"
+
+SEE ALSO
+
+  spx help key overview
+  spx help recognize endpoint
+  spx help translate endpoint

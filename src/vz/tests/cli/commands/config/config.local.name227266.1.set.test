@@ -1,0 +1,4 @@
+﻿x.command=run
+run.input.vz.command=config @name227266 --hive local --set hello
+run.input.process=vz
+run.output.expect=@config.local.name227266.1.set.test.run.output.expected

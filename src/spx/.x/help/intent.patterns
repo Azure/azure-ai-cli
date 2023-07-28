@@ -1,0 +1,35 @@
+INTENT PATTERNS
+
+@include.the.intent.command
+
+  The `--patterns` option specifies multiple intent PATTERNS to recognize, each
+  with an optional ID, and each PATTERN optionally containing one or more ENTITIES.
+
+USAGE: spx intent [...] --patterns PATTERN1;PATTERN2[;...]
+   OR: spx intent [...] --patterns ID1=PATTERN1;ID2=PATTERN2[;...]
+   OR: spx intent [...] --patterns @PATTERNS-FILE.txt
+
+  WHERE: PATTERN represents a phrase to be recognized
+     OR: INTENTID represents the identifier that will symbolize the pattern
+     OR: PATTERNS-FILE.txt is a multi-line text file
+         ... w/ each [ID=]PATTERN listed individually on separate lines
+
+  NOTE: ENTITIES are indicated by enclosing the ENTITY name inside `{` and `}`
+
+EXAMPLES
+
+  spx intent --patterns "Start {app};Open {app}" --output app entity
+  spx intent --patterns "START=Start {app};START=Open {app}" --output intentid --output app entity
+
+  spx config @EXAMPLEs --clear
+  spx config @EXAMPLEs --add "START=Start {app}"
+  spx config @EXAMPLEs --add "START=Open {app}"
+  spx config @EXAMPLEs --add "START=Launch {app}"
+  spx config @EXAMPLEs --add "CLOSE=Close {app}"
+  spx intent --patterns @EXAMPLEs --output intentid --output app entity
+
+SEE ALSO
+
+  spx help intent format
+  spx help intent input
+  spx help intent

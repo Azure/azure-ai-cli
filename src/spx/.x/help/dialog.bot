@@ -1,0 +1,21 @@
+USAGE: spx dialog bot [...]
+
+    CONNECTION                          (see: spx help dialog connection)
+        --key KEY                       (see: spx help dialog key)
+        --region REGION                 (see: spx help dialog region)
+        --id ID                         (see: spx help dialog bot id)
+
+    INPUT                               (see: spx help dialog input)
+
+    OUTPUT                              (see: spx help dialog bot output)
+        --speakers
+
+    RECOGNITION
+        --once                          (see: spx help dialog bot once)
+        --continuous                    (see: spx help dialog bot continuous)
+        --keyword FILENAME              (see: spx help dialog bot keyword)
+
+SEE ALSO
+
+    spx help setup
+    spx help dialog examples

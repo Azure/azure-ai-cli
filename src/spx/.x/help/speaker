@@ -1,0 +1,16 @@
+SPEAKER
+
+@include.the.speaker.command.long
+
+USAGE: spx speaker <command> [...]
+
+COMMANDS
+
+  spx speaker identify            (see: spx help speaker identify)
+  spx speaker verify              (see: spx help speaker verify)
+
+SEE ALSO
+
+  spx help speaker examples
+  spx help speaker documentation
+  spx help find topics speaker

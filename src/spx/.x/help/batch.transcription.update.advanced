@@ -1,0 +1,36 @@
+BATCH TRANSCRIPTION UDPATE ADVANCED
+
+  The `spx batch transcription update` command updates an existing
+  transcription request with a new name, description, or project association.
+
+USAGE: spx batch transcription update [...]
+
+  CONNECTION                      (see: spx help batch connection)
+    --key KEY                     (see: spx help batch key)
+    --region REGION               (see: spx help batch region)
+
+  UPDATE
+    --project URL                 (see: spx help batch transcription project)
+    --name NAME                   (see: spx help batch transcription name)
+    --description DESCRIPTION     (see: spx help batch transcription description)
+    --transcription URL           (see: spx help batch transcription reference)
+
+  PARALLEL PROCESSING
+    --threads NUMBER              (see: spx help batch threads)
+    --processes NUMBER            (see: spx help batch processes)
+
+  ADVANCED
+    --input path PATH             (see: spx help batch input path)
+    --output path PATH            (see: spx help batch output path)
+    --output json FILENAME        (see: spx help batch output json)
+    --foreach in @FILENAME        (see: spx help batch foreach)
+    --save FILENAME               (see: spx help batch save)
+    --zip ZIPFILE                 (see: spx help batch zip)
+
+SEE ALSO
+
+  spx help batch output
+  spx help batch transcription update advanced
+  spx help batch transcription examples
+  spx help batch transcription list
+  

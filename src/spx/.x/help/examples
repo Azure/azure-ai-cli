@@ -1,0 +1,30 @@
+  ______ ___ _  __
+ /  ___// _ \ \/ /
+ \___ \/ ___/   <
+/____ /_/  /__/\_\
+
+USAGE: spx <command> [...]
+
+EXAMPLES
+
+  spx init
+  
+  spx config @region --set westus2
+  spx config @key --set 436172626F6E20697320636F6F6C2121
+
+  spx synthesize --text "Hello"
+  spx synthesize --files *.txt;*.ssml --audio output {id}.wav
+
+  spx recognize --microphone
+  spx recognize --files *.wav --output results.tsv
+
+  spx translate --target de --microphone
+  spx translate --source en-US --target de;es;fr --file hello.wav
+
+ADDITIONAL EXAMPLES
+
+  spx help find "mp3"
+  spx help find "mp3" --expand
+
+  spx help find topics "examples"
+  spx help list topics 

@@ -1,0 +1,11 @@
+BATCH TRANSCRIPTION LIST LANGUAGES
+
+  The `spx batch transcription list` `--languages` option
+  lists supported BATCH TRANSCRIPTION languages, in BCP-47 tag format.
+
+USAGE: spx batch transcription list [...] --languages
+
+SEE ALSO
+
+  spx help setup
+  spx help batch transcription list

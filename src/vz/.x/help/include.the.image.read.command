@@ -1,0 +1,1 @@
+  The `vz image analyze` command recognizes text found in video or images.

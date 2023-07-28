@@ -1,0 +1,23 @@
+CUSTOM SPEECH RECOGNITION DATASET
+
+@include.the.csr.dataset.command
+
+USAGE: spx csr dataset <command> [...]
+
+COMMANDS
+
+  spx csr dataset create [...]        (see: spx help csr dataset create)
+  spx csr dataset status [...]        (see: spx help csr dataset status)
+  spx csr dataset list [...]          (see: spx help csr dataset list)
+
+  spx csr dataset update [...]        (see: spx help csr dataset update)
+  spx csr dataset delete [...]        (see: spx help csr dataset delete)
+
+  spx csr dataset upload [...]        (see: spx help csr dataset upload)
+  spx csr dataset download [...]      (see: spx help csr dataset download)
+
+ADDITIONAL TOPICS
+
+  spx help csr examples
+  spx help csr list datasets
+  spx help documentation

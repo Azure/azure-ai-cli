@@ -1,0 +1,23 @@
+PROFILE FILE
+
+@include.the.profile.command
+
+  The `--file` option specifies a single local audio file to be
+  uploaded to the service for identification/verification enrollment.
+
+USAGE: spx profile enroll [...] --file @FILENAME.txt
+   OR: spx profile enroll [...] --file FILE
+
+  WHERE: FILE represents a local audio file accessible to the current user
+     OR: FILENAME.txt is a single line text file containing the file to stream
+
+EXAMPLES
+
+  spx profile enroll --id @my.id --file hello.wav --kind TextIndependentVerification
+
+  echo hello.wav>file.txt
+  spx profile enroll --id @my.id --file @file.txt --kind TextIndependentVerification
+
+SEE ALSO
+
+  spx help profile

@@ -1,0 +1,14 @@
+FACE
+
+@include.the.face.command.long
+
+COMMANDS
+
+  vz face identify [...]        (see: vz help face identify)
+  vz face verify [...]          (see: vz help face verify)
+
+ADDITIONAL TOPICS
+
+  vz help face setup
+  vz help documentation
+  vz help find topics face

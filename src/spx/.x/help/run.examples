@@ -1,0 +1,20 @@
+RUN EXAMPLES
+
+  `EXAMPLE 1`: Create and run `spx synthesize` job
+
+    spx synthesize --text Hello --audio output hello.wav --save tts.hello.job
+    spx run --job tts.hello.job
+
+  `EXAMPLE 2`: Create and run `spx recognize` job
+
+    spx recognize --file hello.wav --save sr.hello.job
+    spx run --job sr.hello.job
+
+  `EXAMPLE 3`: Run multiple jobs
+
+    spx run --jobs *hello.job
+  
+ADDITIONAL TOPICS
+
+  spx help run advanced
+  spx help run

@@ -1,0 +1,33 @@
+  ______ ___ _  __
+ /  ___// _ \ \/ /
+ \___ \/ ___/   <
+/____ /_/  /__/\_\
+
+USAGE: spx batch transcription onprem <command> [...]
+
+BATCH TRANSCRIPTION ONPREM
+
+  The `spx batch transcription onprem` command enables running against any number of 
+  user-supplied Azure Speech Containers.
+
+  NOTE: This command can only be used when running `spx` in its Linux container.
+        The container's lifetime must span all the sequence of applied commands.
+        It is recommended to `docker run` the SPX container first, and then
+        `docker exec` these commands.
+
+COMMANDS
+
+  spx batch transcription onprem create [...]          (see: spx help batch transcription onprem create)
+  spx batch transcription onprem status [...]          (see: spx help batch transcription onprem status)
+  spx batch transcription onprem list                  (see: spx help batch transcription onprem list)
+  spx batch transcription onprem delete [...]          (see: spx help batch transcription onprem delete)
+  spx batch transcription onprem endpoints [...]       (see: spx help batch transcription onprem endpoints)
+
+ADDITIONAL TOPICS
+
+  spx help setup
+  spx help batch transcription onprem examples
+
+  Learn more about running On-Premise Speech Containers:
+  https://docs.microsoft.com/azure/cognitive-services/speech-service/speech-container-howto
+ 

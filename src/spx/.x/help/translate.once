@@ -1,0 +1,21 @@
+TRANSLATE ONCE
+
+@include.the.translate.command
+
+  The `--once` option translates the first phrase in an audio stream,
+  optimized for interactive use cases.
+
+  The `--once+` option repeatedly translates phrases in an audio
+  stream, optimized for non-interactive use cases.
+
+USAGE: spx translate [...] --once
+
+EXAMPLES
+
+  spx translate --microphone --once --source en-US --target de
+  spx translate --file hello.wav --once+ --source en-US --target de
+
+SEE ALSO
+
+  spx help translate
+  spx help translate continuous

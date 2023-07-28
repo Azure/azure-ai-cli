@@ -1,0 +1,23 @@
+PROFILE CREATE
+
+@include.the.profile.command.long
+
+  The `profile create` function creates a new voice profile.
+
+USAGE: spx profile create [...]
+   OR: spx profile create [...] --output id my.id
+
+CONNECTION                      (see: spx help profile connection)
+  --key KEY                     (see: spx help profile key)
+  --region REGION               (see: spx help profile region)
+
+KIND
+  --kind KIND                   (see: spx help profile kind)
+
+ADVANCED                        
+  --output id PATH              (see: spx help profile output id)
+
+SEE ALSO
+
+  spx help profile
+  spx help profile examples

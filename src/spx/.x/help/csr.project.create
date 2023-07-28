@@ -1,0 +1,26 @@
+CUSTOM SPEECH RECOGNITION PROJECT CREATE
+
+@include.the.csr.project.create.command
+
+USAGE: spx csr project create [...]
+
+CONNECTION                      (see: spx help csr connection)
+  --key KEY                     (see: spx help csr key)
+  --region REGION               (see: spx help csr region)
+
+CREATE
+  --name NAME                   (see: spx help csr project name)
+  --language LANGUAGE           (see: spx help csr project create language)
+  --description DESCRIPTION     (see: spx help csr project description)
+
+OUTPUT                          (see: spx help csr output)
+  --output json FILENAME        (see: spx help csr output json)
+  --output url @@FILE           (see: spx help csr output url)
+  --output id @@FILE            (see: spx help csr output id)
+
+ADVANCED
+  --input path PATH             (see: spx help csr input path)
+  --output path PATH            (see: spx help csr output path)
+  --foreach in @FILENAME        (see: spx help csr foreach)
+  --save FILENAME               (see: spx help csr save)
+  --zip ZIPFILE                 (see: spx help csr zip)

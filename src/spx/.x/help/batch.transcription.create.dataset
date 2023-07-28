@@ -1,0 +1,41 @@
+BATCH TRANSCRIPTION CREATE DATASET
+
+  The `spx batch transcription create` command creates new
+  requests to transcribe remote audio streams.
+
+  The `--dataset` option specifies the content to be transcribed,
+  referring to audio data stored remotely in a custom speech recognition dataset.
+
+USAGE: spx batch transcription create [...] --dataset DATASET-ID
+   OR: spx batch transcription create [...] --dataset DATASET-URL
+   OR: spx batch transcription create [...] --dataset @FILENAME
+   OR: spx batch transcription create [...] @CONFIG-FILENAME
+
+  WHERE: DATASET-ID is the dataset ID
+     OR: DATASET-URL is the dataset URL
+     OR: FILENAME is a single line text file containing the dataset ID or URL
+     OR: CONFIG-FILENAME is a single line text file in the following form:
+
+            batch.dataset.id=ID-or-URL
+
+EXAMPLES
+
+  spx batch transcription create [...] --dataset 01234567-89ab-cdef-fedc-ba9876543210
+
+  spx config @my.dataset --set 01234567-89ab-cdef-fedc-ba9876543210
+  spx batch transcription create [...] --dataset @my.dataset
+
+  spx csr dataset create [...] --output url @@my.dataset
+  spx batch transcription create [...] --dataset @my.dataset
+
+  spx csr dataset create [...] --output url @@my.dataset
+  spx config @transcription.details --set name "My transcription"
+  spx config @transcription.details --add dataset @my.dataset
+  spx batch transcription create @transcription.details
+
+SEE ALSO
+
+  spx help csr dataset create
+  spx help config advanced
+  spx help batch transcription create
+  

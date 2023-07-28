@@ -1,0 +1,31 @@
+CONFIG REGION
+
+@include.the.config.command
+
+  The `--region` option specifies the configuration data 
+  SCOPE of use based on the REGION in use.
+
+USAGE: spx config [...] --region REGION
+
+  WHERE: REGION is the name of the region (e.g. westus, eastus, etc.)
+
+  For a full list of supported regions, see: https://aka.ms/speech/regions
+
+EXAMPLES
+
+  spx config @key --set 436172626F6E20697320636F6F6C2121 --region westus2
+  spx config @key --set 436172626F6E20697320636F6F6C2020 --region eastus
+  spx config --find key --region *
+
+  spx config @region --set westus2
+  spx recognize --file hello.wav
+
+  spx config @region --set eastus
+  spx recognize --file hello.wav
+
+  spx recognize --nodefaults --foreach region in eastus;westus2 --key @@key --file hello.wav
+
+SEE ALSO
+
+  spx help config scope
+  spx help config

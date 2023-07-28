@@ -1,0 +1,30 @@
+PERSON UPDATE
+
+@include.the.person.update.command
+
+USAGE: vz person update [...]
+
+  CONNECTION                      (see: vz help person connection)
+    --key KEY                     (see: vz help person key)
+    --region REGION               (see: vz help person region)
+    --endpoint ENDPOINT           (see: vz help person endpoint)
+
+  UPDATE
+    --id ID                       (see: vz help person id)
+    --name NAME                   (see: vz help person name)
+    --data USER-DATA              (see: vz help person user data)
+
+  GROUP
+    --group id ID                 (see: vz help person group id)
+    --group kind KIND             (see: vz help person group kind)
+
+  OUTPUT                          (see: vz help person output)
+    --output request FILENAME     (see: vz help person output request)
+    --output json FILENAME        (see: vz help person output json)
+
+SEE ALSO
+
+  vz help setup
+  vz help person update advanced
+  vz help person update examples
+  vz help find topics person

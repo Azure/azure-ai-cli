@@ -1,0 +1,28 @@
+RECOGNIZE THREADS
+
+@include.the.recognize.command
+
+  The `--threads` option specifies a how many threads to use when 
+  parallelizing recognition tasks.
+
+  The `--ramp threads every` option can optionally be used to control
+  how quickly each new thread will be added to the thread pool. If this option
+  is not specified, the default will be 0 ms, and thus the maximum number of
+  threads will immediately be available to the pool.
+
+USAGE: spx recognize [...] --threads NUMBER
+   OR: spx recognize [...] --threads NUMBER --ramp threads every MILLISECONDS
+
+  WHERE: NUMBER represents the maximum number of threads to use/pool
+    AND: MILLISECONDS represents the number of milliseconds to wait before
+         ... adding each new thread
+
+EXAMPLES
+
+  spx recognize --files @filelist.txt --threads 10
+  spx recognize --files *.wav --threads 20 --ramp threads every 30000
+
+SEE ALSO
+
+  spx help recognize
+  spx help recognize processes

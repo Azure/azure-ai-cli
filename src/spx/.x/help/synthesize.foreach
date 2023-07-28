@@ -1,0 +1,25 @@
+SYNTHESIZE FOREACH
+
+@include.the.synthesize.command
+
+  The `--foreach` option repeats a specific command multiple times
+  effectively multiplying one set of command line options by another.
+
+USAGE: spx synthesize [...] --foreach in @FILE1.tsv
+   OR: spx synthesize [...] --foreach OPT1;[OPT2;[...]] in @FILE2.tsv
+   OR: spx synthesize [...] --foreach OPT1;[OPT2;[...]] skip header in @FILE3.tsv
+
+  WHERE: OPT represents a command line option (e.g. file, audio.output.file)
+    AND: FILE1.tsv contains tab separated values, with line1: OPT1 [\t OPT2 [\t ...]]
+     OR: FILE2.tsv contains tab separated values, with data rows starting on line 1
+     OR: FILE3.tsv contains tab separated values, with data rows starting on line 2
+
+EXAMPLE
+
+  spx synthesize --foreach region in eastus;westus2 --key @@key --text Hello
+
+SEE ALSO
+
+  spx help synthesize examples
+  spx help synthesize files
+  spx help synthesize

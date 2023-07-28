@@ -1,0 +1,33 @@
+BATCH TRANSCRIPTION CREATE
+
+  The `spx batch transcription create` command creates new
+  requests to transcribe remote audio streams.
+
+USAGE: spx batch transcription create [...]
+
+  CONNECTION                      (see: spx help batch connection)
+    --key KEY                     (see: spx help batch key)
+    --region REGION               (see: spx help batch region)
+
+  CREATE
+    --name NAME                   (see: spx help batch transcription name)
+    --model URL                   (see: spx help batch transcription create model)
+    --content URL                 (see: spx help batch transcription create content)
+    --content @URLs.txt           (see: spx help batch transcription create content)
+    --language LANGUAGE           (see: spx help batch transcription create language)
+
+  PARALLEL PROCESSING
+    --threads NUMBER              (see: spx help batch threads)
+    --processes NUMBER            (see: spx help batch processes)
+
+  ADVANCED
+    --project URL                 (see: spx help batch transcription project)
+    --wait [TIMEOUT]              (see: spx help batch transcription wait)
+
+SEE ALSO
+
+  spx help setup
+  spx help batch output
+  spx help batch transcription examples
+  spx help batch transcription create advanced
+  

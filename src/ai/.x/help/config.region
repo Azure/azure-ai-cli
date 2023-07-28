@@ -1,0 +1,31 @@
+CONFIG REGION
+
+@include.the.config.command
+
+  The `--region` option specifies the configuration data 
+  SCOPE of use based on the REGION in use.
+
+USAGE: ai config [...] --region REGION
+
+  WHERE: REGION is the name of the region (e.g. westus, eastus, etc.)
+
+    For a full list of supported regions, see:  https://aka.ms/ai/regions
+
+EXAMPLES
+
+  ai config --set key 436172626F6E20697320636F6F6C2121 --region westus2
+  ai config --set key 436172626F6E20697320636F6F6C2020 --region eastus
+  ai config --find key --region *
+
+  ai config --set region westus2
+  ai complete --file prompt.txt
+
+  ai config --set region eastus
+  ai complete --file prompt.txt
+
+  ai complete --nodefaults --foreach region in eastus;westus2 --key @@key --file prompt.txt
+
+SEE ALSO
+
+  ai help config scope
+  ai help config

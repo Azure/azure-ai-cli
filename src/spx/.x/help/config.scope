@@ -1,0 +1,23 @@
+CONFIG SCOPE
+
+@include.the.config.command
+
+  @files can exist at multiple SCOPEs of use, across two kinds of SCOPEs:
+  (1) REGION specific SCOPEs
+  (2) COMMAND specific
+
+  REGION specific SCOPEs enables SPX configuration data to vary based on
+  what REGION is specified for each SPX command. For example, you likely use
+  different subscription keys dependent upon what REGION in which your Azure
+  Speech Service is running.
+
+  COMMAND specific SCOPEs enable SPX configuration data to vary based on
+  what COMMAND is being used. For example, for TRANSLATE commands you may
+  want to output the translated text default, whereas, for RECOGNIZE 
+  commands, you do not want the translated text in your output files.
+
+SEE ALSO
+
+  spx help config command
+  spx help config region
+  spx help config

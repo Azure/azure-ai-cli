@@ -1,0 +1,3 @@
+webjob.config.username=@webjob.user
+webjob.config.password=@webjob.password
+webjob.config.endpoint=@webjob.endpoint

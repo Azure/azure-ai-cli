@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+
+  <PropertyGroup>
+    <CLIAssemblyVersion>1.0.0</CLIAssemblyVersion>
+    <DefaultPublicOAISDKVersion>1.0.0-beta.6</DefaultPublicOAISDKVersion>
+    <OAISDKVersion Condition="'$(OAISDKVersion)' == ''">$(DefaultPublicOAISDKVersion)</OAISDKVersion>
+    <ErrorOnDuplicatePublishOutputFiles>false</ErrorOnDuplicatePublishOutputFiles>
+  </PropertyGroup>
+
+  <Choose>
+    <When Condition="'$(LocalBuildSDKBinPath)' == ''">
+      <ItemGroup>
+        <PackageReference Include="Azure.AI.OpenAI" Version="[$(OAISDKVersion)]" />
+      </ItemGroup>
+    </When>
+    <!-- <Otherwise>
+      <Choose>
+        <When Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+          <ItemGroup>
+            <Reference Include="Azure.AI.OpenAI">
+              <HintPath Condition="Exists('$(LocalBuildSDKBinPath)\Release\Azure.AI.OpenAI.dll')">$(LocalBuildSDKBinPath)\Release\Azure.AI.OpenAI.dll</HintPath>
+              <HintPath Condition="!Exists('$(LocalBuildSDKBinPath)\Release\Azure.AI.OpenAI.dll')">$(LocalBuildSDKBinPath)\Release\netstandard2.0\Azure.AI.OpenAI.dll</HintPath>
+            </Reference>
+          </ItemGroup>
+        </When>
+        <When Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+          <ItemGroup>
+            <Reference Include="Azure.AI.OpenAI">
+              <HintPath Condition="Exists('$(LocalBuildSDKBinPath)\Debug\Azure.AI.OpenAI.dll')">$(LocalBuildSDKBinPath)\Debug\Azure.AI.OpenAI.dll</HintPath>
+              <HintPath Condition="!Exists('$(LocalBuildSDKBinPath)\Debug\Azure.AI.OpenAI.dll')">$(LocalBuildSDKBinPath)\Debug\netstandard2.0\Azure.AI.OpenAI.dll</HintPath>
+            </Reference>
+          </ItemGroup>
+        </When>
+        <When Condition="$(Configuration.Contains('ReleaseUnixOS'))">
+          <ItemGroup>
+            <Reference Include="Azure.AI.OpenAI">
+              <HintPath>$(LocalBuildSDKBinPath)/ReleaseUnixOS/netstandard2.0/Azure.AI.OpenAI.dll</HintPath>
+            </Reference>
+          </ItemGroup>
+        </When>
+        <When Condition="$(Configuration.Contains('DebugUnixOS'))">
+          <ItemGroup>
+            <Reference Include="Azure.AI.OpenAI">
+              <HintPath>$(LocalBuildSDKBinPath)/DebugUnixOS/netstandard2.0/Azure.AI.OpenAI.dll</HintPath>
+            </Reference>
+          </ItemGroup>
+        </When>
+      </Choose>
+    </Otherwise> -->
+  </Choose>
+
+  <PropertyGroup>
+    <CLIAssemblyVersion Condition="'$(CLIAssemblyVersion)' == ''">$(OAISDKVersion)</CLIAssemblyVersion>
+    <CLIAssemblyInformationalVersion Condition="'$(CLIAssemblyInformationalVersion)' == ''">$(CLIAssemblyVersion)</CLIAssemblyInformationalVersion>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <FileVersion>$(CLIAssemblyVersion)</FileVersion>
+    <AssemblyVersion>$(CLIAssemblyVersion)</AssemblyVersion>
+    <InformationalVersion>$(CLIAssemblyInformationalVersion)</InformationalVersion>
+  </PropertyGroup>
+
+</Project>

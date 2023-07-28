@@ -1,0 +1,26 @@
+BATCH OUTPUT ID
+
+  The `--output id` option writes the batch resource reference into the SPX
+  datastore configuration file specified.
+  
+  Use this option to chain together multiple batch commands
+  in sequence, or to subsequently use the reference
+  without parsing the service JSON response. 
+  
+USAGE: spx batch [...] --output id @@FILE
+
+  WHERE: FILE is the name of the SPX configuration datastore file
+
+EXAMPLE
+
+  spx batch transcription create [...] --output id @@created.id.txt
+  spx batch transcription status --transcription @created.id.txt --wait
+
+SEE ALSO
+
+  spx help batch transcription create
+  spx help batch transcription status
+  spx help batch output json
+  spx help batch output url
+  spx help batch output
+  spx help batch

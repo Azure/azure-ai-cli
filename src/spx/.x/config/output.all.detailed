@@ -1,0 +1,6 @@
+output.all.audio.input.id=true
+output.all.recognizer.session.started.sessionid=true
+output.all.recognizer.recognized.result.latency=true
+output.all.recognizer.recognized.result.text=true
+output.all.recognizer.recognizing.result.latency=true
+output.all.recognizer.recognized.result.json=true

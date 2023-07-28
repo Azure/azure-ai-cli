@@ -1,0 +1,42 @@
+SYNTHESIZE EXAMPLES
+
+  `INIT`: Automatically setup spx with REGION and KEY default values
+
+    spx init
+
+  `SETUP`: Manually setup spx with REGION and KEY default values
+
+    spx config synthesize @region --set westus2
+    spx config synthesize @key --set 436172626F6E20697320636F6F6C2121
+
+  `EXAMPLE 1`: Synthesize text into speech on default speakers
+  
+    spx synthesize --text "Hello"
+
+  `EXAMPLE 2`: Synthesize text into speech in a WAV file
+
+    spx synthesize --text "Hello" --audio output hello.wav
+
+  `EXAMPLE 3`: Synthesize text or SSML from a file and save output to WAV file
+
+    spx synthesize --file file.txt --audio output text.wav
+    spx synthesize --file file.ssml --audio output ssml.wav
+
+  `EXAMPLE 4`: Synthesize speech from multiple files using wildcards
+
+    spx synthesize --files *.txt;*.ssml --audio output {id}.wav
+
+  `EXAMPLE 5`: Synthesize from TSV file with input and output file names
+
+    spx synthesize --foreach input.file;audio.output in @filelist.txt
+
+    WHERE: `filelist.txt` is the filename for a file containing tab delimited content:
+
+      textFileName1 \t wavOutputFileName1
+      ssmlFileName2 \t wavOutputFileName2
+
+ADDITIONAL TOPICS
+
+  spx help setup
+  spx help synthesize
+  spx help synthesize advanced

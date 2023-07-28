@@ -1,0 +1,46 @@
+BATCH LIST ADVANCED
+
+  The `spx batch list` command lists resources related to Azure
+  Speech Service batch operations.
+
+USAGE: spx batch list [...]
+
+  CONNECTION                      (see: spx help batch connection)
+    --key KEY                     (see: spx help batch key)
+    --region REGION               (see: spx help batch region)
+
+  TRANSCRIPTIONS
+    --transcriptions              (see: spx help batch transcription list)
+    --transcription languages     (see: spx help batch transcription list languages)
+
+  TRANSCRIPT FILES
+    --transcription URL           (see: spx help batch transcription reference)
+    --files                       (see: spx help batch transcription list files)
+
+  OUTPUT
+    --output json FILENAME        (see: spx help batch output json)
+    --output urls @@FILE          (see: spx help batch output urls)
+    --output url @@FILE           (see: spx help batch output url)
+    --output ids @@FILE           (see: spx help batch output ids)
+    --output id @@FILE            (see: spx help batch output id)
+    --skip NUMBER
+    --top NUMBER
+    --tail NUMBER
+
+  PARALLEL PROCESSING
+    --threads NUMBER              (see: spx help batch threads)
+    --processes NUMBER            (see: spx help batch processes)
+
+  ADVANCED
+    --project URL                 (see: spx help batch transcription project)
+    --input path PATH             (see: spx help batch input path)
+    --output path PATH            (see: spx help batch output path)
+    --foreach in @FILENAME        (see: spx help batch foreach)
+    --save FILENAME               (see: spx help batch save)
+    --zip ZIPFILE                 (see: spx help batch zip)
+
+SEE ALSO
+
+  spx help batch download
+  spx help batch output
+  

@@ -1,0 +1,4 @@
+﻿x.command=run
+run.input.vz.command=vz config @name227266
+run.input.process=vz
+run.output.expect=@config.local.name227266.2.get.test.run.output.expected

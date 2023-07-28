@@ -1,0 +1,27 @@
+RUN
+
+@include.the.run.command
+
+USAGE: vz run [...]
+
+  RUN
+    --command COMMAND
+    --args ARG1;ARG2[;...]
+    --args @FILENAME
+    --args "ARGS"
+
+  JOBs
+    --job FILE
+    --jobs FILE1;FILE2[;...]
+    --jobs @FILELIST.txt
+
+EXAMPLE
+
+    vz image analyze --file image1.jpg --save analyze.1.job
+    vz run --job analyze.1.job
+
+SEE ALSO
+
+  vz help run advanced
+  vz help run examples
+  vz help find topics run

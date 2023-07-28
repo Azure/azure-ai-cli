@@ -1,0 +1,76 @@
+BATCH OUTPUT
+
+  The `spx batch` command manages Azure Speech Service batch operations.
+
+  BATCH DOWNLOAD FILE OUTPUT
+
+    When using `spx batch download` or `spx batch transcription download`, the
+    `--output file` option specifies the name of the downloaded file.
+    
+    Use this option when you want to use a different filename than the default.
+
+    SEE ALSO
+
+      spx help batch transcription download
+      spx help batch download output file
+      spx help batch download
+
+  BATCH OPERATION REQUEST OUTPUT
+
+    For all `spx batch` commands, the `--output request` option writes the
+    HTTP request into the file specified.
+    
+    Use this option to inspect how the REST API operates.
+
+    SEE ALSO
+
+      spx help batch output request
+      spx help batch output json
+
+  BATCH OPERATION RESPONSE OUTPUT
+
+    For all `spx batch` commands, the `--output json` option writes the service
+    JSON response into the file specified.
+    
+    Use this option to save the service JSON response.
+
+    SEE ALSO
+
+      spx help batch output json
+      spx help batch output request
+
+  BATCH RESOURCE REFERENCE OUTPUT - URL or ID
+
+    For the `spx batch` `create` and `status` commands, the `--output url` and
+    `--output id` options write the batch resource reference into the SPX
+    datastore configuration file specified.
+    
+    Use this option to chain together multiple batch commands
+    in sequence, or to subsequently use the reference
+    without parsing the service JSON response. 
+
+    SEE ALSO
+
+      spx help batch transcription create
+      spx help batch transcription status
+      spx help batch output id
+      spx help batch output url
+
+  BATCH RESOURCE REFERENCE LIST OUTPUT - URLs or IDs
+
+    The `--output urls` and `--output ids` options write the list of batch
+    resource references into the SPX datastore configuration file specified.
+  
+    Use this option to chain together multiple batch commands
+    in sequence, or to subsequently use the reference
+    list without parsing the service JSON response. 
+
+    SEE ALSO
+    
+      spx help batch output ids
+      spx help batch output urls
+
+SEE ALSO
+
+  spx help config
+  spx help batch transcription

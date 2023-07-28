@@ -1,0 +1,4 @@
+﻿x.command=run
+run.input.spx.command=config local transcribe @key --clear --region westus2
+run.input.process=spx
+x.quiet=true

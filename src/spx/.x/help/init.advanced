@@ -1,0 +1,35 @@
+INIT
+
+@include.the.init.command.long
+
+USAGE: spx init [...]
+
+  AZURE
+    --subscription SUBSCRIPTION   (see: spx help init subscription)
+
+  INTERACTIVE
+    --interactive BOOL            (see: spx help init interactive)
+
+  RESOURCE
+    --region REGION               (see: spx help init region)
+    --group GROUP                 (see: spx help init group)
+    --name NAME                   (see: spx help init name)
+
+  PARALLEL PROCESSING
+    --threads NUMBER              (see: spx help init threads)
+    --processes NUMBER            (see: spx help init processes)
+    --repeat NUMBER
+    --max NUMBER
+
+  ADVANCED
+    --foreach in @ITEMS.txt       (see: spx help init foreach)
+    --save FILENAME               (see: spx help init save)
+    --zip ZIPFILE                 (see: spx help init zip)
+
+SEE ALSO
+
+  spx help setup
+  spx help config
+  spx help config hive
+  spx help init examples
+  spx help find topics init

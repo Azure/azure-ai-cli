@@ -1,0 +1,27 @@
+PERSON FACE LIST
+
+@include.the.person.face.list.command
+
+USAGE: vz person face list [...]
+
+  CONNECTION                      (see: vz help person connection)
+    --key KEY                     (see: vz help person key)
+    --region REGION               (see: vz help person region)
+    --endpoint ENDPOINT           (see: vz help person endpoint)
+
+  LIST
+    --person id ID                (see: vz help person id)
+    --group id ID                 (see: vz help person group id)
+    --group kind KIND             (see: vz help person group kind)
+
+  OUTPUT                          (see: vz help person output)
+    --output ids @FILE            (see: vz help person output ids)
+    --output request FILENAME     (see: vz help person output request)
+    --output json FILENAME        (see: vz help person output json)
+
+SEE ALSO
+
+  vz help setup
+  vz help person face list advanced
+  vz help person face list examples
+  vz help find topics person face

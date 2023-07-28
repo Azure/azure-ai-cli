@@ -1,0 +1,20 @@
+RECOGNIZE - UPDATING DEFAULT CONNECTION
+
+EXAMPLES
+
+    spx config recognize @default.connection --set host wss://localhost:5000/
+    spx config recognize @key --set @@none
+
+    spx config recognize @default.connection --set host wss://chinaeast2.stt.speech.azure.cn
+    spx config recognize @key --set 436172626F6E20697320636F6F6C2121
+
+    spx config recognize @default.connection --set @@connection.from.endpoint
+    spx config recognize @endpoint --set wss://westus2.stt.speech.microsoft.com/speech/recognition/conversation/cognitiveservices/v1
+    spx config recognize @key --set 436172626F6E20697320636F6F6C2121
+
+    spx config recognize @default.connection --set @@connection.from.region
+    spx config recognize @key --set 436172626F6E20697320636F6F6C2121
+    spx config recognize @region --set westus2
+
+    spx config recognize @default.connection --set @@connection.from.host
+    spx config recognize @host --set wss://localhost:5000/

@@ -1,0 +1,16 @@
+BATCH TRANSCRIPTION LIST FILES
+
+  The `spx batch transcription list` command lists existing batch
+  transcriptions, providing details for each.
+
+USAGE: spx batch transcription list [...] --files
+
+EXAMPLES
+
+  spx batch transcription list --skip 0 --top 1 --output url @@transcription-url.txt
+  spx batch transcription list --files --transcription @transcription-url.txt --output last url @@file-url.txt
+
+SEE ALSO
+
+  spx help config advanced
+  spx help batch transcription create

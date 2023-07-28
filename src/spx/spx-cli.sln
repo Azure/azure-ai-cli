@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29613.14
+MinimumVisualStudioVersion = 16.0.29613.14
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "spx-cli", "spx-cli.csproj", "{0F84ECFA-1B83-4A94-9F4C-731AEE75E74D}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|x64 = Debug|x64
+		Release|x64 = Release|x64
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{0F84ECFA-1B83-4A94-9F4C-731AEE75E74D}.Debug|x64.ActiveCfg = Debug|x64
+		{0F84ECFA-1B83-4A94-9F4C-731AEE75E74D}.Debug|x64.Build.0 = Debug|x64
+		{0F84ECFA-1B83-4A94-9F4C-731AEE75E74D}.Release|x64.ActiveCfg = Release|x64
+		{0F84ECFA-1B83-4A94-9F4C-731AEE75E74D}.Release|x64.Build.0 = Release|x64
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {11C89A45-BF41-43FB-8FB1-6903597DC469}
+	EndGlobalSection
+EndGlobal

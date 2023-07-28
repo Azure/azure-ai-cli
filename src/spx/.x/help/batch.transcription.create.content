@@ -1,0 +1,28 @@
+BATCH TRANSCRIPTION CREATE CONTENT
+
+  The `spx batch transcription create` command creates new
+  transcription requests to transcribe remote audio streams.
+
+  The `--content` option specifies the content to be transcribed,
+  referring to audio data stored remotely and accessible at supplied URLs.
+
+USAGE: spx batch transcription create [...] --content URL
+   OR: spx batch transcription create [...] --content URL1;URL2[;...]
+   OR: spx batch transcription create [...] --content @URLs.txt
+
+  WHERE: URL points to an audio file, or a .ZIP containing multiple audio files
+     OR: URLs.txt is a text file containing one or more URLs
+
+EXAMPLES
+
+  spx batch transcription create --name "Example 1" --content http://crbn.us/hello.wav
+
+  spx config @urls.txt --clear
+  spx config @urls.txt --add http://crbn.us/hello.wav
+  spx config @urls.txt --add http://crbn.us/whatstheweatherlike.wav
+  spx batch transcription create --name "Example 2" --content @urls.txt
+
+SEE ALSO
+
+  spx help config advanced
+  spx help batch transcription create

@@ -1,0 +1,22 @@
+CONFIG HIVE
+
+@include.the.config.command
+
+  The `--hive` option specifies which configuration data HIVE to use.
+
+USAGE: spx config [@FILE] --hive HIVE [...]
+   OR: spx config HIVE [@FILE] [...]
+
+  WHERE: HIVE is `.`        (working directory, e.g. './')
+     OR: HIVE is `local`    (working directory config, e.g. './.spx/')
+     OR: HIVE is `user`     (local user directory config, e.g. 'C:\Users\USERNAME/.spx/')
+     OR: HIVE is `global`   (roaming user directory config, e.g. 'C:\Users\USERNAME\AppData\Roaming\.spx/')
+     OR: HIVE is `system`   (spx process file location config, e.g. 'where spx.exe')
+
+   NOTE: HIVES are searched or used in the order specified above.
+
+SEE ALSO
+
+  spx help config command
+  spx help config region
+  spx help config

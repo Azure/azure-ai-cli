@@ -1,0 +1,21 @@
+CUSTOM SPEECH RECOGNITION ENDPOINT DELETE
+
+@include.the.csr.endpoint.delete.command
+
+USAGE: spx csr endpoint delete [...]
+
+CONNECTION                      (see: spx help csr connection)
+  --key KEY                     (see: spx help csr key)
+  --region REGION               (see: spx help csr region)
+
+DELETE
+  --endpoint URL                (see: spx help csr endpoint delete endpoint)
+  --endpoint log URL            (see: spx help csr endpoint delete endpoint log)
+
+ADVANCED                        (see: spx help csr advanced)
+  --input path PATH             (see: spx help csr input path)
+  --output path PATH            (see: spx help csr output path)
+  --output json FILENAME        (see: spx help csr output json)
+  --foreach in @FILENAME        (see: spx help csr foreach)
+  --save FILENAME               (see: spx help csr save)
+  --zip ZIPFILE                 (see: spx help csr zip)

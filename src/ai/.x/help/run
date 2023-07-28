@@ -1,0 +1,27 @@
+RUN
+
+@include.the.run.command
+
+USAGE: ai run [...]
+
+  RUN
+    --command COMMAND
+    --args ARG1;ARG2[;...]
+    --args @FILENAME
+    --args "ARGS"
+
+  JOBs
+    --job FILE
+    --jobs FILE1;FILE2[;...]
+    --jobs @FILELIST.txt
+
+EXAMPLE
+
+    ai complete --file prompt.txt --save complete.1.job
+    ai run --job complete.1.job
+
+SEE ALSO
+
+  ai help run advanced
+  ai help run examples
+  ai help find topics run

@@ -1,0 +1,51 @@
+TRANSLATE OUTPUT ALL
+
+@include.the.translate.command
+
+  The `--output all` option specifies an ITEM to accumulate and
+  aggregate into a TSV or JSON output file, combined across all events.
+
+  The `--output all file` option specifies the output filename. 
+
+  The `--output all file type` option specifies the output file type,
+  either JSON or TSV (tab separated values). If no file type is provided,
+  the output file will be TSV by default.
+
+USAGE: spx translate [...] --output all ITEM
+   OR: spx translate [...] --output all file FILENAME
+   OR: spx translate [...] --output all file type TYPE
+
+   WHERE: FILENAME represents a local text file writable by the current user
+     OR: FILE is `-` represents STDOUT, where TSV or JSON data will be saved
+
+  NOTE: Default output uses the `@output.all.standard` preset template
+
+    output.all.audio.input.id=true
+    output.all.translator.session.started.sessionid=true
+    output.all.translator.translated.result.text=true
+
+EXAMPLES
+
+  spx translate --once --output all text
+  spx translate --once --output all text --output all file output.tsv
+  spx translate --once --output all text --output all file type json
+
+  spx config translate @default.output --set @@output.all.standard
+  spx config translate @default.output --set @@output.all.detailed
+  spx config translate @default.output --set @@output.all.latency
+  spx config translate @default.output --set @@output.all.transcript.display
+  spx config translate @default.output --set @@output.all.transcript.lexical
+
+  spx config translate @default.output --add @@translate.output.all.translated.text
+
+  spx config translate @default.output --clear
+  spx config translate @default.output --add output.all.id true
+  spx config translate @default.output --add output.all.sessionid true
+  spx config translate @default.output --add output.all.text true
+  spx config translate @default.output --add output.all.result.translated.text true
+
+SEE ALSO
+
+  spx help translate output overview
+  spx help translate output examples
+  spx help translate

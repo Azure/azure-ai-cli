@@ -1,0 +1,21 @@
+KEY OVERVIEW
+
+@include.the.azure.speech.service
+
+  To find the subscription KEY for an existing resource, first, locate the
+  resource on https://portal.azure.com. The subscription KEY is listed at
+  the top of the Quick start tab under Resource Management.
+
+  To create new Azure Speech Service resource, see https://aka.ms/speech/create.
+
+USAGE: spx <command> [...] --key KEY
+   OR: spx <command> [...] --key @FILENAME
+   OR: spx <command> [...] @CONFIG-FILENAME
+
+@include.the.key.option.where
+
+SEE ALSO
+
+  spx help setup
+  spx help examples
+  spx help region overview

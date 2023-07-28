@@ -1,0 +1,21 @@
+PROFILE
+
+@include.the.profile.command.long
+
+USAGE: spx profile <command> [...]
+
+COMMANDS
+
+  spx profile create [...]        (see: spx help profile create)
+  spx profile enroll [...]        (see: spx help profile enroll)
+
+  spx profile status [...]        (see: spx help profile status)
+  spx profile list [...]          (see: spx help profile list)
+
+  spx profile delete [...]        (see: spx help profile delete)
+
+SEE ALSO
+
+  spx help profile examples
+  spx help profile documentation
+  spx help find topics profile

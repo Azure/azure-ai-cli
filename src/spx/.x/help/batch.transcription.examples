@@ -1,0 +1,54 @@
+BATCH TRANSCRIPTION EXAMPLES
+
+  `INIT`: Automatically setup spx with REGION and KEY default values
+
+    spx init
+
+  `SETUP`: Manually setup spx with REGION and KEY default values
+
+    spx config batch @region --set westus2
+    spx config batch @key --set 436172626F6E20697320636F6F6C2121
+
+  `EXAMPLE 1`: Create a batch transcription for an audio file
+
+    spx batch transcription create --name "Example 1" --content https://crbn.us/hello.wav
+
+  `EXAMPLE 2`: Create a batch transcription for two remote audio files
+
+    spx config @audio.urls.txt --clear
+    spx config @audio.urls.txt --add http://crbn.us/hello.wav
+    spx config @audio.urls.txt --add http://crbn.us/whatstheweatherlike.wav
+    spx batch transcription create --name "Example 2" --content @audio.urls.txt
+
+  `EXAMPLE 3`: Create a batch of transcriptions, and only return when done
+
+    SAVE JOB
+
+      spx config @audio.urls.txt --clear
+      spx config @audio.urls.txt --add http://crbn.us/hello.wav
+      spx config @audio.urls.txt --add http://crbn.us/whatstheweatherlike.wav
+      spx batch transcription create --name "Example 3" --content @audio.urls.txt --save transcription.job
+
+    EXECUTE JOB
+
+      spx batch transcription create @transcription.job --wait
+
+  `EXAMPLE 4`: List transcriptions previously created
+
+    spx batch transcription list
+
+  `EXAMPLE 5`: List transcription files for most recently created/completed transcription
+
+    spx batch transcription list --output last url @@transcription.url.txt
+    spx batch transcription list --files --transcription @transcription.url.txt
+
+  `EXAMPLE 6`: Download all transcription files
+
+    spx batch transcription list --output last url @@transcription.url.txt
+    spx batch transcription list --files --transcription @transcription.url.txt --output urls @@file.urls.txt
+    spx batch transcription download --foreach file in @file.urls.txt --output path ./files
+
+SEE ALSO
+
+  spx help batch transcription
+  spx help batch transcription more examples

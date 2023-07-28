@@ -1,0 +1,16 @@
+RECOGNIZE CONNECT
+
+@include.the.recognize.command
+
+  The `--connect` option forces connection to the service
+  earlier in the process to decrease overall latency.
+
+USAGE: spx recognize [...] --connect
+
+EXAMPLE
+
+  spx recognize --file hello.wav --connect
+
+SEE ALSO
+
+  spx help recognize

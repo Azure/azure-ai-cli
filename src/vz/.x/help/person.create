@@ -1,0 +1,30 @@
+PERSON CREATE
+
+@include.the.person.create.command
+
+USAGE: vz person create [...]
+
+  CONNECTION                      (see: vz help person connection)
+    --key KEY                     (see: vz help person key)
+    --region REGION               (see: vz help person region)
+    --endpoint ENDPOINT           (see: vz help person endpoint)
+
+  CREATE
+    --name NAME                   (see: vz help person name)
+    --data USER-DATA              (see: vz help person user data)
+
+  GROUP
+    --group id ID                 (see: vz help person group id)
+    --group kind KIND             (see: vz help person group kind)
+
+  OUTPUT                          (see: vz help person output)
+    --output request FILENAME     (see: vz help person output request)
+    --output json FILENAME        (see: vz help person output json)
+    --output id @FILE             (see: vz help person output id)
+
+SEE ALSO
+
+  vz help setup
+  vz help person create advanced
+  vz help person create examples
+  vz help find topics person

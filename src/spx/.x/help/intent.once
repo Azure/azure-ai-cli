@@ -1,0 +1,23 @@
+INTENT ONCE
+
+@include.the.intent.command
+
+@include.the.intent.method
+
+  The `--once` option recognizes the first phrase in an audio stream,
+  optimized for interactive use cases.
+
+  The `--once+` option repeatedly recognizes phrases in an audio
+  stream, optimized for non-interactive use cases.
+
+USAGE: spx intent [...] --once
+
+EXAMPLES
+
+  spx intent --microphone --once
+  spx intent --file hello.wav --once+
+
+SEE ALSO
+
+  spx help intent
+  spx help intent continuous

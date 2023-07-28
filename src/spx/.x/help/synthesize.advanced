@@ -1,0 +1,62 @@
+SYNTHESIZE
+
+@include.the.synthesize.command.long
+
+USAGE: spx synthesize [...]
+
+  CONNECTION                      (see: spx help synthesize connection)
+    --key KEY                     (see: spx help synthesize key)
+    --region REGION               (see: spx help synthesize region)
+    --endpoint URI                (see: spx help synthesize endpoint)
+    --token VALUE                 (see: spx help synthesize token)
+
+  SERVICE
+    --traffic type test           (see: spx help traffic type)
+    --query string name=value     (see: spx help query string)
+
+  VOICEs
+    --voice NAME                  (see: spx help synthesize voice)
+    --voices                      (see: spx help synthesize list voices)
+
+  INPUT                           (see: spx help synthesize input)
+    --interactive                 (see: spx help synthesize interactive)
+    --text TEXT                   (see: spx help synthesize text)
+    --ssml SSML                   (see: spx help synthesize ssml)
+    --file FILE                   (see: spx help synthesize file)
+    --files PATTERN               (see: spx help synthesize files)
+    --files @FILELIST.txt         (see: spx help synthesize files)
+    --format FORMAT               (see: spx help synthesize format)
+    --url URL                     (see: spx help synthesize url)
+    --urls URL                    (see: spx help synthesize urls)
+    --urls @URLLIST.txt           (see: spx help synthesize urls)
+    --id url URL                  (see: spx help input id)
+    --id ID                       (see: spx help input id)
+
+  OUTPUT                          (see: spx help synthesize output)
+    --speakers                    (see: spx help synthesize speakers)
+    --audio output FILENAME       (see: spx help synthesize audio output)
+    --output all [<item>]         (see: spx help synthesize output all)
+    --output each [<item>]        (see: spx help synthesize output each)
+    --output all file FILENAME    (see: spx help synthesize output all file)
+    --output each file FILENAME   (see: spx help synthesize output each file)
+
+  PARALLEL PROCESSING
+    --threads NUMBER              (see: spx help synthesize threads)
+    --processes NUMBER            (see: spx help synthesize processes)
+    --repeat NUMBER
+    --max NUMBER
+
+  ADVANCED
+    --log FILENAME                (see: spx help synthesize log)
+    --proxy HOSTNAME              (see: spx help synthesize proxy)
+    --property NAME=VALUE         (see: spx help synthesize property)
+    --properties @PROPLIST.txt    (see: spx help synthesize properties)
+    --foreach in @ITEMS.txt       (see: spx help synthesize foreach)
+    --save FILENAME               (see: spx help synthesize save)
+    --zip ZIPFILE                 (see: spx help synthesize zip)
+
+SEE ALSO
+
+  spx help setup
+  spx help synthesize examples
+  spx help find topics synthesize

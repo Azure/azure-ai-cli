@@ -1,0 +1,31 @@
+INTENT PROXY
+
+@include.the.intent.command
+
+  The `--proxy` option specifies a HTTP proxy host name. 
+  The `--proxy port` option specifies the HTTP proxy port.
+
+USAGE: spx intent [...] --proxy PROXY
+   OR: spx intent [...] --proxy PROXY --proxy port PORT
+   OR: spx intent [...] @CONFIG-FILENAME
+
+  WHERE: PROXY represents the PROXY host (e.g. localhost)
+     OR: PORT represents the PROXY port (e.g. 80, which is the default)
+     OR: CONFIG-FILENAME is a multi-line text file as follows:
+
+            service.config.proxy.host=HOST
+            service.config.proxy.port=PORT
+
+EXAMPLES
+
+  spx intent --file hello.wav --proxy localhost --proxy port 8888
+
+  spx config intent @fiddler --set proxy.host localhost
+  spx config intent @fiddler --add proxy.port 8888
+
+  spx intent --file hello.wav @fiddler
+
+SEE ALSO
+
+  spx help intent
+  spx help config

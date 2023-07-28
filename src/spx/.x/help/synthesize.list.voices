@@ -1,0 +1,12 @@
+SYNTHESIZE LIST VOICEs
+
+@include.the.synthesize.command
+
+  The `--voices` option lists supported VOICE NAMEs, and their
+  corresponding languages (locales), in BCP-47 tag format.
+
+USAGE: spx synthesize [...] --voices
+
+SEE ALSO
+
+  spx help setup

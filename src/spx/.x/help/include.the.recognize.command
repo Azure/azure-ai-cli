@@ -1,0 +1,1 @@
+  The `spx recognize` command recognizes streaming audio.

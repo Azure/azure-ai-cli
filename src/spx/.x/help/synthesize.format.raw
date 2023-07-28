@@ -1,0 +1,26 @@
+SYNTHESIZE RAW
+
+@include.the.synthesize.command
+
+  The `--format` option specifies the container format for the
+  audio file being generated.
+
+USAGE: spx synthesize [...] --format FORMAT
+
+  WHERE: FORMAT is raw
+     OR: FORMAT is raw-16khz-16bit-mono-pcm
+     OR: FORMAT is raw-16khz-16bit-mono-truesilk
+     OR: FORMAT is raw-24khz-16bit-mono-pcm
+     OR: FORMAT is raw-24khz-16bit-mono-truesilk
+     OR: FORMAT is raw-48khz-16bit-mono-pcm
+     OR: FORMAT is raw-8khz-16bit-mono-pcm
+     OR: FORMAT is raw-8khz-8bit-mono-alaw
+     OR: FORMAT is raw-8khz-8bit-mono-mulaw
+
+  NOTE: The default `raw` format is `raw-16khz-16bit-mono-pcm`
+  
+SEE ALSO
+
+  spx help synthesize audio output
+  spx help synthesize format
+  spx help synthesize

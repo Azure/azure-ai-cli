@@ -1,0 +1,538 @@
+# -----------------------------------------------------------------------------
+# CI/CD pipeline for SPX tool
+# -----------------------------------------------------------------------------
+trigger:
+- master
+
+variables:
+  SIGN_PARAMS_DLL: |
+    [
+      {
+        "keyCode": "CP-230012",
+        "operationSetCode": "SigntoolSign",
+        "parameters": [
+          {
+            "parameterName": "OpusName",
+            "parameterValue": "Microsoft"
+          },
+          {
+            "parameterName": "OpusInfo",
+            "parameterValue": "http://www.microsoft.com"
+          },
+          {
+            "parameterName": "PageHash",
+            "parameterValue": "/NPH"
+          },
+          {
+            "parameterName": "FileDigest",
+            "parameterValue": "/fd sha256"
+          },
+          {
+            "parameterName": "TimeStamp",
+            "parameterValue": "/tr \"http://rfc3161.gtm.corp.microsoft.com/TSS/HttpTspServer\" /td sha256"
+          }
+        ],
+        "toolName": "signtool.exe",
+        "toolVersion": "6.2.9304.0"
+      },
+      {
+          "keyCode": "CP-230012",
+          "operationSetCode": "SigntoolVerify",
+          "parameters": [ ],
+          "toolName": "signtool.exe",
+          "toolVersion": "6.2.9304.0"
+       }
+    ]
+  
+  SIGN_PARAMS_NUGET: |
+    [ 
+      {
+          "keyCode": "CP-401405",
+          "operationSetCode": "NuGetSign",
+          "parameters": [ ],
+          "toolName": "sign",
+          "toolVersion": "1.0"
+      },
+      {
+          "keyCode": "CP-401405",
+          "operationSetCode": "NuGetVerify",
+          "parameters": [ ],
+          "toolName": "sign",
+          "toolVersion": "1.0"
+      }
+    ]
+
+jobs:
+
+# -----------------------------------------------------------------------------
+# Build job, definition, and all steps
+# -----------------------------------------------------------------------------
+- job: Build
+  condition: true
+
+  pool:
+      name: SkymanWS2022Compliant
+
+  steps:
+
+  # -----------------------------------------------------------------------------
+  # Restore version variables if triggered from SDK Build
+  # -----------------------------------------------------------------------------
+  - script: 'env | sort'
+    displayName: "echo Environment variables"
+  - bash: |
+      set +x
+      echo "##vso[task.setvariable variable=TRIGGEREDBY_SPEECHSDK_VERSION]${BUILD_TRIGGEREDBY_BUILDNUMBER}"
+      echo "##vso[task.setvariable variable=TRIGGEREDBY_SPEECHSDK_VERSION_SUFFIX_ONLY]-${BUILD_TRIGGEREDBY_BUILDNUMBER##*-}"
+      echo "##vso[task.setvariable variable=TRIGGEREDBY_SPEECHSDK_VERSION_VERSION_ONLY]${BUILD_TRIGGEREDBY_BUILDNUMBER%%-*}"
+    displayName: 'Restore version variables from triggering build (part 1)'
+    condition: eq(variables['Build.Reason'], 'BuildCompletion')
+  - bash: |
+      set +x
+      echo TRIGGEREDBY_SPEECHSDK_VERSION=${TRIGGEREDBY_SPEECHSDK_VERSION}
+      echo TRIGGEREDBY_SPEECHSDK_VERSION_VERSION_ONLY=${TRIGGEREDBY_SPEECHSDK_VERSION_VERSION_ONLY}
+      echo TRIGGEREDBY_SPEECHSDK_VERSION_SUFFIX_ONLY=${TRIGGEREDBY_SPEECHSDK_VERSION_SUFFIX_ONLY}
+      echo "##vso[task.setvariable variable=SpeechSDKVersion]$(TRIGGEREDBY_SPEECHSDK_VERSION)"
+      echo "##vso[task.setvariable variable=spx.version]$(TRIGGEREDBY_SPEECHSDK_VERSION_VERSION_ONLY)"
+      echo "##vso[task.setvariable variable=spx.version.suffix]$(TRIGGEREDBY_SPEECHSDK_VERSION_SUFFIX_ONLY)"
+    displayName: 'Restore version variables from triggering build (part 2)'
+    condition: eq(variables['Build.Reason'], 'BuildCompletion')
+  - script: 'env | sort'
+    displayName: "echo Environment variables 2"
+    condition: eq(variables['Build.Reason'], 'BuildCompletion')
+
+  # -----------------------------------------------------------------------------
+  # Install NuGet and run NuGet restore
+  # -----------------------------------------------------------------------------
+  - task: NuGetToolInstaller@0
+    displayName: 'Use NuGet 5.5.1'
+    inputs:
+      versionSpec: 5.5.1
+
+  - task: NuGetCommand@2
+    displayName: 'NuGet restore'
+    inputs:
+      includeNuGetOrg: false
+      feedsToUse: config
+      nugetConfigPath: 'spx/NuGet.Config'
+      restoreSolution: '$(Parameters.solution)'
+
+  # -----------------------------------------------------------------------------
+  # Restore, build, and publish for Windows dotnet core
+  # -----------------------------------------------------------------------------
+  - task: DotNetCoreCLI@2
+    displayName: 'dotnet restore windows'
+    inputs:
+      command: restore
+      publishWebProjects: false
+      projects: '**/spx-cli.csproj'
+      arguments: '/p:VersionAssembly=$(spx.version) /p:Version=$(spx.version) /p:AssemblyVersion=$(spx.version) /p:VersionSuffix=$(spx.version.suffix) /p:SpeechSDKVersion=$(SpeechSDKVersion) -r win-x64'
+      workingDirectory: spx
+      zipAfterPublish: false
+      includeNuGetOrg: false
+      feedsToUse: config
+      nugetConfigPath: 'spx/NuGet.Config'
+      noCache: true
+
+  - task: DotNetCoreCLI@2
+    displayName: 'dotnet build windows'
+    inputs:
+      command: build
+      publishWebProjects: false
+      projects: '**/spx-cli.csproj'
+      arguments: '/p:VersionAssembly=$(spx.version) /p:Version=$(spx.version) /p:AssemblyVersion=$(spx.version) /p:VersionSuffix=$(spx.version.suffix) --version-suffix $(spx.version.suffix) /p:SpeechSDKVersion=$(SpeechSDKVersion) -r win-x64 -c $(BuildConfiguration) --no-restore'
+      workingDirectory: spx
+      zipAfterPublish: false
+      includeNuGetOrg: false
+      feedsToUse: config
+      nugetConfigPath: 'spx/NuGet.Config'
+
+  - task: DotNetCoreCLI@2
+    displayName: 'dotnet publish windows'
+    inputs:
+      command: publish
+      publishWebProjects: false
+      projects: '**/spx-cli.csproj'
+      arguments: '/p:VersionAssembly=$(spx.version) /p:Version=$(spx.version) /p:AssemblyVersion=$(spx.version) /p:VersionSuffix=$(spx.version.suffix) --version-suffix $(spx.version.suffix) /p:SpeechSDKVersion=$(SpeechSDKVersion) -r win-x64 -c $(BuildConfiguration) --no-restore --no-build /p:IncludeSymbols=false /p:PublishProfile="Properties\PublishProfiles\folder publish spx-cli release (win-x64).pubxml"'
+      workingDirectory: spx
+      zipAfterPublish: false
+      modifyOutputPath: true
+      includeNuGetOrg: false
+      feedsToUse: config
+      nugetConfigPath: 'spx/NuGet.Config'
+
+  # -----------------------------------------------------------------------------
+  # Restore, build, and publish Linux dotnet core
+  # -----------------------------------------------------------------------------
+  - task: DotNetCoreCLI@2
+    displayName: 'dotnet restore linux'
+    inputs:
+      command: restore
+      publishWebProjects: false
+      projects: '**/spx-cli.csproj'
+      arguments: '/p:VersionAssembly=$(spx.version) /p:Version=$(spx.version) /p:AssemblyVersion=$(spx.version) /p:VersionSuffix=$(spx.version.suffix) /p:SpeechSDKVersion=$(SpeechSDKVersion) -r linux-x64'
+      workingDirectory: spx
+      zipAfterPublish: false
+      includeNuGetOrg: false
+      feedsToUse: config
+      nugetConfigPath: 'spx/NuGet.Config'
+      noCache: true
+
+  - task: DotNetCoreCLI@2
+    displayName: 'dotnet build linux'
+    inputs:
+      command: build
+      publishWebProjects: false
+      projects: '**/spx-cli.csproj'
+      arguments: '/p:VersionAssembly=$(spx.version) /p:Version=$(spx.version) /p:AssemblyVersion=$(spx.version) /p:VersionSuffix=$(spx.version.suffix) --version-suffix $(spx.version.suffix) /p:SpeechSDKVersion=$(SpeechSDKVersion) -r linux-x64 -c $(BuildConfiguration) --no-restore /p:IncludeSymbols=false'
+      workingDirectory: spx
+      # outputDir: linux
+      zipAfterPublish: false
+      modifyOutputPath: true
+      includeNuGetOrg: false
+      feedsToUse: config
+      nugetConfigPath: 'spx/NuGet.Config'
+
+  - task: DotNetCoreCLI@2
+    displayName: 'dotnet publish linux'
+    inputs:
+      command: publish
+      publishWebProjects: false
+      projects: '**/spx-cli.csproj'
+      arguments: '/p:VersionAssembly=$(spx.version) /p:Version=$(spx.version) /p:AssemblyVersion=$(spx.version) /p:VersionSuffix=$(spx.version.suffix) --version-suffix $(spx.version.suffix) /p:SpeechSDKVersion=$(SpeechSDKVersion) -r linux-x64 -c $(BuildConfiguration) --no-restore --no-build /p:PublishProfile="Properties\PublishProfiles\folder publish spx-cli release (linux-x64).pubxml"'
+      workingDirectory: spx
+      # outputDir: linux
+      zipAfterPublish: false
+      modifyOutputPath: true
+      includeNuGetOrg: false
+      feedsToUse: config
+      nugetConfigPath: 'spx/NuGet.Config'
+
+  # -----------------------------------------------------------------------------
+  # Copy all build ARTIFACTS for spx to the staging directory
+  # -----------------------------------------------------------------------------
+  - task: CopyFiles@2
+    displayName: 'Copy Files to: $(build.artifactstagingdirectory) (spx)'
+    inputs:
+      SourceFolder: '$(system.defaultworkingdirectory)'
+      Contents: |
+        spx\**
+        !**/*.pdb
+      CleanTargetFolder: true
+      TargetFolder: '$(build.artifactstagingdirectory)'
+    condition: succeededOrFailed()
+
+  # -----------------------------------------------------------------------------
+  # Prepare the linux-x64 dotnet core binaries
+  # -----------------------------------------------------------------------------
+  - task: CopyFiles@2
+    displayName: 'Copy Files to: $(build.artifactstagingdirectory) (linux-x64 dotnet core binaries)'
+    inputs:
+      SourceFolder: '$(system.defaultworkingdirectory)'
+      FlattenFolders: true
+      Contents: |
+        spx\bin\Release\netcoreapp3.1\publish\linux-x64\libMicrosoft.CognitiveServices.Speech.core.so
+        spx\bin\Release\netcoreapp3.1\publish\linux-x64\libMicrosoft.CognitiveServices.Speech.extension.kws.so
+        spx\bin\Release\netcoreapp3.1\publish\linux-x64\libMicrosoft.CognitiveServices.Speech.extension.lu.so
+        spx\bin\Release\netcoreapp3.1\publish\linux-x64\libMicrosoft.CognitiveServices.Speech.extension.codec.so
+        spx\bin\Release\netcoreapp3.1\publish\linux-x64\libMicrosoft.CognitiveServices.Speech.extension.silk_codec.so
+        spx\bin\Release\netcoreapp3.1\publish\linux-x64\libMicrosoft.CognitiveServices.Speech.extension.audio.sys.so
+        spx\bin\Release\netcoreapp3.1\publish\linux-x64\Microsoft.CognitiveServices.Speech.csharp.dll
+        spx\bin\Release\netcoreapp3.1\publish\linux-x64\Newtonsoft.Json.dll
+        spx\bin\Release\netcoreapp3.1\publish\linux-x64\spx
+        spx\bin\Release\netcoreapp3.1\publish\linux-x64\spx.dll
+        spx\bin\Release\netcoreapp3.1\publish\linux-x64\spx.runtimeconfig.json
+        spx\bin\Release\netcoreapp3.1\publish\linux-x64\System.Linq.Async.dll
+        spx\bin\Release\netcoreapp3.1\publish\linux-x64\System.Interactive.Async.dll
+        spx\LICENSE.txt
+        spx\THIRD_PARTY_NOTICE.txt
+      TargetFolder: '$(build.artifactstagingdirectory)\spx-netcore31-linux-x64'
+      preserveTimestamp: true
+
+  # -----------------------------------------------------------------------------
+  # Sign SPX binaries.
+  # -----------------------------------------------------------------------------
+  - task: SFP.build-tasks.custom-build-task-1.EsrpCodeSigning@1
+    displayName: 'Sign SPX (linux-x64 dotnet core binaries)'
+    inputs:
+      ConnectedServiceName: 'Speech SDK ESRP Signing Alternate'
+      FolderPath: '$(build.artifactstagingdirectory)\spx-netcore31-linux-x64'
+      Pattern: 'spx.dll'
+      signConfigType: inlineSignParams
+      inlineOperation: $(SIGN_PARAMS_DLL)
+    condition: succeeded()
+
+  # -----------------------------------------------------------------------------
+  # Prepare the win-x64 dotnet core binaries
+  # -----------------------------------------------------------------------------
+  - task: CopyFiles@2
+    displayName: 'Copy Files to: $(build.artifactstagingdirectory) (win-x64 dotnet core binaries)'
+    inputs:
+      SourceFolder: '$(system.defaultworkingdirectory)'
+      FlattenFolders: true
+      Contents: |
+        spx\bin\Release\netcoreapp3.1\publish\win-x64\Microsoft.CognitiveServices.Speech.core.dll
+        spx\bin\Release\netcoreapp3.1\publish\win-x64\Microsoft.CognitiveServices.Speech.csharp.dll
+        spx\bin\Release\netcoreapp3.1\publish\win-x64\Microsoft.CognitiveServices.Speech.extension.audio.sys.dll
+        spx\bin\Release\netcoreapp3.1\publish\win-x64\Microsoft.CognitiveServices.Speech.extension.lu.dll
+        spx\bin\Release\netcoreapp3.1\publish\win-x64\Microsoft.CognitiveServices.Speech.extension.kws.dll
+        spx\bin\Release\netcoreapp3.1\publish\win-x64\Microsoft.CognitiveServices.Speech.extension.codec.dll
+        spx\bin\Release\netcoreapp3.1\publish\win-x64\Microsoft.CognitiveServices.Speech.extension.silk_codec.dll
+        spx\bin\Release\netcoreapp3.1\publish\win-x64\Newtonsoft.Json.dll
+        spx\bin\Release\netcoreapp3.1\publish\win-x64\spx.exe
+        spx\bin\Release\netcoreapp3.1\publish\win-x64\spx.dll
+        spx\bin\Release\netcoreapp3.1\publish\win-x64\spx.runtimeconfig.json
+        spx\bin\Release\netcoreapp3.1\publish\win-x64\System.Linq.Async.dll
+        spx\bin\Release\netcoreapp3.1\publish\win-x64\System.Interactive.Async.dll
+        spx\LICENSE.txt
+        spx\THIRD_PARTY_NOTICE.txt     
+      TargetFolder: '$(build.artifactstagingdirectory)\spx-netcore31-win-x64'
+      preserveTimestamp: true
+
+  # -----------------------------------------------------------------------------
+  # Sign SPX binaries.
+  # -----------------------------------------------------------------------------
+  - task: SFP.build-tasks.custom-build-task-1.EsrpCodeSigning@1
+    displayName: 'Sign SPX (win-x64 dotnet core binaries)'
+    inputs:
+      ConnectedServiceName: 'Speech SDK ESRP Signing Alternate'
+      FolderPath: '$(build.artifactstagingdirectory)\spx-netcore31-win-x64'
+      Pattern: 'spx.exe,spx.dll'
+      signConfigType: inlineSignParams
+      inlineOperation: $(SIGN_PARAMS_DLL)
+    condition: succeeded()
+
+  - task: DotNetCoreCLI@2
+    displayName: 'Create NuGet DotnetTool package (win-x64 dotnet core)'
+    inputs:
+      command: 'custom'
+      custom: 'pack'
+      arguments: '"spx-cli.csproj" /p:Version=$(spx.version) /p:PackageVersion=$(spx.version) --version-suffix $(spx.version.suffix) -c $(BuildConfiguration) -o $(Build.ArtifactStagingDirectory)/nupkg -p:IncludeSymbols=false --no-restore'
+      workingDirectory: spx
+      modifyOutputPath: true
+      includeNuGetOrg: false
+      feedsToUse: config
+      nugetConfigPath: 'spx/NuGet.Config'
+
+  - task: DotNetCoreCLI@2
+    displayName: 'Create NuGet Dependency package (win-x64 dotnet core)'
+    inputs:
+      command: 'custom'
+      custom: 'pack'
+      arguments: >-
+        '"spx-cli.csproj" 
+        /p:PackageId=Microsoft.CognitiveServices.Speech.CLI-Dependency 
+        /p:PackageType=Dependency 
+        /p:Version=$(spx.version) 
+        /p:PackageVersion=$(spx.version) 
+        --version-suffix $(spx.version.suffix) 
+        -c $(BuildConfiguration) 
+        -o $(Build.ArtifactStagingDirectory)/nupkg 
+        -p:IncludeSymbols=false 
+        --no-restore'
+      workingDirectory: spx
+      modifyOutputPath: true
+      includeNuGetOrg: false
+      feedsToUse: config
+      nugetConfigPath: 'spx/NuGet.Config'
+
+  # -----------------------------------------------------------------------------
+  # Sign SPX NuGet
+  # -----------------------------------------------------------------------------
+  - task: SFP.build-tasks.custom-build-task-1.EsrpCodeSigning@1
+    displayName: 'Sign SPX NuGet DotnetTool package'
+    inputs:
+      ConnectedServiceName: 'Speech SDK ESRP Signing Alternate'
+      FolderPath: '$(build.artifactstagingdirectory)/nupkg'
+      Pattern: 'Microsoft.CognitiveServices.Speech.CLI.$(spx.version).nupkg'
+      signConfigType: inlineSignParams
+      inlineOperation: $(SIGN_PARAMS_NUGET)
+    condition: succeeded()
+
+  # -----------------------------------------------------------------------------
+  # Sign SPX NuGet Dependency Package
+  # -----------------------------------------------------------------------------
+  - task: SFP.build-tasks.custom-build-task-1.EsrpCodeSigning@1
+    displayName: 'Sign SPX NuGet Dependency package'
+    inputs:
+      ConnectedServiceName: 'Speech SDK ESRP Signing Alternate'
+      FolderPath: '$(build.artifactstagingdirectory)/nupkg'
+      Pattern: 'Microsoft.CognitiveServices.Speech.CLI-Dependency.$(spx.version).nupkg'
+      signConfigType: inlineSignParams
+      inlineOperation: $(SIGN_PARAMS_NUGET)
+    condition: and(succeeded(), eq(variables['SPEECHSDK_SIGN'], 'true'))
+
+  # -----------------------------------------------------------------------------
+  # Publish NuGet artifacts
+  # -----------------------------------------------------------------------------
+  - task: PublishBuildArtifacts@1
+    displayName: 'Publish Artifact: spx NuGet'
+    inputs:
+      PathtoPublish: '$(build.artifactstagingdirectory)/nupkg'
+      artifactName: Microsoft.CognitiveServices.Speech.CLI.$(spx.version).nupkg
+    condition: succeededOrFailed()
+
+  # -----------------------------------------------------------------------------
+  # Publish NuGet Dependency package artifacts
+  # -----------------------------------------------------------------------------
+  - task: PublishBuildArtifacts@1
+    displayName: 'Publish Artifact: spx Dependency NuGet'
+    inputs:
+      PathtoPublish: '$(build.artifactstagingdirectory)/nupkg'
+      artifactName: Microsoft.CognitiveServices.Speech.CLI-Dependency.$(spx.version).nupkg
+    condition: succeededOrFailed()
+
+  # -----------------------------------------------------------------------------
+  # Create zip ARCHIVEs
+  - task: ArchiveFiles@2
+    inputs:
+      rootFolderOrFile: '$(build.artifactstagingdirectory)\spx-netcore31-linux-x64'
+      includeRootFolder: false
+      archiveType: 'zip'
+      archiveFile: '$(Build.ArtifactStagingDirectory)/zips/spx-netcore31-linux-x64.zip'
+      replaceExistingArchive: true
+
+  - task: ArchiveFiles@2
+    inputs:
+      rootFolderOrFile: '$(build.artifactstagingdirectory)\spx-netcore31-win-x64'
+      includeRootFolder: false
+      archiveType: 'zip'
+      archiveFile: '$(Build.ArtifactStagingDirectory)/zips/spx-netcore31-win-x64.zip'
+      replaceExistingArchive: true
+
+  # -----------------------------------------------------------------------------
+  # Publish ZIP artifacts
+  # -----------------------------------------------------------------------------
+  - task: PublishBuildArtifacts@1
+    displayName: 'Publish Artifact: zips'
+    inputs:
+      PathtoPublish: '$(build.artifactstagingdirectory)/zips'
+      artifactName: spx-zips
+    condition: succeededOrFailed()
+
+  # -----------------------------------------------------------------------------
+  # Publish **ALL** artifacts
+  # -----------------------------------------------------------------------------
+  - task: PublishBuildArtifacts@1
+    displayName: 'Publish Artifact: release'
+    inputs:
+      PathtoPublish: '$(build.artifactstagingdirectory)'
+      artifactName: spx-artifacts
+    condition: and(succeededOrFailed(), eq(variables['Debug.PublishArtifacts'], 'true'))
+
+  # -----------------------------------------------------------------------------
+  # Create top level zip file.
+  # -----------------------------------------------------------------------------
+  - task: ArchiveFiles@2
+    displayName: 'Create top level zip file.'
+    inputs:
+      rootFolderOrFile: '$(Build.ArtifactStagingDirectory)/zips'
+      includeRootFolder: false
+      archiveType: 'zip'
+      archiveFile: '$(Build.ArtifactStagingDirectory)/zips/spx-zips.zip'
+      replaceExistingArchive: true
+    condition: succeeded()
+
+  # Publish zip file to public drop folder in BlobStorage.
+  - task: AzureCLI@2
+    displayName: 'Publish zip file to drop folder in BlobStorage.'
+    condition: and(succeeded(), eq(variables['Publish.AzureBlob'], 'true'))
+    inputs:
+      azureSubscription: 'Carbon Dropper (CSSpeechStorage Drop)'
+      scriptType: batch
+      scriptLocation: inlineScript
+      inlineScript: |
+        for /f %%f in ('dir /q /b dir $(Build.ArtifactStagingDirectory)\zips\*.zip') do (
+          call az storage blob upload --subscription "Speech Services - DEV - Transcription" --account-name csspeechstorage --container-name "drop" -n "spx/$(spx.version).$(Build.BuildNumber)/%%f" -f "$(Build.ArtifactStagingDirectory)\zips\%%f"
+        )
+        if "$(UpdateLatest)" == "true" (
+          call az storage blob upload --subscription "Speech Services - DEV - Transcription" --account-name csspeechstorage --container-name "drop" -n "spx/latest/spx-zips.zip" -f "$(Build.ArtifactStagingDirectory)\zips\spx-zips.zip"
+        )
+
+# -----------------------------------------------------------------------------
+# Docker build and publish job, defintion, and all steps
+# -----------------------------------------------------------------------------
+- job: DockerBuildAndPush
+
+  dependsOn: Build
+  condition: and(succeeded(), eq(variables['build.docker'], 'true'))
+
+  pool:
+    name: SkymanUbuntu2004Hosted
+
+  steps:
+  - checkout: self
+
+  # -----------------------------------------------------------------------------
+  # Restore version variables if triggered from SDK Build
+  # -----------------------------------------------------------------------------
+  - script: 'env | sort'
+    displayName: "echo Environment variables"
+  - bash: |
+      set +x
+      echo "##vso[task.setvariable variable=TRIGGEREDBY_SPEECHSDK_VERSION]${BUILD_TRIGGEREDBY_BUILDNUMBER}"
+      echo "##vso[task.setvariable variable=TRIGGEREDBY_SPEECHSDK_VERSION_SUFFIX_ONLY]-${BUILD_TRIGGEREDBY_BUILDNUMBER##*-}"
+      echo "##vso[task.setvariable variable=TRIGGEREDBY_SPEECHSDK_VERSION_VERSION_ONLY]${BUILD_TRIGGEREDBY_BUILDNUMBER%%-*}"
+    displayName: 'Restore version variables from triggering build (part 1)'
+    condition: eq(variables['Build.Reason'], 'BuildCompletion')
+  - bash: |
+      set +x
+      echo TRIGGEREDBY_SPEECHSDK_VERSION=${TRIGGEREDBY_SPEECHSDK_VERSION}
+      echo TRIGGEREDBY_SPEECHSDK_VERSION_VERSION_ONLY=${TRIGGEREDBY_SPEECHSDK_VERSION_VERSION_ONLY}
+      echo TRIGGEREDBY_SPEECHSDK_VERSION_SUFFIX_ONLY=${TRIGGEREDBY_SPEECHSDK_VERSION_SUFFIX_ONLY}
+      echo "##vso[task.setvariable variable=SpeechSDKVersion]$(TRIGGEREDBY_SPEECHSDK_VERSION)"
+      echo "##vso[task.setvariable variable=spx.version]$(TRIGGEREDBY_SPEECHSDK_VERSION_VERSION_ONLY)"
+      echo "##vso[task.setvariable variable=spx.version.suffix]$(TRIGGEREDBY_SPEECHSDK_VERSION_SUFFIX_ONLY)"
+    displayName: 'Restore version variables from triggering build (part 2)'
+    condition: eq(variables['Build.Reason'], 'BuildCompletion')
+  - script: 'env | sort'
+    displayName: "echo Environment variables 2"
+    condition: eq(variables['Build.Reason'], 'BuildCompletion')
+
+  # -----------------------------------------------------------------------------
+  # Login into docker registry
+  # -----------------------------------------------------------------------------
+  - task: Docker@2
+    displayName: Docker Login
+    inputs:
+      command: login
+      containerRegistry: $(DockerRegistryServiceConnection)
+
+  # -----------------------------------------------------------------------------
+  # Build the docker image
+  # -----------------------------------------------------------------------------
+  - task: Docker@2
+    displayName: Build SPX docker images (clis)
+    inputs:
+      command: build
+      containerRegistry: '$(DockerRegistryServiceConnection)'
+      repository: '$(DockerRepositoryName)'
+      arguments: --build-arg SPX_Version=$(spx.version).$(Build.BuildNumber)
+      tags: |
+        latest
+        $(spx.version).$(Build.BuildNumber)
+
+  # -----------------------------------------------------------------------------
+  # Publish the versioned docker image
+  # -----------------------------------------------------------------------------
+  - task: Docker@2
+    displayName: Push "versioned" SPX docker image
+    inputs:
+      command: push
+      containerRegistry: '$(DockerRegistryServiceConnection)'
+      repository: '$(DockerRepositoryName)'
+      tags: |
+        $(spx.version).$(Build.BuildNumber)        
+
+  # -----------------------------------------------------------------------------
+  # Publish the latest docker image
+  # -----------------------------------------------------------------------------
+  - task: Docker@2
+    displayName: Push "latest" SPX docker image
+    condition: and(succeeded(), eq(variables['UpdateLatest'], 'true'))
+    inputs:
+      command: push
+      containerRegistry: '$(DockerRegistryServiceConnection)'
+      repository: '$(DockerRepositoryName)'
+      tags: |
+        latest        

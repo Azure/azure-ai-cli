@@ -1,0 +1,20 @@
+CUSTOM SPEECH RECOGNITION EVALUATION
+
+@include.the.csr.evaluation.command
+
+USAGE: spx csr evaluation <command> [...]
+
+COMMANDS
+
+  spx csr evaluation create [...]           (see: spx help csr evaluation create)
+  spx csr evaluation status [...]           (see: spx help csr evaluation status)
+  spx csr evaluation list [...]             (see: spx help csr evaluation list)
+
+  spx csr evaluation update [...]           (see: spx help csr evaluation update)
+  spx csr evaluation delete [...]           (see: spx help csr evaluation delete)
+
+ADDITIONAL TOPICS
+
+  spx help csr examples
+  spx help csr evaluation examples
+  spx help documentation

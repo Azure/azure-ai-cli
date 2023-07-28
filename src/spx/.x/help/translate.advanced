@@ -1,0 +1,86 @@
+TRANSLATE
+
+@include.the.translate.command.long
+
+USAGE: spx translate [...]
+
+  CONNECTION                      (see: spx help translate connection)
+    --key KEY                     (see: spx help translate key)
+    --region REGION               (see: spx help translate region)
+    --endpoint URI                (see: spx help translate endpoint)
+    --token VALUE                 (see: spx help translate token)
+
+  SERVICE
+    --traffic type test           (see: spx help traffic type)
+    --http header name=value      (see: spx help http header)
+    --query string name=value     (see: spx help query string)
+    --speech config @file.json    (see: spx help websocket messages)
+    --speech context @file.json   (see: spx help websocket messages)
+
+  LANGUAGE                        (see: spx help translate language)
+    --source LANGUAGE             (see: spx help translate source)
+    --target LANGUAGE             (see: spx help translate target)
+
+  INPUT                           (see: spx help translate input)
+    --microphone                  (see: spx help translate microphone)
+    --file FILE                   (see: spx help translate file)
+    --files PATTERN               (see: spx help translate files)
+    --files @FILELIST.txt         (see: spx help translate files)
+    --url URL                     (see: spx help translate url)
+    --urls URL                    (see: spx help translate urls)
+    --urls @URLLIST.txt           (see: spx help translate urls)
+    --format FORMAT               (see: spx help translate format)
+    --id url URL                  (see: spx help input id)
+    --id ID                       (see: spx help input id)
+
+  TRANSLATION
+    --once[+]                     (see: spx help translate once)
+    --continuous                  (see: spx help translate continuous)
+    --timeout MILLISECONDS        (see: spx help translate continuous)
+    --keyword FILENAME            (see: spx help translate keyword)
+
+  ACCURACY                        (see: spx help translate improve accuracy)
+    --endpoint id ID              (see: spx help translate custom speech)
+    --category id CUSTOM-MT-ID    (see: spx help translate custom translation)
+    --phrases @PHRASELIST.txt     (see: spx help translate phrases)
+
+  TESTING                         (see: spx help translate testing)
+    --transcript TEXT             (see: spx help translate transcript)
+    --check wer NUMOP NUMBER      (see: spx help translate check wer)
+    --check text TEXTOP TEXT      (see: spx help translate check text)
+
+  OUTPUT                          (see: spx help translate output)
+    --output all [<item>]         (see: spx help translate output all)
+    --output each [<item>]        (see: spx help translate output each)
+    --output batch json           (see: spx help translate output batch json)
+    --output batch file FILENAME  (see: spx help translate output batch file)
+    --output each file FILENAME   (see: spx help translate output each file)
+    --output all file FILENAME    (see: spx help translate output all file)
+    --word level timing           (see: spx help translate word level timing)
+    --profanity OPTION            (see: spx help translate profanity)
+
+  LOGGING                         (see: spx help translate log)
+    --log FILENAME
+    --content logging
+
+  PARALLEL PROCESSING
+    --threads NUMBER              (see: spx help translate threads)
+    --processes NUMBER            (see: spx help translate processes)
+    --repeat NUMBER
+    --max NUMBER
+
+  ADVANCED
+    --connect                     (see: spx help translate connect)
+    --disconnect                  (see: spx help translate disconnect)
+    --proxy HOSTNAME              (see: spx help translate proxy)
+    --property NAME=VALUE         (see: spx help translate property)
+    --properties @PROPLIST.txt    (see: spx help translate properties)
+    --foreach in @ITEMS.txt       (see: spx help translate foreach)
+    --save FILENAME               (see: spx help translate save)
+    --zip ZIPFILE                 (see: spx help translate zip)
+
+SEE ALSO
+
+  spx help setup
+  spx help translate examples
+  spx help find topics translate

@@ -1,0 +1,15 @@
+DIALOG
+
+@include.the.dialog.command.long
+
+USAGE: spx dialog <command> [...]
+
+COMMANDS
+
+    spx dialog bot [...]                    (see: spx help dialog bot)
+    spx dialog customcommands [...]         (see: spx help dialog customcommands)
+
+ADDITIONAL TOPICS
+
+    spx help dialog examples
+    spx help documentation

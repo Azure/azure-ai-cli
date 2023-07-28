@@ -1,0 +1,31 @@
+CUSTOM SPEECH RECOGNITION EVALUATION CREATE
+
+@include.the.csr.evaluation.create.command
+
+USAGE: spx csr evaluation create [...]
+
+CONNECTION                      (see: spx help csr connection)
+  --key KEY                     (see: spx help csr key)
+  --region REGION               (see: spx help csr region)
+
+CREATE
+  --project URL                 (see: spx help csr evaluation project)
+  --name NAME                   (see: spx help csr evaluation name)
+  --model1 URL                  (see: spx help csr evaluation create model1)
+  --model2 URL                  (see: spx help csr evaluation create model2)
+  --dataset URL                 (see: spx help csr evaluation create dataset)
+  --language LANGUAGE           (see: spx help csr evaluation create language)
+  --description DESCRIPTION     (see: spx help csr evaluation description)
+
+OUTPUT                          (see: spx help csr output)
+  --output json FILENAME        (see: spx help csr output json)
+  --output url @@FILE           (see: spx help csr output url)
+  --output id @@FILE            (see: spx help csr output id)
+  --wait [TIMEOUT]              (see: spx help csr wait)
+
+ADVANCED
+  --input path PATH             (see: spx help csr input path)
+  --output path PATH            (see: spx help csr output path)
+  --foreach in @FILENAME        (see: spx help csr foreach)
+  --save FILENAME               (see: spx help csr save)
+  --zip ZIPFILE                 (see: spx help csr zip)

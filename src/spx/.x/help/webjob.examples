@@ -1,0 +1,24 @@
+WEBJOB EXAMPLES
+
+  `SETUP`: Setup `spx` with USERNAME, PASSWORD, and ENDPOINT default values
+
+    spx config webjob @user --set USERNAME
+    spx config webjob @password --set PASSWORD
+    spx config webjob @endpoint --set https://RESOURCE-NAME.scm.azurewebsites.net/
+
+  `EXAMPLE`: Recognize speech from multiple files contained in a ZIP file
+
+    copy audio-files.zip upload-package.zip
+    spx recognize --files *.wav --output batch json --output batch file EXAMPLE1.json --zip upload-package.zip
+
+    spx webjob upload --file upload-package.zip --name EXAMPLE1
+    spx webjob run --name EXAMPLE1
+
+    spx webjob status --name EXAMPLE1
+    spx webjob download --file data/jobs/triggered/EXAMPLE1/202112110503544381/output_log.txt
+    spx webjob download --file data/jobs/triggered/EXAMPLE1/202112110503544381/EXAMPLE1.json
+
+ADDITIONAL TOPICS
+  
+  spx help webjob
+  spx help webjob setup

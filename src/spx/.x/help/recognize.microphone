@@ -1,0 +1,17 @@
+RECOGNIZE MICROPHONE
+
+@include.the.recognize.command
+
+  The `--microphone` option specifies use of a microphone.
+
+USAGE: spx recognize [...] --microphone
+   OR: spx recognize [...] --microphone DEVICE-ID
+
+  WHERE: DEVICE-ID represents a specific microphone device
+
+  For full list of DEVICE-IDs, see https://aka.ms/speech/sdk/device-ids
+
+SEE ALSO
+
+  spx help recognize
+  spx help recognize input

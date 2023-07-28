@@ -1,0 +1,30 @@
+PERSON EXAMPLES
+
+;  `EXAMPLE 1` - Initialize a person 100% interactively
+;
+;    vz person init
+;
+;  `EXAMPLE 2` - Initialize a person, enrolling interactively, saving outputs for use in scripts later
+;
+;    vz person init --output-person-id @my.person.id --output-group-kind @my.group.kind --output-group-id @my.group.id
+;
+;  `EXAMPLE 3` - Initialize a person, enrolling non-interactively by specifying all required information
+;
+;    vz person init --interactive false --name PERSONNAME --files PERSON\*.png --group-id @my.group.id --group-kind large --output-person-id @my.person.id
+;
+  `EXAMPLE 4` - Create a Large Person Group, and add one person, with 1 face
+
+    vz person group create --name GROUPNAME --group-kind large --output-person-group-id @my.group.id
+    vz person create --name PERSONNAME --group-kind large --group-id @my.group.id --output-person-id @my.person.id
+    vz person face add --file image.png --person-id @my.person.id --group-kind large --group-id @my.group.id
+    vz person group train --group-id @my.group.id
+
+  `EXAMPLE 5` - Create two people, adding 1 face each; create a Dynamic Person Group referring to both
+
+    vz person create --name PERSONNAME1 --group-kind dynamic --output-person-id @my.person1.id --output-add-person-id @my.person.ids
+    vz person create --name PERSONNAME2 --group-kind dynamic --output-person-id @my.person2.id --output-add-person-id @my.person.ids
+
+    vz person face add --person-id @my.person1.id --file person1.png --group-kind dynamic
+    vz person face add --person-id @my.person2.id --file person2.png --group-kind dynamic
+
+    vz person group create --name GROUPNAME --group-kind dynamic --add-person-ids @my.person.ids --output-person-group-id @my.group.id

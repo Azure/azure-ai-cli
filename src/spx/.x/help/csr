@@ -1,0 +1,24 @@
+CUSTOM SPEECH RECOGNITION
+
+  The `spx csr` commands manage custom speech recognition models.
+
+USAGE: spx csr <command> [...]
+
+COMMANDS
+
+  spx csr project [...]           (see: spx help csr project)
+  spx csr dataset [...]           (see: spx help csr dataset)
+
+  spx csr model [...]             (see: spx help csr model)
+  spx csr endpoint [...]          (see: spx help csr endpoint)
+
+  spx csr evaluation [...]        (see: spx help csr evaluation)
+
+  spx csr list [...]              (see: spx help csr list)
+  spx csr download [...]          (see: spx help csr download)
+
+ADDITIONAL TOPICS
+
+  spx help csr examples
+  spx help find topics csr
+  

@@ -1,0 +1,36 @@
+RECOGNIZE OUTPUT
+
+@include.the.recognize.command
+
+  Recognition output approaches:
+  (1) Per event output - Specified ITEMs are accumulated and output per event
+  (2) Combined output - Specified ITEMs are accumulated and output per audio stream
+  (3) Batch output - Recognition output is similar to `spx batch` transcriptions
+  
+  For (1) and (2), one or more ITEMs from a large set of items may be chosen
+  to output, in either JSON or TSV format.
+
+  For (3), a fixed set of ITEMs are output, both combined and segmented by
+  service determined utterance boundaries, as well as some stream summary
+  information.
+
+  (1) To use per event output, see: spx help recognize output each
+  (2) To use combined output, see: spx help recognize output all
+  (3) To use batch output, see spx help recognize output batch
+
+EXAMPLES
+
+  spx recognize --file hello.wav --output all id --output all sessionid --output all text
+  spx recognize --once --output each event --output all sessionid --output each text
+  spx recognize --once --output batch json --output batch file my.output.json
+
+  spx config recognize @default.output --clear
+  spx config recognize @default.output --add output.all.id true
+  spx config recognize @default.output --add output.all.sessionid true
+  spx config recognize @default.output --add output.all.text true
+
+SEE ALSO
+
+  spx help config
+  spx help batch transcription
+  spx help recognize

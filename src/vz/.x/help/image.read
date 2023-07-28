@@ -1,0 +1,33 @@
+IMAGE READ
+
+@include.the.image.read.command.long
+
+USAGE: vz image read [...]
+
+  CONNECTION                      (see: vz help image read connection)
+    --key KEY                     (see: vz help image read key)
+    --region REGION               (see: vz help image read region)
+    --endpoint ENDPOINT           (see: vz help image read endpoint)
+
+  INPUT                           (see: vz help image read input)
+    --camera                      (see: vz help image read camera)
+    --file FILE                   (see: vz help image read file)
+    --files PATTERN               (see: vz help image read files)
+    --files @FILELIST.txt         (see: vz help image read files)
+
+  ANALYSIS
+    --once[+]                     (see: vz help image read once)
+    --continuous                  (see: vz help image read continuous)
+
+  ADVANCED
+    --log FILENAME                (see: vz help image read log)
+    --proxy HOSTNAME              (see: vz help image read proxy)
+    --foreach in @ITEMS.txt       (see: vz help image read foreach)
+    --threads NUMBER              (see: vz help image read threads)
+
+SEE ALSO
+
+  vz help setup
+  vz help image read examples
+  vz help image read output
+  vz help find topics image read

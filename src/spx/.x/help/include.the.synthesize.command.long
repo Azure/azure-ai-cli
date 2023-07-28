@@ -1,0 +1,2 @@
+  The `spx synthesize` command synthesizes audio from text or SSML
+  and render to the local device's speakers or write into local audio files.

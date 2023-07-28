@@ -1,0 +1,37 @@
+RECOGNIZE FILE
+
+@include.the.recognize.command
+
+  The `--file` option specifies a single local audio file to be
+  streamed to the service for recognition.
+
+  The `--url` option specifies a single remote audio file to be
+  streamed to the service for recognition after first caching the audio
+  locally, removing it when done.
+
+USAGE: spx recognize [...] --url URL
+   OR: spx recognize [...] --url @FILENAME.txt
+   OR: spx recognize [...] --file @FILEAME.txt
+   OR: spx recognize [...] --file FILE
+
+  WHERE: URL represents a remote audio file accessible to the public
+     OR: FILE represents a local audio file accessible to the current user
+     OR: FILE is `-` indicating that audio file content will be read from STDIN
+     OR: FILENAME.txt is a single line text file containing the file to stream
+
+  NOTE: `--url` is an alias for `--file` ... both accept both files and urls
+
+EXAMPLES
+
+  spx recognize --file hello.wav
+  spx recognize --url https://crbn.us/hello.wav
+
+  echo hello.wav>file.txt
+  spx recognize --file @file.txt
+
+SEE ALSO
+
+  spx help recognize files
+  spx help recognize format
+  spx help recognize input
+  spx help recognize
