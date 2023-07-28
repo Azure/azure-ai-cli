@@ -1,0 +1,30 @@
+REGION OVERVIEW
+
+  The Azure Speech Service is REGION specific.
+
+  To find the region for an existing resource:
+
+    (1) Locate the resource on https://portal.azure.com
+    (2) Find the ENDPOINT listed on the `Keys and Endpoints` start tab
+    (3) Extract the REGION from the ENDPOINT; for example:
+
+        If ENDPOINT == ```https://westus.api.cognitive.microsoft.com/...```
+        Then REGION == ```westus```.
+
+  For a full list of supported regions, see https://aka.ms/speech/regions.
+
+USAGE: spx <command> [...] --region REGION
+   OR: spx <command> [...] --region @FILENAME
+   OR: spx <command> [...] @CONFIG-FILENAME
+
+  WHERE: REGION is the name of the region (e.g. westus, eastus, etc.)
+     OR: FILENAME is a single line text file containing the REGION
+     OR: CONFIG-FILENAME is a single line text file in the following form:
+
+       service.config.region=westus
+
+SEE ALSO
+
+  spx help setup
+  spx help examples
+  spx help key overview

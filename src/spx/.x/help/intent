@@ -1,0 +1,46 @@
+INTENT
+
+@include.the.intent.command.long
+
+USAGE: spx intent [...]
+
+  CONNECTION                      (see: spx help intent connection)
+    --key KEY                     (see: spx help intent key)
+    --region REGION               (see: spx help intent region)
+
+  PATTERNS
+    --pattern PATTERN             (see: spx help intent pattern)
+    --pattern INTENTID=PATTERN
+    --patterns PATTERN1;PATTERN2  (see: spx help intent patterns)
+    --patterns @PATTERNS.txt
+
+  LUIS                            (see: spx help intent luis)
+    --luis key KEY                (see: spx help intent luis key)
+    --luis region REGION          (see: spx help intent luis region)
+    --luis appid APPID            (see: spx help intent luis appid)
+
+  INPUT                           (see: spx help intent input)
+    --microphone                  (see: spx help intent microphone)
+    --file FILE                   (see: spx help intent file)
+    --files PATTERN               (see: spx help intent files)
+    --files @FILELIST.txt         (see: spx help intent files)
+    --format FORMAT               (see: spx help intent format)
+
+  RECOGNITION
+    --once[+]                     (see: spx help intent once)
+    --continuous                  (see: spx help intent continuous)
+    --keyword FILENAME            (see: spx help intent keyword)
+    --language LANGUAGE           (see: spx help intent language)
+
+  ADVANCED
+    --log FILENAME                (see: spx help intent log)
+    --proxy HOSTNAME              (see: spx help intent proxy)
+    --foreach in @ITEMS.txt       (see: spx help intent foreach)
+    --threads NUMBER              (see: spx help intent threads)
+
+SEE ALSO
+
+  spx help setup
+  spx help intent advanced
+  spx help intent examples
+  spx help find topics intent

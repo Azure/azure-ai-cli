@@ -1,0 +1,25 @@
+RECOGNIZE KEYWORD
+
+@include.the.recognize.command
+
+  The `--keyword` option gates the recognition of speech until
+  a keyword from the specified keyword model is recognized.
+
+  Once the keyword is recognized, the next phrase in the speech stream will
+  also be recognized, after which the system will once again gate speech
+  recognition until the keyword is recognized again.
+
+  The `--timeout` option can be used to limit the amount of audio recognized.
+  If not specified, there is effectively no timeout.
+
+USAGE: spx recognize [...] --keyword KEYWORD-MODEL
+   OR: spx recognize [...] --keyword KEYWORD-MODEL --timeout [MILLISECONDS]
+
+EXAMPLES
+
+  spx recognize --microphone --continuous
+  spx recognize --file hello.wav --continuous --timeout 30000
+
+SEE ALSO
+
+  spx help recognize

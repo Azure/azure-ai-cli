@@ -1,0 +1,42 @@
+DIALOG EXAMPLES
+
+    `SETUP`: Setup spx with REGION and KEY default values. as well as the 
+           APPID for your Custom Commands application
+
+        spx config dialog --set @region=westus2
+        spx config dialog --set @key=436172626F6E20697320636F6F6C2121
+
+            For `spx dialog customcommands`, the --appId parameter is always required.
+            
+            For `spx dialog bot`, the --botId may be optionally provided, or
+            the default bot for the provided Speech KEY will be connected to.
+
+    `EXAMPLE 1`: Single dialog interaction with Custom Commands (supporting multi-turn)
+
+        spx dialog customcommands --appId 169df083-986f-43cf-89f1-b3cc4a1ccc08 --once
+
+    `EXAMPLE 2`: Custom Commands continuous dialog
+
+        spx dialog customcommands --continuous --appId 169df083-986f-43cf-89f1-b3cc4a1ccc08 --microphone --speakers
+
+    `EXAMPLE 3`: Connect to the default Bot for your Speech subscription
+
+        spx dialog bot --microphone --speakers
+
+    `EXAMPLE 4`: Custom Commands with keyword activation
+    
+        spx dialog bot --keyword keyword.table --microphone --speakers --appId 169df083-986f-43cf-89f1-b3cc4a1ccc08
+
+        WHERE: keyword.table is the filename for the keyword model being used
+
+    `EXAMPLE 5`: Bot with keyword activation
+
+        spx dialog bot --keyword keyword.table --microphone --speakers
+
+        WHERE: keyword.table is the filename for the keyword model being used
+
+ADDITIONAL TOPICS
+
+    spx help setup
+    spx help dialog advanced
+    spx help dialog

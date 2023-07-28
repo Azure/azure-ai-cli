@@ -1,0 +1,31 @@
+CONFIG REGION
+
+@include.the.config.command
+
+  The `--region` option specifies the configuration data 
+  SCOPE of use based on the REGION in use.
+
+USAGE: vz config [...] --region REGION
+
+  WHERE: REGION is the name of the region (e.g. westus, eastus, etc.)
+
+    For a full list of supported regions, see:  https://aka.ms/vision/regions
+
+EXAMPLES
+
+  vz config --set key 436172626F6E20697320636F6F6C2121 --region westus2
+  vz config --set key 436172626F6E20697320636F6F6C2020 --region eastus
+  vz config --find key --region *
+
+  vz config --set region westus2
+  vz image analyze --file image1.jpg
+
+  vz config --set region eastus
+  vz image analyze --file image1.jpg
+
+  vz image analyze --nodefaults --foreach region in eastus;westus2 --key @@key --file image1.jpg
+
+SEE ALSO
+
+  vz help config scope
+  vz help config

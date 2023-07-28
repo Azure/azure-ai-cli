@@ -1,0 +1,87 @@
+RECOGNIZE
+
+@include.the.recognize.command.long
+
+USAGE: spx recognize [...]
+
+  CONNECTION                      (see: spx help recognize connection)
+    --key KEY                     (see: spx help recognize key)
+    --region REGION               (see: spx help recognize region)
+    --endpoint URI                (see: spx help recognize endpoint)
+    --token VALUE                 (see: spx help recognize token)
+
+  SERVICE
+    --traffic type test           (see: spx help traffic type)
+    --http header name=value      (see: spx help http header)
+    --query string name=value     (see: spx help query string)
+    --speech config @file.json    (see: spx help websocket messages)
+    --speech context @file.json   (see: spx help websocket messages)
+
+  LANGUAGE
+    --language LANGUAGE           (see: spx help recognize language)
+    --languages LANG1;LANG2       (see: spx help recognize languages)
+
+  INPUT                           (see: spx help recognize input)
+    --microphone                  (see: spx help recognize microphone)
+    --file FILE                   (see: spx help recognize file)
+    --files PATTERN               (see: spx help recognize files)
+    --files @FILELIST.txt         (see: spx help recognize files)
+    --url URL                     (see: spx help recognize url)
+    --urls URL                    (see: spx help recognize urls)
+    --urls @URLLIST.txt           (see: spx help recognize urls)
+    --format FORMAT               (see: spx help recognize format)
+    --id url URL                  (see: spx help input id)
+    --id ID                       (see: spx help input id)
+
+  RECOGNITION
+    --once[+]                     (see: spx help recognize once)
+    --continuous                  (see: spx help recognize continuous)
+    --timeout MILLISECONDS        (see: spx help recognize continuous)
+    --keyword FILENAME            (see: spx help recognize keyword)
+
+  ACCURACY                        (see: spx help recognize improve accuracy)
+    --endpoint id ID              (see: spx help recognize custom speech)
+    --phrases @PHRASELIST.txt     (see: spx help recognize phrases)
+
+  TESTING                         (see: spx help recognize testing)
+    --transcript TEXT             (see: spx help recognize transcript)
+    --check wer NUMOP NUMBER      (see: spx help recognize check wer)
+    --check text TEXTOP TEXT      (see: spx help recognize check text)
+    --check result JMES_STRING    (see: spx help recognize check result)
+
+  OUTPUT                          (see: spx help recognize output)
+    --output all [<item>]         (see: spx help recognize output all)
+    --output each [<item>]        (see: spx help recognize output each)
+    --output batch json           (see: spx help recognize output batch json)
+    --output batch file FILENAME  (see: spx help recognize output batch file)
+    --output each file FILENAME   (see: spx help recognize output each file)
+    --output all file FILENAME    (see: spx help recognize output all file)
+    --output vtt file FILENAME    (see: spx help recognize output vtt file)
+    --word level timing           (see: spx help recognize word level timing)
+    --profanity OPTION            (see: spx help recognize profanity)
+
+  LOGGING                         (see: spx help recognize log)
+    --log FILENAME
+    --content logging
+
+  PARALLEL PROCESSING
+    --threads NUMBER              (see: spx help recognize threads)
+    --processes NUMBER            (see: spx help recognize processes)
+    --repeat NUMBER
+    --max NUMBER
+
+  ADVANCED
+    --connect                     (see: spx help recognize connect)
+    --disconnect                  (see: spx help recognize disconnect)
+    --proxy HOSTNAME              (see: spx help recognize proxy)
+    --property NAME=VALUE         (see: spx help recognize property)
+    --properties @PROPLIST.txt    (see: spx help recognize properties)
+    --foreach in @ITEMS.txt       (see: spx help recognize foreach)
+    --save FILENAME               (see: spx help recognize save)
+    --zip ZIPFILE                 (see: spx help recognize zip)
+
+SEE ALSO
+
+  spx help setup
+  spx help recognize examples
+  spx help find topics recognize

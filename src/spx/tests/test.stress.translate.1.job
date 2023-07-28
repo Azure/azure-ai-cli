@@ -1,0 +1,8 @@
+﻿x.command=translate
+x.command.parallel.thread.count=20
+service.config.region=@region
+service.config.key=@key
+audio.input.files=*.wav
+source.language.config=en-US
+target.language.config=de;fr;ja
+x.command.expand.file.name=audio.input.file

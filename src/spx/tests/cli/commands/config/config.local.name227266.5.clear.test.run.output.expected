@@ -1,0 +1,11 @@
+﻿(?# ---------- BANNER)
+^SPX - Azure Speech CLI, Version [1]\.[0-9]{2}[^\r]+\r?$\n
+^Copyright \(c\) 202[0-9] Microsoft Corporation\. All Rights Reserved\.\r?$\n
+^\r?$\n
+
+
+(?# ---------- DELETED)
+^name227266 \(deleted from '\w+[^\r]+[/\\]\.spx[/\\]data'\)\r?$\n
+^\r?$\n
+^  hello\r?$\n
+^  goodbye\r?$\n

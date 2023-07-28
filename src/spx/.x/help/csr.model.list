@@ -1,0 +1,23 @@
+CUSTOM SPEECH RECOGNITION MODEL LIST
+
+@include.the.model.list.command
+
+USAGE: spx csr model list [...]
+
+CONNECTION                      (see: spx help csr connection)
+  --key KEY                     (see: spx help csr key)
+  --region REGION               (see: spx help csr region)
+
+LIST
+  --models                      (see: spx help csr model list models)
+  --languages                   (see: spx help csr model list model languages)
+  --base models                 (see: spx help csr model list base models)
+
+ADVANCED
+  --project URL                 (see: spx help csr project)
+  --input path PATH             (see: spx help csr input path)
+  --output path PATH            (see: spx help csr output path)
+  --output json FILENAME        (see: spx help csr output json)
+  --foreach in @FILENAME        (see: spx help csr foreach)
+  --save FILENAME               (see: spx help csr save)
+  --zip ZIPFILE                 (see: spx help csr zip)

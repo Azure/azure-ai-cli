@@ -1,0 +1,44 @@
+RECOGNIZE OUTPUT EACH
+
+@include.the.recognize.command
+
+  The `--output each` option specifies an ITEM to accumulate and
+  aggregate into a TSV or JSON output file, one ITEM per event.
+
+  The `--output each file` option specifies the output filename. 
+
+  The `--output each file type` option specifies the output file type,
+  either JSON or TSV (tab separated values). If no file type is provided,
+  the output file will be TSV by default.
+
+USAGE: spx recognize [...] --output each ITEM
+   OR: spx recognize [...] --output each file FILENAME
+   OR: spx recognize [...] --output each file type TYPE
+
+   WHERE: FILENAME represents a local text file writable by the current user
+     OR: FILE is `-` represents STDOUT, where TSV or JSON data will be saved
+
+  NOTE: By default, nothing is output per event
+
+EXAMPLES
+
+  spx recognize --once --output each text
+  spx recognize --once --output each event --output each text
+  spx recognize --once --output each text --output each file output.tsv
+
+  spx config recognize @default.output --set @@output.each.event
+  spx config recognize @default.output --set @@output.each.detailed
+  spx config recognize @default.output --set @@output.each.latency
+
+  spx config recognize @default.output --clear
+  spx config recognize @default.output --add output.each.sessionid true
+  spx config recognize @default.output --add output.each.event true
+  spx config recognize @default.output --add output.each.text true
+  spx config recognize @default.output --add output.each.latency true
+  spx config recognize @default.output --add @output.all.standard
+
+SEE ALSO
+
+  spx help recognize output overview
+  spx help recognize output examples
+  spx help recognize

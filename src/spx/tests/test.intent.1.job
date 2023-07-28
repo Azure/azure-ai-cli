@@ -1,0 +1,7 @@
+x.command=intent
+luis.region=@luis.region
+luis.key=@luis.key
+luis.appid=@luis.appid
+audio.input.file=changeReso.wav
+audio.input.type=file
+x.verbose=true

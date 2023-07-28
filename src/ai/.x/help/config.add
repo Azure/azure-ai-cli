@@ -1,0 +1,32 @@
+CONFIG ADD
+
+@include.the.config.command
+
+  The `--add` option adds AI configuration data to a new or an
+  existing AI configuration datastore file.
+
+USAGE: ai config --add NAME VALUE
+   OR: ai config @NAME --add VALUE
+   OR: ai config @CONFIG-FILENAME --add NAME VALUE
+
+  WHERE: NAME represents the name of the VALUE
+    AND: VALUE represents the value to be added
+     OR: CONFIG-FILENAME is the name of the configuration file
+
+   NOTE: If no HIVE is specified, the first configuration file found
+         will be used. If no existing configuration file is found,
+         the first HIVE found will be used.
+
+EXAMPLES
+
+  ai config @my.files --clear
+  ai config @my.files --add hello.wav
+  ai config @my.files --add howareyou.wav
+  ai complete --files @my.files
+
+SEE ALSO
+
+  ai help config
+  ai help config set
+  ai help config clear
+  ai help config hive

@@ -1,0 +1,34 @@
+SYNTHESIZE REGION
+
+@include.the.synthesize.command
+
+@include.the.region.option
+
+USAGE: spx synthesize [...] --region REGION
+   OR: spx synthesize [...] --region @FILENAME
+   OR: spx synthesize [...] @CONFIG-FILENAME
+
+@include.the.region.option.where
+
+EXAMPLES
+
+  spx config synthesize @region --set westus2
+  spx config synthesize @key --set 436172626F6E20697320636F6F6C2121
+  spx synthesize --nodefaults --region @region --key @key --text Hello
+
+  spx config synthesize @default.config --clear
+  spx config synthesize @default.config --add key @key
+  spx config synthesize @default.config --add region @region
+  spx synthesize --text Hello
+
+  spx config synthesize @key --set 436172626F6E20697320636F6F6C2121 --region westus2
+  spx config synthesize @key --set 436172626F6E20697320636F6F6C2020 --region eastus
+  spx synthesize --foreach region in eastus;westus2 --key @@key --text Hello
+
+SEE ALSO
+
+  spx help setup
+  spx help region overview
+  spx help synthesize connection
+  spx help synthesize key
+  spx help synthesize

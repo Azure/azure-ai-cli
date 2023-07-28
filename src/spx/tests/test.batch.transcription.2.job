@@ -1,0 +1,5 @@
+﻿x.command=run
+foreach.0.tsv.file=@test.batch.transcription.2.job.foreach.0.tsv.file
+foreach.0.tsv.file.has.header=false
+foreach.0.tsv.file.columns=spx.command
+foreach.count=1

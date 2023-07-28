@@ -1,0 +1,25 @@
+ENDPOINT OVERVIEW
+
+  For some scenarios, use "wss://" or "ws://" instead of "https://". For a
+  full list of supported endpoints, see https://aka.ms/vision/endpoints
+
+USAGE: vz <command> [...] --endpoint "ENDPOINT"
+   OR: vz <command> [...] --endpoint @FILENAME
+   OR: vz <command> [...] @CONFIG-FILENAME
+
+WHERE: ENDPOINT represents the ENDPOINT uri as text (don't forget to add quotes)
+   OR: FILENAME is a single line text file containing the ENDPOINT
+   OR: CONFIG-FILENAME is a single line text file in the following form:
+
+       service.config.endpoint=wss://...
+
+EXAMPLES
+
+  vz image analyze --endpoint @my.analyze.endpoint --file image1.jpg
+  vz image read --endpoint @my.read.endpoint --file image1.jpg
+  vz face identify --endpoint @my.face.endpoint --file image1.jpg --person group @my.person.group
+
+SEE ALSO
+
+  vz help init
+  vz help setup

@@ -1,0 +1,1 @@
+  The `spx translate` command translates streaming audio.

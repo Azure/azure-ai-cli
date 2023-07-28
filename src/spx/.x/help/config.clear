@@ -1,0 +1,24 @@
+CONFIG CLEAR
+
+@include.the.config.command
+
+  The `--clear` option removes SPX configuration data from
+  an existing SPX configuration datastore file.
+
+USAGE: spx config --clear NAME
+   OR: spx config @NAME --clear
+   OR: spx config @CONFIG-FILENAME --clear
+
+  WHERE: NAME represents the name of the VALUE to clear
+     OR: CONFIG-FILENAME is the name of the configuration file to remove
+
+EXAMPLES
+
+  spx config @my.files --clear
+  spx config @my.files --add hello.wav
+  spx config @my.files --add howareyou.wav
+  spx recognize --files @my.files
+
+SEE ALSO
+
+  spx help config

@@ -1,0 +1,21 @@
+KEY OVERVIEW
+
+@include.the.azure.ai.service
+
+  To find the subscription KEY for an existing resource, first, locate the
+  resource on https://portal.azure.com. The subscription KEY is listed at
+  the top of the Quick start tab under Resource Management.
+
+  To create new Azure AI Service resource, see https://aka.ms/ai/create.
+
+USAGE: ai <command> [...] --key KEY
+   OR: ai <command> [...] --key @FILENAME
+   OR: ai <command> [...] @CONFIG-FILENAME
+
+@include.the.key.option.where
+
+SEE ALSO
+
+  ai help setup
+  ai help examples
+  ai help region overview

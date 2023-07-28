@@ -1,0 +1,22 @@
+RECOGNIZE WORD LEVEL TIMING
+
+@include.the.recognize.command
+
+  The `--word level timing` option requests word level timing
+  details in recognition results.
+
+USAGE: spx recognize [...] --word level timing
+   OR: spx recognize [...] @CONFIG-FILENAME
+
+  WHERE: CONFIG-FILENAME is a single line text file in the following form:
+
+      service.output.config.word.level.timing=true
+
+EXAMPLE
+
+  spx recognize --file hello.wav --word level timing --output json
+
+SEE ALSO
+
+  see help recognize output json
+  spx help recognize

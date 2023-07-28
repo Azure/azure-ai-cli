@@ -1,0 +1,3 @@
+﻿x.command=run
+run.input.spx.command=batch transcription create --name "Example 1" --content https://crbn.us/whatstheweatherlike.wav
+run.input.process=spx

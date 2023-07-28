@@ -1,0 +1,40 @@
+SETUP OVERVIEW
+
+  `AI RESOURCE`
+
+@include.create.resource
+
+@include.create.resource.extra
+
+  `REGION and KEY`
+
+@include.the.azure.ai.service.long
+
+  To select or create an Azure AI Resource, and automatically store the associated
+  KEY and REGION in the AI configuration datastore:
+
+    ai init
+
+  To manually store your subscription KEY and REGION in the AI configuration datastore:
+
+    ai config --set key PUT-YOUR-KEY-HERE
+    ai config --set region PUT-YOUR-REGION-HERE
+
+    For example:
+
+      ai config --set key 436172626F6E20697320636F6F6C2121
+      ai config --set region westus2
+
+SEE ALSO
+
+  ai help key overview
+  ai help region overview
+
+  ai help init
+  ai help init examples
+
+  ai help config
+  ai help config examples
+
+  ai help advanced setup
+  ai help webjob setup

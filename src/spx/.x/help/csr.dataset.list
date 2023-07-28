@@ -1,0 +1,26 @@
+CUSTOM SPEECH RECOGNITION DATASET LIST
+
+@include.the.csr.dataset.list.command
+
+USAGE: spx csr dataset list [...]
+
+CONNECTION                      (see: spx help csr connection)
+  --key KEY                     (see: spx help csr key)
+  --region REGION               (see: spx help csr region)
+
+LIST
+  --datasets                    (see: spx help csr dataset list datasets)
+  --languages                   (see: spx help csr dataset list languages)
+
+DATASET FILES                   (see: spx help csr dataset list files)
+  --dataset ID/URL
+  --files
+
+ADVANCED
+  --project URL                 (see: spx help csr dataset list project)
+  --input path PATH             (see: spx help csr input path)
+  --output path PATH            (see: spx help csr output path)
+  --output json FILENAME        (see: spx help csr output json)
+  --foreach in @FILENAME        (see: spx help csr foreach)
+  --save FILENAME               (see: spx help csr save)
+  --zip ZIPFILE                 (see: spx help csr zip)

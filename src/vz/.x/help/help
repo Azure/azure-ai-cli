@@ -1,0 +1,41 @@
+ _   __ _____
+| | / /|_   /
+| |/ /  /  /_
+|___/  /_____|
+
+USAGE: vz <command> [...]
+
+COMMANDS
+
+  vz init [...]             (see: vz help init)
+  vz config [...]           (see: vz help config)
+
+  vz image [...]            (see: vz help image)
+
+  vz person [...]           (see: vz help person)
+  vz face [...]             (see: vz help face)
+
+  vz run [...]              (see: vz help run)
+
+EXAMPLES
+
+  vz init
+
+  vz config --set region westus2
+  vz config --set key 436172626F6E20697320636F6F6C2121
+
+  vz image analyze --file image1.jpg
+  vz image read --file image1.jpg
+
+ADDITIONAL TOPICS
+
+  vz help setup
+  vz help examples
+
+  vz help find "jpg"
+  vz help find "jpg" --expand
+
+  vz help find topics "examples"
+  vz help list topics
+
+  vz help documentation

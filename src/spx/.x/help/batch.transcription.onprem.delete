@@ -1,0 +1,19 @@
+BATCH TRANSCRIPTION ONPREM DELETE
+
+  The `spx batch transcription onprem delete` command deletes
+  a previously submitted batch. This will cancel the batch if it is
+  currently running.
+
+USAGE: spx batch transcription onprem delete [...]
+
+  CREATE
+    --id ID                       Id of previously submitted batch.
+
+SEE ALSO
+
+  spx help setup
+  spx help batch transcription onprem examples
+  
+  Learn more about running On-Premise Speech Containers:
+  https://docs.microsoft.com/azure/cognitive-services/speech-service/speech-container-howto
+ 

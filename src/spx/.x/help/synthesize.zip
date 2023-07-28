@@ -1,0 +1,25 @@
+SYNTHESIZE ZIP
+
+@include.the.synthesize.command
+
+@include.the.zip.option
+
+  NOTE: `--zip` does not package local input files (e.g. text, SSML, etc.)
+
+USAGE: spx synthesize [...] --zip FILENAME
+
+EXAMPLES
+
+  spx synthesize --files *.txt --zip test1.zip
+  spx synthesize --files *.txt;*.ssml --audio output {id}.wav --zip test2.zip
+  spx synthesize --files @URLs.txt --output zip output.zip --zip test3.zip
+
+  spx synthesize --foreach file;audio.output in @filelist.txt --zip test4.job --zip output output.zip
+  spx webjob --upload test4.zip --run
+
+SEE ALSO
+
+  spx help synthesize
+  spx help synthesize files
+  spx help synthesize foreach
+  spx help webjob setup

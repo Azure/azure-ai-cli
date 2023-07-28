@@ -1,0 +1,26 @@
+TRANSLATE FOREACH
+
+@include.the.translate.command
+
+  The `--foreach` option repeats a specific command multiple times
+  effectively multiplying one set of command line options by another.
+
+USAGE: spx translate [...] --foreach in @FILE1.tsv
+   OR: spx translate [...] --foreach OPT1;[OPT2;[...]] in @FILE2.tsv
+   OR: spx translate [...] --foreach OPT1;[OPT2;[...]] skip header in @FILE3.tsv
+
+  WHERE: OPT represents a command line option (e.g. file, id, transcript)
+    AND: FILE1.tsv contains tab separated values, with line1: OPT1 [\t OPT2 [\t ...]]
+     OR: FILE2.tsv contains tab separated values, with data rows starting on line 1
+     OR: FILE3.tsv contains tab separated values, with data rows starting on line 2
+
+EXAMPLES
+
+  spx translate --foreach file;transcript in @filelist.txt --check wer eq 0
+  spx translate --foreach file;transcript in @filelist.txt --check translated text wer eq 0
+
+SEE ALSO
+
+  spx help translate examples
+  spx help translate files
+  spx help translate

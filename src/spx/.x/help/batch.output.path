@@ -1,0 +1,18 @@
+BATCH OUTPUT PATH
+
+  The `--output path` option specifies where all output files
+  should be written. If not provided, the default is the current directory.
+  
+USAGE: spx batch [...] --output path FILEPATH
+
+  WHERE: FILEPATH is the name of output directory
+
+EXAMPLES
+
+  spx batch [...] --output path .\spx\output
+  spx batch [...] --output path ~/spx/output
+
+SEE ALSO
+
+  spx help batch input path
+  spx help batch

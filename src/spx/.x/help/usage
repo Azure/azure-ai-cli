@@ -1,0 +1,42 @@
+  ______ ___ _  __
+ /  ___// _ \ \/ /
+ \___ \/ ___/   <
+/____ /_/  /__/\_\
+
+USAGE: spx <command> [...]
+
+HELP
+
+  spx help
+  spx help setup
+
+COMMANDS
+
+  spx init [...]            (see: spx help init)
+  spx config [...]          (see: spx help config)
+
+  spx recognize [...]       (see: spx help recognize)
+  spx synthesize [...]      (see: spx help synthesize)
+
+  spx intent [...]          (see: spx help intent)
+  spx translate [...]       (see: spx help translate)
+
+  spx batch [...]           (see: spx help batch)
+  spx csr [...]             (see: spx help csr)
+
+  spx profile [...]         (see: spx help profile)
+  spx speaker [...]         (see: spx help speaker)
+
+  spx webjob [...]          (see: spx help webjob)
+
+ADDITIONAL TOPICS
+
+  spx help examples
+
+  spx help find "mp3"
+  spx help find "mp3" --expand
+
+  spx help find topics "examples"
+  spx help list topics
+
+  spx help documentation

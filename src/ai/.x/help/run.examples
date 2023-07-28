@@ -1,0 +1,20 @@
+RUN EXAMPLES
+
+  `EXAMPLE 1`: Create and run `ai complete` job
+
+    ai complete --file prompt1.txt --save complete1.job
+    ai run --job complete1.job
+
+  `EXAMPLE 2`: Create and run `ai chat` job
+
+    ai chat --file prompt1.txt --save chat1.job
+    ai run --job chat1.job
+
+  `EXAMPLE 3`: Run multiple jobs
+
+    ai run --jobs *1*.job
+  
+ADDITIONAL TOPICS
+
+  ai help run advanced
+  ai help run

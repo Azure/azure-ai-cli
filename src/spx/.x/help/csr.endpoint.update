@@ -1,0 +1,23 @@
+CUSTOM SPEECH RECOGNITION ENDPOINT UPDATE
+
+@include.the.csr.endpoint.update.command
+
+USAGE: spx csr endpoint update [...]
+
+CONNECTION                      (see: spx help csr connection)
+  --key KEY                     (see: spx help csr key)
+  --region REGION               (see: spx help csr region)
+
+UPDATE
+  --endpoint URL                (see: spx help csr endpoint update endpoint)
+  --project URL                 (see: spx help csr endpoint project)
+  --name NAME                   (see: spx help csr endpoint name)
+  --description DESCRIPTION     (see: spx help csr endpoint description)
+
+ADVANCED
+  --input path PATH             (see: spx help csr input path)
+  --output path PATH            (see: spx help csr output path)
+  --output json FILENAME        (see: spx help csr output json)
+  --foreach in @FILENAME        (see: spx help csr foreach)
+  --save FILENAME               (see: spx help csr save)
+  --zip ZIPFILE                 (see: spx help csr zip)

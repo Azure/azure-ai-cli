@@ -1,0 +1,20 @@
+BATCH SAVE
+
+@include.the.save.option
+
+USAGE: spx batch [...] --save FILENAME
+
+EXAMPLES
+
+  spx config @urls.txt --clear
+  spx config @urls.txt --add http://crbn.us/hello.wav
+  spx config @urls.txt --add http://crbn.us/whatstheweatherlike.wav
+  spx batch transcription create --name "My transcription" --content @urls.txt --save transcription.job
+
+  spx batch transcription create @transcription.job
+
+SEE ALSO
+
+  spx help batch
+  spx help config
+  spx help batch zip

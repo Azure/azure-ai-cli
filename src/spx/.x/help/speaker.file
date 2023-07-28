@@ -1,0 +1,17 @@
+SPEAKER FILE
+
+@include.the.speaker.command
+
+  The `--file` option specifies a single local audio file to be
+  uploaded to the service for identification or verification.
+
+USAGE: spx speaker identify [...] --file @FILENAME.txt
+   OR: spx speaker verify [...] --file FILE
+
+  WHERE: FILE represents a local audio file accessible to the current user
+     OR: FILENAME.txt is a single line text file containing the file to stream
+
+SEE ALSO
+
+  spx help speaker identify
+  spx help speaker verify

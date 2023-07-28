@@ -1,0 +1,23 @@
+INTENT SAVE
+
+@include.the.intent.command
+
+@include.the.save.option
+
+USAGE: spx intent [...] --save FILENAME
+
+EXAMPLES
+
+  spx intent --files *.wav --save test1.job
+  spx intent --files *.wav --log {id}.log --save test2.job
+  spx intent --files @URLs.txt --output zip output.zip --save test3.job
+
+  spx intent --foreach file;transcript in @items.txt --save test4.job
+  spx intent @test4.job
+
+SEE ALSO
+
+  spx help intent
+  spx help intent files
+  spx help intent foreach
+  spx help webjob setup

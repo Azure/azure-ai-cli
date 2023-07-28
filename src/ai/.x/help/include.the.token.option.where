@@ -1,0 +1,5 @@
+  WHERE: TOKEN is the AUTH TOKEN obtained from the `issueToken` endpoint
+     OR: FILENAME is a single line text file containing your AUTH TOKEN
+     OR: CONFIG-FILENAME is a single line text file in the following form:
+
+            service.config.token=TOKEN

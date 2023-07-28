@@ -1,0 +1,25 @@
+TRANSLATE ZIP
+
+@include.the.translate.command
+
+@include.the.zip.option
+
+  NOTE: `--zip` does not package local input files (e.g. audio, models, etc.)
+
+USAGE: spx translate [...] --zip FILENAME
+
+EXAMPLES
+
+  spx translate --files *.wav --source en-US --target de --zip test1.zip
+  spx translate --files *.wav --log {id}.log --source en-US --target de --zip test2.zip
+  spx translate --foreach file;transcript in @items.txt --source en-US --target de --zip test3.zip
+
+  spx translate --files @URLs.txt --output zip output.zip --source en-US --target de --zip test4.zip
+  spx webjob --upload test4.zip --run
+
+SEE ALSO
+
+  spx help translate
+  spx help translate files
+  spx help translate foreach
+  spx help webjob setup

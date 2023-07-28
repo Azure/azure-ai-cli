@@ -1,0 +1,3 @@
+output.all.audio.input.id=true
+output.all.recognizer.session.started.sessionid=true
+output.all.recognizer.recognized.result.text=true

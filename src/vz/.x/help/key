@@ -1,0 +1,21 @@
+KEY OVERVIEW
+
+@include.the.azure.vision.service
+
+  To find the subscription KEY for an existing resource, first, locate the
+  resource on https://portal.azure.com. The subscription KEY is listed at
+  the top of the Quick start tab under Resource Management.
+
+  To create new Azure Vision Service resource, see https://aka.ms/vision/create.
+
+USAGE: vz <command> [...] --key KEY
+   OR: vz <command> [...] --key @FILENAME
+   OR: vz <command> [...] @CONFIG-FILENAME
+
+@include.the.key.option.where
+
+SEE ALSO
+
+  vz help setup
+  vz help examples
+  vz help region overview

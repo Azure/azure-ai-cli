@@ -1,0 +1,7 @@
+x.command=synthesize
+service.config.region=@region
+service.config.key=@key
+synthesizer.input.text=Change my reservation.
+synthesizer.input.type=text
+audio.output.file=changeReso.wav
+audio.output.type=file

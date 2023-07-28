@@ -1,0 +1,20 @@
+CONFIG FIND
+
+@include.the.config.command
+
+  The `--find` option locates VZ configuration data stored
+  inside existing VZ configuration datastore files.
+
+USAGE: vz config --find CONFIG-NAME
+   OR: vz config --find CONFIG-FILENAME
+   OR: vz config --find CONFIG-FILENAME-PATTERN
+
+EXAMPLES
+
+  vz config --find key
+  vz config --find key --region westus2
+  vz config --find key --region *
+
+SEE ALSO
+
+  vz help config

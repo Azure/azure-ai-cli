@@ -1,0 +1,111 @@
+# -----------------------------------------------------------------------------
+# CI/CD pipeline for SPX tool
+# -----------------------------------------------------------------------------
+trigger: none # To avoid running this pipeline on CI, before Build pipeline completes
+pr: none # To avoid running this pipeline before Build pipeline completes
+resources:
+  pipelines:
+  - pipeline: spxBuild   # Internal name of the source pipeline, used elsewhere within  YAML 
+    source: Azure-Samples.cognitive-services-speech-tools # Azure Pipelines name of the source pipeline referenced
+    trigger: true # Run the below test pipeline when a run of spx-build-pipeline completes
+
+variables:
+  - group: Carbon
+
+jobs:
+
+# -----------------------------------------------------------------------------
+# Build job, definition, and all steps
+# -----------------------------------------------------------------------------
+- job: Test
+  condition: true
+
+  pool:
+      name: SkymanWS2022Compliant
+
+  steps:
+
+  # -----------------------------------------------------------------------------
+  # Restore version variables if triggered from SDK Build
+  # -----------------------------------------------------------------------------
+  - script: 'env | sort'
+    displayName: "echo Environment variables"
+  - bash: |
+      set +x
+      echo "##vso[task.setvariable variable=TRIGGEREDBY_SPX_VERSION]${BUILD_TRIGGEREDBY_BUILDNUMBER}"
+      echo "##vso[task.setvariable variable=TRIGGEREDBY_SPX_VERSION_SUFFIX_ONLY]-${BUILD_TRIGGEREDBY_BUILDNUMBER##*-}"
+      echo "##vso[task.setvariable variable=TRIGGEREDBY_SPX_VERSION_VERSION_ONLY]${BUILD_TRIGGEREDBY_BUILDNUMBER%%-*}"
+    displayName: 'Restore version variables from triggering build (part 1)'
+    condition: eq(variables['Build.Reason'], 'BuildCompletion')
+  - bash: |
+      set +x
+      echo TRIGGEREDBY_SPX_VERSION=${TRIGGEREDBY_SPX_VERSION}
+      echo TRIGGEREDBY_SPX_VERSION_VERSION_ONLY=${TRIGGEREDBY_SPX_VERSION_VERSION_ONLY}
+      echo TRIGGEREDBY_SPX_VERSION_SUFFIX_ONLY=${TRIGGEREDBY_SPX_VERSION_SUFFIX_ONLY}
+      # echo "##vso[task.setvariable variable=SpeechSDKVersion]$(TRIGGEREDBY_SPEECHSDK_VERSION)"
+      # echo "##vso[task.setvariable variable=spx.version]$(TRIGGEREDBY_SPEECHSDK_VERSION_VERSION_ONLY)"
+      # echo "##vso[task.setvariable variable=spx.version.suffix]$(TRIGGEREDBY_SPEECHSDK_VERSION_SUFFIX_ONLY)"
+    displayName: 'Restore version variables from triggering build (part 2)'
+    condition: eq(variables['Build.Reason'], 'BuildCompletion')
+  - script: 'env | sort'
+    displayName: "echo Environment variables 2"
+    condition: eq(variables['Build.Reason'], 'BuildCompletion')
+
+  # -----------------------------------------------------------------------------
+  # Install NuGet and run NuGet restore
+  # -----------------------------------------------------------------------------
+  - task: NuGetToolInstaller@0
+    displayName: 'Use NuGet 5.5.1'
+    inputs:
+      versionSpec: 5.5.1
+
+  - task: NuGetCommand@2
+    displayName: 'NuGet restore'
+    inputs:
+      includeNuGetOrg: false
+      feedsToUse: config
+      nugetConfigPath: 'spx/NuGet.Config'
+      restoreSolution: '$(Parameters.solution)'
+
+  # -----------------------------------------------------------------------------
+  # Download the artifact and .net executables
+  # -----------------------------------------------------------------------------
+  - task: DownloadBuildArtifacts@0
+    displayName: Download SPX build artifact (executable)
+    inputs:
+      buildType: specific
+      project: 'e71f1362-9c7d-488b-99c7-3376db8d3302' # Skyman
+      pipeline: 13649 # Azure-Samples.cognitive-services-speech-tools
+      buildVersionToDownload: specific
+      specificBuildWithTriggering: true
+      buildId: $(SPXBuild_id)
+      downloadType: specific
+      downloadPath: spxBuild
+
+  - task: ExtractFiles@1
+    displayName: Extract SPX .netcore 3.1 executable
+    inputs:
+      archiveFilePatterns: '**/spx-netcore31-win-x64.zip'
+      destinationFolder: spx-netcore31
+      cleanDestinationFolder: true
+
+  # -----------------------------------------------------------------------------
+  # Run the tests
+  # -----------------------------------------------------------------------------
+  - script: | 
+      SET PATH=$(System.DefaultWorkingDirectory)\spx-netcore31;%PATH%
+      spx config @region --set $(SPXRegion)
+      spx config @key --set $(csspeech-cli-test-westus)
+      check-basics.cmd
+    workingDirectory: spx/tests
+    displayName: Run spx tests
+    condition: and(succeeded(), ne(variables['stressTest'], 'true'))
+
+  - script: | 
+      SET PATH=$(System.DefaultWorkingDirectory)\spx-netcore31;%PATH%
+      spx config @region --set $(SPXRegion)
+      spx config @key --set $(csspeech-cli-test-westus)
+      check-stress-test.cmd
+    workingDirectory: spx/tests
+    displayName: Run spx tests
+    condition: and(succeeded(), eq(variables['stressTest'], 'true'))

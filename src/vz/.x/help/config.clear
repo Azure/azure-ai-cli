@@ -1,0 +1,27 @@
+CONFIG CLEAR
+
+@include.the.config.command
+
+  The `--clear` option removes VZ configuration data from
+  an existing VZ configuration datastore file.
+
+USAGE: vz config --clear NAME
+   OR: vz config @NAME --clear
+   OR: vz config @CONFIG-FILENAME --clear
+
+  WHERE: NAME represents the name of the VALUE to clear
+     OR: CONFIG-FILENAME is the name of the configuration file to remove
+
+EXAMPLES
+
+  vz config @my.files --clear
+  vz config @my.files --add image1.jpg
+  vz config @my.files --add image2.jpg
+  vz image analyze --files @my.files
+
+SEE ALSO
+
+  vz help config
+  vz help config add
+  vz help config set
+  vz help config hive

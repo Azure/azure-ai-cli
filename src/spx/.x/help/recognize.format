@@ -1,0 +1,27 @@
+RECOGNIZE FORMAT
+
+@include.the.recognize.command
+
+  The `--format` option specifies the container format for the
+  audio file being recognized.
+
+USAGE: spx recognize [...] --format FORMAT
+
+  WHERE: FORMAT is any
+     OR: FORMAT is mp3
+     OR: FORMAT is ogg
+     OR: FORMAT is opus
+     OR: FORMAT is flac
+     OR: FORMAT is alaw
+     OR: FORMAT is mulaw
+
+EXAMPLES
+
+  spx recognize --file audio.mp3 --format mp3
+  spx recognize --files @filelist.txt --format any
+
+SEE ALSO
+
+  spx help recognize file
+  spx help recognize files
+  spx help recognize

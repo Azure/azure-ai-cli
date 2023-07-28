@@ -1,0 +1,23 @@
+RECOGNIZE ONCE
+
+@include.the.recognize.command
+
+@include.the.recognize.method
+
+  The `--once` option recognizes the first phrase in an audio stream,
+  optimized for interactive use cases.
+
+  The `--once+` option repeatedly recognizes phrases in an audio
+  stream, optimized for non-interactive use cases.
+
+USAGE: spx recognize [...] --once
+
+EXAMPLES
+
+  spx recognize --microphone --once
+  spx recognize --file hello.wav --once+
+
+SEE ALSO
+
+  spx help recognize
+  spx help recognize continuous

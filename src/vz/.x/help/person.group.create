@@ -1,0 +1,34 @@
+PERSON GROUP CREATE
+
+@include.the.person.group.create.command
+
+USAGE: vz person group create [...]
+
+  CONNECTION                      (see: vz help person connection)
+    --key KEY                     (see: vz help person key)
+    --region REGION               (see: vz help person region)
+    --endpoint ENDPOINT           (see: vz help person endpoint)
+
+  CREATE
+    --name NAME                   (see: vz help person group name)
+    --data USER-DATA              (see: vz help person group user data)
+    --group kind KIND             (see: vz help person group kind)
+
+  LARGE GROUP                     (see: vz help large person group)
+    --recognition model MODEL     (see: vz help large person group recognition model)
+
+  DYNAMIC GROUP                   (see: vz help dynamic person group)
+    --add person id ID            (see: vz help dynamic person group add person id)
+    --add person ids @IDs         (see: vz help dynamic person group add person ids)
+
+  OUTPUT                          (see: vz help person output)
+    --output request FILENAME     (see: vz help person output request)
+    --output json FILENAME        (see: vz help person output json)
+    --output id @FILE             (see: vz help person output id)
+
+SEE ALSO
+
+  vz help setup
+  vz help person group create advanced
+  vz help person group create examples
+  vz help find topics person group

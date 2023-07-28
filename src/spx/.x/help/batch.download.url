@@ -1,0 +1,28 @@
+BATCH DOWNLOAD URL
+
+  The `--url` option specifies which resource to download from the service.
+
+USAGE: spx batch download [...] --url URL
+   OR: spx batch download [...] --url @FILENAME
+   OR: spx batch download [...] @CONFIG-FILENAME
+
+  WHERE: URL is the resource to download
+     OR: FILENAME is a single line text file containing the URL
+     OR: CONFIG-FILENAME is a single line text file in the following form:
+
+            batch.download.url=URL
+
+EXAMPLE
+
+  spx batch transcription list --output last url @@transcription-url.txt
+  spx batch transcription list --files --transcription @transcription-url.txt --output last url @@file-url.txt
+
+  spx batch transcription download --url @file-url.txt --output json file.json
+  spx batch transcription download --file @file-url.txt --output file file.contents
+
+SEE ALSO
+
+  spx help batch transcription list
+  spx help batch transcription download
+  spx help batch output
+  spx help batch

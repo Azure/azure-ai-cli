@@ -1,0 +1,35 @@
+ _   __ _____
+| | / /|_   /
+| |/ /  /  /_
+|___/  /_____|
+
+USAGE: vz <command> [...]
+
+HELP
+
+  vz help
+  vz help setup
+
+COMMANDS
+
+  vz init [...]             (see: vz help init)
+  vz config [...]           (see: vz help config)
+
+  vz image [...]            (see: vz help image)
+
+  vz person [...]           (see: vz help person)
+  vz face [...]             (see: vz help face)
+
+  vz run [...]              (see: vz help run)
+
+ADDITIONAL TOPICS
+
+  vz help examples
+
+  vz help find "jpg"
+  vz help find "jpg" --expand
+
+  vz help find topics "examples"
+  vz help list topics
+
+  vz help documentation

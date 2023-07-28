@@ -1,0 +1,85 @@
+SYNTHESIZE OUTPUT EXAMPLES
+
+  spx synthesize [...] --output all input id
+  spx synthesize [...] --output all resultid
+  spx synthesize [...] --output all reason
+  spx synthesize [...] --output all audio data
+  spx synthesize [...] --output all audio length
+
+  spx synthesize [...] --output each input id
+  spx synthesize [...] --output each resultid
+  spx synthesize [...] --output each reason
+  spx synthesize [...] --output each audio data
+  spx synthesize [...] --output each audio length
+
+  spx synthesize [...] --output all result resultid
+  spx synthesize [...] --output all result reason
+  spx synthesize [...] --output all result audio data
+  spx synthesize [...] --output all result audio length
+
+  spx synthesize [...] --output each result resultid
+  spx synthesize [...] --output each result reason
+  spx synthesize [...] --output each result audio data
+  spx synthesize [...] --output each result audio length
+
+  spx synthesize [...] --output all events
+  spx synthesize [...] --output each event
+
+  spx synthesize [...] --output all synthesizer events
+  spx synthesize [...] --output each synthesizer event
+
+  spx synthesize [...] --output all synthesizer synthesis canceled events
+  spx synthesize [...] --output all synthesizer synthesis canceled error
+  spx synthesize [...] --output all synthesizer synthesis canceled error code
+  spx synthesize [...] --output all synthesizer synthesis canceled error details
+  spx synthesize [...] --output all synthesizer synthesis canceled reason
+
+  spx synthesize [...] --output each synthesizer canceled event
+  spx synthesize [...] --output each synthesizer canceled error
+  spx synthesize [...] --output each synthesizer canceled error code
+  spx synthesize [...] --output each synthesizer canceled error details
+  spx synthesize [...] --output each synthesizer canceled reason
+
+  spx synthesize [...] --output all synthesizer synthesis started events
+  spx synthesize [...] --output all synthesizer synthesis started result resultid
+  spx synthesize [...] --output all synthesizer synthesis started result reason
+  spx synthesize [...] --output all synthesizer synthesis started result audio data
+  spx synthesize [...] --output all synthesizer synthesis started result audio length
+
+  spx synthesize [...] --output each synthesizer synthesis started event
+  spx synthesize [...] --output each synthesizer synthesis started result resultid
+  spx synthesize [...] --output each synthesizer synthesis started result reason
+  spx synthesize [...] --output each synthesizer synthesis started result audio data
+  spx synthesize [...] --output each synthesizer synthesis started result audio length
+
+  spx synthesize [...] --output all synthesizer synthesizing events
+  spx synthesize [...] --output all synthesizer synthesizing result resultid
+  spx synthesize [...] --output all synthesizer synthesizing result reason
+  spx synthesize [...] --output all synthesizer synthesizing result audio data
+  spx synthesize [...] --output all synthesizer synthesizing result audio length
+
+  spx synthesize [...] --output each synthesizer synthesizing event
+  spx synthesize [...] --output each synthesizer synthesizing result resultid
+  spx synthesize [...] --output each synthesizer synthesizing result reason
+  spx synthesize [...] --output each synthesizer synthesizing result audio data
+  spx synthesize [...] --output each synthesizer synthesizing result audio length
+
+  spx synthesize [...] --output all synthesizer synthesis completed events
+  spx synthesize [...] --output all synthesizer synthesis completed result resultid
+  spx synthesize [...] --output all synthesizer synthesis completed result reason
+  spx synthesize [...] --output all synthesizer synthesis completed result audio data
+  spx synthesize [...] --output all synthesizer synthesis completed result audio length
+
+  spx synthesize [...] --output each synthesizer synthesis completed event
+  spx synthesize [...] --output each synthesizer synthesis completed result resultid
+  spx synthesize [...] --output each synthesizer synthesis completed result reason
+  spx synthesize [...] --output each synthesizer synthesis completed result audio data
+  spx synthesize [...] --output each synthesizer synthesis completed result audio length
+
+  spx synthesize [...] --output all file type tsv 
+  spx synthesize [...] --output all file output.tsv
+  spx synthesize [...] --output all tsv file has header false
+
+  spx synthesize [...] --output each file type tsv
+  spx synthesize [...] --output each file output.tsv
+  spx synthesize [...] --output each tsv file has header false

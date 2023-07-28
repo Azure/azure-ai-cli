@@ -1,0 +1,28 @@
+TRANSLATE PROCESSES
+
+@include.the.translate.command
+
+  The `--processes` option specifies the maximum number of
+  sub-processes to use when parallelizing translation tasks.
+
+  The `--ramp processes every` option can optionally be used to control
+  how quickly each new sub-process will be added to the pool. If this option
+  is not specified, the default will be 0 ms, and thus the maximum number of
+  processes will immediately be available to the pool.
+
+USAGE: spx translate [...] --processes NUMBER
+   OR: spx translate [...] --processes NUMBER --ramp processes every MILLISECONDS
+
+  WHERE: NUMBER represents the maximum number of processes to use/pool
+    AND: MILLISECONDS represents the number of milliseconds to wait before
+         ... adding each new process
+
+EXAMPLES
+
+  spx translate --files @filelist.txt --processes 10
+  spx translate --files *.wav --processes 20 --ramp processes every 30000
+
+SEE ALSO
+
+  spx help translate
+  spx help translate threads

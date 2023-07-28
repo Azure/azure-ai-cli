@@ -1,0 +1,23 @@
+PERSON FACE
+
+  The `vz person face` command manages Azure Vision Face Service person faces
+  associated with persons in large or dynamic person groups, enabling
+  identification and verification of human faces using the `vz face` command.
+
+USAGE: vz person <command> [...]
+
+COMMANDS
+
+  vz person face add [...]           (see: vz help person face add)
+  vz person face list [...]          (see: vz help person face list)
+
+  vz person face update [...]        (see: vz help person face update)
+  vz person face delete [...]        (see: vz help person face delete)
+
+ADDITIONAL TOPICS
+
+  vz help setup
+  vz help person overview
+  vz help person examples
+  vz help find topics face
+  vz help find topics person

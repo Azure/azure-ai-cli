@@ -1,0 +1,21 @@
+CONFIG
+
+@include.the.config.command
+
+USAGE: spx config [HIVE] [COMMAND] [@FILE] [...]
+
+  --set [NAME=]VALUE            (see: spx help config set)
+  --clear NAME                  (see: spx help config clear)
+
+EXAMPLES
+
+  spx config @key
+  spx config @key --set 436172626F6E20697320636F6F6C2121
+  spx config @region --set westus2
+
+SEE ALSO
+
+  spx help setup
+  spx help config advanced
+  spx help config examples
+  spx help find topics config

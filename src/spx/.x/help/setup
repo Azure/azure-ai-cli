@@ -1,0 +1,40 @@
+SETUP OVERVIEW
+
+  `SPEECH RESOURCE`
+
+@include.create.resource
+
+@include.create.resource.extra
+
+  `REGION and KEY`
+
+@include.the.azure.speech.service.long
+
+  To select or create an Azure Speech Resource, and automatically store the associated
+  KEY and REGION in the SPX configuration datastore:
+
+    spx init
+
+  To manually store your subscription KEY and REGION in the SPX configuration datastore:
+
+    spx config @key --set PUT-YOUR-KEY-HERE
+    spx config @region --set PUT-YOUR-REGION-HERE
+
+    For example:
+
+      spx config @key --set 436172626F6E20697320636F6F6C2121
+      spx config @region --set westus2
+
+SEE ALSO
+
+  spx help key overview
+  spx help region overview
+
+  spx help init
+  spx help init examples
+
+  spx help config
+  spx help config examples
+
+  spx help advanced setup
+  spx help webjob setup

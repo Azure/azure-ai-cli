@@ -1,0 +1,39 @@
+INIT
+
+@include.the.init.command.long
+
+USAGE: vz init [...]
+
+  AZURE
+    --subscription SUBSCRIPTION   (see: vz help init subscription)
+
+  INTERACTIVE
+    --interactive BOOL            (see: vz help init interactive)
+
+  RESOURCE
+    --region region               (see: vz help init region)
+    --group GROUP                 (see: vz help init group)
+    --name NAME                   (see: vz help init name)
+
+EXAMPLES
+
+  `EXAMPLE 1`: interactively select or create an Azure Vision resource
+
+    vz init
+
+  `EXAMPLE 2`: interactively select a resource matching a set of criteria
+
+    vz init --name "vision-us" --region westus2
+
+  `EXAMPLE 3`: non-interactively select or create a resource by specifying all parameters
+
+    vz init --interactive false --subscription "Pay-As-You-Go" --region westus2 --group "vision-4372626e-rg" --name "vision-4372626e"
+
+SEE ALSO
+
+  vz help setup
+  vz help config
+  vz help config hive
+  vz help init advanced
+  vz help init examples
+  vz help find topics init

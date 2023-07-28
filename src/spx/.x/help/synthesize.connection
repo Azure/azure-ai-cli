@@ -1,0 +1,43 @@
+CONNECTION OVERVIEW
+
+  AUTHENTICATION - KEY or TOKEN
+
+    The Azure Speech Service requires authentication using subscriptions keys
+    or authentication tokens.
+
+    To use subscription keys see: spx help key
+    To use authentication tokens see: spx help token
+
+  CONNECTION - REGION, ENDPOINT, or HOST
+
+    The Azure Speech Service runs in REGION specific data centers, sovereign
+    clouds, or on-premise containers. For sovereign clouds and on-premise
+    containers, you may need to specify the ENDPOINT or HOST directly.
+
+    To specify a particular REGION see: spx help synthesize region
+    To specify a particular ENDPOINT see: spx help synthesize endpoint
+    To specify a particular HOST see: spx help synthesize host
+
+EXAMPLES
+
+  `EXAMPLE 1`: Store and use the region and key in the SPX configuration
+
+    spx config synthesize @region --set westus2
+    spx config synthesize @key --set 436172626F6E20697320636F6F6C2121
+    spx synthesize --file file.txt
+
+  `EXAMPLE 2`: Use region and key provided on the command line
+
+    spx synthesize --nodefaults --region westus2 --key 436172626F6E20697320636F6F6C2121 --file file.txt
+
+  `EXAMPLE 3`: Use a specific sovereign cloud host on the command line
+
+    spx synthesize --nodefaults --host wss://chinaeast2.tts.speech.azure.cn --file file.txt
+
+  `EXAMPLE 4`: Use a specific on-premise container host on the command line
+
+    spx synthesize --nodefaults --host wss://localhost:5000/ --file file.txt
+
+  `EXAMPLE 5`: Use a specific endpoint on the command line
+
+    spx synthesize --nodefaults --endpoint wss://westus2.tts.speech.microsoft.com/cognitiveservices/websocket/v1

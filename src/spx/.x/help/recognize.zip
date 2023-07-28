@@ -1,0 +1,25 @@
+RECOGNIZE ZIP
+
+@include.the.recognize.command
+
+@include.the.zip.option
+
+  NOTE: `--zip` does not package local input files (e.g. audio, models, etc.)
+
+USAGE: spx recognize [...] --zip FILENAME
+
+EXAMPLES
+
+  spx recognize --files *.wav --zip test1.zip
+  spx recognize --files *.wav --log {id}.log --zip test2.zip
+  spx recognize --foreach file;transcript in @items.txt --zip test3.zip
+
+  spx recognize --files @URLs.txt --output zip output.zip --zip test4.zip
+  spx webjob --upload test4.zip --run
+
+SEE ALSO
+
+  spx help recognize
+  spx help recognize files
+  spx help recognize foreach
+  spx help webjob setup

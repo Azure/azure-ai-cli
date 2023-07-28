@@ -1,0 +1,40 @@
+﻿(?# ---------- BANNER)
+^SPX - Azure Speech CLI, Version [1]\.[0-9]{2}[^\r]+\r?$\n
+^Copyright \(c\) 202[0-9] Microsoft Corporation\. All Rights Reserved\.\r?$\n
+^\r?$\n
+
+
+(?# ---------- CONFIG)
+^CONFIG\r?$\n
+^\r?$\n
+
+(?# DESCRIPTION, multiple line)
+^  (?s:.*SPX\s+configuration\s+datastore\s+files)
+
+
+(?# ---------- USAGE)
+\r?\n\r?\n(?=USAGE:)
+^USAGE: spx config \[HIVE\] \[COMMAND\] \[@FILE\] \[\.\.\.\]\r?$\n
+^\r?$\n
+^  --set \[NAME=\]VALUE            \(see: spx help config set\)\r?$\n
+^  --clear NAME                  \(see: spx help config clear\)\r?$\n
+^\r?$\n
+
+
+(?# ---------- EXAMPLES)
+^EXAMPLES\r?$\n
+^\r?$\n
+^  spx config @key\r?$\n
+^  spx config @key --set \w+[^\r\n]+\r?$\n
+^  spx config @region --set \w+[^\r\n]+\r?$\n
+^\r?$\n
+
+
+(?# ---------- SEE ALSO)
+^SEE ALSO\r?$\n
+^\r?$\n
+^  spx help setup\r?$\n
+^  spx help config advanced\r?$\n
+^  spx help config examples\r?$\n
+^  spx help find topics config\r?$\n
+^\r?$\n

@@ -1,0 +1,20 @@
+CONFIG FIND
+
+@include.the.config.command
+
+  The `--find` option locates SPX configuration data stored
+  inside existing SPX configuration datastore files.
+
+USAGE: spx config --find CONFIG-NAME
+   OR: spx config --find CONFIG-FILENAME
+   OR: spx config --find CONFIG-FILENAME-PATTERN
+
+EXAMPLES
+
+  spx config --find key
+  spx config --find key --region westus2
+  spx config --find key --region *
+
+SEE ALSO
+
+  spx help config

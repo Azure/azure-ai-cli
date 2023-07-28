@@ -1,0 +1,24 @@
+RECOGNIZE CONTINUOUS
+
+@include.the.recognize.command
+
+@include.the.recognize.method
+
+  The `--continuous` option recognizes streaming audio continuously,
+  optimized for interactive conversations and audio files.
+
+  The `--timeout` option can be used to limit the amount of audio recognized.
+  If not specified, there is effectively no timeout.
+
+USAGE: spx recognize [...] --continuous
+   OR: spx recognize [...] --continuous --timeout [MILLISECONDS]
+
+EXAMPLES
+
+  spx recognize --microphone --continuous
+  spx recognize --file hello.wav --continuous --timeout 30000
+
+SEE ALSO
+
+  spx help recognize once
+  spx help recognize

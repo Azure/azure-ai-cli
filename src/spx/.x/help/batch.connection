@@ -1,0 +1,30 @@
+BATCH CONNECTION OVERVIEW
+
+@include.the.azure.speech.service.long
+
+  To specify a particular key, see: spx help batch key
+  To specify a particular region, see: spx help batch region
+
+  NOTE: Default connection uses the `@connection.from.region` preset template
+
+    service.config.region=@region
+    service.config.key=@key
+
+EXAMPLES
+
+  `EXAMPLE 1`: Use `westus2` region and key directly on command line
+
+    spx batch transcription list --region westus2 --key 436172626F6E20697320636F6F6C2121
+
+  `EXAMPLE 2`: Use the `westus2` region and key stored in SPX configuration
+
+    spx config batch @region --set westus2
+    spx config batch @key --set 436172626F6E20697320636F6F6C2121
+    spx batch transcription list --region @region --key @key
+
+  `EXAMPLE 3`: Update the default connection
+
+    spx config batch @key --set 436172626F6E20697320636F6F6C2121
+    spx config batch @region --set westus2
+    spx config batch @default.connection --set @@connection.from.region
+    spx batch transcription list

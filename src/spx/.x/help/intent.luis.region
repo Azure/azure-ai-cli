@@ -1,0 +1,14 @@
+INTENT LUIS REGION
+
+@include.the.intent.command
+
+@include.the.luis.option
+
+USAGE: spx intent [...] --luis region LUIS_REGION
+
+  WHERE: LUIS_REGION represents the region for the LUIS app that intent recognition is being run against
+
+SEE ALSO
+
+  spx help intent
+  spx help intent luis 

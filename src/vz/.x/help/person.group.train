@@ -1,0 +1,26 @@
+PERSON GROUP TRAIN
+
+@include.the.person.group.train.command
+
+USAGE: vz person group train [...]
+
+  CONNECTION                      (see: vz help person connection)
+    --key KEY                     (see: vz help person key)
+    --region REGION               (see: vz help person region)
+    --endpoint ENDPOINT           (see: vz help person endpoint)
+
+  TRAIN
+    --group id ID                 (see: vz help person group id)
+    --group kind KIND             (see: vz help person group kind)
+    --wait [TIMEOUT]              (see: vz help person group train wait)
+
+  OUTPUT                          (see: vz help person output)
+    --output request FILENAME     (see: vz help person output request)
+    --output json FILENAME        (see: vz help person output json)
+
+SEE ALSO
+
+  vz help setup
+  vz help person group train advanced
+  vz help person group train examples
+  vz help find topics person group

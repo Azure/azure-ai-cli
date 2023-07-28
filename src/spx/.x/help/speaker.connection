@@ -1,0 +1,44 @@
+CONNECTION OVERVIEW
+
+  AUTHENTICATION - KEY or TOKEN
+
+    The Azure Speech Service requires authentication using subscriptions keys
+    or authentication tokens.
+
+    To use subscription keys see: spx help speaker key
+    To use authentication tokens see: spx help speaker token
+
+  CONNECTION - REGION or ENDPOINT
+
+    The Azure Speech Service runs in REGION specific data centers, sovereign
+    clouds, or on-premise containers. For sovereign clouds and on-premise
+    containers, you may need to specify the ENDPOINT directly.
+
+    To specify a particular REGION see: spx help speaker region
+    To specify a particular ENDPOINT see: spx help speaker endpoint
+
+    NOTE: Default connection uses the `@connection.from.region` preset template
+
+      service.config.region=@region
+      service.config.key=@key
+
+EXAMPLES
+
+  `EXAMPLE 1`: Use the `westus2` region and key stored in the SPX configuration
+
+    spx config speaker @region --set westus2
+    spx config speaker @key --set 436172626F6E20697320636F6F6C2121
+    spx speaker verify create --output id @my.id
+
+  `EXAMPLE 2`: Use the `westus2` region and key directly on command line
+
+    spx speaker identify list --region westus2 --key 436172626F6E20697320636F6F6C2121
+
+  `EXAMPLE 3`: Use a specific endpoint on the command line
+
+    spx speaker identify list --nodefaults --endpoint https://westus.api.cognitive.microsoft.com/spid/v1
+    spx speaker verify list --nodefaults --endpoint https://westus.api.cognitive.microsoft.com/spid/v1
+
+SEE ALSO
+
+  spx help speaker 

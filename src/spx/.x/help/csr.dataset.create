@@ -1,0 +1,30 @@
+CUSTOM SPEECH RECOGNITION DATASET CREATE
+
+@include.the.csr.dataset.create.command
+
+USAGE: spx csr dataset create [...]
+
+CONNECTION                      (see: spx help csr connection)
+  --key KEY                     (see: spx help csr key)
+  --region REGION               (see: spx help csr region)
+
+CREATE
+  --project URL                 (see: spx help csr dataset project)
+  --name NAME                   (see: spx help csr dataset name)
+  --kind KIND                   (see: spx help csr dataset create kind)
+  --content URL                 (see: spx help csr dataset create content)
+  --language LANGUAGE           (see: spx help csr dataset create language)
+  --description DESCRIPTION     (see: spx help csr dataset description)
+
+OUTPUT                          (see: spx help csr output)
+  --output json FILENAME        (see: spx help csr output json)
+  --output url @@FILE           (see: spx help csr output url)
+  --output id @@FILE            (see: spx help csr output id)
+  --wait [TIMEOUT]              (see: spx help csr wait)
+
+ADVANCED
+  --input path PATH             (see: spx help csr input path)
+  --output path PATH            (see: spx help csr output path)
+  --foreach in @FILENAME        (see: spx help csr foreach)
+  --save FILENAME               (see: spx help csr save)
+  --zip ZIPFILE                 (see: spx help csr zip)

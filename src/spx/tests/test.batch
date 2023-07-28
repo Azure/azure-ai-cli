@@ -1,0 +1,3 @@
+﻿x.command=run
+run.input.spx.jobs=test.batch.transcription.*.job
+x.command.expand.file.name=run.input.spx.job

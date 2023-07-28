@@ -1,0 +1,3 @@
+﻿x.command=run
+run.input.spx.command=config local transcribe @key --clear --region eastus
+run.input.process=spx

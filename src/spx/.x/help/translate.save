@@ -1,0 +1,23 @@
+TRANSLATE SAVE
+
+@include.the.translate.command
+
+@include.the.save.option
+
+USAGE: spx translate [...] --save FILENAME
+
+EXAMPLES
+
+  spx translate --files *.wav --source en-US --target de --save test1.job
+  spx translate --files *.wav --log {id}.log --source en-US --target de --save test2.job
+  spx translate --files @URLs.txt --output zip output.zip --source en-US --target de --save test3.job
+
+  spx translate --foreach file;transcript in @items.txt --source en-US --target de --save test4.job
+  spx translate @test4.job
+
+SEE ALSO
+
+  spx help translate
+  spx help translate files
+  spx help translate foreach
+  spx help webjob setup

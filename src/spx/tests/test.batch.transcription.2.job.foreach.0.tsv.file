@@ -1,0 +1,14 @@
+﻿spx config @trx2.content --set http://crbn.us/hello.wav
+spx config @trx2.content --add http://crbn.us/whatstheweatherlike.wav
+
+spx batch transcription create --name "Example 2" --content @trx2.content --output url trx2
+spx batch transcription status --transcription @trx2 --wait
+
+spx batch transcription list --transcription @trx2 --files --output urls trx2.files
+spx batch transcription download --foreach file in @trx2.files
+
+spx batch transcription delete --transcription @trx2
+
+spx config @trx2.content --clear
+spx config @trx2.files --clear
+spx config @trx2 --clear

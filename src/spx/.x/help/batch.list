@@ -1,0 +1,25 @@
+BATCH LIST
+
+  The `spx batch list` command lists resources related to Azure
+  Speech Service batch operations.
+
+USAGE: spx batch list [...]
+
+  CONNECTION                      (see: spx help batch connection)
+    --key KEY                     (see: spx help batch key)
+    --region REGION               (see: spx help batch region)
+
+  TRANSCRIPTIONS
+    --transcriptions              (see: spx help batch transcription list)
+    --transcription languages     (see: spx help batch transcription list languages)
+
+  TRANSCRIPT FILES
+    --transcription URL           (see: spx help batch transcription reference)
+    --files                       (see: spx help batch transcription list files)
+
+SEE ALSO
+
+  spx help batch transcription list advanced
+  spx help batch download
+  spx help batch output
+  

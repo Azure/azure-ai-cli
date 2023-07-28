@@ -1,0 +1,31 @@
+SYNTHESIZE PROXY
+
+@include.the.synthesize.command
+
+  The `--proxy` option specifies a HTTP proxy host name. 
+  The `--proxy port` option specifies the HTTP proxy port.
+
+USAGE: spx synthesize [...] --proxy PROXY
+   OR: spx synthesize [...] --proxy PROXY --proxy port PORT
+   OR: spx synthesize [...] @CONFIG-FILENAME
+
+  WHERE: PROXY represents the PROXY host (e.g. localhost)
+     OR: PORT represents the PROXY port (e.g. 80, which is the default)
+     OR: CONFIG-FILENAME is a multi-line text file as follows:
+
+            connection.proxy.host=HOST
+            connection.proxy.port=PORT
+
+EXAMPLES
+
+  spx synthesize --text Hello --proxy localhost --proxy port 8888
+
+  spx config synthesize @fiddler --set proxy.host localhost
+  spx config synthesize @fiddler --add proxy.port 8888
+
+  spx synthesize --file hello.wav @fiddler
+
+SEE ALSO
+
+  spx help synthesize
+  spx help config

@@ -1,0 +1,31 @@
+RECOGNIZE WER
+
+@include.the.recognize.command
+
+  The `--wer` option allows an external remote method (such as an Azure Function)
+  to calculate the word error rate via HTTP GET.
+
+USAGE: spx recognize [...] --wer url URL
+
+  The remote method will be provided the following query parameters:
+  * `transcription` - the expected text
+  * `recognition` - the recognized text
+  * `locale` - the spoken LANGUAGE in BCP-47 format
+
+  For example:
+  
+    https://crbn.us/wer?transcription=TRANSCRIPT&recognition=RECOGNIZEDTEXT&locale=LOCALE
+
+  The remote method should return a JSON object, with `wordCount` and `errors` integer values. For example:
+
+    { "wordCount": 4, "errors": 0 }  
+
+EXAMPLES
+
+  spx recognize --foreach file;transcript in @filelist.txt --wer url https://crbn.us/wer --check wer eq 0
+
+SEE ALSO
+
+  spx help recognize examples
+  spx help recognize files
+  spx help recognize

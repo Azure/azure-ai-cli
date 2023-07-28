@@ -1,0 +1,7 @@
+output.each.audio.input.id=true
+output.each.event=true
+output.each.event.sessionid=true
+output.each.result.reason=true
+output.each.result.latency=true
+output.each.result.text=true
+output.each.result.json=true

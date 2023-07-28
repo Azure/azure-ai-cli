@@ -1,0 +1,51 @@
+TRANSLATE EXAMPLES
+
+  `INIT`: Automatically setup spx with REGION and KEY default values
+
+    spx init
+
+  `SETUP`: Manually setup spx with REGION and KEY default values
+
+    spx config translate @region --set westus2
+    spx config translate @key --set 436172626F6E20697320636F6F6C2121
+
+  `EXAMPLE 1`: Translate from microphone into German
+  
+    spx translate --microphone --source en-US --target de
+
+  `EXAMPLE 2`: Translate from local WAV file, or remote MP3 file
+
+    spx translate --source en-US --target de --file hello.wav
+    spx translate --source en-US --target de --file https://crbn.us/hello.mp3 --format mp3
+
+  `EXAMPLE 3`: Translate multiple files using wildcards
+
+    spx translate --source en-US --target de --files *.wav
+
+  `EXAMPLE 4`: Improve speech recognition accuracy with phrase lists
+
+    spx translate --source en-US --target de --files *.wav --phrases "Hello;Hi;Howya doin"
+
+  `EXAMPLE 5`: Recognize multiple files from TSV file with file names and transcriptions
+
+    spx translate --source en-US --target de --foreach file;transcript in @filelist.txt --check wer eq 0
+
+    WHERE: `filelist.txt` is the filename for a file containing tab delimited content:
+
+      audioFileName1 \t transcript1
+      audioFileName2 \t transcript2
+
+  `EXAMPLE 6`: Recognize multiple files from TSV file with file ids and transcriptions
+
+    spx translate --source en-US --target de --foreach id;transcript in @filelist.txt --check wer eq 0
+
+    WHERE: `filelist.txt` is the filename for a file containing tab delimited content:
+
+      audioFileNameNoExtension1 \t transcript1
+      audioFileNameNoExtension2 \t transcript2
+
+ADDITIONAL TOPICS
+
+  spx help setup
+  spx help translate advanced
+  spx help translate

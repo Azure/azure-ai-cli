@@ -1,0 +1,10 @@
+﻿x.command=recognize
+service.config.region=@region
+service.config.key=@key
+diagnostics.config.log.file=log-{run.time}.log
+output.all.audio.input.id=true
+output.all.recognizer.session.started.sessionid=true
+output.all.recognizer.recognized.result.text=true
+audio.input.file=https://crbn.us/hello.wav
+audio.input.type=file
+x.command.diagnostics.log.expect=@recognize.hello.path.term.dtor.test.x.command.diagnostics.log.expected

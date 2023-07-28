@@ -1,0 +1,20 @@
+BATCH DOWNLOAD OUTPUT FILE
+
+  The `--output file` option specifies the filename of the downloaded file.
+
+USAGE: spx batch download [...] --output file FILE
+   OR: spx batch download [...] @CONFIG-FILENAME
+
+  WHERE: FILE is the filename of the downloaded file.
+     OR: FILE is `-` representing STDOUT.
+
+EXAMPLE
+
+  spx batch download [...] --output file audio1.json
+
+SEE ALSO
+
+  spx help batch transcription list
+  spx help batch transcription download
+  spx help batch output
+  spx help batch

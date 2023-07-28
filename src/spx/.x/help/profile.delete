@@ -1,0 +1,13 @@
+PROFILE DELETE
+
+@include.the.profile.command.long
+
+  The `profile delete` function deletes a given voice profile.
+
+USAGE: spx profile delete --id ID
+  OR:  spx profile delete --file @FILE /* [THIS DELETES ALL PROFILES LISTED IN GIVEN FILE] */
+
+SEE ALSO
+
+  spx help profile
+  spx help profile examples

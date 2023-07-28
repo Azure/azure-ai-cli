@@ -1,0 +1,29 @@
+BATCH TRANSCRIPTION NAME
+
+  The `--name` option specifies the display name of the TRANSCRIPTION.
+
+USAGE: spx batch transcription [...] --name NAME
+   OR: spx batch transcription [...] --name @FILENAME
+   OR: spx batch transcription [...] @CONFIG-FILENAME
+
+  WHERE: NAME is the transcription display name
+     OR: FILENAME is a single line text file containing the NAME
+     OR: CONFIG-FILENAME is a single line text file in the following form:
+
+            batch.transcription.name=NAME
+
+EXAMPLES
+
+  spx batch transcription [...] --name "My transcription"
+
+  spx config @my.name --set "My transcription"
+  spx batch transcription [...] --name @my.name
+
+  spx config @transcription.details --set name "My transcription"
+  spx config @transcription.details --add description "This is the description"
+  spx batch transcription [...] @transcription.details
+
+SEE ALSO
+
+  spx help batch transcription create
+  spx help batch transcription update

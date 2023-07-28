@@ -1,0 +1,23 @@
+CUSTOM SPEECH RECOGNITION MODEL
+
+@include.the.csr.model.command
+
+USAGE: spx csr model <command> [...]
+
+COMMANDS
+
+  spx csr model create [...]          (see: spx help csr model create)
+  spx csr model status [...]          (see: spx help csr model status)
+  spx csr model list [...]            (see: spx help csr model list)
+
+  spx csr model update [...]          (see: spx help csr model update)
+  spx csr model delete [...]          (see: spx help csr model delete)
+
+  spx csr model copy [...]            (see: spx help csr model copy)
+
+ADDITIONAL TOPICS
+
+  spx help csr examples
+  spx help csr model examples
+  spx help csr list models
+  spx help documentation

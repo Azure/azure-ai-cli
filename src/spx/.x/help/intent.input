@@ -1,0 +1,43 @@
+INTENT INPUT OVERVIEW
+
+@include.the.intent.command
+
+  FROM MICROPHONE - DEFAULT DEVICE or SPECIFIC DEVICE
+
+    The `spx intent` command can recognize intent using streaming audio captured
+    from a device microphone (default microphone or specific microphone).
+
+    To intent audio from a device MICROPHONE see: spx help intent microphone 
+
+  FROM FILE - SINGLE or MULTIPLE FILES
+
+    The `spx intent` command can also recognize intent using audio stored in local
+    or remote audio files, in various audio container formats (e.g. mp3, ogg).
+
+    To recognize intent from a single audio file see: spx help intent file
+    To recognize intent from a multiple audio files see: spx help intent files
+    To recognize intent from file(s) in various formats see: spx help intent format
+ 
+EXAMPLES
+
+  `EXAMPLE 1`: Recognize intent from a microphone
+  
+    spx intent --microphone
+
+  `EXAMPLE 2`: Recognize intent from local WAV file, or remote MP3 file
+
+    spx intent --file hello.wav
+    spx intent --file http://crbn.us/hello.mp3 --format mp3
+
+  `EXAMPLE 3`: Recognize intent in multiple files using wildcards
+
+    spx intent --files *.wav
+
+  `EXAMPLE 4`: Recognize intent in audio file content piped thru STDIN
+
+    spx synthesize --text "Hello" --audio output - --quiet | spx intent --file -
+
+SEE ALSO
+
+  spx help intent examples
+  spx help intent

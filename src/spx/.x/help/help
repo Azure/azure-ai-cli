@@ -1,0 +1,56 @@
+  ______ ___ _  __
+ /  ___// _ \ \/ /
+ \___ \/ ___/   <
+/____ /_/  /__/\_\
+
+USAGE: spx <command> [...]
+
+COMMANDS
+
+  spx init [...]            (see: spx help init)
+  spx config [...]          (see: spx help config)
+
+  spx recognize [...]       (see: spx help recognize)
+  spx synthesize [...]      (see: spx help synthesize)
+
+  spx intent [...]          (see: spx help intent)
+  spx translate [...]       (see: spx help translate)
+
+  spx batch [...]           (see: spx help batch)
+  spx csr [...]             (see: spx help csr)
+
+  spx profile [...]         (see: spx help profile)
+  spx speaker [...]         (see: spx help speaker)
+
+  spx webjob [...]          (see: spx help webjob)
+
+EXAMPLES
+
+  spx init
+
+  spx config @region --set westus2
+  spx config @key --set 436172626F6E20697320636F6F6C2121
+
+  spx synthesize --text "Hello"
+  spx synthesize --files *.txt;*.ssml --audio output {id}.wav
+
+  spx recognize --microphone
+  spx recognize --files *.wav --output results.tsv
+
+  spx translate --target de --microphone
+  spx translate --source en-US --target de;es;fr --file hello.wav
+
+  spx config --set @appId=1b9b6355-e76a-48c5-861c-bb54dd25a806
+
+ADDITIONAL TOPICS
+
+  spx help setup
+  spx help examples
+
+  spx help find "mp3"
+  spx help find "mp3" --expand
+
+  spx help find topics "examples"
+  spx help list topics
+
+  spx help documentation

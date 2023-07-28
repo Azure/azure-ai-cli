@@ -1,0 +1,6 @@
+  The `vz init` command allows interactive and non-interactive selection
+  or creation of Azure Vision Services resources.
+
+  When a Vision resource is selected or created using this command, the
+  associated resource keys and region are retrieved and automatically
+  stored in the local VZ configuration datastore.

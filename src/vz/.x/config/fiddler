@@ -1,0 +1,2 @@
+service.config.proxy.port=8888
+service.config.proxy.host=localhost

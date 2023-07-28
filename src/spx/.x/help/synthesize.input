@@ -1,0 +1,53 @@
+SYNTHESIZE INPUT OVERVIEW
+
+@include.the.synthesize.command
+
+  INTERACTIVE - You type the text
+
+    The `spx synthesize` command can create human sounding output from simple
+    text that you type in, INTERACTIVELY.
+
+    To synthesize text INTERACTIVELY see: spx help synthesize interactive
+
+  COMMAND LINE - TEXT or SSML
+
+    The `spx synthesize` command can also create human sounding output supplied
+    directly on the command line. 
+
+    To synthesize TEXT from the command line, see: spx help synthesize text
+    To synthesize SSML from the command line, see: spx help synthesize ssml
+
+  DATA FILES - TEXT or SSML FILES
+
+    In addition, the `spx synthesize` command can also create human sounding 
+    output stored in local or remote data files (TEXT or SSML standard).
+
+    To synthesize TEXT or SSML from a single file, see: spx help synthesize file
+    To synthesize TEXT or SSML from multiple files, see: spx help synthesize files
+ 
+EXAMPLES
+
+  `EXAMPLE 1`: Synthesize text entered on the command line
+  
+    spx synthesize --text "This is a test of the emergency broadcast system."
+
+  `EXAMPLE 2`: Synthesize text stored in a local file
+
+    spx synthesize --file story.txt
+
+  `EXAMPLE 3`: Synthesize speech defined in a local SSML file
+
+    spx synthesize --file cheerful.ssml
+
+  `EXAMPLE 4`: Synthesize speech stored in a remote file, either TEXT or SSML
+
+    spx synthesize --url http://crbn.us/text
+
+  `EXAMPLE 5`: From a set of local files, synthesize from all text and SSML files
+
+    spx synthesize --files *.txt;*.ssml
+
+SEE ALSO
+
+  spx help synthesize examples
+  spx help synthesize

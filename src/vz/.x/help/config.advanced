@@ -1,0 +1,36 @@
+CONFIG
+
+@include.the.config.command
+
+USAGE: vz config [HIVE] [COMMAND] [@FILE] [...]
+
+  OPTIONs
+    --set [NAME=]VALUE            (see: vz help config set)
+    --add [NAME=]VALUE            (see: vz help config add)
+    --find NAME                   (see: vz help config find)
+    --clear [NAME]                (see: vz help config clear)
+
+  ADANCED
+    --hive HIVE                   (see: vz help config hive)
+    --region REGION               (see: vz help config region)
+    --command COMMAND             (see: vz help config command)
+
+EXAMPLES                          (see: vz help config examples)
+
+  vz config --set region westus2
+  vz config --set key 436172626F6E20697320636F6F6C2121
+
+  vz config image analyze --set region westus2
+  vz config image analyze --set key 436172626F6E20697320636F6F6C2121
+
+  vz config image read --set region eastus
+  vz config image read --set key 436172626F6E20697320636F6F6C2020
+
+  vz config image --find key
+
+SEE ALSO
+
+  vz help setup
+  vz help config scope
+  vz help config hive
+  vz help find topics config

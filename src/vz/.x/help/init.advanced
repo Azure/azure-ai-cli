@@ -1,0 +1,35 @@
+INIT
+
+@include.the.init.command.long
+
+USAGE: vz init [...]
+
+  AZURE
+    --subscription SUBSCRIPTION   (see: vz help init subscription)
+
+  INTERACTIVE
+    --interactive BOOL            (see: vz help init interactive)
+
+  RESOURCE
+    --region REGION               (see: vz help init region)
+    --group GROUP                 (see: vz help init group)
+    --name NAME                   (see: vz help init name)
+
+  PARALLEL PROCESSING
+    --threads NUMBER              (see: vz help init threads)
+    --processes NUMBER            (see: vz help init processes)
+    --repeat NUMBER
+    --max NUMBER
+
+  ADVANCED
+    --foreach in @ITEMS.txt       (see: vz help init foreach)
+    --save FILENAME               (see: vz help init save)
+    --zip ZIPFILE                 (see: vz help init zip)
+
+SEE ALSO
+
+  vz help setup
+  vz help config
+  vz help config hive
+  vz help init examples
+  vz help find topics init

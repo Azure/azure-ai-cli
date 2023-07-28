@@ -1,0 +1,41 @@
+PROFILE EXAMPLES
+
+  `INIT`: Automatically setup spx with REGION and KEY default values
+
+    spx init
+
+  `SETUP`: Manually setup spx with REGION and KEY default values
+
+    spx config profile @region --set westus2
+    spx config profile @key --set 436172626F6E20697320636F6F6C2121
+
+  `EXAMPLE 1`: Create a voice profile 
+  
+    spx profile create --output id my.id --kind TextIndependentIdentification
+    spx profile create --output id my.id --kind TextDependentVerification
+
+  `EXAMPLE 2`: List all profile identification/verification profiles
+
+    spx profile list
+    spx profile list --output file my.profiles --kind TextIndependentVerification
+
+  `EXAMPLE 3`: Get the status of a profile identification/verification profile
+
+    spx profile status --id 12345678-1234-1234-1234-12345678 --kind TextDependentVerification
+    spx profile status --id @my.id --output json my.status.json
+
+  `EXAMPLE 4`: Enroll a profile identification/verification profile using an audio file
+
+    spx profile enroll --id @my.id --file my_audio_file.wav
+
+  `EXAMPLE 5`: Delete a profile identification/verification profile
+
+    spx profile delete --id @my.id --kind TextIndependentVerification
+    spx profile delete --file @my.profiles.to.delete --kind TextIndependentVerification
+
+ADDITIONAL TOPICS
+
+  spx help setup
+  spx help profile 
+  spx help speaker identify
+  spx help speaker verify

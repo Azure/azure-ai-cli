@@ -1,0 +1,26 @@
+CUSTOM SPEECH RECOGNITION ENDPOINT LIST
+
+@include.the.csr.endpoint.list.command
+
+USAGE: spx csr endpoint list [...]
+
+CONNECTION                      (see: spx help csr connection)
+  --key KEY                     (see: spx help csr key)
+  --region REGION               (see: spx help csr region)
+
+LIST
+  --endpoints                   (see: spx help csr endpoint list endpoints)
+  --languages                   (see: spx help csr endpoint list endpoint languages)
+
+ENDPOINT LOGs                   (see: spx help csr endpoint list endpoint logs)
+  --endpoint URL
+  --logs
+
+ADVANCED                        (see: spx help csr advanced)
+  --project URL                 (see: spx help csr project)
+  --input path PATH             (see: spx help csr input path)
+  --output path PATH            (see: spx help csr output path)
+  --output json FILENAME        (see: spx help csr output json)
+  --foreach in @FILENAME        (see: spx help csr foreach)
+  --save FILENAME               (see: spx help csr save)
+  --zip ZIPFILE                 (see: spx help csr zip)

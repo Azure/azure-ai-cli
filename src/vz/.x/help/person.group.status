@@ -1,0 +1,26 @@
+PERSON GROUP STATUS
+
+@include.the.person.group.status.command
+
+USAGE: vz person group status [...]
+
+  CONNECTION                      (see: vz help person connection)
+    --key KEY                     (see: vz help person key)
+    --region REGION               (see: vz help person region)
+    --endpoint ENDPOINT           (see: vz help person endpoint)
+
+  STATUS
+    --group id ID                 (see: vz help person group id)
+    --group kind KIND             (see: vz help person group kind)
+    --wait [TIMEOUT]              (see: vz help person group status wait)
+
+  OUTPUT                          (see: vz help person output)
+    --output request FILENAME     (see: vz help person output request)
+    --output json FILENAME        (see: vz help person output json)
+
+SEE ALSO
+
+  vz help setup
+  vz help person group status advanced
+  vz help person group status examples
+  vz help find topics person group

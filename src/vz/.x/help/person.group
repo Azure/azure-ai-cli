@@ -1,0 +1,26 @@
+PERSON GROUP
+
+  The `vz person group` command manages Azure Vision Face Service large or
+  dynamic person groups containing persons, enabling identification and
+  verification of human faces using the `vz face` command.
+
+USAGE: vz person group <command> [...]
+
+COMMANDS
+
+  vz person group create [...]        (see: vz help person group create)
+  vz person group list [...]          (see: vz help person group list)
+
+  vz person group train [...]         (see: vz help person group train)
+  vz person group status [...]        (see: vz help person group status)
+
+  vz person group update [...]        (see: vz help person group update)
+  vz person group delete [...]        (see: vz help person group delete)
+
+ADDITIONAL TOPICS
+
+  vz help setup
+  vz help person overview
+  vz help person examples
+  vz help find topics face
+  vz help find topics person

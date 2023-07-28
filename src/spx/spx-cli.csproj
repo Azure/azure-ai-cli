@@ -1,0 +1,99 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <!-- See BuildCommon.targets for <PackageId> and other configurable properties -->
+    <TargetFramework>net6.0</TargetFramework>
+    <AssemblyName>spx</AssemblyName>
+    <SelfContained>false</SelfContained>
+    <OutputType>Exe</OutputType>
+    <RuntimeIdentifiers>win-x64;linux-x64</RuntimeIdentifiers>
+    <Configurations>Debug;Release</Configurations>
+    <RootNamespace>Azure.AI.Details.Common.CLI</RootNamespace>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+    <ToolCommandName>spx</ToolCommandName>
+    <DebugType>full</DebugType>
+    <DebugSymbols>true</DebugSymbols>
+    <EnableUnmanagedDebugging>true</EnableUnmanagedDebugging>
+    <PackageOutputPath>./nupkg</PackageOutputPath>
+    <GenerateDependencyFile>true</GenerateDependencyFile>
+    <PackageLicenseFile>license.txt</PackageLicenseFile>
+    <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
+    <Authors>Microsoft</Authors>
+    <Description>Speech CLI (SPX) is a command line tool for using the Speech service without writing any code. See https://docs.microsoft.com/azure/cognitive-services/speech-service/spx-overview for more information.</Description>
+    <Copyright>© Microsoft Corporation. All rights reserved.</Copyright>
+    <PackageProjectUrl>https://docs.microsoft.com/azure/cognitive-services/speech-service/spx-overview</PackageProjectUrl>
+    <PackageTags>Microsoft Speech; Speech CLI; azureofficial; Azure AI Speech</PackageTags>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <LocalBinOutputPath Condition="'$(LocalBinOutputPath)' == '' And '$(LocalBuildSDKBinPath)' != ''">$(LocalBuildSDKBinPath)</LocalBinOutputPath>
+    <LocalBinOutputPath Condition="'$(LocalBinOutputPath)' == ''">bin</LocalBinOutputPath>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="license.txt" Pack="true" PackagePath="license.txt" />
+  </ItemGroup>
+
+  <PropertyGroup>
+    <IncludeSymbols>false</IncludeSymbols>
+    <StartupObject>Azure.AI.Details.Common.CLI.Program</StartupObject>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(PackageType)' == 'Dependency'">
+    <PublishSingleFile>true</PublishSingleFile>
+    <IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
+  </PropertyGroup>
+
+  <Choose>
+    <When Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+      <PropertyGroup>
+        <Platforms>x64</Platforms>
+        <OutputPath>$(LocalBinOutputPath)\Release\</OutputPath>
+      </PropertyGroup>
+    </When>
+    <When Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+      <PropertyGroup>
+        <Platforms>x64</Platforms>
+        <OutputPath>$(LocalBinOutputPath)\Debug\</OutputPath>
+      </PropertyGroup>
+    </When>
+    <When Condition="$(Configuration.Contains('ReleaseUnixOS'))">
+      <PropertyGroup>
+        <DefineConstants>$(DefineConstants);UNIX</DefineConstants>
+        <OutputPath>$(LocalBinOutputPath)\ReleaseUnixOS</OutputPath>
+      </PropertyGroup>
+    </When>
+    <When Condition="$(Configuration.Contains('DebugUnixOS'))">
+      <PropertyGroup>
+        <DefineConstants>$(DefineConstants);UNIX</DefineConstants>
+        <OutputPath>$(LocalBinOutputPath)\DebugUnixOS</OutputPath>
+      </PropertyGroup>
+    </When>
+  </Choose>
+
+  <ItemGroup>
+    <Compile Include="..\common\**" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include=".x\help\*">
+      <Link>resources\.spx\help\%(Filename)%(Extension)</Link>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include=".x\config\*">
+      <Link>resources\.spx\config\%(Filename)%(Extension)</Link>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="JmesPath.Net" Version="1.0.182" />
+    <PackageReference Include="Microsoft.Bot.Schema" Version="4.12.2" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
+    <PackageReference Include="System.Interactive.Async" Version="5.0.0" />
+  </ItemGroup>
+
+  <Import Project="BuildCommon.targets" />
+
+</Project>

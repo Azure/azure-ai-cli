@@ -1,0 +1,4 @@
+﻿x.command=run
+run.input.vz.command=vz config
+run.input.process=vz
+run.output.expect=@config.usage.test.run.output.expected

@@ -1,0 +1,56 @@
+RUN
+
+@include.the.run.command
+
+USAGE: spx run [...]
+
+  RUN SPX
+    --command COMMAND
+    --job FILE
+    --jobs FILE1;FILE2[;...]
+    --jobs @FILELIST.txt
+    --jobs PATTERN
+
+  PROCESS
+    --process PROCESS
+    --bash
+    --wsl
+    --cmd
+
+  SCRIPTS
+    --script FILE
+    --scripts FILE1;FILE2[;...]
+    --scripts @FILELIST.txt
+    --scripts PATTERN
+    --script "SCRIPT"
+
+  FILES
+    --file FILE
+    --files FILE1;FILE2[;...]
+    --files @FILELIST.txt
+    --files PATTERN
+
+  ARGUMENTS
+    --line LINE
+    --item ITEM
+    --[pre/post] args ARGS
+    --[pre/post] script args ARGS
+    --[pre/post] file args ARGS
+    --[pre/post] line args ARGS
+    --[pre/post] item args ARGS
+
+  ADVANCED
+    --foreach in @ITEMS.txt
+    --foreach OPT in @ITEMS.txt
+    --foreach OPT1;OPT2 in @ITEMS.txt
+    --threads NUMBER
+    --processes NUMBER
+
+EXAMPLES
+
+  spx config @run.cmd --add "spx synthesize --text Hello --audio output hello.wav"
+  spx config @run.cmd --add "spx recognize --file hello.wav"
+  spx run --spx --foreach command in @run.cmd
+
+  spx batch transcription list --output urls @urls.file.txt
+  spx run --script "echo " --foreach item in @urls.file.txt --args2 " is the URL"

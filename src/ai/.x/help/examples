@@ -1,0 +1,26 @@
+   ___ ____  ___  _____
+  / _ /_  / / _ |/_  _/
+ / __ |/ /_/ __ |_/ /_  
+/_/ |_/___/_/ |_/____/  
+
+USAGE: ai <command> [...]
+
+EXAMPLES
+
+  ai init
+  
+  ai config --set region westus2
+  ai config --set key 436172626F6E20697320636F6F6C2121
+
+  ai complete --file prompt.txt
+  ai complete --files *.txt
+
+  ai chat --file prompt.txt
+
+ADDITIONAL EXAMPLES
+
+  ai help find "prompt"
+  ai help find "prompt" --expand
+
+  ai help find topics "examples"
+  ai help list topics

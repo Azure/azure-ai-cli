@@ -1,0 +1,28 @@
+BATCH TRANSCRIPTION ONPREM CREATE
+
+  The `spx batch transcription onprem create` command submits a new batch
+  of audio files to be transcribed using the user-supplied on-premise speech container endpoints.
+
+  Endpoints should already have been configured using `spx batch transcription onprem endpoints`.
+
+USAGE: spx batch transcription onprem create [...]
+
+  CREATE
+    --files /file/path1;file/path2;...
+        OR
+    --files @FILES.txt
+
+    --language LANGUAGE           e.g. en-US
+    --nbest NBEST                 How many transcript alternatives to return.
+    --diarization DIARIZATION     Options: None, Identity, Anonymous.
+    --resume RESUME               Permit resume from previous failure? Options: true, false.
+    --combine COMBINE             Combine output jsons into single output json. Options: true, false.
+
+SEE ALSO
+
+  spx help setup
+  spx help batch transcription onprem examples
+  
+  Learn more about running On-Premise Speech Containers:
+  https://docs.microsoft.com/azure/cognitive-services/speech-service/speech-container-howto
+ 

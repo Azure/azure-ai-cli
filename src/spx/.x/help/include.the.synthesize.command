@@ -1,0 +1,1 @@
+  The `spx synthesize` command synthesizes audio from text or SSML.

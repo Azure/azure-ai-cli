@@ -1,0 +1,29 @@
+BATCH TRANSCRIPTION DESCRIPTION
+
+  The `--description` option specifies the transcription DESCRIPTION.
+
+USAGE: spx batch transcription [...] --description DESCRIPTION
+   OR: spx batch transcription [...] --description @FILENAME
+   OR: spx batch transcription [...] @CONFIG-FILENAME
+
+  WHERE: DESCRIPTION is the transcription description
+     OR: FILENAME is a single line text file containing the DESCRIPTION
+     OR: CONFIG-FILENAME is a single line text file in the following form:
+
+            batch.transcription.description=DESCRIPTION
+
+EXAMPLES
+
+  spx batch transcription [...] --description "This is the description"
+
+  spx config @my.description --set "This is the description"
+  spx batch transcription [...] --description @my.description
+
+  spx config @transcription.details --set name "My transcription"
+  spx config @transcription.details --add description "This is the description"
+  spx batch transcription [...] @transcription.details
+
+SEE ALSO
+
+  spx help batch transcription create
+  spx help batch transcription update

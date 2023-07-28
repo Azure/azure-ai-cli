@@ -1,0 +1,4 @@
+﻿x.command=run
+run.input.spx.command=config local --find name227266
+run.input.process=spx
+run.output.expect=@config.local.name227266.3.find.test.run.output.expected

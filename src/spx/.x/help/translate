@@ -1,0 +1,39 @@
+TRANSLATE
+
+@include.the.translate.command.long
+
+USAGE: spx translate [...]
+
+  CONNECTION                      (see: spx help translate connection)
+    --key KEY                     (see: spx help translate key)
+    --region REGION               (see: spx help translate region)
+
+  LANGUAGE                        (see: spx help translate language)
+    --source LANGUAGE
+    --target LANGUAGE
+
+  INPUT                           (see: spx help translate input)
+    --microphone                  (see: spx help translate microphone)
+    --file FILE                   (see: spx help translate file)
+    --files PATTERN               (see: spx help translate files)
+    --files @FILELIST.txt         (see: spx help translate files)
+    --format FORMAT               (see: spx help translate format)
+
+  TRANSLATION
+    --once[+]                     (see: spx help translate once)
+    --continuous                  (see: spx help translate continuous)
+    --keyword FILENAME            (see: spx help translate keyword)
+
+  ADVANCED
+    --log FILENAME                (see: spx help translate log)
+    --proxy HOSTNAME              (see: spx help translate proxy)
+    --phrases @PHRASES.txt        (see: spx help translate phrases)
+    --foreach in @ITEMS.txt       (see: spx help translate foreach)
+    --threads NUMBER              (see: spx help translate threads)
+
+SEE ALSO
+
+  spx help setup
+  spx help translate advanced
+  spx help translate examples
+  spx help find topics translate

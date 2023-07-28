@@ -1,0 +1,32 @@
+BATCH REGION
+
+  The `spx batch` command manages remote audio streams.
+
+@include.the.region.option
+
+USAGE: spx batch [...] --region REGION
+   OR: spx batch [...] --region @FILENAME
+   OR: spx batch [...] @CONFIG-FILENAME
+
+@include.the.region.option.where
+
+EXAMPLES
+
+  spx batch transcription list --region westus2 --key 436172626F6E20697320636F6F6C2121
+
+  spx config batch @region --set westus2
+  spx config batch @key --set 436172626F6E20697320636F6F6C2121
+  spx batch transcription list --region @region --key @key
+
+  spx config batch @region --set westus2
+  spx config batch @key --set 436172626F6E20697320636F6F6C2121
+  spx config batch @default.config --set @@connection.from.region
+  spx batch transcription list
+
+SEE ALSO
+
+  spx help setup
+  spx help region overview
+  spx help batch connection
+  spx help batch key
+  spx help batch

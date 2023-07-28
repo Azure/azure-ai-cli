@@ -1,0 +1,40 @@
+SETUP OVERVIEW
+
+  `VISION RESOURCE`
+
+@include.create.resource
+
+@include.create.resource.extra
+
+  `REGION and KEY`
+
+@include.the.azure.vision.service.long
+
+  To select or create an Azure Vision Resource, and automatically store the associated
+  KEY and REGION in the VZ configuration datastore:
+
+    vz init
+
+  To manually store your subscription KEY and REGION in the VZ configuration datastore:
+
+    vz config --set key PUT-YOUR-KEY-HERE
+    vz config --set region PUT-YOUR-REGION-HERE
+
+    For example:
+
+      vz config --set key 436172626F6E20697320636F6F6C2121
+      vz config --set region westus2
+
+SEE ALSO
+
+  vz help key overview
+  vz help region overview
+
+  vz help init
+  vz help init examples
+
+  vz help config
+  vz help config examples
+
+  vz help advanced setup
+  vz help webjob setup

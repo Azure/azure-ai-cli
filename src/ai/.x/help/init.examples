@@ -1,0 +1,19 @@
+INIT EXAMPLES
+
+  `EXAMPLE 1`: interactively select or create an Azure AI resource
+
+    ai init
+
+  `EXAMPLE 2`: interactively select a resource matching a set of criteria
+
+    ai init --name "ai-westus2" --region westus2
+
+  `EXAMPLE 3`: non-interactively select or create a resource by specifying all parameters
+
+    ai init --interactive false --subscription "Pay-As-You-Go" --region westus2 --group "ai-westus2-436172626F6E"
+
+SEE ALSO
+
+  ai help init
+  ai help init advanced
+  

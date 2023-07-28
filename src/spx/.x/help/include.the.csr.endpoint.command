@@ -1,0 +1,1 @@
+  The `spx csr endpoint` commands manage custom speech recognition endpoints.

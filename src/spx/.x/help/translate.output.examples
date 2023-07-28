@@ -1,0 +1,181 @@
+TRANSLATE OUTPUT EXAMPLES
+
+  spx translate [...] --output all audio id
+  spx translate [...] --output all sessionid
+  spx translate [...] --output all resultid
+  spx translate [...] --output all reason
+  spx translate [...] --output all text
+  spx translate [...] --output all itn text
+  spx translate [...] --output all lexical text
+  spx translate [...] --output all offset
+  spx translate [...] --output all duration
+  spx translate [...] --output all latency
+  spx translate [...] --output all json
+
+  spx translate [...] --output each audio id
+  spx translate [...] --output each sessionid
+  spx translate [...] --output each resultid
+  spx translate [...] --output each reason
+  spx translate [...] --output each text
+  spx translate [...] --output each itn text
+  spx translate [...] --output each lexical text
+  spx translate [...] --output each offset
+  spx translate [...] --output each duration
+  spx translate [...] --output each latency
+  spx translate [...] --output each json
+
+  spx translate [...] --output all result resultid
+  spx translate [...] --output all result reason
+  spx translate [...] --output all result text
+  spx translate [...] --output all result translated text
+  spx translate [...] --output all result translated TARGET-LANGUAGE text
+  spx translate [...] --output all result offset
+  spx translate [...] --output all result duration
+  spx translate [...] --output all result latency
+  spx translate [...] --output all result json
+
+  spx translate [...] --output each result resultid
+  spx translate [...] --output each result reason
+  spx translate [...] --output each result text
+  spx translate [...] --output each result translated text
+  spx translate [...] --output each result translated TARGET-LANGUAGE text
+  spx translate [...] --output each result offset
+  spx translate [...] --output each result duration
+  spx translate [...] --output each result latency
+  spx translate [...] --output each result json
+
+  spx translate [...] --output all events
+  spx translate [...] --output all event sessionid
+
+  spx translate [...] --output each event
+  spx translate [...] --output each event sessionid
+
+  spx translate [...] --output all connection events
+  spx translate [...] --output all connection event sessionid
+  spx translate [...] --output all connection connected events
+  spx translate [...] --output all connection connected sessionid
+  spx translate [...] --output all connection disconnected events
+  spx translate [...] --output all connection disconnected sessionid
+
+  spx translate [...] --output each connection event
+  spx translate [...] --output each connection event sessionid
+  spx translate [...] --output each connection connected event
+  spx translate [...] --output each connection connected sessionid
+  spx translate [...] --output each connection disconnected event
+  spx translate [...] --output each connection disconnected sessionid
+
+  spx translate [...] --output all translator events
+  spx translate [...] --output all translator event sessionid
+
+  spx translate [...] --output each translator event
+  spx translate [...] --output each translator event sessionid
+
+  spx translate [...] --output all translator session events
+  spx translate [...] --output all translator session event sessionid
+  spx translate [...] --output all translator session started events
+  spx translate [...] --output all translator session started sessionid
+  spx translate [...] --output all translator session stopped events
+  spx translate [...] --output all translator session stopped sessionid
+
+  spx translate [...] --output each translator session event
+  spx translate [...] --output each translator session event sessionid
+  spx translate [...] --output each translator session started event
+  spx translate [...] --output each translator session started sessionid
+  spx translate [...] --output each translator session stopped event
+  spx translate [...] --output each translator session stopped sessionid
+
+  spx translate [...] --output all connection message received events
+  spx translate [...] --output all connection message received binary message
+  spx translate [...] --output all connection message received binary message size
+  spx translate [...] --output all connection message received content type
+  spx translate [...] --output all connection message received is binary message
+  spx translate [...] --output all connection message received is text message
+  spx translate [...] --output all connection message received path
+  spx translate [...] --output all connection message received request id
+  spx translate [...] --output all connection message received text message
+
+  spx translate [...] --output each connection message received event
+  spx translate [...] --output each connection message received binary message
+  spx translate [...] --output each connection message received binary message size
+  spx translate [...] --output each connection message received content type
+  spx translate [...] --output each connection message received is binary message
+  spx translate [...] --output each connection message received is text message
+  spx translate [...] --output each connection message received path
+  spx translate [...] --output each connection message received request id
+  spx translate [...] --output each connection message received text message
+
+  spx translate [...] --output all translator canceled events
+  spx translate [...] --output all translator canceled error
+  spx translate [...] --output all translator canceled error code
+  spx translate [...] --output all translator canceled error details
+  spx translate [...] --output all translator canceled reason
+
+  spx translate [...] --output each translator canceled event
+  spx translate [...] --output each translator canceled error
+  spx translate [...] --output each translator canceled error code
+  spx translate [...] --output each translator canceled error details
+  spx translate [...] --output each translator canceled reason
+
+  spx translate [...] --output all translator translated events
+  spx translate [...] --output all translator translated sessionid
+  spx translate [...] --output all translator translated result resultid
+  spx translate [...] --output all translator translated result reason
+  spx translate [...] --output all translator translated result text
+  spx translate [...] --output all translator translated result translated text
+  spx translate [...] --output all translator translated result translated TARGET-LANGUAGE text
+  spx translate [...] --output all translator translated result itn text
+  spx translate [...] --output all translator translated result lexical text
+  spx translate [...] --output all translator translated result offset
+  spx translate [...] --output all translator translated result duration
+  spx translate [...] --output all translator translated result latency
+  spx translate [...] --output all translator translated result json
+
+  spx translate [...] --output each translator translated event
+  spx translate [...] --output each translator translated sessionid
+  spx translate [...] --output each translator translated result resultid
+  spx translate [...] --output each translator translated result reason
+  spx translate [...] --output each translator translated result text
+  spx translate [...] --output each translator translated result itn text
+  spx translate [...] --output each translator translated result lexical text
+  spx translate [...] --output each translator translated result offset
+  spx translate [...] --output each translator translated result duration
+  spx translate [...] --output each translator translated result latency
+  spx translate [...] --output each translator translated result json
+
+  spx translate [...] --output all translator recognizing events
+  spx translate [...] --output all translator recognizing sessionid
+  spx translate [...] --output all translator recognizing result resultid
+  spx translate [...] --output all translator recognizing result reason
+  spx translate [...] --output all translator recognizing result text
+  spx translate [...] --output all translator recognizing result translated text
+  spx translate [...] --output all translator recognizing result translated TARGET-LANGUAGE text
+  spx translate [...] --output all translator recognizing result offset
+  spx translate [...] --output all translator recognizing result duration
+  spx translate [...] --output all translator recognizing result latency
+  spx translate [...] --output all translator recognizing result json
+
+  spx translate [...] --output each translator recognizing event
+  spx translate [...] --output each translator recognizing sessionid
+  spx translate [...] --output each translator recognizing result resultid
+  spx translate [...] --output each translator recognizing result reason
+  spx translate [...] --output each translator recognizing result text
+  spx translate [...] --output each translator recognizing result translated text
+  spx translate [...] --output each translator recognizing result translated TARGET-LANGUAGE text
+  spx translate [...] --output each translator recognizing result offset
+  spx translate [...] --output each translator recognizing result duration
+  spx translate [...] --output each translator recognizing result latency
+  spx translate [...] --output each translator recognizing result json
+
+  spx translate [...] --output all file type json
+  spx translate [...] --output all file output.json
+
+  spx translate [...] --output each file type json
+  spx translate [...] --output each file output.json
+
+  spx translate [...] --output all file type tsv 
+  spx translate [...] --output all file output.tsv
+  spx translate [...] --output all tsv file has header false
+
+  spx translate [...] --output each file type tsv
+  spx translate [...] --output each file output.tsv
+  spx translate [...] --output each tsv file has header false

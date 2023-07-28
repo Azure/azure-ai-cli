@@ -1,0 +1,23 @@
+RECOGNIZE SAVE
+
+@include.the.recognize.command
+
+@include.the.save.option
+
+USAGE: spx recognize [...] --save FILENAME
+
+EXAMPLES
+
+  spx recognize --files *.wav --save test1.job
+  spx recognize --files *.wav --log {id}.log --save test2.job
+  spx recognize --files @URLs.txt --output zip output.zip --save test3.job
+
+  spx recognize --foreach file;transcript in @items.txt --save test4.job
+  spx recognize @test4.job
+
+SEE ALSO
+
+  spx help recognize
+  spx help recognize files
+  spx help recognize foreach
+  spx help webjob setup

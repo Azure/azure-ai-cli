@@ -1,0 +1,24 @@
+RECOGNIZE OUTPUT VTT 
+
+@include.the.recognize.command
+
+  The `--output vtt` option indicates that recognition results should
+  be output in the WEBVTT format, which provides captioning information for audio/video files.
+  More information on the format can be found at https://www.w3.org/TR/webvtt1/.
+
+  The `--output vtt file` option specifies the name of the file to use. If 
+  this option is not specified, a default filename will be provided.
+
+USAGE: spx recognize [...] --output vtt
+   OR: spx recognize [...] --output vtt file FILENAME
+
+EXAMPLES
+
+  spx recognize --file hello.wav --output vtt
+  spx recognize --file hello.wav --output vtt file hello.vtt
+
+SEE ALSO
+
+  spx help recognize output
+  spx help recognize
+  

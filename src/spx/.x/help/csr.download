@@ -1,0 +1,30 @@
+USAGE: spx csr download [...]
+
+CONNECTION                      (see: spx help csr connection)
+  --key KEY                     (see: spx help csr key)
+  --region REGION               (see: spx help csr region)
+
+DOWNLOAD
+  --url URL                     (see: spx help csr download url)
+  --file URL                    (see: spx help csr download file)
+  
+DATASET FILE
+  --dataset file URL            (see: spx help csr download dataset file)
+
+EVALUATION FILE
+  --evaluation file URL         (see: spx help csr download dataset file)
+
+ENDPOINT LOG
+  --endpoint log URL            (see: spx help csr download endpoint log)
+
+OUTPUT                          (see: spx help csr output)
+  --output file FILENAME        (see: spx help csr output file)
+  --output json FILENAME        (see: spx help csr output json)
+  --output url @@FILE           (see: spx help csr output url)
+
+ADVANCED                        (see: spx help csr advanced)
+  --input path PATH             (see: spx help csr input path)
+  --output path PATH            (see: spx help csr output path)
+  --foreach in @FILENAME        (see: spx help csr foreach)
+  --save FILENAME               (see: spx help csr save)
+  --zip ZIPFILE                 (see: spx help csr zip)

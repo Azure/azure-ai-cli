@@ -1,0 +1,33 @@
+IMAGE ANALYZE
+
+@include.the.image.analyze.command.long
+
+USAGE: vz image analyze [...]
+
+  CONNECTION                      (see: vz help image analyze connection)
+    --key KEY                     (see: vz help image analyze key)
+    --region REGION               (see: vz help image analyze region)
+    --endpoint ENDPOINT           (see: vz help image analyze endpoint)
+
+  INPUT                           (see: vz help image analyze input)
+    --camera                      (see: vz help image analyze camera)
+    --file FILE                   (see: vz help image analyze file)
+    --files PATTERN               (see: vz help image analyze files)
+    --files @FILELIST.txt         (see: vz help image analyze files)
+
+  ANALYSIS
+    --once[+]                     (see: vz help image analyze once)
+    --continuous                  (see: vz help image analyze continuous)
+
+  ADVANCED
+    --log FILENAME                (see: vz help image analyze log)
+    --proxy HOSTNAME              (see: vz help image analyze proxy)
+    --foreach in @ITEMS.txt       (see: vz help image analyze foreach)
+    --threads NUMBER              (see: vz help image analyze threads)
+
+SEE ALSO
+
+  vz help setup
+  vz help image analyze examples
+  vz help image analyze output
+  vz help find topics image analyze

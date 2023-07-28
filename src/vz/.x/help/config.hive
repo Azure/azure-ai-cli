@@ -1,0 +1,22 @@
+CONFIG HIVE
+
+@include.the.config.command
+
+  The `--hive` option specifies which configuration data HIVE to use.
+
+USAGE: vz config [@FILE] --hive HIVE [...]
+   OR: vz config HIVE [@FILE] [...]
+
+  WHERE: HIVE is `.`        (working directory, e.g. './')
+     OR: HIVE is `local`    (working directory config, e.g. './.vz/')
+     OR: HIVE is `user`     (local user directory config, e.g. 'C:\Users\USERNAME/.vz/')
+     OR: HIVE is `global`   (roaming user directory config, e.g. 'C:\Users\USERNAME\AppData\Roaming\.vz/')
+     OR: HIVE is `system`   (vz process file location config, e.g. 'where vz.exe')
+
+   NOTE: HIVES are searched or used in the order specified above.
+
+SEE ALSO
+
+  vz help config command
+  vz help config region
+  vz help config

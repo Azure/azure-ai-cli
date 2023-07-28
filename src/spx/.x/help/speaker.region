@@ -1,0 +1,36 @@
+SPEAKER REGION
+
+@include.the.speaker.command
+
+@include.the.region.option
+
+USAGE: spx speaker [...] --region REGION
+   OR: spx speaker [...] --region @FILENAME
+   OR: spx speaker [...] @CONFIG-FILENAME
+
+@include.the.region.option.where
+
+EXAMPLES
+
+  spx config speaker @region --set westus2
+  spx config speaker @key --set 436172626F6E20697320636F6F6C2121
+  spx speaker [identify/verify] --nodefaults --region @region --key @key --file FILE
+
+  spx config speaker @default.config --clear
+  spx config speaker @default.config --add key @key
+  spx config speaker @default.config --add region @region
+  spx speaker [identify/verify] --output id @my.id --file FILE
+
+  spx config speaker @key --set 436172626F6E20697320636F6F6C2121 --region westus2
+  spx config speaker @key --set 436172626F6E20697320636F6F6C2020 --region eastus
+  spx speaker [identify/verify] --id @my.id --key @key --file FILE
+
+
+SEE ALSO
+
+  spx help setup
+  spx help region overview
+  spx help speaker key
+  spx help speaker
+  spx help speaker identify
+  spx help speaker verify

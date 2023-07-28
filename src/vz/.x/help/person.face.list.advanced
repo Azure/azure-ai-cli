@@ -1,0 +1,37 @@
+PERSON FACE LIST ADVANCED
+
+@include.the.person.face.list.command
+
+USAGE: vz person face list [...]
+
+  CONNECTION                      (see: vz help person connection)
+    --key KEY                     (see: vz help person key)
+    --region REGION               (see: vz help person region)
+    --endpoint ENDPOINT           (see: vz help person endpoint)
+
+  LIST
+    --person id ID                (see: vz help person id)
+    --group id ID                 (see: vz help person group id)
+    --group kind KIND             (see: vz help person group kind)
+
+  OUTPUT                          (see: vz help person output)
+    --output ids @FILE            (see: vz help person output ids)
+    --output request FILENAME     (see: vz help person output request)
+    --output json FILENAME        (see: vz help person output json)
+
+  PARALLEL PROCESSING
+    --threads NUMBER              (see: vz help person threads)
+    --processes NUMBER            (see: vz help person processes)
+
+  ADVANCED
+    --input path PATH             (see: vz help person input path)
+    --output path PATH            (see: vz help person output path)
+    --foreach in @ITEMS.txt       (see: vz help person foreach)
+    --save FILENAME               (see: vz help person save)
+    --zip ZIPFILE                 (see: vz help person zip)
+
+SEE ALSO
+
+  vz help setup
+  vz help person face list examples
+  vz help find topics person face

@@ -1,0 +1,39 @@
+RECOGNIZE
+
+@include.the.recognize.command.long
+
+USAGE: spx recognize [...]
+
+  CONNECTION                      (see: spx help recognize connection)
+    --key KEY                     (see: spx help recognize key)
+    --region REGION               (see: spx help recognize region)
+
+  LANGUAGE                        (see: spx help recognize language)
+    --language LANGUAGE
+    --languages LANG1;LANG2[;...]
+
+  INPUT                           (see: spx help recognize input)
+    --microphone                  (see: spx help recognize microphone)
+    --file FILE                   (see: spx help recognize file)
+    --files PATTERN               (see: spx help recognize files)
+    --files @FILELIST.txt         (see: spx help recognize files)
+    --format FORMAT               (see: spx help recognize format)
+
+  RECOGNITION
+    --once[+]                     (see: spx help recognize once)
+    --continuous                  (see: spx help recognize continuous)
+    --keyword FILENAME            (see: spx help recognize keyword)
+
+  ADVANCED
+    --log FILENAME                (see: spx help recognize log)
+    --proxy HOSTNAME              (see: spx help recognize proxy)
+    --phrases @PHRASELIST.txt     (see: spx help recognize phrases)
+    --foreach in @ITEMS.txt       (see: spx help recognize foreach)
+    --threads NUMBER              (see: spx help recognize threads)
+
+SEE ALSO
+
+  spx help setup
+  spx help recognize advanced
+  spx help recognize examples
+  spx help find topics recognize

@@ -1,0 +1,33 @@
+BATCH TRANSCRIPTION WAIT
+
+  The `--wait` option waits for the transcription status become
+  either `Success` or `Failed`.
+
+USAGE: spx batch transcription [...] --wait
+   OR: spx batch transcription [...] --wait TIMEOUT
+   OR: spx batch transcription [...] --wait @FILENAME
+   OR: spx batch transcription [...] @CONFIG-FILENAME
+
+  WHERE: TIMEOUT is the amount of time to wait in milliseconds (default 1 day)
+     OR: FILENAME is a single line text file containing MILLISECONDS to wait
+     OR: CONFIG-FILENAME is a single line text file in the following form:
+
+            batch.wait.timeout=TIMEOUT
+
+EXAMPLES
+
+  spx batch transcription [...] --wait
+  spx batch transcription [...] --wait 60000
+
+  spx config @my.wait --add batch.wait.timeout 60000
+  spx batch transcription [...] @my.wait
+
+  spx config batch @default.connection --set @@connection.from.region
+  spx config batch @default.connection --add batch.wait.timeout 60000
+
+SEE ALSO
+
+  spx help csr project create
+  spx help batch transcription create
+  spx help batch transcription update
+  

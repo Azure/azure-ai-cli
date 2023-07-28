@@ -1,0 +1,48 @@
+CUSTOM SPEECH RECOGNITION
+
+The `spx csr list` command shows details about speech recognition models.
+
+USAGE: spx csr list [...]
+
+CONNECTION                      (see: spx help csr connection)
+  --key KEY                     (see: spx help csr key)
+  --region REGION               (see: spx help csr region)
+
+PROJECTS
+  --projects                    List projects
+  --project languages           List supported locales for projects
+
+DATASETS
+  --datasets                    List datasets
+  --dataset languages           List supported locales for datasets
+
+DATASET FILES                   (see: spx help csr list dataset files)
+  --dataset URL
+
+MODELS
+  --models                      List models
+  --model languages             List supported locales for models
+  --base models                 (see: spx help csr list base models)
+
+EVALUATIONS
+  --evaluations                 List evaluations
+  --evaluation languages        List supported locales for evaluations
+
+EVALUATION FILES                (see: spx help csr list evaluation files)
+  --evaluation URL
+
+ENDPOINTS
+  --endpoints                   List endpoints
+  --endpoint languages          List supported locales for endpoints
+
+ENDPOINT LOGS                   (see: spx help csr list endpoint logs)
+  --endpoint URL
+
+ADVANCED                        (see: spx help csr advanced)
+  --project URL                 (see: spx help csr project)
+  --input path PATH             (see: spx help csr input path)
+  --output path PATH            (see: spx help csr output path)
+  --output json FILENAME        (see: spx help csr output json)
+  --foreach in @FILENAME        (see: spx help csr foreach)
+  --save FILENAME               (see: spx help csr save)
+  --zip ZIPFILE                 (see: spx help csr zip)

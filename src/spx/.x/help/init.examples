@@ -1,0 +1,19 @@
+INIT EXAMPLES
+
+  `EXAMPLE 1`: interactively select or create an Azure Speech resource
+
+    spx init
+
+  `EXAMPLE 2`: interactively select a resource matching a set of criteria
+
+    spx init --name "speech-us" --region westus2
+
+  `EXAMPLE 3`: non-interactively select or create a resource by specifying all parameters
+
+    spx init --interactive false --subscription "Pay-As-You-Go" --region westus2 --group "speech-westus2-436172626F6E"
+
+SEE ALSO
+
+  spx help init
+  spx help init advanced
+  

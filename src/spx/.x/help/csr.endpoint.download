@@ -1,0 +1,26 @@
+CUSTOM SPEECH RECOGNITION ENDPOINT DOWNLOAD
+
+@include.the.csr.endpoint.download.command
+
+USAGE: spx csr endpoint download [...]
+
+CONNECTION                      (see: spx help csr connection)
+  --key KEY                     (see: spx help csr key)
+  --region REGION               (see: spx help csr region)
+
+ENDPOINT LOG
+  --endpoint log URL            (see: spx help csr endpoint download endpoint log)
+
+OUTPUT                          (see: spx help csr output)
+  --output file FILENAME        (see: spx help csr output file)
+  --output json FILENAME        (see: spx help csr output json)
+  --output url @@FILE           (see: spx help csr output url)
+
+ADVANCED                        (see: spx help csr advanced)
+  --url URL                     (see: spx help csr download url)
+  --file URL                    (see: spx help csr download file)
+  --input path PATH             (see: spx help csr input path)
+  --output path PATH            (see: spx help csr output path)
+  --foreach in @FILENAME        (see: spx help csr foreach)
+  --save FILENAME               (see: spx help csr save)
+  --zip ZIPFILE                 (see: spx help csr zip)

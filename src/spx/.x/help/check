@@ -1,0 +1,34 @@
+CHECK
+
+  The `--check` option can be used to evaluate the events and responses 
+  of spx interactions. This can be useful for validating a single entity,
+  check many, or as a validation operation for more advanced test scenarios.
+
+  Provide a query in the form of a JMESPath script and if
+  the result of the expression is not "false" or "null" it 
+  returns as a success. See https://jmespath.org/
+
+  Take extra caution - JMESPath uses double quotes, single quotes, and 
+  backticks (`) for different values. Ensure you escape these properly
+  depending on your input environment when authoring JMESPath scripts.
+  See "spx help check advanced" for more.
+
+USAGE: spx [...] --check JMESSTRING
+
+  WHERE: JMESSTRING is the JSMEPath string to evaluate against.
+
+  NOTE: optionally, the `verbose` command can be appended to
+      toggle full output display on failed checks. This defaults
+      to TRUE when provided without a value
+
+EXAMPLES:
+
+  spx recognize --file hello.wav --check "\"recognizer.recognized.result.json\".DisplayText=='Hello.'"
+
+  spx recognize --file hello.wav --check "\"result.latency\" < `10`" --check verbose
+  spx recognize --file hello.wav --check "\"result.latency\" < `10`" --check verbose false
+
+SEE ALSO
+
+  spx help check advanced
+  spx help check examples

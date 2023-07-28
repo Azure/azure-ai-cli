@@ -1,0 +1,27 @@
+SPEAKER IDENTIFY
+
+IMPORTANT: The identification audio sample must contain 30 seconds or more of speech to be successful.
+
+  The `speaker identify` command identifies speakers in a given audio sample against one or more voice profiles.
+
+USAGE: spx speaker identify --id ID --file AUDIO_SAMPLE_FILE
+   OR: spx speaker identify --ids [ID1, ID2, ..., ID10] --file AUDIO_SAMPLE_FILE
+
+  CONNECTION                      (see: spx help speaker connection)
+    --key KEY                     (see: spx help speaker key)
+    --region REGION               (see: spx help speaker region)
+
+  INPUT
+    --id ID                       (see: spx help speaker id)
+    --file FILE                   (see: spx help speaker file)
+
+  ADVANCED
+    --log FILENAME                (see: spx help speaker log)
+    --foreach in @ITEMS.txt       (see: spx help speaker foreach)
+    --threads NUMBER              (see: spx help speaker threads)
+
+SEE ALSO
+
+  spx help speaker verify
+  spx help speaker examples
+  spx help find topics speaker

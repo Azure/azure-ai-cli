@@ -1,0 +1,43 @@
+RECOGNIZE FILES
+
+@include.the.recognize.command
+
+  The `--files` option specifies multiple local audio files to be
+  streamed to the service for recognition.
+
+  The `--urls` option specifies multiple remote audio files to be
+  streamed to the service for recognition after first caching the audio
+  locally, removing it when done.
+
+USAGE: spx recognize [...] --urls URL1;URL2[;...]
+   OR: spx recognize [...] --urls @FILELIST.txt
+   OR: spx recognize [...] --files @FILELIST.txt
+   OR: spx recognize [...] --files FILE1;FILE2[;...]
+   OR: spx recognize [...] --files PATTERN
+
+  WHERE: URL1;URL2 represent remote audio files accessible to the public
+     OR: FILE1;FILE2 represent local audio files accessible to the current user
+     OR: PATTERN represents a local audio file wildcard search pattern
+     OR: FILELIST.txt is a multi-line text file containing files and/or URLs,
+         ... or PATTERNs, listed individually, each on separate lines
+     
+  NOTE: `--urls` is an alias for `--files` ... both accept both files and urls
+
+EXAMPLES
+
+  spx recognize --files *.wav
+  spx recognize --files "hello.wav;goodbye.wav"
+
+  spx recognize --urls "https://crbn.us/hello.wav;https://crbn.us/goodbye.wav"
+
+  echo hello.wav> filelist.txt
+  echo goodbye.wav>> filelist.txt
+  echo https://crbn.us/whatstheweatherlike.wav>> filelist.txt
+
+  spx recognize --files @filelist.txt
+
+SEE ALSO
+
+  spx help recognize format
+  spx help recognize input
+  spx help recognize

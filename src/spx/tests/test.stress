@@ -1,0 +1,5 @@
+﻿x.command=run
+foreach.0.tsv.file=@test.foreach.stress.tsv.file
+foreach.0.tsv.file.has.header=false
+foreach.0.tsv.file.columns=job
+foreach.count=1

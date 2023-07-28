@@ -1,0 +1,58 @@
+AI INDEX UPDATE
+
+@include.the.ai.index.update.command
+
+USAGE: ai index update [...]
+
+  EMBEDDINGS
+    --embeddings-index-name NAME            (see: ai help index embeddings name)
+    --embeddings-deployment DEPLOYMENT      (see: ai help index embeddings deployment)
+
+  ITEM
+    --id ID                                 (see: ai help index id)
+    --metadata METADATA                     (see: ai help index metadata)
+    --description DESCRIPTION               (see: ai help index description)
+
+  DATA
+    --text TEXT                             (see: ai help index text)
+    --file FILE                             (see: ai help index file)
+    --files FILEs                           (see: ai help index files)
+    --url URL                               (see: ai help index url)
+    --urls URLs                             (see: ai help index urls)
+
+  REFERENCE
+    --external-source                       (see: ai help index external source)
+
+  AZURE SEARCH
+    --azure-search-endpoint ENDPOINT        (see: ai help azure search endpoint)
+    --azure-search-api-key KEY              (see: ai help azure search key)
+
+  CHROMA
+    --chroma-endpoint ENDPOINT              (see: ai help chroma endpoint)
+
+  PINECONE
+    --pinecone-environment ENVIRONMENT      (see: ai help pinecone environment)
+    --pinecone-api-key KEY                  (see: ai help pinecone api key)
+
+  QDRANT
+    --qdrant-endpoint ENDPOINT              (see: ai help qdrant endpoint)
+    --qdrant-vector-size size               (see: ai help qdrant vector size)
+
+  WEAVIATE
+    --weaviate-endpoint ENDPOINT            (see: ai help weaviate endpoint)
+    --weaviate-api-key KEY                  (see: ai help weaviate api key)
+
+EXAMPLES
+
+  ai index update
+       --id 'https://crbn.us/file1'
+       --file file1.md
+       --description 'Description of file 1 here'
+       --metadata '{"title": "File 1"}'
+       --external-source 'https://crbn.us/'
+       --azure-search-endpoint @acs.endpoint
+       --azure-search-api-key @acs.key
+
+  ai index update
+      --files file*.md
+      --

@@ -1,0 +1,47 @@
+TRANSLATE OUTPUT EACH
+
+@include.the.translate.command
+
+  The `--output each` option specifies an ITEM to accumulate and
+  aggregate into a TSV or JSON output file, one ITEM per event.
+
+  The `--output each file` option specifies the output filename. 
+
+  The `--output each file type` option specifies the output file type,
+  either JSON or TSV (tab separated values). If no file type is provided,
+  the output file will be TSV by default.
+
+USAGE: spx translate [...] --output each ITEM
+   OR: spx translate [...] --output each file FILENAME
+   OR: spx translate [...] --output each file type TYPE
+
+   WHERE: FILENAME represents a local text file writable by the current user
+     OR: FILE is `-` represents STDOUT, where TSV or JSON data will be saved
+
+  NOTE: By default, nothing is output per event
+
+EXAMPLES
+
+  spx translate --once --output each text
+  spx translate --once --output each event --output each text
+  spx translate --once --output each text --output each file output.tsv
+
+  spx config translate @default.output --set @@output.each.event
+  spx config translate @default.output --set @@output.each.detailed
+  spx config translate @default.output --set @@output.each.latency
+
+  spx config translate @default.output --add @@translate.output.each.translated.text
+
+  spx config translate @default.output --clear
+  spx config translate @default.output --add output.each.sessionid true
+  spx config translate @default.output --add output.each.event true
+  spx config translate @default.output --add output.each.text true
+  spx config translate @default.output --add output.each.result.translated.text true
+  spx config translate @default.output --add output.each.latency true
+  spx config translate @default.output --add @output.all.standard
+
+SEE ALSO
+
+  spx help translate output overview
+  spx help translate output examples
+  spx help translate

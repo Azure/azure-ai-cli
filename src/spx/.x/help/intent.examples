@@ -1,0 +1,58 @@
+INTENT EXAMPLES
+
+  `INIT`: Automatically setup spx with REGION and KEY default values
+
+    spx init
+
+  `SETUP`: Manually setup spx with REGION and KEY default values
+
+    spx config intent @region --set westus2
+    spx config intent @key --set 436172626F6E20697320636F6F6C2122
+
+  `EXAMPLE 1`: Recognize intent patterns from a microphone
+  
+    spx intent --microphone --patterns "Start {app};Close {app}"
+
+  `EXAMPLE 2`: Recognize intent patterns from local WAV file, or remote MP3 file
+
+    spx intent --file hello.wav --patterns "Start {app};Close {app}"
+    spx intent --file https://crbn.us/hello.mp3 --format mp3 --patterns "Start {app};Close {app}"
+
+  `EXAMPLE 3`: Recognize intent from multiple files using wildcards
+
+    spx intent --files *.wav --patterns "Start {app};Close {app}"
+
+  `EXAMPLE 4`: Recognize intent in audio file content piped thru STDIN
+
+    spx synthesize --text "Start Code" --audio output - --quiet | spx intent --pattern "Start {app}" --file -
+
+  `EXAMPLE 5`: Recognize LUIS intents
+
+    spx intent --luis appid 43617262-6F6E-2069-7320-636F6F6C21FF --microphone
+    spx intent --luis appid 43617262-6F6E-2069-7320-636F6F6C21FF --file hello.wav
+    spx intent --luis appid 43617262-6F6E-2069-7320-636F6F6C21FF --file hello.mp3 --format mp3
+    spx intent --luis appid 43617262-6F6E-2069-7320-636F6F6C21FF --files *.wav
+
+  `EXAMPLE 6`: Recognize intent in multiple files from TSV file with file names and transcriptions
+
+    spx intent --foreach file;transcript in @filelist.txt --check wer eq 0
+
+    WHERE: `filelist.txt` is the filename for a file containing tab delimited content:
+
+      audioFileName1 \t transcript1
+      audioFileName2 \t transcript2
+
+  `EXAMPLE 7`: Recognize intent in multiple files listed in a TSV file with file ids and transcriptions
+
+    spx intent --foreach id;transcript in @filelist.txt --check wer eq 0
+
+    WHERE: `filelist.txt` is the filename for a file containing tab delimited content:
+
+      audioFileNameNoExtension1 \t transcript1
+      audioFileNameNoExtension2 \t transcript2
+
+ADDITIONAL TOPICS
+
+  spx help setup
+  spx help intent advanced
+  spx help intent

@@ -1,0 +1,33 @@
+FACE IDENTIFY
+
+@include.the.face.identify.command.long
+
+USAGE: vz face identify [...]
+
+  CONNECTION                      (see: vz help face identify connection)
+    --key KEY                     (see: vz help face identify key)
+    --region REGION               (see: vz help face identify region)
+    --endpoint ENDPOINT           (see: vz help face identify endpoint)
+
+  INPUT                           (see: vz help face identify input)
+    --camera                      (see: vz help face identify camera)
+    --file FILE                   (see: vz help face identify file)
+    --files PATTERN               (see: vz help face identify files)
+    --files @FILELIST.txt         (see: vz help face identify files)
+
+  ANALYSIS
+    --once[+]                     (see: vz help face identify once)
+    --continuous                  (see: vz help face identify continuous)
+
+  ADVANCED
+    --log FILENAME                (see: vz help face identify log)
+    --proxy HOSTNAME              (see: vz help face identify proxy)
+    --foreach in @ITEMS.txt       (see: vz help face identify foreach)
+    --threads NUMBER              (see: vz help face identify threads)
+
+SEE ALSO
+
+  vz help setup
+  vz help face identify examples
+  vz help face identify output
+  vz help find topics face identify

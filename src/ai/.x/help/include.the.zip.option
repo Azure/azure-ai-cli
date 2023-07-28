@@ -1,0 +1,3 @@
+  The `--zip` option packages command line and related configuration
+  data along with AI and its runtime dependencies into a self-contained
+  .ZIP file for backup or portability to another device.

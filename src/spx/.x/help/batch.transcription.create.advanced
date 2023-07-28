@@ -1,0 +1,52 @@
+BATCH TRANSCRIPTION CREATE ADVANCED
+
+  The `spx batch transcription create` command creates new
+  transcription requests to transcribe remote audio streams.
+
+USAGE: spx batch transcription create [...]
+
+  CONNECTION                      (see: spx help batch connection)
+    --key KEY                     (see: spx help batch key)
+    --region REGION               (see: spx help batch region)
+
+  CREATE
+    --name NAME                   (see: spx help batch transcription name)
+    --model URL                   (see: spx help batch transcription create model)
+    --dataset URL                 (see: spx help batch transcription create dataset)
+    --content URL                 (see: spx help batch transcription create content)
+    --content @URLs.txt           (see: spx help batch transcription create content)
+    --language LANGUAGE           (see: spx help batch transcription create language)
+
+  PROPERTIES
+    --diarization                 Identify two speakers in mono channel audio
+    --word level timing           Add word level timestamps to the output
+    --punctuation mode MODE       MODE: None, Dictated, Automatic or DictatedAndAutomatic(default)
+    --profanity filter FILTER     FILTER: None, Masked(default), Removed, or Tags
+    --property NAME=VALUE         (see: spx help batch transcription create properties)
+    --properties @FILENAME        (see: spx help batch transcription create properties)
+    --description DESCRIPTION     (see: spx help batch transcription description)
+    --project URL                 (see: spx help batch transcription project)
+
+  OUTPUT
+    --output json FILENAME        (see: spx help batch output json)
+    --output url @@FILE           (see: spx help batch output url)
+    --output id @@FILE            (see: spx help batch output id)
+    --wait [TIMEOUT]              (see: spx help batch transcription wait)
+
+  PARALLEL PROCESSING
+    --threads NUMBER              (see: spx help batch threads)
+    --processes NUMBER            (see: spx help batch processes)
+
+  ADVANCED
+    --input path PATH             (see: spx help batch input path)
+    --output path PATH            (see: spx help batch output path)
+    --foreach in @FILENAME        (see: spx help batch foreach)
+    --save FILENAME               (see: spx help batch save)
+    --zip ZIPFILE                 (see: spx help batch zip)
+
+SEE ALSO
+
+  spx help setup
+  spx help batch output
+  spx help batch transcription examples
+  

@@ -1,0 +1,27 @@
+ _   __ _____
+| | / /|_   /
+| |/ /  /  /_
+|___/  /_____|
+
+USAGE: vz <command> [...]
+
+EXAMPLES
+
+  vz init
+  
+  vz config --set region westus2
+  vz config --set key 436172626F6E20697320636F6F6C2121
+
+  vz image analyze --camera --once
+  vz image analyze --file image1.jpg
+  vz image analyze --files *.jpg
+
+  vz image read --file image1.jpg
+
+ADDITIONAL EXAMPLES
+
+  vz help find "jpg"
+  vz help find "jpg" --expand
+
+  vz help find topics "examples"
+  vz help list topics

@@ -1,0 +1,30 @@
+BATCH OUTPUT REQUEST
+
+  The `--output request` option writes the HTTP request into the file specified.
+
+  Use this option to inspect how the REST API operates.
+
+USAGE: spx batch [...] --output request FILE.request
+   OR: spx batch [...] @CONFIG-FILENAME
+
+  WHERE: FILE.request is the file to store the HTTP request
+     OR: CONFIG-FILENAME is a single line text file in the following form:
+
+            batch.output.request.file=FILE.request
+
+EXAMPLES
+
+  spx batch transcription list --output request @transcription-list.request
+
+  spx config @transcription.job --set name "My transcription"
+  spx config @transcription.job --add content http://crbn.us/hello.wav
+  spx config @transcription.job --add batch.output.request.file create-operation-output.request
+  spx batch transcription create @transcription.details
+
+SEE ALSO
+
+  spx help batch output
+  spx help batch output json
+  spx help batch transcription
+  spx help batch
+  

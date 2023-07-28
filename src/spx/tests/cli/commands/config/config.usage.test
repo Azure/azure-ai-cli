@@ -1,0 +1,4 @@
+﻿x.command=run
+run.input.spx.command=spx config
+run.input.process=spx
+run.output.expect=@config.usage.test.run.output.expected

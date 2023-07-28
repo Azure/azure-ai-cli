@@ -1,0 +1,41 @@
+BATCH TRANSCRIPTION CREATE MODEL
+
+  The `spx batch transcription create` command creates new
+  requests to transcribe remote audio streams.
+
+  The `--model` option specifies the custom speech model to use to
+  transcribe the content in this new transcription request.
+
+USAGE: spx batch transcription create [...] --model MODEL-ID
+   OR: spx batch transcription create [...] --model MODEL-URL
+   OR: spx batch transcription create [...] --model @FILENAME
+   OR: spx batch transcription create [...] @CONFIG-FILENAME
+
+  WHERE: MODEL-ID is the model ID
+     OR: MODEL-URL is the model URL
+     OR: FILENAME is a single line text file containing the model ID or URL
+     OR: CONFIG-FILENAME is a single line text file in the following form:
+
+            batch.model.id=ID-or-URL
+
+EXAMPLES
+
+  spx batch transcription create [...] --model 01234567-89ab-cdef-fedc-ba9876543210
+
+  spx config @my.model --set 01234567-89ab-cdef-fedc-ba9876543210
+  spx batch transcription create [...] --model @my.model
+
+  spx csr model create [...] --output url @@my.model
+  spx batch transcription create [...] --model @my.model
+
+  spx config @my.model --set 01234567-89ab-cdef-fedc-ba9876543210
+  spx config @transcription.details --set name "My transcription"
+  spx config @transcription.details --add model @my.model
+  spx batch transcription create @transcription.details --content http://crbn.us/hello.wav
+
+SEE ALSO
+
+  spx help csr model create
+  spx help config advanced
+  spx help batch transcription create
+  

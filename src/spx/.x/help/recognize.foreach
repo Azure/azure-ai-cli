@@ -1,0 +1,25 @@
+RECOGNIZE FOREACH
+
+@include.the.recognize.command
+
+  The `--foreach` option repeats a specific command multiple times
+  effectively multiplying one set of command line options by another.
+
+USAGE: spx recognize [...] --foreach in @FILE1.tsv
+   OR: spx recognize [...] --foreach OPT1;[OPT2;[...]] in @FILE2.tsv
+   OR: spx recognize [...] --foreach OPT1;[OPT2;[...]] skip header in @FILE3.tsv
+
+  WHERE: OPT represents a command line option (e.g. file, id, transcript)
+    AND: FILE1.tsv contains tab separated values, with line1: OPT1 [\t OPT2 [\t ...]]
+     OR: FILE2.tsv contains tab separated values, with data rows starting on line 1
+     OR: FILE3.tsv contains tab separated values, with data rows starting on line 2
+
+EXAMPLE
+
+  spx recognize --foreach file;transcript in @filelist.txt --check wer eq 0
+
+SEE ALSO
+
+  spx help recognize examples
+  spx help recognize files
+  spx help recognize

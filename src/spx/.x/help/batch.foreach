@@ -1,0 +1,32 @@
+BATCH FOREACH
+
+  The `--foreach` option repeats a specific command multiple times
+  effectively multiplying one set of command line options by another.
+
+USAGE: spx batch [...] --foreach in @FILE1.tsv
+   OR: spx batch [...] --foreach OPT1;[OPT2;[...]] in @FILE2.tsv
+   OR: spx batch [...] --foreach OPT1;[OPT2;[...]] skip header in @FILE3.tsv
+
+  WHERE: OPT represents a command line option (e.g. file, language)
+    AND: FILE1.tsv contains tab separated values, with line1: OPT1 [\t OPT2 [\t ...]]
+     OR: FILE2.tsv contains tab separated values, with data rows starting on line 1
+     OR: FILE3.tsv contains tab separated values, with data rows starting on line 2
+
+EXAMPLE
+
+  spx config @audio.txt --clear
+  spx config @audio.txt --add http://crbn.us/hello.wav
+  spx config @audio.txt --add http://crbn.us/whatstheweatherlike.wav
+  spx batch transcription create --name "Example" --content @audio.txt --output url @@transcription.url.txt --wait
+
+  spx batch transcription list --files --transcription @transcription.url.txt --output urls @@file.urls.txt
+  spx batch transcription download --foreach file in @file.urls.txt --threads 10
+
+SEE ALSO
+
+  spx help batch transcription create
+  spx help batch transcription download
+  spx help batch transcription list
+  spx help batch output urls
+  spx help batch
+  

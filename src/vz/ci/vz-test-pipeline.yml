@@ -1,0 +1,111 @@
+# -----------------------------------------------------------------------------
+# CI/CD pipeline for VZ tool
+# -----------------------------------------------------------------------------
+trigger: none # To avoid running this pipeline on CI, before Build pipeline completes
+pr: none # To avoid running this pipeline before Build pipeline completes
+resources:
+  pipelines:
+  - pipeline: vzBuild   # Internal name of the source pipeline, used elsewhere within  YAML 
+    source: Azure-Samples.cognitive-services-speech-tools # Azure Pipelines name of the source pipeline referenced
+    trigger: true # Run the below test pipeline when a run of vz-build-pipeline completes
+
+variables:
+  - group: Carbon
+
+jobs:
+
+# -----------------------------------------------------------------------------
+# Build job, definition, and all steps
+# -----------------------------------------------------------------------------
+- job: Test
+  condition: true
+
+  pool:
+      name: SkymanWS2022Compliant
+
+  steps:
+
+  # -----------------------------------------------------------------------------
+  # Restore version variables if triggered from SDK Build
+  # -----------------------------------------------------------------------------
+  - script: 'env | sort'
+    displayName: "echo Environment variables"
+  - bash: |
+      set +x
+      echo "##vso[task.setvariable variable=TRIGGEREDBY_VZ_VERSION]${BUILD_TRIGGEREDBY_BUILDNUMBER}"
+      echo "##vso[task.setvariable variable=TRIGGEREDBY_VZ_VERSION_SUFFIX_ONLY]-${BUILD_TRIGGEREDBY_BUILDNUMBER##*-}"
+      echo "##vso[task.setvariable variable=TRIGGEREDBY_VZ_VERSION_VERSION_ONLY]${BUILD_TRIGGEREDBY_BUILDNUMBER%%-*}"
+    displayName: 'Restore version variables from triggering build (part 1)'
+    condition: eq(variables['Build.Reason'], 'BuildCompletion')
+  - bash: |
+      set +x
+      echo TRIGGEREDBY_VZ_VERSION=${TRIGGEREDBY_VZ_VERSION}
+      echo TRIGGEREDBY_VZ_VERSION_VERSION_ONLY=${TRIGGEREDBY_VZ_VERSION_VERSION_ONLY}
+      echo TRIGGEREDBY_VZ_VERSION_SUFFIX_ONLY=${TRIGGEREDBY_VZ_VERSION_SUFFIX_ONLY}
+      # echo "##vso[task.setvariable variable=VisionSDKVersion]$(TRIGGEREDBY_VISIONSDK_VERSION)"
+      # echo "##vso[task.setvariable variable=vz.version]$(TRIGGEREDBY_VISIONSDK_VERSION_VERSION_ONLY)"
+      # echo "##vso[task.setvariable variable=vz.version.suffix]$(TRIGGEREDBY_VISIONSDK_VERSION_SUFFIX_ONLY)"
+    displayName: 'Restore version variables from triggering build (part 2)'
+    condition: eq(variables['Build.Reason'], 'BuildCompletion')
+  - script: 'env | sort'
+    displayName: "echo Environment variables 2"
+    condition: eq(variables['Build.Reason'], 'BuildCompletion')
+
+  # -----------------------------------------------------------------------------
+  # Install NuGet and run NuGet restore
+  # -----------------------------------------------------------------------------
+  - task: NuGetToolInstaller@0
+    displayName: 'Use NuGet 5.5.1'
+    inputs:
+      versionSpec: 5.5.1
+
+  - task: NuGetCommand@2
+    displayName: 'NuGet restore'
+    inputs:
+      includeNuGetOrg: false
+      feedsToUse: config
+      nugetConfigPath: 'vz/NuGet.Config'
+      restoreSolution: '$(Parameters.solution)'
+
+  # -----------------------------------------------------------------------------
+  # Download the artifact and .net executables
+  # -----------------------------------------------------------------------------
+  - task: DownloadBuildArtifacts@0
+    displayName: Download VZ build artifact (executable)
+    inputs:
+      buildType: specific
+      project: 'e71f1362-9c7d-488b-99c7-3376db8d3302' # Skyman
+      pipeline: 13649 # Azure-Samples.cognitive-services-speech-tools
+      buildVersionToDownload: specific
+      specificBuildWithTriggering: true
+      buildId: $(VZBuild_id)
+      downloadType: specific
+      downloadPath: vzBuild
+
+  - task: ExtractFiles@1
+    displayName: Extract VZ .netcore 3.1 executable
+    inputs:
+      archiveFilePatterns: '**/vz-netcore31-win-x64.zip'
+      destinationFolder: vz-netcore31
+      cleanDestinationFolder: true
+
+  # -----------------------------------------------------------------------------
+  # Run the tests
+  # -----------------------------------------------------------------------------
+  - script: | 
+      SET PATH=$(System.DefaultWorkingDirectory)\vz-netcore31;%PATH%
+      vz config --set region $(VZRegion)
+      vz config --set key $(csspeech-cli-test-westus)
+      check-basics.cmd
+    workingDirectory: vz/tests
+    displayName: Run vz tests
+    condition: and(succeeded(), ne(variables['stressTest'], 'true'))
+
+  - script: | 
+      SET PATH=$(System.DefaultWorkingDirectory)\vz-netcore31;%PATH%
+      vz config --set region $(VZRegion)
+      vz config --set key $(csspeech-cli-test-westus)
+      check-stress-test.cmd
+    workingDirectory: vz/tests
+    displayName: Run vz tests
+    condition: and(succeeded(), eq(variables['stressTest'], 'true'))

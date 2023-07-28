@@ -1,0 +1,29 @@
+IMAGE EXAMPLES
+
+  `INIT`: Automatically setup vz with REGION, KEY, and ENDPOINT default values
+
+    vz init
+
+  `SETUP`: Manually setup vz with REGION, KEY, and ENDPOINT default values
+
+    vz config image --set region westus2
+    vz config image --set key 436172626F6E20697320636F6F6C2121
+    vz config image --set endpoint https://...
+
+  `EXAMPLE 1`: Analyze an image captured from default device camera
+
+    vz image analyze --camera --once
+
+  `EXAMPLE 2`: Analyze an image from a local JPG file
+
+    vz image analyze --file image1.jpg
+
+  `EXAMPLE 3`: Analyze images from multiple files using wildcards
+
+    vz image analyze --files *.jpg
+
+ADDITIONAL TOPICS
+
+  vz help setup
+  vz help image analyze
+  vz help image analyze advanced

@@ -1,0 +1,34 @@
+WEBJOB DOWNLOAD
+
+  The `spx webjob download` command downloads files from Azure
+  Triggered WebJob runs that have already completed.
+
+USAGE: spx webjob download [...]
+
+  CONNECTION                      (see: spx help webjob connection)
+    --user USERNAME               (see: spx help webjob user)
+    --password PASSWORD           (see: spx help webjob password)
+    --endpoint ENDPOINT           (see: spx help webjob endpoint)
+
+  WEBJOB
+    --name WEBJOB-NAME            (see: spx help webjob name)
+    --id ID                       (see: spx help webjob run id)
+
+  DOWNLOAD
+    --file URL                    (see: spx help webjob download file)
+    --output file FILENAME        (see: spx help webjob download output file)
+
+  ADVANCED
+    --input path PATH             (see: spx help webjob input path)
+    --output path PATH            (see: spx help webjob output path)
+    --output json FILENAME        (see: spx help webjob output json)
+    --foreach in @FILENAME        (see: spx help webjob foreach)
+    --save FILENAME               (see: spx help webjob save)
+    --zip ZIPFILE                 (see: spx help webjob zip)
+
+SEE ALSO
+
+  spx help webjob
+  spx help webjob list
+  spx help webjob status
+  spx help webjob examples

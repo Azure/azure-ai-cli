@@ -1,0 +1,39 @@
+CONFIG EXAMPLES
+
+  `EXAMPLE 1`: Set the default subscription key and region
+
+    vz config --set key 436172626F6E20697320636F6F6C2121
+    vz config --set region westus2
+
+  `EXAMPLE 2`: Recognize multiple files from a file list
+
+    vz config @my.files --clear
+    vz config @my.files --add image1.jpg
+    vz config @my.files --add image2.jpg
+    vz image analyze --files @my.files
+
+  `EXAMPLE 3`: Set the default subscription keys for specific regions
+
+    vz config --region westus2 --set key 436172626F6E20697320636F6F6C2121
+    vz config --region eastus2 --set key 436172626F6E20697320636F6F6C2020
+
+    vz config --set region westus2
+
+  `EXAMPLE 4`: Set the default subscription keys for a specific command
+
+    vz config image analyze --set region westus2
+    vz config image analyze --set key 436172626F6E20697320636F6F6C2121
+    
+  `EXAMPLE 5`: Update default.output for image analyze command
+
+    vz config image analyze @default.output --clear
+    vz config image analyze @default.output --add output.id true
+    vz config image analyze @default.output --add output.text true
+
+  `EXAMPLE 6`: Disable all defaults for all commands
+
+    vz config --set vz.defaults @@none
+
+ADDITIONAL TOPICS
+
+  vz help config

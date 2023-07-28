@@ -1,0 +1,5 @@
+    The `spx dialog` command connects to a speech enabled dialog, sending speech or
+    text input to a backing app and rendering audio to the local device's audio output
+    based on returned responses. This dialog can be configured to connect to a Bot
+    Framework backend or a Custom Commands backend.
+    

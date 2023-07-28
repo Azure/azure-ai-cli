@@ -1,0 +1,24 @@
+ENDPOINT OVERVIEW
+
+  For some scenarios, use "wss://" or "ws://" instead of "https://". For a
+  full list of supported endpoints, see https://aka.ms/ai/endpoints
+
+USAGE: ai <command> [...] --endpoint "ENDPOINT"
+   OR: ai <command> [...] --endpoint @FILENAME
+   OR: ai <command> [...] @CONFIG-FILENAME
+
+WHERE: ENDPOINT represents the ENDPOINT uri as text (don't forget to add quotes)
+   OR: FILENAME is a single line text file containing the ENDPOINT
+   OR: CONFIG-FILENAME is a single line text file in the following form:
+
+       service.config.endpoint=wss://...
+
+EXAMPLES
+
+  ai complete --endpoint @my.complete.endpoint --file prompt.txt
+  ai chat --endpoint @my.chat.endpoint --file prompt.txt
+
+SEE ALSO
+
+  ai help init
+  ai help setup

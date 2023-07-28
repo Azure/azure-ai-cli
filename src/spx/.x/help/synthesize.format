@@ -1,0 +1,30 @@
+SYNTHESIZE FORMAT
+
+@include.the.synthesize.command
+
+  The `--format` option specifies the container format for the
+  audio file being generated.
+
+USAGE: spx synthesize [...] --format FORMAT
+
+  WHERE: FORMAT is wav          (see: spx help synthesize wav)
+     OR: FORMAT is mp3          (see: spx help synthesize mp3)
+     OR: FORMAT is ogg          (see: spx help synthesize ogg)
+     OR: FORMAT is opus         (see: spx help synthesize opus)
+     OR: FORMAT is webm         (see: spx help synthesize webm)
+     OR: FORMAT is alaw         (see: spx help synthesize wav)
+     OR: FORMAT is mulaw        (see: spx help synthesize wav)
+     OR: FORMAT is siren        (see: spx help synthesize siren)
+     OR: FORMAT is raw          (see: spx help synthesize raw)
+
+  NOTE: The default `wav` format is `riff-16khz-16bit-mono-pcm`
+
+EXAMPLES
+
+  spx synthesize --text "Hello" --audio output audio.mp3 --format mp3
+  spx synthesize --text "Hello" --audio output audio.ogg --format ogg
+
+SEE ALSO
+
+  spx help synthesize audio output
+  spx help synthesize

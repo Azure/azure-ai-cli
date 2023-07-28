@@ -1,0 +1,41 @@
+WEBJOB SETUP OVERVIEW
+
+  Azure WebJobs uses endpoints, usernames, and passwords to identify,
+  authenticate, authorize, meter, and bill Azure resources and accounts.
+
+  When using SPX, you can specify your WebJob endpoint, username, and
+  password on the command line directly using the following syntax:
+
+    spx webjob --endpoint ENDPOINT --user USER --password PASSWORD
+
+  To save time, you can store your ENDPOINT, USER name, and PASSWORD in
+  configuration files, typically named `webjob.endpoint`, `webjob.user`,
+  and `webjob.password`. This can be accomplished as follows:
+
+    spx config webjob @endpoint --set PUT-YOUR-WEBJOB-ENDPOINT-HERE
+    spx config webjob @password --set PUT-YOUR-WEBJOB-PASSWORD-HERE
+    spx config webjob @user --set PUT-YOUR-WEBJOB-USERNAME-HERE
+
+  Once configured as above, instead of providing the ENDPOINT, USER name,
+  and PASSWORD directly on the command line, you can use the following syntax:
+
+    spx webjob --endpoint @webjob.endpoint --user @webjob.user --password @webjob.password
+
+USING @defaults with @webjob.endpoint, @webjob.user, and @webjob.password
+
+  Additionally, there are other @files that can take direct advantage of
+  the @files that store endpoint, username, and password values.
+  For example:
+
+    spx webjob @defaults --list
+
+  This is possible because the @defaults configuration file references the
+  @webjob.endpoint, @webjob.user, and @webjob.password configuration files.
+
+SEE ALSO
+
+  spx help webjob user
+  spx help webjob password
+  spx help webjob endpoint
+  spx help webjob examples
+  spx help webjob

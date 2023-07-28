@@ -1,0 +1,33 @@
+PROFILE REGION
+
+@include.the.profile.command
+
+@include.the.region.option
+
+USAGE: spx profile [...] --region REGION
+   OR: spx profile [...] --region @FILENAME
+   OR: spx profile [...] @CONFIG-FILENAME
+
+@include.the.region.option.where
+
+EXAMPLES
+
+  spx config profile @region --set westus2
+  spx config profile @key --set 436172626F6E20697320636F6F6C2121
+  spx profile list --nodefaults --region @region --key @key --output file FILE
+
+  spx config profile @default.config --clear
+  spx config profile @default.config --add key @key
+  spx config profile @default.config --add region @region
+  spx profile status --id @my.id --output json FILE
+
+  spx config profile @key --set 436172626F6E20697320636F6F6C2121 --region westus2
+  spx config profile @key --set 436172626F6E20697320636F6F6C2020 --region eastus
+  spx profile create --output id @my.id --key @key
+
+SEE ALSO
+
+  spx help setup
+  spx help region overview
+  spx help profile key
+  spx help profile

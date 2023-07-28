@@ -1,0 +1,18 @@
+BATCH INPUT PATH
+
+  The `--input path` option specifies additional paths to search
+  for input files. If not provided, the default is the current directory.
+  
+USAGE: spx batch [...] --input path FILEPATH
+
+  WHERE: FILEPATH is the name of input directory
+
+EXAMPLES
+
+  spx batch [...] --output path .\spx\input
+  spx batch [...] --output path ~/spx/input
+
+SEE ALSO
+
+  spx help batch output path
+  spx help batch

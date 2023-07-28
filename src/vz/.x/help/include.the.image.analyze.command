@@ -1,0 +1,1 @@
+  The `vz image analyze` command analyzes video or images.

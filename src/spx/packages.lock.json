@@ -1,0 +1,8 @@
+{
+  "version": 1,
+  "dependencies": {
+    "net6.0": {},
+    "net6.0/linux-x64": {},
+    "net6.0/win-x64": {}
+  }
+}

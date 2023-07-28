@@ -1,0 +1,25 @@
+INTENT FORMAT
+
+@include.the.intent.command
+
+  The `--format` option specifies the container format of the audio file.
+
+USAGE: spx intent [...] --format FORMAT
+
+  WHERE: FORMAT is any
+     OR: FORMAT is mp3
+     OR: FORMAT is ogg
+     OR: FORMAT is flac
+     OR: FORMAT is alaw
+     OR: FORMAT is opus
+
+EXAMPLES
+
+  spx intent --file audio.mp3 --format mp3
+  spx intent --files @filelist.txt --format any
+
+SEE ALSO
+
+  spx help intent file
+  spx help intent files
+  spx help intent

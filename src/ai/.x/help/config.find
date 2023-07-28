@@ -1,0 +1,20 @@
+CONFIG FIND
+
+@include.the.config.command
+
+  The `--find` option locates AI configuration data stored
+  inside existing AI configuration datastore files.
+
+USAGE: ai config --find CONFIG-NAME
+   OR: ai config --find CONFIG-FILENAME
+   OR: ai config --find CONFIG-FILENAME-PATTERN
+
+EXAMPLES
+
+  ai config --find key
+  ai config --find key --region westus2
+  ai config --find key --region *
+
+SEE ALSO
+
+  ai help config

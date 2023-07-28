@@ -1,0 +1,20 @@
+CHECK RESULT
+
+  The `--check result` option allows for evaluation of the 
+  SpeechServiceResponse_JsonResult property on recognition 
+  results represented in JSON.
+
+  The JMESPath expression will be used to operate on the JSON object
+  and if the result of the expression is not "false" or "null" it 
+  is a success. See https://jmespath.org/
+
+USAGE: spx [command] --check result [JMESSTRING]
+
+  WHERE: JMESSTRING is the text JSMEPath string to evaluate against.
+
+EXAMPLES
+
+  spx recognize --file hello.wav --check result "DisplayText == 'Hello.'"
+  spx recognize --file myAudio.wav --check result "RecognitionStatus == 'Success' && Duration > '5'"
+  spx recognize --file hello.wav --check result "reverse(sort_by(NBest,&Confidence))[0].Lexical == 'hello'" --query string format=detailed
+  spx recognize --file hello.wav --query string format=simple --check result 'contains(*,"NBest") == `false`'

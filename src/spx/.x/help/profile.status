@@ -1,0 +1,24 @@
+PROFILE STATUS
+
+@include.the.profile.command.long
+
+  The `spx profile status` function outputs information (such as enrollment status, created date, and locale) concerning the selected voice profile.
+
+USAGE: spx profile status --id ID [...]
+   OR: spx profile status --id @FILE [...]
+
+CONNECTION                      (see: spx help profile connection)
+  --key KEY                     (see: spx help profile key)
+  --region REGION               (see: spx help profile region)
+
+KIND
+  --kind KIND                   (see: spx help profile kind)
+
+ADVANCED                        
+  --output file PATH            (see: spx help profile output file)
+  --output json PATH            (see: spx help profile output json)
+
+SEE ALSO
+
+  spx help profile 
+  spx help profile examples

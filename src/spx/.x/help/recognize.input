@@ -1,0 +1,43 @@
+RECOGNIZE INPUT OVERVIEW
+
+@include.the.recognize.command
+
+  FROM MICROPHONE - DEFAULT DEVICE or SPECIFIC DEVICE
+
+    The `spx recognize` command can recognize streaming audio captured
+    from a device microphone (default microphone or specific microphone).
+
+    To recognize audio from a device MICROPHONE see: spx help recognize microphone 
+
+  FROM FILE - SINGLE or MULTIPLE FILES
+
+    The `spx recognize` command can also recognize audio stored in local
+    or remote audio files, in various audio container formats (e.g. mp3, ogg).
+
+    To recognize from a single audio file see: spx help recognize file
+    To recognize from a multiple audio files see: spx help recognize files
+    To recognize from file(s) in various formats see: spx help recognize format
+ 
+EXAMPLES
+
+  `EXAMPLE 1`: Recognize speech from a microphone
+  
+    spx recognize --microphone
+
+  `EXAMPLE 2`: Recognize speech from local WAV file, or remote MP3 file
+
+    spx recognize --file hello.wav
+    spx recognize --file http://crbn.us/hello.mp3 --format mp3
+
+  `EXAMPLE 3`: Recognize speech in multiple files using wildcards
+
+    spx recognize --files *.wav
+
+  `EXAMPLE 4`: Recognize speech in audio file content piped thru STDIN
+
+    spx synthesize --text "Hello" --audio output - --quiet | spx recognize --file -
+
+SEE ALSO
+
+  spx help recognize examples
+  spx help recognize

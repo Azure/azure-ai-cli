@@ -1,0 +1,44 @@
+INTENT OUTPUT EACH
+
+@include.the.intent.command
+
+  The `--output each` option specifies an ITEM to accumulate and
+  aggregate into a TSV or JSON output file, one ITEM per event.
+
+  The `--output each file` option specifies the output filename. 
+
+  The `--output each file type` option specifies the output file type,
+  either JSON or TSV (tab separated values). If no file type is provided,
+  the output file will be TSV by default.
+
+USAGE: spx intent [...] --output each ITEM
+   OR: spx intent [...] --output each file FILENAME
+   OR: spx intent [...] --output each file type TYPE
+
+   WHERE: FILENAME represents a local text file writable by the current user
+     OR: FILE is `-` represents STDOUT, where TSV or JSON data will be saved
+
+  NOTE: By default, nothing is output per event
+
+EXAMPLES
+
+  spx intent --once --output each text
+  spx intent --once --output each event --output each text
+  spx intent --once --output each text --output each file output.tsv
+
+  spx config intent @default.output --set @@output.each.event
+  spx config intent @default.output --set @@output.each.detailed
+  spx config intent @default.output --set @@output.each.latency
+
+  spx config intent @default.output --clear
+  spx config intent @default.output --add output.each.sessionid true
+  spx config intent @default.output --add output.each.event true
+  spx config intent @default.output --add output.each.text true
+  spx config intent @default.output --add output.each.latency true
+  spx config intent @default.output --add @output.all.standard
+
+SEE ALSO
+
+  spx help intent output overview
+  spx help intent output examples
+  spx help intent

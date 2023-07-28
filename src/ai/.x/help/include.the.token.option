@@ -1,0 +1,2 @@
+  The `--token` option specifies an authentication token to use
+  to authenticate, authorize, meter, and bill Azure resources and accounts.

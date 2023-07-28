@@ -1,0 +1,22 @@
+CONFIG HIVE
+
+@include.the.config.command
+
+  The `--hive` option specifies which configuration data HIVE to use.
+
+USAGE: ai config [@FILE] --hive HIVE [...]
+   OR: ai config HIVE [@FILE] [...]
+
+  WHERE: HIVE is `.`        (working directory, e.g. './')
+     OR: HIVE is `local`    (working directory config, e.g. './.ai/')
+     OR: HIVE is `user`     (local user directory config, e.g. 'C:\Users\USERNAME/.ai/')
+     OR: HIVE is `global`   (roaming user directory config, e.g. 'C:\Users\USERNAME\AppData\Roaming\.ai/')
+     OR: HIVE is `system`   (ai process file location config, e.g. 'where ai.exe')
+
+   NOTE: HIVES are searched or used in the order specified above.
+
+SEE ALSO
+
+  ai help config command
+  ai help config region
+  ai help config

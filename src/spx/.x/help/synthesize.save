@@ -1,0 +1,24 @@
+SYNTHESIZE SAVE
+
+@include.the.synthesize.command
+
+@include.the.save.option
+
+USAGE: spx synthesize [...] --save FILENAME
+
+EXAMPLES
+
+  spx synthesize --files *.txt --save test1.job
+  spx synthesize --files *.txt;*.ssml --audio output {id}.wav --save test2.job
+  spx synthesize --files @URLs.txt --output zip output.zip --save test3.job
+
+  spx synthesize @test3.job
+
+  spx synthesize --foreach file;audio.output in @filelist.txt --save test4.job
+  spx synthesize @test4.job
+
+SEE ALSO
+
+  spx help synthesize
+  spx help synthesize files
+  spx help synthesize foreach

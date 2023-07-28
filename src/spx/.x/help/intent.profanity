@@ -1,0 +1,21 @@
+INTENT PROFANITY
+
+@include.the.intent.command
+
+  The `--profanity` controls how the service deals with spoken profanity.
+
+USAGE: spx intent [...] --profanity OPTION
+
+  WHERE: OPTION is raw
+     OR: OPTION is masked
+     OR: OPTION is removed
+
+EXAMPLES
+
+  spx intent --file hello.wav --profanity raw
+  spx intent --file hello.wav --profanity masked
+  spx intent --file hello.wav --profanity removed
+
+SEE ALSO
+
+  spx help intent

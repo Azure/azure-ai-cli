@@ -1,0 +1,20 @@
+INTENT - UPDATING DEFAULT CONNECTION
+
+EXAMPLES
+
+    spx config intent @default.connection --set host wss://localhost:5000/
+    spx config intent @key --set @@none
+
+    spx config intent @default.connection --set host wss://chinaeast2.stt.speech.azure.cn
+    spx config intent @key --set 436172626F6E20697320636F6F6C2121
+
+    spx config intent @default.connection --set @@connection.from.endpoint
+    spx config intent @endpoint --set wss://westus2.stt.speech.microsoft.com/speech/recognition/conversation/cognitiveservices/v1
+    spx config intent @key --set 436172626F6E20697320636F6F6C2121
+
+    spx config intent @default.connection --set @@connection.from.region
+    spx config intent @key --set 436172626F6E20697320636F6F6C2121
+    spx config intent @region --set westus2
+
+    spx config intent @default.connection --set @@connection.from.host
+    spx config intent @host --set wss://localhost:5000/

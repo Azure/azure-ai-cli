@@ -1,0 +1,31 @@
+SYNTHESIZE FILE
+
+@include.the.synthesize.command
+
+  The `--file` option specifies a single local data file containing
+  text or SSML to be synthesized into audio.
+
+  The `--url` option specifies a single local data file containing
+  text or SSML to be synthesized into audio after first caching the data
+  locally, removing it when done.
+
+USAGE: spx synthesize [...] --file URL
+   OR: spx synthesize [...] --file FILE
+   OR: spx synthesize [...] --file @FILENAME.txt
+
+  WHERE: URL represents a remote text or SSML file accessible to the public
+    OR: FILE represents a local text or SSML file accessible to the current user
+    OR: FILE is `-` indicating that text or SSML file content will be read from STDIN
+    OR: FILENAME.txt is a single line text file containing the file to synthesize
+
+EXAMPLES
+
+  spx synthesize --file story.txt
+  spx synthesize --url https://crbn.us/cheerful.ssml
+
+  echo file.txt>filetosynth.txt
+  spx synthesize --file @filetosynth.txt
+
+SEE ALSO
+
+  spx help synthesize

@@ -1,0 +1,19 @@
+WEBJOB
+
+@include.the.webjob.command.long
+
+COMMANDS
+
+  spx webjob list [...]         (see: spx help webjob list)
+  spx webjob upload [...]       (see: spx help webjob upload)
+
+  spx webjob run [...]          (see: spx help webjob run)
+  spx webjob status [...]       (see: spx help webjob status)
+
+  spx webjob download [...]     (see: spx help webjob download)
+
+ADDITIONAL TOPICS
+
+  spx help webjob setup
+  spx help webjob examples
+  spx help find topics webjob

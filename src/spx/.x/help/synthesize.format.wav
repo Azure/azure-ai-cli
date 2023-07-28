@@ -1,0 +1,25 @@
+SYNTHESIZE WAV
+
+@include.the.synthesize.command
+
+  The `--format` option specifies the container format for the
+  audio file being generated.
+
+USAGE: spx synthesize [...] --format FORMAT
+
+  WHERE: FORMAT is wav
+     OR: FORMAT is riff-16khz-16bit-mono-pcm
+     OR: FORMAT is riff-24khz-16bit-mono-pcm
+     OR: FORMAT is riff-48khz-16bit-mono-pcm
+     OR: FORMAT is riff-8khz-16bit-mono-pcm
+     OR: FORMAT is riff-8khz-8bit-mono-alaw
+     OR: FORMAT is riff-8khz-8bit-mono-mulaw
+     OR: FORMAT is riff-16khz-16kbps-mono-siren
+
+  NOTE: The default `wav` format is `riff-16khz-16bit-mono-pcm`
+  
+SEE ALSO
+
+  spx help synthesize audio output
+  spx help synthesize format
+  spx help synthesize

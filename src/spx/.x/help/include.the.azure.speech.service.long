@@ -1,0 +1,3 @@
+  The Azure Speech Service uses subscription keys to identify, authenticate,
+  authorize, meter, and bill Azure resources and accounts. The Azure Speech
+  Service is region-specific.

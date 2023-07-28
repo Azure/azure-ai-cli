@@ -1,0 +1,34 @@
+CHECK EXAMPLES
+
+The examples below are written for usage in Windows CMD. If using 
+a different environment, adjust the escape paramaters accordingly.
+
+Alternatively, you can save the JMESPath query to an SPX config file
+without the need for character escaping or formatting. 
+
+For details on JMESPath grammar, see https://jmespath.org/specification.html
+
+  `EXAMPLE 1`: Verify the "DisplayText" on a recognition result object.
+
+    spx recognize --file hello.wav --check "\"recognizer.recognized.result.json\".DisplayText=='Hello.'"
+
+  `EXAMPLE 2`: Verify the number of items in an array element
+
+    spx recognize --file myAudio.wav --check "\"recognizer.events\" | [@] | length(@) > `3`"
+
+  `EXAMPLE 3`: Validate multiple expressions using "and" operator, &&
+
+    spx recognize --file hello.wav --check "\"recognizer.canceled.reason\" == 'EndOfStream' && \"recognizer.recognized.result.json\".DisplayText=='Hello.'"
+
+  `EXAMPLE 4`: Use a configuration file to provide the JMESPath query string
+
+    spx recognize --file myAudio.wav --check @myDisplayTextCheck
+
+    WHERE: `myDisplayTextCheck` is a file containing a JMESPath query:
+
+        "recognizer.recognized.result.json".DisplayText=='Hello.'
+
+SEE ALSO
+
+  spx help check advanced
+  spx help config

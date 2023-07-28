@@ -1,0 +1,4 @@
+﻿x.command=run
+run.output.expect=@webjob.download.name.id.request.test.run.output.expect
+run.input.spx.command=webjob download --endpoint ENDPOINT --password PASSWORD --user USERNAME --name JOBNAME --id ID --output request -
+run.input.process=spx

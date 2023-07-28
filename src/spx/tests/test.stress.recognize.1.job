@@ -1,0 +1,6 @@
+﻿x.command=recognize
+x.command.parallel.thread.count=20
+service.config.region=@region
+service.config.key=@key
+audio.input.files=*.wav
+audio.input.type=file

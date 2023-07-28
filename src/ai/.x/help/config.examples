@@ -1,0 +1,39 @@
+CONFIG EXAMPLES
+
+  `EXAMPLE 1`: Set the default subscription key and region
+
+    ai config --set key 436172626F6E20697320636F6F6C2121
+    ai config --set region westus2
+
+  `EXAMPLE 2`: Recognize multiple files from a file list
+
+    ai config @my.files --clear
+    ai config @my.files --add prompt1.txt
+    ai config @my.files --add prompt2.txt
+    ai complete --files @my.files
+
+  `EXAMPLE 3`: Set the default subscription keys for specific regions
+
+    ai config --region westus2 --set key 436172626F6E20697320636F6F6C2121
+    ai config --region eastus2 --set key 436172626F6E20697320636F6F6C2020
+
+    ai config --set region westus2
+
+  `EXAMPLE 4`: Set the default subscription keys for a specific command
+
+    ai config chat --set region westus2
+    ai config chat --set key 436172626F6E20697320636F6F6C2121
+    
+  `EXAMPLE 5`: Update default.output for chat command
+
+    ai config chat @default.output --clear
+    ai config chat @default.output --add output.id true
+    ai config chat @default.output --add output.text true
+
+  `EXAMPLE 6`: Disable all defaults for all commands
+
+    ai config --set ai.defaults @@none
+
+ADDITIONAL TOPICS
+
+  ai help config

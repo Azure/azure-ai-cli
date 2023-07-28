@@ -1,0 +1,23 @@
+CUSTOM SPEECH RECOGNITION ENDPOINT
+
+@include.the.csr.endpoint.command
+
+USAGE: spx csr endpoint <command> [...]
+
+COMMANDS
+
+  spx csr endpoint create [...]       (see: spx help csr endpoint create)
+  spx csr endpoint status [...]       (see: spx help csr endpoint status)
+
+  spx csr endpoint list [...]         (see: spx help csr endpoint list)
+  spx csr endpoint download [...]     (see: spx help csr endpoint download)
+
+  spx csr endpoint update [...]       (see: spx help csr endpoint update)
+  spx csr endpoint delete [...]       (see: spx help csr endpoint delete)
+
+ADDITIONAL TOPICS
+
+  spx help csr examples
+  spx help csr endpoint examples
+  spx help csr list endpoints
+  spx help documentation

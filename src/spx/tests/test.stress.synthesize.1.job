@@ -1,0 +1,8 @@
+﻿x.command=synthesize
+x.command.parallel.thread.count=20
+service.config.region=@region
+service.config.key=@key
+foreach.0.tsv.file=@test.stress.synthesize.1.job.foreach.0.tsv.file
+foreach.0.tsv.file.has.header=false
+foreach.0.tsv.file.columns=input.file;audio.output
+foreach.count=1

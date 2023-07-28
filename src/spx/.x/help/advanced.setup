@@ -1,0 +1,118 @@
+ADVANCED SETUP OVERVIEW
+
+  `SPEECH RESOURCE`
+
+@include.create.resource
+
+@include.create.resource.extra
+
+  `REGION and KEY`
+
+@include.the.azure.speech.service.long
+
+  When using SPX, you can specify your Azure Speech Service REGION and KEY
+  on the command line directly using the following syntax:
+
+    spx recognize --nodefaults --key KEY-VALUE --region REGION-VALUE --file hello.wav
+
+  To save time, you can store your subscription KEY and REGION in one or more
+  configuration files, typically named `key` and `region`. This can be
+  accomplished as follows:
+
+    spx config @key --set PUT-YOUR-KEY-HERE
+    spx config @region --set PUT-YOUR-REGION-HERE
+
+  For example:
+
+    spx config @key --set 436172626F6E20697320636F6F6C2121
+    spx config @region --set westus2
+
+  Once configured as above, instead of providing the subscription KEY and
+  REGION directly on the command line, you can take advantage of the configuration
+  datastore, using the following syntax:
+
+    spx recognize --nodefaults --key @key --region @region --file hello.wav
+
+  You can also set the KEY and REGION for specific commands. For example:
+
+    spx config recognize @key --set 436172626F6E20697320636F6F6C2020
+    spx config recognize @region --set eastus
+
+USING @spx.defaults with @key and @region
+
+  Additionally, there are other @files that can take direct advantage of
+  your stored key and region in their corresponding @key and @region
+  configuration files. The following 4 examples have the same effect:
+
+    spx recognize --nodefaults @spx.defaults --file hello.wav
+    spx recognize --nodefaults @default.config --file hello.wav
+    spx recognize --nodefaults @recognize.default.config --file hello.wav
+    spx recognize --file hello.wav
+
+  This is true because `spx` loads configuration from `spx.defaults` by
+  default, unless the first option provided is `--nodefaults`, or you turn off
+  the loading of defaults completely with `spx config @spx.defaults --set @@none`
+  
+  You can follow the chain of default configuration data, like this:
+
+    spx config recognize @spx.defaults
+
+  Which shows:
+
+    @default.config
+
+  Continuing with `spx config recognize @default.config` shows: 
+
+      @default.connection
+      @default.log
+      @default.path
+      @default.output
+
+  Continuing with `spx config recognize @default.connection`, shows:
+
+      @connection.from.region
+
+  Continuing with `spx config recognize @connection.from.region`, shows:
+
+      service.config.region=@region
+      service.config.key=@key
+
+  Which is how `spx config` `--set` for `@region` and `@key` get pulled in...
+
+CREATING and USING your own @FILES
+
+  If you want to create a similar mechanism, that only includes your 
+  subscription KEY and REGION, together, without other defaults, you can do 
+  so as follows:
+
+    spx config @my.defaults --clear
+    spx config @my.defaults --add key PUT-YOUR-KEY-HERE
+    spx config @my.defaults --add region PUT-YOUR-REGION-HERE
+
+  For example:
+
+    spx config @my.defaults --clear
+    spx config @my.defaults --add key 436172626F6E20697320636F6F6C2121
+    spx config @my.defaults --add region westus2
+    spx config @my.defaults
+
+  Once configured in this manner, you can then refer to your subscription
+  KEY and REGION, together, much more easily, as in the following command:
+
+    spx recognize --nodefaults @my.defaults --file hello.wav
+
+  Or, you could change how `spx.defaults` directly, by additionally doing this:
+
+    spx config @spx.defaults --set @@my.defaults
+
+  Now, you can issue commands like before, and only your defaults will be used:
+
+    spx recognize --file hello.wav
+
+SEE ALSO
+
+  spx help key overview
+  spx help region overview
+  spx help defaults
+  spx help webjob setup
+  spx help setup
