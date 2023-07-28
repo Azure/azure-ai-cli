@@ -85,6 +85,8 @@
   <ItemGroup>
     <PackageReference Include="Azure.Core" Version="1.34.0" />
     <PackageReference Include="JmesPath.Net" Version="1.0.182" />
+    <PackageReference Include="Microsoft.SemanticKernel" Version="0.18.230725.3-preview" />
+    <PackageReference Include="Microsoft.SemanticKernel.Connectors.Memory.AzureCognitiveSearch" Version="0.18.230725.3-preview" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
     <PackageReference Include="System.Interactive.Async" Version="6.0.1" />
   </ItemGroup>

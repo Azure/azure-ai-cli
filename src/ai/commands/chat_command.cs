@@ -17,11 +17,9 @@ using System.Net;
 using Azure.AI.OpenAI;
 using Azure.AI.Details.Common.CLI.ConsoleGui;
 
-#if SEMANTIC_KERNEL
 using Microsoft.SemanticKernel;
 using Microsoft.SemanticKernel.Connectors.Memory.AzureCognitiveSearch;
 using Microsoft.SemanticKernel.Memory;
-#endif
 
 namespace Azure.AI.Details.Common.CLI
 {
@@ -65,12 +63,8 @@ namespace Azure.AI.Details.Common.CLI
 
         private async Task ChatInteractively(bool repeatedly = false)
         {
-            #if SEMANTIC_KERNEL
-
-                var kernel = CreateSemanticKernel(out var acsIndex);
-                if (kernel != null) await StoreMemoryAsync(kernel, acsIndex);
-
-            #endif
+            var kernel = CreateSemanticKernel(out var acsIndex);
+            if (kernel != null) await StoreMemoryAsync(kernel, acsIndex);
 
             var client = CreateOpenAIClient(out var deployment);
             var options = CreateChatCompletionOptions();
@@ -93,15 +87,11 @@ namespace Azure.AI.Details.Common.CLI
                 if (text.ToLower() == "quit") break;
                 if (text.ToLower() == "exit") break;
 
-                #if SEMANTIC_KERNEL
-
-                    var relevantMemories = await SearchMemoryAsync(kernel, acsIndex, text);
-                    if (relevantMemories != null)
-                    {
-                    text = UpdateUserInputWithSearchResultInfo(text, relevantMemories);
-                    }
-
-                #endif
+                var relevantMemories = await SearchMemoryAsync(kernel, acsIndex, text);
+                if (relevantMemories != null)
+                {
+                text = UpdateUserInputWithSearchResultInfo(text, relevantMemories);
+                }
 
                 var task = GetChatCompletionsAsync(client, deployment, options, text);
                 WaitForStopOrCancel(task);
@@ -280,8 +270,6 @@ namespace Azure.AI.Details.Common.CLI
         // DisplayHelper _display = null;
 
 
-        #if SEMANTIC_KERNEL
-
         private IKernel? CreateSemanticKernel(out string acsIndex)
         {
            var key = _values["service.config.key"];
@@ -384,8 +372,6 @@ namespace Azure.AI.Details.Common.CLI
                    = "README: README associated with a sample chat summary react-based webapp",
            };
         }
-
-        #endif
 
         private const string DefaultSystemPrompt = "You are an AI assistant that helps people find information regarding Azure AI.";
     }
