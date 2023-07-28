@@ -16,7 +16,9 @@ Subscription: Speech Services - SDK (rob) (e72e5254-f265-4e95-9bd2-9ee8e7329051)
 Name: *** Loading choices ***
 ```
 
-==>
+==> if there are no resources: [confirm creating a new one](#ai-resource---no-resources)  
+or  
+==> if there is at least one resource: [confirm/select resource or create a new one](#ai-resource---1-or-more-resources)
 
 # AI Resource - No resources
 
@@ -34,6 +36,8 @@ Name: -----------------------------
       | (Create new)                    <=== default selection
       -----------------------------
 ```
+
+==> [create a new AI resource](#ai-resource---create-new)
 
 # AI Resource - 1 or more resources
 
@@ -54,6 +58,10 @@ Name: -----------------------------
       | robch-hub3 (eastus, AI Hub)
       -----------------------------
 ```
+
+==> [create a new AI resource](#ai-resource---create-new)  
+or
+==> [select an AI resource](#ai-resource---selected)
 
 # AI Resource - (Selected)
 

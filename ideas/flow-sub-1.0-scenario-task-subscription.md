@@ -1,4 +1,4 @@
-# Scenario
+# Select Scenario
 
 Load scenario choices
 
@@ -28,7 +28,9 @@ Name: --------------------------------
       --------------------------------
 ```
 
-# Task
+==> [select a task](#select-task)
+
+# Select Task
 
 Load task choices
 
@@ -51,8 +53,9 @@ Task: --------------------------------
       │ Generate code
       --------------------------------
 ```
+==> [select a subscription](#select-subscription)
 
-# Subscription
+# Select Subscription
 
 Load list of subscription, and determine default selection
 
