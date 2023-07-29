@@ -11,7 +11,6 @@ COMMANDS
   ai config [...]           (see: ai help config)
 
   ai chat [...]             (see: ai help chat)
-  ai complete [...]         (see: ai help complete)
 
   ai speech [...]           (see: ai help speech)
   ai vision [...]           (see: ai help vision)
