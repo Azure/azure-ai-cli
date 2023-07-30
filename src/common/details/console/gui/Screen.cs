@@ -258,15 +258,23 @@ namespace Azure.AI.Details.Common.CLI.ConsoleGui
         public void WriteTextWithHighlight(Colors normal, Colors highlight, int x, int y, string text, int cch = int.MaxValue, char delimiter = '`')
         {
             var colorOn = false;
-            var color = normal;
-            foreach (var textPiece in text.Split(delimiter))
+            foreach (var part in text.Split(delimiter))
             {
-                WriteText(color, x, y, textPiece, cch);
-                cch -= textPiece.Length;
-                x += textPiece.Length;
+                if (colorOn && ColorHelpers.TryParseColorStyleText(part, out Colors parsed, out text))
+                {
+                    WriteText(parsed, x, y, text, cch);
+                    cch -= text.Length;
+                    x += text.Length;
+                }
+                else
+                {
+                    var color = colorOn ? highlight : normal;
+                    WriteText(color, x, y, part, cch);
+                    cch -= part.Length;
+                    x += part.Length;
+                }
 
                 colorOn = !colorOn;
-                color = colorOn ? highlight : normal;
             }
 
             Console.ResetColor();

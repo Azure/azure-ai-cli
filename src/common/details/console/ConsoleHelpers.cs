@@ -5,6 +5,8 @@
 
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
+using System.Linq;
 using System.Text;
 
 namespace Azure.AI.Details.Common.CLI
@@ -81,19 +83,27 @@ namespace Azure.AI.Details.Common.CLI
         public static void WriteLineWithHighlight(string text, char delimiter = '`')
         {
             var colorOn = false;
-            foreach (var textPiece in text.Split(delimiter))
+            foreach (var part in text.Split(delimiter))
             {
-                Console.Write(textPiece);
-
-                colorOn = !colorOn;
-                if (colorOn)
+                if (!colorOn)
                 {
-                    ColorHelpers.SetHighlightColors();
+                    ColorHelpers.ResetColor();
+                    Console.Write(part);
+                }
+                else if (ColorHelpers.TryParseColorStyleText(part, out var colors, out text))
+                {
+                    Console.ForegroundColor = colors.Foreground;
+                    Console.BackgroundColor = colors.Background;
+                    Console.Write(text);
                 }
                 else
                 {
-                    ColorHelpers.ResetColor();
+                    ColorHelpers.SetHighlightColors();
+                    Console.Write(part);
                 }
+
+
+                colorOn = !colorOn;
             }
 
             Console.ResetColor();

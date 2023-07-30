@@ -51,6 +51,36 @@ namespace Azure.AI.Details.Common.CLI
             return new Colors(colors[3], colors[2]);
         }
 
+        public static bool TryParseColorStyleText(string text, out Colors parsedStyle, out string parsedText)
+        {
+            if (text.Length > 2 && text[0] == '#')
+            {
+                if (text.StartsWith("#example;"))
+                {
+                    parsedStyle = new Colors(ConsoleColor.Yellow, ConsoleColor.Black);
+                    parsedText = text.Substring(9);
+                    return true;
+                }
+                else if (text.StartsWith("#error;"))
+                {
+                    parsedStyle = GetErrorColors();
+                    parsedText = text.Substring(7);
+                    return true;
+                }
+                else if (text.Length > 4 && text[3] == ';')
+                {
+                    var fg = (ConsoleColor)int.Parse(text.Substring(1, 1), System.Globalization.NumberStyles.HexNumber);
+                    var bg = (ConsoleColor)int.Parse(text.Substring(2, 1), System.Globalization.NumberStyles.HexNumber);
+                    parsedStyle = new Colors(fg, bg);
+                    parsedText = text.Substring(4);
+                    return true;
+                }
+            }
+            parsedStyle = null;
+            parsedText = null;
+            return false;
+        }
+
         private static ConsoleColor[] GetBestColors()
         {
             var bg = Console.BackgroundColor;

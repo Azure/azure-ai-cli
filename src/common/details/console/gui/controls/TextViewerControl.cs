@@ -139,6 +139,14 @@ namespace Azure.AI.Details.Common.CLI.ConsoleGui
                 if (text[i] == '`')
                 {
                     cchSkips++;
+                    if (!highlightOn && i + 1 < text.Length && text[i + 1] == '#')
+                    {
+                        var at = text.IndexOf(';', i + 1);
+                        if (at > 0)
+                        {
+                            i = at;
+                        }
+                    }
                     highlightOn = !highlightOn;
                     continue;
                 }
