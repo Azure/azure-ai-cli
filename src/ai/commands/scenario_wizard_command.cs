@@ -304,16 +304,12 @@ namespace Azure.AI.Details.Common.CLI
 
         private static void DisplayScenarioBanner()
         {
-            var logo = FileHelpers.FindFileInHelpPath($"help/include.{Program.Name}.ascii.logo");
-            if (!string.IsNullOrEmpty(logo))
-            {
-                var text = FileHelpers.ReadAllHelpText(logo, Encoding.UTF8);
-                ConsoleHelpers.WriteLineWithHighlight(text + "\n");
-            }
-            else
-            {
-                ConsoleHelpers.WriteLineWithHighlight($"`{Program.Name.ToUpper()} SCENARIO`");
-            }
+            var logo = FileHelpers.FindFileInHelpPath($"help/include.{Program.Name}.wizard.ascii.logo")
+                    ?? FileHelpers.FindFileInHelpPath($"help/include.{Program.Name}.ascii.logo");
+            var text = !string.IsNullOrEmpty(logo)
+                     ? FileHelpers.ReadAllHelpText(logo, Encoding.UTF8) + "\n"
+                     : $"`{Program.Name.ToUpper()} SCENARIO`";
+            ConsoleHelpers.WriteLineWithHighlight(text);
 
             ConsoleHelpers.WriteLineWithHighlight("`SCENARIO`");
         }
