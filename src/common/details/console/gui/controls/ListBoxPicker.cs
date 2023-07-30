@@ -4,6 +4,7 @@
 //
 
 using System;
+using System.Linq;
 using System.Text;
 using Azure.AI.Details.Common.CLI;
 
@@ -11,6 +12,12 @@ namespace Azure.AI.Details.Common.CLI.ConsoleGui
 {
     public class ListBoxPicker : SpeedSearchListBoxControl
     {
+        public static int PickIndexOf(string[] choices, int select = 0)
+        {
+            var width = Math.Max(choices.Max(x => x.Length) + 4, 29);
+            return ListBoxPicker.PickIndexOf(choices, width, 30, new Colors(ConsoleColor.White, ConsoleColor.Blue), new Colors(ConsoleColor.White, ConsoleColor.Red), select);
+        }
+
         public static int PickIndexOf(string[] lines, int width, int height, Colors normal, Colors selected, int select = 0)
         {
             if (height > lines.Length + 2) height = lines.Length + 2;
@@ -37,6 +44,12 @@ namespace Azure.AI.Details.Common.CLI.ConsoleGui
             picker.Run();
 
             return picker._picked;
+        }
+
+        public static string PickString(string[] choices, int select = 0)
+        {
+            var width = Math.Max(choices.Max(x => x.Length) + 4, 29);
+            return ListBoxPicker.PickString(choices, width, 30, new Colors(ConsoleColor.White, ConsoleColor.Blue), new Colors(ConsoleColor.White, ConsoleColor.Red), select);
         }
 
         public static string PickString(string[] lines, int width, int height, Colors normal, Colors selected, int select = 0)

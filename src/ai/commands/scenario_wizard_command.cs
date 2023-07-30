@@ -10,7 +10,6 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Collections.Generic;
 using System.Net;
 using Newtonsoft.Json.Linq;
 using Azure.AI.Details.Common.CLI.ConsoleGui;
@@ -18,6 +17,7 @@ using System.Runtime.InteropServices;
 
 namespace Azure.AI.Details.Common.CLI
 {
+
     public class ScenarioWizardCommand : Command
     {
         internal ScenarioWizardCommand(ICommandValues values)
@@ -73,30 +73,29 @@ namespace Azure.AI.Details.Common.CLI
             var scenarios = GetScenarios();
             Console.Write("\rName: ");
 
-            var scenario = PickScenario(scenarios);
+            var scenario = ListBoxPicker.PickString(scenarios);
             if (scenario == null) return;
             Console.WriteLine($"\rName: {scenario} ");
 
-            Console.Write($"\rTask: ");
+            var actions = GetActions(scenario);
+            var actionText = string.Empty;
+            if (actions.Count(x => !string.IsNullOrEmpty(x.Action)) > 0)
+            {
+                Console.Write($"\rTask: ");
 
-            var action = AutoSizedListBoxPickerPickString(
-                "Quickstart",
-                "or STEP 1: Initialize",
-                "   STEP 2: Interact",
-                "   STEP 3: Generate code",
-                "   STEP 4: Deploy",
-                "   STEP 5: Evaluate",
-                "   STEP 6: Update",
-                "   STEP 7: Clean up"
-                );
-            if (action == null) return;
-            Console.WriteLine($"\rTask: {action.Trim()}\n");
+                var action = ListBoxPicker.PickIndexOf(actions.Select(x => x.ActionWithPrefix).ToArray());
+                if (action < 0) return;
 
-            if (scenario.ToLower().Contains("your data") && action.ToLower().Contains("quickstart"))
+                actionText = actions[action].Action;
+
+                Console.WriteLine($"\rTask: {actionText.Trim()}\n");
+            }
+
+            if (scenario.ToLower().Contains("your data") && actionText.ToLower().Contains("quickstart"))
             {
                 ChatWithYourDataScenario(scenario);
             }
-            else if (scenario.ToLower().StartsWith("chat") && action.ToLower().Contains("quickstart"))
+            else if (scenario.ToLower().StartsWith("chat") && actionText.ToLower().Contains("quickstart"))
             {
                 SimpleChatScenario(scenario);
             }
@@ -264,12 +263,6 @@ namespace Azure.AI.Details.Common.CLI
             return process;
         }
 
-        private static string AutoSizedListBoxPickerPickString(params string[] choices)
-        {
-            var width = Math.Max(choices.Max(x => x.Length) + 4, 29);
-            return ListBoxPicker.PickString(choices, width, 30, new Colors(ConsoleColor.White, ConsoleColor.Blue), new Colors(ConsoleColor.White, ConsoleColor.Red));
-        }
-
         private static string[] GetDataLocationChoices()
         {
             return new string[] {
@@ -317,25 +310,17 @@ namespace Azure.AI.Details.Common.CLI
         private static string[] GetScenarios()
         {
             Thread.Sleep(400);
-            return new string[] {
-                "Chat (OpenAI)",
-                "Chat w/ your prompt (OpenAI)",
-                "Chat w/ your data (OpenAI)",
-                "Caption audio (Speech to Text)",
-                "Caption images and video (Vision)",
-                "Extract text from images (Vision)",
-                "Extract text from documents and forms (Language)",
-                "Transcribe and analyze calls (Speech, Language)",
-                "Translate documents and text (Language)",
-                "Summarize documents (Language)",
-                "...more"
-            };
+            return ScenarioActions.Actions
+                .Select(x => x.Scenario)
+                .Distinct()
+                .ToArray();
         }
 
-        private static string PickScenario(string[] scenarios)
+        private static ScenarioAction[] GetActions(string scenario)
         {
-            var width = Math.Max(scenarios.Max(x => x.Length) + 4, 29);
-            return ListBoxPicker.PickString(scenarios, width, 30, new Colors(ConsoleColor.White, ConsoleColor.Blue), new Colors(ConsoleColor.White, ConsoleColor.Red));
+            return ScenarioActions.Actions
+                .Where(x => x.Scenario == scenario)
+                .ToArray();
         }
 
         private static Process StartShellCommandProcess(string command, string arguments)
