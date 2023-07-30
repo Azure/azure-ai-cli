@@ -69,13 +69,35 @@ namespace Azure.AI.Details.Common.CLI.ConsoleGui
 
                     var start = new ProcessStartInfo(Program.Exe, $"quiet {helpCommand}");
                     start.UseShellExecute = false;
-                    Process.Start(start).WaitForExit();
+                    
+                    var process = Process.Start(start);
+                    process.WaitForExit();
+                    
+                    if (process.ExitCode != 0)
+                    {
+                        Environment.Exit(process.ExitCode);
+                    }
                 }
                 else if (text.ToLower().Contains("see: https://") || text.ToLower().Contains("see https://"))
                 {
                     var at = text.LastIndexOf("https://");
                     var url = text.Substring(at);
                     ProcessHelpers.StartBrowser(url);
+                }
+                else
+                {
+                    var tryItPrefix = $"try: {Program.Name} ";
+                    var at = text.ToLower().LastIndexOf(tryItPrefix);
+                    if (at > 0)
+                    {
+                        var tryCommand = text.Substring(at + tryItPrefix.Length);
+                        tryCommand = tryCommand.TrimEnd(')');
+
+                        var start = new ProcessStartInfo(Program.Exe, $"cls {tryCommand}");
+                        start.UseShellExecute = false;
+                        Process.Start(start).WaitForExit();
+                        Environment.Exit(-1);
+                    }
                 }
             }
         }
@@ -140,7 +162,7 @@ namespace Azure.AI.Details.Common.CLI.ConsoleGui
             var text = base.GetSpeedSearchText();
             var helpCommand = GetProgramHelpCommand();
             return string.IsNullOrEmpty(text) || text == helpCommand
-                ? $"(\\(see: {helpCommand}.*\\))|({helpCommand}.*)|(https://[^ ]+)"
+                ? $"(\\(see: {helpCommand}.*\\))|({helpCommand}.*)|(https://[^ ]+)|(try: {Program.Name} .*)|(TRY: {Program.Name} .*)"
                 : text;
         }
 

@@ -18,9 +18,9 @@ using System.Runtime.InteropServices;
 
 namespace Azure.AI.Details.Common.CLI
 {
-    public class ScenarioCommand : Command
+    public class ScenarioWizardCommand : Command
     {
-        internal ScenarioCommand(ICommandValues values)
+        internal ScenarioWizardCommand(ICommandValues values)
         {
             _values = values.ReplaceValues();
             _quiet = _values.GetOrDefault("x.quiet", false);
@@ -29,11 +29,11 @@ namespace Azure.AI.Details.Common.CLI
 
         internal bool RunCommand()
         {
-            RunScenarioCommand().Wait();
+            RunScenarioWizardCommand().Wait();
             return _values.GetOrDefault("passed", true);
         }
 
-        private async Task<bool> RunScenarioCommand()
+        private async Task<bool> RunScenarioWizardCommand()
         {
             try
             {
@@ -54,13 +54,13 @@ namespace Azure.AI.Details.Common.CLI
 
             switch (command)
             {
-                case "scenario": await DoScenario(); break;
+                case "wizard": await DoScenario(); break;
             }
         }
 
         private async Task DoScenario()
         {
-            var interactive = _values.GetOrDefault("scenario.interactive", true);
+            var interactive = _values.GetOrDefault("scenario.wizard.interactive", true);
             await DoScenario(interactive);
         }
 
@@ -79,15 +79,24 @@ namespace Azure.AI.Details.Common.CLI
 
             Console.Write($"\rTask: ");
 
-            var action = AutoSizedListBoxPickerPickString("Explore interactively", "Initialize resources", "Generate code");
+            var action = AutoSizedListBoxPickerPickString(
+                "Quickstart",
+                "or STEP 1: Initialize",
+                "   STEP 2: Interact",
+                "   STEP 3: Generate code",
+                "   STEP 4: Deploy",
+                "   STEP 5: Evaluate",
+                "   STEP 6: Update",
+                "   STEP 7: Clean up"
+                );
             if (action == null) return;
-            Console.WriteLine($"\rTask: {action}\n");
+            Console.WriteLine($"\rTask: {action.Trim()}\n");
 
-            if (scenario.ToLower().Contains("your data") && action.ToLower().Contains("explore"))
+            if (scenario.ToLower().Contains("your data") && action.ToLower().Contains("quickstart"))
             {
                 ChatWithYourDataScenario(scenario);
             }
-            else if (scenario.ToLower().StartsWith("chat") && action.ToLower().Contains("explore"))
+            else if (scenario.ToLower().StartsWith("chat") && action.ToLower().Contains("quickstart"))
             {
                 SimpleChatScenario(scenario);
             }
@@ -180,13 +189,13 @@ namespace Azure.AI.Details.Common.CLI
             Console.WriteLine("  To generate code, try:");
             Console.WriteLine("");
             Console.ForegroundColor = ConsoleColor.Yellow;
-            Console.WriteLine($"      ai scenario --name \"{scenario}\" --code --language C#");
+            Console.WriteLine($"      ai wizard --scenario \"{scenario}\" --code --language C#");
             Console.ResetColor();
             Console.WriteLine("");
             Console.WriteLine("  To chat using public data, try:");
             Console.WriteLine("");
             Console.ForegroundColor = ConsoleColor.Yellow;
-            Console.WriteLine("      ai scenario --name \"Chat (OAI)\" --explore");
+            Console.WriteLine("      ai wizard --scenario \"Chat (OpenAI)\" --explore");
             Console.ResetColor();
             Console.WriteLine("");
         }
@@ -215,13 +224,13 @@ namespace Azure.AI.Details.Common.CLI
                 Console.WriteLine("  To generate code, try:");
                 Console.WriteLine("");
                 Console.ForegroundColor = ConsoleColor.Yellow;
-                Console.WriteLine($"      ai scenario --name \"{scenario}\" --code --language C#");
+                Console.WriteLine($"      ai wizard --scenario \"{scenario}\" --code --language C#");
                 Console.ResetColor();
                 Console.WriteLine("");
                 Console.WriteLine("  To chat w/ your own data (files, etc.), try:");
                 Console.WriteLine("");
                 Console.ForegroundColor = ConsoleColor.Yellow;
-                Console.WriteLine("      ai scenario --name \"Chat w/ your data (OAI)\"");
+                Console.WriteLine("      ai wizard --scenario \"Chat w/ your data (OpenAI)\"");
                 Console.ResetColor();
                 Console.WriteLine("");
             }
@@ -313,9 +322,9 @@ namespace Azure.AI.Details.Common.CLI
         {
             Thread.Sleep(400);
             return new string[] {
-                "Chat (OAI)",
-                "Chat w/ your prompt (OAI)",
-                "Chat w/ your data (OAI)",
+                "Chat (OpenAI)",
+                "Chat w/ your prompt (OpenAI)",
+                "Chat w/ your data (OpenAI)",
                 "Caption audio (Speech to Text)",
                 "Caption images and video (Vision)",
                 "Extract text from images (Vision)",

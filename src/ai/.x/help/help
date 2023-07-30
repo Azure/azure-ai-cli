@@ -1,28 +1,50 @@
+
    ___ ____  ___  _____
   / _ /_  / / _ |/_  _/
  / __ |/ /_/ __ |_/ /_  
 /_/ |_/___/_/ |_/____/  
 
+
+`AI HELP`
+
+  Interactively browse and explore commands, options, and examples. 
+
+    `-` ↑↓ and <TAB> to move around.
+    `-` <ENTER> to follow a link.
+    `-` <ESC> to exit or go back.
+
+  To get started with `ai`: 
+  
+    TRY: ai wizard
+
+
+`AZAI CLI`
+
 USAGE: ai <command> [...]
 
-COMMANDS
+  `INTERACTIVE`
 
-  ai init [...]             (see: ai help init)
-  ai config [...]           (see: ai help config)
+    ai help                   (see: ai help get started)
+    ai wizard                 (see: ai help wizard)
 
-  ai chat [...]             (see: ai help chat)
+  `CONFIGURATION`
 
-  ai speech [...]           (see: ai help speech)
-  ai vision [...]           (see: ai help vision)
-  ai language [...]         (see: ai help language)
-  ai translation [...]      (see: ai help translation)
+    ai init [...]             (see: ai help init)
+    ai config [...]           (see: ai help config)
 
-  ai scenario [...]         (see: ai help scenario)
-  ai snippet [...]          (see: ai help snippet)
+  `AI SERVICES and TOOLS`
 
-  ai run [...]              (see: ai help run)
+    ai chat [...]             (see: ai help chat)
+    ai eval [...]             (see: ai help eval)
 
-EXAMPLES
+    ai speech [...]           (see: ai help speech)
+    ai vision [...]           (see: ai help vision)
+    ai language [...]         (see: ai help language)
+    ai translation [...]      (see: ai help translation)
+
+    ai tool [...]             (see: ai help tool)
+
+`EXAMPLES`
 
   ai init
 
@@ -32,7 +54,7 @@ EXAMPLES
   ai complete --file prompt.txt
   ai chat --file prompt.txt --interactive
 
-ADDITIONAL TOPICS
+`ADDITIONAL HELP`
 
   ai help setup
   ai help examples

@@ -5,29 +5,29 @@
 
 USAGE: ai <command> [...]
 
-HELP
+`INTERACTIVE`
 
-  ai help
-  ai help setup
+  ai help                   (see: ai help get started)
+  ai wizard                 (see: ai help wizard)
 
-COMMANDS
+`CONFIGURATION`
 
   ai init [...]             (see: ai help init)
   ai config [...]           (see: ai help config)
 
+`AI SERVICES and TOOLS`
+
   ai chat [...]             (see: ai help chat)
+  ai eval [...]             (see: ai help eval)
 
   ai speech [...]           (see: ai help speech)
   ai vision [...]           (see: ai help vision)
   ai language [...]         (see: ai help language)
   ai translation [...]      (see: ai help translation)
 
-  ai scenario [...]         (see: ai help scenario)
-  ai snippet [...]          (see: ai help snippet)
+  ai tool [...]             (see: ai help tool)
 
-  ai run [...]              (see: ai help run)
-
-ADDITIONAL TOPICS
+`SEE ALSO`
 
   ai help examples
 

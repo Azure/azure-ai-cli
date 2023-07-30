@@ -8,7 +8,7 @@ using System.Linq;
 
 namespace Azure.AI.Details.Common.CLI
 {
-    class ScenarioCommandParser : CommandParser
+    class ScenarioWizardCommandParser : CommandParser
     {
         public static bool ParseCommand(INamedValueTokens tokens, ICommandValues values)
         {
@@ -17,11 +17,11 @@ namespace Azure.AI.Details.Common.CLI
 
         public static bool ParseCommandValues(INamedValueTokens tokens, ICommandValues values)
         {
-            return ParseCommandValues("scenario", GetCommandParsers(values), tokens, values);
+            return ParseCommandValues("wizard", GetCommandParsers(values), tokens, values);
         }
 
         private static readonly (string name, bool valuesRequired)[] _commands =  {
-            ("scenario", false)
+            ("wizard", false)
         };
 
         private static readonly string[] _partialCommands = {
@@ -32,8 +32,8 @@ namespace Azure.AI.Details.Common.CLI
             var commandName = values.GetCommand();
             switch (commandName)
             {
-                case "scenario":
-                    return scenarioCommandParsers;
+                case "wizard":
+                    return ScenarioWizardCommandParsers;
             }
 
             return null;
@@ -45,7 +45,7 @@ namespace Azure.AI.Details.Common.CLI
         {
             public CommonScenarioNamedValueTokenParsers() : base(
 
-                new NamedValueTokenParser(null, "x.command", "11", "1", "scenario"),
+                new NamedValueTokenParser(null, "x.command", "11", "1", "wizard"),
 
                 new ExpectOutputTokenParser(),
                 new DiagnosticLogTokenParser(),
@@ -56,14 +56,14 @@ namespace Azure.AI.Details.Common.CLI
                 new NamedValueTokenParser("--uri", "service.config.endpoint.uri", "0010;0001", "1"),
                 new NamedValueTokenParser("--deployment", "service.config.deployment", "001", "1"),
 
-                new NamedValueTokenParser("--interactive", "scenario.interactive", "01", "1;0", "true;false", null, "true")
+                new NamedValueTokenParser("--interactive", "scenario.wizard.interactive", "001", "1;0", "true;false", null, "true")
 
             )
             {
             }
         }
 
-        private static readonly INamedValueTokenParser[] scenarioCommandParsers = {
+        private static readonly INamedValueTokenParser[] ScenarioWizardCommandParsers = {
             new CommonScenarioNamedValueTokenParsers()
         };
 

@@ -36,11 +36,11 @@ namespace Azure.AI.Details.Common.CLI
         #endregion
 
         #region help command data
-        public const string HelpCommandTokens = "init;config;chat;complete;scenario;run";
+        public const string HelpCommandTokens = "init;config;chat;complete;wizard;run";
         #endregion
 
         #region config command data
-        public static string ConfigScopeTokens = $"init;chat;complete;scenario;run;*";
+        public static string ConfigScopeTokens = $"init;chat;complete;wizard;run;*";
         #endregion
 
         #region zip option data
@@ -62,7 +62,7 @@ namespace Azure.AI.Details.Common.CLI
                 "init" => (new InitCommand(values)).RunCommand(),
                 "chat" => (new ChatCommand(values)).RunCommand(),
                 "complete" => (new CompleteCommand(values)).RunCommand(),
-                "scenario" => (new ScenarioCommand(values)).RunCommand(),
+                "wizard" => (new ScenarioWizardCommand(values)).RunCommand(),
                 "run" => (new RunJobCommand(values)).RunCommand(),
                 _ => false
             };
@@ -80,7 +80,7 @@ namespace Azure.AI.Details.Common.CLI
                 "config" => ConfigCommandParser.ParseCommand(tokens, values),
                 "chat" => ChatCommandParser.ParseCommand(tokens, values),
                 "complete" => CompleteCommandParser.ParseCommand(tokens, values),
-                "scenario" => ScenarioCommandParser.ParseCommand(tokens, values),
+                "wizard" => ScenarioWizardCommandParser.ParseCommand(tokens, values),
                 "run" => RunJobCommandParser.ParseCommand(tokens, values),
                 _ => false
             };
@@ -95,7 +95,7 @@ namespace Azure.AI.Details.Common.CLI
                 "config" => ConfigCommandParser.ParseCommandValues(tokens, values),
                 "chat" => ChatCommandParser.ParseCommandValues(tokens, values),
                 "complete" => CompleteCommandParser.ParseCommandValues(tokens, values),
-                "scenario" => ScenarioCommandParser.ParseCommandValues(tokens, values),
+                "wizard" => ScenarioWizardCommandParser.ParseCommandValues(tokens, values),
                 "run" => RunJobCommandParser.ParseCommandValues(tokens, values),
                 _ => false
             };
