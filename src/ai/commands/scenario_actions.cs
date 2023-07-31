@@ -50,7 +50,7 @@ namespace Azure.AI.Details.Common.CLI
                     new("Chat w/ your data (OpenAI)", "   STEP 6:", "Update", null), // ChatWithYourDataOpenAiStep6Update),
                     new("Chat w/ your data (OpenAI)", "   STEP 7:", "Clean up", null), // ChatWithYourDataOpenAiStep7CleanUp),
 
-                    new("Caption audio (Speech to Text)", "Quickstart", null), // CaptionAudioSpeechToTextQuickStart),
+                    new("Caption audio (Speech to Text)", "Quickstart", CaptionAudioSpeechToTextQuickStart.Run),
                     new("Caption audio (Speech to Text)", "or STEP 1:", "Initialize", null), // CaptionAudioSpeechToTextStep1Initialize),
                     new("Caption audio (Speech to Text)", "   STEP 2:", "Interact/caption audio", null), // CaptionAudioSpeechToTextStep2RecognizeSpeech),
                     new("Caption audio (Speech to Text)", "   STEP 3:", "Generate code", null), // CaptionAudioSpeechToTextStep3GenerateCode),
@@ -59,7 +59,7 @@ namespace Azure.AI.Details.Common.CLI
                     new("Caption audio (Speech to Text)", "   STEP 6:", "Update", null), // CaptionAudioSpeechToTextStep6Update),
                     new("Caption audio (Speech to Text)", "   STEP 7:", "Clean up", null), // CaptionAudioSpeechToTextStep7CleanUp),
 
-                    new("Caption images and video (Vision)", "Quickstart", null), // CaptionImagesAndVideoVisionQuickStart),
+                    new("Caption images and video (Vision)", "Quickstart", CaptionImagesAndVideoVisionQuickStart.Run),
                     new("Caption images and video (Vision)", "or STEP 1:", "Initialize", null), // CaptionImagesAndVideoVisionStep1Initialize),
                     new("Caption images and video (Vision)", "   STEP 2:", "Interact/caption", null), // CaptionImagesAndVideoVisionStep2RecognizeText),
                     new("Caption images and video (Vision)", "   STEP 3:", "Generate code", null), // CaptionImagesAndVideoVisionStep3GenerateCode),
@@ -68,7 +68,7 @@ namespace Azure.AI.Details.Common.CLI
                     new("Caption images and video (Vision)", "   STEP 6:", "Update", null), // CaptionImagesAndVideoVisionStep6Update),
                     new("Caption images and video (Vision)", "   STEP 7:", "Clean up", null), // CaptionImagesAndVideoVisionStep7CleanUp),
 
-                    new("Extract text from images (Vision)", "Quickstart", null), // ExtractTextFromImagesVisionQuickStart),
+                    new("Extract text from images (Vision)", "Quickstart", ExtractTextFromImagesVisionQuickStart.Run),
                     new("Extract text from images (Vision)", "or STEP 1:", "Initialize", null), // ExtractTextFromImagesVisionStep1Initialize),
                     new("Extract text from images (Vision)", "   STEP 2:", "Interact/extract", null), // ExtractTextFromImagesVisionStep2ExtractText),
                     new("Extract text from images (Vision)", "   STEP 3:", "Generate code", null), // ExtractTextFromImagesVisionStep3GenerateCode),
@@ -77,7 +77,7 @@ namespace Azure.AI.Details.Common.CLI
                     new("Extract text from images (Vision)", "   STEP 6:", "Update", null), // ExtractTextFromImagesVisionStep6Update),
                     new("Extract text from images (Vision)", "   STEP 7:", "Clean up", null), // ExtractTextFromImagesVisionStep7CleanUp),
 
-                    new("Extract text from documents and forms (Language)", "Quickstart", null), // ExtractTextFromDocumentsAndFormsLanguageQuickStart),
+                    new("Extract text from documents and forms (Language)", "Quickstart", ExtractTextFromDocumentsAndFormsLanguageQuickStart.Run),
                     new("Extract text from documents and forms (Language)", "or STEP 1:", "Initialize", null), // ExtractTextFromDocumentsAndFormsLanguageStep1Initialize),
                     new("Extract text from documents and forms (Language)", "   STEP 2:", "Interact/extract", null), // ExtractTextFromDocumentsAndFormsLanguageStep2ExtractText),
                     new("Extract text from documents and forms (Language)", "   STEP 3:", "Generate code", null), // ExtractTextFromDocumentsAndFormsLanguageStep3GenerateCode),
@@ -86,7 +86,7 @@ namespace Azure.AI.Details.Common.CLI
                     new("Extract text from documents and forms (Language)", "   STEP 6:", "Update", null), // ExtractTextFromDocumentsAndFormsLanguageStep6Update),
                     new("Extract text from documents and forms (Language)", "   STEP 7:", "Clean up", null), // ExtractTextFromDocumentsAndFormsLanguageStep7CleanUp),
 
-                    new("Transcribe and analyze calls (Speech, Language)", "Quickstart", null), // TranscribeAndAnalyzeCallsSpeechLanguageQuickStart),
+                    new("Transcribe and analyze calls (Speech, Language)", "Quickstart", TranscribeAndAnalyzeCallsSpeechLanguageQuickStart.Run),
                     new("Transcribe and analyze calls (Speech, Language)", "or STEP 1:", "Initialize", null), // TranscribeAndAnalyzeCallsSpeechLanguageStep1Initialize),
                     new("Transcribe and analyze calls (Speech, Language)", "   STEP 2:", "Interact/transcribe", null), // TranscribeAndAnalyzeCallsSpeechLanguageStep2TranscribeCalls),
                     new("Transcribe and analyze calls (Speech, Language)", "   STEP 3:", "Generate code", null), // TranscribeAndAnalyzeCallsSpeechLanguageStep3GenerateCode),
@@ -95,7 +95,7 @@ namespace Azure.AI.Details.Common.CLI
                     new("Transcribe and analyze calls (Speech, Language)", "   STEP 6:", "Update", null), // TranscribeAndAnalyzeCallsSpeechLanguageStep6Update),
                     new("Transcribe and analyze calls (Speech, Language)", "   STEP 7:", "Clean up", null), // TranscribeAndAnalyzeCallsSpeechLanguageStep7CleanUp),
 
-                    new("Translate documents and text (Language)", "Quickstart", null), // TranslateDocumentsAndTextLanguageQuickStart),
+                    new("Translate documents and text (Language)", "Quickstart", TranslateDocumentsAndTextLanguageQuickStart.Run),
                     new("Translate documents and text (Language)", "or STEP 1:", "Initialize", null), // TranslateDocumentsAndTextLanguageStep1Initialize),
                     new("Translate documents and text (Language)", "   STEP 2:", "Interact/translate", null), // TranslateDocumentsAndTextLanguageStep2TranslateText),
                     new("Translate documents and text (Language)", "   STEP 3:", "Generate code", null), // TranslateDocumentsAndTextLanguageStep3GenerateCode),
@@ -104,7 +104,7 @@ namespace Azure.AI.Details.Common.CLI
                     new("Translate documents and text (Language)", "   STEP 6:", "Update", null), // TranslateDocumentsAndTextLanguageStep6Update),
                     new("Translate documents and text (Language)", "   STEP 7:", "Clean up", null), // TranslateDocumentsAndTextLanguageStep7CleanUp),
 
-                    new("Summarize documents (Language)", "Quickstart", null), // SummarizeDocumentsLanguageQuickStart),
+                    new("Summarize documents (Language)", "Quickstart", SummarizeDocumentsLanguageQuickStart.Run),
                     new("Summarize documents (Language)", "or STEP 1:", "Initialize", null), // SummarizeDocumentsLanguageStep1Initialize),
                     new("Summarize documents (Language)", "   STEP 2:", "Interact/summarize", null), // SummarizeDocumentsLanguageStep2SummarizeDocuments),
                     new("Summarize documents (Language)", "   STEP 3:", "Generate code", null), // SummarizeDocumentsLanguageStep3GenerateCode),

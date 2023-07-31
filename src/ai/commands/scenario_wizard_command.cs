@@ -78,26 +78,29 @@ namespace Azure.AI.Details.Common.CLI
             Console.WriteLine($"\rName: {scenario} ");
 
             var actions = GetActions(scenario);
-            var actionText = string.Empty;
+            var action = (ScenarioAction)null;
             if (actions.Count(x => !string.IsNullOrEmpty(x.Action)) > 0)
             {
                 Console.Write($"\rTask: ");
 
-                var action = ListBoxPicker.PickIndexOf(actions.Select(x => x.ActionWithPrefix).ToArray());
-                if (action < 0) return;
+                var index = ListBoxPicker.PickIndexOf(actions.Select(x => x.ActionWithPrefix).ToArray());
+                if (index < 0) return;
+                action = actions[index];
 
-                actionText = actions[action].Action;
-
-                Console.WriteLine($"\rTask: {actionText.Trim()}\n");
+                Console.WriteLine($"\rTask: {action.Action.Trim()}\n");
             }
 
-            if (scenario.ToLower().Contains("your data") && actionText.ToLower().Contains("quickstart"))
+            if (scenario.ToLower().Contains("your data") && action.Action.ToLower().Contains("quickstart"))
             {
                 ChatWithYourDataScenario(scenario);
             }
-            else if (scenario.ToLower().StartsWith("chat") && actionText.ToLower().Contains("quickstart"))
+            else if (scenario.ToLower().StartsWith("chat") && action.Action.ToLower().Contains("quickstart"))
             {
                 SimpleChatScenario(scenario);
+            }
+            else if (action.InvokeAction != null)
+            {
+                action.InvokeAction(action);
             }
             else
             {

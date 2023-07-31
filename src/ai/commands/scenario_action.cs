@@ -29,6 +29,6 @@ namespace Azure.AI.Details.Common.CLI
 
         public string ActionWithPrefix => string.IsNullOrEmpty(ActionPrefix) ? Action : $"{ActionPrefix} {Action}";
 
-        Action<ScenarioAction> InvokeAction { get; set; }
+        public Action<ScenarioAction> InvokeAction { get; set; }
     }
 }
