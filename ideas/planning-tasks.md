@@ -2,18 +2,18 @@
 
 | Hrs | Aug | Ignite |   |
 |---|---|---|---|
-|   |✔️|   |  ✅ `ai-cli` github repo (private for now)  
-|   |✔️|   |  ✅ `ai` CLI: basic structure (csproj, files, etc.)  
+| - |✔️|   |  ✅ `ai-cli` github repo (private for now)  
+| - |✔️|   |  ✅ `ai` CLI: basic structure (csproj, files, etc.)  
 |   |   |   |  
-|   |???|???|  ⏹️ CI: scripts + nuget tool package  
-|   |???|???|  ⏹️ CI: scripts + github build actions  
-|   |???|???|  ⏹️ CI: scripts + github test actions  
-|   |???|???|  ⏹️ CD: how to get nuget to vs code hosted container
+|24+|???|???|  ⏹️ CI: scripts + nuget tool package  
+|24+|???|???|  ⏹️ CI: scripts + github build actions  
+|40+|???|???|  ⏹️ CI: scripts + github test actions  
+|16+|???|???|  ⏹️ CD: how to get nuget to vs code hosted container
 |   |   |   |  
-|   |✔️|   |  ✅ `ai help`: basic functionality and IA  
-|   | x |   |  ⏹️ `ai help`: placeholder help content for all commands/sub-commands  
+| - |✔️|   |  ✅ `ai help`: basic functionality and IA  
+| 8 | x |   |  ⏹️ `ai help`: placeholder help content for all commands/sub-commands  
 |   |   |   |  
-|   |✔️|   |  ✅ `ai wizard`: basic functionality and IA  
+| - |✔️|   |  ✅ `ai wizard`: basic functionality and IA  
 | 4 | x |   |  ⏹️ `ai wizard`: placeholder for all August-Hero wizard steps  
 |   |   |   |  
 | 1 | x |   |  ⏹️ `ai speech`: placeholder for all speech commands  
@@ -24,147 +24,173 @@
 | 1 | x |   |  ⏹️ `ai service`: placeholder for all service commands  
 | 1 | x |   |  ⏹️ `ai tool`: placeholder for all tool commands  
 |   |   |   |  
-|   | x |   |  ⏹️ python: proof of life: enumerate hubs  
-|   | x |   |  ⏹️ python: proof of life: create hubs  
-|   | x |   |  ⏹️ python: proof of life: update hubs  
-|   | x |   |  ⏹️ python: proof of life: delete hubs  
+| 1 | x |   |  ⏹️ python: proof of life: enumerate hubs  
+| 1 | x |   |  ⏹️ python: proof of life: create hubs  
+| 1 | x |   |  ⏹️ python: proof of life: update hubs  
+| 1 | x |   |  ⏹️ python: proof of life: delete hubs  
 |   |   |   |  
-|   | x |   |  ⏹️ python: proof of life: enumerate projects  
-|   | x |   |  ⏹️ python: proof of life: create projects  
-|   | x |   |  ⏹️ python: proof of life: update projects  
-|   | x |   |  ⏹️ python: proof of life: delete projects  
+| 1 | x |   |  ⏹️ python: proof of life: enumerate projects  
+| 1 | x |   |  ⏹️ python: proof of life: create projects  
+| 1 | x |   |  ⏹️ python: proof of life: update projects  
+| 1 | x |   |  ⏹️ python: proof of life: delete projects  
 |   |   |   |  
-|   | x |   |  ⏹️ python: proof of life: enumerate deployments  
-|   | x |   |  ⏹️ python: proof of life: create deployments  
-|   | x |   |  ⏹️ python: proof of life: update deployments  
-|   | x |   |  ⏹️ python: proof of life: delete deployments  
+| 1 | x |   |  ⏹️ python: proof of life: enumerate deployments  
+| 1 | x |   |  ⏹️ python: proof of life: create deployments  
+| 1 | x |   |  ⏹️ python: proof of life: update deployments  
+| 1 | x |   |  ⏹️ python: proof of life: delete deployments  
 |   |   |   |  
-|   | x |   |  ⏹️ python: proof of life: enumerate indexes  
-|   | x |   |  ⏹️ python: proof of life: create indexes  
-|   | x |   |  ⏹️ python: proof of life: update indexes  
-|   | x |   |  ⏹️ python: proof of life: delete indexes  
+| 1 | x |   |  ⏹️ python: proof of life: enumerate indexes  
+| 1 | x |   |  ⏹️ python: proof of life: create indexes  
+| 1 | x |   |  ⏹️ python: proof of life: update indexes  
+| 1 | x |   |  ⏹️ python: proof of life: delete indexes  
 |   |   |   |  
-|   | x |   |  ⏹️ python: proof of life: enumerate connection  
-|   | x |   |  ⏹️ python: proof of life: create connection  
-|   | x |   |  ⏹️ python: proof of life: update connection  
-|   | x |   |  ⏹️ python: proof of life: delete connection  
+| 1 | x |   |  ⏹️ python: proof of life: enumerate connection  
+| 1 | x |   |  ⏹️ python: proof of life: create connection  
+| 1 | x |   |  ⏹️ python: proof of life: update connection  
+| 1 | x |   |  ⏹️ python: proof of life: delete connection  
 |   |   |   |  
-|   |   | x |  ⏹️ python: proof of life: enumerate evaluations  
-|   |   | x |  ⏹️ python: proof of life: create evaluations  
-|   |   | x |  ⏹️ python: proof of life: update evaluations  
-|   |   | x |  ⏹️ python: proof of life: delete evaluations  
+| 1 |   | x |  ⏹️ python: proof of life: enumerate evaluations  
+| 1 |   | x |  ⏹️ python: proof of life: create evaluations  
+| 1 |   | x |  ⏹️ python: proof of life: update evaluations  
+| 1 |   | x |  ⏹️ python: proof of life: delete evaluations  
 |   |   |   |  
-|   |   | x |  ⏹️ python: proof of life: enumerate flows  
-|   |   | x |  ⏹️ python: proof of life: create flows  
-|   |   | x |  ⏹️ python: proof of life: update flows  
-|   |   | x |  ⏹️ python: proof of life: delete flows  
+| 1 |   | x |  ⏹️ python: proof of life: enumerate flows  
+| 1 |   | x |  ⏹️ python: proof of life: create flows  
+| 1 |   | x |  ⏹️ python: proof of life: update flows  
+| 1 |   | x |  ⏹️ python: proof of life: delete flows  
 |   |   |   |  
-|   | x |   |  ⏹️ `ai service deployment`: create
-|   |???|???|  ⏹️ `ai service deployment`: status
-|   | x |   |  ⏹️ `ai service deployment`: list
-|   |???|???|  ⏹️ `ai service deployment`: update
-|   | x |   |  ⏹️ `ai service deployment`: delete  
+| 1 | x |   |  ⏹️ `ai service deployment`: `--help`
+| 1 | x |   |  ⏹️ `ai service deployment`: create
+| 1 |???|???|  ⏹️ `ai service deployment`: status
+| 2 | x |   |  ⏹️ `ai service deployment`: list
+| 1 |???|???|  ⏹️ `ai service deployment`: update
+| 1 | x |   |  ⏹️ `ai service deployment`: delete  
+| 4 | x |   |  ⏹️ `ai service deployment`: `init`
+| 2 | x |   |  ⏹️ `ai service deployment`: `--output`
+| 1 | x |   |  ⏹️ `ai service deployment`: `--wait`
 |   |   |   |  
-|   | x |   |  ⏹️ `ai service resource`: create hub
-|   |???|???|  ⏹️ `ai service resource`: status on hub
-|   |???|???|  ⏹️ `ai service resource`: list hubs
-|   |???|???|  ⏹️ `ai service resource`: update hub
-|   | x |   |  ⏹️ `ai service resource`: delete hub
+| 1 | x |   |  ⏹️ `ai service resource`: `--help`
+| 1 | x |   |  ⏹️ `ai service resource`: create hub
+| 1 |???|???|  ⏹️ `ai service resource`: status on hub
+| 2 |???|???|  ⏹️ `ai service resource`: list hubs
+| 1 |???|???|  ⏹️ `ai service resource`: update hub
+| 1 | x |   |  ⏹️ `ai service resource`: delete hub
+| 4 | x |   |  ⏹️ `ai service resource`: `init`
+| 2 | x |   |  ⏹️ `ai service resource`: `--output`
+| 1 | x |   |  ⏹️ `ai service resource`: `--wait`
 |   |   |   |  
-|   | x |   |  ⏹️ `ai service project`: create
-|   |???|???|  ⏹️ `ai service project`: status
-|   | x |   |  ⏹️ `ai service project`: list
-|   |???|???|  ⏹️ `ai service project`: update
-|   | x |   |  ⏹️ `ai service project`: delete  
+| 1 | x |   |  ⏹️ `ai service project`: `--help`
+| 1 | x |   |  ⏹️ `ai service project`: create
+| 1 |???|???|  ⏹️ `ai service project`: status
+| 2 | x |   |  ⏹️ `ai service project`: list
+| 1 |???|???|  ⏹️ `ai service project`: update
+| 1 | x |   |  ⏹️ `ai service project`: delete  
+| 4 | x |   |  ⏹️ `ai service project`: `init`
+| 2 | x |   |  ⏹️ `ai service project`: `--output`
+| 1 | x |   |  ⏹️ `ai service project`: `--wait`
 |   |   |   |  
-|   | x |   |  ⏹️ `ai service connection`: create
-|   |???|???|  ⏹️ `ai service connection`: status
-|   | x |   |  ⏹️ `ai service connection`: list
-|   |???|???|  ⏹️ `ai service connection`: update
-|   | x |   |  ⏹️ `ai service connection`: delete  
+| 1 | x |   |  ⏹️ `ai service connection`: `--help`
+| 1 | x |   |  ⏹️ `ai service connection`: create
+| 1 |???|???|  ⏹️ `ai service connection`: status
+| 2 | x |   |  ⏹️ `ai service connection`: list
+| 1 |???|???|  ⏹️ `ai service connection`: update
+| 1 | x |   |  ⏹️ `ai service connection`: delete  
+| 4 | x |   |  ⏹️ `ai service connection`: `init`
+| 2 | x |   |  ⏹️ `ai service connection`: `--output`  
+| 1 | x |   |  ⏹️ `ai service connection`: `--wait`  
 |   |   |   |  
-|   |   | x |  ⏹️ `ai service evaluation`: create
-|   |   | x |  ⏹️ `ai service evaluation`: status
-|   |   | x |  ⏹️ `ai service evaluation`: list
-|   |   | x |  ⏹️ `ai service evaluation`: update
-|   |   | x |  ⏹️ `ai service evaluation`: delete  
+| 1 | x |   |  ⏹️ `ai service evaluation`: `--help`
+| 1 |   | x |  ⏹️ `ai service evaluation`: create
+| 1 |   | x |  ⏹️ `ai service evaluation`: status
+| 2 |   | x |  ⏹️ `ai service evaluation`: list
+| 1 |   | x |  ⏹️ `ai service evaluation`: update
+| 1 |   | x |  ⏹️ `ai service evaluation`: delete  
+| 4 | x |   |  ⏹️ `ai service evaluation`: `init`
+| 2 |   | x |  ⏹️ `ai service evaluation`: `--output`  
+| 1 |   | x |  ⏹️ `ai service evaluation`: `--wait`  
 |   |   |   |  
-|   |???|???|  ⏹️ `ai service flow`: create
-|   |???|???|  ⏹️ `ai service flow`: status
-|   |???|???|  ⏹️ `ai service flow`: list
-|   |???|???|  ⏹️ `ai service flow`: update
-|   |???|???|  ⏹️ `ai service flow`: delete  
+| 1 |???|???|  ⏹️ `ai service flow`: `--help`
+| 1 |???|???|  ⏹️ `ai service flow`: create
+| 1 |???|???|  ⏹️ `ai service flow`: status
+| 2 |???|???|  ⏹️ `ai service flow`: list
+| 1 |???|???|  ⏹️ `ai service flow`: update
+| 1 |???|???|  ⏹️ `ai service flow`: delete  
+| 1 |???|???|  ⏹️ `ai service flow`: `--output`  
+| 1 |???|???|  ⏹️ `ai service flow`: `--wait`  
 |   |   |   |  
-|   |✔️|   |  ✅ `ai init`: basic functionality (OpenAI resource, not AI Hub)  
-|   | x |   |  ⏹️ `ai init`: update to use AI Hubs  
-|   | x |   |  ⏹️ `ai init`: deployement, pick or create, list models, pick  
+| - |✔️|   |  ✅ `ai init`: basic functionality (OpenAI resource, not AI Hub)  
+| 4 | x |   |  ⏹️ `ai init`: update to use AI Hubs  
+| 4 | x |   |  ⏹️ `ai init`: deployement, pick or create, list models, pick  
 |   |   |   |  
-|   |✔️|   |  ✅ `ai config`: basic functionality and IA  
-|   | x |   |  ⏹️ `ai config`: update defaults structure to match AI Hub/Project usage  
+| - |✔️|   |  ✅ `ai config`: basic functionality and IA  
+| 4 | x |   |  ⏹️ `ai config`: update defaults structure to match AI Hub/Project usage  
 |   |   |   |  
-|   |✔️|   |  ✅ `ai chat`: basic functionality for interactive chat  
-|   |✔️|   |  ✅ `ai chat`: w/ my data poc: embeddings provider, index provider, etc.  
-|   | x |   |  ⏹️ `ai chat`: command line inputs: prompt, temperature, top-p, frequency penalty, presence penalty, etc.  
-|   | x |   |  ⏹️ `ai chat`: command line inputs: non-interactive chat: input file, output file, etc.  
-|   |   | x |  ⏹️ `ai chat`: interactive chat (hot-reload)  
+| - |✔️|   |  ✅ `ai chat`: basic functionality for interactive chat  
+| - |✔️|   |  ✅ `ai chat`: w/ my data poc: embeddings provider, index provider, etc.  
+| 4 | x |   |  ⏹️ `ai chat`: command line inputs: prompt, temperature, top-p, frequency penalty, presence penalty, etc.  
+| 4 | x |   |  ⏹️ `ai chat`: command line inputs: non-interactive chat: input file, output file, etc.  
+|12 |   | x |  ⏹️ `ai chat`: interactive chat (hot-reload)  
 |   |   |   |  
-|   | x |   |  ⏹️ `ai chat`: spec and write help for all inputs  
-|   | x |   |  ⏹️ `ai chat`: w/ my data: migrate to AI Hub usage  
+| 2 | x |   |  ⏹️ `ai chat`: spec and write help for all inputs  
+| 4 | x |   |  ⏹️ `ai chat`: w/ my data: migrate to AI Hub usage  
 |   |   |   |  
-|   |???|???|  ⏹️ `ai eval`: spec and write help for all inputs  
-|   |???|???|  ⏹️ `ai eval`: basic functionality  
-|   |???|???|  ⏹️ `ai eval`: more advanced functionality (needs breakdown)  
+| 8 |???|???|  ⏹️ `ai eval`: spec and write help for all inputs  
+| 8 |???|???|  ⏹️ `ai eval`: basic functionality  
+|???|???|???|  ⏹️ `ai eval`: more advanced functionality (needs breakdown)  
 |   |   |   |  
-|   |???|???|  ⏹️ aka.ms: links for all `https://` used in help and code  
+| 4 |???|???|  ⏹️ aka.ms: links for all `https://` used in help and code  
 |   |   |   |  
-|   |✔️|   |  ✅ `ai wizard`: Chat (OpenAI) w/ OpenAIClient w/ key, endpoint, region  
-|   |???|???|  ⏹️ `ai wizard`: Chat (OpenAI) w/ OpenAIClient w/ AI Hub  
-|   | x |   |  ⏹️ `ai wizard`: Chat (OpenAI) Quickstart  
-|   |???|???|  ⏹️ `ai wizard`: Chat (OpenAI) - Step 1: Initialize  
-|   |???|???|  ⏹️ `ai wizard`: Chat (OpenAI) - Step 2: Interact/chat  
-|   |???|???|  ⏹️ `ai wizard`: Chat (OpenAI) - Step 3: Generate code  
-|   |???|???|  ⏹️ `ai wizard`: Chat (OpenAI) - Step 4: Deploy  
-|   |???|???|  ⏹️ `ai wizard`: Chat (OpenAI) - Step 5: Evaluate  
-|   |???|???|  ⏹️ `ai wizard`: Chat (OpenAI) - Step 6: Update  
-|   |???|???|  ⏹️ `ai wizard`: Chat (OpenAI) - Step 7: Clean up  
+| - |✔️|   |  ✅ `ai wizard`: Chat (OpenAI) w/ OpenAIClient w/ key, endpoint, region  
+| 2 |???|???|  ⏹️ `ai wizard`: Chat (OpenAI) w/ OpenAIClient w/ AI Hub  
+| 4 | x |   |  ⏹️ `ai wizard`: Chat (OpenAI) Quickstart  
+| 2 |???|???|  ⏹️ `ai wizard`: Chat (OpenAI) - Step 1: Initialize  
+| 2 |???|???|  ⏹️ `ai wizard`: Chat (OpenAI) - Step 2: Interact/chat  
+|16 |???|???|  ⏹️ `ai wizard`: Chat (OpenAI) - Step 3: Generate code (python) 
+|16 |???|???|  ⏹️ `ai wizard`: Chat (OpenAI) - Step 3: Generate code (C#) 
+|???|???|???|  ⏹️ `ai wizard`: Chat (OpenAI) - Step 4: Deploy  
+|???|???|???|  ⏹️ `ai wizard`: Chat (OpenAI) - Step 5: Evaluate  
+|???|???|???|  ⏹️ `ai wizard`: Chat (OpenAI) - Step 6: Update  
+| 4 |???|???|  ⏹️ `ai wizard`: Chat (OpenAI) - Step 7: Clean up  
 |   |   |   |  
-|   |✔️|   |  ✅ `ai wizard`: Chat (OpenAI) w/ your prompt w/ OpenAIClient w/ key, endpoint, region  
-|   |???|???|  ⏹️ `ai wizard`: Chat (OpenAI) w/ your prompt w/ OpenAIClient w/ AI Hub  
-|   | x |   |  ⏹️ `ai wizard`: Chat (OpenAI) w/ your prompt Quickstart  
-|   |???|???|  ⏹️ `ai wizard`: Chat (OpenAI) w/ your prompt - Step 1: Initialize  
-|   |???|???|  ⏹️ `ai wizard`: Chat (OpenAI) w/ your prompt - Step 2: Interact/chat  
-|   |???|???|  ⏹️ `ai wizard`: Chat (OpenAI) w/ your prompt - Step 3: Generate code  
-|   |???|???|  ⏹️ `ai wizard`: Chat (OpenAI) w/ your prompt - Step 4: Deploy  
-|   |???|???|  ⏹️ `ai wizard`: Chat (OpenAI) w/ your prompt - Step 5: Evaluate  
-|   |???|???|  ⏹️ `ai wizard`: Chat (OpenAI) w/ your prompt - Step 6: Update  
-|   |???|???|  ⏹️ `ai wizard`: Chat (OpenAI) w/ your prompt - Step 7: Clean up  
+| - |✔️|   |  ✅ `ai wizard`: Chat (OpenAI) w/ your prompt w/ OpenAIClient w/ key, endpoint, region  
+| 2 |???|???|  ⏹️ `ai wizard`: Chat (OpenAI) w/ your prompt w/ OpenAIClient w/ AI Hub  
+| 4 | x |   |  ⏹️ `ai wizard`: Chat (OpenAI) w/ your prompt Quickstart  
+| 2 |???|???|  ⏹️ `ai wizard`: Chat (OpenAI) w/ your prompt - Step 1: Initialize  
+| 2 |???|???|  ⏹️ `ai wizard`: Chat (OpenAI) w/ your prompt - Step 2: Interact/chat  
+| 8 |???|???|  ⏹️ `ai wizard`: Chat (OpenAI) w/ your prompt - Step 3: Generate code (python)
+| 4 |???|???|  ⏹️ `ai wizard`: Chat (OpenAI) w/ your prompt - Step 3: Generate code (C#)
+|???|???|???|  ⏹️ `ai wizard`: Chat (OpenAI) w/ your prompt - Step 4: Deploy  
+|???|???|???|  ⏹️ `ai wizard`: Chat (OpenAI) w/ your prompt - Step 5: Evaluate  
+|???|???|???|  ⏹️ `ai wizard`: Chat (OpenAI) w/ your prompt - Step 6: Update  
+| 4 |???|???|  ⏹️ `ai wizard`: Chat (OpenAI) w/ your prompt - Step 7: Clean up  
 |   |   |   |  
-|   |✔️|   |  ✅ `ai wizard`: Chat (OpenAI) w/ your data w/ OpenAIClient w/ key, endpoint, region  
-|   | x |   |  ⏹️ `ai wizard`: Chat (OpenAI) w/ your data w/ OpenAIClient w/ AI Hub  
-|   | x |   |  ⏹️ `ai wizard`: Chat (OpenAI) w/ your data Quickstart  
-|   |???|???|  ⏹️ `ai wizard`: Chat (OpenAI) w/ your data - Step 1: Initialize  
-|   |???|???|  ⏹️ `ai wizard`: Chat (OpenAI) w/ your data - Step 2: Interact/chat  
-|   |???|???|  ⏹️ `ai wizard`: Chat (OpenAI) w/ your data - Step 3: Generate code  
-|   |???|???|  ⏹️ `ai wizard`: Chat (OpenAI) w/ your data - Step 4: Deploy  
-|   |???|???|  ⏹️ `ai wizard`: Chat (OpenAI) w/ your data - Step 5: Evaluate  
-|   |???|???|  ⏹️ `ai wizard`: Chat (OpenAI) w/ your data - Step 6: Update  
-|   |???|???|  ⏹️ `ai wizard`: Chat (OpenAI) w/ your data - Step 7: Clean up  
+| - |✔️|   |  ✅ `ai wizard`: Chat (OpenAI) w/ your data w/ OpenAIClient w/ key, endpoint, region  
+| 2 | x |   |  ⏹️ `ai wizard`: Chat (OpenAI) w/ your data w/ OpenAIClient w/ AI Hub  
+| 4 | x |   |  ⏹️ `ai wizard`: Chat (OpenAI) w/ your data Quickstart  
+| 2 |???|???|  ⏹️ `ai wizard`: Chat (OpenAI) w/ your data - Step 1: Initialize  
+| 2 |???|???|  ⏹️ `ai wizard`: Chat (OpenAI) w/ your data - Step 2: Interact/chat  
+| 8 |???|???|  ⏹️ `ai wizard`: Chat (OpenAI) w/ your data - Step 3: Generate code (python)
+| 4 |???|???|  ⏹️ `ai wizard`: Chat (OpenAI) w/ your data - Step 3: Generate code (C#)
+|???|???|???|  ⏹️ `ai wizard`: Chat (OpenAI) w/ your data - Step 4: Deploy  
+|???|???|???|  ⏹️ `ai wizard`: Chat (OpenAI) w/ your data - Step 5: Evaluate  
+|???|???|???|  ⏹️ `ai wizard`: Chat (OpenAI) w/ your data - Step 6: Update  
+| 4 |???|???|  ⏹️ `ai wizard`: Chat (OpenAI) w/ your data - Step 7: Clean up  
 |   |   |   |  
-|   |   | x |  ⏹️ `ai speech recognize`: Basic SR functionality
-|   |   | x |  ⏹️ `ai speech synthesize`: Basic TTS functionality
+|12 |   | x |  ⏹️ `ai speech recognize`: Basic SR functionality
+|12 |   | x |  ⏹️ `ai speech synthesize`: Basic TTS functionality
 |   |   |   |  
-|   |???|???|  ⏹️ PM: prompt flow: what's relationship between prompt flow CLI and `ai` CLI?  
-|   |???|???|  ⏹️ PM: help: how/where/who will docs? samples?  
-|   |???|???|  ⏹️ PM: studio: integration plan with studio (needs breakdown)  
-|   |???|???|  ⏹️ PM: vscode: integration plan with hosted VS Code plans (needs breakdown)  
-|   |???|???|  ⏹️ PM: cloud shell: how to get it here almost by default if not default
-|   |???|???|  ⏹️ PM: nuget: how to publish to nuget with the correct owner (same as az-cli)  
-|   |???|???|  ⏹️ PM: content safety aspects to CLI?  
-|   |???|???|  ⏹️ PM: "model" aspects to CLI?  
+| ! |???|???|  ⏹️ PM: prompt flow: what's relationship between prompt flow CLI and `ai` CLI?  
+| ! |???|???|  ⏹️ PM: help: how/where/who will docs? samples?  
+| ! |???|???|  ⏹️ PM: studio: integration plan with studio (needs breakdown)  
+| ! |???|???|  ⏹️ PM: vscode: integration plan with hosted VS Code plans (needs breakdown)  
+| ! |???|???|  ⏹️ PM: cloud shell: how to get it here almost by default if not default
+| ! |???|???|  ⏹️ PM: nuget: how to publish to nuget with the correct owner (same as az-cli)  
+| ! |???|???|  ⏹️ PM: content safety aspects to CLI?  
+| ! |???|???|  ⏹️ PM: "model" aspects to CLI?  
 |   |   |   |  
-|   |   | x |  ⏹️ `ai speech`: port all SPX functionality (needs more breakdown)  
-|   |   | x |  ⏹️ `ai vision`: port all VZ functionality (needs more breakdown)  
-|   |   | x |  ⏹️ `ai language`: create all CLI functionality (needs more breakdown)
-|   |   | x |  ⏹️ `ai translation`: create all CLI functionality (needs more breakdown)
-|   |   | x |  ⏹️ `ai search`: create all CLI functionality (needs more breakdown)
+|XL |   | x |  ⏹️ `ai speech`: port all SPX functionality (needs more breakdown)  
+|XL |   | x |  ⏹️ `ai vision`: port all VZ functionality (needs more breakdown)  
+|XL++|  | x |  ⏹️ `ai language`: create all CLI functionality (needs more breakdown)
+|XL++|  | x |  ⏹️ `ai translation`: create all CLI functionality (needs more breakdown)
+|XL++|  | x |  ⏹️ `ai search`: create all CLI functionality (needs more breakdown)
 |   |   |   |  
