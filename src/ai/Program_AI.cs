@@ -40,7 +40,7 @@ namespace Azure.AI.Details.Common.CLI
         #endregion
 
         #region config command data
-        public static string ConfigScopeTokens = $"init;chat;complete;wizard;run;*";
+        public static string ConfigScopeTokens = $"init;chat;eval;speech;vision;language;search;service;tool;wizard;run;*";
         #endregion
 
         #region zip option data
