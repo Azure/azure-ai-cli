@@ -16,13 +16,13 @@
 | - |✔️|   |  ✅ `ai wizard`: basic functionality and IA  
 | 4 | x |   |  ⏹️ `ai wizard`: placeholder for all August-Hero wizard steps  
 |   |   |   |  
-| 1 | x |   |  ⏹️ `ai speech`: placeholder for all speech commands  
-| 1 | x |   |  ⏹️ `ai vision`: placeholder for all speech commands  
-| 1 | x |   |  ⏹️ `ai language`: placeholder for all language commands  
-| 1 | x |   |  ⏹️ `ai translation`: placeholder for all translation commands  
-| 1 | x |   |  ⏹️ `ai search`: placeholder for all search commands  
-| 1 | x |   |  ⏹️ `ai service`: placeholder for all service commands  
-| 1 | x |   |  ⏹️ `ai tool`: placeholder for all tool commands  
+| 1 | x |   |  ⏹️ `ai speech`: placeholder for all speech commands (parser, warning)  
+| 1 | x |   |  ⏹️ `ai vision`: placeholder for all speech commands (parser, warning)  
+| 1 | x |   |  ⏹️ `ai language`: placeholder for all language commands (parser, warning)  
+| 1 | x |   |  ⏹️ `ai translation`: placeholder for all translation commands (parser, warning)  
+| 1 | x |   |  ⏹️ `ai search`: placeholder for all search commands (parser, warning)  
+| 1 | x |   |  ⏹️ `ai service`: placeholder for all service commands (parser, warning)  
+| 1 | x |   |  ⏹️ `ai tool`: placeholder for all tool commands (parser, warning)  
 |   |   |   |  
 | 1 | x |   |  ⏹️ python: proof of life: enumerate hubs  
 | 1 | x |   |  ⏹️ python: proof of life: create hubs  
@@ -58,6 +58,9 @@
 | 1 |   | x |  ⏹️ python: proof of life: create flows  
 | 1 |   | x |  ⏹️ python: proof of life: update flows  
 | 1 |   | x |  ⏹️ python: proof of life: delete flows  
+|   |   |   |  
+| 1 |   |   |  ⏹️ `ai service`: `help`  
+| 1 |   |   |  ⏹️ `ai service`: parser  
 |   |   |   |  
 | 1 | x |   |  ⏹️ `ai service deployment`: `--help`
 | 1 | x |   |  ⏹️ `ai service deployment`: create
@@ -176,8 +179,9 @@
 |???|???|???|  ⏹️ `ai wizard`: Chat (OpenAI) w/ your data - Step 6: Update  
 | 4 |???|???|  ⏹️ `ai wizard`: Chat (OpenAI) w/ your data - Step 7: Clean up  
 |   |   |   |  
-|12 |   | x |  ⏹️ `ai speech recognize`: Basic SR functionality
-|12 |   | x |  ⏹️ `ai speech synthesize`: Basic TTS functionality
+|12 |   | x |  ⏹️ `ai speech recognize`: Basic SR functionality  
+|12 |   | x |  ⏹️ `ai speech synthesize`: Basic TTS functionality  
+|12 |   | x |  ⏹️ `ai speech synthesize`: Basic Translation functionality  
 |   |   |   |  
 | ! |???|???|  ⏹️ PM: prompt flow: what's relationship between prompt flow CLI and `ai` CLI?  
 | ! |???|???|  ⏹️ PM: help: how/where/who will docs? samples?  
