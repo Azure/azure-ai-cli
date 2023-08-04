@@ -1,6 +1,6 @@
 TRANSLATE MICROPHONE
 
-@include.the.translate.command
+@speech.include.the.translate.command
 
   The `--microphone` option specifies use of a microphone.
 

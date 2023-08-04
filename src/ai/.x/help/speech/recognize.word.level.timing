@@ -1,6 +1,6 @@
 RECOGNIZE WORD LEVEL TIMING
 
-@include.the.recognize.command
+@speech.include.the.recognize.command
 
   The `--word level timing` option requests word level timing
   details in recognition results.

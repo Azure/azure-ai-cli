@@ -1,6 +1,6 @@
 CUSTOM SPEECH RECOGNITION DATASET DELETE
 
-@include.the.csr.dataset.delete.command
+@speech.include.the.csr.dataset.delete.command
 
 USAGE: ai speech csr dataset delete [...]
 

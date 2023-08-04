@@ -1,6 +1,6 @@
 SPEAKER FILE
 
-@include.the.speaker.command
+@speech.include.the.speaker.command
 
   The `--file` option specifies a single local audio file to be
   uploaded to the service for identification or verification.

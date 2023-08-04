@@ -1,6 +1,6 @@
 RECOGNIZE OUTPUT VTT 
 
-@include.the.recognize.command
+@speech.include.the.recognize.command
 
   The `--output vtt` option indicates that recognition results should
   be output in the WEBVTT format, which provides captioning information for audio/video files.

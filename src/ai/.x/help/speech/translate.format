@@ -1,6 +1,6 @@
 TRANSLATE FORMAT
 
-@include.the.translate.command
+@speech.include.the.translate.command
 
   The `--format` option specifies the container format for the
   audio file being translated.

@@ -1,6 +1,6 @@
 RECOGNIZE OUTPUT ALL
 
-@include.the.recognize.command
+@speech.include.the.recognize.command
 
   The `--output all` option specifies an ITEM to accumulate and
   aggregate into a TSV or JSON output file, combined across all events.

@@ -1,8 +1,8 @@
 RECOGNIZE CONTINUOUS
 
-@include.the.recognize.command
+@speech.include.the.recognize.command
 
-@include.the.recognize.method
+@speech.include.the.recognize.method
 
   The `--continuous` option recognizes streaming audio continuously,
   optimized for interactive conversations and audio files.

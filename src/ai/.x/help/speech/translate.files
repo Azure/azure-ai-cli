@@ -1,6 +1,6 @@
 TRANSLATE FILES
 
-@include.the.translate.command
+@speech.include.the.translate.command
 
   The `--files` option specifies multiple local audio files to be
   streamed to the service for translation.

@@ -1,6 +1,6 @@
 INTENT INPUT OVERVIEW
 
-@include.the.intent.command
+@speech.include.the.intent.command
 
   FROM MICROPHONE - DEFAULT DEVICE or SPECIFIC DEVICE
 

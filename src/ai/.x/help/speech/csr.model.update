@@ -1,6 +1,6 @@
 CUSTOM SPEECH RECOGNITION MODEL UPDATE
 
-@include.the.csr.model.update.command
+@speech.include.the.csr.model.update.command
 
 USAGE: ai speech csr model update [...]
 

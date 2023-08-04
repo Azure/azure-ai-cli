@@ -1,6 +1,6 @@
 CUSTOM SPEECH RECOGNITION MODEL CREATE
 
-@include.the.csr.model.create.command
+@speech.include.the.csr.model.create.command
 
 USAGE: ai speech csr model create [...]
 

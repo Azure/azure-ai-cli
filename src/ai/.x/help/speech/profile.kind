@@ -1,6 +1,6 @@
 PROFILE KIND
 
-@include.the.profile.command.long
+@speech.include.the.profile.command.long
 
   The `--kind` parameter sets profile operations to TextIndependentIdentification/TextIndependentVerification/TextDependentVerification
   mode (default is TextIndependentIdentification).

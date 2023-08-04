@@ -1,6 +1,6 @@
 CUSTOM SPEECH RECOGNITION ENDPOINT DELETE
 
-@include.the.csr.endpoint.delete.command
+@speech.include.the.csr.endpoint.delete.command
 
 USAGE: ai speech csr endpoint delete [...]
 

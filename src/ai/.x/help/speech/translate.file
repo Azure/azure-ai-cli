@@ -1,6 +1,6 @@
 TRANSLATE FILE
 
-@include.the.translate.command
+@speech.include.the.translate.command
 
   The `--file` option specifies a single local audio file to be
   streamed to the service for translation.

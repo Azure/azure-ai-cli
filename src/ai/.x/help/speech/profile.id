@@ -1,6 +1,6 @@
 PROFILE ID
 
-@include.the.profile.command
+@speech.include.the.profile.command
 
   The `--id` option specifies a voice profile id or a file containing such an id 
   to be sent to the service for recognition operations.

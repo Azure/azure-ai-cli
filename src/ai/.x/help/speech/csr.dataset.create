@@ -1,6 +1,6 @@
 CUSTOM SPEECH RECOGNITION DATASET CREATE
 
-@include.the.csr.dataset.create.command
+@speech.include.the.csr.dataset.create.command
 
 USAGE: ai speech csr dataset create [...]
 

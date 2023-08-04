@@ -1,6 +1,6 @@
 BATCH ZIP
 
-@include.the.zip.option
+@speech.include.the.zip.option
 
 USAGE: ai speech batch [...] --zip FILENAME
 
@@ -17,7 +17,7 @@ EXAMPLES
 
 SEE ALSO
 
+  ai help config
   ai help speech batch
-  ai help speech config
   ai help speech batch save
   ai help speech webjob setup

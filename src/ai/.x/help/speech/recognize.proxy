@@ -1,6 +1,6 @@
 RECOGNIZE PROXY
 
-@include.the.recognize.command
+@speech.include.the.recognize.command
 
   The `--proxy` option specifies a HTTP proxy host name. 
   The `--proxy port` option specifies the HTTP proxy port.
@@ -27,5 +27,5 @@ EXAMPLES
 
 SEE ALSO
 
+  ai help config
   ai help speech recognize
-  ai help speech config

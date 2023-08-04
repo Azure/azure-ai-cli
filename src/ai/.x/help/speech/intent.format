@@ -1,6 +1,6 @@
 INTENT FORMAT
 
-@include.the.intent.command
+@speech.include.the.intent.command
 
   The `--format` option specifies the container format of the audio file.
 

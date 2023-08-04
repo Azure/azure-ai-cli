@@ -1,6 +1,6 @@
 TRANSLATE OUTPUT
 
-@include.the.translate.command
+@speech.include.the.translate.command
 
   Translation output approaches:
   (1) Per event output - Specified ITEMs are accumulated and output per event
@@ -31,6 +31,6 @@ EXAMPLES
 
 SEE ALSO
 
-  ai help speech config
+  ai help config
   ai help speech batch transcription
   ai help speech translate

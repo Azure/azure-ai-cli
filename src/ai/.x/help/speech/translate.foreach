@@ -1,6 +1,6 @@
 TRANSLATE FOREACH
 
-@include.the.translate.command
+@speech.include.the.translate.command
 
   The `--foreach` option repeats a specific command multiple times
   effectively multiplying one set of command line options by another.

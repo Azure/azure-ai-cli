@@ -1,6 +1,6 @@
 SYNTHESIZE AUDIO OUTPUT
 
-@include.the.synthesize.command
+@speech.include.the.synthesize.command
 
   The `--speakers` option specifies audio output should be sent to 
   the default output device.

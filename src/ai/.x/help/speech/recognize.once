@@ -1,8 +1,8 @@
 RECOGNIZE ONCE
 
-@include.the.recognize.command
+@speech.include.the.recognize.command
 
-@include.the.recognize.method
+@speech.include.the.recognize.method
 
   The `--once` option recognizes the first phrase in an audio stream,
   optimized for interactive use cases.

@@ -1,6 +1,6 @@
 SYNTHESIZE FILE
 
-@include.the.synthesize.command
+@speech.include.the.synthesize.command
 
   The `--file` option specifies a single local data file containing
   text or SSML to be synthesized into audio.

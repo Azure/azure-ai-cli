@@ -1,6 +1,6 @@
 TRANSLATE ONCE
 
-@include.the.translate.command
+@speech.include.the.translate.command
 
   The `--once` option translates the first phrase in an audio stream,
   optimized for interactive use cases.

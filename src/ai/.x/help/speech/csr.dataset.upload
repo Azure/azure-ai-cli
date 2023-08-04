@@ -1,6 +1,6 @@
 CUSTOM SPEECH RECOGNITION DATASET UPLOAD
 
-@include.the.csr.dataset.upload.command
+@speech.include.the.csr.dataset.upload.command
 
 USAGE: ai speech csr dataset upload [...]
 

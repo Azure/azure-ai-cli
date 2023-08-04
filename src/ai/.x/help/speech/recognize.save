@@ -1,8 +1,8 @@
 RECOGNIZE SAVE
 
-@include.the.recognize.command
+@speech.include.the.recognize.command
 
-@include.the.save.option
+@speech.include.the.save.option
 
 USAGE: ai speech recognize [...] --save FILENAME
 

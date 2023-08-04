@@ -2,13 +2,13 @@ BATCH REGION
 
   The `ai speech batch` command manages remote audio streams.
 
-@include.the.region.option
+@speech.include.the.region.option
 
 USAGE: ai speech batch [...] --region REGION
    OR: ai speech batch [...] --region @FILENAME
    OR: ai speech batch [...] @CONFIG-FILENAME
 
-@include.the.region.option.where
+@speech.include.the.region.option.where
 
 EXAMPLES
 

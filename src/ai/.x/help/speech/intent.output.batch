@@ -1,6 +1,6 @@
 INTENT OUTPUT BATCH
 
-@include.the.intent.command
+@speech.include.the.intent.command
 
   The `--output batch json` option indicates that intent recognition results should
   be output in the same format as `ai speech batch` transcriptions.

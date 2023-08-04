@@ -1,6 +1,6 @@
 TRANSLATE THREADS
 
-@include.the.translate.command
+@speech.include.the.translate.command
 
   The `--threads` option specifies a how many threads to use when parallelizing 
   translation tasks.

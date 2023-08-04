@@ -1,6 +1,6 @@
 CUSTOM SPEECH RECOGNITION EVALUATION LIST
 
-@include.the.csr.evaluation.list.command
+@speech.include.the.csr.evaluation.list.command
 
 USAGE: ai speech csr evaluation list [...]
 

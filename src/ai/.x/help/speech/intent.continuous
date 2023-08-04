@@ -1,8 +1,8 @@
 INTENT CONTINUOUS
 
-@include.the.intent.command
+@speech.include.the.intent.command
 
-@include.the.intent.method
+@speech.include.the.intent.method
 
   The `--continuous` option recognizes streaming audio continuously,
   optimized for interactive conversations and audio files.

@@ -1,6 +1,6 @@
 CUSTOM SPEECH RECOGNITION PROJECT CREATE
 
-@include.the.csr.project.create.command
+@speech.include.the.csr.project.create.command
 
 USAGE: ai speech csr project create [...]
 

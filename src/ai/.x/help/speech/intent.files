@@ -1,6 +1,6 @@
 INTENT FILES
 
-@include.the.intent.command
+@speech.include.the.intent.command
 
   The `--files` option specifies multiple local audio files to be
   streamed to the service for recognition.

@@ -1,6 +1,6 @@
 RECOGNIZE KEYWORD
 
-@include.the.recognize.command
+@speech.include.the.recognize.command
 
   The `--keyword` option gates the recognition of speech until
   a keyword from the specified keyword model is recognized.

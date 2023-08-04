@@ -1,6 +1,6 @@
 INTENT OUTPUT VTT 
 
-@include.the.intent.command
+@speech.include.the.intent.command
 
   The `--output vtt` option requests intent recognition results in WEBVTT format.
   WEBVTT format provides captioning information for audio/video files.

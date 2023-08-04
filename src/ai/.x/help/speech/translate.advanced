@@ -1,6 +1,6 @@
 TRANSLATE
 
-@include.the.translate.command.long
+@speech.include.the.translate.command.long
 
 USAGE: ai speech translate [...]
 

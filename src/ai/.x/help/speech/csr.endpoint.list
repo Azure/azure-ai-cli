@@ -1,6 +1,6 @@
 CUSTOM SPEECH RECOGNITION ENDPOINT LIST
 
-@include.the.csr.endpoint.list.command
+@speech.include.the.csr.endpoint.list.command
 
 USAGE: ai speech csr endpoint list [...]
 

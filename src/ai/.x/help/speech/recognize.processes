@@ -1,6 +1,6 @@
 RECOGNIZE PROCESSES
 
-@include.the.recognize.command
+@speech.include.the.recognize.command
 
   The `--processes` option specifies the maximum number of
   sub-processes to use when parallelizing recognition tasks.

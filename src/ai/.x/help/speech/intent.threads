@@ -1,6 +1,6 @@
 INTENT THREADS
 
-@include.the.intent.command
+@speech.include.the.intent.command
 
   The `--threads` option specifies a how many threads to use when 
   parallelizing recognition tasks.

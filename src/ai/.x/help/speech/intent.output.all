@@ -1,6 +1,6 @@
 INTENT OUTPUT ALL
 
-@include.the.intent.command
+@speech.include.the.intent.command
 
   The `--output all` option specifies an ITEM to accumulate and
   aggregate into a TSV or JSON output file, combined across all events.

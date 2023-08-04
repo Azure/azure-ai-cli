@@ -1,6 +1,6 @@
 RECOGNIZE WER
 
-@include.the.recognize.command
+@speech.include.the.recognize.command
 
   The `--wer` option allows an external remote method (such as an Azure Function)
   to calculate the word error rate via HTTP GET.

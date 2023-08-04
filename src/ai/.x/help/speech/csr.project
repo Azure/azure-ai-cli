@@ -1,6 +1,6 @@
 CUSTOM SPEECH RECOGNITION PROJECT
 
-@include.the.csr.project.command
+@speech.include.the.csr.project.command
 
 USAGE: ai speech csr project <command> [...]
 

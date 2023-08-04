@@ -1,6 +1,6 @@
 RECOGNIZE
 
-@include.the.recognize.command.long
+@speech.include.the.recognize.command.long
 
 USAGE: ai speech recognize [...]
 

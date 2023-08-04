@@ -1,8 +1,8 @@
 TRANSLATE ZIP
 
-@include.the.translate.command
+@speech.include.the.translate.command
 
-@include.the.zip.option
+@speech.include.the.zip.option
 
   NOTE: `--zip` does not package local input files (e.g. audio, models, etc.)
 

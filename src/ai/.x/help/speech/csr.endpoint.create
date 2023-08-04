@@ -1,6 +1,6 @@
 CUSTOM SPEECH RECOGNITION ENDPOINT CREATE
 
-@include.the.csr.endpoint.create.command
+@speech.include.the.csr.endpoint.create.command
 
 USAGE: ai speech csr endpoint create [...]
 

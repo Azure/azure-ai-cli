@@ -1,6 +1,6 @@
 RECOGNIZE PHRASEs
 
-@include.the.recognize.command
+@speech.include.the.recognize.command
 
   The `--phrases` option increases speech recognition accuracy
   by supplying one or more words or phrases that are likely to appear

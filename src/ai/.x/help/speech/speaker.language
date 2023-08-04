@@ -1,6 +1,6 @@
 SPEAKER LANGUAGE
 
-@include.the.speaker.command
+@speech.include.the.speaker.command
 
   The `--language` option specifies a single spoken LANGUAGE in
   BCP-47 format. Speech streamed to the service will be forced to match

@@ -73,7 +73,7 @@ namespace Azure.AI.Details.Common.CLI.ConsoleGui
                     var process = Process.Start(start);
                     process.WaitForExit();
                     
-                    if (process.ExitCode != 0)
+                    if (process.ExitCode == -1)
                     {
                         Environment.Exit(process.ExitCode);
                     }

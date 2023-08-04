@@ -1,6 +1,6 @@
 CUSTOM SPEECH RECOGNITION MODEL COPY
 
-@include.the.csr.model.copy.command
+@speech.include.the.csr.model.copy.command
 
 USAGE: ai speech csr model copy [...]
 

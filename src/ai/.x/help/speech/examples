@@ -20,4 +20,4 @@ ADDITIONAL EXAMPLES
   ai help find speech "mp3" --expand
 
   ai help find topics speech "examples"
-  ai help speech list topics 
+  ai help list topics speech

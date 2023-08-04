@@ -1,6 +1,6 @@
 INTENT PROFANITY
 
-@include.the.intent.command
+@speech.include.the.intent.command
 
   The `--profanity` controls how the service deals with spoken profanity.
 

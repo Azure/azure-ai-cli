@@ -1,6 +1,6 @@
 RECOGNIZE CONNECT
 
-@include.the.recognize.command
+@speech.include.the.recognize.command
 
   The `--connect` option forces connection to the service
   earlier in the process to decrease overall latency.

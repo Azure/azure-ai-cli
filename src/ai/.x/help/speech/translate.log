@@ -1,8 +1,8 @@
 TRANSLATE LOG
 
-@include.the.translate.command
+@speech.include.the.translate.command
 
-@include.the.log.option
+@speech.include.the.log.option
 
   The `--content logging enabled` option enables service level logging
   of the audio content and translation results.

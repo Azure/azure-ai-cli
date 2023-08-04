@@ -1,6 +1,6 @@
 CUSTOM SPEECH RECOGNITION EVALUATION UPDATE
 
-@include.the.csr.evaluation.update.command
+@speech.include.the.csr.evaluation.update.command
 
 USAGE: ai speech csr evaluation update [...]
 

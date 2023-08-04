@@ -1,6 +1,6 @@
 TRANSLATE PROXY
 
-@include.the.translate.command
+@speech.include.the.translate.command
 
   The `--proxy` option specifies a HTTP proxy host name. 
   The `--proxy port` option specifies the HTTP proxy port.
@@ -27,5 +27,5 @@ EXAMPLES
 
 SEE ALSO
 
+  ai help config
   ai help speech translate
-  ai help speech config

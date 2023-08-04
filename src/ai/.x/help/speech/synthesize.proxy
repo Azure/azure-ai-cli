@@ -1,6 +1,6 @@
 SYNTHESIZE PROXY
 
-@include.the.synthesize.command
+@speech.include.the.synthesize.command
 
   The `--proxy` option specifies a HTTP proxy host name. 
   The `--proxy port` option specifies the HTTP proxy port.
@@ -27,5 +27,5 @@ EXAMPLES
 
 SEE ALSO
 
+  ai help config
   ai help speech synthesize
-  ai help speech config

@@ -1,6 +1,6 @@
 RECOGNIZE INPUT OVERVIEW
 
-@include.the.recognize.command
+@speech.include.the.recognize.command
 
   FROM MICROPHONE - DEFAULT DEVICE or SPECIFIC DEVICE
 

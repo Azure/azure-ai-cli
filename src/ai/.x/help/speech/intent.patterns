@@ -1,6 +1,6 @@
 INTENT PATTERNS
 
-@include.the.intent.command
+@speech.include.the.intent.command
 
   The `--patterns` option specifies multiple intent PATTERNS to recognize, each
   with an optional ID, and each PATTERN optionally containing one or more ENTITIES.

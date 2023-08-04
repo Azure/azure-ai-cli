@@ -1,6 +1,6 @@
 BATCH CONNECTION OVERVIEW
 
-@include.the.azure.speech.service.long
+@speech.include.the.azure.speech.service.long
 
   To specify a particular key, see: ai help speech batch key
   To specify a particular region, see: ai help speech batch region

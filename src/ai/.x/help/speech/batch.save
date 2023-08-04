@@ -1,6 +1,6 @@
 BATCH SAVE
 
-@include.the.save.option
+@speech.include.the.save.option
 
 USAGE: ai speech batch [...] --save FILENAME
 
@@ -15,6 +15,6 @@ EXAMPLES
 
 SEE ALSO
 
+  ai help config
   ai help speech batch
-  ai help speech config
   ai help speech batch zip

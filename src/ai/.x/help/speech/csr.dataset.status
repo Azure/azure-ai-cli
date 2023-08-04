@@ -1,6 +1,6 @@
 CUSTOM SPEECH RECOGNITION DATASET STATUS
 
-@include.the.csr.dataset.status.command
+@speech.include.the.csr.dataset.status.command
 
 USAGE: ai speech csr dataset status [...]
 

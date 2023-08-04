@@ -1,6 +1,6 @@
 CUSTOM SPEECH RECOGNITION ENDPOINT STATUS
 
-@include.the.csr.endpoint.status.command
+@speech.include.the.csr.endpoint.status.command
 
 USAGE: ai speech csr endpoint status [...]
 

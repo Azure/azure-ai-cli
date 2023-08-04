@@ -1,6 +1,6 @@
 RECOGNIZE MICROPHONE
 
-@include.the.recognize.command
+@speech.include.the.recognize.command
 
   The `--microphone` option specifies use of a microphone.
 

@@ -1,8 +1,8 @@
 INTENT ONCE
 
-@include.the.intent.command
+@speech.include.the.intent.command
 
-@include.the.intent.method
+@speech.include.the.intent.method
 
   The `--once` option recognizes the first phrase in an audio stream,
   optimized for interactive use cases.

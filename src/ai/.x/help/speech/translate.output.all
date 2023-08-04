@@ -1,6 +1,6 @@
 TRANSLATE OUTPUT ALL
 
-@include.the.translate.command
+@speech.include.the.translate.command
 
   The `--output all` option specifies an ITEM to accumulate and
   aggregate into a TSV or JSON output file, combined across all events.

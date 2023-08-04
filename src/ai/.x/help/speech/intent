@@ -1,6 +1,6 @@
 INTENT
 
-@include.the.intent.command.long
+@speech.include.the.intent.command.long
 
 USAGE: ai speech intent [...]
 

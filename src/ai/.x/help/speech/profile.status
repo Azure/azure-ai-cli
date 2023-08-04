@@ -1,6 +1,6 @@
 PROFILE STATUS
 
-@include.the.profile.command.long
+@speech.include.the.profile.command.long
 
   The `ai speech profile status` function outputs information (such as enrollment status, created date, and locale) concerning the selected voice profile.
 

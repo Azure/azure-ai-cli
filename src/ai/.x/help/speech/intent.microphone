@@ -1,6 +1,6 @@
 INTENT MICROPHONE
 
-@include.the.intent.command
+@speech.include.the.intent.command
 
   The `--microphone` option specifies use of a microphone.
 

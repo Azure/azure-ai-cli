@@ -1,6 +1,6 @@
 TRANSLATE WORD LEVEL TIMING
 
-@include.the.translate.command
+@speech.include.the.translate.command
 
   The `--word level timing` option requests word level timing
   details in translation results.

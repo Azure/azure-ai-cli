@@ -1,8 +1,8 @@
 INTENT LUIS ALLINTENTS
 
-@include.the.intent.command
+@speech.include.the.intent.command
 
-@include.the.luis.option
+@speech.include.the.luis.option
 
 Recognize against all intents of the LUIS model in use
 

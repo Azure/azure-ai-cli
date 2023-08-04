@@ -1,6 +1,6 @@
 PROFILE CREATE
 
-@include.the.profile.command.long
+@speech.include.the.profile.command.long
 
   The `profile create` function creates a new voice profile.
 

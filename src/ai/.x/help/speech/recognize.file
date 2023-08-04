@@ -1,6 +1,6 @@
 RECOGNIZE FILE
 
-@include.the.recognize.command
+@speech.include.the.recognize.command
 
   The `--file` option specifies a single local audio file to be
   streamed to the service for recognition.

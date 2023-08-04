@@ -1,8 +1,8 @@
 INTENT SAVE
 
-@include.the.intent.command
+@speech.include.the.intent.command
 
-@include.the.save.option
+@speech.include.the.save.option
 
 USAGE: ai speech intent [...] --save FILENAME
 

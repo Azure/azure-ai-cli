@@ -3,7 +3,7 @@ PROFILE ENROLL
 IMPORTANT: For TextIndependentIdentification, the enrollment audio sample must contain 30 seconds or more of speech to be successful. 
   For TextIndependentVerification, three or more samples with a combined 15 seconds or more of speech are required.
 
-@include.the.profile.command.long
+@speech.include.the.profile.command.long
 
   The `profile enroll` function enrolls a given voice profile using an audio sample.
 

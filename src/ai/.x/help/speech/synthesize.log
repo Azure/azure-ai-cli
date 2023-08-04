@@ -1,8 +1,8 @@
 SYNTHESIZE LOG
 
-@include.the.synthesize.command
+@speech.include.the.synthesize.command
 
-@include.the.log.option
+@speech.include.the.log.option
 
 USAGE: ai speech synthesize [...] --log FILENAME
 

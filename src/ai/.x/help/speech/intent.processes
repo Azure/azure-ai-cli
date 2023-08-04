@@ -1,6 +1,6 @@
 INTENT PROCESSES
 
-@include.the.intent.command
+@speech.include.the.intent.command
 
   The `--processes` option specifies the maximum number of
   sub-processes to use when parallelizing intent recognition tasks.

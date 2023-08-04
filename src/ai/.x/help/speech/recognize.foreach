@@ -1,6 +1,6 @@
 RECOGNIZE FOREACH
 
-@include.the.recognize.command
+@speech.include.the.recognize.command
 
   The `--foreach` option repeats a specific command multiple times
   effectively multiplying one set of command line options by another.

@@ -1,6 +1,6 @@
 TRANSLATE KEYWORD
 
-@include.the.translate.command
+@speech.include.the.translate.command
 
   The `--keyword` option gates the translation of speech until
   a keyword from the specified keyword model is translated.

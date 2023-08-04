@@ -1,6 +1,6 @@
 TRANSLATE PROCESSES
 
-@include.the.translate.command
+@speech.include.the.translate.command
 
   The `--processes` option specifies the maximum number of
   sub-processes to use when parallelizing translation tasks.

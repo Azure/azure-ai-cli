@@ -139,7 +139,7 @@ namespace Azure.AI.Details.Common.CLI
             files.AddRange(FileHelpers.FindFilesInHelpPath($"help/{find}.*", values));
             files.AddRange(FileHelpers.FindFilesInHelpPath($"help/*{find}*", values));
 
-            var found = files.Where(x => !x.Contains("/include."))
+            var found = files.Where(x => !x.Contains("/include.") && !x.Contains(".include."))
                 .Select(x => File.Exists(x)
                     ? new FileInfo(x).FullName
                     : x)
@@ -865,7 +865,7 @@ namespace Azure.AI.Details.Common.CLI
             name = name.Trim('.', '/');
 
             name = $"{Program.Exe}/{dotDirectory}{subDir}{name}";
-            return name;
+            return name.EndsWith("._") ? name.Substring(0, name.Length - 2) : name;
         }
 
         public static IEnumerable<string> FindResources(string find)

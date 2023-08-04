@@ -1,8 +1,8 @@
 SYNTHESIZE ZIP
 
-@include.the.synthesize.command
+@speech.include.the.synthesize.command
 
-@include.the.zip.option
+@speech.include.the.zip.option
 
   NOTE: `--zip` does not package local input files (e.g. text, SSML, etc.)
 

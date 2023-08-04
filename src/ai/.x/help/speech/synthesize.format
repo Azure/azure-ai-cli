@@ -1,6 +1,6 @@
 SYNTHESIZE FORMAT
 
-@include.the.synthesize.command
+@speech.include.the.synthesize.command
 
   The `--format` option specifies the container format for the
   audio file being generated.

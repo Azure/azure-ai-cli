@@ -1,6 +1,6 @@
 TRANSLATE CONTINUOUS
 
-@include.the.translate.command
+@speech.include.the.translate.command
 
   The `--continuous` option translates streaming audio continuously,
   optimized for interactive conversations and audio files.

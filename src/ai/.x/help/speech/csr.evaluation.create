@@ -1,6 +1,6 @@
 CUSTOM SPEECH RECOGNITION EVALUATION CREATE
 
-@include.the.csr.evaluation.create.command
+@speech.include.the.csr.evaluation.create.command
 
 USAGE: ai speech csr evaluation create [...]
 

@@ -1,6 +1,6 @@
 INTENT PHRASEs
 
-@include.the.intent.command
+@speech.include.the.intent.command
 
   The `--phrases` option increases intent recognition accuracy
   by supplying one or more words or phrases that are likely to appear

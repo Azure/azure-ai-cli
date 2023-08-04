@@ -1,6 +1,6 @@
 INTENT OUTPUT
 
-@include.the.intent.command
+@speech.include.the.intent.command
 
   Recognition output approaches:
   (1) Per event output - Specified items are accumulated and output per event
@@ -31,6 +31,6 @@ EXAMPLES
 
 SEE ALSO
 
-  ai help speech config
+  ai help config
   ai help speech batch transcription
   ai help speech intent

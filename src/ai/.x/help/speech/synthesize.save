@@ -1,8 +1,8 @@
 SYNTHESIZE SAVE
 
-@include.the.synthesize.command
+@speech.include.the.synthesize.command
 
-@include.the.save.option
+@speech.include.the.save.option
 
 USAGE: ai speech synthesize [...] --save FILENAME
 

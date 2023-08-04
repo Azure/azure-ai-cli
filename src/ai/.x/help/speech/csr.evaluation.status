@@ -1,6 +1,6 @@
 CUSTOM SPEECH RECOGNITION EVALUATION STATUS
 
-@include.the.csr.evaluation.status.command
+@speech.include.the.csr.evaluation.status.command
 
 USAGE: ai speech csr evaluation status [...]
 

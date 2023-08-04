@@ -1,6 +1,6 @@
 TRANSLATE CONNECT
 
-@include.the.translate.command
+@speech.include.the.translate.command
 
   The `--connect` option forces connection to the service
   earlier in the process to decrease overall latency.

@@ -1,6 +1,6 @@
 RECOGNIZE PROFANITY
 
-@include.the.recognize.command
+@speech.include.the.recognize.command
 
   The `--profanity` controls how the service deals with spoken profanity.
 

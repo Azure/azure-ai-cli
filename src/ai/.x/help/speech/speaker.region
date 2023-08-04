@@ -1,14 +1,14 @@
 SPEAKER REGION
 
-@include.the.speaker.command
+@speech.include.the.speaker.command
 
-@include.the.region.option
+@speech.include.the.region.option
 
 USAGE: ai speech speaker [...] --region REGION
    OR: ai speech speaker [...] --region @FILENAME
    OR: ai speech speaker [...] @CONFIG-FILENAME
 
-@include.the.region.option.where
+@speech.include.the.region.option.where
 
 EXAMPLES
 

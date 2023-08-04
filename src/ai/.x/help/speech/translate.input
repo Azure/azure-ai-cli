@@ -1,6 +1,6 @@
 TRANSLATE INPUT OVERVIEW
 
-@include.the.translate.command
+@speech.include.the.translate.command
 
   FROM MICROPHONE - DEFAULT DEVICE or SPECIFIC DEVICE
 

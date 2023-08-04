@@ -1,8 +1,8 @@
 INTENT LUIS
 
-@include.the.intent.command
+@speech.include.the.intent.command
 
-@include.the.luis.option
+@speech.include.the.luis.option
 
 USAGE: ai speech intent [...] --luis key LUIS_KEY
    OR: ai speech intent [...] --luis region LUIS_REGION

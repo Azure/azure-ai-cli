@@ -1,6 +1,6 @@
 SYNTHESIZE PROCESSES
 
-@include.the.synthesize.command
+@speech.include.the.synthesize.command
 
   The `--processes` option specifies the maximum number of
   sub-processes to use when parallelizing synthesis tasks.

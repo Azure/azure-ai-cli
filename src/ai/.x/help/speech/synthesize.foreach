@@ -1,6 +1,6 @@
 SYNTHESIZE FOREACH
 
-@include.the.synthesize.command
+@speech.include.the.synthesize.command
 
   The `--foreach` option repeats a specific command multiple times
   effectively multiplying one set of command line options by another.

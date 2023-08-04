@@ -1,6 +1,6 @@
 INTENT PROXY
 
-@include.the.intent.command
+@speech.include.the.intent.command
 
   The `--proxy` option specifies a HTTP proxy host name. 
   The `--proxy port` option specifies the HTTP proxy port.
@@ -27,5 +27,5 @@ EXAMPLES
 
 SEE ALSO
 
+  ai help config
   ai help speech intent
-  ai help speech config

@@ -1,6 +1,6 @@
 CUSTOM SPEECH RECOGNITION MODEL STATUS
 
-@include.the.csr.model.status.command
+@speech.include.the.csr.model.status.command
 
 USAGE: ai speech csr model status [...]
 

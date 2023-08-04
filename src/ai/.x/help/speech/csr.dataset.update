@@ -1,6 +1,6 @@
 CUSTOM SPEECH RECOGNITION DATASET UPDATE
 
-@include.the.csr.dataset.update.command
+@speech.include.the.csr.dataset.update.command
 
 USAGE: ai speech csr dataset update [...]
 

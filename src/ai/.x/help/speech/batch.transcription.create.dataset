@@ -35,7 +35,7 @@ EXAMPLES
 
 SEE ALSO
 
+  ai help config advanced
   ai help speech csr dataset create
-  ai help speech config advanced
   ai help speech batch transcription create
   

@@ -1,6 +1,6 @@
 INTENT LANGUAGE
 
-@include.the.intent.command
+@speech.include.the.intent.command
 
   The `--language` option specifies a single spoken LANGUAGE in
   BCP-47 format. Speech streamed to the service will be forced to match

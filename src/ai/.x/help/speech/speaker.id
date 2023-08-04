@@ -1,6 +1,6 @@
 SPEAKER ID
 
-@include.the.speaker.command
+@speech.include.the.speaker.command
 
   The `--id` option specifies a verification/identification profile id or a file containing such an id 
   to be sent to the service for speaker recognition operations.

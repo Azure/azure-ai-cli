@@ -1,6 +1,6 @@
 CUSTOM SPEECH RECOGNITION EVALUATION DELETE
 
-@include.the.csr.evaluation.delete.command
+@speech.include.the.csr.evaluation.delete.command
 
 USAGE: ai speech csr evaluation delete [...]
 

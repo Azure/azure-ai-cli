@@ -1,8 +1,8 @@
 INTENT LOG
 
-@include.the.intent.command
+@speech.include.the.intent.command
 
-@include.the.log.option
+@speech.include.the.log.option
 
   The `--content logging enabled` option enables service level logging
   of the audio content and intent recognition results.

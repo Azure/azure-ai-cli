@@ -1,6 +1,6 @@
 INTENT WER
 
-@include.the.intent.command
+@speech.include.the.intent.command
 
   The `--wer` option allows an external remote method (such as an Azure Function)
   to calculate the word error rate via HTTP GET.

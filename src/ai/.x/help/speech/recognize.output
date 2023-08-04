@@ -1,6 +1,6 @@
 RECOGNIZE OUTPUT
 
-@include.the.recognize.command
+@speech.include.the.recognize.command
 
   Recognition output approaches:
   (1) Per event output - Specified ITEMs are accumulated and output per event
@@ -31,6 +31,6 @@ EXAMPLES
 
 SEE ALSO
 
-  ai help speech config
+  ai help config
   ai help speech batch transcription
   ai help speech recognize

@@ -1,14 +1,14 @@
 INTENT REGION
 
-@include.the.intent.command
+@speech.include.the.intent.command
 
-@include.the.region.option
+@speech.include.the.region.option
 
 USAGE: ai speech intent [...] --region REGION
    OR: ai speech intent [...] --region @FILENAME
    OR: ai speech intent [...] @CONFIG-FILENAME
 
-@include.the.region.option.where
+@speech.include.the.region.option.where
 
 EXAMPLES
 

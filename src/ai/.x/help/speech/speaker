@@ -1,6 +1,6 @@
 SPEAKER
 
-@include.the.speaker.command.long
+@speech.include.the.speaker.command.long
 
 USAGE: ai speech speaker <command> [...]
 

@@ -1,6 +1,6 @@
 SYNTHESIZE
 
-@include.the.synthesize.command.long
+@speech.include.the.synthesize.command.long
 
 USAGE: ai speech synthesize [...]
 

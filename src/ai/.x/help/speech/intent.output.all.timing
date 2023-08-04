@@ -1,6 +1,6 @@
 INTENT WORD LEVEL TIMING
 
-@include.the.intent.command
+@speech.include.the.intent.command
 
   The `--word level timing` option requests word level timing
   details in intent recognition results.

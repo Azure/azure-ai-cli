@@ -1,6 +1,6 @@
 CUSTOM SPEECH RECOGNITION MODEL LIST
 
-@include.the.model.list.command
+@speech.include.the.model.list.command
 
 USAGE: ai speech csr model list [...]
 

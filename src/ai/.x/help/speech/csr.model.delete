@@ -1,6 +1,6 @@
 CUSTOM SPEECH RECOGNITION MODEL DELETE
 
-@include.the.csr.model.delete.command
+@speech.include.the.csr.model.delete.command
 
 USAGE: ai speech csr model delete [...]
 

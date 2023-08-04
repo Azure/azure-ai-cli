@@ -1,6 +1,6 @@
 CUSTOM SPEECH RECOGNITION ENDPOINT DOWNLOAD
 
-@include.the.csr.endpoint.download.command
+@speech.include.the.csr.endpoint.download.command
 
 USAGE: ai speech csr endpoint download [...]
 

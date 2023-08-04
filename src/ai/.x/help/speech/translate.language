@@ -1,6 +1,6 @@
 TRANSLATE LANGUAGE
 
-@include.the.translate.command
+@speech.include.the.translate.command
 
   The `--source` and `--target` language options are used to specify the
   spoken source language and translation target languages in BCP-47 format.

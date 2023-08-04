@@ -1,6 +1,6 @@
 TRANSLATE PHRASEs
 
-@include.the.translate.command
+@speech.include.the.translate.command
 
   The `--phrases` option increases speech recognition accuracy
   by supplying one or more words or phrases that are likely to appear

@@ -1,6 +1,6 @@
 CUSTOM SPEECH RECOGNITION MODEL
 
-@include.the.csr.model.command
+@speech.include.the.csr.model.command
 
 USAGE: ai speech csr model <command> [...]
 

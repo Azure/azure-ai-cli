@@ -1,8 +1,8 @@
 TRANSLATE SAVE
 
-@include.the.translate.command
+@speech.include.the.translate.command
 
-@include.the.save.option
+@speech.include.the.save.option
 
 USAGE: ai speech translate [...] --save FILENAME
 
