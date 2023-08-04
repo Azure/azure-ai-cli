@@ -1,10 +1,10 @@
 SYNTHESIZE EXAMPLES
 
-  `INIT`: Automatically setup `ai` with REGION and KEY default values
+  `INIT`: Automatically setup ai with REGION and KEY default values
 
     ai init
 
-  `SETUP`: Manually setup `ai` with REGION and KEY default values
+  `SETUP`: Manually setup ai with REGION and KEY default values
 
     ai config speech @region --set westus2
     ai config speech @key --set 436172626F6E20697320636F6F6C2121
