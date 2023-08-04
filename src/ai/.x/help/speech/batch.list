@@ -1,0 +1,25 @@
+BATCH LIST
+
+  The `ai speech batch list` command lists resources related to Azure
+  Speech Service batch operations.
+
+USAGE: ai speech batch list [...]
+
+  CONNECTION                      (see: ai help speech batch connection)
+    --key KEY                     (see: ai help speech batch key)
+    --region REGION               (see: ai help speech batch region)
+
+  TRANSCRIPTIONS
+    --transcriptions              (see: ai help speech batch transcription list)
+    --transcription languages     (see: ai help speech batch transcription list languages)
+
+  TRANSCRIPT FILES
+    --transcription URL           (see: ai help speech batch transcription reference)
+    --files                       (see: ai help speech batch transcription list files)
+
+SEE ALSO
+
+  ai help speech batch transcription list advanced
+  ai help speech batch download
+  ai help speech batch output
+  

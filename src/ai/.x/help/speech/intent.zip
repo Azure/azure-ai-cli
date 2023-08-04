@@ -1,0 +1,23 @@
+INTENT ZIP
+
+@include.the.intent.command
+
+@include.the.zip.option
+
+  NOTE: `--zip` does not package local input files (e.g. audio, models, etc.)
+
+USAGE: ai speech intent [...] --zip FILENAME
+
+EXAMPLES
+
+  ai speech intent --files *.wav --zip test1.zip
+  ai speech intent --files *.wav --log {id}.log --zip test2.zip
+  ai speech intent --foreach file;transcript in @items.txt --zip test3.zip
+
+  ai speech intent --files @URLs.txt --output zip output.zip --zip test4.zip
+
+SEE ALSO
+
+  ai help speech intent
+  ai help speech intent files
+  ai help speech intent foreach

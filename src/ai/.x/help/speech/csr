@@ -1,0 +1,24 @@
+CUSTOM SPEECH RECOGNITION
+
+  The `ai speech csr` commands manage custom speech recognition models.
+
+USAGE: ai speech csr <command> [...]
+
+COMMANDS
+
+  ai speech csr project [...]           (see: ai help speech csr project)
+  ai speech csr dataset [...]           (see: ai help speech csr dataset)
+
+  ai speech csr model [...]             (see: ai help speech csr model)
+  ai speech csr endpoint [...]          (see: ai help speech csr endpoint)
+
+  ai speech csr evaluation [...]        (see: ai help speech csr evaluation)
+
+  ai speech csr list [...]              (see: ai help speech csr list)
+  ai speech csr download [...]          (see: ai help speech csr download)
+
+ADDITIONAL TOPICS
+
+  ai help speech csr examples
+  ai help find topics speech csr
+  

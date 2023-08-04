@@ -1,0 +1,29 @@
+BATCH TRANSCRIPTION DESCRIPTION
+
+  The `--description` option specifies the transcription DESCRIPTION.
+
+USAGE: ai speech batch transcription [...] --description DESCRIPTION
+   OR: ai speech batch transcription [...] --description @FILENAME
+   OR: ai speech batch transcription [...] @CONFIG-FILENAME
+
+  WHERE: DESCRIPTION is the transcription description
+     OR: FILENAME is a single line text file containing the DESCRIPTION
+     OR: CONFIG-FILENAME is a single line text file in the following form:
+
+            batch.transcription.description=DESCRIPTION
+
+EXAMPLES
+
+  ai speech batch transcription [...] --description "This is the description"
+
+  ai config @my.description --set "This is the description"
+  ai speech batch transcription [...] --description @my.description
+
+  ai config @transcription.details --set name "My transcription"
+  ai config @transcription.details --add description "This is the description"
+  ai speech batch transcription [...] @transcription.details
+
+SEE ALSO
+
+  ai help speech batch transcription create
+  ai help speech batch transcription update

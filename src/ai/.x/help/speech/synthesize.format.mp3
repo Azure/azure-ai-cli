@@ -1,0 +1,26 @@
+SYNTHESIZE MP3
+
+@include.the.synthesize.command
+
+  The `--format` option specifies the container format for the
+  audio file being generated.
+
+USAGE: ai speech synthesize [...] --format FORMAT
+
+  WHERE: FORMAT is mp3
+     OR: FORMAT is audio-16khz-128kbitrate-mono-mp3
+     OR: FORMAT is audio-16khz-32kbitrate-mono-mp3
+     OR: FORMAT is audio-16khz-64kbitrate-mono-mp3
+     OR: FORMAT is audio-24khz-160kbitrate-mono-mp3
+     OR: FORMAT is audio-24khz-48kbitrate-mono-mp3
+     OR: FORMAT is audio-24khz-96kbitrate-mono-mp3
+     OR: FORMAT is audio-48khz-192kbitrate-mono-mp3
+     OR: FORMAT is audio-48khz-96kbitrate-mono-mp3
+
+  NOTE: The default `mp3` format is `audio-16khz-128kbitrate-mono-mp3`
+  
+SEE ALSO
+
+  ai help speech synthesize audio output
+  ai help speech synthesize format
+  ai help speech synthesize

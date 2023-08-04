@@ -1,0 +1,17 @@
+TRANSLATE MICROPHONE
+
+@include.the.translate.command
+
+  The `--microphone` option specifies use of a microphone.
+
+USAGE: ai speech translate [...] --microphone
+   OR: ai speech translate [...] --microphone DEVICE-ID
+
+  WHERE: DEVICE-ID represents a specific microphone device
+
+  For full list of DEVICE-IDs, see https://aka.ms/speech/sdk/device-ids
+
+SEE ALSO
+
+  ai help speech translate
+  ai help speech translate input

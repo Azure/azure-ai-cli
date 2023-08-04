@@ -1,0 +1,16 @@
+BATCH TRANSCRIPTION LIST TRANSCRIPTIONS
+
+  The `ai speech batch transcription list` command lists existing batch
+  transcriptions, providing details for each.
+
+USAGE: ai speech batch transcription list [...]
+
+EXAMPLES
+
+  ai speech batch transcription list --skip 0 --top 1 --output url @@transcription-url.txt
+  ai speech batch transcription list --files --transcription @transcription-url.txt --output last url @@file-url.txt
+
+SEE ALSO
+
+  ai help speech config advanced
+  ai help speech batch transcription create

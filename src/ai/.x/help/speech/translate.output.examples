@@ -1,0 +1,181 @@
+TRANSLATE OUTPUT EXAMPLES
+
+  ai speech translate [...] --output all audio id
+  ai speech translate [...] --output all sessionid
+  ai speech translate [...] --output all resultid
+  ai speech translate [...] --output all reason
+  ai speech translate [...] --output all text
+  ai speech translate [...] --output all itn text
+  ai speech translate [...] --output all lexical text
+  ai speech translate [...] --output all offset
+  ai speech translate [...] --output all duration
+  ai speech translate [...] --output all latency
+  ai speech translate [...] --output all json
+
+  ai speech translate [...] --output each audio id
+  ai speech translate [...] --output each sessionid
+  ai speech translate [...] --output each resultid
+  ai speech translate [...] --output each reason
+  ai speech translate [...] --output each text
+  ai speech translate [...] --output each itn text
+  ai speech translate [...] --output each lexical text
+  ai speech translate [...] --output each offset
+  ai speech translate [...] --output each duration
+  ai speech translate [...] --output each latency
+  ai speech translate [...] --output each json
+
+  ai speech translate [...] --output all result resultid
+  ai speech translate [...] --output all result reason
+  ai speech translate [...] --output all result text
+  ai speech translate [...] --output all result translated text
+  ai speech translate [...] --output all result translated TARGET-LANGUAGE text
+  ai speech translate [...] --output all result offset
+  ai speech translate [...] --output all result duration
+  ai speech translate [...] --output all result latency
+  ai speech translate [...] --output all result json
+
+  ai speech translate [...] --output each result resultid
+  ai speech translate [...] --output each result reason
+  ai speech translate [...] --output each result text
+  ai speech translate [...] --output each result translated text
+  ai speech translate [...] --output each result translated TARGET-LANGUAGE text
+  ai speech translate [...] --output each result offset
+  ai speech translate [...] --output each result duration
+  ai speech translate [...] --output each result latency
+  ai speech translate [...] --output each result json
+
+  ai speech translate [...] --output all events
+  ai speech translate [...] --output all event sessionid
+
+  ai speech translate [...] --output each event
+  ai speech translate [...] --output each event sessionid
+
+  ai speech translate [...] --output all connection events
+  ai speech translate [...] --output all connection event sessionid
+  ai speech translate [...] --output all connection connected events
+  ai speech translate [...] --output all connection connected sessionid
+  ai speech translate [...] --output all connection disconnected events
+  ai speech translate [...] --output all connection disconnected sessionid
+
+  ai speech translate [...] --output each connection event
+  ai speech translate [...] --output each connection event sessionid
+  ai speech translate [...] --output each connection connected event
+  ai speech translate [...] --output each connection connected sessionid
+  ai speech translate [...] --output each connection disconnected event
+  ai speech translate [...] --output each connection disconnected sessionid
+
+  ai speech translate [...] --output all translator events
+  ai speech translate [...] --output all translator event sessionid
+
+  ai speech translate [...] --output each translator event
+  ai speech translate [...] --output each translator event sessionid
+
+  ai speech translate [...] --output all translator session events
+  ai speech translate [...] --output all translator session event sessionid
+  ai speech translate [...] --output all translator session started events
+  ai speech translate [...] --output all translator session started sessionid
+  ai speech translate [...] --output all translator session stopped events
+  ai speech translate [...] --output all translator session stopped sessionid
+
+  ai speech translate [...] --output each translator session event
+  ai speech translate [...] --output each translator session event sessionid
+  ai speech translate [...] --output each translator session started event
+  ai speech translate [...] --output each translator session started sessionid
+  ai speech translate [...] --output each translator session stopped event
+  ai speech translate [...] --output each translator session stopped sessionid
+
+  ai speech translate [...] --output all connection message received events
+  ai speech translate [...] --output all connection message received binary message
+  ai speech translate [...] --output all connection message received binary message size
+  ai speech translate [...] --output all connection message received content type
+  ai speech translate [...] --output all connection message received is binary message
+  ai speech translate [...] --output all connection message received is text message
+  ai speech translate [...] --output all connection message received path
+  ai speech translate [...] --output all connection message received request id
+  ai speech translate [...] --output all connection message received text message
+
+  ai speech translate [...] --output each connection message received event
+  ai speech translate [...] --output each connection message received binary message
+  ai speech translate [...] --output each connection message received binary message size
+  ai speech translate [...] --output each connection message received content type
+  ai speech translate [...] --output each connection message received is binary message
+  ai speech translate [...] --output each connection message received is text message
+  ai speech translate [...] --output each connection message received path
+  ai speech translate [...] --output each connection message received request id
+  ai speech translate [...] --output each connection message received text message
+
+  ai speech translate [...] --output all translator canceled events
+  ai speech translate [...] --output all translator canceled error
+  ai speech translate [...] --output all translator canceled error code
+  ai speech translate [...] --output all translator canceled error details
+  ai speech translate [...] --output all translator canceled reason
+
+  ai speech translate [...] --output each translator canceled event
+  ai speech translate [...] --output each translator canceled error
+  ai speech translate [...] --output each translator canceled error code
+  ai speech translate [...] --output each translator canceled error details
+  ai speech translate [...] --output each translator canceled reason
+
+  ai speech translate [...] --output all translator translated events
+  ai speech translate [...] --output all translator translated sessionid
+  ai speech translate [...] --output all translator translated result resultid
+  ai speech translate [...] --output all translator translated result reason
+  ai speech translate [...] --output all translator translated result text
+  ai speech translate [...] --output all translator translated result translated text
+  ai speech translate [...] --output all translator translated result translated TARGET-LANGUAGE text
+  ai speech translate [...] --output all translator translated result itn text
+  ai speech translate [...] --output all translator translated result lexical text
+  ai speech translate [...] --output all translator translated result offset
+  ai speech translate [...] --output all translator translated result duration
+  ai speech translate [...] --output all translator translated result latency
+  ai speech translate [...] --output all translator translated result json
+
+  ai speech translate [...] --output each translator translated event
+  ai speech translate [...] --output each translator translated sessionid
+  ai speech translate [...] --output each translator translated result resultid
+  ai speech translate [...] --output each translator translated result reason
+  ai speech translate [...] --output each translator translated result text
+  ai speech translate [...] --output each translator translated result itn text
+  ai speech translate [...] --output each translator translated result lexical text
+  ai speech translate [...] --output each translator translated result offset
+  ai speech translate [...] --output each translator translated result duration
+  ai speech translate [...] --output each translator translated result latency
+  ai speech translate [...] --output each translator translated result json
+
+  ai speech translate [...] --output all translator recognizing events
+  ai speech translate [...] --output all translator recognizing sessionid
+  ai speech translate [...] --output all translator recognizing result resultid
+  ai speech translate [...] --output all translator recognizing result reason
+  ai speech translate [...] --output all translator recognizing result text
+  ai speech translate [...] --output all translator recognizing result translated text
+  ai speech translate [...] --output all translator recognizing result translated TARGET-LANGUAGE text
+  ai speech translate [...] --output all translator recognizing result offset
+  ai speech translate [...] --output all translator recognizing result duration
+  ai speech translate [...] --output all translator recognizing result latency
+  ai speech translate [...] --output all translator recognizing result json
+
+  ai speech translate [...] --output each translator recognizing event
+  ai speech translate [...] --output each translator recognizing sessionid
+  ai speech translate [...] --output each translator recognizing result resultid
+  ai speech translate [...] --output each translator recognizing result reason
+  ai speech translate [...] --output each translator recognizing result text
+  ai speech translate [...] --output each translator recognizing result translated text
+  ai speech translate [...] --output each translator recognizing result translated TARGET-LANGUAGE text
+  ai speech translate [...] --output each translator recognizing result offset
+  ai speech translate [...] --output each translator recognizing result duration
+  ai speech translate [...] --output each translator recognizing result latency
+  ai speech translate [...] --output each translator recognizing result json
+
+  ai speech translate [...] --output all file type json
+  ai speech translate [...] --output all file output.json
+
+  ai speech translate [...] --output each file type json
+  ai speech translate [...] --output each file output.json
+
+  ai speech translate [...] --output all file type tsv 
+  ai speech translate [...] --output all file output.tsv
+  ai speech translate [...] --output all tsv file has header false
+
+  ai speech translate [...] --output each file type tsv
+  ai speech translate [...] --output each file output.tsv
+  ai speech translate [...] --output each tsv file has header false

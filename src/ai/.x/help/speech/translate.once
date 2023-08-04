@@ -1,0 +1,21 @@
+TRANSLATE ONCE
+
+@include.the.translate.command
+
+  The `--once` option translates the first phrase in an audio stream,
+  optimized for interactive use cases.
+
+  The `--once+` option repeatedly translates phrases in an audio
+  stream, optimized for non-interactive use cases.
+
+USAGE: ai speech translate [...] --once
+
+EXAMPLES
+
+  ai speech translate --microphone --once --source en-US --target de
+  ai speech translate --file hello.wav --once+ --source en-US --target de
+
+SEE ALSO
+
+  ai help speech translate
+  ai help speech translate continuous

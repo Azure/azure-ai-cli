@@ -1,0 +1,24 @@
+RECOGNIZE CONTINUOUS
+
+@include.the.recognize.command
+
+@include.the.recognize.method
+
+  The `--continuous` option recognizes streaming audio continuously,
+  optimized for interactive conversations and audio files.
+
+  The `--timeout` option can be used to limit the amount of audio recognized.
+  If not specified, there is effectively no timeout.
+
+USAGE: ai speech recognize [...] --continuous
+   OR: ai speech recognize [...] --continuous --timeout [MILLISECONDS]
+
+EXAMPLES
+
+  ai speech recognize --microphone --continuous
+  ai speech recognize --file hello.wav --continuous --timeout 30000
+
+SEE ALSO
+
+  ai help speech recognize once
+  ai help speech recognize

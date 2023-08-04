@@ -23,8 +23,9 @@ USAGE: ai <command> [...]
   ai speech [...]           (see: ai help speech)
   ai vision [...]           (see: ai help vision)
   ai language [...]         (see: ai help language)
-  ai translation [...]      (see: ai help translation)
+  ai search [...]           (see: ai help search)
 
+  ai service [...]          (see: ai help service)
   ai tool [...]             (see: ai help tool)
 
 `SEE ALSO`

@@ -1,0 +1,48 @@
+CONNECTION OVERVIEW
+
+  AUTHENTICATION - KEY or TOKEN
+
+    The Azure Speech Service requires authentication using subscriptions keys
+    or authentication tokens.
+
+    To use subscription keys see: ai help speech translate key
+    To use authentication tokens see: ai help speech translate token
+
+  CONNECTION - REGION, ENDPOINT, or HOST
+
+    The Azure Speech Service runs in REGION specific data centers, sovereign
+    clouds, or on-premise containers. For sovereign clouds and on-premise
+    containers, you may need to specify the ENDPOINT or HOST directly.
+
+    To specify a particular REGION see: ai help speech translate region
+    To specify a particular ENDPOINT see: ai help speech translate endpoint
+    To specify a particular HOST see: ai help speech translate host
+
+    NOTE: Default connection uses the `@connection.from.region` preset template
+
+      service.config.region=@region
+      service.config.key=@key
+
+EXAMPLES
+
+  `EXAMPLE 1`: Use the `westus2` region and key stored in the AI configuration
+
+    ai config speech @region --set westus2
+    ai config speech @key --set 436172626F6E20697320636F6F6C2121
+    ai speech translate --file hello.wav --target de
+
+  `EXAMPLE 2`: Use the `westus2` region and key directly on command line
+
+    ai speech translate --region westus2 --key 436172626F6E20697320636F6F6C2121 --file hello.wav --target de
+
+  `EXAMPLE 3`: Use a specific sovereign cloud HOST on the command line
+
+    ai speech translate --host wss://chinaeast2.s2s.speech.azure.cn --file hello.wav --target de
+
+  `EXAMPLE 4`: Using a specific on-premise container HOST on the command line
+
+    ai speech translate --key @none --host wss://localhost:5000/ --file hello.wav --target de
+
+  `EXAMPLE 5`: Using a specific ENDPOINT on the command line
+
+    ai speech translate --nodefaults --endpoint wss://westus2.s2s.speech.microsoft.com/speech/translation/cognitiveservices/v1 --target de

@@ -1,0 +1,46 @@
+BATCH TRANSCRIPTION LIST ADVANCED
+
+  The `ai speech batch transcription list` command lists details about
+  existing batch transcriptions.
+
+USAGE: ai speech batch transcription list [...]
+
+  CONNECTION                      (see: ai help speech batch connection)
+    --key KEY                     (see: ai help speech batch key)
+    --region REGION               (see: ai help speech batch region)
+
+  LIST
+    --transcriptions              (see: ai help speech batch transcription list)
+    --languages                   (see: ai help speech batch transcription list languages)
+
+  TRANSCRIPT FILES
+    --transcription URL           (see: ai help speech batch transcription reference)
+    --files                       (see: ai help speech batch transcription list files)
+
+  OUTPUT
+    --output json FILENAME        (see: ai help speech batch output json)
+    --output urls @@FILE          (see: ai help speech batch output urls)
+    --output url @@FILE           (see: ai help speech batch output url)
+    --output ids @@FILE           (see: ai help speech batch output ids)
+    --output id @@FILE            (see: ai help speech batch output id)
+    --skip NUMBER
+    --top NUMBER
+    --tail NUMBER
+
+  PARALLEL PROCESSING
+    --threads NUMBER              (see: ai help speech batch threads)
+    --processes NUMBER            (see: ai help speech batch processes)
+
+  ADVANCED
+    --input path PATH             (see: ai help speech batch input path)
+    --output path PATH            (see: ai help speech batch output path)
+    --foreach in @FILENAME        (see: ai help speech batch foreach)
+    --save FILENAME               (see: ai help speech batch save)
+    --zip ZIPFILE                 (see: ai help speech batch zip)
+
+SEE ALSO
+
+  ai help speech batch output
+  ai help speech batch transcription create
+  ai help speech batch transcription examples
+  

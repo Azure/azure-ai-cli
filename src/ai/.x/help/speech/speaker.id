@@ -1,0 +1,22 @@
+SPEAKER ID
+
+@include.the.speaker.command
+
+  The `--id` option specifies a verification/identification profile id or a file containing such an id 
+  to be sent to the service for speaker recognition operations.
+
+USAGE: ai speech speaker [identify/verify] --id 12341234-1234-1234-1234-5678-0123-4567-01234567 [...] 
+   OR: ai speech speaker [identify/verify] --id @FILENAME [...]
+
+  WHERE: FILENAME is a single line text file containing a identification/verification profile id
+
+EXAMPLES
+
+  ai speech speaker identify --id @my.id --file hello.wav
+  ai speech speaker verify --id @my.id --file FILE
+
+SEE ALSO
+
+  ai help speech speaker
+  ai help speech speaker identify
+  ai help speech speaker verify

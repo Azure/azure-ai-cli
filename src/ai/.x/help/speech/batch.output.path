@@ -1,0 +1,18 @@
+BATCH OUTPUT PATH
+
+  The `--output path` option specifies where all output files
+  should be written. If not provided, the default is the current directory.
+  
+USAGE: ai speech batch [...] --output path FILEPATH
+
+  WHERE: FILEPATH is the name of output directory
+
+EXAMPLES
+
+  ai speech batch [...] --output path .\ai\output
+  ai speech batch [...] --output path ~/ai/output
+
+SEE ALSO
+
+  ai help speech batch input path
+  ai help speech batch

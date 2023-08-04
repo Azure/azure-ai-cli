@@ -1,0 +1,20 @@
+SYNTHESIZE SIREN
+
+@include.the.synthesize.command
+
+  The `--format` option specifies the container format for the
+  audio file being generated.
+
+USAGE: ai speech synthesize [...] --format FORMAT
+
+  WHERE: FORMAT is siren
+     OR: FORMAT is audio-16khz-16kbps-mono-siren
+     OR: FORMAT is riff-16khz-16kbps-mono-siren
+
+  NOTE: The default `siren` format is `audio-16khz-16kbps-mono-siren`
+  
+SEE ALSO
+
+  ai help speech synthesize audio output
+  ai help speech synthesize format
+  ai help speech synthesize

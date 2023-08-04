@@ -1,0 +1,24 @@
+SYNTHESIZE SAVE
+
+@include.the.synthesize.command
+
+@include.the.save.option
+
+USAGE: ai speech synthesize [...] --save FILENAME
+
+EXAMPLES
+
+  ai speech synthesize --files *.txt --save test1.job
+  ai speech synthesize --files *.txt;*.ssml --audio output {id}.wav --save test2.job
+  ai speech synthesize --files @URLs.txt --output zip output.zip --save test3.job
+
+  ai speech synthesize @test3.job
+
+  ai speech synthesize --foreach file;audio.output in @filelist.txt --save test4.job
+  ai speech synthesize @test4.job
+
+SEE ALSO
+
+  ai help speech synthesize
+  ai help speech synthesize files
+  ai help speech synthesize foreach

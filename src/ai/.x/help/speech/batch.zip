@@ -1,0 +1,23 @@
+BATCH ZIP
+
+@include.the.zip.option
+
+USAGE: ai speech batch [...] --zip FILENAME
+
+EXAMPLES
+
+  ai config @urls.txt --clear
+  ai config @urls.txt --add http://crbn.us/hello.wav
+  ai config @urls.txt --add http://crbn.us/whatstheweatherlike.wav
+  ai config @transcription.details --set name "My transcription"
+  ai config @transcription.details --add batch.wait.timeout 8640000
+  ai speech batch transcription create @transcription.details --content @urls.txt --wait --zip transcription.zip
+
+  ai webjob --upload transcription.zip --run
+
+SEE ALSO
+
+  ai help speech batch
+  ai help speech config
+  ai help speech batch save
+  ai help speech webjob setup

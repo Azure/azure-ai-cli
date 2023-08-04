@@ -1,0 +1,1 @@
+  The `ai speech csr endpoint` commands manage custom speech recognition endpoints.

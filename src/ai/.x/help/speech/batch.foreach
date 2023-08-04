@@ -1,0 +1,32 @@
+BATCH FOREACH
+
+  The `--foreach` option repeats a specific command multiple times
+  effectively multiplying one set of command line options by another.
+
+USAGE: ai speech batch [...] --foreach in @FILE1.tsv
+   OR: ai speech batch [...] --foreach OPT1;[OPT2;[...]] in @FILE2.tsv
+   OR: ai speech batch [...] --foreach OPT1;[OPT2;[...]] skip header in @FILE3.tsv
+
+  WHERE: OPT represents a command line option (e.g. file, language)
+    AND: FILE1.tsv contains tab separated values, with line1: OPT1 [\t OPT2 [\t ...]]
+     OR: FILE2.tsv contains tab separated values, with data rows starting on line 1
+     OR: FILE3.tsv contains tab separated values, with data rows starting on line 2
+
+EXAMPLE
+
+  ai config @audio.txt --clear
+  ai config @audio.txt --add http://crbn.us/hello.wav
+  ai config @audio.txt --add http://crbn.us/whatstheweatherlike.wav
+  ai speech batch transcription create --name "Example" --content @audio.txt --output url @@transcription.url.txt --wait
+
+  ai speech batch transcription list --files --transcription @transcription.url.txt --output urls @@file.urls.txt
+  ai speech batch transcription download --foreach file in @file.urls.txt --threads 10
+
+SEE ALSO
+
+  ai help speech batch transcription create
+  ai help speech batch transcription download
+  ai help speech batch transcription list
+  ai help speech batch output urls
+  ai help speech batch
+  

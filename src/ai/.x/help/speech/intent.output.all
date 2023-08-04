@@ -1,0 +1,48 @@
+INTENT OUTPUT ALL
+
+@include.the.intent.command
+
+  The `--output all` option specifies an ITEM to accumulate and
+  aggregate into a TSV or JSON output file, combined across all events.
+
+  The `--output all file` option specifies the output filename. 
+
+  The `--output all file type` option specifies the output file type,
+  either JSON or TSV (tab separated values). If no file type is provided,
+  the output file will be TSV by default.
+
+USAGE: ai speech intent [...] --output all ITEM
+   OR: ai speech intent [...] --output all file FILENAME
+   OR: ai speech intent [...] --output all file type TYPE
+
+   WHERE: FILENAME represents a local text file writable by the current user
+     OR: FILE is `-` represents STDOUT, where TSV or JSON data will be saved
+
+  NOTE: Default output uses the `@output.all.standard` preset template
+
+    output.all.audio.input.id=true
+    output.all.intentr.session.started.sessionid=true
+    output.all.intentr.intentd.result.text=true
+
+EXAMPLES
+
+  ai speech intent --once --output all text
+  ai speech intent --once --output all text --output all file output.tsv
+  ai speech intent --once --output all text --output all file type json
+
+  ai config speech @default.output --set @@output.all.standard
+  ai config speech @default.output --set @@output.all.detailed
+  ai config speech @default.output --set @@output.all.latency
+  ai config speech @default.output --set @@output.all.transcript.display
+  ai config speech @default.output --set @@output.all.transcript.lexical
+
+  ai config speech @default.output --clear
+  ai config speech @default.output --add output.all.id true
+  ai config speech @default.output --add output.all.sessionid true
+  ai config speech @default.output --add output.all.text true
+
+SEE ALSO
+
+  ai help speech intent output overview
+  ai help speech intent output examples
+  ai help speech intent

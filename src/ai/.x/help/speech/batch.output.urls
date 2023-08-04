@@ -1,0 +1,27 @@
+BATCH OUTPUT URLS
+
+  The `--output urls` option writes the list of batch resource references
+  into the AI datastore configuration file specified.
+
+  Use this option to chain together multiple batch commands
+  in sequence, or to subsequently use the reference
+  list without parsing the service JSON response. 
+
+USAGE: ai speech batch [...] --output urls @@FILE
+
+  WHERE: FILE is the name of the AI configuration datastore file
+
+EXAMPLE
+
+  ai speech batch transcription list --output urls @@url-list.txt
+  ai speech batch transcription status --foreach transcription in @url-list.txt --wait 30000
+
+SEE ALSO
+
+  ai help speech batch transcription list
+  ai help speech batch transcription status
+  ai help speech batch output json
+  ai help speech batch output ids
+  ai help speech batch output
+  ai help speech batch
+  

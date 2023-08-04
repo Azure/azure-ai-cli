@@ -1,0 +1,35 @@
+INTENT PATTERNS
+
+@include.the.intent.command
+
+  The `--patterns` option specifies multiple intent PATTERNS to recognize, each
+  with an optional ID, and each PATTERN optionally containing one or more ENTITIES.
+
+USAGE: ai speech intent [...] --patterns PATTERN1;PATTERN2[;...]
+   OR: ai speech intent [...] --patterns ID1=PATTERN1;ID2=PATTERN2[;...]
+   OR: ai speech intent [...] --patterns @PATTERNS-FILE.txt
+
+  WHERE: PATTERN represents a phrase to be recognized
+     OR: INTENTID represents the identifier that will symbolize the pattern
+     OR: PATTERNS-FILE.txt is a multi-line text file
+         ... w/ each [ID=]PATTERN listed individually on separate lines
+
+  NOTE: ENTITIES are indicated by enclosing the ENTITY name inside `{` and `}`
+
+EXAMPLES
+
+  ai speech intent --patterns "Start {app};Open {app}" --output app entity
+  ai speech intent --patterns "START=Start {app};START=Open {app}" --output intentid --output app entity
+
+  ai config @EXAMPLEs --clear
+  ai config @EXAMPLEs --add "START=Start {app}"
+  ai config @EXAMPLEs --add "START=Open {app}"
+  ai config @EXAMPLEs --add "START=Launch {app}"
+  ai config @EXAMPLEs --add "CLOSE=Close {app}"
+  ai speech intent --patterns @EXAMPLEs --output intentid --output app entity
+
+SEE ALSO
+
+  ai help speech intent format
+  ai help speech intent input
+  ai help speech intent

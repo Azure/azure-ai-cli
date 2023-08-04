@@ -1,0 +1,13 @@
+PROFILE KIND
+
+@include.the.profile.command.long
+
+  The `--kind` parameter sets profile operations to TextIndependentIdentification/TextIndependentVerification/TextDependentVerification
+  mode (default is TextIndependentIdentification).
+
+USAGE: ai speech profile [enroll/create/status/list/delete] --kind [TextIndependentIdentification/TextIndependentVerification/TextDependentVerification] [...]
+
+SEE ALSO
+
+  ai help speech profile
+  ai help speech profile examples

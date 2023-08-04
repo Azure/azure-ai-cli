@@ -1,0 +1,23 @@
+TRANSLATE SAVE
+
+@include.the.translate.command
+
+@include.the.save.option
+
+USAGE: ai speech translate [...] --save FILENAME
+
+EXAMPLES
+
+  ai speech translate --files *.wav --source en-US --target de --save test1.job
+  ai speech translate --files *.wav --log {id}.log --source en-US --target de --save test2.job
+  ai speech translate --files @URLs.txt --output zip output.zip --source en-US --target de --save test3.job
+
+  ai speech translate --foreach file;transcript in @items.txt --source en-US --target de --save test4.job
+  ai speech translate @test4.job
+
+SEE ALSO
+
+  ai help speech translate
+  ai help speech translate files
+  ai help speech translate foreach
+  ai help speech webjob setup

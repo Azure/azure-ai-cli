@@ -1,0 +1,25 @@
+TRANSLATE ZIP
+
+@include.the.translate.command
+
+@include.the.zip.option
+
+  NOTE: `--zip` does not package local input files (e.g. audio, models, etc.)
+
+USAGE: ai speech translate [...] --zip FILENAME
+
+EXAMPLES
+
+  ai speech translate --files *.wav --source en-US --target de --zip test1.zip
+  ai speech translate --files *.wav --log {id}.log --source en-US --target de --zip test2.zip
+  ai speech translate --foreach file;transcript in @items.txt --source en-US --target de --zip test3.zip
+
+  ai speech translate --files @URLs.txt --output zip output.zip --source en-US --target de --zip test4.zip
+  ai webjob --upload test4.zip --run
+
+SEE ALSO
+
+  ai help speech translate
+  ai help speech translate files
+  ai help speech translate foreach
+  ai help speech webjob setup

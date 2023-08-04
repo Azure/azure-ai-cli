@@ -1,0 +1,86 @@
+TRANSLATE
+
+@include.the.translate.command.long
+
+USAGE: ai speech translate [...]
+
+  CONNECTION                      (see: ai help speech translate connection)
+    --key KEY                     (see: ai help speech translate key)
+    --region REGION               (see: ai help speech translate region)
+    --endpoint URI                (see: ai help speech translate endpoint)
+    --token VALUE                 (see: ai help speech translate token)
+
+  SERVICE
+    --traffic type test           (see: ai help speech traffic type)
+    --http header name=value      (see: ai help speech http header)
+    --query string name=value     (see: ai help speech query string)
+    --speech config @file.json    (see: ai help speech websocket messages)
+    --speech context @file.json   (see: ai help speech websocket messages)
+
+  LANGUAGE                        (see: ai help speech translate language)
+    --source LANGUAGE             (see: ai help speech translate source)
+    --target LANGUAGE             (see: ai help speech translate target)
+
+  INPUT                           (see: ai help speech translate input)
+    --microphone                  (see: ai help speech translate microphone)
+    --file FILE                   (see: ai help speech translate file)
+    --files PATTERN               (see: ai help speech translate files)
+    --files @FILELIST.txt         (see: ai help speech translate files)
+    --url URL                     (see: ai help speech translate url)
+    --urls URL                    (see: ai help speech translate urls)
+    --urls @URLLIST.txt           (see: ai help speech translate urls)
+    --format FORMAT               (see: ai help speech translate format)
+    --id url URL                  (see: ai help speech input id)
+    --id ID                       (see: ai help speech input id)
+
+  TRANSLATION
+    --once[+]                     (see: ai help speech translate once)
+    --continuous                  (see: ai help speech translate continuous)
+    --timeout MILLISECONDS        (see: ai help speech translate continuous)
+    --keyword FILENAME            (see: ai help speech translate keyword)
+
+  ACCURACY                        (see: ai help speech translate improve accuracy)
+    --endpoint id ID              (see: ai help speech translate custom speech)
+    --category id CUSTOM-MT-ID    (see: ai help speech translate custom translation)
+    --phrases @PHRASELIST.txt     (see: ai help speech translate phrases)
+
+  TESTING                         (see: ai help speech translate testing)
+    --transcript TEXT             (see: ai help speech translate transcript)
+    --check wer NUMOP NUMBER      (see: ai help speech translate check wer)
+    --check text TEXTOP TEXT      (see: ai help speech translate check text)
+
+  OUTPUT                          (see: ai help speech translate output)
+    --output all [<item>]         (see: ai help speech translate output all)
+    --output each [<item>]        (see: ai help speech translate output each)
+    --output batch json           (see: ai help speech translate output batch json)
+    --output batch file FILENAME  (see: ai help speech translate output batch file)
+    --output each file FILENAME   (see: ai help speech translate output each file)
+    --output all file FILENAME    (see: ai help speech translate output all file)
+    --word level timing           (see: ai help speech translate word level timing)
+    --profanity OPTION            (see: ai help speech translate profanity)
+
+  LOGGING                         (see: ai help speech translate log)
+    --log FILENAME
+    --content logging
+
+  PARALLEL PROCESSING
+    --threads NUMBER              (see: ai help speech translate threads)
+    --processes NUMBER            (see: ai help speech translate processes)
+    --repeat NUMBER
+    --max NUMBER
+
+  ADVANCED
+    --connect                     (see: ai help speech translate connect)
+    --disconnect                  (see: ai help speech translate disconnect)
+    --proxy HOSTNAME              (see: ai help speech translate proxy)
+    --property NAME=VALUE         (see: ai help speech translate property)
+    --properties @PROPLIST.txt    (see: ai help speech translate properties)
+    --foreach in @ITEMS.txt       (see: ai help speech translate foreach)
+    --save FILENAME               (see: ai help speech translate save)
+    --zip ZIPFILE                 (see: ai help speech translate zip)
+
+SEE ALSO
+
+  ai help speech setup
+  ai help speech translate examples
+  ai help find topics speech translate

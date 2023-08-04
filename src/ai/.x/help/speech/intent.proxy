@@ -1,0 +1,31 @@
+INTENT PROXY
+
+@include.the.intent.command
+
+  The `--proxy` option specifies a HTTP proxy host name. 
+  The `--proxy port` option specifies the HTTP proxy port.
+
+USAGE: ai speech intent [...] --proxy PROXY
+   OR: ai speech intent [...] --proxy PROXY --proxy port PORT
+   OR: ai speech intent [...] @CONFIG-FILENAME
+
+  WHERE: PROXY represents the PROXY host (e.g. localhost)
+     OR: PORT represents the PROXY port (e.g. 80, which is the default)
+     OR: CONFIG-FILENAME is a multi-line text file as follows:
+
+            service.config.proxy.host=HOST
+            service.config.proxy.port=PORT
+
+EXAMPLES
+
+  ai speech intent --file hello.wav --proxy localhost --proxy port 8888
+
+  ai config speech @fiddler --set proxy.host localhost
+  ai config speech @fiddler --add proxy.port 8888
+
+  ai speech intent --file hello.wav @fiddler
+
+SEE ALSO
+
+  ai help speech intent
+  ai help speech config

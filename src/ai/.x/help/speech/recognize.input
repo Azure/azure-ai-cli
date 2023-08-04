@@ -1,0 +1,43 @@
+RECOGNIZE INPUT OVERVIEW
+
+@include.the.recognize.command
+
+  FROM MICROPHONE - DEFAULT DEVICE or SPECIFIC DEVICE
+
+    The `ai speech recognize` command can recognize streaming audio captured
+    from a device microphone (default microphone or specific microphone).
+
+    To recognize audio from a device MICROPHONE see: ai help speech recognize microphone 
+
+  FROM FILE - SINGLE or MULTIPLE FILES
+
+    The `ai speech recognize` command can also recognize audio stored in local
+    or remote audio files, in various audio container formats (e.g. mp3, ogg).
+
+    To recognize from a single audio file see: ai help speech recognize file
+    To recognize from a multiple audio files see: ai help speech recognize files
+    To recognize from file(s) in various formats see: ai help speech recognize format
+ 
+EXAMPLES
+
+  `EXAMPLE 1`: Recognize speech from a microphone
+  
+    ai speech recognize --microphone
+
+  `EXAMPLE 2`: Recognize speech from local WAV file, or remote MP3 file
+
+    ai speech recognize --file hello.wav
+    ai speech recognize --file http://crbn.us/hello.mp3 --format mp3
+
+  `EXAMPLE 3`: Recognize speech in multiple files using wildcards
+
+    ai speech recognize --files *.wav
+
+  `EXAMPLE 4`: Recognize speech in audio file content piped thru STDIN
+
+    ai speech synthesize --text "Hello" --audio output - --quiet | ai speech recognize --file -
+
+SEE ALSO
+
+  ai help speech recognize examples
+  ai help speech recognize

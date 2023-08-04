@@ -1,0 +1,26 @@
+CUSTOM SPEECH RECOGNITION PROJECT CREATE
+
+@include.the.csr.project.create.command
+
+USAGE: ai speech csr project create [...]
+
+CONNECTION                      (see: ai help speech csr connection)
+  --key KEY                     (see: ai help speech csr key)
+  --region REGION               (see: ai help speech csr region)
+
+CREATE
+  --name NAME                   (see: ai help speech csr project name)
+  --language LANGUAGE           (see: ai help speech csr project create language)
+  --description DESCRIPTION     (see: ai help speech csr project description)
+
+OUTPUT                          (see: ai help speech csr output)
+  --output json FILENAME        (see: ai help speech csr output json)
+  --output url @@FILE           (see: ai help speech csr output url)
+  --output id @@FILE            (see: ai help speech csr output id)
+
+ADVANCED
+  --input path PATH             (see: ai help speech csr input path)
+  --output path PATH            (see: ai help speech csr output path)
+  --foreach in @FILENAME        (see: ai help speech csr foreach)
+  --save FILENAME               (see: ai help speech csr save)
+  --zip ZIPFILE                 (see: ai help speech csr zip)

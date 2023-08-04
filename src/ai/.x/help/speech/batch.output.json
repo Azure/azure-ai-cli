@@ -1,0 +1,31 @@
+BATCH OUTPUT JSON
+
+  The `--output json` option writes the service JSON response into the file specified.
+
+  Use this option to save the service JSON response.
+
+USAGE: ai speech batch [...] --output json FILE.json
+   OR: ai speech batch [...] @CONFIG-FILENAME
+
+  WHERE: FILE.json is the file to store the JSON output from the batch operation
+     OR: FILENAME is a single line text file containing FILE.json filename
+     OR: CONFIG-FILENAME is a single line text file in the following form:
+
+            batch.output.json.file=FILE.json
+
+EXAMPLES
+
+  ai speech batch transcription list --output json @transcription-list.json
+
+  ai config @transcription.job --set name "My transcription"
+  ai config @transcription.job --add content http://crbn.us/hello.wav
+  ai config @transcription.job --add batch.output.json.file create-operation-output.json
+  ai speech batch transcription create @transcription.details
+
+SEE ALSO
+
+  ai help speech batch output
+  ai help speech batch output request
+  ai help speech batch transcription
+  ai help speech batch
+  

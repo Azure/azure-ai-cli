@@ -1,0 +1,23 @@
+CUSTOM SPEECH RECOGNITION ENDPOINT
+
+@include.the.csr.endpoint.command
+
+USAGE: ai speech csr endpoint <command> [...]
+
+COMMANDS
+
+  ai speech csr endpoint create [...]       (see: ai help speech csr endpoint create)
+  ai speech csr endpoint status [...]       (see: ai help speech csr endpoint status)
+
+  ai speech csr endpoint list [...]         (see: ai help speech csr endpoint list)
+  ai speech csr endpoint download [...]     (see: ai help speech csr endpoint download)
+
+  ai speech csr endpoint update [...]       (see: ai help speech csr endpoint update)
+  ai speech csr endpoint delete [...]       (see: ai help speech csr endpoint delete)
+
+ADDITIONAL TOPICS
+
+  ai help speech csr examples
+  ai help speech csr endpoint examples
+  ai help speech csr list endpoints
+  ai help speech documentation

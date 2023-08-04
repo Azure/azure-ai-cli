@@ -1,0 +1,41 @@
+BATCH TRANSCRIPTION CREATE MODEL
+
+  The `ai speech batch transcription create` command creates new
+  requests to transcribe remote audio streams.
+
+  The `--model` option specifies the custom speech model to use to
+  transcribe the content in this new transcription request.
+
+USAGE: ai speech batch transcription create [...] --model MODEL-ID
+   OR: ai speech batch transcription create [...] --model MODEL-URL
+   OR: ai speech batch transcription create [...] --model @FILENAME
+   OR: ai speech batch transcription create [...] @CONFIG-FILENAME
+
+  WHERE: MODEL-ID is the model ID
+     OR: MODEL-URL is the model URL
+     OR: FILENAME is a single line text file containing the model ID or URL
+     OR: CONFIG-FILENAME is a single line text file in the following form:
+
+            batch.model.id=ID-or-URL
+
+EXAMPLES
+
+  ai speech batch transcription create [...] --model 01234567-89ab-cdef-fedc-ba9876543210
+
+  ai config @my.model --set 01234567-89ab-cdef-fedc-ba9876543210
+  ai speech batch transcription create [...] --model @my.model
+
+  ai speech csr model create [...] --output url @@my.model
+  ai speech batch transcription create [...] --model @my.model
+
+  ai config @my.model --set 01234567-89ab-cdef-fedc-ba9876543210
+  ai config @transcription.details --set name "My transcription"
+  ai config @transcription.details --add model @my.model
+  ai speech batch transcription create @transcription.details --content http://crbn.us/hello.wav
+
+SEE ALSO
+
+  ai help speech csr model create
+  ai help speech config advanced
+  ai help speech batch transcription create
+  

@@ -1,0 +1,20 @@
+CUSTOM SPEECH RECOGNITION EVALUATION
+
+@include.the.csr.evaluation.command
+
+USAGE: ai speech csr evaluation <command> [...]
+
+COMMANDS
+
+  ai speech csr evaluation create [...]           (see: ai help speech csr evaluation create)
+  ai speech csr evaluation status [...]           (see: ai help speech csr evaluation status)
+  ai speech csr evaluation list [...]             (see: ai help speech csr evaluation list)
+
+  ai speech csr evaluation update [...]           (see: ai help speech csr evaluation update)
+  ai speech csr evaluation delete [...]           (see: ai help speech csr evaluation delete)
+
+ADDITIONAL TOPICS
+
+  ai help speech csr examples
+  ai help speech csr evaluation examples
+  ai help speech documentation

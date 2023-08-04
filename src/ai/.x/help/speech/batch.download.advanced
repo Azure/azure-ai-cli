@@ -1,0 +1,35 @@
+BATCH TRANSCRIPTION DOWNLOAD ADVANCED
+
+  The `ai speech batch download` command downloads files from Azure
+  Speech Service batch operations.
+
+USAGE: ai speech batch download [...]
+
+  CONNECTION                      (see: ai help speech batch connection)
+    --key KEY                     (see: ai help speech batch key)
+    --region REGION               (see: ai help speech batch region)
+
+  DOWNLOAD
+    --url URL                     (see: ai help speech batch download url)
+    --file URL                    (see: ai help speech batch download file)
+
+  OUTPUT
+    --output file FILENAME        (see: ai help speech batch download output file)
+    --output json FILENAME        (see: ai help speech batch output json)
+
+  PARALLEL PROCESSING
+    --threads NUMBER              (see: ai help speech batch threads)
+    --processes NUMBER            (see: ai help speech batch processes)
+
+  ADVANCED
+    --input path PATH             (see: ai help speech batch input path)
+    --output path PATH            (see: ai help speech batch output path)
+    --foreach in @FILENAME        (see: ai help speech batch foreach)
+    --save FILENAME               (see: ai help speech batch save)
+    --zip ZIPFILE                 (see: ai help speech batch zip)
+
+SEE ALSO
+
+  ai help speech batch transcription list
+  ai help speech batch output
+  

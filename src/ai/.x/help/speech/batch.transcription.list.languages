@@ -1,0 +1,11 @@
+BATCH TRANSCRIPTION LIST LANGUAGES
+
+  The `ai speech batch transcription list` `--languages` option
+  lists supported BATCH TRANSCRIPTION languages, in BCP-47 tag format.
+
+USAGE: ai speech batch transcription list [...] --languages
+
+SEE ALSO
+
+  ai help speech setup
+  ai help speech batch transcription list

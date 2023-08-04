@@ -1,0 +1,21 @@
+RECOGNIZE PROFANITY
+
+@include.the.recognize.command
+
+  The `--profanity` controls how the service deals with spoken profanity.
+
+USAGE: ai speech recognize [...] --profanity OPTION
+
+  WHERE: OPTION is raw
+     OR: OPTION is masked
+     OR: OPTION is removed
+
+EXAMPLES
+
+  ai speech recognize --file hello.wav --profanity raw
+  ai speech recognize --file hello.wav --profanity masked
+  ai speech recognize --file hello.wav --profanity removed
+
+SEE ALSO
+
+  ai help speech recognize

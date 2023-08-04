@@ -1,0 +1,21 @@
+INTENT PROFANITY
+
+@include.the.intent.command
+
+  The `--profanity` controls how the service deals with spoken profanity.
+
+USAGE: ai speech intent [...] --profanity OPTION
+
+  WHERE: OPTION is raw
+     OR: OPTION is masked
+     OR: OPTION is removed
+
+EXAMPLES
+
+  ai speech intent --file hello.wav --profanity raw
+  ai speech intent --file hello.wav --profanity masked
+  ai speech intent --file hello.wav --profanity removed
+
+SEE ALSO
+
+  ai help speech intent

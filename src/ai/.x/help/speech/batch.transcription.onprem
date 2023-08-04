@@ -1,0 +1,33 @@
+  ______ ___ _  __
+ /  ___// _ \ \/ /
+ \___ \/ ___/   <
+/____ /_/  /__/\_\
+
+USAGE: ai speech batch transcription onprem <command> [...]
+
+BATCH TRANSCRIPTION ONPREM
+
+  The `ai speech batch transcription onprem` command enables running against any number of 
+  user-supplied Azure Speech Containers.
+
+  NOTE: This command can only be used when running `ai` in its Linux container.
+        The container's lifetime must span all the sequence of applied commands.
+        It is recommended to `docker run` the AI container first, and then
+        `docker exec` these commands.
+
+COMMANDS
+
+  ai speech batch transcription onprem create [...]          (see: ai help speech batch transcription onprem create)
+  ai speech batch transcription onprem status [...]          (see: ai help speech batch transcription onprem status)
+  ai speech batch transcription onprem list                  (see: ai help speech batch transcription onprem list)
+  ai speech batch transcription onprem delete [...]          (see: ai help speech batch transcription onprem delete)
+  ai speech batch transcription onprem endpoints [...]       (see: ai help speech batch transcription onprem endpoints)
+
+ADDITIONAL TOPICS
+
+  ai help speech setup
+  ai help speech batch transcription onprem examples
+
+  Learn more about running On-Premise Speech Containers:
+  https://docs.microsoft.com/azure/cognitive-services/speech-service/speech-container-howto
+ 

@@ -1,0 +1,18 @@
+BATCH INPUT PATH
+
+  The `--input path` option specifies additional paths to search
+  for input files. If not provided, the default is the current directory.
+  
+USAGE: ai speech batch [...] --input path FILEPATH
+
+  WHERE: FILEPATH is the name of input directory
+
+EXAMPLES
+
+  ai speech batch [...] --output path .\ai\input
+  ai speech batch [...] --output path ~/ai/input
+
+SEE ALSO
+
+  ai help speech batch output path
+  ai help speech batch

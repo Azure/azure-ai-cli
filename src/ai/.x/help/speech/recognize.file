@@ -1,0 +1,37 @@
+RECOGNIZE FILE
+
+@include.the.recognize.command
+
+  The `--file` option specifies a single local audio file to be
+  streamed to the service for recognition.
+
+  The `--url` option specifies a single remote audio file to be
+  streamed to the service for recognition after first caching the audio
+  locally, removing it when done.
+
+USAGE: ai speech recognize [...] --url URL
+   OR: ai speech recognize [...] --url @FILENAME.txt
+   OR: ai speech recognize [...] --file @FILEAME.txt
+   OR: ai speech recognize [...] --file FILE
+
+  WHERE: URL represents a remote audio file accessible to the public
+     OR: FILE represents a local audio file accessible to the current user
+     OR: FILE is `-` indicating that audio file content will be read from STDIN
+     OR: FILENAME.txt is a single line text file containing the file to stream
+
+  NOTE: `--url` is an alias for `--file` ... both accept both files and urls
+
+EXAMPLES
+
+  ai speech recognize --file hello.wav
+  ai speech recognize --url https://crbn.us/hello.wav
+
+  echo hello.wav>file.txt
+  ai speech recognize --file @file.txt
+
+SEE ALSO
+
+  ai help speech recognize files
+  ai help speech recognize format
+  ai help speech recognize input
+  ai help speech recognize

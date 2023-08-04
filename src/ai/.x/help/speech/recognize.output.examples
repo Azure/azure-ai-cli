@@ -1,0 +1,171 @@
+RECOGNIZE OUTPUT EXAMPLES
+
+  ai speech recognize [...] --output all audio id
+  ai speech recognize [...] --output all sessionid
+  ai speech recognize [...] --output all resultid
+  ai speech recognize [...] --output all reason
+  ai speech recognize [...] --output all text
+  ai speech recognize [...] --output all itn text
+  ai speech recognize [...] --output all lexical text
+  ai speech recognize [...] --output all offset
+  ai speech recognize [...] --output all duration
+  ai speech recognize [...] --output all latency
+  ai speech recognize [...] --output all json
+
+  ai speech recognize [...] --output each audio id
+  ai speech recognize [...] --output each sessionid
+  ai speech recognize [...] --output each resultid
+  ai speech recognize [...] --output each reason
+  ai speech recognize [...] --output each text
+  ai speech recognize [...] --output each itn text
+  ai speech recognize [...] --output each lexical text
+  ai speech recognize [...] --output each offset
+  ai speech recognize [...] --output each duration
+  ai speech recognize [...] --output each latency
+  ai speech recognize [...] --output each json
+
+  ai speech recognize [...] --output all result resultid
+  ai speech recognize [...] --output all result reason
+  ai speech recognize [...] --output all result text
+  ai speech recognize [...] --output all result offset
+  ai speech recognize [...] --output all result duration
+  ai speech recognize [...] --output all result latency
+  ai speech recognize [...] --output all result json
+
+  ai speech recognize [...] --output each result resultid
+  ai speech recognize [...] --output each result reason
+  ai speech recognize [...] --output each result text
+  ai speech recognize [...] --output each result offset
+  ai speech recognize [...] --output each result duration
+  ai speech recognize [...] --output each result latency
+  ai speech recognize [...] --output each result json
+
+  ai speech recognize [...] --output all events
+  ai speech recognize [...] --output all event sessionid
+
+  ai speech recognize [...] --output each event
+  ai speech recognize [...] --output each event sessionid
+
+  ai speech recognize [...] --output all connection events
+  ai speech recognize [...] --output all connection event sessionid
+  ai speech recognize [...] --output all connection connected events
+  ai speech recognize [...] --output all connection connected sessionid
+  ai speech recognize [...] --output all connection disconnected events
+  ai speech recognize [...] --output all connection disconnected sessionid
+
+  ai speech recognize [...] --output each connection event
+  ai speech recognize [...] --output each connection event sessionid
+  ai speech recognize [...] --output each connection connected event
+  ai speech recognize [...] --output each connection connected sessionid
+  ai speech recognize [...] --output each connection disconnected event
+  ai speech recognize [...] --output each connection disconnected sessionid
+
+  ai speech recognize [...] --output all recognizer events
+  ai speech recognize [...] --output all recognizer event sessionid
+
+  ai speech recognize [...] --output each recognizer event
+  ai speech recognize [...] --output each recognizer event sessionid
+
+  ai speech recognize [...] --output all recognizer session events
+  ai speech recognize [...] --output all recognizer session event sessionid
+  ai speech recognize [...] --output all recognizer session started events
+  ai speech recognize [...] --output all recognizer session started sessionid
+  ai speech recognize [...] --output all recognizer session stopped events
+  ai speech recognize [...] --output all recognizer session stopped sessionid
+
+  ai speech recognize [...] --output each recognizer session event
+  ai speech recognize [...] --output each recognizer session event sessionid
+  ai speech recognize [...] --output each recognizer session started event
+  ai speech recognize [...] --output each recognizer session started sessionid
+  ai speech recognize [...] --output each recognizer session stopped event
+  ai speech recognize [...] --output each recognizer session stopped sessionid
+
+  ai speech recognize [...] --output all connection message received events
+  ai speech recognize [...] --output all connection message received binary message
+  ai speech recognize [...] --output all connection message received binary message size
+  ai speech recognize [...] --output all connection message received content type
+  ai speech recognize [...] --output all connection message received is binary message
+  ai speech recognize [...] --output all connection message received is text message
+  ai speech recognize [...] --output all connection message received path
+  ai speech recognize [...] --output all connection message received request id
+  ai speech recognize [...] --output all connection message received text message
+
+  ai speech recognize [...] --output each connection message received event
+  ai speech recognize [...] --output each connection message received binary message
+  ai speech recognize [...] --output each connection message received binary message size
+  ai speech recognize [...] --output each connection message received content type
+  ai speech recognize [...] --output each connection message received is binary message
+  ai speech recognize [...] --output each connection message received is text message
+  ai speech recognize [...] --output each connection message received path
+  ai speech recognize [...] --output each connection message received request id
+  ai speech recognize [...] --output each connection message received text message
+
+  ai speech recognize [...] --output all recognizer canceled events
+  ai speech recognize [...] --output all recognizer canceled error
+  ai speech recognize [...] --output all recognizer canceled error code
+  ai speech recognize [...] --output all recognizer canceled error details
+  ai speech recognize [...] --output all recognizer canceled reason
+
+  ai speech recognize [...] --output each recognizer canceled event
+  ai speech recognize [...] --output each recognizer canceled error
+  ai speech recognize [...] --output each recognizer canceled error code
+  ai speech recognize [...] --output each recognizer canceled error details
+  ai speech recognize [...] --output each recognizer canceled reason
+
+  ai speech recognize [...] --output all recognizer recognized events
+  ai speech recognize [...] --output all recognizer recognized sessionid
+  ai speech recognize [...] --output all recognizer recognized result resultid
+  ai speech recognize [...] --output all recognizer recognized result reason
+  ai speech recognize [...] --output all recognizer recognized result text
+  ai speech recognize [...] --output all recognizer recognized result itn text
+  ai speech recognize [...] --output all recognizer recognized result lexical text
+  ai speech recognize [...] --output all recognizer recognized result offset
+  ai speech recognize [...] --output all recognizer recognized result duration
+  ai speech recognize [...] --output all recognizer recognized result latency
+  ai speech recognize [...] --output all recognizer recognized result json
+
+  ai speech recognize [...] --output each recognizer recognized event
+  ai speech recognize [...] --output each recognizer recognized sessionid
+  ai speech recognize [...] --output each recognizer recognized result resultid
+  ai speech recognize [...] --output each recognizer recognized result reason
+  ai speech recognize [...] --output each recognizer recognized result text
+  ai speech recognize [...] --output each recognizer recognized result itn text
+  ai speech recognize [...] --output each recognizer recognized result lexical text
+  ai speech recognize [...] --output each recognizer recognized result offset
+  ai speech recognize [...] --output each recognizer recognized result duration
+  ai speech recognize [...] --output each recognizer recognized result latency
+  ai speech recognize [...] --output each recognizer recognized result json
+
+  ai speech recognize [...] --output all recognizer recognizing events
+  ai speech recognize [...] --output all recognizer recognizing sessionid
+  ai speech recognize [...] --output all recognizer recognizing result resultid
+  ai speech recognize [...] --output all recognizer recognizing result reason
+  ai speech recognize [...] --output all recognizer recognizing result text
+  ai speech recognize [...] --output all recognizer recognizing result offset
+  ai speech recognize [...] --output all recognizer recognizing result duration
+  ai speech recognize [...] --output all recognizer recognizing result latency
+  ai speech recognize [...] --output all recognizer recognizing result json
+
+  ai speech recognize [...] --output each recognizer recognizing event
+  ai speech recognize [...] --output each recognizer recognizing sessionid
+  ai speech recognize [...] --output each recognizer recognizing result resultid
+  ai speech recognize [...] --output each recognizer recognizing result reason
+  ai speech recognize [...] --output each recognizer recognizing result text
+  ai speech recognize [...] --output each recognizer recognizing result offset
+  ai speech recognize [...] --output each recognizer recognizing result duration
+  ai speech recognize [...] --output each recognizer recognizing result latency
+  ai speech recognize [...] --output each recognizer recognizing result json
+
+  ai speech recognize [...] --output all file type json
+  ai speech recognize [...] --output all file output.json
+
+  ai speech recognize [...] --output each file type json
+  ai speech recognize [...] --output each file output.json
+
+  ai speech recognize [...] --output all file type tsv 
+  ai speech recognize [...] --output all file output.tsv
+  ai speech recognize [...] --output all tsv file has header false
+
+  ai speech recognize [...] --output each file type tsv
+  ai speech recognize [...] --output each file output.tsv
+  ai speech recognize [...] --output each tsv file has header false

@@ -1,0 +1,35 @@
+BATCH TRANSCRIPTION PROJECT
+
+  The `--project` specifies the PROJECT with which to associate a transcription.
+
+USAGE: ai speech batch transcription [...] --project PROJECT-ID
+   OR: ai speech batch transcription [...] --project PROJECT-URL
+   OR: ai speech batch transcription [...] --project @FILENAME
+   OR: ai speech batch transcription [...] @CONFIG-FILENAME
+
+  WHERE: PROJECT-ID is the project ID
+     OR: PROJECT-URL is the project URL
+     OR: FILENAME is a single line text file containing the project ID or URL
+     OR: CONFIG-FILENAME is a single line text file in the following form:
+
+            batch.project.id=ID-or-URL
+
+EXAMPLES
+
+  ai speech batch transcription [...] --project 01234567-89ab-cdef-fedc-ba9876543210
+
+  ai config @my.project --set 01234567-89ab-cdef-fedc-ba9876543210
+  ai speech batch transcription [...] --project @my.project
+
+  ai speech csr project create [...] --output url @@my.project
+  ai speech batch transcription [...] --project @my.project
+
+  ai config @transcription.details --set name "My transcription"
+  ai config @transcription.details --add project 01234567-89ab-cdef-fedc-ba9876543210
+  ai speech batch transcription [...] @transcription.details
+
+SEE ALSO
+
+  ai help speech csr project create
+  ai help speech batch transcription create
+  ai help speech batch transcription update

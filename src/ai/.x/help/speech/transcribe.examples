@@ -1,0 +1,18 @@
+TRANSCRIBE EXAMPLES
+
+  ai config speech @region --command transcribe --set centralus
+  ai config speech @key --command transcribe --region centralus --key PUT-YOUR-KEY-HERE
+
+  ai speech transcribe --conversation id GUID --file 8-channel-audio.wav
+
+PREVIEW NOTE
+
+  The Azure Conversational Transcription Service is currently in
+  PREVIEW. As a result, CTS does not support all regions or languages.
+
+    Supported regions: centralus, eastasia
+    Supported languages: en-US, zh-CN
+
+ADDITIONAL TOPICS
+
+  ai help speech transcribe

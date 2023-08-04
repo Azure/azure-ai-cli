@@ -1,0 +1,85 @@
+SYNTHESIZE OUTPUT EXAMPLES
+
+  ai speech synthesize [...] --output all input id
+  ai speech synthesize [...] --output all resultid
+  ai speech synthesize [...] --output all reason
+  ai speech synthesize [...] --output all audio data
+  ai speech synthesize [...] --output all audio length
+
+  ai speech synthesize [...] --output each input id
+  ai speech synthesize [...] --output each resultid
+  ai speech synthesize [...] --output each reason
+  ai speech synthesize [...] --output each audio data
+  ai speech synthesize [...] --output each audio length
+
+  ai speech synthesize [...] --output all result resultid
+  ai speech synthesize [...] --output all result reason
+  ai speech synthesize [...] --output all result audio data
+  ai speech synthesize [...] --output all result audio length
+
+  ai speech synthesize [...] --output each result resultid
+  ai speech synthesize [...] --output each result reason
+  ai speech synthesize [...] --output each result audio data
+  ai speech synthesize [...] --output each result audio length
+
+  ai speech synthesize [...] --output all events
+  ai speech synthesize [...] --output each event
+
+  ai speech synthesize [...] --output all synthesizer events
+  ai speech synthesize [...] --output each synthesizer event
+
+  ai speech synthesize [...] --output all synthesizer synthesis canceled events
+  ai speech synthesize [...] --output all synthesizer synthesis canceled error
+  ai speech synthesize [...] --output all synthesizer synthesis canceled error code
+  ai speech synthesize [...] --output all synthesizer synthesis canceled error details
+  ai speech synthesize [...] --output all synthesizer synthesis canceled reason
+
+  ai speech synthesize [...] --output each synthesizer canceled event
+  ai speech synthesize [...] --output each synthesizer canceled error
+  ai speech synthesize [...] --output each synthesizer canceled error code
+  ai speech synthesize [...] --output each synthesizer canceled error details
+  ai speech synthesize [...] --output each synthesizer canceled reason
+
+  ai speech synthesize [...] --output all synthesizer synthesis started events
+  ai speech synthesize [...] --output all synthesizer synthesis started result resultid
+  ai speech synthesize [...] --output all synthesizer synthesis started result reason
+  ai speech synthesize [...] --output all synthesizer synthesis started result audio data
+  ai speech synthesize [...] --output all synthesizer synthesis started result audio length
+
+  ai speech synthesize [...] --output each synthesizer synthesis started event
+  ai speech synthesize [...] --output each synthesizer synthesis started result resultid
+  ai speech synthesize [...] --output each synthesizer synthesis started result reason
+  ai speech synthesize [...] --output each synthesizer synthesis started result audio data
+  ai speech synthesize [...] --output each synthesizer synthesis started result audio length
+
+  ai speech synthesize [...] --output all synthesizer synthesizing events
+  ai speech synthesize [...] --output all synthesizer synthesizing result resultid
+  ai speech synthesize [...] --output all synthesizer synthesizing result reason
+  ai speech synthesize [...] --output all synthesizer synthesizing result audio data
+  ai speech synthesize [...] --output all synthesizer synthesizing result audio length
+
+  ai speech synthesize [...] --output each synthesizer synthesizing event
+  ai speech synthesize [...] --output each synthesizer synthesizing result resultid
+  ai speech synthesize [...] --output each synthesizer synthesizing result reason
+  ai speech synthesize [...] --output each synthesizer synthesizing result audio data
+  ai speech synthesize [...] --output each synthesizer synthesizing result audio length
+
+  ai speech synthesize [...] --output all synthesizer synthesis completed events
+  ai speech synthesize [...] --output all synthesizer synthesis completed result resultid
+  ai speech synthesize [...] --output all synthesizer synthesis completed result reason
+  ai speech synthesize [...] --output all synthesizer synthesis completed result audio data
+  ai speech synthesize [...] --output all synthesizer synthesis completed result audio length
+
+  ai speech synthesize [...] --output each synthesizer synthesis completed event
+  ai speech synthesize [...] --output each synthesizer synthesis completed result resultid
+  ai speech synthesize [...] --output each synthesizer synthesis completed result reason
+  ai speech synthesize [...] --output each synthesizer synthesis completed result audio data
+  ai speech synthesize [...] --output each synthesizer synthesis completed result audio length
+
+  ai speech synthesize [...] --output all file type tsv 
+  ai speech synthesize [...] --output all file output.tsv
+  ai speech synthesize [...] --output all tsv file has header false
+
+  ai speech synthesize [...] --output each file type tsv
+  ai speech synthesize [...] --output each file output.tsv
+  ai speech synthesize [...] --output each tsv file has header false

@@ -1,0 +1,34 @@
+INTENT REGION
+
+@include.the.intent.command
+
+@include.the.region.option
+
+USAGE: ai speech intent [...] --region REGION
+   OR: ai speech intent [...] --region @FILENAME
+   OR: ai speech intent [...] @CONFIG-FILENAME
+
+@include.the.region.option.where
+
+EXAMPLES
+
+  ai config speech @region --set westus2
+  ai config speech @key --set 12345678123456781234567812345678
+  ai speech intent --nodefaults --region @region --key @key --file hello.wav
+
+  ai config speech @default.config --clear
+  ai config speech @default.config --add key @key
+  ai config speech @default.config --add region @region
+  ai speech intent --file hello.wav
+
+  ai config speech @key --set 12345678123456781234567812345678 --region westus2
+  ai config speech @key --set 12345678123456781234567812345678 --region eastus
+  ai speech intent --foreach region in eastus;westus2 --key @@key --file hello.wav
+
+SEE ALSO
+
+  ai help speech setup
+  ai help speech region overview
+  ai help speech intent connection
+  ai help speech intent key
+  ai help speech intent

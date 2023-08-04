@@ -1,0 +1,25 @@
+SYNTHESIZE LOG
+
+@include.the.synthesize.command
+
+@include.the.log.option
+
+USAGE: ai speech synthesize [...] --log FILENAME
+
+  NOTE: Default SDK logging uses the `@log.time` preset template
+
+    diagnostics.config.log.file=log-{run.time}.log
+
+EXAMPLES
+
+  ai speech synthesize --text Hello --log log.log
+  ai speech synthesize --file hello.ssml --log {id}.log
+  ai speech synthesize --file hello.ssml --log {config.region}.log
+
+  ai config speech @default.log --clear
+  ai config speech @default.log --set @@none
+  ai config speech @default.log --set log {config.region}-{id}-{run.time}.log
+
+SEE ALSO
+
+  ai help speech synthesize

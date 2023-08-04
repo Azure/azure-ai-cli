@@ -1,0 +1,25 @@
+INTENT OUTPUT VTT 
+
+@include.the.intent.command
+
+  The `--output vtt` option requests intent recognition results in WEBVTT format.
+  WEBVTT format provides captioning information for audio/video files.
+  Learn more: https://www.w3.org/TR/webvtt1/
+
+
+  The `--output vtt file` option specifies the name of the file to use. If 
+  this option is not specified, a default filename will be provided.
+
+USAGE: ai speech intent [...] --output vtt
+   OR: ai speech intent [...] --output vtt file FILENAME
+
+EXAMPLES
+
+  ai speech intent --file hello.wav --output vtt
+  ai speech intent --file hello.wav --output vtt file hello.vtt
+
+SEE ALSO
+
+  ai help speech intent output
+  ai help speech intent
+  

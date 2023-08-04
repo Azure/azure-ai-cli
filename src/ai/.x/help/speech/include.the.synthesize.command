@@ -1,0 +1,1 @@
+  The `ai speech synthesize` command synthesizes audio from text or SSML.

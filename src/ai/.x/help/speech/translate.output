@@ -1,0 +1,36 @@
+TRANSLATE OUTPUT
+
+@include.the.translate.command
+
+  Translation output approaches:
+  (1) Per event output - Specified ITEMs are accumulated and output per event
+  (2) Combined output - Specified ITEMs are accumulated and output per audio stream
+  (3) Batch output - Translation output is similar to `ai speech batch` transcriptions
+  
+  For (1) and (2), one or more ITEMs from a large set of items may be chosen
+  to output, in either JSON or TSV format.
+
+  For (3), a fixed set of ITEMs are output, both combined and segmented by
+  service determined utterance boundaries, as well as some stream summary
+  information.
+
+  (1) To use per event output, see: ai help speech translate output each
+  (2) To use combined output, see: ai help speech translate output all
+  (3) To use batch output, see ai help speech translate output batch
+
+EXAMPLES
+
+  ai speech translate --file hello.wav --source en-US --target de --output all id --output all sessionid --output all text
+  ai speech translate --once --source en-US --target de --output each event --output all sessionid --output each text
+  ai speech translate --once --source en-US --target de --output batch json --output batch file my.output.json
+
+  ai config speech @default.output --clear
+  ai config speech @default.output --add output.all.id true
+  ai config speech @default.output --add output.all.sessionid true
+  ai config speech @default.output --add output.all.text true
+
+SEE ALSO
+
+  ai help speech config
+  ai help speech batch transcription
+  ai help speech translate

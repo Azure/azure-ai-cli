@@ -1,0 +1,45 @@
+CUSTOM SPEECH RECOGNITION EXAMPLES
+
+  `INIT`: Automatically setup `ai` with REGION and KEY default values
+
+    ai init
+
+  `SETUP`: Manually setup `ai` with REGION and KEY default values
+
+    ai config speech @region --set westus2
+    ai config speech @key --set 436172626F6E20697320636F6F6C2121
+
+  `EXAMPLE 1`: Use new endpoint with custom speech recognition model
+
+    ai speech csr endpoint create --name "LM example" --text @sentences.txt --output id @my.cid.txt
+    ai speech csr endpoint status --endpoint @my.cid.txt --wait
+    ai speech recognize --files test.wav --endpoint id @my.cid
+
+  `EXAMPLE 2`: List custom speech recognition projects or endpoints
+
+    ai speech csr project list --projects
+    ai speech csr endpoint list --endpoints
+
+  `EXAMPLE 3`: Use new custom speech recognition model in batch transcription
+
+    ai speech csr model create --name "LM example" --text @sentences.txt --output url @my.model.txt
+    ai speech batch transcription create --name "Example 3" --model @my.model.txt --output url @my.trx.txt
+    ai speech batch transcription status --transcription @my.trx.txt --wait
+
+  `EXAMPLE 4`: Create custom speech recognition model using text and audio datasets
+
+    ai speech csr dataset create --name "LM" --kind Language --content https://crbn.us/data.txt --output url @my.datasets.txt
+    ai speech csr dataset create --name "AM" --kind Acoustic --content https://crbn.us/audio.zip --output add url @my.datasets.txt
+    ai speech csr model create --name "Example 4" --datasets @my.datasets.txt --output url @my.model.txt
+    ai speech csr model status --model @my.model.txt --wait
+
+  `EXAMPLE 5`: Create custom speech recognition model using uploaded text dataset
+
+    ai speech csr dataset upload --name "LM data" --kind Language --data data.txt --output url @my.dataset.txt
+    ai speech csr model create --name "Example 5" --dataset @my.dataset.txt --output url @my.model.txt
+    ai speech csr model status --model @my.model.txt --wait
+   
+ADDITIONAL TOPICS
+
+  ai help speech setup
+  ai help speech csr

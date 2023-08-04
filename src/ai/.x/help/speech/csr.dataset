@@ -1,0 +1,23 @@
+CUSTOM SPEECH RECOGNITION DATASET
+
+@include.the.csr.dataset.command
+
+USAGE: ai speech csr dataset <command> [...]
+
+COMMANDS
+
+  ai speech csr dataset create [...]        (see: ai help speech csr dataset create)
+  ai speech csr dataset status [...]        (see: ai help speech csr dataset status)
+  ai speech csr dataset list [...]          (see: ai help speech csr dataset list)
+
+  ai speech csr dataset update [...]        (see: ai help speech csr dataset update)
+  ai speech csr dataset delete [...]        (see: ai help speech csr dataset delete)
+
+  ai speech csr dataset upload [...]        (see: ai help speech csr dataset upload)
+  ai speech csr dataset download [...]      (see: ai help speech csr dataset download)
+
+ADDITIONAL TOPICS
+
+  ai help speech csr examples
+  ai help speech csr list datasets
+  ai help speech documentation

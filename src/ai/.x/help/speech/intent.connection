@@ -1,0 +1,52 @@
+CONNECTION OVERVIEW
+
+  AUTHENTICATION - KEY or TOKEN
+
+    The Azure Speech service requires authentication using subscriptions keys
+    or authentication tokens.
+
+    To use subscription keys see: ai help speech intent key
+    To use authentication tokens see: ai help speech intent token
+
+  CONNECTION - REGION, ENDPOINT, or HOST
+
+    The Azure Speech service runs in REGION specific data centers, sovereign
+    clouds, or on-premise containers. For sovereign clouds and on-premise
+    containers, you may need to specify the ENDPOINT or HOST directly.
+
+    To specify a particular REGION see: ai help speech intent region
+    To specify a particular ENDPOINT see: ai help speech intent endpoint
+    To specify a particular HOST see: ai help speech intent host
+
+    NOTE: Default connection uses the `@connection.from.region` preset template
+
+      service.config.region=@region
+      service.config.key=@key
+
+EXAMPLES
+
+  `EXAMPLE 1`: Use the `westus2` region and key stored in the AI configuration
+
+    ai config speech @region --set westus2
+    ai config speech @key --set 436172626F6E20697320636F6F6C2121
+    ai speech intent --file hello.wav
+
+  `EXAMPLE 2`: Use the `westus2` region and key directly on command line
+
+    ai speech intent --region westus2 --key 436172626F6E20697320636F6F6C2121 --file hello.wav
+
+  `EXAMPLE 3`: Use a specific sovereign cloud host on the command line
+
+    ai speech intent --host wss://chinaeast2.stt.speech.azure.cn --file hello.wav
+
+  `EXAMPLE 4`: Use a specific on-premise container host on the command line
+
+    ai speech intent --key @none --host wss://localhost:5000/ --file hello.wav
+
+  `EXAMPLE 5`: Use a specific endpoint on the command line
+
+    ai speech intent --nodefaults --endpoint wss://westus2.stt.speech.microsoft.com/speech/recognition/conversation/cognitiveservices/v1
+
+SEE ALSO
+
+  ai help speech intent default connection example

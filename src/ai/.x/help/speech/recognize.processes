@@ -1,0 +1,28 @@
+RECOGNIZE PROCESSES
+
+@include.the.recognize.command
+
+  The `--processes` option specifies the maximum number of
+  sub-processes to use when parallelizing recognition tasks.
+
+  The `--ramp processes every` option can optionally be used to control
+  how quickly each new sub-process will be added to the pool. If this option
+  is not specified, the default will be 0 ms, and thus the maximum number of
+  processes will immediately be available to the pool.
+
+USAGE: ai speech recognize [...] --processes NUMBER
+   OR: ai speech recognize [...] --processes NUMBER --ramp processes every MILLISECONDS
+
+  WHERE: NUMBER represents the maximum number of processes to use/pool
+    AND: MILLISECONDS represents the number of milliseconds to wait before
+         ... adding each new process
+
+EXAMPLES
+
+  ai speech recognize --files @filelist.txt --processes 10
+  ai speech recognize --files *.wav --processes 20 --ramp processes every 30000
+
+SEE ALSO
+
+  ai help speech recognize
+  ai help speech recognize threads

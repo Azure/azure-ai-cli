@@ -1,0 +1,25 @@
+INTENT PATTERN
+
+@include.the.intent.command
+
+  The `--pattern` option specifies a single intent PATTERN to recognize,
+  optionally containing one or more ENTITIES.
+
+USAGE: ai speech intent [...] --pattern PATTERN
+   OR: ai speech intent [...] --pattern INTENTID=PATTERN
+
+  WHERE: PATTERN represents a phrase to be recognized
+     OR: INTENTID represents the identifier that will symbolize the pattern
+
+  NOTE: ENTITIES are indicated by enclosing the ENTITY name inside `{` and `}`
+
+EXAMPLES
+
+  ai speech intent --pattern "Start {app}" --output app entity
+  ai speech intent --pattern "START=Start {app}" --output intentid --output app entity
+
+SEE ALSO
+
+  ai help speech intent patterns
+  ai help speech intent output
+  ai help speech intent

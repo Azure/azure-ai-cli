@@ -1,0 +1,22 @@
+SYNTHESIZE WEBM
+
+@include.the.synthesize.command
+
+  The `--format` option specifies the container format for the
+  audio file being generated.
+
+USAGE: ai speech synthesize [...] --format FORMAT
+
+  WHERE: FORMAT is webm
+     OR: FORMAT is webm-16khz-16bit-mono-opus
+     OR: FORMAT is webm-24khz-16bit-24kbps-mono-opus
+     OR: FORMAT is webm-24khz-16bit-mono-opus
+
+  NOTE: The default `webm` format is `webm-16khz-16bit-mono-opus`
+  
+SEE ALSO
+
+  ai help speech synthesize audio output
+  ai help speech synthesize format
+  ai help speech synthesize opus
+  ai help speech synthesize

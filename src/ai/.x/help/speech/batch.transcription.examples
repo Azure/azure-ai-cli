@@ -1,0 +1,54 @@
+BATCH TRANSCRIPTION EXAMPLES
+
+  `INIT`: Automatically setup `ai` with REGION and KEY default values
+
+    ai init
+
+  `SETUP`: Manually setup `ai` with REGION and KEY default values
+
+    ai config speech @region --set westus2
+    ai config speech @key --set 436172626F6E20697320636F6F6C2121
+
+  `EXAMPLE 1`: Create a batch transcription for an audio file
+
+    ai speech batch transcription create --name "Example 1" --content https://crbn.us/hello.wav
+
+  `EXAMPLE 2`: Create a batch transcription for two remote audio files
+
+    ai config @audio.urls.txt --clear
+    ai config @audio.urls.txt --add http://crbn.us/hello.wav
+    ai config @audio.urls.txt --add http://crbn.us/whatstheweatherlike.wav
+    ai speech batch transcription create --name "Example 2" --content @audio.urls.txt
+
+  `EXAMPLE 3`: Create a batch of transcriptions, and only return when done
+
+    SAVE JOB
+
+      ai config @audio.urls.txt --clear
+      ai config @audio.urls.txt --add http://crbn.us/hello.wav
+      ai config @audio.urls.txt --add http://crbn.us/whatstheweatherlike.wav
+      ai speech batch transcription create --name "Example 3" --content @audio.urls.txt --save transcription.job
+
+    EXECUTE JOB
+
+      ai speech batch transcription create @transcription.job --wait
+
+  `EXAMPLE 4`: List transcriptions previously created
+
+    ai speech batch transcription list
+
+  `EXAMPLE 5`: List transcription files for most recently created/completed transcription
+
+    ai speech batch transcription list --output last url @@transcription.url.txt
+    ai speech batch transcription list --files --transcription @transcription.url.txt
+
+  `EXAMPLE 6`: Download all transcription files
+
+    ai speech batch transcription list --output last url @@transcription.url.txt
+    ai speech batch transcription list --files --transcription @transcription.url.txt --output urls @@file.urls.txt
+    ai speech batch transcription download --foreach file in @file.urls.txt --output path ./files
+
+SEE ALSO
+
+  ai help speech batch transcription
+  ai help speech batch transcription more examples

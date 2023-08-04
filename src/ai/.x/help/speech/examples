@@ -1,0 +1,23 @@
+USAGE: ai speech <command> [...]
+
+EXAMPLES
+
+  ai config @region --set westus2
+  ai config @key --set 436172626F6E20697320636F6F6C2121
+
+  ai speech synthesize --text "Hello"
+  ai speech synthesize --files *.txt;*.ssml --audio output {id}.wav
+
+  ai speech recognize --microphone
+  ai speech recognize --files *.wav --output results.tsv
+
+  ai speech translate --target de --microphone
+  ai speech translate --source en-US --target de;es;fr --file hello.wav
+
+ADDITIONAL EXAMPLES
+
+  ai help find speech "mp3"
+  ai help find speech "mp3" --expand
+
+  ai help find topics speech "examples"
+  ai help speech list topics 

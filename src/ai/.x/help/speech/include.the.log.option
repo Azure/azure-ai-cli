@@ -1,0 +1,3 @@
+  The `--log` option specifies the name of the file into which
+  to write additional log information and diagnostics. This logging is
+  performed by the Speech SDK, upon which AI is built. 

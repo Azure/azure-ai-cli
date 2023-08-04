@@ -1,0 +1,37 @@
+TRANSLATE FILE
+
+@include.the.translate.command
+
+  The `--file` option specifies a single local audio file to be
+  streamed to the service for translation.
+
+  The `--url` option specifies a single remote audio file to be
+  streamed to the service for translation after first caching the audio
+  locally, removing it when done.
+
+USAGE: ai speech translate [...] --url URL
+   OR: ai speech translate [...] --url @FILENAME.txt
+   OR: ai speech translate [...] --file @FILEAME.txt
+   OR: ai speech translate [...] --file FILE
+
+  WHERE: URL represents a remote audio file accessible to the public
+     OR: FILE represents a local audio file accessible to the current user
+     OR: FILE is `-` indicating that audio file content will be read from STDIN
+     OR: FILENAME.txt is a single line text file containing the file to stream
+
+  NOTE: `--url` is an alias for `--file` ... both accept both files and urls
+
+EXAMPLES
+
+  ai speech translate --file hello.wav --source en-US --target de
+  ai speech translate --url https://crbn.us/hello.wav --source en-US --target de
+
+  echo hello.wav>file.txt
+  ai speech translate --file @file.txt --source en-US --target de
+
+SEE ALSO
+
+  ai help speech translate files
+  ai help speech translate format
+  ai help speech translate input
+  ai help speech translate

@@ -895,7 +895,8 @@ namespace Azure.AI.Details.Common.CLI
         private static Stream GetResourceStream(string fileName)
         {
             var resource = ResourceNameFromFileName(fileName);
-            return _assembly.GetManifestResourceStream(resource);
+            return _assembly.GetManifestResourceStream(resource)
+                ?? _assembly.GetManifestResourceStream(resource + "._");
         }
 
         private static string ReadAllResourceText(string fileName, Encoding encoding)

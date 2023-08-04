@@ -1,0 +1,28 @@
+BATCH DOWNLOAD URL
+
+  The `--url` option specifies which resource to download from the service.
+
+USAGE: ai speech batch download [...] --url URL
+   OR: ai speech batch download [...] --url @FILENAME
+   OR: ai speech batch download [...] @CONFIG-FILENAME
+
+  WHERE: URL is the resource to download
+     OR: FILENAME is a single line text file containing the URL
+     OR: CONFIG-FILENAME is a single line text file in the following form:
+
+            batch.download.url=URL
+
+EXAMPLE
+
+  ai speech batch transcription list --output last url @@transcription-url.txt
+  ai speech batch transcription list --files --transcription @transcription-url.txt --output last url @@file-url.txt
+
+  ai speech batch transcription download --url @file-url.txt --output json file.json
+  ai speech batch transcription download --file @file-url.txt --output file file.contents
+
+SEE ALSO
+
+  ai help speech batch transcription list
+  ai help speech batch transcription download
+  ai help speech batch output
+  ai help speech batch

@@ -1,0 +1,16 @@
+TRANSLATE CONNECT
+
+@include.the.translate.command
+
+  The `--connect` option forces connection to the service
+  earlier in the process to decrease overall latency.
+
+USAGE: ai speech translate [...] --connect
+
+EXAMPLE
+
+  ai speech translate --file hello.wav --source en-US --target de --connect
+
+SEE ALSO
+
+  ai help speech translate

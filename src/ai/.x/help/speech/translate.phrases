@@ -1,0 +1,30 @@
+TRANSLATE PHRASEs
+
+@include.the.translate.command
+
+  The `--phrases` option increases speech recognition accuracy
+  by supplying one or more words or phrases that are likely to appear
+  in the streaming audio. 
+
+USAGE: ai speech translate [...] --phrases "PHRASE1;"
+   OR: ai speech translate [...] --phrases "PHRASE1;PHRASE2[;...]
+   OR: ai speech translate [...] --phrases @PHRASELIST.txt
+
+  WHERE: PHRASE represents one or more words that might appear in the audio
+     OR: PHRASELIST.txt is a multi-line text file containing one or more
+         ... PHRASEs, listed individually, each on separate lines
+     
+EXAMPLES
+
+  ai speech translate --file hello.wav --phrases "Hello;Hi;Howya doin" --source en-US --target de
+
+  echo Hello> phrases.txt
+  echo Hi>> phrases.txt
+  echo Howya doin>> phrases.txt
+
+  ai speech translate --file hello.wav --phrases @phrases.txt --source en-US --target de
+
+SEE ALSO
+
+  ai help speech translate custom speech
+  ai help speech translate

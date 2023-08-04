@@ -1,0 +1,25 @@
+TRANSLATE KEYWORD
+
+@include.the.translate.command
+
+  The `--keyword` option gates the translation of speech until
+  a keyword from the specified keyword model is translated.
+
+  Once the keyword is recognized, the next phrase in the speech stream will
+  also be translated, after which the system will once again gate speech
+  translation until the keyword is recognized again.
+
+  The `--timeout` option can be used to limit the amount of audio translated.
+  If not specified, there is effectively no timeout.
+
+USAGE: ai speech translate [...] --keyword KEYWORD-MODEL
+   OR: ai speech translate [...] --keyword KEYWORD-MODEL --timeout [MILLISECONDS]
+
+EXAMPLES
+
+  ai speech translate --microphone --continuous
+  ai speech translate --file hello.wav --continuous --timeout 30000
+
+SEE ALSO
+
+  ai help speech translate

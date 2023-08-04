@@ -1,0 +1,21 @@
+CUSTOM SPEECH RECOGNITION PROJECT
+
+@include.the.csr.project.command
+
+USAGE: ai speech csr project <command> [...]
+
+COMMANDS
+
+  ai speech csr project create [...]        (see: ai help speech csr project create)
+  ai speech csr project status [...]        (see: ai help speech csr project status)
+  ai speech csr project list [...]          (see: ai help speech csr project list)
+
+  ai speech csr project update [...]        (see: ai help speech csr project update)
+  ai speech csr project delete [...]        (see: ai help speech csr project delete)
+
+ADDITIONAL TOPICS
+
+  ai help speech csr examples
+  ai help speech csr project examples
+  ai help speech csr list projects
+  ai help speech documentation

@@ -1,0 +1,30 @@
+BATCH OUTPUT REQUEST
+
+  The `--output request` option writes the HTTP request into the file specified.
+
+  Use this option to inspect how the REST API operates.
+
+USAGE: ai speech batch [...] --output request FILE.request
+   OR: ai speech batch [...] @CONFIG-FILENAME
+
+  WHERE: FILE.request is the file to store the HTTP request
+     OR: CONFIG-FILENAME is a single line text file in the following form:
+
+            batch.output.request.file=FILE.request
+
+EXAMPLES
+
+  ai speech batch transcription list --output request @transcription-list.request
+
+  ai config @transcription.job --set name "My transcription"
+  ai config @transcription.job --add content http://crbn.us/hello.wav
+  ai config @transcription.job --add batch.output.request.file create-operation-output.request
+  ai speech batch transcription create @transcription.details
+
+SEE ALSO
+
+  ai help speech batch output
+  ai help speech batch output json
+  ai help speech batch transcription
+  ai help speech batch
+  

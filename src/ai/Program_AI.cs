@@ -61,6 +61,7 @@ namespace Azure.AI.Details.Common.CLI
             return root switch {
                 "init" => (new InitCommand(values)).RunCommand(),
                 "chat" => (new ChatCommand(values)).RunCommand(),
+                "speech" => (new SpeechCommand(values)).RunCommand(),
                 "complete" => (new CompleteCommand(values)).RunCommand(),
                 "wizard" => (new ScenarioWizardCommand(values)).RunCommand(),
                 "run" => (new RunJobCommand(values)).RunCommand(),
@@ -79,6 +80,7 @@ namespace Azure.AI.Details.Common.CLI
                 "init" => InitCommandParser.ParseCommand(tokens, values),
                 "config" => ConfigCommandParser.ParseCommand(tokens, values),
                 "chat" => ChatCommandParser.ParseCommand(tokens, values),
+                "speech" => SpeechCommandParser.ParseCommand(tokens, values),
                 "complete" => CompleteCommandParser.ParseCommand(tokens, values),
                 "wizard" => ScenarioWizardCommandParser.ParseCommand(tokens, values),
                 "run" => RunJobCommandParser.ParseCommand(tokens, values),
@@ -94,6 +96,7 @@ namespace Azure.AI.Details.Common.CLI
                 "init" => InitCommandParser.ParseCommandValues(tokens, values),
                 "config" => ConfigCommandParser.ParseCommandValues(tokens, values),
                 "chat" => ChatCommandParser.ParseCommandValues(tokens, values),
+                "speech" => SpeechCommandParser.ParseCommandValues(tokens, values),
                 "complete" => CompleteCommandParser.ParseCommandValues(tokens, values),
                 "wizard" => ScenarioWizardCommandParser.ParseCommandValues(tokens, values),
                 "run" => RunJobCommandParser.ParseCommandValues(tokens, values),

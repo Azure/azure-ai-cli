@@ -1,0 +1,23 @@
+INTENT SAVE
+
+@include.the.intent.command
+
+@include.the.save.option
+
+USAGE: ai speech intent [...] --save FILENAME
+
+EXAMPLES
+
+  ai speech intent --files *.wav --save test1.job
+  ai speech intent --files *.wav --log {id}.log --save test2.job
+  ai speech intent --files @URLs.txt --output zip output.zip --save test3.job
+
+  ai speech intent --foreach file;transcript in @items.txt --save test4.job
+  ai speech intent @test4.job
+
+SEE ALSO
+
+  ai help speech intent
+  ai help speech intent files
+  ai help speech intent foreach
+  ai help speech webjob setup

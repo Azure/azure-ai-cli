@@ -1,0 +1,30 @@
+SYNTHESIZE FORMAT
+
+@include.the.synthesize.command
+
+  The `--format` option specifies the container format for the
+  audio file being generated.
+
+USAGE: ai speech synthesize [...] --format FORMAT
+
+  WHERE: FORMAT is wav          (see: ai help speech synthesize wav)
+     OR: FORMAT is mp3          (see: ai help speech synthesize mp3)
+     OR: FORMAT is ogg          (see: ai help speech synthesize ogg)
+     OR: FORMAT is opus         (see: ai help speech synthesize opus)
+     OR: FORMAT is webm         (see: ai help speech synthesize webm)
+     OR: FORMAT is alaw         (see: ai help speech synthesize wav)
+     OR: FORMAT is mulaw        (see: ai help speech synthesize wav)
+     OR: FORMAT is siren        (see: ai help speech synthesize siren)
+     OR: FORMAT is raw          (see: ai help speech synthesize raw)
+
+  NOTE: The default `wav` format is `riff-16khz-16bit-mono-pcm`
+
+EXAMPLES
+
+  ai speech synthesize --text "Hello" --audio output audio.mp3 --format mp3
+  ai speech synthesize --text "Hello" --audio output audio.ogg --format ogg
+
+SEE ALSO
+
+  ai help speech synthesize audio output
+  ai help speech synthesize

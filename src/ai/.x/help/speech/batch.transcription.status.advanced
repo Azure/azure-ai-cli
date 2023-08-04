@@ -1,0 +1,37 @@
+BATCH TRANSCRIPTION STATUS ADVANCED
+
+  The `ai speech batch transcription status` command checks the status of
+  existing batch transcriptions, providing additional details.
+  
+USAGE: ai speech batch transcription status [...]
+
+  CONNECTION                      (see: ai help speech batch connection)
+    --key KEY                     (see: ai help speech batch key)
+    --region REGION               (see: ai help speech batch region)
+
+  STATUS
+    --transcription URL           (see: ai help speech batch transcription reference)
+
+  OUTPUT
+    --output json FILENAME        (see: ai help speech batch output json)
+    --output url @@FILE           (see: ai help speech batch output url)
+    --output id @@FILE            (see: ai help speech batch output id)
+    --wait [TIMEOUT]              (see: ai help speech batch transcription wait)
+
+  PARALLEL PROCESSING
+    --threads NUMBER              (see: ai help speech batch threads)
+    --processes NUMBER            (see: ai help speech batch processes)
+
+  ADVANCED
+    --input path PATH             (see: ai help speech batch input path)
+    --output path PATH            (see: ai help speech batch output path)
+    --foreach in @FILENAME        (see: ai help speech batch foreach)
+    --save FILENAME               (see: ai help speech batch save)
+    --zip ZIPFILE                 (see: ai help speech batch zip)
+
+SEE ALSO
+
+  ai help speech batch output
+  ai help speech batch transcription examples
+  ai help speech batch transcription list
+  

@@ -1,0 +1,23 @@
+CUSTOM SPEECH RECOGNITION MODEL
+
+@include.the.csr.model.command
+
+USAGE: ai speech csr model <command> [...]
+
+COMMANDS
+
+  ai speech csr model create [...]          (see: ai help speech csr model create)
+  ai speech csr model status [...]          (see: ai help speech csr model status)
+  ai speech csr model list [...]            (see: ai help speech csr model list)
+
+  ai speech csr model update [...]          (see: ai help speech csr model update)
+  ai speech csr model delete [...]          (see: ai help speech csr model delete)
+
+  ai speech csr model copy [...]            (see: ai help speech csr model copy)
+
+ADDITIONAL TOPICS
+
+  ai help speech csr examples
+  ai help speech csr model examples
+  ai help speech csr list models
+  ai help speech documentation

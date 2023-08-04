@@ -1,0 +1,30 @@
+  ______ ___ _  __
+ /  ___// _ \ \/ /
+ \___ \/ ___/   <
+/____ /_/  /__/\_\
+
+USAGE: ai speech batch transcription <command> [...]
+
+BATCH TRANSCRIPTION
+
+  The `ai speech batch transcription` command manages Azure Speech Service
+  batch transcriptions.
+
+COMMANDS
+
+  ai speech batch transcription create [...]          (see: ai help speech batch transcription create)
+  ai speech batch transcription status [...]          (see: ai help speech batch transcription status)
+
+  ai speech batch transcription list [...]            (see: ai help speech batch transcription list)
+  ai speech batch transcription download [...]        (see: ai help speech batch transcription download)
+
+  ai speech batch transcription update [...]          (see: ai help speech batch transcription update)
+  ai speech batch transcription delete [...]          (see: ai help speech batch transcription delete)
+
+  ai speech batch transcription onprem [...]          (see: ai help speech batch transcription onprem)
+
+ADDITIONAL TOPICS
+
+  ai help speech setup
+  ai help speech batch transcription examples
+  ai help find topics speech batch transcription

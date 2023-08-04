@@ -1,0 +1,23 @@
+RECOGNIZE SAVE
+
+@include.the.recognize.command
+
+@include.the.save.option
+
+USAGE: ai speech recognize [...] --save FILENAME
+
+EXAMPLES
+
+  ai speech recognize --files *.wav --save test1.job
+  ai speech recognize --files *.wav --log {id}.log --save test2.job
+  ai speech recognize --files @URLs.txt --output zip output.zip --save test3.job
+
+  ai speech recognize --foreach file;transcript in @items.txt --save test4.job
+  ai speech recognize @test4.job
+
+SEE ALSO
+
+  ai help speech recognize
+  ai help speech recognize files
+  ai help speech recognize foreach
+  ai help speech webjob setup

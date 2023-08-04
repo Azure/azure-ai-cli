@@ -1,0 +1,53 @@
+SYNTHESIZE INPUT OVERVIEW
+
+@include.the.synthesize.command
+
+  INTERACTIVE - You type the text
+
+    The `ai speech synthesize` command can create human sounding output from simple
+    text that you type in, INTERACTIVELY.
+
+    To synthesize text INTERACTIVELY see: ai help speech synthesize interactive
+
+  COMMAND LINE - TEXT or SSML
+
+    The `ai speech synthesize` command can also create human sounding output supplied
+    directly on the command line. 
+
+    To synthesize TEXT from the command line, see: ai help speech synthesize text
+    To synthesize SSML from the command line, see: ai help speech synthesize ssml
+
+  DATA FILES - TEXT or SSML FILES
+
+    In addition, the `ai speech synthesize` command can also create human sounding 
+    output stored in local or remote data files (TEXT or SSML standard).
+
+    To synthesize TEXT or SSML from a single file, see: ai help speech synthesize file
+    To synthesize TEXT or SSML from multiple files, see: ai help speech synthesize files
+ 
+EXAMPLES
+
+  `EXAMPLE 1`: Synthesize text entered on the command line
+  
+    ai speech synthesize --text "This is a test of the emergency broadcast system."
+
+  `EXAMPLE 2`: Synthesize text stored in a local file
+
+    ai speech synthesize --file story.txt
+
+  `EXAMPLE 3`: Synthesize speech defined in a local SSML file
+
+    ai speech synthesize --file cheerful.ssml
+
+  `EXAMPLE 4`: Synthesize speech stored in a remote file, either TEXT or SSML
+
+    ai speech synthesize --url http://crbn.us/text
+
+  `EXAMPLE 5`: From a set of local files, synthesize from all text and SSML files
+
+    ai speech synthesize --files *.txt;*.ssml
+
+SEE ALSO
+
+  ai help speech synthesize examples
+  ai help speech synthesize

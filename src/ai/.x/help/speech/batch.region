@@ -1,0 +1,32 @@
+BATCH REGION
+
+  The `ai speech batch` command manages remote audio streams.
+
+@include.the.region.option
+
+USAGE: ai speech batch [...] --region REGION
+   OR: ai speech batch [...] --region @FILENAME
+   OR: ai speech batch [...] @CONFIG-FILENAME
+
+@include.the.region.option.where
+
+EXAMPLES
+
+  ai speech batch transcription list --region westus2 --key 436172626F6E20697320636F6F6C2121
+
+  ai config speech @region --set westus2
+  ai config speech @key --set 436172626F6E20697320636F6F6C2121
+  ai speech batch transcription list --region @region --key @key
+
+  ai config speech @region --set westus2
+  ai config speech @key --set 436172626F6E20697320636F6F6C2121
+  ai config speech @default.config --set @@connection.from.region
+  ai speech batch transcription list
+
+SEE ALSO
+
+  ai help speech setup
+  ai help speech region overview
+  ai help speech batch connection
+  ai help speech batch key
+  ai help speech batch

@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net7.0</TargetFramework>
+    <TargetFramework>net6.0</TargetFramework>
     <AssemblyName>ai</AssemblyName>
     <SelfContained>false</SelfContained>
     <OutputType>Exe</OutputType>
@@ -70,8 +70,8 @@
     <Compile Include="..\common\**" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include=".x\help\*">
-      <Link>resources\.ai\help\%(Filename)%(Extension)</Link>
+    <EmbeddedResource Include=".x\help\**">
+      <Link>resources\.ai\help\%(RecursiveDir)%(Filename)%(Extension)</Link>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </EmbeddedResource>
   </ItemGroup>

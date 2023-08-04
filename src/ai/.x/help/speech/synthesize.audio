@@ -1,0 +1,41 @@
+SYNTHESIZE AUDIO OUTPUT
+
+@include.the.synthesize.command
+
+  The `--speakers` option specifies audio output should be sent to 
+  the default output device.
+
+  The `--audio output` option specifies a local audio file to which
+  the synthesized audio content will be streamed.
+
+USAGE: ai speech synthesize [...] --speakers
+   OR: ai speech synthesize [...] --audio output FILE
+   OR: ai speech synthesize [...] --audio output @FILENAME.txt
+
+  WHERE: FILE represents a local audio file writable by the current user
+     OR: FILE is `-` represents STDOUT, where raw audio data will be streamed
+     OR: FILENAME.txt is a single line text file containing the FILE
+
+EXAMPLES
+
+  `EXAMPLE 1`: Synthesize text into speech on default speakers
+  
+    ai speech synthesize --text Hello --speakers
+
+  `EXAMPLE 2`: Synthesize text into speech in a WAV file
+
+    ai speech synthesize --text "Hello" --audio output hello.wav
+
+  `EXAMPLE 3`: Synthesize text into speech piping raw audio into file
+
+    ai speech synthesize --text "Hello" --audio output - --quiet >hello.raw
+
+  `EXAMPLE 4`: Recognize speech from raw audio content piped thru STDIN from synthesize command
+
+    ai speech synthesize --text "Hello" --audio output - --quiet | ai speech recognize --file -
+
+SEE ALSO
+
+  ai help speech synthesize examples
+  ai help speech synthesize format
+  ai help speech synthesize

@@ -1,0 +1,89 @@
+INTENT
+
+@include.the.intent.command.long
+
+USAGE: ai speech intent [...]
+
+  CONNECTION                      (see: ai help speech intent connection)
+    --key KEY                     (see: ai help speech intent key)
+    --region REGION               (see: ai help speech intent region)
+    --endpoint URI                (see: ai help speech intent endpoint)
+    --token VALUE                 (see: ai help speech intent token)
+
+  SERVICE
+    --traffic type test           (see: ai help speech traffic type)
+    --http header name=value      (see: ai help speech http header)
+    --query string name=value     (see: ai help speech query string)
+
+  PATTERNS
+    --pattern PATTERN             (see: ai help speech intent pattern)
+    --pattern INTENTID=PATTERN
+    --patterns PATTERN1;PATTERN2  (see: ai help speech intent patterns)
+    --patterns @PATTERNS.txt
+
+  LUIS                            (see: ai help speech intent luis)
+    --luis key KEY                (see: ai help speech intent luis key)
+    --luis region REGION          (see: ai help speech intent luis region)
+    --luis appid APPID            (see: ai help speech intent luis appid)
+    --luis intent INTENTID        (see: ai help speech intent luis intent)
+    --luis allintents true        (see: ai help speech intent luis allintents)
+
+  INPUT                           (see: ai help speech intent input)
+    --microphone                  (see: ai help speech intent microphone)
+    --file FILE                   (see: ai help speech intent file)
+    --files PATTERN               (see: ai help speech intent files)
+    --files @FILELIST.txt         (see: ai help speech intent files)
+    --url URL                     (see: ai help speech intent url)
+    --urls URL                    (see: ai help speech intent urls)
+    --urls @URLLIST.txt           (see: ai help speech intent urls)
+    --format FORMAT               (see: ai help speech intent format)
+    --id url URL                  (see: ai help speech input id)
+    --id ID                       (see: ai help speech input id)
+
+  RECOGNITION
+    --language LANGUAGE           (see: ai help speech intent language)
+    --timeout MILLISECONDS        (see: ai help speech intent continuous)
+
+  ACCURACY                        (see: ai help speech intent improve accuracy)
+    --endpoint id ID              (see: ai help speech intent custom speech)
+    --phrases @PHRASELIST.txt     (see: ai help speech intent phrases)
+
+  TESTING                         (see: ai help speech intent testing)
+    --transcript TEXT             (see: ai help speech intent transcript)
+    --check wer NUMOP NUMBER      (see: ai help speech intent check wer)
+    --check text TEXTOP TEXT      (see: ai help speech intent check text)
+
+  OUTPUT                          (see: ai help speech intent output)
+    --output all [<item>]         (see: ai help speech intent output all)
+    --output each [<item>]        (see: ai help speech intent output each)
+    --output batch json           (see: ai help speech intent output batch json)
+    --output batch file FILENAME  (see: ai help speech intent output batch file)
+    --output each file FILENAME   (see: ai help speech intent output each file)
+    --output all file FILENAME    (see: ai help speech intent output all file)
+    --output vtt file FILENAME    (see: ai help speech intent output vtt file)
+    --word level timing           (see: ai help speech intent word level timing)
+    --profanity OPTION            (see: ai help speech intent profanity)
+
+  LOGGING                         (see: ai help speech intent log)
+    --log FILENAME
+    --content logging
+
+  PARALLEL PROCESSING
+    --threads NUMBER              (see: ai help speech intent threads)
+    --processes NUMBER            (see: ai help speech intent processes)
+    --repeat NUMBER
+    --max NUMBER
+
+  ADVANCED
+    --proxy HOSTNAME              (see: ai help speech intent proxy)
+    --property NAME=VALUE         (see: ai help speech intent property)
+    --properties @PROPLIST.txt    (see: ai help speech intent properties)
+    --foreach in @ITEMS.txt       (see: ai help speech intent foreach)
+    --save FILENAME               (see: ai help speech intent save)
+    --zip ZIPFILE                 (see: ai help speech intent zip)
+
+SEE ALSO
+
+  ai help speech setup
+  ai help speech intent examples
+  ai help find topics speech intent

@@ -1,0 +1,4 @@
+  The `ai speech intent` command recognizes streaming audio captured
+  from a device microphone or stored in local or remote audio files 
+  and returns intent information from that recognition using PATTERNS
+  or a previously authored and deployed LUIS model.

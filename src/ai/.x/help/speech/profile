@@ -1,0 +1,21 @@
+PROFILE
+
+@include.the.profile.command.long
+
+USAGE: ai speech profile <command> [...]
+
+COMMANDS
+
+  ai speech profile create [...]        (see: ai help speech profile create)
+  ai speech profile enroll [...]        (see: ai help speech profile enroll)
+
+  ai speech profile status [...]        (see: ai help speech profile status)
+  ai speech profile list [...]          (see: ai help speech profile list)
+
+  ai speech profile delete [...]        (see: ai help speech profile delete)
+
+SEE ALSO
+
+  ai help speech profile examples
+  ai help speech profile documentation
+  ai help find topics speech profile

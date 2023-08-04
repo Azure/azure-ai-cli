@@ -1,0 +1,26 @@
+INTENT LUIS
+
+@include.the.intent.command
+
+@include.the.luis.option
+
+USAGE: ai speech intent [...] --luis key LUIS_KEY
+   OR: ai speech intent [...] --luis region LUIS_REGION
+   OR: ai speech intent [...] --luis appid LUIS_APP_ID
+   OR: ai speech intent [...] --luis intent LUIS_INTENT_ID
+   OR: ai speech intent [...] --luis allintents true 
+
+EXAMPLES
+
+  ai speech intent --file hello.wav --luis key LUIS_KEY --luis region LUIS_REGION --luis appid LUIS_APP_ID
+  ai speech intent --microphone --luis key LUIS_KEY --luis region LUIS_REGION --luis appid LUIS_APP_ID --luis intent LUIS_INTENT_ID
+  ai speech intent --file hello.wav --luis key LUIS_KEY --luis region LUIS_REGION --luis appid LUIS_APP_ID --luis allintents true
+
+SEE ALSO
+
+  ai help speech intent
+  ai help speech intent luis key
+  ai help speech intent luis region
+  ai help speech intent luis intent
+  ai help speech intent luis allintents
+  ai help speech luis documentation

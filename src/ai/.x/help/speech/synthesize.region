@@ -1,0 +1,34 @@
+SYNTHESIZE REGION
+
+@include.the.synthesize.command
+
+@include.the.region.option
+
+USAGE: ai speech synthesize [...] --region REGION
+   OR: ai speech synthesize [...] --region @FILENAME
+   OR: ai speech synthesize [...] @CONFIG-FILENAME
+
+@include.the.region.option.where
+
+EXAMPLES
+
+  ai config speech @region --set westus2
+  ai config speech @key --set 436172626F6E20697320636F6F6C2121
+  ai speech synthesize --nodefaults --region @region --key @key --text Hello
+
+  ai config speech @default.config --clear
+  ai config speech @default.config --add key @key
+  ai config speech @default.config --add region @region
+  ai speech synthesize --text Hello
+
+  ai config speech @key --set 436172626F6E20697320636F6F6C2121 --region westus2
+  ai config speech @key --set 436172626F6E20697320636F6F6C2020 --region eastus
+  ai speech synthesize --foreach region in eastus;westus2 --key @@key --text Hello
+
+SEE ALSO
+
+  ai help speech setup
+  ai help speech region overview
+  ai help speech synthesize connection
+  ai help speech synthesize key
+  ai help speech synthesize

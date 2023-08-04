@@ -1,0 +1,39 @@
+TRANSLATE INPUT OVERVIEW
+
+@include.the.translate.command
+
+  FROM MICROPHONE - DEFAULT DEVICE or SPECIFIC DEVICE
+
+    The `ai speech translate` command can translate streaming audio captured
+    from a device microphone (default microphone or specific microphone).
+
+    To translate audio from a device MICROPHONE see: ai help speech translate microphone 
+
+  FROM FILE - SINGLE or MULTIPLE FILES
+
+    The `ai speech translate` command can also translate audio stored in local
+    or remote audio files, in various audio container formats (e.g. mp3, ogg).
+
+    To translate from a single audio FILE see: ai help speech translate file
+    To translate from a multiple audio FILES see: ai help speech translate files
+    To translate from file(s) in various FORMATs see: ai help speech translate format
+ 
+EXAMPLES
+
+  `EXAMPLE 1`: Translate speech from microphone
+  
+    ai speech translate --microphone --source en-US --target de
+
+  `EXAMPLE 2`: Translate from local WAV file, or remote MP3 file
+
+    ai speech translate --file hello.wav --source en-US --target de
+    ai speech translate --file http://crbn.us/hello.mp3 --format mp3 --source en-US --target de
+
+  `EXAMPLE 3`: Translate multiple files using wildcards
+
+    ai speech translate --files *.wav --source en-US --target de
+
+SEE ALSO
+
+  ai help speech translate examples
+  ai help speech translate

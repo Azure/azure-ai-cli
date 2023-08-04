@@ -1,0 +1,15 @@
+INTENT LUIS INTENT
+
+@include.the.intent.command
+
+@include.the.luis.option
+
+USAGE: ai speech intent [...] --luis intent [INTENT_NAME] INTENT_ID
+
+  WHERE: INTENT_ID represents the intent ID of the LUIS app that intent recognition is being run against
+
+SEE ALSO
+
+  ai help speech intent
+  ai help speech intent luis 
+  ai help speech luis documentation

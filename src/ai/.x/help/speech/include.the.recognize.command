@@ -1,0 +1,1 @@
+  The `ai speech recognize` command recognizes streaming audio.

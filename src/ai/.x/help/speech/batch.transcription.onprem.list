@@ -1,0 +1,18 @@
+BATCH TRANSCRIPTION ONPREM LIST
+
+  The `ai speech batch transcription onprem list` command lists previously
+  submitted batches since the container was started.
+
+USAGE: ai speech batch transcription onprem list [...]
+
+  CREATE
+    --outfile OUTFILE             If provided, writes the ids to file.
+
+SEE ALSO
+
+  ai help speech setup
+  ai help speech batch transcription onprem examples
+  
+  Learn more about running On-Premise Speech Containers:
+  https://docs.microsoft.com/azure/cognitive-services/speech-service/speech-container-howto
+ 

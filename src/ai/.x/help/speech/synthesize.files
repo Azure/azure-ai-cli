@@ -1,0 +1,42 @@
+SYNTHESIZE FILES
+
+@include.the.synthesize.command
+
+  The `--files` option specifies multiple local data files containing
+  text or SSML to be synthesized into audio.
+
+  The `--urls` option specifies multiple local data files containing
+  text or SSML to be synthesized into audio after first caching the data
+  locally, removing it when done.
+
+USAGE: ai speech synthesize [...] --urls URL1;URL2[;...]
+   OR: ai speech synthesize [...] --urls @FILELIST.txt
+   OR: ai speech synthesize [...] --files @FILELIST.txt
+   OR: ai speech synthesize [...] --files FILE1;FILE2[;...]
+   OR: ai speech synthesize [...] --files PATTERN
+
+  WHERE: URL1;URL2 represent remote data files accessible to the public
+     OR: FILE1;FILE2 represent local data files accessible to the current user
+     OR: PATTERN represents a local data file wildcard search pattern
+     OR: FILELIST.txt is a multi-line text file containing files and/or URLs,
+         ... or PATTERNs, listed individually, each on separate lines
+     
+  NOTE: `--urls` is an alias for `--files` ... both accept both files and urls
+
+EXAMPLES
+
+  ai speech synthesize --files *.txt;*.ssml --audio output {id}.wav
+  ai speech synthesize --files "story.txt;cheerful.ssml"
+
+  ai speech synthesize --urls "https://crbn.us/story.txt;https://crbn.us/cheerful.ssml"
+
+  echo story.txt> filelist.txt
+  echo cheerful.ssml>> filelist.txt
+  echo https://crbn.us/sentences.txt>> filelist.txt
+
+  ai speech synthesize --files @filelist.txt
+
+SEE ALSO
+
+  ai help speech synthesize input
+  ai help speech synthesize

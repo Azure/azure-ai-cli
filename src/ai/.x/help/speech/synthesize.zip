@@ -1,0 +1,25 @@
+SYNTHESIZE ZIP
+
+@include.the.synthesize.command
+
+@include.the.zip.option
+
+  NOTE: `--zip` does not package local input files (e.g. text, SSML, etc.)
+
+USAGE: ai speech synthesize [...] --zip FILENAME
+
+EXAMPLES
+
+  ai speech synthesize --files *.txt --zip test1.zip
+  ai speech synthesize --files *.txt;*.ssml --audio output {id}.wav --zip test2.zip
+  ai speech synthesize --files @URLs.txt --output zip output.zip --zip test3.zip
+
+  ai speech synthesize --foreach file;audio.output in @filelist.txt --zip test4.job --zip output output.zip
+  ai webjob --upload test4.zip --run
+
+SEE ALSO
+
+  ai help speech synthesize
+  ai help speech synthesize files
+  ai help speech synthesize foreach
+  ai help speech webjob setup

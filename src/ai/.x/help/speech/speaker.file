@@ -1,0 +1,17 @@
+SPEAKER FILE
+
+@include.the.speaker.command
+
+  The `--file` option specifies a single local audio file to be
+  uploaded to the service for identification or verification.
+
+USAGE: ai speech speaker identify [...] --file @FILENAME.txt
+   OR: ai speech speaker verify [...] --file FILE
+
+  WHERE: FILE represents a local audio file accessible to the current user
+     OR: FILENAME.txt is a single line text file containing the file to stream
+
+SEE ALSO
+
+  ai help speech speaker identify
+  ai help speech speaker verify

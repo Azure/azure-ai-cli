@@ -1,0 +1,28 @@
+TRANSLATE THREADS
+
+@include.the.translate.command
+
+  The `--threads` option specifies a how many threads to use when parallelizing 
+  translation tasks.
+
+  The `--ramp threads every` option can optionally be used to control
+  how quickly each new thread will be added to the thread pool. If this option
+  is not specified, the default will be 0 ms, and thus the maximum number of
+  threads will immediately be available to the pool.
+
+USAGE: ai speech translate [...] --threads NUMBER
+   OR: ai speech translate [...] --threads NUMBER --ramp threads every MILLISECONDS
+
+  WHERE: NUMBER represents the maximum number of threads to use/pool
+    AND: MILLISECONDS represents the number of milliseconds to wait before
+         ... adding each new thread
+
+EXAMPLES
+
+  ai speech translate --files @filelist.txt --source en-US --target de --threads 10
+  ai speech translate --files *.wav --source en-US --target de --threads 20 --ramp threads every 30000
+
+SEE ALSO
+
+  ai help speech translate
+  ai help speech translate processes

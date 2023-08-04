@@ -1,0 +1,31 @@
+TRANSLATE LANGUAGE
+
+@include.the.translate.command
+
+  The `--source` and `--target` language options are used to specify the
+  spoken source language and translation target languages in BCP-47 format.
+  Speech streamed to the service will be forced to match words and phrases
+  in the specified SOURCE language, then translated to the TARGET languages.
+
+  For a full list of supported languages, see https://aka.ms/speech/languages
+
+  If no language is specified, the default will be en-US.
+
+USAGE: ai speech translate [...] --source LANGUAGE
+  AND: ai speech translate [...] --target LANGUAGE1[;LANGUAGE2[;...]]
+   OR: ai speech translate [...] --source @LANGUAGE.txt
+   OR: ai speech translate [...] --target @LANGUAGES.txt
+
+  WHERE: LANGUAGE is a supported BCP-47 language tag (e.g. en-US)
+     OR: LANGUAGE.txt is a single line text file containing one language
+     OR: LANGUAGES.txt is a multi-line text file, with one language per line
+
+EXAMPLES
+
+  ai speech translate --source en-US --file english.wav --target de
+  ai speech translate --source de-DE --file german.wav --target en
+  ai speech translate --source en-US --files *.wav --target en;de;fr
+
+SEE ALSO
+
+  ai help speech translate

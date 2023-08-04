@@ -1,0 +1,32 @@
+INTENT LOG
+
+@include.the.intent.command
+
+@include.the.log.option
+
+  The `--content logging enabled` option enables service level logging
+  of the audio content and intent recognition results.
+
+USAGE: ai speech intent [...] --log FILENAME
+   OR: ai speech intent [...] --content logging enabled
+
+  NOTE: Default SDK logging uses the `@log.time` preset template
+
+    diagnostics.config.log.file=log-{run.time}.log
+
+EXAMPLES
+
+  ai speech intent --file hello.wav --log log.log
+  ai speech intent --file hello.wav --log {id}.log
+  ai speech intent --file hello.wav --log {config.region}.log
+
+  ai speech intent --file hello.wav --content logging enabled
+
+  ai config speech @default.log --clear
+  ai config speech @default.log --set @none
+  ai config speech @default.log --set log {config.region}-{id}-{run.time}.log
+  ai config speech @default.log --add content.logging.enabled true
+
+SEE ALSO
+
+  ai help speech intent

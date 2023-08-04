@@ -1,0 +1,33 @@
+PROFILE REGION
+
+@include.the.profile.command
+
+@include.the.region.option
+
+USAGE: ai speech profile [...] --region REGION
+   OR: ai speech profile [...] --region @FILENAME
+   OR: ai speech profile [...] @CONFIG-FILENAME
+
+@include.the.region.option.where
+
+EXAMPLES
+
+  ai config speech @region --set westus2
+  ai config speech @key --set 436172626F6E20697320636F6F6C2121
+  ai speech profile list --nodefaults --region @region --key @key --output file FILE
+
+  ai config speech @default.config --clear
+  ai config speech @default.config --add key @key
+  ai config speech @default.config --add region @region
+  ai speech profile status --id @my.id --output json FILE
+
+  ai config speech @key --set 436172626F6E20697320636F6F6C2121 --region westus2
+  ai config speech @key --set 436172626F6E20697320636F6F6C2020 --region eastus
+  ai speech profile create --output id @my.id --key @key
+
+SEE ALSO
+
+  ai help speech setup
+  ai help speech region overview
+  ai help speech profile key
+  ai help speech profile

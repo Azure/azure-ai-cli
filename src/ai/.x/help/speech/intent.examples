@@ -1,0 +1,58 @@
+INTENT EXAMPLES
+
+  `INIT`: Automatically setup `ai` with REGION and KEY default values
+
+    ai init
+
+  `SETUP`: Manually setup `ai` with REGION and KEY default values
+
+    ai config speech @region --set westus2
+    ai config speech @key --set 436172626F6E20697320636F6F6C2122
+
+  `EXAMPLE 1`: Recognize intent patterns from a microphone
+  
+    ai speech intent --microphone --patterns "Start {app};Close {app}"
+
+  `EXAMPLE 2`: Recognize intent patterns from local WAV file, or remote MP3 file
+
+    ai speech intent --file hello.wav --patterns "Start {app};Close {app}"
+    ai speech intent --file https://crbn.us/hello.mp3 --format mp3 --patterns "Start {app};Close {app}"
+
+  `EXAMPLE 3`: Recognize intent from multiple files using wildcards
+
+    ai speech intent --files *.wav --patterns "Start {app};Close {app}"
+
+  `EXAMPLE 4`: Recognize intent in audio file content piped thru STDIN
+
+    ai speech synthesize --text "Start Code" --audio output - --quiet | ai speech intent --pattern "Start {app}" --file -
+
+  `EXAMPLE 5`: Recognize LUIS intents
+
+    ai speech intent --luis appid 43617262-6F6E-2069-7320-636F6F6C21FF --microphone
+    ai speech intent --luis appid 43617262-6F6E-2069-7320-636F6F6C21FF --file hello.wav
+    ai speech intent --luis appid 43617262-6F6E-2069-7320-636F6F6C21FF --file hello.mp3 --format mp3
+    ai speech intent --luis appid 43617262-6F6E-2069-7320-636F6F6C21FF --files *.wav
+
+  `EXAMPLE 6`: Recognize intent in multiple files from TSV file with file names and transcriptions
+
+    ai speech intent --foreach file;transcript in @filelist.txt --check wer eq 0
+
+    WHERE: `filelist.txt` is the filename for a file containing tab delimited content:
+
+      audioFileName1 \t transcript1
+      audioFileName2 \t transcript2
+
+  `EXAMPLE 7`: Recognize intent in multiple files listed in a TSV file with file ids and transcriptions
+
+    ai speech intent --foreach id;transcript in @filelist.txt --check wer eq 0
+
+    WHERE: `filelist.txt` is the filename for a file containing tab delimited content:
+
+      audioFileNameNoExtension1 \t transcript1
+      audioFileNameNoExtension2 \t transcript2
+
+ADDITIONAL TOPICS
+
+  ai help speech setup
+  ai help speech intent advanced
+  ai help speech intent

@@ -1,0 +1,13 @@
+PROFILE DELETE
+
+@include.the.profile.command.long
+
+  The `profile delete` function deletes a given voice profile.
+
+USAGE: ai speech profile delete --id ID
+  OR:  ai speech profile delete --file @FILE /* [THIS DELETES ALL PROFILES LISTED IN GIVEN FILE] */
+
+SEE ALSO
+
+  ai help speech profile
+  ai help speech profile examples

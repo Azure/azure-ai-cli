@@ -1,0 +1,28 @@
+BATCH THREADS
+
+  The `--threads` option specifies a how many threads to use when parallelizing
+  tasks.
+
+  The `--ramp threads every` option can optionally be used to control
+  how quickly each new thread will be added to the thread pool. If this option
+  is not specified, the default will be 0 ms, and thus the maximum number of
+  threads will immediately be available to the pool.
+
+USAGE: ai speech batch [...] --threads NUMBER
+   OR: ai speech batch [...] --threads NUMBER --ramp threads every MILLISECONDS
+
+  WHERE: NUMBER represents the maximum number of threads to use/pool
+    AND: MILLISECONDS represents the number of milliseconds to wait before
+         ... adding each new thread
+
+EXAMPLES
+
+  ai speech batch transcription list [...] --files --output urls @@file.urls.txt
+  ai speech batch transcription download --foreach file in @file.urls.txt --threads 10
+
+SEE ALSO
+
+  ai help speech batch foreach
+  ai help speech batch processes
+  ai help speech batch
+  

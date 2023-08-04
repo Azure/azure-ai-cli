@@ -1,0 +1,16 @@
+RECOGNIZE CONNECT
+
+@include.the.recognize.command
+
+  The `--connect` option forces connection to the service
+  earlier in the process to decrease overall latency.
+
+USAGE: ai speech recognize [...] --connect
+
+EXAMPLE
+
+  ai speech recognize --file hello.wav --connect
+
+SEE ALSO
+
+  ai help speech recognize

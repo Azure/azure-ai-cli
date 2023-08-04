@@ -1,0 +1,36 @@
+SPEAKER REGION
+
+@include.the.speaker.command
+
+@include.the.region.option
+
+USAGE: ai speech speaker [...] --region REGION
+   OR: ai speech speaker [...] --region @FILENAME
+   OR: ai speech speaker [...] @CONFIG-FILENAME
+
+@include.the.region.option.where
+
+EXAMPLES
+
+  ai config speech @region --set westus2
+  ai config speech @key --set 436172626F6E20697320636F6F6C2121
+  ai speech speaker [identify/verify] --nodefaults --region @region --key @key --file FILE
+
+  ai config speech @default.config --clear
+  ai config speech @default.config --add key @key
+  ai config speech @default.config --add region @region
+  ai speech speaker [identify/verify] --output id @my.id --file FILE
+
+  ai config speech @key --set 436172626F6E20697320636F6F6C2121 --region westus2
+  ai config speech @key --set 436172626F6E20697320636F6F6C2020 --region eastus
+  ai speech speaker [identify/verify] --id @my.id --key @key --file FILE
+
+
+SEE ALSO
+
+  ai help speech setup
+  ai help speech region overview
+  ai help speech speaker key
+  ai help speech speaker
+  ai help speech speaker identify
+  ai help speech speaker verify

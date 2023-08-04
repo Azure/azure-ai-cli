@@ -1,0 +1,27 @@
+RECOGNIZE FORMAT
+
+@include.the.recognize.command
+
+  The `--format` option specifies the container format for the
+  audio file being recognized.
+
+USAGE: ai speech recognize [...] --format FORMAT
+
+  WHERE: FORMAT is any
+     OR: FORMAT is mp3
+     OR: FORMAT is ogg
+     OR: FORMAT is opus
+     OR: FORMAT is flac
+     OR: FORMAT is alaw
+     OR: FORMAT is mulaw
+
+EXAMPLES
+
+  ai speech recognize --file audio.mp3 --format mp3
+  ai speech recognize --files @filelist.txt --format any
+
+SEE ALSO
+
+  ai help speech recognize file
+  ai help speech recognize files
+  ai help speech recognize

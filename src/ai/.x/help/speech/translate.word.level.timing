@@ -1,0 +1,22 @@
+TRANSLATE WORD LEVEL TIMING
+
+@include.the.translate.command
+
+  The `--word level timing` option requests word level timing
+  details in translation results.
+
+USAGE: ai speech translate [...] --word level timing
+   OR: ai speech translate [...] @CONFIG-FILENAME
+
+  WHERE: CONFIG-FILENAME is a single line text file in the following form:
+
+      service.output.config.word.level.timing=true
+
+EXAMPLE
+
+  ai speech translate --file hello.wav --word level timing --output json
+
+SEE ALSO
+
+  see help translate output json
+  ai help speech translate

@@ -1,0 +1,23 @@
+RECOGNIZE ONCE
+
+@include.the.recognize.command
+
+@include.the.recognize.method
+
+  The `--once` option recognizes the first phrase in an audio stream,
+  optimized for interactive use cases.
+
+  The `--once+` option repeatedly recognizes phrases in an audio
+  stream, optimized for non-interactive use cases.
+
+USAGE: ai speech recognize [...] --once
+
+EXAMPLES
+
+  ai speech recognize --microphone --once
+  ai speech recognize --file hello.wav --once+
+
+SEE ALSO
+
+  ai help speech recognize
+  ai help speech recognize continuous

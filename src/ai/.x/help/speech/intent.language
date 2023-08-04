@@ -1,0 +1,26 @@
+INTENT LANGUAGE
+
+@include.the.intent.command
+
+  The `--language` option specifies a single spoken LANGUAGE in
+  BCP-47 format. Speech streamed to the service will be forced to match
+  words and phrases in the specified LANGUAGE.
+
+  For a full list of supported languages, see https://aka.ms/speech/languages
+
+  If no language is specified, the default will be en-US.
+
+USAGE: ai speech intent [...] --language LANGUAGE
+   OR: ai speech intent [...] --language @LANGUAGE.txt
+
+  WHERE: LANGUAGE is a supported BCP-47 language tag (e.g. en-US)
+     OR: LANGUAGE.txt is a single line text file containing one LANGUAGE
+
+EXAMPLES
+
+  ai speech intent --language en-US --file english.wav
+  ai speech intent --language de-DE --file german.wav
+
+SEE ALSO
+
+  ai help speech intent

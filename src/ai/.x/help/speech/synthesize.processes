@@ -1,0 +1,27 @@
+SYNTHESIZE PROCESSES
+
+@include.the.synthesize.command
+
+  The `--processes` option specifies the maximum number of
+  sub-processes to use when parallelizing synthesis tasks.
+
+  The `--ramp processes every` option can optionally be used to control
+  how quickly each new sub-process will be added to the pool. If this option
+  is not specified, the default will be 0 ms, and thus the maximum number of
+  processes will immediately be available to the pool.
+
+USAGE: ai speech synthesize [...] --processes NUMBER
+   OR: ai speech synthesize [...] --processes NUMBER --ramp processes every MILLISECONDS
+
+  WHERE: NUMBER represents the maximum number of processes to use/pool
+    AND: MILLISECONDS represents the number of milliseconds to wait before
+         ... adding each new process
+
+EXAMPLES
+
+  ai speech synthesize --files @filelist.txt --audio output {id}.wav --processes 5
+
+SEE ALSO
+
+  ai help speech synthesize
+  ai help speech synthesize threads

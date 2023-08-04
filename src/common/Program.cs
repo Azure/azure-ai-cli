@@ -87,8 +87,10 @@ namespace Azure.AI.Details.Common.CLI
         {
             var assembly = typeof(Program).Assembly;
             var names = assembly.GetManifestResourceNames();
-            FileHelpers.WriteAllLines($"{Program.Name}.debug.manifest.resource.names.txt", names, Encoding.UTF8);
-            Console.WriteLine($"\nDEBUG: {names.Count()} resources written to {Program.Name}.debug.manifest.resource.names.txt");
+
+            Console.WriteLine($"\nDEBUG: {names.Count()} resources found!\n");
+            names.ToList().ForEach(x => Console.WriteLine($"  {x}"));
+            Console.WriteLine();
         }
 
         private static void DebugDumpCommandLineArgs(string[] mainArgs)

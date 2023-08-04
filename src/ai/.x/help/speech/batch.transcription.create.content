@@ -1,0 +1,28 @@
+BATCH TRANSCRIPTION CREATE CONTENT
+
+  The `ai speech batch transcription create` command creates new
+  transcription requests to transcribe remote audio streams.
+
+  The `--content` option specifies the content to be transcribed,
+  referring to audio data stored remotely and accessible at supplied URLs.
+
+USAGE: ai speech batch transcription create [...] --content URL
+   OR: ai speech batch transcription create [...] --content URL1;URL2[;...]
+   OR: ai speech batch transcription create [...] --content @URLs.txt
+
+  WHERE: URL points to an audio file, or a .ZIP containing multiple audio files
+     OR: URLs.txt is a text file containing one or more URLs
+
+EXAMPLES
+
+  ai speech batch transcription create --name "Example 1" --content http://crbn.us/hello.wav
+
+  ai config @urls.txt --clear
+  ai config @urls.txt --add http://crbn.us/hello.wav
+  ai config @urls.txt --add http://crbn.us/whatstheweatherlike.wav
+  ai speech batch transcription create --name "Example 2" --content @urls.txt
+
+SEE ALSO
+
+  ai help speech config advanced
+  ai help speech batch transcription create

@@ -1,0 +1,28 @@
+SPEAKER LANGUAGE
+
+@include.the.speaker.command
+
+  The `--language` option specifies a single spoken LANGUAGE in
+  BCP-47 format. Speech streamed to the service will be forced to match
+  words and phrases in the specified LANGUAGE.
+
+  For a full list of supported languages, see https://aka.ms/speech/languages
+
+  If no language is specified, the default will be en-US.
+
+USAGE: ai speech speaker identify [...] --language LANGUAGE
+   OR: ai speech speaker verify [...] --language @LANGUAGE.txt
+
+  WHERE: LANGUAGE is a supported BCP-47 language tag (e.g. en-US)
+     OR: LANGUAGE.txt is a single line text file containing one LANGUAGE
+
+EXAMPLES
+
+  ai speech speaker identify --id @my.en.profile.id --language en-US --file FILE
+  ai speech speaker verify --id @my.fr.profile.id --language fr-FR --file FILE
+
+SEE ALSO
+
+  ai help speech speaker
+  ai help speech speaker identify
+  ai help speech speaker verify

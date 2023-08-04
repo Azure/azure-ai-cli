@@ -1,0 +1,20 @@
+BATCH SAVE
+
+@include.the.save.option
+
+USAGE: ai speech batch [...] --save FILENAME
+
+EXAMPLES
+
+  ai config @urls.txt --clear
+  ai config @urls.txt --add http://crbn.us/hello.wav
+  ai config @urls.txt --add http://crbn.us/whatstheweatherlike.wav
+  ai speech batch transcription create --name "My transcription" --content @urls.txt --save transcription.job
+
+  ai speech batch transcription create @transcription.job
+
+SEE ALSO
+
+  ai help speech batch
+  ai help speech config
+  ai help speech batch zip

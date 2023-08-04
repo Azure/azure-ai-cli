@@ -1,0 +1,31 @@
+SYNTHESIZE FILE
+
+@include.the.synthesize.command
+
+  The `--file` option specifies a single local data file containing
+  text or SSML to be synthesized into audio.
+
+  The `--url` option specifies a single local data file containing
+  text or SSML to be synthesized into audio after first caching the data
+  locally, removing it when done.
+
+USAGE: ai speech synthesize [...] --file URL
+   OR: ai speech synthesize [...] --file FILE
+   OR: ai speech synthesize [...] --file @FILENAME.txt
+
+  WHERE: URL represents a remote text or SSML file accessible to the public
+    OR: FILE represents a local text or SSML file accessible to the current user
+    OR: FILE is `-` indicating that text or SSML file content will be read from STDIN
+    OR: FILENAME.txt is a single line text file containing the file to synthesize
+
+EXAMPLES
+
+  ai speech synthesize --file story.txt
+  ai speech synthesize --url https://crbn.us/cheerful.ssml
+
+  echo file.txt>filetosynth.txt
+  ai speech synthesize --file @filetosynth.txt
+
+SEE ALSO
+
+  ai help speech synthesize

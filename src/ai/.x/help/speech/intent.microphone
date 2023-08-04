@@ -1,0 +1,17 @@
+INTENT MICROPHONE
+
+@include.the.intent.command
+
+  The `--microphone` option specifies use of a microphone.
+
+USAGE: ai speech intent [...] --microphone
+   OR: ai speech intent [...] --microphone DEVICE-ID
+
+  WHERE: DEVICE-ID represents a specific microphone device
+
+  For full list of DEVICE-IDs, see https://aka.ms/speech/sdk/device-ids
+
+SEE ALSO
+
+  ai help speech intent
+  ai help speech intent input

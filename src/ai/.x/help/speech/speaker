@@ -1,0 +1,16 @@
+SPEAKER
+
+@include.the.speaker.command.long
+
+USAGE: ai speech speaker <command> [...]
+
+COMMANDS
+
+  ai speech speaker identify            (see: ai help speech speaker identify)
+  ai speech speaker verify              (see: ai help speech speaker verify)
+
+SEE ALSO
+
+  ai help speech speaker examples
+  ai help speech speaker documentation
+  ai help find topics speech speaker

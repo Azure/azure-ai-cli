@@ -1,0 +1,188 @@
+BATCH TRANSCRIPTION MORE EXAMPLES
+
+  ai speech batch transcription list --output last url @@transcription-url.txt
+  ai speech batch transcription list --files --transcription @transcription-url.txt --output last url @@file-url.txt
+
+  ai speech batch transcription download --url @file-url.txt --output json file.json
+  ai speech batch transcription download --file @file-url.txt --output file file.contents
+
+  -
+
+  ai config @audio.txt --clear
+  ai config @audio.txt --add http://crbn.us/hello.wav
+  ai config @audio.txt --add http://crbn.us/whatstheweatherlike.wav
+  ai speech batch transcription create --name "Example" --content @audio.txt --output url @@transcription.url.txt --wait
+
+  ai speech batch transcription list --files --transcription @transcription.url.txt --output urls @@file.urls.txt
+  ai speech batch transcription download --foreach file in @file.urls.txt --threads 10
+
+  -
+
+  ai speech batch transcription list --region westus2 --key 436172626F6E20697320636F6F6C2121
+
+  ai config speech @region --set westus2
+  ai config speech @key --set 436172626F6E20697320636F6F6C2121
+  ai speech batch transcription list --region @region --key @key
+
+  ai config speech @region --set westus2
+  ai config speech @key --set 436172626F6E20697320636F6F6C2121
+  ai config speech @default.config --set @@connection.from.region
+  ai speech batch transcription list
+
+  - 
+
+  ai speech batch transcription list --output ids @@id-list.txt
+  ai speech batch transcription status --foreach transcription in @id-list.txt --wait 30000
+
+  -
+
+  ai speech batch transcription list --output json @transcription-list.json
+
+  ai config @transcription.job --set name "My transcription"
+  ai config @transcription.job --add content http://crbn.us/hello.wav
+  ai config @transcription.job --add batch.output.json.file create-operation-output.json
+  ai speech batch transcription create @transcription.details
+
+  -
+
+  ai speech batch transcription list --output request @transcription-list.request
+
+  ai config @transcription.job --set name "My transcription"
+  ai config @transcription.job --add content http://crbn.us/hello.wav
+  ai config @transcription.job --add batch.output.request.file create-operation-output.request
+  ai speech batch transcription create @transcription.details
+
+  -
+
+  ai speech batch transcription create [...] --output url @@created.url.txt
+  ai speech batch transcription status --transcription @created.url.txt --wait
+
+  -
+
+  ai speech batch transcription list --output urls @@url-list.txt
+  ai speech batch transcription status --foreach transcription in @url-list.txt --wait 30000
+
+  -
+
+  ai speech batch transcription list [...] --files --output urls @@file.urls.txt
+  ai speech batch transcription download --foreach file in @file.urls.txt --processes 10
+
+  -
+
+  ai speech batch transcription list --region westus2 --key 436172626F6E20697320636F6F6C2121
+
+  ai config speech @region --set westus2
+  ai config speech @key --set 436172626F6E20697320636F6F6C2121
+  ai speech batch transcription list --region @region --key @key
+
+  ai config speech @region --set westus2
+  ai config speech @key --set 436172626F6E20697320636F6F6C2121
+  ai config speech @default.config --set @@connection.from.region
+  ai speech batch transcription list
+
+  -
+
+  ai config @urls.txt --clear
+  ai config @urls.txt --add http://crbn.us/hello.wav
+  ai config @urls.txt --add http://crbn.us/whatstheweatherlike.wav
+  ai speech batch transcription create --name "My transcription" --content @urls.txt --save transcription.job
+
+  ai speech batch transcription create @transcription.job
+
+  -
+
+  ai speech batch transcription list [...] --files --output urls @@file.urls.txt
+  ai speech batch transcription download --foreach file in @file.urls.txt --threads 10
+
+  -
+
+  ai speech batch transcription create --name "Example 1" --content http://crbn.us/hello.wav
+
+  ai config @urls.txt --clear
+  ai config @urls.txt --add http://crbn.us/hello.wav
+  ai config @urls.txt --add http://crbn.us/whatstheweatherlike.wav
+  ai speech batch transcription create --name "Example 2" --content @urls.txt
+
+  -
+
+  ai speech batch transcription create [...] --dataset 01234567-89ab-cdef-fedc-ba9876543210
+
+  ai config @my.dataset --set 01234567-89ab-cdef-fedc-ba9876543210
+  ai speech batch transcription create [...] --dataset @my.dataset
+
+  ai speech csr dataset create [...] --output url @@my.dataset
+  ai speech batch transcription create [...] --dataset @my.dataset
+
+  ai speech csr dataset create [...] --output url @@my.dataset
+  ai config @transcription.details --set name "My transcription"
+  ai config @transcription.details --add dataset @my.dataset
+  ai speech batch transcription create @transcription.details
+
+  -
+
+  ai speech batch transcription create [...] --language de-DE
+
+  ai config @my.language --set de-DE
+  ai speech batch transcription create [...] --language @my.language
+
+  ai config @transcription.details --set name "My transcription"
+  ai config @transcription.details --add language de-DE
+  ai speech batch transcription create @transcription.details --content http://crbn.us/hello.wav
+
+  -
+
+  ai speech batch transcription create [...] --model 01234567-89ab-cdef-fedc-ba9876543210
+
+  ai config @my.model --set 01234567-89ab-cdef-fedc-ba9876543210
+  ai speech batch transcription create [...] --model @my.model
+
+  ai speech csr model create [...] --output url @@my.model
+  ai speech batch transcription create [...] --model @my.model
+
+  ai config @my.model --set 01234567-89ab-cdef-fedc-ba9876543210
+  ai config @transcription.details --set name "My transcription"
+  ai config @transcription.details --add model @my.model
+  ai speech batch transcription create @transcription.details --content http://crbn.us/hello.wav
+
+  -
+  ai speech batch transcription [...] --name "My transcription"
+
+  ai config @my.name --set "My transcription"
+  ai speech batch transcription [...] --name @my.name
+
+  ai config @transcription.details --set name "My transcription"
+  ai config @transcription.details --add description "This is the description"
+  ai speech batch transcription [...] @transcription.details
+
+  -
+
+  ai speech batch transcription [...] --project 01234567-89ab-cdef-fedc-ba9876543210
+
+  ai config @my.project --set 01234567-89ab-cdef-fedc-ba9876543210
+  ai speech batch transcription [...] --project @my.project
+
+  ai speech csr project create [...] --output url @@my.project
+  ai speech batch transcription [...] --project @my.project
+
+  ai config @transcription.details --set name "My transcription"
+  ai config @transcription.details --add project 01234567-89ab-cdef-fedc-ba9876543210
+  ai speech batch transcription [...] @transcription.details
+
+  -
+
+  ai speech batch transcription [...] --wait
+  ai speech batch transcription [...] --wait 60000
+
+  ai config @my.wait --add batch.wait.timeout 60000
+  ai speech batch transcription [...] @my.wait
+
+  ai config speech @default.connection --set @@connection.from.region
+  ai config speech @default.connection --add batch.wait.timeout 60000
+
+  -
+  ai config @urls.txt --clear
+  ai config @urls.txt --add http://crbn.us/hello.wav
+  ai config @urls.txt --add http://crbn.us/whatstheweatherlike.wav
+  ai config @transcription.details --set name "My transcription"
+  ai config @transcription.details --add batch.wait.timeout 8640000
+  ai speech batch transcription create @transcription.details --content @urls.txt --wait --zip transcription.zip

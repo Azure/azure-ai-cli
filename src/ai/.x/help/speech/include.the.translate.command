@@ -1,0 +1,1 @@
+  The `ai speech translate` command translates streaming audio.

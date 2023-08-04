@@ -1,0 +1,31 @@
+INTENT OUTPUT BATCH
+
+@include.the.intent.command
+
+  The `--output batch json` option indicates that intent recognition results should
+  be output in the same format as `ai speech batch` transcriptions.
+
+  The `--output batch file` option specifies the name of the file to use. If 
+  this option is not specified, a default filename will be provided.
+
+USAGE: ai speech intent [...] --output batch json
+   OR: ai speech intent [...] --output batch file FILENAME
+
+   WHERE: FILENAME represents a local text file writable by the current user
+     OR: FILE is `-` represents STDOUT, where TSV or JSON data will be saved
+
+EXAMPLES
+
+  ai speech intent --file hello.wav --output batch json
+  ai speech intent --file hello.wav --output batch file hello.json
+
+  ai config speech @default.output --clear
+  ai config speech @default.output --add output.batch.json true
+  ai config speech @default.output --add output.batch.file output.{id}.{run.time}.json
+
+SEE ALSO
+
+  ai help speech intent output
+  ai help speech batch transcription
+  ai help speech intent
+  

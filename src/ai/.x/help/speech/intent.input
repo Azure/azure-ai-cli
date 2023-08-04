@@ -1,0 +1,43 @@
+INTENT INPUT OVERVIEW
+
+@include.the.intent.command
+
+  FROM MICROPHONE - DEFAULT DEVICE or SPECIFIC DEVICE
+
+    The `ai speech intent` command can recognize intent using streaming audio captured
+    from a device microphone (default microphone or specific microphone).
+
+    To intent audio from a device MICROPHONE see: ai help speech intent microphone 
+
+  FROM FILE - SINGLE or MULTIPLE FILES
+
+    The `ai speech intent` command can also recognize intent using audio stored in local
+    or remote audio files, in various audio container formats (e.g. mp3, ogg).
+
+    To recognize intent from a single audio file see: ai help speech intent file
+    To recognize intent from a multiple audio files see: ai help speech intent files
+    To recognize intent from file(s) in various formats see: ai help speech intent format
+ 
+EXAMPLES
+
+  `EXAMPLE 1`: Recognize intent from a microphone
+  
+    ai speech intent --microphone
+
+  `EXAMPLE 2`: Recognize intent from local WAV file, or remote MP3 file
+
+    ai speech intent --file hello.wav
+    ai speech intent --file http://crbn.us/hello.mp3 --format mp3
+
+  `EXAMPLE 3`: Recognize intent in multiple files using wildcards
+
+    ai speech intent --files *.wav
+
+  `EXAMPLE 4`: Recognize intent in audio file content piped thru STDIN
+
+    ai speech synthesize --text "Hello" --audio output - --quiet | ai speech intent --file -
+
+SEE ALSO
+
+  ai help speech intent examples
+  ai help speech intent

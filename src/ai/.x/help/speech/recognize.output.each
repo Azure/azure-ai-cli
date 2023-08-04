@@ -1,0 +1,44 @@
+RECOGNIZE OUTPUT EACH
+
+@include.the.recognize.command
+
+  The `--output each` option specifies an ITEM to accumulate and
+  aggregate into a TSV or JSON output file, one ITEM per event.
+
+  The `--output each file` option specifies the output filename. 
+
+  The `--output each file type` option specifies the output file type,
+  either JSON or TSV (tab separated values). If no file type is provided,
+  the output file will be TSV by default.
+
+USAGE: ai speech recognize [...] --output each ITEM
+   OR: ai speech recognize [...] --output each file FILENAME
+   OR: ai speech recognize [...] --output each file type TYPE
+
+   WHERE: FILENAME represents a local text file writable by the current user
+     OR: FILE is `-` represents STDOUT, where TSV or JSON data will be saved
+
+  NOTE: By default, nothing is output per event
+
+EXAMPLES
+
+  ai speech recognize --once --output each text
+  ai speech recognize --once --output each event --output each text
+  ai speech recognize --once --output each text --output each file output.tsv
+
+  ai config speech @default.output --set @@output.each.event
+  ai config speech @default.output --set @@output.each.detailed
+  ai config speech @default.output --set @@output.each.latency
+
+  ai config speech @default.output --clear
+  ai config speech @default.output --add output.each.sessionid true
+  ai config speech @default.output --add output.each.event true
+  ai config speech @default.output --add output.each.text true
+  ai config speech @default.output --add output.each.latency true
+  ai config speech @default.output --add @output.all.standard
+
+SEE ALSO
+
+  ai help speech recognize output overview
+  ai help speech recognize output examples
+  ai help speech recognize
