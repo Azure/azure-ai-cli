@@ -1,1 +1,35 @@
-@include.not.written.yet
+WIZARD
+
+  The `ai wizard` command initiates interactive or non-interactive wizard
+  walk thrus for various AI services and tools.
+
+  To try it out:
+                                                                                                                                        
+    TRY: ai wizard     
+
+USAGE: ai wizard [...]
+
+  AZURE
+    --subscription SUBSCRIPTION   (see: ai help wizard subscription)
+
+  RESOURCE
+    --region REGION               (see: ai help wizard region)
+    --group GROUP                 (see: ai help wizard group)
+    --name NAME                   (see: ai help wizard name)
+
+  CHAT
+    --model MODEL                 (see: ai help wizard model)
+    --deployment DEPLOYMENT       (see: ai help wizard deployment)
+    --system PROMPT               (see: ai help wizard system prompt)
+
+  INPUT                           (see: ai help wizard input)
+    --file FILE                   (see: ai help wizard file)
+    --files PATTERN               (see: ai help wizard files)
+    --files @FILELIST.txt         (see: ai help wizard files)
+    --jsonl FILE                  (see: ai help wizard jsonl)
+
+SEE ALSO
+
+  ai help wizard advanced
+  ai help wizard examples
+  ai help find topics wizard

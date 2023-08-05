@@ -1,5 +1,7 @@
 # `ai` CLI Tasks to complete  
 
+(similar breakdwon on ADO at [https://crbn.us/ai.ado](https://crbn.us/ai.ado))  
+
 | Hrs | Aug | Ignite |   |
 |---|---|---|---|
 | - |✔️|   |  ✅ `ai-cli` github repo (private for now)  
