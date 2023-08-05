@@ -5,25 +5,35 @@ CHAT
 
 USAGE: ai chat [...]
 
-  CONNECTION                      (see: ai help connection)
-    --deployment DEPLOYMENT       (see: ai help chat deployment)
-    --endpoint ENDPOINT           (see: ai help chat endpoint)
-    --key KEY                     (see: ai help chat key)
+  CONNECTION                            (see: ai help connection)
+    --deployment DEPLOYMENT             (see: ai help chat deployment)
+    --endpoint ENDPOINT                 (see: ai help chat endpoint)
+    --key KEY                           (see: ai help chat key)
 
-  INPUT                           (see: ai help chat input)
-    --interactive                 (see: ai help chat interactive)
-    --system PROMPT               (see: ai help chat system prompt)
-    --file FILE                   (see: ai help chat history file)
-    --files PATTERN               (see: ai help chat history files)
-    --files @FILELIST.txt         (see: ai help chat history files)
-    --jsonl FILE                  (see: ai help chat history jsonl)
-    --user MESSAGE                (see: ai help chat user message)
+  INPUT                                 (see: ai help chat input)
+    --interactive                       (see: ai help chat interactive)
+    --system PROMPT                     (see: ai help chat system prompt)
+    --file FILE                         (see: ai help chat history file)
+    --files PATTERN                     (see: ai help chat history files)
+    --files @FILELIST.txt               (see: ai help chat history files)
+    --jsonl FILE                        (see: ai help chat history jsonl)
+    --user MESSAGE                      (see: ai help chat user message)
 
-  OPTIONS                         (see: ai help chat options)
-    --temperature TEMPERATURE     (see: ai help chat options temperature)
-    --max-tokens MAX_TOKENS       (see: ai help chat options max-tokens)
-    --top-p TOP_P                 (see: ai help chat options top-p)
-    --n N                         (see: ai help chat options n)
+  CHAT WITH DATA                        (see: ai help chat with data)
+    --data DATA                         (see: ai help chat data)
+    --data-file FILE                    (see: ai help chat data file)
+    --data-files PATTERN                (see: ai help chat data files)
+    --data-files @FILELIST.txt          (see: ai help chat data files)
+    --embeddings-deployment DEPLOYMENT  (see: ai help chat embeddings deployment)
+    --search-index INDEX                (see: ai help search index)
+    --search-endpoint ENDPOINT          (see: ai help search endpoint)
+    --search-api-key KEY                (see: ai help search key)
+
+  OPTIONS                               (see: ai help chat options)
+    --temperature TEMPERATURE           (see: ai help chat options temperature)
+    --max-tokens MAX_TOKENS             (see: ai help chat options max-tokens)
+    --top-p TOP_P                       (see: ai help chat options top-p)
+    --n N                               (see: ai help chat options n)
 
 EXAMPLES
 
@@ -35,9 +45,21 @@ EXAMPLES
 
     ai chat --system @prompt.txt --user "What can you do?"
 
-  `EXAMPLE 3`: Chat using a collection of chat messages stored in a file
+  `EXAMPLE 3`: Chat using chat message history stored in a file
 
     ai chat --file chat-history.txt --user "Tell me a joke"
+
+  `EXAMPLE 4`: Chat w/ data using in-memory vector index (real-time embeddings)
+
+    ai config @ada --set text-embedding-ada-002
+    ai service openai deployment create --name @ada --model @ada --wait
+    ai chat --data-files *.txt --embeddings-deployment @ada --interactive
+
+  `EXAMPLE 5`: Chat w/ data using Azure Search vector index (pre-computed embeddings)
+
+    ai config @myindex --set MyIndex
+    ai search index create --name @myindex --files *.txt --interactive
+    ai chat --index @myindex --interactive
 
 SEE ALSO
 
