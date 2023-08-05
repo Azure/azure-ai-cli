@@ -1,0 +1,1 @@
+  The `ai search index update` command updates a vector index.

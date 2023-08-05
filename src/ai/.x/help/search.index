@@ -1,1 +1,20 @@
-@include.not.written.yet
+SEARCH INDEX
+
+  The `ai search index` commands manage vector indexes using in Retrieval
+  Augmented Generation solutions (aka "Chat w/ my data").
+
+USAGE: ai search index <command> [...]
+
+COMMANDS
+
+  ai search index create [...]         (see: ai help search index create)
+  ai search index status [...]         (see: ai help search index status)
+  ai search index list [...]           (see: ai help search index list)
+
+  ai search index update [...]         (see: ai help search index update)
+  ai search index delete [...]         (see: ai help search index delete)
+
+ADDITIONAL TOPICS
+
+  ai help search index examples
+  ai help documentation
