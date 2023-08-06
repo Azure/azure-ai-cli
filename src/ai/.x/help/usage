@@ -28,6 +28,11 @@ USAGE: ai <command> [...]
   ai service [...]          (see: ai help service)
   ai tool [...]             (see: ai help tool)
 
+`AI DEVELOPMENT`
+
+  ai code [...]             (see: ai help code)
+  ai samples [...]          (see: ai help samples)
+  
 `SEE ALSO`
 
   ai help examples

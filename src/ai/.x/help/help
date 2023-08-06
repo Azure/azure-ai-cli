@@ -45,15 +45,15 @@ USAGE: ai <command> [...]
     ai service [...]          (see: ai help service)
     ai tool [...]             (see: ai help tool)
 
+  `AI DEVELOPMENT`
+
+    ai code [...]             (see: ai help code)
+    ai samples [...]          (see: ai help samples)
+    
 `EXAMPLES`
 
   ai init
-
-  ai config --set region westus2
-  ai config --set key 436172626F6E20697320636F6F6C2121
-
-  ai complete --file prompt.txt
-  ai chat --file prompt.txt --interactive
+  ai chat --interactive --system @prompt.txt
 
 `ADDITIONAL HELP`
 

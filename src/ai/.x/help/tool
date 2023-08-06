@@ -1,1 +1,25 @@
-@include.not.written.yet
+   ___ ____  ___  _____  __________  ____  __ 
+  / _ /_  / / _ |/_  _/ /_  __/ __ \/ __ \/ / 
+ / __ |/ /_/ __ |_/ /_   / / / /_/ / /_/ / /__
+/_/ |_/___/_/ |_/____/  /_/  \____/\____/____/
+
+
+USAGE: ai tool <command> [...]
+
+COMMANDS
+
+  ai tool text split [...]          (see: ai help tool text split)
+  ai tool text jsonl [...]          (see: ai help tool text jsonl)
+  ai tool text json [...]           (see: ai help tool text json)
+
+  ai tool audio [...]               (see: ai help tool audio)
+  ai tool image [...]               (see: ai help tool image)
+  ai tool video [...]               (see: ai help tool video)
+
+  ai tool files [...]               (see: ai help tool files)
+  ai tool http [...]                (see: ai help tool http)
+
+ADDITIONAL TOPICS
+
+  ai help tool examples
+  ai help find topics tool

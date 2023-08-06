@@ -41,18 +41,3 @@ USAGE: ai index update [...]
   WEAVIATE
     --weaviate-endpoint ENDPOINT            (see: ai help weaviate endpoint)
     --weaviate-api-key KEY                  (see: ai help weaviate api key)
-
-EXAMPLES
-
-  ai index update
-       --id 'https://crbn.us/file1'
-       --file file1.md
-       --description 'Description of file 1 here'
-       --metadata '{"title": "File 1"}'
-       --external-source 'https://crbn.us/'
-       --azure-search-endpoint @acs.endpoint
-       --azure-search-api-key @acs.key
-
-  ai index update
-      --files file*.md
-      --

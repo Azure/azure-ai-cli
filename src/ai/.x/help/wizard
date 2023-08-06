@@ -1,13 +1,13 @@
-WIZARD
+`WIZARD`
 
   The `ai wizard` command initiates interactive step-by-step
   walk thru experiences for various AI services and tools.
 
   To try it out:
                                                                                                                                         
-    TRY: ai wizard     
+    TRY: ai wizard
 
-USAGE: ai wizard [...]
+`USAGE`: ai wizard [...]
 
   AZURE
     --subscription SUBSCRIPTION   (see: ai help wizard subscription)
@@ -27,6 +27,23 @@ USAGE: ai wizard [...]
     --files PATTERN               (see: ai help wizard files)
     --files @FILELIST.txt         (see: ai help wizard files)
     --jsonl FILE                  (see: ai help wizard jsonl)
+
+  SCENARIO
+    --scenario SCENARIO           (see: ai help wizard scenario)
+
+`SCENARIOS`
+
+  Chat (OpenAI)
+  Chat w/ your prompt (OpenAI)
+  Chat w/ your data (OpenAI)
+  Caption audio (Speech to Text)
+  Caption images and video (Vision)
+  Extract text from images (Vision)
+  Extract text from documents and forms (Language)
+  Transcribe and analyze calls (Speech, Language)
+  Translate documents and text (Language)
+  Summarize documents (Language)
+  ...more!        
 
 SEE ALSO
 

@@ -18,13 +18,12 @@
 | - |✔️|   |  ✅ `ai wizard`: basic functionality and IA  
 | 4 | x |   |  ⏹️ `ai wizard`: placeholder for all August-Hero wizard steps  
 |   |   |   |  
-| 1 | x |   |  ⏹️ `ai speech`: placeholder for all speech commands (parser, warning)  
-| 1 | x |   |  ⏹️ `ai vision`: placeholder for all speech commands (parser, warning)  
-| 1 | x |   |  ⏹️ `ai language`: placeholder for all language commands (parser, warning)  
-| 1 | x |   |  ⏹️ `ai translation`: placeholder for all translation commands (parser, warning)  
-| 1 | x |   |  ⏹️ `ai search`: placeholder for all search commands (parser, warning)  
-| 1 | x |   |  ⏹️ `ai service`: placeholder for all service commands (parser, warning)  
-| 1 | x |   |  ⏹️ `ai tool`: placeholder for all tool commands (parser, warning)  
+| 1 | ✔️ |   |  ✅ `ai speech`: placeholder for speech commands (parser, warning)  
+| 1 | ✔️ |   |  ✅ `ai vision`:  placeholder for vision commands (parser, warning)  
+| 1 | ✔️ |   |  ✅ `ai language`: placeholder for language commands (parser, warning)  
+| 1 | ✔️ |   |  ✅ `ai search`: initial placeholder for search commands (parser, warning)  
+| 1 | ✔️ |   |  ✅ `ai service`: initial placeholder for service commands (parser, warning)  
+| 1 | ✔️ |   |  ✅ `ai tool`: initial placeholder for tool commands (parser, warning)  
 |   |   |   |  
 | 1 | x |   |  ⏹️ python: proof of life: enumerate hubs  
 | 1 | x |   |  ⏹️ python: proof of life: create hubs  
