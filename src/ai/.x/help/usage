@@ -18,7 +18,6 @@ USAGE: ai <command> [...]
 `AI SERVICES and TOOLS`
 
   ai chat [...]             (see: ai help chat)
-  ai eval [...]             (see: ai help eval)
 
   ai speech [...]           (see: ai help speech)
   ai vision [...]           (see: ai help vision)
@@ -32,7 +31,8 @@ USAGE: ai <command> [...]
 
   ai code [...]             (see: ai help code)
   ai samples [...]          (see: ai help samples)
-  
+  ai eval [...]             (see: ai help eval)
+
 `SEE ALSO`
 
   ai help examples
