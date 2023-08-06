@@ -29,8 +29,8 @@ USAGE: ai <command> [...]
 
 `AI DEVELOPMENT`
 
-  ai code [...]             (see: ai help code)
   ai samples [...]          (see: ai help samples)
+  ai code [...]             (see: ai help code)
   ai eval [...]             (see: ai help eval)
 
 `SEE ALSO`
