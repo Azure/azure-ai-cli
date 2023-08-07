@@ -23,6 +23,7 @@ namespace Azure.AI.Details.Common.CLI
 
         private static readonly (string name, bool valuesRequired)[] _commands =  {
             ("service.resource", true),
+            ("service.project", true),
             ("service.deployment", true),
             ("service.connection", true),
             ("service.deployment", true),

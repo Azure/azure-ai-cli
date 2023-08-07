@@ -36,11 +36,11 @@ namespace Azure.AI.Details.Common.CLI
         #endregion
 
         #region help command data
-        public const string HelpCommandTokens = "init;config;chat;complete;wizard;run";
+        public const string HelpCommandTokens = "wizard;init;config;chat;speech;vision;language;search;service;tool;samples;code;eval;run";
         #endregion
 
         #region config command data
-        public static string ConfigScopeTokens = $"init;chat;eval;speech;vision;language;search;service;tool;wizard;run;*";
+        public static string ConfigScopeTokens = $"wizard;init;chat;speech;vision;language;search;service;tool;samples;code;eval;run;*";
         #endregion
 
         #region zip option data
@@ -61,14 +61,15 @@ namespace Azure.AI.Details.Common.CLI
             return root switch {
                 "init" => (new InitCommand(values)).RunCommand(),
                 "chat" => (new ChatCommand(values)).RunCommand(),
-                "eval" => (new EvalCommand(values)).RunCommand(),
                 "speech" => (new SpeechCommand(values)).RunCommand(),
                 "vision" => (new VisionCommand(values)).RunCommand(),
                 "language" => (new LanguageCommand(values)).RunCommand(),
                 "search" => (new SearchCommand(values)).RunCommand(),
                 "service" => (new ServiceCommand(values)).RunCommand(),
                 "tool" => (new ToolCommand(values)).RunCommand(),
-                "complete" => (new CompleteCommand(values)).RunCommand(),
+                "samples" => (new SamplesCommand(values)).RunCommand(),
+                "code" => (new CodeCommand(values)).RunCommand(),
+                "eval" => (new EvalCommand(values)).RunCommand(),
                 "wizard" => (new ScenarioWizardCommand(values)).RunCommand(),
                 "run" => (new RunJobCommand(values)).RunCommand(),
                 _ => false
@@ -93,7 +94,8 @@ namespace Azure.AI.Details.Common.CLI
                 "search" => SearchCommandParser.ParseCommand(tokens, values),
                 "service" => ServiceCommandParser.ParseCommand(tokens, values),
                 "tool" => ToolCommandParser.ParseCommand(tokens, values),
-                "complete" => CompleteCommandParser.ParseCommand(tokens, values),
+                "samples" => SamplesCommandParser.ParseCommand(tokens, values),
+                "code" => CodeCommandParser.ParseCommand(tokens, values),
                 "wizard" => ScenarioWizardCommandParser.ParseCommand(tokens, values),
                 "run" => RunJobCommandParser.ParseCommand(tokens, values),
                 _ => false
@@ -115,6 +117,8 @@ namespace Azure.AI.Details.Common.CLI
                 "search" => SearchCommandParser.ParseCommandValues(tokens, values),
                 "service" => ServiceCommandParser.ParseCommandValues(tokens, values),
                 "tool" => ToolCommandParser.ParseCommandValues(tokens, values),
+                "samples" => SamplesCommandParser.ParseCommandValues(tokens, values),
+                "code" => CodeCommandParser.ParseCommandValues(tokens, values),
                 "complete" => CompleteCommandParser.ParseCommandValues(tokens, values),
                 "wizard" => ScenarioWizardCommandParser.ParseCommandValues(tokens, values),
                 "run" => RunJobCommandParser.ParseCommandValues(tokens, values),

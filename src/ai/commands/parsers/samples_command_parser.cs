@@ -9,7 +9,7 @@ using System.Linq;
 
 namespace Azure.AI.Details.Common.CLI
 {
-    class ToolCommandParser : CommandParser
+    class SamplesCommandParser : CommandParser
     {
         public static bool ParseCommand(INamedValueTokens tokens, ICommandValues values)
         {
@@ -18,15 +18,15 @@ namespace Azure.AI.Details.Common.CLI
 
         public static bool ParseCommandValues(INamedValueTokens tokens, ICommandValues values)
         {
-            return ParseCommandValues("tool", GetCommandParsers(values), tokens, values);
+            return ParseCommandValues("samples", GetCommandParsers(values), tokens, values);
         }
 
         private static readonly (string name, bool valuesRequired)[] _commands =  {
-            ("tool", true)
+            ("samples", true)
         };
 
         private static readonly string[] _partialCommands = {
-            "tool"
+            "samples"
         };
 
         private static IEnumerable<INamedValueTokenParser> GetCommandParsers(ICommandValues values)
@@ -36,7 +36,7 @@ namespace Azure.AI.Details.Common.CLI
             {
                 if (commandName == command.name)
                 {
-                    return _toolPlaceHolderParsers;
+                    return _samplesPlaceHolderParsers;
                 }
             }
 
@@ -45,9 +45,9 @@ namespace Azure.AI.Details.Common.CLI
 
         #region private data
 
-        public class CommonToolNamedValueTokenParsers : NamedValueTokenParserList
+        public class CommonSamplesNamedValueTokenParsers : NamedValueTokenParserList
         {
-            public CommonToolNamedValueTokenParsers() : base(
+            public CommonSamplesNamedValueTokenParsers() : base(
 
                 new NamedValueTokenParser(null, "x.command", "11", "1"),
 
@@ -65,9 +65,9 @@ namespace Azure.AI.Details.Common.CLI
             }
         }
 
-        private static INamedValueTokenParser[] _toolPlaceHolderParsers = {
+        private static INamedValueTokenParser[] _samplesPlaceHolderParsers = {
 
-            new CommonToolNamedValueTokenParsers()
+            new CommonSamplesNamedValueTokenParsers()
 
         };
 
