@@ -4,6 +4,7 @@
 //
 
 using System;
+using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using Azure.AI.Details.Common.CLI;
@@ -250,8 +251,11 @@ namespace Azure.AI.Details.Common.CLI.ConsoleGui
         protected bool RowContainsRegex(int row, string searchFor, out int col, out int width)
         {
             var text = GetSpeedSearchText(row).ToLower();
-            var match = TryCatchHelpers.TryCatchNoThrow<Match>(() => Regex.Match(text, searchFor), null, out _);
-            
+            var matches = TryCatchHelpers.TryCatchNoThrow<MatchCollection>(() => Regex.Matches(text, searchFor), null, out _);
+
+            var maxIndex = matches?.Count() > 0 ? matches?.Max(match => match.Index) : null;
+            var match = maxIndex.HasValue ? matches.Where(match => match.Index == maxIndex).Last() : null;
+           
             col = match != null && match.Success ? match.Index : -1;
             width = match != null && match.Success ? match.Length : -1;
 

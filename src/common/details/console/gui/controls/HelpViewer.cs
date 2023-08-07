@@ -162,7 +162,7 @@ namespace Azure.AI.Details.Common.CLI.ConsoleGui
             var text = base.GetSpeedSearchText();
             var helpCommand = GetProgramHelpCommand();
             return string.IsNullOrEmpty(text) || text == helpCommand
-                ? $"(\\(see: {helpCommand}.*\\))|({helpCommand}.*)|(https://[^ ]+)|(try: {Program.Name} .*)|(TRY: {Program.Name} .*)"
+                ? $"(\\(see: {helpCommand}.*\\))|({helpCommand}[^()]*)|(https://[^ ]+)|(try: {Program.Name} .*)|(TRY: {Program.Name} .*)"
                 : text;
         }
 
