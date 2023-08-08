@@ -1,0 +1,16 @@
+USAGE: ai service project <command> [...]
+
+COMMANDS
+
+  ai service project create [...]        (see: ai help service project create)
+  ai service project status [...]        (see: ai help service project status)
+  ai service project list [...]          (see: ai help service project list)
+
+  ai service project update [...]        (see: ai help service project update)
+  ai service project delete [...]        (see: ai help service project delete)
+
+ADDITIONAL TOPICS
+
+  ai help service examples
+  ai help service project examples
+  ai help speech documentation
