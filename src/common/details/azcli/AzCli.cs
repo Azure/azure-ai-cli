@@ -9,6 +9,7 @@ using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using Newtonsoft.Json.Linq;
 using Azure.AI.Details.Common.CLI;
+using System.Collections.Generic;
 
 namespace Azure.AI.Details.Common.CLI
 {
@@ -183,31 +184,31 @@ namespace Azure.AI.Details.Common.CLI
             return x;
         }
 
-        // public static async Task<ProcessResponse<CognitiveServicesDeploymentInfo[]>> ListCognitiveServicesDeployments(string subscriptionId = null, string kind = null)
-        // {
-        //     var cmdPart = "cognitiveservices account deployment list";
-        //     var subPart = subscriptionId != null ? $"--subscription {subscriptionId}" : "";
-        //     var condPart = kind != null ? $"--kind {kind}" : null;
+        public static async Task<ProcessResponse<CognitiveServicesDeploymentInfo[]>> ListCognitiveServicesDeployments(string subscriptionId = null, string group = null, string resourceName = null, string kind = null)
+        {
+            var cmdPart = "cognitiveservices account deployment list";
+            var subPart = subscriptionId != null ? $"--subscription {subscriptionId} -g {group} -n {resourceName}" : "";
+            var condPart = kind != null ? $"--kind {kind}" : null;
 
-        //     var process = await ProcessHelpers.ParseShellCommandJson<JArray>("az", $"{cmdPart} {subPart} {condPart} --query \"[].{{Name:name,Location: location,Kind:kind,Group:resourceGroup,Endpoint:properties.endpoint,Model:properties.model.name,Format:properties.model.format}}\"");
+            var process = await ProcessHelpers.ParseShellCommandJson<JArray>("az", $"{cmdPart} {subPart} {condPart} --query \"[].{{Name:name,Location: location,Kind:kind,Group:resourceGroup,Endpoint:properties.endpoint,Model:properties.model.name,Format:properties.model.format}}\"");
 
-        //     var x = new ProcessResponse<CognitiveServicesDeploymentInfo[]>();
-        //     x.StdOutput = process.StdOutput;
-        //     x.StdError = process.StdError;
+            var x = new ProcessResponse<CognitiveServicesDeploymentInfo[]>();
+            x.StdOutput = process.StdOutput;
+            x.StdError = process.StdError;
 
-        //     var deployments = process.Payload;
-        //     x.Payload = new CognitiveServicesDeploymentInfo[deployments.Count];
+            var deployments = process.Payload;
+            x.Payload = new CognitiveServicesDeploymentInfo[deployments.Count];
 
-        //     var i = 0;
-        //     foreach (var deployment in deployments)
-        //     {
-        //         x.Payload[i].Name = deployment["Name"].Value<string>();
-        //         x.Payload[i].Kind = deployment["Kind"].Value<string>();
-        //         i++;
-        //     }
+            var i = 0;
+            foreach (var deployment in deployments)
+            {
+                x.Payload[i].Name = deployment["Name"].Value<string>();
+                x.Payload[i].Kind = deployment["Kind"].Value<string>();
+                i++;
+            }
 
-        //     return x;
-        // }
+            return x;
+        }
 
         public static async Task<ProcessResponse<CognitiveServicesResourceInfo?>> CreateCognitiveServicesResource(string subscriptionId, string group, string regionLocation, string name, string kind = "CognitiveServices", string sku = "F0")
         {
@@ -255,26 +256,26 @@ namespace Azure.AI.Details.Common.CLI
             return x;
         }
 
-        // public static async Task<ProcessResponse<CognitiveServicesDeploymentInfo>> CreateCognitiveServicesDeployment(string subscriptionId, string group, string name, string kind, string sku, string regionLocation, string model)
-        // {
-        //     var cmdPart = "cognitiveservices account deployment";
-        //     var subPart = subscriptionId != null ? $"--subscription {subscriptionId}" : "";
+        public static async Task<ProcessResponse<CognitiveServicesDeploymentInfo>> CreateCognitiveServicesDeployment(string subscriptionId, string group, string name, string kind, string sku, string regionLocation, string model)
+        {
+            var cmdPart = "cognitiveservices account deployment";
+            var subPart = subscriptionId != null ? $"--subscription {subscriptionId}" : "";
 
-        //     var process = await ProcessHelpers.ParseShellCommandJson<JObject>("az", $"{cmdPart} {subPart} --kind {kind} --sku {sku} -g {group} -n {name} --yes --location {regionLocation} --custom-domain {name}.cognitiveservices.azure.com --yes --model {model}");
+            var process = await ProcessHelpers.ParseShellCommandJson<JObject>("az", $"{cmdPart} {subPart} --kind {kind} --sku {sku} -g {group} -n {name} --yes --location {regionLocation} --custom-domain {name}.cognitiveservices.azure.com --yes --model {model}");
 
-        //     var x = new ProcessResponse<CognitiveServicesDeploymentInfo>();
-        //     x.StdOutput = process.StdOutput;
-        //     x.StdError = process.StdError;
+            var x = new ProcessResponse<CognitiveServicesDeploymentInfo>();
+            x.StdOutput = process.StdOutput;
+            x.StdError = process.StdError;
 
-        //     var resource = process.Payload;
-        //     x.Payload = new CognitiveServicesDeploymentInfo()
-        //     {
-        //         Name = resource?["name"]?.Value<string>(),
-        //         Kind = resource?["kind"]?.Value<string>(),
-        //     };
+            var resource = process.Payload;
+            x.Payload = new CognitiveServicesDeploymentInfo()
+            {
+                Name = resource?["name"]?.Value<string>(),
+                Kind = resource?["kind"]?.Value<string>(),
+            };
 
-        //     return x;
-        // }
+            return x;
+        }
 
         public static async Task<ProcessResponse<CognitiveServicesKeyInfo>> ListCognitiveServicesKeys(string subscriptionId, string group, string name)
         {
@@ -295,6 +296,12 @@ namespace Azure.AI.Details.Common.CLI
             };
 
             return x;
+        }
+
+        public class CognitiveServicesDeploymentInfo
+        {
+            public string Name { get; set; }
+            public string Kind { get; set; }
         }
     }
 }

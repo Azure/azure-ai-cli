@@ -45,30 +45,6 @@ namespace Azure.AI.Details.Common.CLI
                 return resource.Value;
             }
 
-            // public static async Task<AzCli.CognitiveServicesDeploymentInfo> PickOrCreateCognitiveResourceDeployment(bool interactive, string subscriptionId, string regionLocation, string group, string resourceName, string deploymentFilter)
-            // {
-            //     var createNewItem = !string.IsNullOrEmpty(deploymentFilter)
-            //         ? $"(Create `{deploymentFilter}`)"
-            //         : interactive ? "(Create new)" : null;
-
-            //     (var deployment, var error) = await FindCognitiveServicesResourceDeployment(interactive, subscriptionId, regionLocation, group, resourceName, deploymentFilter, createNewItem);
-            //     if (deployment != null && deployment.Value.Name == null)
-            //     {
-            //         (deployment, error) = await TryCreateCognitiveServicesResourceDeployment(interactive, subscriptionId, regionLocation, group, resourceName, deploymentFilter);
-            //     }
-
-            //     if (deployment == null && error != null)
-            //     {
-            //         throw new ApplicationException($"ERROR: Loading or creating resource deployment:\n{error}");
-            //     }
-            //     else if (deployment == null)
-            //     {
-            //         throw new ApplicationException($"CANCELED: No resource deployment selected");
-            //     }
-
-            //     return deployment.Value;
-            // }
-
             public static async Task<AzCli.CognitiveServicesKeyInfo> LoadCognitiveServicesResourceKeys(string subscriptionId, AzCli.CognitiveServicesResourceInfo resource)
             {
                 ConsoleHelpers.WriteLineWithHighlight($"\n`{Program.SERVICE_RESOURCE_DISPLAY_NAME_ALL_CAPS} KEYS`");
