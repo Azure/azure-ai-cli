@@ -1,0 +1,16 @@
+USAGE: ai service deployment <command> [...]
+
+COMMANDS
+
+  ai service deployment create [...]        (see: ai help service deployment create)
+  ai service deployment status [...]        (see: ai help service deployment status)
+  ai service deployment list [...]          (see: ai help service deployment list)
+
+  ai service deployment update [...]        (see: ai help service deployment update)
+  ai service deployment delete [...]        (see: ai help service deployment delete)
+
+ADDITIONAL TOPICS
+
+  ai help service examples
+  ai help service deployment examples
+  ai help speech documentation
