@@ -99,11 +99,11 @@ namespace Azure.AI.Details.Common.CLI
             var subscriptionId = await AzCliConsoleGui.PickSubscriptionIdAsync(interactive, subscriptionFilter);
 
             ConsoleHelpers.WriteLineWithHighlight($"\n`{Program.SERVICE_RESOURCE_DISPLAY_NAME_ALL_CAPS}`");
-            var regionLocation = await AzCliConsoleGui.PickRegionLocationAsync(interactive, regionFilter);
+            var regionLocation = new AzCli.AccountRegionLocationInfo(); // await AzCliConsoleGui.PickRegionLocationAsync(interactive, regionFilter);
             var resource = await AzCliConsoleGui.PickOrCreateCognitiveResource(interactive, subscriptionId, regionLocation.Name, groupFilter, resourceFilter, kind, sku, agreeTerms);
 
-            // var experimentWithPickDeployment = false;
-            // if (experimentWithPickDeployment) await AzCliConsoleGui.AiResourceDeploymentPicker.PickOrCreateDeployment(interactive, subscriptionId, resource.RegionLocation, resource.Group, resource.Name, null);
+            var experimentWithPickDeployment = true;
+            if (experimentWithPickDeployment) await AzCliConsoleGui.AiResourceDeploymentPicker.PickOrCreateDeployment(interactive, subscriptionId, resource.RegionLocation, resource.Group, resource.Name, null);
 
             var keys = await AzCliConsoleGui.LoadCognitiveServicesResourceKeys(subscriptionId, resource);
             return (resource.RegionLocation, resource.Endpoint, keys.Key1);

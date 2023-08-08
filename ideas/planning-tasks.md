@@ -133,7 +133,7 @@
 |    | - |✔️|   |  ✅ `ai chat`: w/ my data poc: embeddings provider, index provider, etc.  
 | P1 | 4 | x |   |  ⏹️ `ai chat`: command line inputs: prompt, temperature, top-p, frequency penalty, presence penalty, etc.  
 | P1 | 4 | x |   |  ⏹️ `ai chat`: command line inputs: non-interactive chat: input file, output file, etc.  
-| P1 |12 |   | x |  ⏹️ `ai chat`: interactive chat (hot-reload)  
+| P2 |12 |   | x |  ⏹️ `ai chat`: interactive chat (hot-reload)  
 |    |   |   |   |  
 | P1 | 2 | x |   |  ⏹️ `ai chat`: spec and write help for all inputs  
 | P1 | 4 | x |   |  ⏹️ `ai chat`: w/ my data: migrate to AI Hub usage  

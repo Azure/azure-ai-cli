@@ -97,8 +97,11 @@ namespace Azure.AI.Details.Common.CLI
             {
                 ConsoleHelpers.WriteLineWithHighlight($"\n`CREATE DEPLOYMENT`");
 
-                var modelName = AskPrompt("Model Name: ", "gpt-35-turbo", true);
-                var modelVersion = AskPrompt("Model Version: ", "0301", true);
+                var normal = new Colors(ConsoleColor.White, ConsoleColor.Blue);
+                var selected = new Colors(ConsoleColor.White, ConsoleColor.Red);
+
+                var modelName = ListBoxPicker.PickString(new string[] { "gpt-35-turbo", "gpt-35-turbo-16k", "text-embedding-ada-002"}, 30, 5, normal, selected);
+                var modelVersion = modelName.Contains("gpt") ? "0613" : "2";
                 var modelFormat = "OpenAI";
 
                 deploymentName = AskPrompt("Name: ", deploymentName);

@@ -245,7 +245,7 @@ namespace Azure.AI.Details.Common.CLI
                 var selected = ColorHelpers.GetHighlightColors(ConsoleColor.White, ConsoleColor.Blue);
 
                 var lines = text.Split('\n').Select(x => x.TrimEnd('\r')).ToArray();
-                ConsoleGui.HelpViewer.DisplayHelpText(lines, Console.WindowWidth, Console.WindowHeight, normal, selected, 0, 0, 0);
+                ConsoleGui.HelpViewer.DisplayHelpText(lines, Console.WindowWidth - 1, Console.WindowHeight, normal, selected, 0, 0, 0);
             }
 
             if (!values.GetOrDefault("x.quiet", false) || !interactive)
@@ -330,7 +330,7 @@ namespace Azure.AI.Details.Common.CLI
 
                 var expanded = FileHelpers.ExpandFoundHelpFiles(found);
                 var lines = expanded.Split('\n').Select(x => x.TrimEnd('\r')).ToArray();
-                ConsoleGui.HelpViewer.DisplayHelpText(lines, Console.WindowWidth, Console.WindowHeight, normal, selected, 0, 0, 0);
+                ConsoleGui.HelpViewer.DisplayHelpText(lines, Console.WindowWidth - 1, Console.WindowHeight, normal, selected, 0, 0, 0);
             }
 
             if (!values.GetOrDefault("x.quiet", false) || !interactive)

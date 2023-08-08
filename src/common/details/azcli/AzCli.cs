@@ -233,7 +233,7 @@ namespace Azure.AI.Details.Common.CLI
                 Name = resource?["name"]?.Value<string>(),
                 Kind = resource?["kind"]?.Value<string>(),
                 RegionLocation = resource?["location"]?.Value<string>(),
-                Endpoint = resource?["endpoint"]?.Value<string>()
+                Endpoint = resource?["properties"]?["endpoint"].Value<string>()
             };
 
             return x;
@@ -266,7 +266,7 @@ namespace Azure.AI.Details.Common.CLI
             var cmdPart = "cognitiveservices account deployment create";
             var subPart = subscriptionId != null ? $"--subscription {subscriptionId}" : "";
 
-            var process = await ProcessHelpers.ParseShellCommandJson<JObject>("az", $"{cmdPart} {subPart} -g {group} -n {resourceName} --deployment-name {deploymentName} --model-name {modelName} --model-version {modelVersion} --model-format {modelFormat} --scale-capacity 1");
+            var process = await ProcessHelpers.ParseShellCommandJson<JObject>("az", $"{cmdPart} {subPart} -g {group} -n {resourceName} --deployment-name {deploymentName} --model-name {modelName} --model-version {modelVersion} --model-format {modelFormat} --sku-capacity 1 --sku-name \"Standard\"");
 
             var x = new ProcessResponse<CognitiveServicesDeploymentInfo>();
             x.StdOutput = process.StdOutput;

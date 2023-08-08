@@ -1160,10 +1160,10 @@ namespace Azure.AI.Details.Common.CLI
             var local = CheckDotDirectory(Directory.GetCurrentDirectory(), false, false).Replace('/', '\\');
             var app = GetAppResourceConfigDotDir().Replace('/', '\\');
 
+            if (fileName.StartsWith(local)) return "local";
             if (fileName.StartsWith(system)) return "system";
             if (fileName.StartsWith(global)) return "global";
             if (fileName.StartsWith(user)) return "user";
-            if (fileName.StartsWith(local)) return "local";
             if (fileName.StartsWith(app)) return Program.Name;
 
             return null;
