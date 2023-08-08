@@ -135,7 +135,7 @@ namespace Azure.AI.Details.Common.CLI
                 Console.Write("\r");
                 if (string.IsNullOrEmpty(response.StdOutput) && !string.IsNullOrEmpty(response.StdError))
                 {
-                    ConsoleHelpers.WriteLineError($"ERROR: Creating Cognitive Services resources: {response.StdError}");
+                    ConsoleHelpers.WriteLineError($"ERROR: Creating Cognitive Services resource: {response.StdError}");
                     return (null, response.StdError);
                 }
 

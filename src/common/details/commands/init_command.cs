@@ -102,6 +102,9 @@ namespace Azure.AI.Details.Common.CLI
             var regionLocation = await AzCliConsoleGui.PickRegionLocationAsync(interactive, regionFilter);
             var resource = await AzCliConsoleGui.PickOrCreateCognitiveResource(interactive, subscriptionId, regionLocation.Name, groupFilter, resourceFilter, kind, sku, agreeTerms);
 
+            // var experimentWithPickDeployment = false;
+            // if (experimentWithPickDeployment) await AzCliConsoleGui.AiResourceDeploymentPicker.PickOrCreateDeployment(interactive, subscriptionId, resource.RegionLocation, resource.Group, resource.Name, null);
+
             var keys = await AzCliConsoleGui.LoadCognitiveServicesResourceKeys(subscriptionId, resource);
             return (resource.RegionLocation, resource.Endpoint, keys.Key1);
         }

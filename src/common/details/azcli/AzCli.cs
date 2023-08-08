@@ -51,6 +51,12 @@ namespace Azure.AI.Details.Common.CLI
             public string Key2;
         }
 
+        public struct CognitiveServicesDeploymentInfo
+        {
+            public string Name { get; set; }
+            public string ModelFormat { get; set; }
+        }
+
         // public struct CognitiveServicesDeploymentInfo
         // {
         //     public string Name;
@@ -184,13 +190,12 @@ namespace Azure.AI.Details.Common.CLI
             return x;
         }
 
-        public static async Task<ProcessResponse<CognitiveServicesDeploymentInfo[]>> ListCognitiveServicesDeployments(string subscriptionId = null, string group = null, string resourceName = null, string kind = null)
+        public static async Task<ProcessResponse<CognitiveServicesDeploymentInfo[]>> ListCognitiveServicesDeployments(string subscriptionId = null, string group = null, string resourceName = null, string modelFormat = null)
         {
             var cmdPart = "cognitiveservices account deployment list";
             var subPart = subscriptionId != null ? $"--subscription {subscriptionId} -g {group} -n {resourceName}" : "";
-            var condPart = kind != null ? $"--kind {kind}" : null;
 
-            var process = await ProcessHelpers.ParseShellCommandJson<JArray>("az", $"{cmdPart} {subPart} {condPart} --query \"[].{{Name:name,Location: location,Kind:kind,Group:resourceGroup,Endpoint:properties.endpoint,Model:properties.model.name,Format:properties.model.format}}\"");
+            var process = await ProcessHelpers.ParseShellCommandJson<JArray>("az", $"{cmdPart} {subPart} --query \"[].{{Name:name,Location: location,Group:resourceGroup,Endpoint:properties.endpoint,Model:properties.model.name,Format:properties.model.format}}\"");
 
             var x = new ProcessResponse<CognitiveServicesDeploymentInfo[]>();
             x.StdOutput = process.StdOutput;
@@ -203,7 +208,7 @@ namespace Azure.AI.Details.Common.CLI
             foreach (var deployment in deployments)
             {
                 x.Payload[i].Name = deployment["Name"].Value<string>();
-                x.Payload[i].Kind = deployment["Kind"].Value<string>();
+                x.Payload[i].ModelFormat = deployment["Format"].Value<string>();
                 i++;
             }
 
@@ -256,12 +261,12 @@ namespace Azure.AI.Details.Common.CLI
             return x;
         }
 
-        public static async Task<ProcessResponse<CognitiveServicesDeploymentInfo>> CreateCognitiveServicesDeployment(string subscriptionId, string group, string name, string kind, string sku, string regionLocation, string model)
+        public static async Task<ProcessResponse<CognitiveServicesDeploymentInfo>> CreateCognitiveServicesDeployment(string subscriptionId, string group, string resourceName, string deploymentName, string modelName, string modelVersion, string modelFormat)
         {
-            var cmdPart = "cognitiveservices account deployment";
+            var cmdPart = "cognitiveservices account deployment create";
             var subPart = subscriptionId != null ? $"--subscription {subscriptionId}" : "";
 
-            var process = await ProcessHelpers.ParseShellCommandJson<JObject>("az", $"{cmdPart} {subPart} --kind {kind} --sku {sku} -g {group} -n {name} --yes --location {regionLocation} --custom-domain {name}.cognitiveservices.azure.com --yes --model {model}");
+            var process = await ProcessHelpers.ParseShellCommandJson<JObject>("az", $"{cmdPart} {subPart} -g {group} -n {resourceName} --deployment-name {deploymentName} --model-name {modelName} --model-version {modelVersion} --model-format {modelFormat} --scale-capacity 1");
 
             var x = new ProcessResponse<CognitiveServicesDeploymentInfo>();
             x.StdOutput = process.StdOutput;
@@ -271,7 +276,7 @@ namespace Azure.AI.Details.Common.CLI
             x.Payload = new CognitiveServicesDeploymentInfo()
             {
                 Name = resource?["name"]?.Value<string>(),
-                Kind = resource?["kind"]?.Value<string>(),
+                ModelFormat = resource?["kind"]?.Value<string>(),
             };
 
             return x;
@@ -296,12 +301,6 @@ namespace Azure.AI.Details.Common.CLI
             };
 
             return x;
-        }
-
-        public class CognitiveServicesDeploymentInfo
-        {
-            public string Name { get; set; }
-            public string Kind { get; set; }
         }
     }
 }
