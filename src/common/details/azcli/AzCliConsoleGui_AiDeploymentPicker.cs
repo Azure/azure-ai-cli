@@ -15,7 +15,7 @@ namespace Azure.AI.Details.Common.CLI
     {
         public class AiResourceDeploymentPicker
         {
-            public static async Task<AzCli.CognitiveServicesDeploymentInfo?> PickOrCreateDeployment(bool interactive, string subscriptionId, string regionLocation, string group, string resourceName, string deploymentFilter)
+            public static async Task<AzCli.CognitiveServicesDeploymentInfo> PickOrCreateDeployment(bool interactive, string subscriptionId, string regionLocation, string group, string resourceName, string deploymentFilter)
             {
                var createNewItem = !string.IsNullOrEmpty(deploymentFilter)
                    ? $"(Create `{deploymentFilter}`)"

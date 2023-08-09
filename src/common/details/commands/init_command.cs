@@ -74,8 +74,8 @@ namespace Azure.AI.Details.Common.CLI
             var sku = _values.GetOrDefault("init.service.cognitiveservices.resource.sku", Program.CognitiveServiceResourceSku);
             var yes = _values.GetOrDefault("init.service.cognitiveservices.terms.agree", false);
 
-            var (region, endpoint, key) = await GetRegionAndKey(interactive, subscriptionFilter, regionFilter, groupFilter, resourceFilter, kind, sku, yes);
-            ConfigServiceResource(region, endpoint, key);
+            var (region, endpoint, deployment, key) = await GetRegionAndKey(interactive, subscriptionFilter, regionFilter, groupFilter, resourceFilter, kind, sku, yes);
+            ConfigServiceResource(region, endpoint, deployment, key);
         }
 
         private void DisplayInitServiceBanner()
@@ -94,7 +94,7 @@ namespace Azure.AI.Details.Common.CLI
             }
         }
 
-        private async Task<(string, string, string)> GetRegionAndKey(bool interactive, string subscriptionFilter, string regionFilter, string groupFilter, string resourceFilter, string kind, string sku, bool agreeTerms)
+        private async Task<(string, string, string, string)> GetRegionAndKey(bool interactive, string subscriptionFilter, string regionFilter, string groupFilter, string resourceFilter, string kind, string sku, bool agreeTerms)
         {
             var subscriptionId = await AzCliConsoleGui.PickSubscriptionIdAsync(interactive, subscriptionFilter);
 
@@ -102,25 +102,25 @@ namespace Azure.AI.Details.Common.CLI
             var regionLocation = new AzCli.AccountRegionLocationInfo(); // await AzCliConsoleGui.PickRegionLocationAsync(interactive, regionFilter);
             var resource = await AzCliConsoleGui.PickOrCreateCognitiveResource(interactive, subscriptionId, regionLocation.Name, groupFilter, resourceFilter, kind, sku, agreeTerms);
 
-            var experimentWithPickDeployment = true;
-            if (experimentWithPickDeployment) await AzCliConsoleGui.AiResourceDeploymentPicker.PickOrCreateDeployment(interactive, subscriptionId, resource.RegionLocation, resource.Group, resource.Name, null);
+            var deployment = await AzCliConsoleGui.AiResourceDeploymentPicker.PickOrCreateDeployment(interactive, subscriptionId, resource.RegionLocation, resource.Group, resource.Name, null);
 
             var keys = await AzCliConsoleGui.LoadCognitiveServicesResourceKeys(subscriptionId, resource);
-            return (resource.RegionLocation, resource.Endpoint, keys.Key1);
+            return (resource.RegionLocation, resource.Endpoint, deployment.Name, keys.Key1);
         }
 
-        private static void ConfigServiceResource(string region, string endpoint, string key)
+        private static void ConfigServiceResource(string region, string endpoint, string deployment, string key)
         {
             ConsoleHelpers.WriteLineWithHighlight($"\n`CONFIG {Program.SERVICE_RESOURCE_DISPLAY_NAME_ALL_CAPS}`");
             Console.WriteLine();
 
             if (Program.InitConfigsEndpoint)
             {
-                ConfigSet("@endpoint", endpoint, $"Endpoint: {endpoint}");
+                ConfigSet("@endpoint", endpoint, $"  Endpoint: {endpoint}");
             }
 
-            ConfigSet("@region", region, $"  Region: {region}");
-            ConfigSet("@key", key, $"     Key: {key.Substring(0, 4)}****************************");
+            ConfigSet("@deployment", deployment, $"Deployment: {deployment}");
+            ConfigSet("@region", region, $"    Region: {region}");
+            ConfigSet("@key", key, $"       Key: {key.Substring(0, 4)}****************************");
         }
 
         private static void ConfigSet(string atFile, string setValue, string message)
