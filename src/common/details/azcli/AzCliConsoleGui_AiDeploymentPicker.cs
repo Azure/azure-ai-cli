@@ -43,7 +43,7 @@ namespace Azure.AI.Details.Common.CLI
             {
                 var allowCreateDeployment = !string.IsNullOrEmpty(allowCreateDeploymentOption);
 
-                Console.Write("Deployment: *** Loading ***");
+                Console.Write("Deployment: *** Loading choices ***");
                 var response = await AzCli.ListCognitiveServicesDeployments(subscriptionId, group, resourceName, "OpenAI");
 
                 Console.Write($"\rDeployment: ");
@@ -99,8 +99,16 @@ namespace Azure.AI.Details.Common.CLI
 
                 var normal = new Colors(ConsoleColor.White, ConsoleColor.Blue);
                 var selected = new Colors(ConsoleColor.White, ConsoleColor.Red);
+                
+                Console.Write("\rModel: *** Loading choices ***");
+                var choices = new string[] { "gpt-35-turbo", "gpt-35-turbo-16k", "text-embedding-ada-002" };
 
-                var modelName = ListBoxPicker.PickString(new string[] { "gpt-35-turbo", "gpt-35-turbo-16k", "text-embedding-ada-002"}, 30, 5, normal, selected);
+                Console.Write("\rModel: ");
+                var modelName = ListBoxPicker.PickString(choices, 30, 5, normal, selected);
+                if (string.IsNullOrEmpty(modelName)) return (null, null);
+
+                Console.WriteLine($"\rModel: {modelName}");
+
                 var modelVersion = modelName.Contains("gpt") ? "0613" : "2";
                 var modelFormat = "OpenAI";
 

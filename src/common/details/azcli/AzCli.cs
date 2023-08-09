@@ -57,6 +57,13 @@ namespace Azure.AI.Details.Common.CLI
             public string ModelFormat { get; set; }
         }
 
+        public struct CognitiveServicesModelInfo
+        {
+            public string Name { get; set; }
+            public string Format { get; set; }
+            public string Version { get; set; }
+        }
+
         // public struct CognitiveServicesDeploymentInfo
         // {
         //     public string Name;
@@ -193,9 +200,9 @@ namespace Azure.AI.Details.Common.CLI
         public static async Task<ProcessResponse<CognitiveServicesDeploymentInfo[]>> ListCognitiveServicesDeployments(string subscriptionId = null, string group = null, string resourceName = null, string modelFormat = null)
         {
             var cmdPart = "cognitiveservices account deployment list";
-            var subPart = subscriptionId != null ? $"--subscription {subscriptionId} -g {group} -n {resourceName}" : "";
+            var subPart = subscriptionId != null ? $"--subscription {subscriptionId}" : "";
 
-            var process = await ProcessHelpers.ParseShellCommandJson<JArray>("az", $"{cmdPart} {subPart} --query \"[].{{Name:name,Location: location,Group:resourceGroup,Endpoint:properties.endpoint,Model:properties.model.name,Format:properties.model.format}}\"");
+            var process = await ProcessHelpers.ParseShellCommandJson<JArray>("az", $"{cmdPart} {subPart}  -g {group} -n {resourceName} --query \"[].{{Name:name,Location: location,Group:resourceGroup,Endpoint:properties.endpoint,Model:properties.model.name,Format:properties.model.format}}\"");
 
             var x = new ProcessResponse<CognitiveServicesDeploymentInfo[]>();
             x.StdOutput = process.StdOutput;
@@ -209,6 +216,32 @@ namespace Azure.AI.Details.Common.CLI
             {
                 x.Payload[i].Name = deployment["Name"].Value<string>();
                 x.Payload[i].ModelFormat = deployment["Format"].Value<string>();
+                i++;
+            }
+
+            return x;
+        }
+
+        public static async Task<ProcessResponse<CognitiveServicesModelInfo[]>> ListCognitiveServicesModels(string subscriptionId = null, string regionLocation = null)
+        {
+            var cmdPart = "cognitiveservices account model list";
+            var subPart = subscriptionId != null ? $"--subscription {subscriptionId}" : "";
+
+            var process = await ProcessHelpers.ParseShellCommandJson<JArray>("az", $"{cmdPart} {subPart} -l {regionLocation} --query \"[].{{Name:model.name,Format:model.format,Version:model.version}}\"");
+
+            var x = new ProcessResponse<CognitiveServicesModelInfo[]>();
+            x.StdOutput = process.StdOutput;
+            x.StdError = process.StdError;
+
+            var models = process.Payload;
+            x.Payload = new CognitiveServicesModelInfo[models.Count];
+
+            var i = 0;
+            foreach (var model in models)
+            {
+                x.Payload[i].Name = model["Name"].Value<string>();
+                x.Payload[i].Format = model["Format"].Value<string>();
+                x.Payload[i].Version = model["Version"].Value<string>();
                 i++;
             }
 
