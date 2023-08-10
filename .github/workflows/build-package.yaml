@@ -18,6 +18,10 @@ jobs:
         with:
           dotnet-version: '6.0.x' # Set the desired .NET version
 
+      - name: Set up environment variables
+        run: |
+          echo "BUILD_ARTIFACTSTAGINGDIRECTORY=$PWD/artifacts" >> $GITHUB_ENV
+
       - name: Build and package CLI tool
         id: build-package
         run: |
