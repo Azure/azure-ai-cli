@@ -224,7 +224,7 @@ namespace Azure.AI.Details.Common.CLI
 
         public static async Task<ProcessResponse<CognitiveServicesModelInfo[]>> ListCognitiveServicesModels(string subscriptionId = null, string regionLocation = null)
         {
-            var cmdPart = "cognitiveservices account model list";
+            var cmdPart = "cognitiveservices model list";
             var subPart = subscriptionId != null ? $"--subscription {subscriptionId}" : "";
 
             var process = await ProcessHelpers.ParseShellCommandJson<JArray>("az", $"{cmdPart} {subPart} -l {regionLocation} --query \"[].{{Name:model.name,Format:model.format,Version:model.version}}\"");
