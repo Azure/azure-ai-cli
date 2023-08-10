@@ -199,3 +199,4 @@
 |    |XL++|  | x |  ⏹️ `ai translation`: create all CLI functionality (needs more breakdown)
 |    |XL++|  | x |  ⏹️ `ai search`: create all CLI functionality (needs more breakdown)
 |    |   |   |   |  
+
