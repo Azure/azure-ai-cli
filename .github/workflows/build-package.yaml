@@ -1,0 +1,69 @@
+name: Build and Package CLI Tool
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Set up .NET Core
+        uses: actions/setup-dotnet@v2
+        with:
+          dotnet-version: '6.0.x' # Set the desired .NET version
+
+      - name: Build and package CLI tool
+        id: build-package
+        run: |
+          dotnet build -c Release
+          dotnet pack -c Release --output ${{env.BUILD_ARTIFACTSTAGINGDIRECTORY}} --version-suffix ${{inputs.version_suffix}}
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: cli-tool-artifacts
+          path: ${{env.BUILD_ARTIFACTSTAGINGDIRECTORY}}
+
+  release:
+    needs: build
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/')
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Set up .NET Core
+        uses: actions/setup-dotnet@v2
+        with:
+          dotnet-version: '6.0.x' # Set the desired .NET version
+
+      - name: Download artifacts
+        uses: actions/download-artifact@v2
+        with:
+          name: cli-tool-artifacts
+          path: artifacts
+
+      - name: Extract package version
+        id: extract-version
+        run: |
+          echo "Package files: $(ls artifacts/*.nupkg)"
+          package_path=$(ls artifacts/*.nupkg)
+          package_version=$(dotnet nuget list source "$package_path" | grep -Eo "[0-9]+\.[0-9]+\.[0-9]+")
+          echo "::set-output name=package_version::$package_version"
+
+      - name: Create GitHub Release
+        id: create-release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: artifacts/*.nupkg
+          tag_name: ${{steps.extract-version.outputs.package_version}}
+          title: Release ${{steps.extract-version.outputs.package_version}}
+          body: |
+            Release of the CLI tool version ${{steps.extract-version.outputs.package_version}}
