@@ -16,7 +16,7 @@
     <DebugSymbols>true</DebugSymbols>
     <EnableUnmanagedDebugging>true</EnableUnmanagedDebugging>
     <PackageOutputPath>./nupkg</PackageOutputPath>
-    <PackageLicenseFile>license.txt</PackageLicenseFile>
+    <PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
     <Authors>Microsoft</Authors>
     <Description>Azure AI CLI (AI) is a command line tool for using the Azure AI service without writing any code. See https://docs.microsoft.com/azure/ai for more information.</Description>
@@ -31,7 +31,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Include="license.txt" Pack="true" PackagePath="license.txt" />
+    <None Include="LICENSE.txt" Pack="true" PackagePath="LICENSE.txt" />
   </ItemGroup>
 
   <PropertyGroup>
