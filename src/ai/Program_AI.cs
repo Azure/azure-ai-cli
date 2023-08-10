@@ -50,6 +50,28 @@ namespace Azure.AI.Details.Common.CLI
             // "THIRD_PARTY_NOTICE.txt",
             "Azure.Core.dll",
             "Azure.Identity.dll",
+            "Azure.AI.OpenAI.dll",
+            "Azure.Core.dll",
+            "Azure.Search.Documents.dll",
+            "JmePath.Net.Parser.dll",
+            "JmesPath.Net.dll",
+            "Microsoft.Bcl.AsyncInterfaces.dll",
+            "Microsoft.Bcl.HashCode.dll",
+            "Microsoft.Extensions.Logging.Abstractions.dll",
+            "Microsoft.SemanticKernel.Abstractions.dll",
+            "Microsoft.SemanticKernel.Connectors.AI.OpenAI.dll",
+            "Microsoft.SemanticKernel.Connectors.Memory.AzureCognitiveSearch.dll",
+            "Microsoft.SemanticKernel.Core.dll",
+            "Microsoft.SemanticKernel.dll",
+            "Microsoft.SemanticKernel.Planning.ActionPlanner.dll",
+            "Microsoft.SemanticKernel.Planning.SequentialPlanner.dll",
+            "Microsoft.SemanticKernel.Skills.Core.dll",
+            "Newtonsoft.Json.dll",
+            "System.Diagnostics.DiagnosticSource.dll",
+            "System.Interactive.Async.dll",
+            "System.Linq.Async.dll",
+            "System.Memory.Data.dll",
+            "System.Text.Json.dll"
         };
         #endregion
 
