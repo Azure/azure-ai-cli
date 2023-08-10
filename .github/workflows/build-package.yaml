@@ -5,6 +5,11 @@ on:
     branches:
       - main
 
+defaults:
+  env:
+    ai_version: 1.0.${{ github.run_number }}
+    ai_version_suffix: alpha
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -25,8 +30,8 @@ jobs:
       - name: Build and package CLI tool
         id: build-package
         run: |
-          dotnet build -c Release
-          dotnet pack -c Release --output ${{env.BUILD_ARTIFACTSTAGINGDIRECTORY}} --version-suffix ${{inputs.version_suffix}}
+          dotnet build -c Release /p:VersionAssembly=${{ env.ai_version }} /p:Version=${{ env.ai_version }} /p:AssemblyVersion=${{ env.ai_version }} /p:VersionSuffix=${{ env.ai_version_suffix }} --version-suffix  ${{ env.ai_version_suffix }}
+          dotnet pack -c Release --output ${{env.BUILD_ARTIFACTSTAGINGDIRECTORY}} /p:Version=${{ env.ai_version }} /p:PackageVersion=${{ env.ai_version }} --version-suffix ${{ env.ai_version_suffix }} --version-suffix  ${{ env.ai_version_suffix }}
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v2
