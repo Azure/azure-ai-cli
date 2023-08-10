@@ -116,29 +116,22 @@ namespace Azure.AI.Details.Common.CLI
                 var modelVersion = modelName.Contains("gpt") ? "0613" : "2";
                 var modelFormat = "OpenAI";
 
-                // AskPrompt("Name: ", modelName, true);
                 Console.Write("\rName: ");
-                var pick = ListBoxPicker.PickIndexOf(new string[]
-                    {
-                        $"(Custom name I'll enter myself)",
-                        $"(Use '{modelName}' as the name)",
-                        $"(Use '{modelName}-{modelVersion}' as the name)",
-                        $"(Use 'happy-edison-{modelName}' as the name)",
-                        $"(Use 'happy-edison-{modelName}-{modelVersion}' as the name)",
-                    },
-                    60, 30, normal, selected, 1);
+                choices = new string[] {
+                    $"{modelName}-{modelVersion}",
+                    "(Enter custom name)"
+                };
+                var width = Math.Max(choices.Max(x => x.Length) + 5, 30);
+                var pick = ListBoxPicker.PickIndexOf(choices, width, 30, normal, selected);
 
                 deploymentName = pick switch{
-                    0 => AskPrompt("\rName: "),
-                    1 => modelName,
-                    2 => $"{modelName}-v{modelVersion}",
-                    3 => $"happy-edison-{modelName}",
-                    4 => $"happy-edison-{modelName}-{modelVersion}",
+                    0 => $"{modelName}-{modelVersion}",
+                    1 => AskPrompt("\rName: "),
                     _ => null
                 };
 
                 if (string.IsNullOrEmpty(deploymentName)) return (null, null);
-                if (pick != 0) Console.WriteLine($"\rName: {deploymentName}");
+                if (pick != choices.Length - 1) Console.WriteLine($"\rName: {deploymentName}");
 
                 Console.Write("*** CREATING ***");
                 var response = await AzCli.CreateCognitiveServicesDeployment(subscriptionId, resource.Group, resource.Name, deploymentName, modelName, modelVersion, modelFormat);
