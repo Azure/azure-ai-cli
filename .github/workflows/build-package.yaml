@@ -28,7 +28,7 @@ jobs:
         id: build-package
         run: |
           dotnet build -c Release /p:VersionAssembly=${{ env.AI_VERSION }} /p:Version=${{ env.AI_VERSION }} /p:AssemblyVersion=${{ env.AI_VERSION }} /p:VersionSuffix=${{ env.AI_VERSION_SUFFIX }} --version-suffix  ${{ env.AI_VERSION_SUFFIX }}
-          dotnet pack -c Release --output ${{env.BUILD_ARTIFACTSTAGINGDIRECTORY}} /p:Version=${{ env.AI_VERSION }} /p:PackageVersion=${{ env.AI_VERSION }} --version-suffix ${{ env.AI_VERSION_SUFFIX }} --version-suffix  ${{ env.AI_VERSION_SUFFIX }}
+          dotnet pack -c Release --output ${{env.BUILD_ARTIFACTSTAGINGDIRECTORY}} /p:Version=${{ env.AI_VERSION }} /p:PackageVersion=${{ env.AI_VERSION }} --version-suffix ${{ env.AI_VERSION_SUFFIX }}
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v2
