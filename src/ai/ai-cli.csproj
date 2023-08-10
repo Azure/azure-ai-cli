@@ -30,9 +30,9 @@
     <LocalBinOutputPath Condition="'$(LocalBinOutputPath)' == ''">bin</LocalBinOutputPath>
   </PropertyGroup>
 
-  <!-- <ItemGroup>
+  <ItemGroup>
     <None Include="license.txt" Pack="true" PackagePath="license.txt" />
-  </ItemGroup> -->
+  </ItemGroup>
 
   <PropertyGroup>
     <IncludeSymbols>false</IncludeSymbols>

@@ -46,7 +46,7 @@ namespace Azure.AI.Details.Common.CLI
         #region zip option data
         public static string[] ZipIncludes = 
         {
-            // "LICENSE.txt",
+            "LICENSE.txt",
             // "THIRD_PARTY_NOTICE.txt",
             "Azure.Core.dll",
             "Azure.Identity.dll",
