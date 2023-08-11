@@ -166,7 +166,9 @@ namespace Azure.AI.Details.Common.CLI
         private ChatCompletionsOptions CreateChatCompletionOptions()
         {
             var options = new ChatCompletionsOptions();
-            options.Messages.Add(new ChatMessage(ChatRole.System, DefaultSystemPrompt));
+
+            var systemPrompt = _values.GetOrDefault("chat.message.system.prompt", DefaultSystemPrompt);
+            options.Messages.Add(new ChatMessage(ChatRole.System, systemPrompt));
 
             // messages.ToList().ForEach(m => options.Messages.Add(m));
 
