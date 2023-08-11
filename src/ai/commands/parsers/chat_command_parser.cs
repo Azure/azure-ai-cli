@@ -47,6 +47,7 @@ namespace Azure.AI.Details.Common.CLI
             new NamedValueTokenParser(null,             "chat.input.type", "111", "1", "interactive;interactive+;text;ssml;text.file;ssml.file"),
 
             new NamedValueTokenParser(null,             "chat.message.system.prompt", "0010;0001", "1"),
+            new NamedValueTokenParser(null,             "chat.message.user.prompt", "0010", "1"),
         };
 
         #endregion

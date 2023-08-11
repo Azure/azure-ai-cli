@@ -69,11 +69,13 @@ namespace Azure.AI.Details.Common.CLI
             var client = CreateOpenAIClient(out var deployment);
             var options = CreateChatCompletionOptions();
 
+            var userPrompt = _values["chat.message.user.prompt"];
+
             while (true)
             {
                 DisplayUserChatPrompt();
-                var text = Console.ReadLine();
 
+                var text = ReadLineOrSimulateInput(ref userPrompt);
                 if (text.ToLower() == "")
                 {
                     text = PickInteractiveContextMenu();
@@ -101,6 +103,18 @@ namespace Azure.AI.Details.Common.CLI
             }
 
             Console.ResetColor();
+        }
+
+        private static string ReadLineOrSimulateInput(ref string inputToSimulate)
+        {
+            var simulate = !string.IsNullOrEmpty(inputToSimulate);
+
+            var input = simulate ? inputToSimulate : Console.ReadLine();
+            inputToSimulate = null;
+
+            if (simulate) Console.WriteLine(input);
+
+            return input;
         }
 
         private static string PickInteractiveContextMenu()
