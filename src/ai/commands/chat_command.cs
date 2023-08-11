@@ -169,7 +169,7 @@ namespace Azure.AI.Details.Common.CLI
             var options = new ChatCompletionsOptions();
 
             var systemPrompt = _values.GetOrDefault("chat.message.system.prompt", DefaultSystemPrompt);
-            options.Messages.Add(new ChatMessage(ChatRole.System, systemPrompt));
+            options.Messages.Add(new ChatMessage(ChatRole.System, systemPrompt.ReplaceValues(_values)));
 
             var textFile = _values["chat.message.history.text.file"];
             if (!string.IsNullOrEmpty(textFile)) AddChatMessagesFromTextFile(options, textFile);

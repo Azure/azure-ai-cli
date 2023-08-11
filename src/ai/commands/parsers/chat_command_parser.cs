@@ -58,6 +58,8 @@ namespace Azure.AI.Details.Common.CLI
             new NamedValueTokenParser(null,             "chat.options.frequency.penalty", "0011", "1"),
             new NamedValueTokenParser(null,             "chat.options.presence.penalty", "0011", "1"),
             new NamedValueTokenParser(null,             "chat.options.stop.sequence", "0010", "1"),
+
+            new NamedValueTokenParser(null,             "chat.replace.value.*", "0011;0101", "1;0", null, null, "="),
         };
 
         #endregion
