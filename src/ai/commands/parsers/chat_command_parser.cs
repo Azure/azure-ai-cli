@@ -51,6 +51,13 @@ namespace Azure.AI.Details.Common.CLI
 
             new NamedValueTokenParser(null,             "chat.message.system.prompt", "0010;0001", "1"),
             new NamedValueTokenParser(null,             "chat.message.user.prompt", "0010", "1"),
+
+            new NamedValueTokenParser(null,             "chat.options.max.tokens", "0011", "1"),
+            new NamedValueTokenParser(null,             "chat.options.temperature", "001", "1"),
+            new NamedValueTokenParser(null,             "chat.options.top.p", "0001", "1"),
+            new NamedValueTokenParser(null,             "chat.options.frequency.penalty", "0011", "1"),
+            new NamedValueTokenParser(null,             "chat.options.presence.penalty", "0011", "1"),
+            new NamedValueTokenParser(null,             "chat.options.stop.sequence", "0010", "1"),
         };
 
         #endregion

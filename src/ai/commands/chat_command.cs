@@ -172,48 +172,54 @@ namespace Azure.AI.Details.Common.CLI
             options.Messages.Add(new ChatMessage(ChatRole.System, systemPrompt));
 
             var textFile = _values["chat.message.history.text.file"];
-            if (!string.IsNullOrEmpty(textFile))
+            if (!string.IsNullOrEmpty(textFile)) AddChatMessagesFromTextFile(options, textFile);
+
+            var maxTokens = _values["chat.options.max.tokens"];
+            var temperature = _values["chat.options.temperature"];
+            var frequencyPenalty = _values["chat.options.frequency.penalty"];
+            var presencePenalty = _values["chat.options.presence.penalty"];
+            
+            options.MaxTokens = TryParse(maxTokens, _defaultMaxTokens);
+            options.Temperature = TryParse(temperature, _defaultTemperature);
+            options.FrequencyPenalty = TryParse(frequencyPenalty, _defaultFrequencyPenalty);
+            options.PresencePenalty = TryParse(presencePenalty, _defaultPresencePenalty);
+
+            var stop = _values["chat.options.stop.sequence"];
+            if (!string.IsNullOrEmpty(stop))
             {
-                var existing = FileHelpers.DemandFindFileInDataPath(textFile, _values, "chat history");
-                var text = FileHelpers.ReadAllText(existing, Encoding.Default);
-
-                var lines = text.Split(new char[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries)
-                    .Where(x => !string.IsNullOrEmpty(x))
-                    .Select(x => x.Trim())
-                    .ToList();
-
-                var first = lines.FirstOrDefault();
-                var role = UpdateRole(ref first);
-
-                for (int i = 0; i < lines.Count; i++)
-                {
-                    var line = lines[i];
-                    role = UpdateRole(ref line, role);
-
-                    if (i == 0 && role == ChatRole.System && FirstMessageIsDefaultSystemPrompt(options, role))
-                    {
-                        options.Messages.First().Content = line;
-                        continue;
-                    }
-
-                    options.Messages.Add(new ChatMessage(role, line));
-                }
+                var stops = stop.Split('\n', StringSplitOptions.RemoveEmptyEntries).ToList();
+                stops.ForEach(s => options.StopSequences.Add(s));
             }
 
-            // messages.ToList().ForEach(m => options.Messages.Add(m));
-
-            // options.MaxTokens = TryParse(maxTokens, _defaultMaxTokens);
-            // options.Temperature = TryParse(temperature, _defaultTemperature);
-            // options.FrequencyPenalty = TryParse(frequencyPenalty, _defaultFrequencyPenalty);
-            // options.PresencePenalty = TryParse(presencePenalty, _defaultPresencePenalty);
-
-            // if (!string.IsNullOrEmpty(stop))
-            // {
-            //     var stops = stop.Split('\n', StringSplitOptions.RemoveEmptyEntries).ToList();
-            //     stops.ForEach(s => options.StopSequences.Add(s));
-            // }
-
             return options;
+        }
+
+        private void AddChatMessagesFromTextFile(ChatCompletionsOptions options, string textFile)
+        {
+            var existing = FileHelpers.DemandFindFileInDataPath(textFile, _values, "chat history");
+            var text = FileHelpers.ReadAllText(existing, Encoding.Default);
+
+            var lines = text.Split(new char[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries)
+                .Where(x => !string.IsNullOrEmpty(x))
+                .Select(x => x.Trim())
+                .ToList();
+
+            var first = lines.FirstOrDefault();
+            var role = UpdateRole(ref first);
+
+            for (int i = 0; i < lines.Count; i++)
+            {
+                var line = lines[i];
+                role = UpdateRole(ref line, role);
+
+                if (i == 0 && role == ChatRole.System && FirstMessageIsDefaultSystemPrompt(options, role))
+                {
+                    options.Messages.First().Content = line;
+                    continue;
+                }
+
+                options.Messages.Add(new ChatMessage(role, line));
+            }
         }
 
         private ChatRole UpdateRole(ref string line, ChatRole? currentRole = null)
@@ -329,6 +335,15 @@ namespace Azure.AI.Details.Common.CLI
         // OutputHelper _output = null;
         // DisplayHelper _display = null;
 
+        private int TryParse(string? s, int defaultValue)
+        {
+            return !string.IsNullOrEmpty(s) && int.TryParse(s, out var parsed) ? parsed : defaultValue;
+        }
+
+        private float TryParse(string? s, float defaultValue)
+        {
+            return !string.IsNullOrEmpty(s) && float.TryParse(s, out var parsed) ? parsed : defaultValue;
+        }
 
         private IKernel? CreateSemanticKernel(out string acsIndex)
         {
@@ -434,5 +449,11 @@ namespace Azure.AI.Details.Common.CLI
         }
 
         private const string DefaultSystemPrompt = "You are an AI assistant that helps people find information regarding Azure AI.";
+
+        private const int _defaultMaxTokens = 800;
+        private const float _defaultTemperature = 0.7f;
+        private const float _defaultFrequencyPenalty = 0.0f;
+        private const float _defaultPresencePenalty = 0.0f;
+        private const float _defaultTopP = 0.95f;
     }
 }
