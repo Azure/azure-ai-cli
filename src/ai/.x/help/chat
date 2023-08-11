@@ -16,6 +16,7 @@ USAGE: ai chat [...]
     --file FILE                         (see: ai help chat history file)
     --files PATTERN                     (see: ai help chat history files)
     --files @FILELIST.txt               (see: ai help chat history files)
+    --json FILE                         (see: ai help chat history json)
     --jsonl FILE                        (see: ai help chat history jsonl)
     --user MESSAGE                      (see: ai help chat user message)
 

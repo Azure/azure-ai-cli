@@ -42,9 +42,12 @@ namespace Azure.AI.Details.Common.CLI
             new NamedValueTokenParser(null,             "service.config.acs.key", "0011", "1"),
             new NamedValueTokenParser(null,             "service.config.acs.endpoint.uri", "00110;00101", "1"),
 
-            new NamedValueTokenParser("--interactive",  "chat.input.interactive", "001", "0", null, null, "interactive", "chat.input.type"),
-            new NamedValueTokenParser("--interactive+", "chat.input.interactive+", "001", "0", null, null, "interactive+", "chat.input.type"),
-            new NamedValueTokenParser(null,             "chat.input.type", "111", "1", "interactive;interactive+;text;ssml;text.file;ssml.file"),
+            new NamedValueTokenParser("--interactive",  "chat.input.interactive", "001", "0"),
+
+            new NamedValueTokenParser(null,             "chat.message.history.json.file", "00011", "1", null, null, "json.file", "chat.history.type"),
+            new NamedValueTokenParser(null,             "chat.message.history.jsonl.file", "00011", "1", null, null, "jsonl.file", "chat.history.type"),
+            new NamedValueTokenParser(null,             "chat.message.history.text.file", "00011;00001", "1", null, null, "text.file", "chat.history.type"),
+            new NamedValueTokenParser(null,             "chat.message.history.type", "1111", "1", "interactive;interactive+;json;jsonl;text;json.file;jsonl.file;text.file"),
 
             new NamedValueTokenParser(null,             "chat.message.system.prompt", "0010;0001", "1"),
             new NamedValueTokenParser(null,             "chat.message.user.prompt", "0010", "1"),

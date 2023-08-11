@@ -40,21 +40,8 @@ namespace Azure.AI.Details.Common.CLI
         {
             StartCommand();
 
-            var kind = _values["chat.input.type"];
-            switch (kind)
-            {
-                case "":
-                case null:
-                case "interactive":
-                    // SynthesizeInteractive(false);
-                    // break;
-                    
-                case "interactive+":
-                    ChatInteractively(true).Wait();
-                    break;
-
-                // TODO: Add support for other input types
-            }
+            // TODO: Add support for other scenarios
+            ChatInteractively(true).Wait();
 
             StopCommand();
             DisposeAfterStop();
@@ -92,7 +79,7 @@ namespace Azure.AI.Details.Common.CLI
                 var relevantMemories = await SearchMemoryAsync(kernel, acsIndex, text);
                 if (relevantMemories != null)
                 {
-                text = UpdateUserInputWithSearchResultInfo(text, relevantMemories);
+                    text = UpdateUserInputWithSearchResultInfo(text, relevantMemories);
                 }
 
                 var task = GetChatCompletionsAsync(client, deployment, options, text);
@@ -184,6 +171,35 @@ namespace Azure.AI.Details.Common.CLI
             var systemPrompt = _values.GetOrDefault("chat.message.system.prompt", DefaultSystemPrompt);
             options.Messages.Add(new ChatMessage(ChatRole.System, systemPrompt));
 
+            var textFile = _values["chat.message.history.text.file"];
+            if (!string.IsNullOrEmpty(textFile))
+            {
+                var existing = FileHelpers.DemandFindFileInDataPath(textFile, _values, "chat history");
+                var text = FileHelpers.ReadAllText(existing, Encoding.Default);
+
+                var lines = text.Split(new char[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries)
+                    .Where(x => !string.IsNullOrEmpty(x))
+                    .Select(x => x.Trim())
+                    .ToList();
+
+                var first = lines.FirstOrDefault();
+                var role = UpdateRole(ref first);
+
+                for (int i = 0; i < lines.Count; i++)
+                {
+                    var line = lines[i];
+                    role = UpdateRole(ref line, role);
+
+                    if (i == 0 && role == ChatRole.System && FirstMessageIsDefaultSystemPrompt(options, role))
+                    {
+                        options.Messages.First().Content = line;
+                        continue;
+                    }
+
+                    options.Messages.Add(new ChatMessage(role, line));
+                }
+            }
+
             // messages.ToList().ForEach(m => options.Messages.Add(m));
 
             // options.MaxTokens = TryParse(maxTokens, _defaultMaxTokens);
@@ -198,6 +214,34 @@ namespace Azure.AI.Details.Common.CLI
             // }
 
             return options;
+        }
+
+        private ChatRole UpdateRole(ref string line, ChatRole? currentRole = null)
+        {
+            var lower = line.ToLower();
+            if (lower.StartsWith("system:"))
+            {
+                line = line.Substring(7).Trim();
+                return ChatRole.System;
+            }
+            else if (lower.StartsWith("user:"))
+            {
+                line = line.Substring(5).Trim();
+                return ChatRole.User;
+            }
+            else if (lower.StartsWith("assistant:"))
+            {
+                line = line.Substring(10).Trim();
+                return ChatRole.Assistant;
+            }
+            return currentRole ?? ChatRole.System;
+        }
+
+        private static bool FirstMessageIsDefaultSystemPrompt(ChatCompletionsOptions options, ChatRole role)
+        {
+            return options.Messages.Count() == 1
+                && options.Messages.First().Role == ChatRole.System
+                && options.Messages.First().Content == DefaultSystemPrompt;
         }
 
         private OpenAIClient CreateOpenAIClient(out string deployment)
