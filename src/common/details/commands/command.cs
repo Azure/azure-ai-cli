@@ -141,7 +141,9 @@ namespace Azure.AI.Details.Common.CLI
 
             // binaries
             var sourcePath = AppContext.BaseDirectory;
-            FileHelpers.CopyFile(sourcePath, Program.Exe, tempDirectory, null, verbose);
+
+            var programExe = OperatingSystem.IsWindows() ? Program.Exe : Program.Exe.Replace(".exe", "");
+            FileHelpers.CopyFile(sourcePath, programExe, tempDirectory, null, verbose);
 
             #if NETCOREAPP
             FileHelpers.CopyFile(sourcePath, Program.Name, tempDirectory, null, verbose);

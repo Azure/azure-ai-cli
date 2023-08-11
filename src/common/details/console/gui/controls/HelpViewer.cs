@@ -67,7 +67,8 @@ namespace Azure.AI.Details.Common.CLI.ConsoleGui
                         helpCommand = helpCommand.Substring(0, helpCommand.Length - 1);
                     }
 
-                    var start = new ProcessStartInfo(Program.Exe, $"quiet {helpCommand}");
+                    var programExe = OperatingSystem.IsWindows() ? Program.Exe : Program.Exe.Replace(".exe", "");
+                    var start = new ProcessStartInfo(programExe, $"quiet {helpCommand}");
                     start.UseShellExecute = false;
                     
                     var process = Process.Start(start);
@@ -93,7 +94,8 @@ namespace Azure.AI.Details.Common.CLI.ConsoleGui
                         var tryCommand = text.Substring(at + tryItPrefix.Length);
                         tryCommand = tryCommand.TrimEnd(')');
 
-                        var start = new ProcessStartInfo(Program.Exe, $"cls {tryCommand}");
+                        var programExe = OperatingSystem.IsWindows() ? Program.Exe : Program.Exe.Replace(".exe", "");
+                        var start = new ProcessStartInfo(programExe, $"cls {tryCommand}");
                         start.UseShellExecute = false;
                         Process.Start(start).WaitForExit();
                         Environment.Exit(-1);
@@ -110,7 +112,8 @@ namespace Azure.AI.Details.Common.CLI.ConsoleGui
                 if (selectedRow < 0) break;
 
                 var helpCommand = topics[selectedRow];
-                var start = new ProcessStartInfo(Program.Exe, $"quiet {helpCommand}");
+                var programExe = OperatingSystem.IsWindows() ? Program.Exe : Program.Exe.Replace(".exe", "");
+                var start = new ProcessStartInfo(programExe, $"quiet {helpCommand}");
 
                 start.UseShellExecute = false;
                 Process.Start(start).WaitForExit();
