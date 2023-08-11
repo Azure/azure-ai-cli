@@ -212,6 +212,11 @@ namespace Azure.AI.Details.Common.CLI
                 var line = lines[i];
                 role = UpdateRole(ref line, role);
 
+                if (role == ChatRole.System)
+                {
+                    line = line.ReplaceValues(_values);
+                }
+
                 if (i == 0 && role == ChatRole.System && FirstMessageIsDefaultSystemPrompt(options, role))
                 {
                     options.Messages.First().Content = line;
