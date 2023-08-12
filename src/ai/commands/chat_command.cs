@@ -181,7 +181,7 @@ namespace Azure.AI.Details.Common.CLI
             Console.ForegroundColor = ConsoleColor.White;
             Console.Write(": ");
 
-            Console.ForegroundColor = ConsoleColor.White;
+            Console.ForegroundColor = ConsoleColor.Gray;
 
             var response = await client.GetChatCompletionsStreamingAsync(deployment, options);
 
