@@ -40,15 +40,22 @@ namespace Azure.AI.Details.Common.CLI
         {
             StartCommand();
 
-            // TODO: Add support for other scenarios
-            ChatInteractively(true).Wait();
+            var interactive = _values.GetOrDefault("chat.input.interactive", false);
+            if (interactive)
+            {
+                ChatInteractively().Wait();
+            }
+            else
+            {
+                ChatNonInteractively().Wait();
+            }
 
             StopCommand();
             DisposeAfterStop();
             DeleteTemporaryFiles();
         }
 
-        private async Task ChatInteractively(bool repeatedly = false)
+        private async Task ChatInteractively()
         {
             var kernel = CreateSemanticKernel(out var acsIndex);
             if (kernel != null) await StoreMemoryAsync(kernel, acsIndex);
@@ -85,9 +92,45 @@ namespace Azure.AI.Details.Common.CLI
                 var task = GetChatCompletionsAsync(client, deployment, options, text);
                 WaitForStopOrCancel(task);
 
-                if (!repeatedly) break;
                 if (_canceledEvent.WaitOne(0)) break;
             }
+
+            Console.ResetColor();
+        }
+
+        private async Task ChatNonInteractively()
+        {
+            var userPrompt = _values["chat.message.user.prompt"];
+            if (string.IsNullOrEmpty(userPrompt))
+            {
+                _values.AddThrowError(
+                    "ERROR:", $"Cannot start chat; option missing!\n",
+                        "TRY:", $"{Program.Name} chat --interactive",
+                                $"{Program.Name} chat --user PROMPT",
+                                "",
+                        "SEE:", $"{Program.Name} help chat");
+            }
+
+            var kernel = CreateSemanticKernel(out var acsIndex);
+            if (kernel != null) await StoreMemoryAsync(kernel, acsIndex);
+
+            var client = CreateOpenAIClient(out var deployment);
+            var options = CreateChatCompletionOptions();
+
+            DisplayUserChatPrompt();
+
+            var text = userPrompt;
+            Console.ForegroundColor = ConsoleColor.Yellow;
+            Console.WriteLine(text);
+
+            var relevantMemories = await SearchMemoryAsync(kernel, acsIndex, text);
+            if (relevantMemories != null)
+            {
+                text = UpdateUserInputWithSearchResultInfo(text, relevantMemories);
+            }
+
+            var task = GetChatCompletionsAsync(client, deployment, options, text);
+            WaitForStopOrCancel(task);
 
             Console.ResetColor();
         }

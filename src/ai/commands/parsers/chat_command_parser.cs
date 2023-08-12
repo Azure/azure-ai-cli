@@ -42,7 +42,7 @@ namespace Azure.AI.Details.Common.CLI
             new NamedValueTokenParser(null,             "service.config.acs.key", "0011", "1"),
             new NamedValueTokenParser(null,             "service.config.acs.endpoint.uri", "00110;00101", "1"),
 
-            new NamedValueTokenParser("--interactive",  "chat.input.interactive", "001", "0"),
+            new NamedValueTokenParser("--interactive",  "chat.input.interactive", "001", "0", null, null, "true"),
 
             new NamedValueTokenParser(null,             "chat.message.history.json.file", "00011", "1", null, null, "json.file", "chat.history.type"),
             new NamedValueTokenParser(null,             "chat.message.history.jsonl.file", "00011", "1", null, null, "jsonl.file", "chat.history.type"),
