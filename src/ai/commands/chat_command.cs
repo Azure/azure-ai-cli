@@ -20,6 +20,9 @@ using Azure.AI.Details.Common.CLI.ConsoleGui;
 using Microsoft.SemanticKernel;
 using Microsoft.SemanticKernel.Connectors.Memory.AzureCognitiveSearch;
 using Microsoft.SemanticKernel.Memory;
+using Azure.Core.Diagnostics;
+using Azure.Core.Pipeline;
+using Azure.Core;
 
 namespace Azure.AI.Details.Common.CLI
 {
@@ -323,9 +326,19 @@ namespace Azure.AI.Details.Common.CLI
 
             if (!string.IsNullOrEmpty(endpoint))
             {
+                //var logger = new AzureEventSourceListener((e, message) => {
+                //    System.Diagnostics.Debug.WriteLine($"---\n{e.EventName}\n{message}\n---");
+                //}, System.Diagnostics.Tracing.EventLevel.Verbose);
+
+                //var options = new OpenAIClientOptions();
+                ////options.Diagnostics.IsLoggingContentEnabled = true;
+                //options.Diagnostics.IsLoggingEnabled = true;
+
                 return new OpenAIClient(
                     new Uri(endpoint!),
-                    new AzureKeyCredential(key!));
+                    new AzureKeyCredential(key!)
+                    //options
+                    );
             }
             else if (!string.IsNullOrEmpty(host))
             {

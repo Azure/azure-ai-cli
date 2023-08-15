@@ -7,23 +7,23 @@
 |    | - |✔️|   |  ✅ `ai-cli` github repo (private for now)  
 |    | - |✔️|   |  ✅ `ai` CLI: basic structure (csproj, files, etc.)  
 |    |   |   |   |  
-|    |24+|???|???|  ⏹️ CI: scripts + nuget tool package  
-|    |24+|???|???|  ⏹️ CI: scripts + github build actions  
+|    | - |✔️|   |  ✅ CI: scripts + nuget tool package  
+|    | - |✔️|   |  ✅ CI: scripts + github build actions  
 |    |40+|???|???|  ⏹️ CI: scripts + github test actions  
 |    |16+|???|???|  ⏹️ CD: how to get nuget to vs code hosted container
 |    |   |   |   |  
 |    | - |✔️|   |  ✅ `ai help`: basic functionality and IA  
-|    | 8 | x |   |  ⏹️ `ai help`: placeholder help content for all commands/sub-commands  
+|    | - |✔️|   |  ✅ `ai help`: placeholder help content for all commands/sub-commands  
 |    |   |   |   |  
 |    | - |✔️|   |  ✅ `ai wizard`: basic functionality and IA  
-|    | 4 | x |   |  ⏹️ `ai wizard`: placeholder for all August-Hero wizard steps  
+| P2 | 4 | x |   |  ⏹️ `ai wizard`: placeholder for all August-Hero wizard steps  
 |    |   |   |   |  
-|    | 1 | ✔️ |   |  ✅ `ai speech`: placeholder for speech commands (parser, warning)  
-|    | 1 | ✔️ |   |  ✅ `ai vision`:  placeholder for vision commands (parser, warning)  
-|    | 1 | ✔️ |   |  ✅ `ai language`: placeholder for language commands (parser, warning)  
-|    | 1 | ✔️ |   |  ✅ `ai search`: initial placeholder for search commands (parser, warning)  
-|    | 1 | ✔️ |   |  ✅ `ai service`: initial placeholder for service commands (parser, warning)  
-|    | 1 | ✔️ |   |  ✅ `ai tool`: initial placeholder for tool commands (parser, warning)  
+|    | - | ✔️ |   |  ✅ `ai speech`: placeholder for speech commands (parser, warning)  
+|    | - | ✔️ |   |  ✅ `ai vision`:  placeholder for vision commands (parser, warning)  
+|    | - | ✔️ |   |  ✅ `ai language`: placeholder for language commands (parser, warning)  
+|    | - | ✔️ |   |  ✅ `ai search`: initial placeholder for search commands (parser, warning)  
+|    | - | ✔️ |   |  ✅ `ai service`: initial placeholder for service commands (parser, warning)  
+|    | - | ✔️ |   |  ✅ `ai tool`: initial placeholder for tool commands (parser, warning)  
 |    |   |   |   |  
 | P1 | 1 | x |   |  ⏹️ python: proof of life: enumerate hubs  
 | P1 | 1 | x |   |  ⏹️ python: proof of life: create hubs  
@@ -63,7 +63,7 @@
 |    | 1 |   |   |  ⏹️ `ai service`: `help`  
 |    | 1 |   |   |  ⏹️ `ai service`: parser  
 |    |   |   |   |  
-| P1 | 1 | x |   |  ⏹️ `ai service resource`: `--help`
+|    | - |✔️|   |  ⏹️ `ai service resource`: `--help`
 | P1 | 1 | x |   |  ⏹️ `ai service resource`: create hub
 | P1 | 1 |???|???|  ⏹️ `ai service resource`: status on hub
 | P1 | 2 |???|???|  ⏹️ `ai service resource`: list hubs
@@ -93,7 +93,7 @@
 |    | 2 | x |   |  ⏹️ `ai service connection`: `--output`  
 |    | 1 | x |   |  ⏹️ `ai service connection`: `--wait`  
 |    |   |   |   |  
-| P1 | 1 | x |   |  ⏹️ `ai service deployment`: `--help`
+|    | - |✔️|   |  ⏹️ `ai service deployment`: `--help`
 | P1 | 1 | x |   |  ⏹️ `ai service deployment`: create
 | P1 | 1 |???|???|  ⏹️ `ai service deployment`: status
 | P1 | 2 | x |   |  ⏹️ `ai service deployment`: list
@@ -123,15 +123,15 @@
 |    | 1 |   | x |  ⏹️ `ai service evaluation`: `--wait`  
 |    |   |   |   |  
 |    | - |✔️|   |  ✅ `ai init`: basic functionality (OpenAI resource, not AI Hub)  
+|    | - |✔️|   |  ✅ `ai init`: deployement, pick or create, list models, pick  
 | P1 | 4 | x |   |  ⏹️ `ai init`: update to use AI Hubs  
-| P1 | 4 | x |   |  ⏹️ `ai init`: deployement, pick or create, list models, pick  
 |    |   |   |   |  
 |    | - |✔️|   |  ✅ `ai config`: basic functionality and IA  
 | P1 | 4 | x |   |  ⏹️ `ai config`: update defaults structure to match AI Hub/Project usage  
 |    |   |   |   |  
 |    | - |✔️|   |  ✅ `ai chat`: basic functionality for interactive chat  
 |    | - |✔️|   |  ✅ `ai chat`: w/ my data poc: embeddings provider, index provider, etc.  
-| P1 | 4 | x |   |  ⏹️ `ai chat`: command line inputs: prompt, temperature, top-p, frequency penalty, presence penalty, etc.  
+|    | - |✔️|   |  ✅ `ai chat`: command line inputs: prompt, temperature, top-p, frequency penalty, presence penalty, etc.  
 | P1 | 4 | x |   |  ⏹️ `ai chat`: command line inputs: non-interactive chat: input file, output file, etc.  
 | P2 |12 |   | x |  ⏹️ `ai chat`: interactive chat (hot-reload)  
 |    |   |   |   |  
