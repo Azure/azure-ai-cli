@@ -23,6 +23,8 @@ using Microsoft.SemanticKernel.Memory;
 using Azure.Core.Diagnostics;
 using Azure.Core.Pipeline;
 using Azure.Core;
+using System.Diagnostics.Tracing;
+using Microsoft.CognitiveServices.Speech.Diagnostics.Logging;
 
 namespace Azure.AI.Details.Common.CLI
 {
@@ -326,18 +328,16 @@ namespace Azure.AI.Details.Common.CLI
 
             if (!string.IsNullOrEmpty(endpoint))
             {
-                //var logger = new AzureEventSourceListener((e, message) => {
-                //    System.Diagnostics.Debug.WriteLine($"---\n{e.EventName}\n{message}\n---");
-                //}, System.Diagnostics.Tracing.EventLevel.Verbose);
+                _azureEventSourceListener = new AzureEventSourceListener((e, message) => EventSourceAiLoggerLog(e, message), System.Diagnostics.Tracing.EventLevel.Verbose);
 
-                //var options = new OpenAIClientOptions();
-                ////options.Diagnostics.IsLoggingContentEnabled = true;
-                //options.Diagnostics.IsLoggingEnabled = true;
+                var options = new OpenAIClientOptions();
+                options.Diagnostics.IsLoggingContentEnabled = true;
+                options.Diagnostics.IsLoggingEnabled = true;
 
                 return new OpenAIClient(
                     new Uri(endpoint!),
-                    new AzureKeyCredential(key!)
-                    //options
+                    new AzureKeyCredential(key!),
+                    options
                     );
             }
             else if (!string.IsNullOrEmpty(host))
@@ -363,10 +363,65 @@ namespace Azure.AI.Details.Common.CLI
             }
         }
 
+        private void EnsureStartLogFile()
+        {
+            var log = _values["diagnostics.config.log.file"];
+            if (!string.IsNullOrEmpty(log))
+            {
+                // var id = _values.GetOrDefault("vision.input.id", "");
+                // if (log.Contains("{id}")) log = log.Replace("{id}", id);
+
+                var pid = Process.GetCurrentProcess().Id.ToString();
+                if (log.Contains("{pid}")) log = log.Replace("{pid}", pid);
+
+                var time = DateTime.Now.ToFileTime().ToString();
+                if (log.Contains("{time}")) log = log.Replace("{time}", time);
+
+                var runTime = _values.GetOrDefault("x.run.time", "");
+                if (log.Contains("{run.time}")) log = log.Replace("{run.time}", runTime);
+
+                log = FileHelpers.GetOutputDataFileName(log, _values);
+                FileLogger.Start(log);
+            }
+        }
+
+        private void EnsureStopLogFile()
+        {
+            var log = _values["diagnostics.config.log.file"];
+            if (!string.IsNullOrEmpty(log))
+            {
+                FileLogger.Stop();
+            }
+        }
+
+        private void EventSourceAiLoggerLog(EventWrittenEventArgs e, string message)
+        {
+            message = message.Replace("\r", "\\r").Replace("\n", "\\n");
+            switch (e.Level)
+            {
+                case EventLevel.Error:
+                    AI.DBG_TRACE_ERROR(message, 0, e.EventSource.Name, e.EventName);
+                    break;
+
+                case EventLevel.Warning:
+                    AI.DBG_TRACE_WARNING(message, 0, e.EventSource.Name, e.EventName);
+                    break;
+
+                case EventLevel.Informational:
+                    AI.DBG_TRACE_INFO(message, 0, e.EventSource.Name, e.EventName);
+                    break;
+
+                default:
+                case EventLevel.Verbose:
+                    AI.DBG_TRACE_VERBOSE(message, 0, e.EventSource.Name, e.EventName); break;
+            }
+        }
+
         private void StartCommand()
         {
             CheckPath();
             // CheckChatInput();
+            EnsureStartLogFile();
 
             // _display = new DisplayHelper(_values);
 
@@ -385,6 +440,7 @@ namespace Azure.AI.Details.Common.CLI
         {
             _lock.StopLock(5000);
 
+            EnsureStopLogFile();
             // _output.CheckOutput();
             // _output.StopOutput();
 
@@ -392,6 +448,7 @@ namespace Azure.AI.Details.Common.CLI
         }
 
         private SpinLock _lock = null;
+        private AzureEventSourceListener _azureEventSourceListener;
 
         // OutputHelper _output = null;
         // DisplayHelper _display = null;
