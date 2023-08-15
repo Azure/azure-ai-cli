@@ -27,17 +27,17 @@ USAGE: ai index update [...]
     --azure-search-endpoint ENDPOINT        (see: ai help azure search endpoint)
     --azure-search-api-key KEY              (see: ai help azure search key)
 
-  CHROMA
-    --chroma-endpoint ENDPOINT              (see: ai help chroma endpoint)
+;  CHROMA
+;    --chroma-endpoint ENDPOINT              (see: ai help chroma endpoint)
 
-  PINECONE
-    --pinecone-environment ENVIRONMENT      (see: ai help pinecone environment)
-    --pinecone-api-key KEY                  (see: ai help pinecone api key)
+;  PINECONE
+;    --pinecone-environment ENVIRONMENT      (see: ai help pinecone environment)
+;    --pinecone-api-key KEY                  (see: ai help pinecone api key)
 
-  QDRANT
-    --qdrant-endpoint ENDPOINT              (see: ai help qdrant endpoint)
-    --qdrant-vector-size size               (see: ai help qdrant vector size)
+;  QDRANT
+;    --qdrant-endpoint ENDPOINT              (see: ai help qdrant endpoint)
+;    --qdrant-vector-size size               (see: ai help qdrant vector size)
 
-  WEAVIATE
-    --weaviate-endpoint ENDPOINT            (see: ai help weaviate endpoint)
-    --weaviate-api-key KEY                  (see: ai help weaviate api key)
+;  WEAVIATE
+;    --weaviate-endpoint ENDPOINT            (see: ai help weaviate endpoint)
+;    --weaviate-api-key KEY                  (see: ai help weaviate api key)
