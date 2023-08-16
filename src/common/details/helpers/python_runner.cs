@@ -15,7 +15,7 @@ namespace Azure.AI.Details.Common.CLI
 {
     internal class PythonRunner
     {
-        internal static async Task<(int, string)> RunScriptAsync(string script)
+        internal static async Task<(int, string)> RunScriptAsync(string script, string args = null)
         {
             EnsureFindPython();
             if (_pythonBinary == null)
@@ -30,7 +30,10 @@ namespace Azure.AI.Details.Common.CLI
 
             try
             {
-                (var exitCode, var output) = await ProcessHelpers.RunShellCommandAsync(_pythonBinary, $"\"{tempFile}\"");
+                args = args != null
+                    ? $"\"{tempFile}\" {args}"
+                    : $"\"{tempFile}\"";
+                (var exitCode, var output) = await ProcessHelpers.RunShellCommandAsync(_pythonBinary, args);
 
                 if (exitCode != 0)
                 {
