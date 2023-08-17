@@ -35,7 +35,7 @@ namespace Azure.AI.Details.Common.CLI
             {
                 DisplayBanner(new CommandValues());
 
-                var path = FileHelpers.FindFileInHelpPath($"help/include.python.script.hub_list.py");
+                var path = FileHelpers.FindFileInHelpPath($"help/include.python.script.project_list.py");
                 var script = FileHelpers.ReadAllHelpText(path, Encoding.UTF8);
 
                 (var exit, var output)= PythonRunner.RunScriptAsync(script, "--subscription e72e5254-f265-4e95-9bd2-9ee8e7329051").Result;

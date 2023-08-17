@@ -4,8 +4,8 @@ from azure.ai.ml import MLClient
 from azure.ai.ml.entities import WorkspaceHub, ManagedNetwork, WorkspaceHubConfig
 from azure.identity import DefaultAzureCredential
 
-def create_workspace_hub(subscription_id, resource_group_name, resource_name, location, display_name, description):
-    """Create Azure ML workspace hub."""
+def create_hub(subscription_id, resource_group_name, resource_name, location, display_name, description):
+    """Create Azure ML hub."""
     ml_client = MLClient(
         credential=DefaultAzureCredential(),
         subscription_id=subscription_id,
@@ -34,7 +34,7 @@ def create_workspace_hub(subscription_id, resource_group_name, resource_name, lo
     return { "id": result.id }
 
 def main():
-    """Parse command line arguments and print workspace hubs."""
+    """Parse command line arguments and print created hub."""
     parser = argparse.ArgumentParser(description="List Azure ML workspace hubs")
     parser.add_argument("--subscription", required=True, help="Azure subscription ID")
     parser.add_argument("--group", required=True, help="Azure resource group name")
@@ -51,15 +51,11 @@ def main():
     display_name = args.display_name
     description = args.description
 
-    hub = create_workspace_hub(subscription_id, resource_group_name, resource_name, location, display_name, description)
-
-    # Convert the hub to JSON format
-    hub_json = json.dumps({"hub": hub}, indent=2)
+    hub = create_hub(subscription_id, resource_group_name, resource_name, location, display_name, description)
+    formatted = json.dumps({"hub": hub}, indent=2)
 
     print("---")
-    print(hub_json)
+    print(formatted)
 
 if __name__ == "__main__":
     main()
-
-

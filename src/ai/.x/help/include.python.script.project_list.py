@@ -3,15 +3,15 @@ import json
 from azure.ai.ml import MLClient
 from azure.identity import DefaultAzureCredential
 
-def list_hubs(subscription_id, resource_group_name):
-    """List Azure ML hubs."""
+def list_projects(subscription_id, resource_group_name):
+    """List Azure ML projects."""
     ml_client = MLClient(
         credential=DefaultAzureCredential(),
         subscription_id=subscription_id,
         resource_group_name=resource_group_name
     )
 
-    items = ml_client.workspace_hubs.list(scope="subscription")
+    items = ml_client.workspaces.list(scope="subscription")
     results = []
 
     for item in items:
@@ -27,8 +27,8 @@ def list_hubs(subscription_id, resource_group_name):
     return results
 
 def main():
-    """Parse command line arguments and print hubs."""
-    parser = argparse.ArgumentParser(description="List Azure ML hubs")
+    """Parse command line arguments and print projects."""
+    parser = argparse.ArgumentParser(description="List Azure ML projects")
     parser.add_argument("--subscription", required=True, help="Azure subscription ID")
     parser.add_argument("--group", required=False, help="Azure resource group name")
     args = parser.parse_args()
@@ -36,8 +36,8 @@ def main():
     subscription_id = args.subscription
     resource_group_name = args.group
 
-    hubs = list_hubs(subscription_id, resource_group_name)
-    formatted = json.dumps({"hubs": hubs}, indent=2)
+    projects = list_projects(subscription_id, resource_group_name)
+    formatted = json.dumps({"projects": projects}, indent=2)
 
     print("---")
     print(formatted)
