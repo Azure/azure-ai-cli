@@ -33,6 +33,7 @@ namespace Azure.AI.Details.Common.CLI
         public const string CognitiveServiceResourceKind = "OpenAI";
         public const string CognitiveServiceResourceSku = "s0";
         public static bool InitConfigsEndpoint = true;
+        public static bool InitConfigsSubscription = true;
         #endregion
 
         #region help command data

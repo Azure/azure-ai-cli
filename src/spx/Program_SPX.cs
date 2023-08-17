@@ -33,6 +33,7 @@ namespace Azure.AI.Details.Common.CLI
         public const string CognitiveServiceResourceKind = "SpeechServices";
         public const string CognitiveServiceResourceSku = "S0";
         public static bool InitConfigsEndpoint = false;
+        public static bool InitConfigsSubscription = false;
         #endregion
 
         #region help command data

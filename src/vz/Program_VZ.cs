@@ -32,6 +32,7 @@ namespace Azure.AI.Details.Common.CLI
         public const string CognitiveServiceResourceKind = "ComputerVision";
         public const string CognitiveServiceResourceSku = "S1";
         public static bool InitConfigsEndpoint = true;
+        public static bool InitConfigsSubscription = false;
         #endregion
 
         #region help command data
