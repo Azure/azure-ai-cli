@@ -35,7 +35,7 @@ def create_hub(subscription_id, resource_group_name, resource_name, location, di
 
 def main():
     """Parse command line arguments and print created hub."""
-    parser = argparse.ArgumentParser(description="List Azure ML workspace hubs")
+    parser = argparse.ArgumentParser(description="Create Azure ML hub")
     parser.add_argument("--subscription", required=True, help="Azure subscription ID")
     parser.add_argument("--group", required=True, help="Azure resource group name")
     parser.add_argument("--name", required=True, help="Azure AI resource display name. This is non-unique within the resource group.")
