@@ -11,7 +11,7 @@ def list_workspace_hubs(subscription_id, resource_group_name):
         resource_group_name=resource_group_name
     )
 
-    hub_list = ml_client.workspace_hubs.list()
+    hub_list = ml_client.workspace_hubs.list(scope="subscription")
     items = []
 
     for hub in hub_list:
@@ -30,7 +30,7 @@ def main():
     """Parse command line arguments and print workspace hubs."""
     parser = argparse.ArgumentParser(description="List Azure ML workspace hubs")
     parser.add_argument("--subscription", required=True, help="Azure subscription ID")
-    parser.add_argument("--group", required=True, help="Azure resource group name")
+    parser.add_argument("--group", required=False, help="Azure resource group name")
     args = parser.parse_args()
 
     subscription_id = args.subscription
