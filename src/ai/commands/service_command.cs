@@ -55,10 +55,60 @@ namespace Azure.AI.Details.Common.CLI
 
             switch (command)
             {
+                case "service.resource.list": DoListResources(); break;
+
                 default:
                     _values.AddThrowError("WARNING:", $"'{command.Replace('.', ' ')}' NOT YET IMPLEMENTED!!");
                     break;
             }
+        }
+
+        private void DoListResources()
+        {
+            var subscription = DemandSubscription();
+
+            var message = $"Listing resources for '{subscription}'";
+            if (!_quiet) Console.WriteLine(message);
+
+            DoListResourcesViaPython(subscription);
+
+            if (!_quiet) Console.WriteLine($"{message} Done!\n");
+        }
+
+        private void DoListResourcesViaPython(string subscription)
+        {
+            var path = FileHelpers.FindFileInHelpPath($"help/include.python.script.hub_list.py");
+            var script = FileHelpers.ReadAllHelpText(path, Encoding.UTF8);
+
+            (var exit, var output)= PythonRunner.RunScriptAsync(script, $"--subscription {subscription}").Result;
+            if (exit == 0)
+            {
+                Console.Write(output);
+            }
+            else
+            {
+                ConsoleHelpers.WriteLineError("\nERROR: Python script failed!\n");
+                Console.WriteLine("  " + output.Trim().Replace("\n", "\n  "));
+            }
+        }
+
+        private string DemandSubscription()
+        {
+            var subscription = _values.Get("service.subscription", true);
+
+            if (string.IsNullOrEmpty(subscription) || subscription.Contains("rror"))
+            {
+                _values.AddThrowError(
+                    "ERROR:", $"Listing AI resoures; requires subscription.",
+                            "",
+                      "TRY:", $"{Program.Name} init",
+                              $"{Program.Name} config --set subscription SUBSCRIPTION",
+                              $"{Program.Name} service resource list --subscription SUBSCRIPTION",
+                            "",
+                      "SEE:", $"{Program.Name} help service resource list");
+            }
+
+            return subscription;
         }
 
         private bool _quiet = false;

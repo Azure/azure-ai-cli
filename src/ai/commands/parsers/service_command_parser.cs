@@ -74,6 +74,12 @@ namespace Azure.AI.Details.Common.CLI
         private static IEnumerable<INamedValueTokenParser> GetCommandParsers(ICommandValues values)
         {
             var commandName = values.GetCommand();
+
+            switch (commandName)
+            {
+                case "service.resource.list": return _resourceListParsers;
+            }
+
             foreach (var command in _commands)
             {
                 if (commandName == command.name)
@@ -111,6 +117,12 @@ namespace Azure.AI.Details.Common.CLI
 
             new CommonServiceNamedValueTokenParsers()
 
+        };
+
+        private static INamedValueTokenParser[] _resourceListParsers = {
+            
+            new CommonServiceNamedValueTokenParsers(),
+            new NamedValueTokenParser("--subscription", "service.subscription", "01", "1")
         };
 
         #endregion
