@@ -78,6 +78,7 @@ namespace Azure.AI.Details.Common.CLI
             switch (commandName)
             {
                 case "service.resource.list": return _resourceListParsers;
+                case "service.project.list": return _projectListParsers;
             }
 
             foreach (var command in _commands)
@@ -120,6 +121,12 @@ namespace Azure.AI.Details.Common.CLI
         };
 
         private static INamedValueTokenParser[] _resourceListParsers = {
+            
+            new CommonServiceNamedValueTokenParsers(),
+            new NamedValueTokenParser("--subscription", "service.subscription", "01", "1")
+        };
+
+        private static INamedValueTokenParser[] _projectListParsers = {
             
             new CommonServiceNamedValueTokenParsers(),
             new NamedValueTokenParser("--subscription", "service.subscription", "01", "1")

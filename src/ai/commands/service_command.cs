@@ -56,6 +56,7 @@ namespace Azure.AI.Details.Common.CLI
             switch (command)
             {
                 case "service.resource.list": DoListResources(); break;
+                case "service.project.list": DoListProjects(); break;
 
                 default:
                     _values.AddThrowError("WARNING:", $"'{command.Replace('.', ' ')}' NOT YET IMPLEMENTED!!");
@@ -75,9 +76,39 @@ namespace Azure.AI.Details.Common.CLI
             if (!_quiet) Console.WriteLine($"{message} Done!\n");
         }
 
+        private void DoListProjects()
+        {
+            var subscription = DemandSubscription();
+
+            var message = $"Listing projects for '{subscription}'";
+            if (!_quiet) Console.WriteLine(message);
+
+            DoListProjectsViaPython(subscription);
+
+            if (!_quiet) Console.WriteLine($"{message} Done!\n");
+        }
+
+
         private void DoListResourcesViaPython(string subscription)
         {
             var path = FileHelpers.FindFileInHelpPath($"help/include.python.script.hub_list.py");
+            var script = FileHelpers.ReadAllHelpText(path, Encoding.UTF8);
+
+            (var exit, var output)= PythonRunner.RunScriptAsync(script, $"--subscription {subscription}").Result;
+            if (exit == 0)
+            {
+                Console.Write(output);
+            }
+            else
+            {
+                ConsoleHelpers.WriteLineError("\nERROR: Python script failed!\n");
+                Console.WriteLine("  " + output.Trim().Replace("\n", "\n  "));
+            }
+        }
+
+        private void DoListProjectsViaPython(string subscription)
+        {
+            var path = FileHelpers.FindFileInHelpPath($"help/include.python.script.project_list.py");
             var script = FileHelpers.ReadAllHelpText(path, Encoding.UTF8);
 
             (var exit, var output)= PythonRunner.RunScriptAsync(script, $"--subscription {subscription}").Result;
