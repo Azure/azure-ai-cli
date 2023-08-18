@@ -57,6 +57,7 @@ namespace Azure.AI.Details.Common.CLI
             {
                 case "service.resource.create": DoCreateResource(); break;
                 case "service.resource.list": DoListResources(); break;
+                case "service.project.create": DoCreateProject(); break;
                 case "service.project.list": DoListProjects(); break;
 
                 default:
@@ -77,10 +78,31 @@ namespace Azure.AI.Details.Common.CLI
             var displayName = _values.Get("service.resource.display.name", true) ?? name;
             var description = _values.Get("service.resource.description", true) ?? name;
 
-            var message = $"Creating resource '{name}'";
+            var message = $"{action} '{name}'";
             if (!_quiet) Console.WriteLine(message);
 
             DoCreateResourceViaPython(subscription, group, name, location, displayName, description);
+
+            if (!_quiet) Console.WriteLine($"{message} Done!\n");
+        }
+
+        private void DoCreateProject()
+        {
+            var action = "Creating AI project";
+            var command = "service project create";
+            var subscription = DemandSubscription(action, command);
+            var location = DemandRegionLocation(action, command);
+            var resource = DemandResource(action, command);
+
+            var name = DemandName("service.project.name", action, command);
+            var group = GetGroupName() ?? $"{name}-rg";
+            var displayName = _values.Get("service.project.display.name", true) ?? name;
+            var description = _values.Get("service.project.description", true) ?? name;
+
+            var message = $"{action} '{name}'";
+            if (!_quiet) Console.WriteLine(message);
+
+            DoCreateProjectViaPython(subscription, group, resource, name, location, displayName, description);
 
             if (!_quiet) Console.WriteLine($"{message} Done!\n");
         }
@@ -113,12 +135,23 @@ namespace Azure.AI.Details.Common.CLI
             if (!_quiet) Console.WriteLine($"{message} Done!\n");
         }
 
-
         private void DoCreateResourceViaPython(string subscription, string group, string name, string location, string displayName, string description)
         {
             RunEmbeddedPythonScript("hub_create",
                 "--subscription", subscription,
                 "--group", group,
+                "--name", name, 
+                "--location", location,
+                "--display-name", displayName,
+                "--description", description);
+        }
+
+        private void DoCreateProjectViaPython(string subscription, string group, string resource, string name, string location, string displayName, string description)
+        {
+            RunEmbeddedPythonScript("project_create",
+                "--subscription", subscription,
+                "--group", group,
+                "--resource", resource,
                 "--name", name, 
                 "--location", location,
                 "--display-name", displayName,
@@ -183,6 +216,19 @@ namespace Azure.AI.Details.Common.CLI
                       "SEE:", $"{Program.Name} help {command}");
             }
             return name;
+        }
+
+        private string DemandResource(string action, string command)
+        {
+            var resource = _values.Get("service.resource.name", true);
+            if (string.IsNullOrEmpty(resource))
+            {
+                _values.AddThrowError(
+                    "ERROR:", $"{action}; requires resource.",
+                      "TRY:", $"{Program.Name} {command} --resource RESOURCE",
+                      "SEE:", $"{Program.Name} help {command}");
+            }
+            return resource;
         }
 
         private string DemandRegionLocation(string action, string command)
