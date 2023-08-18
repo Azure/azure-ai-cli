@@ -55,6 +55,7 @@ namespace Azure.AI.Details.Common.CLI
 
             switch (command)
             {
+                case "service.resource.create": DoCreateResource(); break;
                 case "service.resource.list": DoListResources(); break;
                 case "service.project.list": DoListProjects(); break;
 
@@ -64,11 +65,33 @@ namespace Azure.AI.Details.Common.CLI
             }
         }
 
+        private void DoCreateResource()
+        {
+            var action = "Creating AI resource";
+            var command = "service resource create";
+            var subscription = DemandSubscription(action, command);
+            var location = DemandRegionLocation(action, command);
+
+            var name = DemandName("service.resource.name", action, command);
+            var group = GetGroupName() ?? $"{name}-rg";
+            var displayName = _values.Get("service.resource.display.name", true) ?? name;
+            var description = _values.Get("service.resource.description", true) ?? name;
+
+            var message = $"Creating resource '{name}'";
+            if (!_quiet) Console.WriteLine(message);
+
+            DoCreateResourceViaPython(subscription, group, name, location, displayName, description);
+
+            if (!_quiet) Console.WriteLine($"{message} Done!\n");
+        }
+
         private void DoListResources()
         {
-            var subscription = DemandSubscription();
+            var action = "Listing AI resources";
+            var command = "service resource list";
+            var subscription = DemandSubscription(action, command);
 
-            var message = $"Listing resources for '{subscription}'";
+            var message = $"{action} for '{subscription}'";
             if (!_quiet) Console.WriteLine(message);
 
             DoListResourcesViaPython(subscription);
@@ -78,9 +101,11 @@ namespace Azure.AI.Details.Common.CLI
 
         private void DoListProjects()
         {
-            var subscription = DemandSubscription();
+            var action = "Listing AI projects";
+            var command = "service project list";
+            var subscription = DemandSubscription(action, command);
 
-            var message = $"Listing projects for '{subscription}'";
+            var message = $"{action} for '{subscription}'";
             if (!_quiet) Console.WriteLine(message);
 
             DoListProjectsViaPython(subscription);
@@ -89,29 +114,36 @@ namespace Azure.AI.Details.Common.CLI
         }
 
 
+        private void DoCreateResourceViaPython(string subscription, string group, string name, string location, string displayName, string description)
+        {
+            RunEmbeddedPythonScript("hub_create",
+                "--subscription", subscription,
+                "--group", group,
+                "--name", name, 
+                "--location", location,
+                "--display-name", displayName,
+                "--description", description);
+        }
+
         private void DoListResourcesViaPython(string subscription)
         {
-            var path = FileHelpers.FindFileInHelpPath($"help/include.python.script.hub_list.py");
-            var script = FileHelpers.ReadAllHelpText(path, Encoding.UTF8);
-
-            (var exit, var output)= PythonRunner.RunScriptAsync(script, $"--subscription {subscription}").Result;
-            if (exit == 0)
-            {
-                Console.Write(output);
-            }
-            else
-            {
-                ConsoleHelpers.WriteLineError("\nERROR: Python script failed!\n");
-                Console.WriteLine("  " + output.Trim().Replace("\n", "\n  "));
-            }
+            RunEmbeddedPythonScript("hub_list", "--subscription", subscription);
         }
 
         private void DoListProjectsViaPython(string subscription)
         {
-            var path = FileHelpers.FindFileInHelpPath($"help/include.python.script.project_list.py");
-            var script = FileHelpers.ReadAllHelpText(path, Encoding.UTF8);
+            RunEmbeddedPythonScript("project_list", "--subscription", subscription);
+        }
 
-            (var exit, var output)= PythonRunner.RunScriptAsync(script, $"--subscription {subscription}").Result;
+        private void RunEmbeddedPythonScript(string scriptName, params string[] args)
+        {
+            var path = FileHelpers.FindFileInHelpPath($"help/include.python.script.{scriptName}.py");
+            var script = FileHelpers.ReadAllHelpText(path, Encoding.UTF8);
+            var scriptArgs = BuildPythonScriptArgs(args);
+
+            if (!_quiet) Console.WriteLine($"PythonRunner.RunScriptAsync: '{scriptName}' {scriptArgs}");
+
+            (var exit, var output)= PythonRunner.RunScriptAsync(script, scriptArgs).Result;
             if (exit == 0)
             {
                 Console.Write(output);
@@ -123,23 +155,70 @@ namespace Azure.AI.Details.Common.CLI
             }
         }
 
-        private string DemandSubscription()
+        private string DemandSubscription(string action, string command)
         {
             var subscription = _values.Get("service.subscription", true);
-
             if (string.IsNullOrEmpty(subscription) || subscription.Contains("rror"))
             {
                 _values.AddThrowError(
-                    "ERROR:", $"Listing AI resoures; requires subscription.",
+                    "ERROR:", $"{action}; requires subscription.",
                             "",
                       "TRY:", $"{Program.Name} init",
                               $"{Program.Name} config --set subscription SUBSCRIPTION",
-                              $"{Program.Name} service resource list --subscription SUBSCRIPTION",
+                              $"{Program.Name} {command} --subscription SUBSCRIPTION",
                             "",
-                      "SEE:", $"{Program.Name} help service resource list");
+                      "SEE:", $"{Program.Name} help {command}");
             }
-
             return subscription;
+        }
+
+        private string DemandName(string valuesName, string action, string command)
+        {
+            var name = _values.Get(valuesName, true);
+            if (string.IsNullOrEmpty(name))
+            {
+                _values.AddThrowError(
+                    "ERROR:", $"{action}; requires name.",
+                      "TRY:", $"{Program.Name} {command} --name NAME",
+                      "SEE:", $"{Program.Name} help {command}");
+            }
+            return name;
+        }
+
+        private string DemandRegionLocation(string action, string command)
+        {
+            var location = _values.Get("service.region.location", true);
+            if (string.IsNullOrEmpty(location))
+            {
+                _values.AddThrowError(
+                    "ERROR:", $"{action}; requires location.",
+                      "TRY:", $"{Program.Name} {command} --location LOCATION",
+                      "SEE:", $"{Program.Name} help {command}");
+            }
+            return location;
+        }
+
+        private string GetGroupName()
+        {
+            return _values.Get("service.resource.group.name", true);
+        }
+
+        private string BuildPythonScriptArgs(params string[] args)
+        {
+            var sb = new StringBuilder();
+            for (int i = 0; i + 1 < args.Length; i += 2)
+            {
+                var argName = args[i];
+                var argValue = args[i + 1];
+
+                if (string.IsNullOrWhiteSpace(argValue)) continue;
+
+                sb.Append(argValue.Contains(' ')
+                    ? $"{argName} \"{argValue}\""
+                    : $"{argName} {argValue}");
+                sb.Append(' ');
+            }
+            return sb.ToString().Trim();
         }
 
         private bool _quiet = false;

@@ -77,6 +77,7 @@ namespace Azure.AI.Details.Common.CLI
 
             switch (commandName)
             {
+                case "service.resource.create": return _resourceCreateParsers;
                 case "service.resource.list": return _resourceListParsers;
                 case "service.project.list": return _projectListParsers;
             }
@@ -118,6 +119,19 @@ namespace Azure.AI.Details.Common.CLI
 
             new CommonServiceNamedValueTokenParsers()
 
+        };
+
+        private static INamedValueTokenParser[] _resourceCreateParsers = {
+            
+            new CommonServiceNamedValueTokenParsers(),
+            new NamedValueTokenParser("--subscription", "service.subscription", "01", "1"),
+          
+            new NamedValueTokenParser("--subscription", "service.subscription", "01", "1"),
+            new NamedValueTokenParser("--group", "service.resource.group.name", "0010", "1"),
+            new NamedValueTokenParser("--name", "service.resource.name", "010;001", "1"),
+            new NamedValueTokenParser("--location", "service.region.location", "010;001", "1"),
+            new NamedValueTokenParser("--display-name", "service.resource.display.name", "0011", "1"),
+            new NamedValueTokenParser("--description", "service.resource.description", "001", "1")
         };
 
         private static INamedValueTokenParser[] _resourceListParsers = {
