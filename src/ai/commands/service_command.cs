@@ -79,11 +79,12 @@ namespace Azure.AI.Details.Common.CLI
             var description = _values.Get("service.resource.description", true) ?? name;
 
             var message = $"{action} '{name}'";
+
             if (!_quiet) Console.WriteLine(message);
-
-            DoCreateResourceViaPython(subscription, group, name, location, displayName, description);
-
+            var output = DoCreateResourceViaPython(subscription, group, name, location, displayName, description);
             if (!_quiet) Console.WriteLine($"{message} Done!\n");
+
+            Console.WriteLine(output);
         }
 
         private void DoCreateProject()
@@ -100,11 +101,12 @@ namespace Azure.AI.Details.Common.CLI
             var description = _values.Get("service.project.description", true) ?? name;
 
             var message = $"{action} '{name}'";
+
             if (!_quiet) Console.WriteLine(message);
-
-            DoCreateProjectViaPython(subscription, group, resource, name, location, displayName, description);
-
+            var output = DoCreateProjectViaPython(subscription, group, resource, name, location, displayName, description);
             if (!_quiet) Console.WriteLine($"{message} Done!\n");
+
+            Console.WriteLine(output);
         }
 
         private void DoListResources()
@@ -114,11 +116,12 @@ namespace Azure.AI.Details.Common.CLI
             var subscription = DemandSubscription(action, command);
 
             var message = $"{action} for '{subscription}'";
+
             if (!_quiet) Console.WriteLine(message);
-
-            DoListResourcesViaPython(subscription);
-
+            var output = DoListResourcesViaPython(subscription);
             if (!_quiet) Console.WriteLine($"{message} Done!\n");
+
+            Console.WriteLine(output);
         }
 
         private void DoListProjects()
@@ -128,64 +131,45 @@ namespace Azure.AI.Details.Common.CLI
             var subscription = DemandSubscription(action, command);
 
             var message = $"{action} for '{subscription}'";
+
             if (!_quiet) Console.WriteLine(message);
-
-            DoListProjectsViaPython(subscription);
-
+            var output = DoListProjectsViaPython(subscription);
             if (!_quiet) Console.WriteLine($"{message} Done!\n");
+
+            Console.WriteLine(output);
         }
 
-        private void DoCreateResourceViaPython(string subscription, string group, string name, string location, string displayName, string description)
+        private string DoCreateResourceViaPython(string subscription, string group, string name, string location, string displayName, string description)
         {
-            RunEmbeddedPythonScript("hub_create",
-                "--subscription", subscription,
-                "--group", group,
-                "--name", name, 
-                "--location", location,
-                "--display-name", displayName,
-                "--description", description);
+            return RunEmbeddedPythonScript("hub_create",
+                    "--subscription", subscription,
+                    "--group", group,
+                    "--name", name, 
+                    "--location", location,
+                    "--display-name", displayName,
+                    "--description", description);
         }
 
-        private void DoCreateProjectViaPython(string subscription, string group, string resource, string name, string location, string displayName, string description)
+        private string DoCreateProjectViaPython(string subscription, string group, string resource, string name, string location, string displayName, string description)
         {
-            RunEmbeddedPythonScript("project_create",
-                "--subscription", subscription,
-                "--group", group,
-                "--resource", resource,
-                "--name", name, 
-                "--location", location,
-                "--display-name", displayName,
-                "--description", description);
+            return RunEmbeddedPythonScript("project_create",
+                    "--subscription", subscription,
+                    "--group", group,
+                    "--resource", resource,
+                    "--name", name, 
+                    "--location", location,
+                    "--display-name", displayName,
+                    "--description", description);
         }
 
-        private void DoListResourcesViaPython(string subscription)
+        private string DoListResourcesViaPython(string subscription)
         {
-            RunEmbeddedPythonScript("hub_list", "--subscription", subscription);
+            return RunEmbeddedPythonScript("hub_list", "--subscription", subscription);
         }
 
-        private void DoListProjectsViaPython(string subscription)
+        private string DoListProjectsViaPython(string subscription)
         {
-            RunEmbeddedPythonScript("project_list", "--subscription", subscription);
-        }
-
-        private void RunEmbeddedPythonScript(string scriptName, params string[] args)
-        {
-            var path = FileHelpers.FindFileInHelpPath($"help/include.python.script.{scriptName}.py");
-            var script = FileHelpers.ReadAllHelpText(path, Encoding.UTF8);
-            var scriptArgs = BuildPythonScriptArgs(args);
-
-            if (!_quiet) Console.WriteLine($"PythonRunner.RunScriptAsync: '{scriptName}' {scriptArgs}");
-
-            (var exit, var output)= PythonRunner.RunScriptAsync(script, scriptArgs).Result;
-            if (exit == 0)
-            {
-                Console.Write(output);
-            }
-            else
-            {
-                ConsoleHelpers.WriteLineError("\nERROR: Python script failed!\n");
-                Console.WriteLine("  " + output.Trim().Replace("\n", "\n  "));
-            }
+            return RunEmbeddedPythonScript("project_list", "--subscription", subscription);
         }
 
         private string DemandSubscription(string action, string command)
@@ -265,6 +249,47 @@ namespace Azure.AI.Details.Common.CLI
                 sb.Append(' ');
             }
             return sb.ToString().Trim();
+        }
+
+        private string RunEmbeddedPythonScript(string scriptName, params string[] args)
+        {
+            var path = FileHelpers.FindFileInHelpPath($"help/include.python.script.{scriptName}.py");
+            var script = FileHelpers.ReadAllHelpText(path, Encoding.UTF8);
+            var scriptArgs = BuildPythonScriptArgs(args);
+
+            if (Program.Debug) Console.WriteLine($"DEBUG: {scriptName}.py:\n{script}");
+            if (Program.Debug) Console.WriteLine($"DEBUG: PythonRunner.RunScriptAsync: '{scriptName}' {scriptArgs}");
+
+            (var exit, var output)= PythonRunner.RunScriptAsync(script, scriptArgs).Result;
+            if (exit != 0)
+            {
+                output = "\n\n" + output;
+                _values.AddThrowError(
+                     "ERROR:", $"Python script failed!",
+                      "CODE:", exit.ToString(),
+                    "OUTPUT:", output.Replace("\n", "\n  "));
+            }
+
+            return ParseOutputAndSkipLinesUntilStartsWith(output, "---").Trim();
+        }
+
+        private string ParseOutputAndSkipLinesUntilStartsWith(string output, string startsWith)
+        {
+            var lines = output.Split('\n');
+            var sb = new StringBuilder();
+            var skip = true;
+            foreach (var line in lines)
+            {
+                if (skip && line.StartsWith(startsWith))
+                {
+                    skip = false;
+                }
+                else if (!skip)
+                {
+                    sb.AppendLine(line);
+                }
+            }
+            return sb.ToString();
         }
 
         private bool _quiet = false;
