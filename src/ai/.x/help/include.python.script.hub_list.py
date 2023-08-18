@@ -37,7 +37,7 @@ def main():
     resource_group_name = args.group
 
     hubs = list_hubs(subscription_id, resource_group_name)
-    formatted = json.dumps({"hubs": hubs}, indent=2)
+    formatted = json.dumps({"resources": hubs}, indent=2)
 
     print("---")
     print(formatted)
