@@ -1,1 +1,28 @@
-@include.not.written.yet
+SERVICE PROJECT CREATE
+
+  The `ai service project create` command creates an AI resource project.
+
+USAGE: ai service project create [...]
+
+  AZURE
+    --subscription SUBSCRIPTION     (see: ai help subscription)
+    --location LOCATION             (see: ai help region)
+
+  RESOURCE
+    --group GROUP                   (see: ai help resource group)
+    --resource RESOURCE             (see: ai help resource id)
+
+  PROJECT
+    --name NAME                     (see: ai help service project name)
+    --display-name DISPLAY-NAME     (see: ai help service project display name)
+    --description DESCRIPTION       (see: ai help service project description)
+
+EXAMPLE
+
+  ai service project create --location westus2 --group MyResourceGroup --name MyProject --resource @resource
+
+SEE ALSO
+
+  ai help init
+  ai help service project examples
+  ai help find topics service project

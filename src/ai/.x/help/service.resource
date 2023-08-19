@@ -3,7 +3,7 @@ USAGE: ai service resource <command> [...]
 COMMANDS
 
   ai service resource create [...]        (see: ai help service resource create)
-  ai service resource status [...]        (see: ai help service resource status)
+;  ai service resource status [...]        (see: ai help service resource status)
   ai service resource list [...]          (see: ai help service resource list)
 
   ai service resource update [...]        (see: ai help service resource update)
@@ -13,4 +13,4 @@ ADDITIONAL TOPICS
 
   ai help service examples
   ai help service resource examples
-  ai help speech documentation
+  ai help find topics service resource

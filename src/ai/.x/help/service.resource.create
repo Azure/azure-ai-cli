@@ -1,1 +1,25 @@
-@include.not.written.yet
+SERVICE RESOURCE CREATE
+
+  The `ai service create` command creates an AI service resource.
+
+USAGE: ai service resource create [...]
+
+  AZURE
+    --subscription SUBSCRIPTION     (see: ai help subscription)
+    --location LOCATION             (see: ai help region)
+    --group GROUP                   (see: ai help resource group)
+
+  RESOURCE
+    --name NAME                     (see: ai help service resource name)
+    --display-name DISPLAY-NAME     (see: ai help service resource display name)
+    --description DESCRIPTION       (see: ai help service resource description)
+
+EXAMPLE
+
+  ai service resource create --location westus2 --group MyResourceGroup --name MyAiResource
+
+SEE ALSO
+
+  ai help init
+  ai help service resource examples
+  ai help find topics service resource
