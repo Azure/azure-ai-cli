@@ -18,24 +18,24 @@
 |    | - |✔️|   |  ✅ `ai wizard`: basic functionality and IA  
 | P2 | 4 | x |   |  ⏹️ `ai wizard`: placeholder for all August-Hero wizard steps  
 |    |   |   |   |  
-|    | - | ✔️ |   |  ✅ `ai speech`: placeholder for speech commands (parser, warning)  
-|    | - | ✔️ |   |  ✅ `ai vision`:  placeholder for vision commands (parser, warning)  
-|    | - | ✔️ |   |  ✅ `ai language`: placeholder for language commands (parser, warning)  
-|    | - | ✔️ |   |  ✅ `ai search`: initial placeholder for search commands (parser, warning)  
-|    | - | ✔️ |   |  ✅ `ai service`: initial placeholder for service commands (parser, warning)  
-|    | - | ✔️ |   |  ✅ `ai tool`: initial placeholder for tool commands (parser, warning)  
+|    | - | ✔️|   |  ✅ `ai speech`: placeholder for speech commands (parser, warning)  
+|    | - | ✔️|   |  ✅ `ai vision`:  placeholder for vision commands (parser, warning)  
+|    | - | ✔️|   |  ✅ `ai language`: placeholder for language commands (parser, warning)  
+|    | - | ✔️|   |  ✅ `ai search`: initial placeholder for search commands (parser, warning)  
+|    | - | ✔️|   |  ✅ `ai service`: initial placeholder for service commands (parser, warning)  
+|    | - | ✔️|   |  ✅ `ai tool`: initial placeholder for tool commands (parser, warning)  
 |    |   |   |   |  
-| P1 | 1 | x |   |  ⏹️ python: proof of life: enumerate hubs  
-| P1 | 1 | x |   |  ⏹️ python: proof of life: create hubs  
+|    | - | ✔️|   |  ⏹️ python: proof of life: enumerate hubs  
+|    | - | ✔️|   |  ⏹️ python: proof of life: create hubs  
 |    | 1 | x |   |  ⏹️ python: proof of life: update hubs  
 |    | 1 | x |   |  ⏹️ python: proof of life: delete hubs  
 |    |   |   |   |  
-|    | 1 | x |   |  ⏹️ python: proof of life: enumerate projects  
-|    | 1 | x |   |  ⏹️ python: proof of life: create projects  
+|    | - | ✔️|   |  ⏹️ python: proof of life: enumerate projects  
+|    | - | ✔️|   |  ⏹️ python: proof of life: create projects  
 |    | 1 | x |   |  ⏹️ python: proof of life: update projects  
 |    | 1 | x |   |  ⏹️ python: proof of life: delete projects  
 |    |   |   |   |  
-| P1 | x |   |   |  ⏹️ python: proof of life: enumerate deployments  
+| P1 | 1 | x |   |  ⏹️ python: proof of life: enumerate deployments  
 | P1 | 1 | x |   |  ⏹️ python: proof of life: create deployments  
 |    | 1 | x |   |  ⏹️ python: proof of life: update deployments  
 |    | 1 | x |   |  ⏹️ python: proof of life: delete deployments  
@@ -64,24 +64,22 @@
 |    | 1 |   |   |  ⏹️ `ai service`: parser  
 |    |   |   |   |  
 |    | - |✔️|   |  ⏹️ `ai service resource`: `--help`
-| P1 | 1 | x |   |  ⏹️ `ai service resource`: create hub
-| P1 | 1 |???|???|  ⏹️ `ai service resource`: status on hub
-| P1 | 2 |???|???|  ⏹️ `ai service resource`: list hubs
+|    | - |✔️|   |  ⏹️ `ai service resource`: create hub
+|    | 1 |???|???|  ⏹️ `ai service resource`: status on hub
+|    | - |✔️|   |  ⏹️ `ai service resource`: list hubs
 |    | 1 |???|???|  ⏹️ `ai service resource`: update hub
 |    | 1 | x |   |  ⏹️ `ai service resource`: delete hub
 |    | 4 | x |   |  ⏹️ `ai service resource`: `init`
-| P1 | 2 | x |   |  ⏹️ `ai service resource`: `--output`
-| P1 | 1 | x |   |  ⏹️ `ai service resource`: `--wait`
+| P2 | 2 | x |   |  ⏹️ `ai service resource`: `--output`
 |    |   |   |   |  
-|    | 1 | x |   |  ⏹️ `ai service project`: `--help`
-|    | 1 | x |   |  ⏹️ `ai service project`: create
+|    | - |✔️|   |  ⏹️ `ai service project`: `--help`
+|    | - |✔️|   |  ⏹️ `ai service project`: create
 |    | 1 |???|???|  ⏹️ `ai service project`: status
-|    | 2 | x |   |  ⏹️ `ai service project`: list
+|    | - |✔️|   |  ⏹️ `ai service project`: list
 |    | 1 |???|???|  ⏹️ `ai service project`: update
 |    | 1 | x |   |  ⏹️ `ai service project`: delete  
 |    | 4 | x |   |  ⏹️ `ai service project`: `init`
-|    | 2 | x |   |  ⏹️ `ai service project`: `--output`
-|    | 1 | x |   |  ⏹️ `ai service project`: `--wait`
+| P2 | 2 | x |   |  ⏹️ `ai service project`: `--output`
 |    |   |   |   |  
 |    | 1 | x |   |  ⏹️ `ai service connection`: `--help`
 |    | 1 | x |   |  ⏹️ `ai service connection`: create
@@ -100,8 +98,7 @@
 | P1 | 1 |???|???|  ⏹️ `ai service deployment`: update
 |    | 1 | x |   |  ⏹️ `ai service deployment`: delete  
 |    | 4 | x |   |  ⏹️ `ai service deployment`: `init`
-| P1 | 2 | x |   |  ⏹️ `ai service deployment`: `--output`
-| P1 | 1 | x |   |  ⏹️ `ai service deployment`: `--wait`
+| P2 | 2 | x |   |  ⏹️ `ai service deployment`: `--output`
 |    |   |   |   |  
 |    | 1 |???|???|  ⏹️ `ai service flow`: `--help`
 |    | 1 |???|???|  ⏹️ `ai service flow`: create
