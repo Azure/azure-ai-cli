@@ -6,6 +6,7 @@ USAGE: ai service project list [...]
 
   LIST
     --subscription SUBSCRIPTION     (see: ai help subscription)
+    --output-json @FILE             (see: ai help service output json)
 
 EXAMPLE
 

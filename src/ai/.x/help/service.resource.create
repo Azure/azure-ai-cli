@@ -15,7 +15,8 @@ USAGE: ai service resource create [...]
     --description DESCRIPTION       (see: ai help service resource description)
 
   OUTPUT
-    --output-resource-id            (see: ai help service output resource id)
+    --output-resource-id @FILE      (see: ai help service output resource id)
+    --output-json @FILE             (see: ai help service output json)
 
 EXAMPLE
 

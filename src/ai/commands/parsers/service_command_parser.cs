@@ -134,13 +134,16 @@ namespace Azure.AI.Details.Common.CLI
             new NamedValueTokenParser("--display-name", "service.resource.display.name", "0011", "1"),
             new NamedValueTokenParser("--description", "service.resource.description", "001", "1"),
 
-            new NamedValueTokenParser("--output-resource-id", "service.output.resource.id", "0110;0101", "1")
+            new NamedValueTokenParser("--output-resource-id", "service.output.resource.id", "0110;0101", "1"),
+            new NamedValueTokenParser(null, "service.output.json", "011", "1")
         };
 
         private static INamedValueTokenParser[] _resourceListParsers = {
             
             new CommonServiceNamedValueTokenParsers(),
             new NamedValueTokenParser("--subscription", "service.subscription", "01", "1")
+
+            new NamedValueTokenParser(null, "service.output.json", "011", "1")
         };
 
         private static INamedValueTokenParser[] _projectCreateParsers = {
@@ -155,13 +158,16 @@ namespace Azure.AI.Details.Common.CLI
             new NamedValueTokenParser("--display-name", "service.project.display.name", "0011", "1"),
             new NamedValueTokenParser("--description", "service.project.description", "001", "1"),
 
-            new NamedValueTokenParser("--output-project-id", "service.output.project.id", "0110;0101", "1")
+            new NamedValueTokenParser("--output-project-id", "service.output.project.id", "0110;0101", "1"),
+            new NamedValueTokenParser(null, "service.output.json", "011", "1")
         };
 
         private static INamedValueTokenParser[] _projectListParsers = {
             
             new CommonServiceNamedValueTokenParsers(),
             new NamedValueTokenParser("--subscription", "service.subscription", "01", "1")
+
+            new NamedValueTokenParser(null, "service.output.json", "011", "1")
         };
 
         #endregion

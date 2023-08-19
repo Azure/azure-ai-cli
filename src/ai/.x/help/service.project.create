@@ -18,7 +18,8 @@ USAGE: ai service project create [...]
     --description DESCRIPTION       (see: ai help service project description)
 
   OUTPUT
-    --output-project-id             (see: ai help output project id)
+    --output-project-id @FILE       (see: ai help service output project id)
+    --output-json @FILE             (see: ai help service output json)
 
 EXAMPLE
 

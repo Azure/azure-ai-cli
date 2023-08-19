@@ -85,6 +85,7 @@ namespace Azure.AI.Details.Common.CLI
             if (!_quiet) Console.WriteLine($"{message} Done!\n");
 
             Console.WriteLine(output);
+            CheckWriteOutputValueFromJson("service.output", "json", output);
             CheckWriteOutputValueFromJson("service.output", "resource.id", output, "id");
         }
 
@@ -108,6 +109,7 @@ namespace Azure.AI.Details.Common.CLI
             if (!_quiet) Console.WriteLine($"{message} Done!\n");
 
             Console.WriteLine(output);
+            CheckWriteOutputValueFromJson("service.output", "json", output);
             CheckWriteOutputValueFromJson("service.output", "project.id", output, "id");
         }
 
@@ -124,6 +126,7 @@ namespace Azure.AI.Details.Common.CLI
             if (!_quiet) Console.WriteLine($"{message} Done!\n");
 
             Console.WriteLine(output);
+            CheckWriteOutputValueFromJson("service.output", "json", output);
         }
 
         private void DoListProjects()
@@ -139,6 +142,7 @@ namespace Azure.AI.Details.Common.CLI
             if (!_quiet) Console.WriteLine($"{message} Done!\n");
 
             Console.WriteLine(output);
+            CheckWriteOutputValueFromJson("service.output", "json", output);
         }
 
         private string DoCreateResourceViaPython(string subscription, string group, string name, string location, string displayName, string description)
@@ -341,10 +345,10 @@ namespace Azure.AI.Details.Common.CLI
             return sb.ToString();
         }
 
-        private void CheckWriteOutputValueFromJson(string part1, string part2, string json, string valueKey)
+        private void CheckWriteOutputValueFromJson(string part1, string part2, string json, string valueKey = null)
         {
             var parsed = !string.IsNullOrEmpty(json) ? JToken.Parse(json) : null;
-            var value = parsed?[valueKey]?.ToString();
+            var value = !string.IsNullOrEmpty(valueKey) ? parsed?[valueKey]?.ToString() : json;
             CheckWriteOutputValue(part1, part2, value);
         }
 
