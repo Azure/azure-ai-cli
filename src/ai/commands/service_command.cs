@@ -85,6 +85,7 @@ namespace Azure.AI.Details.Common.CLI
             if (!_quiet) Console.WriteLine($"{message} Done!\n");
 
             Console.WriteLine(output);
+            CheckWriteOutputValueFromJson("service.output", "resource.id", output, "id");
         }
 
         private void DoCreateProject()
@@ -107,6 +108,7 @@ namespace Azure.AI.Details.Common.CLI
             if (!_quiet) Console.WriteLine($"{message} Done!\n");
 
             Console.WriteLine(output);
+            CheckWriteOutputValueFromJson("service.output", "project.id", output, "id");
         }
 
         private void DoListResources()
@@ -337,6 +339,32 @@ namespace Azure.AI.Details.Common.CLI
                 }
             }
             return sb.ToString();
+        }
+
+        private void CheckWriteOutputValueFromJson(string part1, string part2, string json, string valueKey)
+        {
+            var parsed = !string.IsNullOrEmpty(json) ? JToken.Parse(json) : null;
+            var value = parsed?[valueKey]?.ToString();
+            CheckWriteOutputValue(part1, part2, value);
+        }
+
+        private void CheckWriteOutputValue(string part1, string part2, string value)
+        {
+            if (string.IsNullOrEmpty(value)) return;
+
+            var atValue = _values.Get($"{part1}.{part2}", true);
+            if (!string.IsNullOrEmpty(atValue))
+            {
+                var atValueFile = FileHelpers.GetOutputDataFileName(atValue, _values);
+                FileHelpers.WriteAllText(atValueFile, value, Encoding.UTF8);
+            }
+
+            var addValue = _values.Get($"{part1}.add.{part2}", true);
+            if (!string.IsNullOrEmpty(addValue))
+            {
+                var addValueFile = FileHelpers.GetOutputDataFileName(addValue, _values);
+                FileHelpers.AppendAllText(addValueFile, "\n" + value, Encoding.UTF8);
+            }
         }
 
         private bool _quiet = false;

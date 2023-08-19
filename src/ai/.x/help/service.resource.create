@@ -14,6 +14,9 @@ USAGE: ai service resource create [...]
     --display-name DISPLAY-NAME     (see: ai help service resource display name)
     --description DESCRIPTION       (see: ai help service resource description)
 
+  OUTPUT
+    --output-resource-id            (see: ai help service output resource id)
+
 EXAMPLE
 
   ai service resource create --location westus2 --group MyResourceGroup --name MyAiResource

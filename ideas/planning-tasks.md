@@ -70,7 +70,7 @@
 |    | 1 |???|???|  ⏹️ `ai service resource`: update hub
 |    | 1 | x |   |  ⏹️ `ai service resource`: delete hub
 |    | 4 | x |   |  ⏹️ `ai service resource`: `init`
-| P2 | 2 | x |   |  ⏹️ `ai service resource`: `--output`
+|    | 2 |✔️|   |  ⏹️ `ai service resource`: `--output`
 |    |   |   |   |  
 |    | - |✔️|   |  ⏹️ `ai service project`: `--help`
 |    | - |✔️|   |  ⏹️ `ai service project`: create
@@ -79,7 +79,7 @@
 |    | 1 |???|???|  ⏹️ `ai service project`: update
 |    | 1 | x |   |  ⏹️ `ai service project`: delete  
 |    | 4 | x |   |  ⏹️ `ai service project`: `init`
-| P2 | 2 | x |   |  ⏹️ `ai service project`: `--output`
+|    | 2 |✔️|   |  ⏹️ `ai service project`: `--output`
 |    |   |   |   |  
 |    | 1 | x |   |  ⏹️ `ai service connection`: `--help`
 |    | 1 | x |   |  ⏹️ `ai service connection`: create

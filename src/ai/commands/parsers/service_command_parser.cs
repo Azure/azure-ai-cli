@@ -132,7 +132,9 @@ namespace Azure.AI.Details.Common.CLI
             new NamedValueTokenParser("--name", "service.resource.name", "010;001", "1"),
             new NamedValueTokenParser("--location", "service.region.location", "010;001", "1"),
             new NamedValueTokenParser("--display-name", "service.resource.display.name", "0011", "1"),
-            new NamedValueTokenParser("--description", "service.resource.description", "001", "1")
+            new NamedValueTokenParser("--description", "service.resource.description", "001", "1"),
+
+            new NamedValueTokenParser("--output-resource-id", "service.output.resource.id", "0110;0101", "1")
         };
 
         private static INamedValueTokenParser[] _resourceListParsers = {
@@ -151,7 +153,9 @@ namespace Azure.AI.Details.Common.CLI
             new NamedValueTokenParser("--name", "service.project.name", "010;001", "1"),
             new NamedValueTokenParser("--location", "service.region.location", "010;001", "1"),
             new NamedValueTokenParser("--display-name", "service.project.display.name", "0011", "1"),
-            new NamedValueTokenParser("--description", "service.project.description", "001", "1")
+            new NamedValueTokenParser("--description", "service.project.description", "001", "1"),
+
+            new NamedValueTokenParser("--output-project-id", "service.output.project.id", "0110;0101", "1")
         };
 
         private static INamedValueTokenParser[] _projectListParsers = {

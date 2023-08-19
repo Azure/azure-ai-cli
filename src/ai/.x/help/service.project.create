@@ -17,6 +17,9 @@ USAGE: ai service project create [...]
     --display-name DISPLAY-NAME     (see: ai help service project display name)
     --description DESCRIPTION       (see: ai help service project description)
 
+  OUTPUT
+    --output-project-id             (see: ai help output project id)
+
 EXAMPLE
 
   ai service project create --location westus2 --group MyResourceGroup --name MyProject --resource @resource
