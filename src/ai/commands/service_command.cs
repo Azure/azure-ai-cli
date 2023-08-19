@@ -263,14 +263,61 @@ namespace Azure.AI.Details.Common.CLI
             (var exit, var output)= PythonRunner.RunScriptAsync(script, scriptArgs).Result;
             if (exit != 0)
             {
-                output = "\n\n" + output;
-                _values.AddThrowError(
-                     "ERROR:", $"Python script failed!",
-                      "CODE:", exit.ToString(),
-                    "OUTPUT:", output.Replace("\n", "\n  "));
+                output = output.Trim('\r', '\n', ' ');
+                output = "\n\n    " + output.Replace("\n", "\n    ");
+
+                var info = new List<string>();
+
+                if (output.Contains("azure.identity"))
+                {
+                    info.Add("WARNING:");
+                    info.Add("azure-identity Python wheel not found!");
+                    info.Add("");
+                    info.Add("TRY:");
+                    info.Add("pip install azure-identity");
+                    info.Add("SEE:");
+                    info.Add("https://pypi.org/project/azure-identity/");
+                    info.Add("");
+                }
+                else if (output.Contains("azure.mgmt.resource"))
+                {
+                    info.Add("WARNING:");
+                    info.Add("azure-mgmt-resource Python wheel not found!");
+                    info.Add("");
+                    info.Add("TRY:");
+                    info.Add("pip install azure-mgmt-resource");
+                    info.Add("SEE:");
+                    info.Add("https://pypi.org/project/azure-mgmt-resource/");
+                    info.Add("");
+                }
+                else if (output.Contains("azure.ai.ml"))
+                {
+                    info.Add("WARNING:");
+                    info.Add("azure-ai-ml Python wheel not found!");
+                    info.Add("");
+                    info.Add("TRY:");
+                    info.Add("pip install azure-ai-ml");
+                    info.Add("SEE:");
+                    info.Add("https://pypi.org/project/azure-ai-ml/");
+                    info.Add("");
+                }
+                else if (output.Contains("ModuleNotFoundError"))
+                {
+                    info.Add("WARNING:");
+                    info.Add("Python wheel not found!");
+                    info.Add("");
+                }
+
+                info.Add("ERROR:");
+                info.Add($"Python script failed! (exit code={exit})");
+                info.Add("");
+                info.Add("OUTPUT:");
+                info.Add(output);
+
+                _values.AddThrowError(info[0], info[1], info.Skip(2).ToArray());
             }
 
-            return ParseOutputAndSkipLinesUntilStartsWith(output, "---").Trim();
+            return ParseOutputAndSkipLinesUntilStartsWith(output, "---").Trim('\r', '\n', ' ');
         }
 
         private string ParseOutputAndSkipLinesUntilStartsWith(string output, string startsWith)

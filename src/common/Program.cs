@@ -30,28 +30,6 @@ namespace Azure.AI.Details.Common.CLI
                 Process.GetCurrentProcess().Kill();
             };
 
-            var tryPythonRunner = mainArgs.Any(x => x == "python");
-            if (tryPythonRunner)
-            {
-                DisplayBanner(new CommandValues());
-
-                var path = FileHelpers.FindFileInHelpPath($"help/include.python.script.project_list.py");
-                var script = FileHelpers.ReadAllHelpText(path, Encoding.UTF8);
-
-                (var exit, var output)= PythonRunner.RunScriptAsync(script, "--subscription e72e5254-f265-4e95-9bd2-9ee8e7329051").Result;
-                if (exit == 0)
-                {
-                    Console.WriteLine(output);
-                }
-                else
-                {
-                    ConsoleHelpers.WriteLineError("\nERROR: Python script failed!\n");
-                    Console.WriteLine("  " + output.Trim().Replace("\n", "\n  "));
-                }
-
-                return exit;
-            }
-
             ICommandValues values = new CommandValues();
             INamedValueTokens tokens = new CmdLineTokenSource(mainArgs, values);
 

@@ -33,23 +33,7 @@ namespace Azure.AI.Details.Common.CLI
                 args = args != null
                     ? $"\"{tempFile}\" {args}"
                     : $"\"{tempFile}\"";
-                (var exitCode, var output) = await ProcessHelpers.RunShellCommandAsync(_pythonBinary, args);
-
-                if (exitCode != 0)
-                {
-                    if (output.Contains("azure.identity"))
-                    {
-                        ConsoleHelpers.WriteLineError("*** Please install azure-identity Python wheel ***");
-                        Console.WriteLine("\n  see: https://pypi.org/project/azure-identity/");
-                    }
-                    else if (output.Contains("azure.mgmt.resource"))
-                    {
-                        ConsoleHelpers.WriteLineError("*** Please install azure-mgmt-resource Python wheel ***");
-                        Console.WriteLine("\n  see: https://pypi.org/project/azure-mgmt-resource/");
-                    }
-                }
-
-                return (exitCode, output);
+                return await ProcessHelpers.RunShellCommandAsync(_pythonBinary, args);
             }
             finally
             {
