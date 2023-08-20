@@ -141,7 +141,7 @@ namespace Azure.AI.Details.Common.CLI
         private static INamedValueTokenParser[] _resourceListParsers = {
             
             new CommonServiceNamedValueTokenParsers(),
-            new NamedValueTokenParser("--subscription", "service.subscription", "01", "1")
+            new NamedValueTokenParser("--subscription", "service.subscription", "01", "1"),
 
             new NamedValueTokenParser(null, "service.output.json", "011", "1")
         };
@@ -165,7 +165,7 @@ namespace Azure.AI.Details.Common.CLI
         private static INamedValueTokenParser[] _projectListParsers = {
             
             new CommonServiceNamedValueTokenParsers(),
-            new NamedValueTokenParser("--subscription", "service.subscription", "01", "1")
+            new NamedValueTokenParser("--subscription", "service.subscription", "01", "1"),
 
             new NamedValueTokenParser(null, "service.output.json", "011", "1")
         };
