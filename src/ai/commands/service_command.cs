@@ -84,7 +84,7 @@ namespace Azure.AI.Details.Common.CLI
             var output = DoCreateResourceViaPython(subscription, group, name, location, displayName, description);
             if (!_quiet) Console.WriteLine($"{message} Done!\n");
 
-            Console.WriteLine(output);
+            if (!_quiet) Console.WriteLine(output);
             CheckWriteOutputValueFromJson("service.output", "json", output);
             CheckWriteOutputValueFromJson("service.output", "resource.id", output, "id");
         }
@@ -108,7 +108,7 @@ namespace Azure.AI.Details.Common.CLI
             var output = DoCreateProjectViaPython(subscription, group, resource, name, location, displayName, description);
             if (!_quiet) Console.WriteLine($"{message} Done!\n");
 
-            Console.WriteLine(output);
+            if (!_quiet) Console.WriteLine(output);
             CheckWriteOutputValueFromJson("service.output", "json", output);
             CheckWriteOutputValueFromJson("service.output", "project.id", output, "id");
         }
@@ -125,7 +125,7 @@ namespace Azure.AI.Details.Common.CLI
             var output = DoListResourcesViaPython(subscription);
             if (!_quiet) Console.WriteLine($"{message} Done!\n");
 
-            Console.WriteLine(output);
+            if (!_quiet) Console.WriteLine(output);
             CheckWriteOutputValueFromJson("service.output", "json", output);
         }
 
@@ -141,7 +141,7 @@ namespace Azure.AI.Details.Common.CLI
             var output = DoListProjectsViaPython(subscription);
             if (!_quiet) Console.WriteLine($"{message} Done!\n");
 
-            Console.WriteLine(output);
+            if (!_quiet) Console.WriteLine(output);
             CheckWriteOutputValueFromJson("service.output", "json", output);
         }
 

@@ -15,14 +15,7 @@ def list_hubs(subscription_id, resource_group_name):
     results = []
 
     for item in items:
-        fields = {
-            "id": item.id,
-            "group": item.resource_group,
-            "location": item.location,
-            "display_name": item.display_name,
-            "name": item.name
-        }
-        results.append(fields)
+        results.append(item._to_dict())
 
     return results
 

@@ -21,7 +21,7 @@ def create_project(subscription_id, resource_id, resource_group_name, project_na
     )
 
     result = ml_client.workspaces.begin_create(project).result()
-    return { "id": result.id }
+    return result._to_dict()
 
 def main():
     """Parse command line arguments and print created project."""
