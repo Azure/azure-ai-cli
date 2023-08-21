@@ -20,6 +20,7 @@ namespace Azure.AI.Details.Common.CLI
         #region name data
         public const string Name = "ai";
         public const string DisplayName = "Azure AI CLI";
+        public const string WarningBanner = "`#e_;This PRIVATE PREVIEW version may change at any time.\nSee: https://aka.ms/azure-ai-cli-private-preview";
         #endregion
 
         #region assembly data

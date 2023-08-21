@@ -20,6 +20,7 @@ namespace Azure.AI.Details.Common.CLI
         #region name data
         public const string Name = "spx";
         public const string DisplayName = "Azure Speech CLI";
+        public const string WarningBanner = null;
         #endregion
 
         #region assembly data

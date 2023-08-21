@@ -37,12 +37,6 @@ namespace Azure.AI.Details.Common.CLI
             if (exitCode == 0 && !values.DisplayHelpRequested())
             {
                 DisplayBanner(values);
-                // Avoid error messages about missing online key/region with embedded
-                if (values.Contains("embedded.config.embedded"))
-                {
-                    values.Reset("service.config.key");
-                    values.Reset("service.config.region");
-                }
                 DisplayParsedValues(values);
                 exitCode = RunCommand(values) ? 0 : -1;
             }
@@ -107,6 +101,13 @@ namespace Azure.AI.Details.Common.CLI
             Console.WriteLine(GetDisplayBannerText());
             Console.WriteLine("Copyright (c) 2022 Microsoft Corporation. All Rights Reserved.");
             Console.WriteLine("");
+
+            var warning = Program.WarningBanner;
+            if (!string.IsNullOrEmpty(warning))
+            {
+                ConsoleHelpers.WriteLineWithHighlight(warning);
+                Console.WriteLine("");
+            }
         }
 
         private static string GetVersionFromAssembly()

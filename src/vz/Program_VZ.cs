@@ -19,6 +19,7 @@ namespace Azure.AI.Details.Common.CLI
         #region name data
         public const string Name = "vz";
         public const string DisplayName = "Azure Vision CLI";
+        public const string WarningBanner = null;
         #endregion
 
         #region assembly data
