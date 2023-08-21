@@ -69,8 +69,8 @@ namespace Azure.AI.Details.Common.CLI
                 }
                 else if (text.Length > 4 && text[3] == ';')
                 {
-                    var fg = (ConsoleColor)int.Parse(text.Substring(1, 1), System.Globalization.NumberStyles.HexNumber);
-                    var bg = (ConsoleColor)int.Parse(text.Substring(2, 1), System.Globalization.NumberStyles.HexNumber);
+                    var fg = text[1] == '_' ? Console.ForegroundColor : (ConsoleColor)(int.Parse(text.Substring(1, 1), System.Globalization.NumberStyles.HexNumber));
+                    var bg = text[2] == '_' ? Console.BackgroundColor : (ConsoleColor)(int.Parse(text.Substring(2, 1), System.Globalization.NumberStyles.HexNumber));
                     parsedStyle = new Colors(fg, bg);
                     parsedText = text.Substring(4);
                     return true;
