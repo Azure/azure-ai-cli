@@ -151,6 +151,11 @@ namespace Azure.AI.Details.Common.CLI
             values.Add("display.help.expand", value ? "true" : "false");
         }
 
+        public static void AddDumpHelpRequest(this INamedValues values, bool value = true)
+        {
+            values.Add("display.help.dump", value ? "true" : "false");
+        }
+
         public static bool DisplayHelpRequested(this INamedValues values)
         {
             return values.GetOrDefault("display.help", false);
@@ -159,6 +164,11 @@ namespace Azure.AI.Details.Common.CLI
         public static bool ExpandHelpRequested(this INamedValues values)
         {
             return values.GetOrDefault("display.help.expand", false);
+        }
+
+        public static bool DumpHelpRequested(this INamedValues values)
+        {
+            return values.GetOrDefault("display.help.dump", false);
         }
 
         public static string GetCommand(this INamedValues values, string defaultValue = "")

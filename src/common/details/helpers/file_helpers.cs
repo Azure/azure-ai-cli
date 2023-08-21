@@ -195,6 +195,17 @@ namespace Azure.AI.Details.Common.CLI
             return found;
         }
 
+        public static IEnumerable<string> FindFilesInDataPath(string fileNames, INamedValues values)
+        {
+            if (Program.Debug) Console.WriteLine($"DEBUG: Searching for DATA '{fileNames}'\n");
+
+            var found = FindFilesInPath(fileNames, values, GetDataPath(values));
+
+            if (Program.Debug) Console.WriteLine();
+
+            return found;
+        }
+
         private static IEnumerable<string> FindFilesInPath(string fileNames, INamedValues values, string searchPath)
         {
             var commandActual = values?.GetCommand();
@@ -277,6 +288,20 @@ namespace Azure.AI.Details.Common.CLI
                 sb.AppendLine(text);
             }
             return sb.ToString();
+        }
+
+        public static void DumpFoundHelpFiles(List<string> found)
+        {
+            foreach (var item in found.Distinct())
+            {
+                string topic = HelpTopicNameFromHelpFileName(item);
+                var text = FileHelpers.ReadAllHelpText(item, Encoding.UTF8);
+
+                var fileName = $"{topic}.md";
+                FileHelpers.WriteAllText(fileName, text, Encoding.UTF8);
+
+                Console.WriteLine($"File: {fileName}");
+            }
         }
 
         public static void PrintExpandedFoundHelpFiles(List<string> found)

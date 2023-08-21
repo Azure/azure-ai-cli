@@ -163,6 +163,7 @@ namespace Azure.AI.Details.Common.CLI
                 len = trimmedTokens.Length;
                 trimmedTokens = trimmedTokens
                     .IfTrimStartsWith("expand", x => values.AddExpandHelpRequest(true))
+                    .IfTrimStartsWith("dump", x => values.AddDumpHelpRequest(true))
                     .IfTrimStartsWith("--topics", x => findTopics = true)
                     .IfTrimStartsWith("--topic", x => findTopics = true)
                     .IfTrimStartsWith("topics", x => findTopics = true)
@@ -172,6 +173,9 @@ namespace Azure.AI.Details.Common.CLI
                     .IfTrim("--expand false", x => values.AddExpandHelpRequest(false))
                     .IfTrim("--expand true", x => values.AddExpandHelpRequest(true))
                     .IfTrim("--expand", x => values.AddExpandHelpRequest(true))
+                    .IfTrim("--dump false", x => values.AddDumpHelpRequest(false))
+                    .IfTrim("--dump true", x => values.AddDumpHelpRequest(true))
+                    .IfTrim("--dump", x => values.AddDumpHelpRequest(true))
                     .IfTrim("--interactive false", x => values.Add("x.help.interactive", "false"))
                     .IfTrim("--interactive true", x => values.Add("x.help.interactive", "true"))
                     .IfTrim("--interactive", x => values.Add("x.help.interactive", "true"));
@@ -314,6 +318,10 @@ namespace Azure.AI.Details.Common.CLI
             if (values.ExpandHelpRequested())
             {
                 ExpandHelpFiles(found, values, interactive);
+            }
+            else if (values.DumpHelpRequested())
+            {
+                FileHelpers.DumpFoundHelpFiles(found);
             }
             else
             {

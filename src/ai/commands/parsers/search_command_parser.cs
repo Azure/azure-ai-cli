@@ -46,6 +46,12 @@ namespace Azure.AI.Details.Common.CLI
         private static IEnumerable<INamedValueTokenParser> GetCommandParsers(ICommandValues values)
         {
             var commandName = values.GetCommand();
+
+            switch (commandName)
+            {
+                case "search.index.update": return _searchIndexUpdateParsers;
+            }
+
             foreach (var command in _commands)
             {
                 if (commandName == command.name)
@@ -84,6 +90,24 @@ namespace Azure.AI.Details.Common.CLI
             new CommonSearchNamedValueTokenParsers()
 
         };
+
+        private static INamedValueTokenParser[] _searchIndexUpdateParsers = {
+            
+            new CommonSearchNamedValueTokenParsers(),
+            new NamedValueTokenParser("--subscription", "service.subscription", "01", "1"),
+
+            new NamedValueTokenParser(null, "azure.search.api.key", "0101;0001", "1"),
+            new NamedValueTokenParser(null, "azure.search.endpoint.uri", "0110;0101", "1"),
+
+            new NamedValueTokenParser(null, "search.embeddings.endpoint.uri", "0101;0110", "1"),
+            new NamedValueTokenParser(null, "search.embeddings.api.key", "0101", "1"),
+            new NamedValueTokenParser(null, "search.embeddings.deployment", "010;001", "1"),
+            new NamedValueTokenParser(null, "search.embeddings.index.name", "0010", "1"),
+
+            new NamedValueTokenParser(null, "search.index.update.file", "0001", "1"),
+            new NamedValueTokenParser(null, "search.index.update.files", "0001", "1"),
+        };
+
 
         #endregion
     }
