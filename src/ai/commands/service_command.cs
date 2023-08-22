@@ -147,13 +147,26 @@ namespace Azure.AI.Details.Common.CLI
 
         private string DoCreateResourceViaPython(string subscription, string group, string name, string location, string displayName, string description)
         {
-            return RunEmbeddedPythonScript("hub_create",
+            var createResource = () => RunEmbeddedPythonScript("hub_create",
                     "--subscription", subscription,
                     "--group", group,
                     "--name", name, 
                     "--location", location,
                     "--display-name", displayName,
                     "--description", description);
+
+            var output = TryCatchHelpers.TryCatchNoThrow<string>(() => createResource(), null, out var exception);
+            if (!string.IsNullOrEmpty(output)) return output;
+
+            var noResourceGroup = exception.Message.Contains("azure.core.exceptions.ResourceNotFoundError");
+            if (noResourceGroup)
+            {
+                _values.Reset("error");
+                CreateResourceGroup(subscription, location, group);
+                return createResource();
+            }
+
+            throw exception;
         }
 
         private string DoCreateProjectViaPython(string subscription, string group, string resource, string name, string location, string displayName, string description)
@@ -369,6 +382,22 @@ namespace Azure.AI.Details.Common.CLI
                 var addValueFile = FileHelpers.GetOutputDataFileName(addValue, _values);
                 FileHelpers.AppendAllText(addValueFile, "\n" + value, Encoding.UTF8);
             }
+        }
+
+        private void CreateResourceGroup(string subscription, string location, string group)
+        {
+            var message = "Creating resource group '{group}'...";
+            if (!_quiet) Console.WriteLine(message);
+
+            var response = AzCli.CreateResourceGroup(subscription, location, group).Result;
+            if (string.IsNullOrEmpty(response.StdOutput) && !string.IsNullOrEmpty(response.StdError))
+            {
+                _values.AddThrowError(
+                    "ERROR:", "Creating resource group",
+                    "OUTPUT:", response.StdError);
+            }
+
+            if (!_quiet) Console.WriteLine($"{message} Done!");
         }
 
         private bool _quiet = false;
