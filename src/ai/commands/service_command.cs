@@ -57,6 +57,7 @@ namespace Azure.AI.Details.Common.CLI
             {
                 case "service.resource.create": DoCreateResource(); break;
                 case "service.resource.list": DoListResources(); break;
+                case "service.resource.delete": DoDeleteResource(); break;
                 case "service.project.create": DoCreateProject(); break;
                 case "service.project.list": DoListProjects(); break;
 
@@ -145,6 +146,27 @@ namespace Azure.AI.Details.Common.CLI
             CheckWriteOutputValueFromJson("service.output", "json", output);
         }
 
+        private void DoDeleteResource()
+        {
+            var action = "Deleting AI resource";
+            var command = "service resource delete";
+
+            var subscription = DemandSubscription(action, command);
+            var resourceName = DemandName("service.resource.name", action, command);
+            var group = DemandGroup(action, command);
+
+            var deleteDependentResources = _values.GetOrDefault("service.resource.delete.dependent.resources", false);
+
+            var message = $"{action} for '{resourceName}'";
+
+            if (!_quiet) Console.WriteLine(message);
+            var output = DoDeleteResourceViaPython(subscription, group, resourceName, deleteDependentResources);
+            if (!_quiet) Console.WriteLine($"{message} Done!\n");
+
+            if (!_quiet) Console.WriteLine(output);
+            CheckWriteOutputValueFromJson("service.output", "json", output);
+        }
+
         private string DoCreateResourceViaPython(string subscription, string group, string name, string location, string displayName, string description)
         {
             var createResource = () => RunEmbeddedPythonScript("hub_create",
@@ -191,6 +213,15 @@ namespace Azure.AI.Details.Common.CLI
             return RunEmbeddedPythonScript("project_list", "--subscription", subscription);
         }
 
+        private string DoDeleteResourceViaPython(string subscription, string group, string name, bool deleteDependentResources)
+        {
+            return RunEmbeddedPythonScript("hub_delete",
+                    "--subscription", subscription,
+                    "--group", group,
+                    "--name", name, 
+                    "--delete-dependent-resources", deleteDependentResources ? "true" : "false");
+        }
+
         private string DemandSubscription(string action, string command)
         {
             var subscription = _values.Get("service.subscription", true);
@@ -219,6 +250,19 @@ namespace Azure.AI.Details.Common.CLI
                       "SEE:", $"{Program.Name} help {command}");
             }
             return name;
+        }
+
+        private string DemandGroup(string action, string command)
+        {
+            var group = _values.Get("service.resource.group.name", true);
+            if (string.IsNullOrEmpty(group))
+            {
+                _values.AddThrowError(
+                    "ERROR:", $"{action}; requires group.",
+                      "TRY:", $"{Program.Name} {command} --group GROUP",
+                      "SEE:", $"{Program.Name} help {command}");
+            }
+            return group;
         }
 
         private string DemandResource(string action, string command)

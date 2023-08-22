@@ -79,6 +79,8 @@ namespace Azure.AI.Details.Common.CLI
             {
                 case "service.resource.create": return _resourceCreateParsers;
                 case "service.resource.list": return _resourceListParsers;
+                case "service.resource.delete": return _resourceDeleteParsers;
+
                 case "service.project.create": return _projectCreateParsers;
                 case "service.project.list": return _projectListParsers;
             }
@@ -142,6 +144,18 @@ namespace Azure.AI.Details.Common.CLI
             
             new CommonServiceNamedValueTokenParsers(),
             new NamedValueTokenParser("--subscription", "service.subscription", "01", "1"),
+
+            new NamedValueTokenParser(null, "service.output.json", "011", "1")
+        };
+
+        private static INamedValueTokenParser[] _resourceDeleteParsers = {
+            
+            new CommonServiceNamedValueTokenParsers(),
+          
+            new NamedValueTokenParser("--subscription", "service.subscription", "01", "1"),
+            new NamedValueTokenParser("--group", "service.resource.group.name", "0010", "1"),
+            new NamedValueTokenParser("--name", "service.resource.name", "010;001", "1"),
+            new NamedValueTokenParser(null, "service.resource.delete.dependent.resources", "00111", "1;0", "true;false", null, "true"),
 
             new NamedValueTokenParser(null, "service.output.json", "011", "1")
         };
