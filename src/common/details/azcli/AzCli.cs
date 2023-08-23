@@ -363,15 +363,13 @@ namespace Azure.AI.Details.Common.CLI
             return x;
         }
 
-        public static async Task<ProcessResponse<CognitiveSearchResourceInfo[]>> ListSearchResources(string subscriptionId, string group, string regionLocation)
+        public static async Task<ProcessResponse<CognitiveSearchResourceInfo[]>> ListSearchResources(string subscriptionId, string regionLocation)
         {
-            var cmdPart = "search service list";
+            var cmdPart = "resource list";
             var subPart = subscriptionId != null ? $"--subscription {subscriptionId}" : "";
-            var queryPart1 = $"--query \"[";
-            var queryPart2 = regionLocation != null ? $"? location=='{regionLocation}'" : "";
-            var queryPart3 = $"].{{Id:id,Name:name,Location:location,Group:resourceGroup,}}\"";
+            var queryPart = string.IsNullOrEmpty(regionLocation) ? "" : $"--location {regionLocation}";
 
-            var process = await ProcessHelpers.ParseShellCommandJson<JArray>("az", $"{cmdPart} {subPart} {queryPart1}{queryPart2}{queryPart3}");
+            var process = await ProcessHelpers.ParseShellCommandJson<JArray>("az", $"{cmdPart} {subPart} {queryPart} --resource-type Microsoft.Search/searchServices");
 
             var x = new ProcessResponse<CognitiveSearchResourceInfo[]>();
             x.StdOutput = process.StdOutput;

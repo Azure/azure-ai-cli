@@ -56,7 +56,10 @@ namespace Azure.AI.Details.Common.CLI
             var interactive = _values.GetOrDefault("init.service.interactive", true);
             switch (command)
             {
-                case "init.openai": await DoInitOpenAi(interactive); break;
+                case "init.openai": await DoInitService(interactive, 0, 0); break;
+                case "init.search": await DoInitService(interactive, 0, 1); break;
+                case "init.project": await DoInitService(interactive, 0, 2); break;
+                case "init.resource": await DoInitService(interactive, 0, 3); break;
                 case "init": await DoInitService(interactive); break;
             }
         }
@@ -89,7 +92,13 @@ namespace Azure.AI.Details.Common.CLI
             //     return;
             // }
 
-            await DoInitOpenAi(interactive);
+            await DoInitService(interactive, 0, picked);
+        }
+
+        private async Task DoInitService(bool interactive, int startWith, int stopWith)
+        {
+            if (startWith <= 0 && stopWith >= 0) await DoInitOpenAi(interactive);
+            if (startWith <= 1 && stopWith >= 1) await DoInitSearch(interactive);
         }
 
         private async Task DoInitOpenAi(bool interactive)
@@ -104,6 +113,32 @@ namespace Azure.AI.Details.Common.CLI
 
             var (subscriptionId, region, endpoint, deployment, key) = await GetRegionAndKey(interactive, subscriptionFilter, regionFilter, groupFilter, resourceFilter, kind, sku, yes);
             ConfigServiceResource(subscriptionId, region, endpoint, deployment, key);
+
+            _values.Reset("init.service.subscription", subscriptionId);
+        }
+
+        private async Task DoInitSearch(bool interactive)
+        {
+            var subscription = _values.GetOrDefault("init.service.subscription", "");
+            var location = _values.GetOrDefault("init.service.resource.region.name", "");
+
+            var response = await AzCli.ListSearchResources(subscription, location);
+            if (string.IsNullOrEmpty(response.StdOutput) && !string.IsNullOrEmpty(response.StdError))
+            {
+                _values.AddThrowError(
+                    "ERROR:", "Listing search resources",
+                    "OUTPUT:", response.StdError);
+            }
+
+            var resources = response.Payload
+                .OrderBy(x => x.Name)
+                .Select(x => x.Name)
+                .ToList();
+
+            foreach (var resource in resources)
+            {
+                Console.WriteLine(resource);
+            }
         }
 
         private void DisplayInitServiceBanner()

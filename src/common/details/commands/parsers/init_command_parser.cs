@@ -24,6 +24,7 @@ namespace Azure.AI.Details.Common.CLI
             ("init.openai", false),
             ("init.search", false),
             ("init.project", false),
+            ("init.resource", false),
             ("init", false)
         };
 
@@ -31,6 +32,7 @@ namespace Azure.AI.Details.Common.CLI
             "init.openai",
             "init.search",
             "init.project",
+            "init.resource",
             "init"
         };
 
@@ -42,6 +44,7 @@ namespace Azure.AI.Details.Common.CLI
                 case "init.openai":
                 case "init.search":
                 case "init.project":
+                case "init.resource":
 
                 case "init":
                     return initCommandParsers;
