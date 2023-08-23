@@ -85,13 +85,6 @@ namespace Azure.AI.Details.Common.CLI
             var choice = string.Join(" + ", choices.Take(picked + 1).Select(x => x.Trim()));
             Console.WriteLine($"\rInitialize: {choice}");
 
-            // if (picked > 0)
-            // {
-            //     Console.WriteLine();
-            //     _values.AddThrowError("WARNING:", $"'ai init {choices2[picked].ToLower()}' NOT YET IMPLEMENTED!!");
-            //     return;
-            // }
-
             picked = picked switch
             {
                 0 => 0,
@@ -128,6 +121,10 @@ namespace Azure.AI.Details.Common.CLI
 
         private async Task DoInitSearch(bool interactive)
         {
+            ConsoleHelpers.WriteLineWithHighlight($"\n`COGNITIVE SEARCH RESOURCE`\n");
+
+            Console.Write("\rName: *** Loading choices ***");
+
             var subscription = _values.GetOrDefault("init.service.subscription", "");
             var location = _values.GetOrDefault("init.service.resource.region.name", "");
 
@@ -141,6 +138,9 @@ namespace Azure.AI.Details.Common.CLI
 
             var resources = response.Payload.OrderBy(x => x.Name);
             var choices = resources.Select(x => $"{x.Name} ({x.RegionLocation})").ToList();
+            choices.Insert(0, "(Create new)");
+
+            Console.Write("\rName: ");
 
             var normal = new Colors(ConsoleColor.White, ConsoleColor.Blue);
             var selected = new Colors(ConsoleColor.White, ConsoleColor.Red);
@@ -149,11 +149,21 @@ namespace Azure.AI.Details.Common.CLI
             var picked = ListBoxPicker.PickIndexOf(choices.ToArray(), width, 30, normal, selected);
             if (picked < 0)
             {
-                Console.WriteLine("\rInitialize: (canceled)");
+                Console.WriteLine("\rName: (canceled)");
                 return;
             }
 
-            Console.WriteLine($"\rInitialize: {choices[picked]}");
+            if (picked == 0)
+            {
+                Console.Write("\rName: ");
+                ConsoleHelpers.WriteLineError($"{choices[0]} NOT YET IMPLEMENTED");
+                Environment.Exit(-1);
+            }
+
+            Console.WriteLine($"\rName: {choices[picked]}");
+
+            var resource = resources.ToArray()[picked - 1];
+            ConfigSearchResource(resource.Endpoint, "????????????????????????????????");
         }
 
         private void DisplayInitServiceBanner()
@@ -204,6 +214,15 @@ namespace Azure.AI.Details.Common.CLI
             ConfigSet("@deployment", deployment, $"  Deployment: {deployment}");
             ConfigSet("@region", region, $"      Region: {region}");
             ConfigSet("@key", key, $"         Key: {key.Substring(0, 4)}****************************");
+        }
+
+        private static void ConfigSearchResource(string endpoint, string key)
+        {
+            ConsoleHelpers.WriteLineWithHighlight($"\n`CONFIG COGNITIVE SEARCH RESOURCE`");
+            Console.WriteLine();
+
+            ConfigSet("@search.endpoint", endpoint, $"Endpoint: {endpoint}");
+            ConfigSet("@search.key", key, $"     Key: {key.Substring(0, 4)}****************************");
         }
 
         private static void ConfigSet(string atFile, string setValue, string message)

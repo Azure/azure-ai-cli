@@ -208,12 +208,12 @@ namespace Azure.AI.Details.Common.CLI
 
         private string GetSearchApiKey()
         {
-            return _values.Get("azure.search.api.key", true);
+            return _values.Get("service.config.search.api.key", true);
         }
 
         private string GetSearchEndpointUri()
         {
-            return _values.Get("azure.search.endpoint.uri", true);
+            return _values.Get("service.config.search.endpoint.uri", true);
         }
 
         private string GetEmbeddingsEndpointUri()

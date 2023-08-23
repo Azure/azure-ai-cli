@@ -24,8 +24,8 @@ USAGE: ai index update [...]
     --external-source                       (see: ai help search index external source)
 
   AZURE SEARCH
-    --azure-search-endpoint ENDPOINT        (see: ai help azure search endpoint)
-    --azure-search-api-key KEY              (see: ai help azure search key)
+    --search-endpoint ENDPOINT               (see: ai help search endpoint)
+    --search-api-key KEY                     (see: ai help search api key)
 
 ;  CHROMA
 ;    --chroma-endpoint ENDPOINT              (see: ai help chroma endpoint)
