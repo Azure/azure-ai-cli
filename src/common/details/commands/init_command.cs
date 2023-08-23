@@ -101,6 +101,7 @@ namespace Azure.AI.Details.Common.CLI
         {
             if (startWith <= 0 && stopWith >= 0) await DoInitOpenAi(interactive);
             if (startWith <= 1 && stopWith >= 1) await DoInitSearch(interactive);
+            if (startWith <= 2 && stopWith >= 2) await DoInitHub(interactive);
         }
 
         private async Task DoInitOpenAi(bool interactive)
@@ -164,6 +165,56 @@ namespace Azure.AI.Details.Common.CLI
 
             var resource = resources.ToArray()[picked - 1];
             ConfigSearchResource(resource.Endpoint, "????????????????????????????????");
+        }
+
+        private async Task DoInitHub(bool interactive)
+        {
+            ConsoleHelpers.WriteLineWithHighlight($"\n`AZURE AI RESOURCE`\n");
+            Console.Write("\rName: *** Loading choices ***");
+
+            var subscription = _values.GetOrDefault("init.service.subscription", "");
+
+            var json = PythonSDKWrapper.ListResources(_values, subscription);
+            if (Program.Debug) Console.WriteLine(json);
+
+            var parsed = !string.IsNullOrEmpty(json) ? JToken.Parse(json) : null;
+            var items = parsed?.Type == JTokenType.Object ? parsed["resources"] : new JArray();
+
+            var choices = new List<string>();
+            foreach (var item in items)
+            {
+                var name = item["name"].Value<string>();
+                var location = item["location"].Value<string>();
+                // var displayName = item["displayName"].Value<string>();
+
+                choices.Add($"{name} ({location})");
+            }
+
+            choices.Insert(0, "(Create new)");
+            var width = Math.Max(choices.Max(x => x.Length) + 4, 29);
+
+            var normal = new Colors(ConsoleColor.White, ConsoleColor.Blue);
+            var selected = new Colors(ConsoleColor.White, ConsoleColor.Red);
+
+            Console.Write("\rName: ");
+            var picked = ListBoxPicker.PickIndexOf(choices.ToArray(), width, 30, normal, selected);
+            if (picked < 0)
+            {
+                Console.WriteLine("\rName: (canceled)");
+                return;
+            }
+
+            if (picked == 0)
+            {
+                Console.Write("\rName: ");
+                ConsoleHelpers.WriteLineError($"{choices[0]} NOT YET IMPLEMENTED");
+                Environment.Exit(-1);
+            }
+
+            Console.WriteLine($"\rName: {choices[picked]}");
+
+            // var resource = resources.ToArray()[picked - 1];
+            // ConfigSearchResource(resource.Endpoint, "????????????????????????????????");
         }
 
         private void DisplayInitServiceBanner()
