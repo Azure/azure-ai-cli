@@ -102,6 +102,7 @@ namespace Azure.AI.Details.Common.CLI
             if (startWith <= 0 && stopWith >= 0) await DoInitOpenAi(interactive);
             if (startWith <= 1 && stopWith >= 1) await DoInitSearch(interactive);
             if (startWith <= 2 && stopWith >= 2) await DoInitHub(interactive);
+            if (startWith <= 3 && stopWith >= 3) await DoInitProject(interactive);
         }
 
         private async Task DoInitOpenAi(bool interactive)
@@ -214,6 +215,66 @@ namespace Azure.AI.Details.Common.CLI
             }
 
             Console.WriteLine($"\rName: {choices[picked]}");
+
+            var resource = items.ToArray()[picked - 1];
+            _values.Reset("service.resource.name", choices[picked]);
+            _values.Reset("srevice.resource.id", items[picked - 1]["id"].Value<string>());
+            
+        }
+
+        private async Task DoInitProject(bool interactive)
+        {
+            Console.Write("\rProject: *** Loading choices ***");
+
+            var subscription = _values.GetOrDefault("init.service.subscription", "");
+            var resourceId = _values.GetOrDefault("srevice.resource.id", null);
+
+            var json = PythonSDKWrapper.ListProjects(_values, subscription);
+            if (Program.Debug) Console.WriteLine(json);
+
+            var parsed = !string.IsNullOrEmpty(json) ? JToken.Parse(json) : null;
+            var items = parsed?.Type == JTokenType.Object ? parsed["projects"] : new JArray();
+
+            var choices = new List<string>();
+            foreach (var item in items)
+            {
+                Console.WriteLine($"item={item.ToString()}");
+                var hub = item["workspace_hub"]?.Value<string>();
+
+                var hubOk = !string.IsNullOrEmpty(hub) && hub == resourceId;
+                if (!hubOk) continue;
+
+                var name = item["name"].Value<string>();
+                var location = item["location"].Value<string>();
+                var displayName = item["display_name"].Value<string>();
+
+                choices.Add(string.IsNullOrEmpty(displayName)
+                    ? $"{name} ({location})"
+                    : $"{displayName} ({location})");
+            }
+
+            choices.Insert(0, "(Create new)");
+            var width = Math.Max(choices.Max(x => x.Length) + 4, 29);
+
+            var normal = new Colors(ConsoleColor.White, ConsoleColor.Blue);
+            var selected = new Colors(ConsoleColor.White, ConsoleColor.Red);
+
+            Console.Write("\rProject: ");
+            var picked = ListBoxPicker.PickIndexOf(choices.ToArray(), width, 30, normal, selected);
+            if (picked < 0)
+            {
+                Console.WriteLine("\rProject: (canceled)");
+                return;
+            }
+
+            if (picked == 0)
+            {
+                Console.Write("\rProject: ");
+                ConsoleHelpers.WriteLineError($"{choices[0]} NOT YET IMPLEMENTED");
+                Environment.Exit(-1);
+            }
+
+            Console.WriteLine($"\rProject: {choices[picked]}");
 
             // var resource = resources.ToArray()[picked - 1];
             // ConfigSearchResource(resource.Endpoint, "????????????????????????????????");
