@@ -367,9 +367,10 @@ namespace Azure.AI.Details.Common.CLI
         {
             var cmdPart = "resource list";
             var subPart = subscriptionId != null ? $"--subscription {subscriptionId}" : "";
-            var queryPart = string.IsNullOrEmpty(regionLocation) ? "" : $"--location {regionLocation}";
+            var queryPart1 = string.IsNullOrEmpty(regionLocation) ? "" : $"--location {regionLocation}";
+            var queryPart2 = "--query \"[].{Name:name,Id:id,Group:resourceGroup,Location:location}\"";
 
-            var process = await ProcessHelpers.ParseShellCommandJson<JArray>("az", $"{cmdPart} {subPart} {queryPart} --resource-type Microsoft.Search/searchServices");
+            var process = await ProcessHelpers.ParseShellCommandJson<JArray>("az", $"{cmdPart} {subPart} {queryPart1} {queryPart2} --resource-type Microsoft.Search/searchServices");
 
             var x = new ProcessResponse<CognitiveSearchResourceInfo[]>();
             x.StdOutput = process.StdOutput;

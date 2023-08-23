@@ -68,7 +68,7 @@ namespace Azure.AI.Details.Common.CLI
         {
             Console.Write("Initialize: ");
 
-            var choices = new string[] { "Azure OpenAI", "    + Cognitive Search", "    + AI Resource", "    + AI Project" };
+            var choices = new string[] { "Azure OpenAI", "Azure AI Project", "Azure AI Resource", "Azure Cognitive Search" };
             var choices2 = new string[] { "openai", "search", "resource", "project" };
 
             var normal = new Colors(ConsoleColor.White, ConsoleColor.Blue);
@@ -82,7 +82,7 @@ namespace Azure.AI.Details.Common.CLI
                 return;
             }
     
-            var choice = string.Join(' ', choices.Take(picked + 1).Select(x => x.Trim()));
+            var choice = string.Join(" + ", choices.Take(picked + 1).Select(x => x.Trim()));
             Console.WriteLine($"\rInitialize: {choice}");
 
             // if (picked > 0)
@@ -91,6 +91,15 @@ namespace Azure.AI.Details.Common.CLI
             //     _values.AddThrowError("WARNING:", $"'ai init {choices2[picked].ToLower()}' NOT YET IMPLEMENTED!!");
             //     return;
             // }
+
+            picked = picked switch
+            {
+                0 => 0,
+                1 => 4,
+                2 => 3,
+                3 => 2,
+                _ => throw new NotImplementedException()
+            };
 
             await DoInitService(interactive, 0, picked);
         }
@@ -130,15 +139,21 @@ namespace Azure.AI.Details.Common.CLI
                     "OUTPUT:", response.StdError);
             }
 
-            var resources = response.Payload
-                .OrderBy(x => x.Name)
-                .Select(x => x.Name)
-                .ToList();
+            var resources = response.Payload.OrderBy(x => x.Name);
+            var choices = resources.Select(x => $"{x.Name} ({x.RegionLocation})").ToList();
 
-            foreach (var resource in resources)
+            var normal = new Colors(ConsoleColor.White, ConsoleColor.Blue);
+            var selected = new Colors(ConsoleColor.White, ConsoleColor.Red);
+
+            var width = Math.Max(choices.Max(x => x.Length) + 4, 29);
+            var picked = ListBoxPicker.PickIndexOf(choices.ToArray(), width, 30, normal, selected);
+            if (picked < 0)
             {
-                Console.WriteLine(resource);
+                Console.WriteLine("\rInitialize: (canceled)");
+                return;
             }
+
+            Console.WriteLine($"\rInitialize: {choices[picked]}");
         }
 
         private void DisplayInitServiceBanner()
