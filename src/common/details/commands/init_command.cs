@@ -185,9 +185,11 @@ namespace Azure.AI.Details.Common.CLI
             {
                 var name = item["name"].Value<string>();
                 var location = item["location"].Value<string>();
-                // var displayName = item["displayName"].Value<string>();
+                var displayName = item["display_name"].Value<string>();
 
-                choices.Add($"{name} ({location})");
+                choices.Add(string.IsNullOrEmpty(displayName)
+                    ? $"{name} ({location})"
+                    : $"{displayName} ({location})");
             }
 
             choices.Insert(0, "(Create new)");
