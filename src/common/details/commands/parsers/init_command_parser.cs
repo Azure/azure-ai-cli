@@ -21,10 +21,17 @@ namespace Azure.AI.Details.Common.CLI
         }
 
         private static readonly (string name, bool valuesRequired)[] _commands =  {
+            ("init.openai", false),
+            ("init.search", false),
+            ("init.project", false),
             ("init", false)
         };
 
         private static readonly string[] _partialCommands = {
+            "init.openai",
+            "init.search",
+            "init.project",
+            "init"
         };
 
         private static INamedValueTokenParser[] GetCommandParsers(ICommandValues values)
@@ -32,6 +39,10 @@ namespace Azure.AI.Details.Common.CLI
             var commandName = values.GetCommand();
             switch (commandName)
             {
+                case "init.openai":
+                case "init.search":
+                case "init.project":
+
                 case "init":
                     return initCommandParsers;
             }

@@ -1,0 +1,16 @@
+USAGE: ai service search <command> [...]
+
+COMMANDS
+
+  ai service search create [...]        (see: ai help service search create)
+;  ai service search status [...]        (see: ai help service search status)
+  ai service search list [...]          (see: ai help service search list)
+
+  ai service search update [...]        (see: ai help service search update)
+  ai service search delete [...]        (see: ai help service search delete)
+
+ADDITIONAL TOPICS
+
+  ai help service examples
+  ai help service search examples
+  ai help find topics service search

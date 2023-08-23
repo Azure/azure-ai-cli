@@ -418,6 +418,9 @@ namespace Azure.AI.Details.Common.CLI
             {
                 var atValueFile = FileHelpers.GetOutputDataFileName(atValue, _values);
                 FileHelpers.WriteAllText(atValueFile, value, Encoding.UTF8);
+
+                var fi = new FileInfo(atValueFile);
+                if (!_quiet) Console.WriteLine($"{fi.Name} (saved at {fi.DirectoryName})\n\n  {value}");
             }
 
             var addValue = _values.Get($"{part1}.add.{part2}", true);
@@ -425,12 +428,15 @@ namespace Azure.AI.Details.Common.CLI
             {
                 var addValueFile = FileHelpers.GetOutputDataFileName(addValue, _values);
                 FileHelpers.AppendAllText(addValueFile, "\n" + value, Encoding.UTF8);
+
+                var fi = new FileInfo(addValueFile);
+                if (!_quiet) Console.WriteLine($"{fi.Name} (saved/added at {fi.DirectoryName})\n\n  {value}");
             }
         }
 
         private void CreateResourceGroup(string subscription, string location, string group)
         {
-            var message = "Creating resource group '{group}'...";
+            var message = $"Creating resource group '{group}'...";
             if (!_quiet) Console.WriteLine(message);
 
             var response = AzCli.CreateResourceGroup(subscription, location, group).Result;

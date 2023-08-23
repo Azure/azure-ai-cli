@@ -46,6 +46,12 @@ namespace Azure.AI.Details.Common.CLI
             ("service.deployment.update", true),
             ("service.deployment.delete", true),
             ("service.deployment", true),
+            ("service.search.create", true),
+            ("service.search.status", true),
+            ("service.search.list", false),
+            ("service.search.update", true),
+            ("service.search.delete", true),
+            ("service.search", true),
             ("service.flow.create", true),
             ("service.flow.status", true),
             ("service.flow.list", false),
@@ -66,6 +72,7 @@ namespace Azure.AI.Details.Common.CLI
             "service.project",
             "service.connection",
             "service.deployment",
+            "service.search",
             "service.flow",
             "service.evaluation",
             "service"
@@ -83,6 +90,8 @@ namespace Azure.AI.Details.Common.CLI
 
                 case "service.project.create": return _projectCreateParsers;
                 case "service.project.list": return _projectListParsers;
+
+                case "service.search.create": return _searchCreateParsers;
             }
 
             foreach (var command in _commands)
@@ -111,7 +120,8 @@ namespace Azure.AI.Details.Common.CLI
                     new NamedValueTokenParser(null, "x.command.expand.file.name", "11111", "1"),
 
                     new NamedValueTokenParser("--uri", "service.config.endpoint.uri", "0010;0001", "1"),
-                    new NamedValueTokenParser("--deployment", "service.config.deployment", "001", "1")
+                    new NamedValueTokenParser("--deployment", "service.config.deployment", "001", "1"),
+                    new NamedValueTokenParser("--subscription", "service.subscription", "01", "1")
 
                 )
             {
@@ -127,9 +137,7 @@ namespace Azure.AI.Details.Common.CLI
         private static INamedValueTokenParser[] _resourceCreateParsers = {
             
             new CommonServiceNamedValueTokenParsers(),
-            new NamedValueTokenParser("--subscription", "service.subscription", "01", "1"),
           
-            new NamedValueTokenParser("--subscription", "service.subscription", "01", "1"),
             new NamedValueTokenParser("--group", "service.resource.group.name", "0010", "1"),
             new NamedValueTokenParser("--name", "service.resource.name", "010;001", "1"),
             new NamedValueTokenParser("--location", "service.region.location", "010;001", "1"),
@@ -143,7 +151,6 @@ namespace Azure.AI.Details.Common.CLI
         private static INamedValueTokenParser[] _resourceListParsers = {
             
             new CommonServiceNamedValueTokenParsers(),
-            new NamedValueTokenParser("--subscription", "service.subscription", "01", "1"),
 
             new NamedValueTokenParser(null, "service.output.json", "011", "1")
         };
@@ -152,7 +159,6 @@ namespace Azure.AI.Details.Common.CLI
             
             new CommonServiceNamedValueTokenParsers(),
           
-            new NamedValueTokenParser("--subscription", "service.subscription", "01", "1"),
             new NamedValueTokenParser("--group", "service.resource.group.name", "0010", "1"),
             new NamedValueTokenParser("--name", "service.resource.name", "010;001", "1"),
             new NamedValueTokenParser(null, "service.resource.delete.dependent.resources", "00111", "1;0", "true;false", null, "true"),
@@ -164,7 +170,6 @@ namespace Azure.AI.Details.Common.CLI
             
             new CommonServiceNamedValueTokenParsers(),
           
-            new NamedValueTokenParser("--subscription", "service.subscription", "01", "1"),
             new NamedValueTokenParser("--group", "service.resource.group.name", "0010", "1"),
             new NamedValueTokenParser("--resource", "service.resource.name", "010", "1"),
             new NamedValueTokenParser("--name", "service.project.name", "010;001", "1"),
@@ -179,9 +184,23 @@ namespace Azure.AI.Details.Common.CLI
         private static INamedValueTokenParser[] _projectListParsers = {
             
             new CommonServiceNamedValueTokenParsers(),
-            new NamedValueTokenParser("--subscription", "service.subscription", "01", "1"),
 
             new NamedValueTokenParser(null, "service.output.json", "011", "1")
+        };
+
+        private static INamedValueTokenParser[] _searchCreateParsers = {
+            
+            new CommonServiceNamedValueTokenParsers(),
+          
+            // new NamedValueTokenParser("--group", "service.resource.group.name", "0010", "1"),
+            // new NamedValueTokenParser("--resource", "service.resource.name", "010", "1"),
+            // new NamedValueTokenParser("--name", "service.project.name", "010;001", "1"),
+            // new NamedValueTokenParser("--location", "service.region.location", "010;001", "1"),
+            // new NamedValueTokenParser("--display-name", "service.project.display.name", "0011", "1"),
+            // new NamedValueTokenParser("--description", "service.project.description", "001", "1"),
+
+            // new NamedValueTokenParser("--output-project-id", "service.output.project.id", "0110;0101", "1"),
+            // new NamedValueTokenParser(null, "service.output.json", "011", "1")
         };
 
         #endregion

@@ -13,6 +13,7 @@ using System.Threading.Tasks;
 using System.Collections.Generic;
 using System.Net;
 using Newtonsoft.Json.Linq;
+using Azure.AI.Details.Common.CLI.ConsoleGui;
 
 namespace Azure.AI.Details.Common.CLI
 {
@@ -48,24 +49,51 @@ namespace Azure.AI.Details.Common.CLI
 
         private async Task DoCommand(string command)
         {
+            DisplayInitServiceBanner();
+
             CheckPath();
 
+            var interactive = _values.GetOrDefault("init.service.interactive", true);
             switch (command)
             {
-                case "init": await DoInitService(); break;
+                case "init.openai": await DoInitOpenAi(interactive); break;
+                case "init": await DoInitService(interactive); break;
             }
-        }
-
-        private async Task DoInitService()
-        {
-            var interactive = _values.GetOrDefault("init.service.interactive", true);
-            await DoInitService(interactive);
         }
 
         private async Task DoInitService(bool interactive)
         {
-            DisplayInitServiceBanner();
+            Console.Write("Initialize: ");
 
+            var choices = new string[] { "Azure OpenAI", "    + Cognitive Search", "    + AI Resource", "    + AI Project" };
+            var choices2 = new string[] { "openai", "search", "resource", "project" };
+
+            var normal = new Colors(ConsoleColor.White, ConsoleColor.Blue);
+            var selected = new Colors(ConsoleColor.White, ConsoleColor.Red);
+
+            var width = Math.Max(choices.Max(x => x.Length) + 4, 29);
+            var picked = ListBoxPicker.PickIndexOf(choices.ToArray(), width, 30, normal, selected);
+            if (picked < 0)
+            {
+                Console.WriteLine("\rInitialize: (canceled)");
+                return;
+            }
+    
+            var choice = string.Join(' ', choices.Take(picked + 1).Select(x => x.Trim()));
+            Console.WriteLine($"\rInitialize: {choice}");
+
+            // if (picked > 0)
+            // {
+            //     Console.WriteLine();
+            //     _values.AddThrowError("WARNING:", $"'ai init {choices2[picked].ToLower()}' NOT YET IMPLEMENTED!!");
+            //     return;
+            // }
+
+            await DoInitOpenAi(interactive);
+        }
+
+        private async Task DoInitOpenAi(bool interactive)
+        {
             var subscriptionFilter = _values.GetOrDefault("init.service.subscription", "");
             var regionFilter = _values.GetOrDefault("init.service.resource.region.name", "");
             var groupFilter = _values.GetOrDefault("init.service.resource.group.name", "");

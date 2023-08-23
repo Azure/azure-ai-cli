@@ -13,6 +13,8 @@ COMMANDS
   ai service connection [...]       (see: ai help service connection)
   ai service deployment [...]       (see: ai help service deployment)
 
+  ai service search [...]           (see: ai help service search)
+
   ai service flow [...]             (see: ai help service flow)
   ai service evaluation [...]       (see: ai help service evaluation)
 

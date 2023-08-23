@@ -64,11 +64,14 @@ namespace Azure.AI.Details.Common.CLI
             public string Version { get; set; }
         }
 
-        // public struct CognitiveServicesDeploymentInfo
-        // {
-        //     public string Name;
-        //     public string Kind;
-        // }
+        public struct CognitiveSearchResourceInfo
+        {
+            public string Id;
+            public string Group;
+            public string Name;
+            public string RegionLocation;
+            public string Endpoint;
+        }
 
         public static async Task<ProcessResponse<SubscriptionInfo[]>> Login()
         {
@@ -332,6 +335,61 @@ namespace Azure.AI.Details.Common.CLI
                 Key1 = keys?["key1"]?.Value<string>(),
                 Key2 = keys?["key2"]?.Value<string>()
             };
+
+            return x;
+        }
+
+        public static async Task<ProcessResponse<CognitiveSearchResourceInfo>> CreateSearchResource(string subscriptionId, string group, string regionLocation, string name, string sku = "Standard")
+        {
+            var cmdPart = "search service create";
+            var subPart = subscriptionId != null ? $"--subscription {subscriptionId}" : "";
+
+            var process = await ProcessHelpers.ParseShellCommandJson<JObject>("az", $"{cmdPart} {subPart} -g {group} -l {regionLocation} -n {name} --sku {sku}");
+
+            var x = new ProcessResponse<CognitiveSearchResourceInfo>();
+            x.StdOutput = process.StdOutput;
+            x.StdError = process.StdError;
+
+            var resource = process.Payload;
+            x.Payload = new CognitiveSearchResourceInfo()
+            {
+                Id = resource?["id"]?.Value<string>(),
+                Name = name,
+                Group = resource?["resourceGroup"]?.Value<string>(),
+                RegionLocation = resource?["location"]?.Value<string>(),
+                Endpoint = $"https://{name}.search.windows.net"             // TODO: Need to find official way of getting this
+            };
+
+            return x;
+        }
+
+        public static async Task<ProcessResponse<CognitiveSearchResourceInfo[]>> ListSearchResources(string subscriptionId, string group, string regionLocation)
+        {
+            var cmdPart = "search service list";
+            var subPart = subscriptionId != null ? $"--subscription {subscriptionId}" : "";
+            var queryPart1 = $"--query \"[";
+            var queryPart2 = regionLocation != null ? $"? location=='{regionLocation}'" : "";
+            var queryPart3 = $"].{{Id:id,Name:name,Location:location,Group:resourceGroup,}}\"";
+
+            var process = await ProcessHelpers.ParseShellCommandJson<JArray>("az", $"{cmdPart} {subPart} {queryPart1}{queryPart2}{queryPart3}");
+
+            var x = new ProcessResponse<CognitiveSearchResourceInfo[]>();
+            x.StdOutput = process.StdOutput;
+            x.StdError = process.StdError;
+
+            var groups = process.Payload;
+            x.Payload = new CognitiveSearchResourceInfo[groups.Count];
+
+            var i = 0;
+            foreach (var resource in groups)
+            {
+                x.Payload[i].Id = resource["Id"].Value<string>();
+                x.Payload[i].Name = resource["Name"].Value<string>();
+                x.Payload[i].Group = resource["Group"].Value<string>();
+                x.Payload[i].RegionLocation = resource["Location"].Value<string>();
+                x.Payload[i].Endpoint = $"https://{x.Payload[i].Name}.search.windows.net"; // TODO: Need to find official way of getting this
+                i++;
+            }
 
             return x;
         }

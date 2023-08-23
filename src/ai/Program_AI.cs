@@ -30,7 +30,7 @@ namespace Azure.AI.Details.Common.CLI
         #endregion
 
         #region init command data
-        public const string SERVICE_RESOURCE_DISPLAY_NAME_ALL_CAPS = "AI RESOURCE";
+        public const string SERVICE_RESOURCE_DISPLAY_NAME_ALL_CAPS = "OPEN AI RESOURCE";
         public const string CognitiveServiceResourceKind = "OpenAI";
         public const string CognitiveServiceResourceSku = "s0";
         public static bool InitConfigsEndpoint = true;
