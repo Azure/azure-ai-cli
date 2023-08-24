@@ -29,9 +29,9 @@ namespace Azure.AI.Details.Common.CLI
             return SubscriptionPicker.PickSubscriptionAsync(interactive, subscriptionFilter);
         }
 
-        public static Task<AzCli.AccountRegionLocationInfo> PickRegionLocationAsync(bool interactive, string regionFilter = null)
+        public static Task<AzCli.AccountRegionLocationInfo> PickRegionLocationAsync(bool interactive, string regionFilter = null, bool allowAnyRegionOption = true)
         {
-            return RegionLocationPicker.PickRegionLocationAsync(interactive, regionFilter);
+            return RegionLocationPicker.PickRegionLocationAsync(interactive, regionFilter, allowAnyRegionOption);
         }
 
         public static Task<AzCli.CognitiveServicesResourceInfo> PickOrCreateCognitiveResource(bool interactive, string subscriptionId = null, string regionFilter = null, string groupFilter = null, string resourceFilter = null, string kind = null, string sku = "F0", bool agreeTerms = false)

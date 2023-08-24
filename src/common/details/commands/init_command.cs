@@ -155,17 +155,47 @@ namespace Azure.AI.Details.Common.CLI
                 return;
             }
 
+            Console.WriteLine($"\rName: {choices[picked]}");
             if (picked == 0)
             {
-                Console.Write("\rName: ");
-                ConsoleHelpers.WriteLineError($"{choices[0]} NOT YET IMPLEMENTED");
-                Environment.Exit(-1);
-            }
+                if (!await TryCreateSearch()) return;
 
-            Console.WriteLine($"\rName: {choices[picked]}");
+                // ConsoleHelpers.WriteLineError($"{choices[0]} NOT YET IMPLEMENTED");
+                // Environment.Exit(-1);
+            }
 
             var resource = resources.ToArray()[picked - 1];
             ConfigSearchResource(resource.Endpoint, "????????????????????????????????");
+        }
+
+        private async Task<bool> TryCreateSearch()
+        {
+            ConsoleHelpers.WriteLineWithHighlight($"\n`CREATE COGNITIVE SEARCH RESOURCE`\n");
+
+            var subscription = _values.GetOrDefault("init.service.subscription", "");
+            var location = await AzCliConsoleGui.PickRegionLocationAsync(true, null, true);
+            if (string.IsNullOrEmpty(location.Name)) return false;
+
+            var group = await AzCliConsoleGui.ResourceGroupPicker.PickOrCreateResourceGroup(true, subscription, location.Name);
+            if (string.IsNullOrEmpty(group.Name)) return false;
+
+            var name = AskPrompt("Name: ");
+            if (string.IsNullOrEmpty(name)) return false;
+
+            Console.Write("*** CREATING ***");
+            var response = await AzCli.CreateSearchResource(subscription, group.Name, location.Name, name);
+
+            Console.Write("\r");
+            if (string.IsNullOrEmpty(response.StdOutput) && !string.IsNullOrEmpty(response.StdError))
+            {
+                ConsoleHelpers.WriteLineError($"ERROR: Creating deployment: {response.StdError}");
+                return false;
+            }
+
+            Console.WriteLine("\r*** CREATED ***  ");
+
+            _values.AddThrowError("WARNING:", "NOT YET IMPLEMENTED ... started though! 😁");
+            return false;
         }
 
         private async Task DoInitHub(bool interactive)
@@ -293,6 +323,28 @@ namespace Azure.AI.Details.Common.CLI
             {
                 ConsoleHelpers.WriteLineWithHighlight($"`{Program.Name.ToUpper()} INIT`");
             }
+        }
+
+        private static string AskPrompt(string prompt, string value = null, bool useEditBox = false)
+        {
+            Console.Write(prompt);
+
+            if (useEditBox)
+            {
+                var normal = new Colors(ConsoleColor.White, ConsoleColor.Blue);
+                var text = EditBoxQuickEdit.Edit(40, 1, normal, value, 128);
+                ColorHelpers.ResetColor();
+                Console.WriteLine(text);
+                return text;
+            }
+
+            if (!string.IsNullOrEmpty(value))
+            {
+                Console.WriteLine(value);
+                return value;
+            }
+
+            return Console.ReadLine();
         }
 
         private async Task<(string, string, string, string, string)> GetRegionAndKey(bool interactive, string subscriptionFilter, string regionFilter, string groupFilter, string resourceFilter, string kind, string sku, bool agreeTerms)

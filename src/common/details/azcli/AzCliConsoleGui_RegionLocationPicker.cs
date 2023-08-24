@@ -21,9 +21,9 @@ namespace Azure.AI.Details.Common.CLI
     {
         public class RegionLocationPicker
         {
-            public static async Task<AzCli.AccountRegionLocationInfo> PickRegionLocationAsync(bool interactive, string regionFilter = null)
+            public static async Task<AzCli.AccountRegionLocationInfo> PickRegionLocationAsync(bool interactive, string regionFilter = null, bool allowAnyRegionOption = true)
             {
-                (var regionLocation, var error) = await FindRegionAsync(interactive, regionFilter, true);
+                (var regionLocation, var error) = await FindRegionAsync(interactive, regionFilter, allowAnyRegionOption);
                 if (regionLocation == null && error != null)
                 {
                     throw new ApplicationException($"ERROR: Loading resource regions/locations:\n{error}");
