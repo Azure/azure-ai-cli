@@ -274,6 +274,7 @@ namespace Azure.AI.Details.Common.CLI
         {
             if (!interactive) ThrowInteractiveNotSupportedApplicationException(); // TODO: Add back non-interactive mode support
 
+            ConsoleHelpers.WriteLineWithHighlight($"\n`AZURE AI PROJECT`\n");
             Console.Write("\rProject: *** Loading choices ***");
 
             var subscription = _values.GetOrDefault("init.service.subscription", "");
