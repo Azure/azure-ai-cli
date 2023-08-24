@@ -46,6 +46,11 @@ namespace Azure.AI.Details.Common.CLI
             return DoDeleteResourceViaPython(values, subscription, group, name, deleteDependentResources);
         }
 
+        static public string CreateConnection(INamedValues values, string subscription, string group, string projectName, string connectionName, string connectionType, string endpoint, string key)
+        {
+            return DoCreateConnectionViaPython(values, subscription, group, projectName, connectionName, connectionType, endpoint, key);
+        }
+
         private static string DoCreateResourceViaPython(INamedValues values, string subscription, string group, string name, string location, string displayName, string description)
         {
             var createResource = () => RunEmbeddedPythonScript(values,
@@ -102,6 +107,19 @@ namespace Azure.AI.Details.Common.CLI
                     "--group", group,
                     "--name", name, 
                     "--delete-dependent-resources", deleteDependentResources ? "true" : "false");
+        }
+
+        private static string DoCreateConnectionViaPython(INamedValues values, string subscription, string group, string projectName, string connectionName, string connectionType, string endpoint, string key)
+        {
+            return RunEmbeddedPythonScript(values,
+                    "api_key_connection_create",
+                    "--subscription", subscription,
+                    "--group", group,
+                    "--project-name", projectName,
+                    "--connection-name", connectionName,
+                    "--connection-type", connectionType,
+                    "--endpoint", endpoint,
+                    "--key", key);
         }
 
         private static string BuildPythonScriptArgs(params string[] args)

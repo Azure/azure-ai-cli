@@ -128,6 +128,8 @@ namespace Azure.AI.Details.Common.CLI
             ConfigServiceResource(subscriptionId, region, endpoint, deployment, key);
 
             _values.Reset("init.service.subscription", subscriptionId);
+            _values.Reset("service.openai.endpoint", endpoint);
+            _values.Reset("service.openai.key", key);
         }
 
         private async Task DoInitSearch(bool interactive)
@@ -334,6 +336,11 @@ namespace Azure.AI.Details.Common.CLI
 
             _values.Reset("service.project.name", projectName);
             _values.Reset("service.project.id", projectId);
+
+            var openAiEndpoint = _values.GetOrDefault("service.openai.endpoint", null);
+            var openAiKey = _values.GetOrDefault("service.openai.key", null);
+
+            var connectionJson = PythonSDKWrapper.CreateConnection(_values, subscription, groupName, projectName, "Default_AzureOpenAI", "azure_open_ai", openAiEndpoint, openAiKey);
 
             dynamic configJsonData = new
             {

@@ -41,9 +41,12 @@ namespace Azure.AI.Details.Common.CLI
             start.RedirectStandardOutput = true;
             start.RedirectStandardError = true;
 
-            foreach (var kvp in addToEnvironment)
+            if (addToEnvironment != null)
             {
-                start.EnvironmentVariables[kvp.Key] = kvp.Value;
+                foreach (var kvp in addToEnvironment)
+                {
+                    start.EnvironmentVariables[kvp.Key] = kvp.Value;
+                }
             }
 
             return Process.Start(start);
