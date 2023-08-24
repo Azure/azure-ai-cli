@@ -74,6 +74,8 @@ namespace Azure.AI.Details.Common.CLI
                 DebugDumpCommandLineArgs(mainArgs);
             }
 
+            if (OS.IsLinux()) Console.WriteLine();
+
             return exitCode;
         }
 
