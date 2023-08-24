@@ -39,8 +39,9 @@ namespace Azure.AI.Details.Common.CLI
                 await DoCommand(_values.GetCommand());
                 return _values.GetOrDefault("passed", true);
             }
-            catch (ApplicationException)
+            catch (ApplicationException ex)
             {
+                Console.WriteLine(ex.Message);
                 Console.WriteLine();
                 _values.Reset("passed", "false");
                 return false;
@@ -56,15 +57,21 @@ namespace Azure.AI.Details.Common.CLI
             var interactive = _values.GetOrDefault("init.service.interactive", true);
             switch (command)
             {
-                case "init.openai": await DoInitService(interactive, 0, 0); break;
-                case "init.search": await DoInitService(interactive, 0, 1); break;
-                case "init.project": await DoInitService(interactive, 0, 2); break;
-                case "init.resource": await DoInitService(interactive, 0, 3); break;
                 case "init": await DoInitService(interactive); break;
+                case "init.openai": await DoInitServiceParts(interactive, 0, 0); break;
+                case "init.search": await DoInitServiceParts(interactive, 0, 1); break;
+                case "init.resource": await DoInitServiceParts(interactive, 0, 3); break;
+                case "init.project": await DoInitServiceParts(interactive, 0, 2); break;
             }
         }
 
         private async Task DoInitService(bool interactive)
+        {
+            if (!interactive) ThrowInteractiveNotSupportedApplicationException(); // TODO: Add back non-interactive mode support
+            await DoInitServiceInteractively();
+        }
+
+        private async Task DoInitServiceInteractively()
         {
             Console.Write("Initialize: ");
 
@@ -94,10 +101,10 @@ namespace Azure.AI.Details.Common.CLI
                 _ => throw new NotImplementedException()
             };
 
-            await DoInitService(interactive, 0, picked);
+            await DoInitServiceParts(true, 0, picked);
         }
 
-        private async Task DoInitService(bool interactive, int startWith, int stopWith)
+        private async Task DoInitServiceParts(bool interactive, int startWith, int stopWith)
         {
             if (startWith <= 0 && stopWith >= 0) await DoInitOpenAi(interactive);
             if (startWith <= 1 && stopWith >= 1) await DoInitSearch(interactive);
@@ -123,8 +130,9 @@ namespace Azure.AI.Details.Common.CLI
 
         private async Task DoInitSearch(bool interactive)
         {
-            ConsoleHelpers.WriteLineWithHighlight($"\n`COGNITIVE SEARCH RESOURCE`\n");
+            if (!interactive) ThrowInteractiveNotSupportedApplicationException(); // TODO: Add back non-interactive mode support
 
+            ConsoleHelpers.WriteLineWithHighlight($"\n`COGNITIVE SEARCH RESOURCE`\n");
             Console.Write("\rName: *** Loading choices ***");
 
             var subscription = _values.GetOrDefault("init.service.subscription", "");
@@ -133,9 +141,8 @@ namespace Azure.AI.Details.Common.CLI
             var response = await AzCli.ListSearchResources(subscription, location);
             if (string.IsNullOrEmpty(response.StdOutput) && !string.IsNullOrEmpty(response.StdError))
             {
-                _values.AddThrowError(
-                    "ERROR:", "Listing search resources",
-                    "OUTPUT:", response.StdError);
+                var output = response.StdError.Replace("\n", "\n  ");
+                throw new ApplicationException($"ERROR: Listing search resources\n  {output}");
             }
 
             var resources = response.Payload.OrderBy(x => x.Name);
@@ -151,36 +158,27 @@ namespace Azure.AI.Details.Common.CLI
             var picked = ListBoxPicker.PickIndexOf(choices.ToArray(), width, 30, normal, selected);
             if (picked < 0)
             {
-                Console.WriteLine("\rName: (canceled)");
-                return;
+                throw new ApplicationException($"CANCELED: No resource selected");
             }
 
             Console.WriteLine($"\rName: {choices[picked]}");
             if (picked == 0)
             {
-                if (!await TryCreateSearch()) return;
-
-                // ConsoleHelpers.WriteLineError($"{choices[0]} NOT YET IMPLEMENTED");
-                // Environment.Exit(-1);
+                await TryCreateSearchInteractive();
             }
 
             var resource = resources.ToArray()[picked - 1];
             ConfigSearchResource(resource.Endpoint, "????????????????????????????????");
         }
 
-        private async Task<bool> TryCreateSearch()
+        private async Task TryCreateSearchInteractive()
         {
             ConsoleHelpers.WriteLineWithHighlight($"\n`CREATE COGNITIVE SEARCH RESOURCE`\n");
 
             var subscription = _values.GetOrDefault("init.service.subscription", "");
             var location = await AzCliConsoleGui.PickRegionLocationAsync(true, null, true);
-            if (string.IsNullOrEmpty(location.Name)) return false;
-
-            var group = await AzCliConsoleGui.ResourceGroupPicker.PickOrCreateResourceGroup(true, subscription, location.Name);
-            if (string.IsNullOrEmpty(group.Name)) return false;
-
-            var name = AskPrompt("Name: ");
-            if (string.IsNullOrEmpty(name)) return false;
+            var group = await AzCliConsoleGui.PickOrCreateResourceGroup(true, subscription, location.Name);
+            var name = DemandAskPrompt("Name: ");
 
             Console.Write("*** CREATING ***");
             var response = await AzCli.CreateSearchResource(subscription, group.Name, location.Name, name);
@@ -188,18 +186,19 @@ namespace Azure.AI.Details.Common.CLI
             Console.Write("\r");
             if (string.IsNullOrEmpty(response.StdOutput) && !string.IsNullOrEmpty(response.StdError))
             {
-                ConsoleHelpers.WriteLineError($"ERROR: Creating deployment: {response.StdError}");
-                return false;
+                var output = response.StdError.Replace("\n", "\n  ");
+                throw new ApplicationException($"ERROR: Creating resource:\n\n  {output}");
             }
 
             Console.WriteLine("\r*** CREATED ***  ");
 
-            _values.AddThrowError("WARNING:", "NOT YET IMPLEMENTED ... started though! 😁");
-            return false;
+            // ThrowNotImplementedButStartedApplicationException(); // TODO: Finish
         }
 
         private async Task DoInitHub(bool interactive)
         {
+            if (!interactive) ThrowInteractiveNotSupportedApplicationException(); // TODO: Add back non-interactive mode support
+
             ConsoleHelpers.WriteLineWithHighlight($"\n`AZURE AI RESOURCE`\n");
             Console.Write("\rName: *** Loading choices ***");
 
@@ -233,15 +232,13 @@ namespace Azure.AI.Details.Common.CLI
             var picked = ListBoxPicker.PickIndexOf(choices.ToArray(), width, 30, normal, selected);
             if (picked < 0)
             {
-                Console.WriteLine("\rName: (canceled)");
-                return;
+                throw new ApplicationException($"CANCELED: No resource selected");
             }
 
             if (picked == 0)
             {
                 Console.Write("\rName: ");
-                ConsoleHelpers.WriteLineError($"{choices[0]} NOT YET IMPLEMENTED");
-                Environment.Exit(-1);
+                ThrowNotImplementedApplicationException("CREATE AI RESOURCE");
             }
 
             Console.WriteLine($"\rName: {choices[picked]}");
@@ -249,11 +246,12 @@ namespace Azure.AI.Details.Common.CLI
             var resource = items.ToArray()[picked - 1];
             _values.Reset("service.resource.name", choices[picked]);
             _values.Reset("srevice.resource.id", items[picked - 1]["id"].Value<string>());
-            
         }
 
         private async Task DoInitProject(bool interactive)
         {
+            if (!interactive) ThrowInteractiveNotSupportedApplicationException(); // TODO: Add back non-interactive mode support
+
             Console.Write("\rProject: *** Loading choices ***");
 
             var subscription = _values.GetOrDefault("init.service.subscription", "");
@@ -292,15 +290,13 @@ namespace Azure.AI.Details.Common.CLI
             var picked = ListBoxPicker.PickIndexOf(choices.ToArray(), width, 30, normal, selected);
             if (picked < 0)
             {
-                Console.WriteLine("\rProject: (canceled)");
-                return;
+                throw new ApplicationException($"CANCELED: No project selected");
             }
 
             if (picked == 0)
             {
                 Console.Write("\rProject: ");
-                ConsoleHelpers.WriteLineError($"{choices[0]} NOT YET IMPLEMENTED");
-                Environment.Exit(-1);
+                ThrowNotImplementedApplicationException("CREATE AI PROJECT");
             }
 
             Console.WriteLine($"\rProject: {choices[picked]}");
@@ -345,6 +341,16 @@ namespace Azure.AI.Details.Common.CLI
             }
 
             return Console.ReadLine();
+        }
+
+        private static string DemandAskPrompt(string prompt, string value = null, bool useEditBox = false)
+        {
+            var answer = AskPrompt(prompt, value, useEditBox);
+            if (string.IsNullOrEmpty(answer))
+            {
+                ThrowPromptNotAnsweredApplicationException();
+            }
+            return answer;
         }
 
         private async Task<(string, string, string, string, string)> GetRegionAndKey(bool interactive, string subscriptionFilter, string regionFilter, string groupFilter, string resourceFilter, string kind, string sku, bool agreeTerms)
@@ -406,6 +412,26 @@ namespace Azure.AI.Details.Common.CLI
             setCommandValues.Add("x.config.command.set", setValue);
             var fileName = FileHelpers.GetOutputConfigFileName(atFile, setCommandValues);
             FileHelpers.WriteAllText(fileName, setValue, Encoding.UTF8);
+        }
+
+        private static void ThrowInteractiveNotSupportedApplicationException()
+        {
+            throw new ApplicationException("WARNING: Non-interactive mode not supported");
+        }
+
+        private static void ThrowNotImplementedApplicationException(string what)
+        {
+            throw new ApplicationException($"WARNING: {what} NOT YET IMPLEMENTED");
+        }
+
+        private static void ThrowNotImplementedButStartedApplicationException()
+        {
+            throw new ApplicationException($"WARNING: NOT YET IMPLEMENTED ... started though! 😁");
+        }
+
+        private static void ThrowPromptNotAnsweredApplicationException()
+        {
+            throw new ApplicationException($"CANCELED: No input provided.");
         }
 
         private readonly bool _quiet = false;
