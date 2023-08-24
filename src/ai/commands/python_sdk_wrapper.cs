@@ -26,7 +26,7 @@ namespace Azure.AI.Details.Common.CLI
             return DoCreateResourceViaPython(values, subscription, group, name, location, displayName, description);
         }
 
-        static public string CreateProject(INamedValues values, string subscription, string group, string resource, string name, string location, string displayName, string description)
+        static public string CreateProject(INamedValues values, string subscription, string group, string resource, string name, string location, string displayName = null, string description = null)
         {
             return DoCreateProjectViaPython(values, subscription, group, resource, name, location, displayName, description);
         }

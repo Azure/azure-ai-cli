@@ -241,7 +241,9 @@ namespace Azure.AI.Details.Common.CLI
 
             var resource = items.ToArray()[picked - 1];
             _values.Reset("service.resource.name", choices[picked]);
-            _values.Reset("srevice.resource.id", items[picked - 1]["id"].Value<string>());
+            _values.Reset("service.resource.id", resource["id"].Value<string>());
+            _values.Reset("service.resource.group.name", resource["resource_group"].Value<string>());
+            _values.Reset("service.region.location", resource["location"].Value<string>());
         }
 
         private async Task DoInitProject(bool interactive)
@@ -251,7 +253,7 @@ namespace Azure.AI.Details.Common.CLI
             Console.Write("\rProject: *** Loading choices ***");
 
             var subscription = _values.GetOrDefault("init.service.subscription", "");
-            var resourceId = _values.GetOrDefault("srevice.resource.id", null);
+            var resourceId = _values.GetOrDefault("service.resource.id", null);
 
             var json = PythonSDKWrapper.ListProjects(_values, subscription);
             if (Program.Debug) Console.WriteLine(json);
@@ -290,10 +292,34 @@ namespace Azure.AI.Details.Common.CLI
             }
 
             Console.WriteLine($"\rProject: {choices[picked]}");
-            if (picked == 0) ThrowNotImplementedApplicationException("CREATE AI PROJECT");
+            if (picked == 0)
+            {
+                TryCreateProjectInteractive();
+                // ThrowNotImplementedApplicationException("CREATE AI PROJECT");
+            } 
 
             // var resource = resources.ToArray()[picked - 1];
             // ConfigSearchResource(resource.Endpoint, "????????????????????????????????");
+        }
+
+        private void TryCreateProjectInteractive()
+        {
+            ConsoleHelpers.WriteLineWithHighlight($"\n`CREATE AZURE AI PROJECT`\n");
+
+            var subscription = _values.GetOrDefault("init.service.subscription", "");
+            var resourceId = _values.GetOrDefault("service.resource.id", "");
+            var group = _values.GetOrDefault("service.resource.group.name", "");
+            var location = _values.GetOrDefault("service.region.location", "");
+
+            var name = DemandAskPrompt("Name: ");
+
+            Console.Write("*** CREATING ***");
+            var projectJson = PythonSDKWrapper.CreateProject(_values, subscription, group, resourceId, name, location);
+
+            Console.WriteLine("\r*** CREATED ***  ");
+
+            // ThrowNotImplementedButStartedApplicationException(); // TODO: Finish
+
         }
 
         private void DisplayInitServiceBanner()
