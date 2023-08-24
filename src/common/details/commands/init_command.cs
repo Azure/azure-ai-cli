@@ -238,7 +238,6 @@ namespace Azure.AI.Details.Common.CLI
             var choices = new List<string>();
             foreach (var item in items)
             {
-                Console.WriteLine($"item={item.ToString()}");
                 var hub = item["workspace_hub"]?.Value<string>();
 
                 var hubOk = !string.IsNullOrEmpty(hub) && hub == resourceId;
