@@ -8,7 +8,8 @@ def delete_hub(subscription_id, resource_group_name, resource_name, delete_depen
     ml_client = MLClient(
         credential=DefaultAzureCredential(),
         subscription_id=subscription_id,
-        resource_group_name=resource_group_name
+        resource_group_name=resource_group_name,
+        user_agent="ai-cli 0.0.1"
     )
 
     result = ml_client.workspace_hubs.begin_delete(resource_name, delete_dependent_resources=delete_dependent_resources).result()

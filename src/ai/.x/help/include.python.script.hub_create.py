@@ -9,7 +9,8 @@ def create_hub(subscription_id, resource_group_name, resource_name, location, di
     ml_client = MLClient(
         credential=DefaultAzureCredential(),
         subscription_id=subscription_id,
-        resource_group_name=resource_group_name
+        resource_group_name=resource_group_name,
+        user_agent="ai-cli 0.0.1"
     )
 
     wshub = WorkspaceHub(

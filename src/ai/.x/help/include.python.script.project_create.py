@@ -9,7 +9,8 @@ def create_project(subscription_id, resource_id, resource_group_name, project_na
     ml_client = MLClient(
         credential=DefaultAzureCredential(),
         subscription_id=subscription_id,
-        resource_group_name=resource_group_name
+        resource_group_name=resource_group_name,
+        user_agent="ai-cli 0.0.1"
     )
 
     project = Workspace(

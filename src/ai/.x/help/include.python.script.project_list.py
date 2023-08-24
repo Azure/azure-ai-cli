@@ -8,7 +8,8 @@ def list_projects(subscription_id, resource_group_name):
     ml_client = MLClient(
         credential=DefaultAzureCredential(),
         subscription_id=subscription_id,
-        resource_group_name=resource_group_name
+        resource_group_name=resource_group_name,
+        user_agent="ai-cli 0.0.1"
     )
 
     items = ml_client.workspaces.list(scope="subscription")
