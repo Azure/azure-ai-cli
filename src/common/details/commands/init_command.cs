@@ -165,6 +165,7 @@ namespace Azure.AI.Details.Common.CLI
             if (picked == 0)
             {
                 await TryCreateSearchInteractive();
+                ThrowNotImplementedButStartedApplicationException(); // Need to fix up `resource` picked so that ConfigSearchResource works
             }
 
             var resource = resources.ToArray()[picked - 1];
@@ -235,13 +236,8 @@ namespace Azure.AI.Details.Common.CLI
                 throw new ApplicationException($"CANCELED: No resource selected");
             }
 
-            if (picked == 0)
-            {
-                Console.Write("\rName: ");
-                ThrowNotImplementedApplicationException("CREATE AI RESOURCE");
-            }
-
             Console.WriteLine($"\rName: {choices[picked]}");
+            if (picked == 0) ThrowNotImplementedApplicationException("CREATE AI RESOURCE");
 
             var resource = items.ToArray()[picked - 1];
             _values.Reset("service.resource.name", choices[picked]);
@@ -293,13 +289,8 @@ namespace Azure.AI.Details.Common.CLI
                 throw new ApplicationException($"CANCELED: No project selected");
             }
 
-            if (picked == 0)
-            {
-                Console.Write("\rProject: ");
-                ThrowNotImplementedApplicationException("CREATE AI PROJECT");
-            }
-
             Console.WriteLine($"\rProject: {choices[picked]}");
+            if (picked == 0) ThrowNotImplementedApplicationException("CREATE AI PROJECT");
 
             // var resource = resources.ToArray()[picked - 1];
             // ConfigSearchResource(resource.Endpoint, "????????????????????????????????");
