@@ -237,13 +237,37 @@ namespace Azure.AI.Details.Common.CLI
             }
 
             Console.WriteLine($"\rName: {choices[picked]}");
-            if (picked == 0) ThrowNotImplementedApplicationException("CREATE AI RESOURCE");
+            var resource = picked > 0 ? items.ToArray()[picked - 1] : null;
+            if (picked == 0)
+            {
+                var resourceJson = await TryCreateHubInteractive();
+                resource = JToken.Parse(resourceJson);
+            }
 
-            var resource = items.ToArray()[picked - 1];
-            _values.Reset("service.resource.name", choices[picked]);
+            _values.Reset("service.resource.name", resource["name"].Value<string>());
             _values.Reset("service.resource.id", resource["id"].Value<string>());
             _values.Reset("service.resource.group.name", resource["resource_group"].Value<string>());
             _values.Reset("service.region.location", resource["location"].Value<string>());
+        }
+
+        private async Task<string> TryCreateHubInteractive()
+        {
+            ConsoleHelpers.WriteLineWithHighlight($"\n`CREATE AZURE AI RESOURCE`\n");
+
+            var subscription = _values.GetOrDefault("init.service.subscription", "");
+            var location = await AzCliConsoleGui.PickRegionLocationAsync(true, null, false);
+            var group = await AzCliConsoleGui.PickOrCreateResourceGroup(true, subscription, location.Name);
+            var name = DemandAskPrompt("Name: ");
+            var displayName = _values.Get("service.resource.display.name", true) ?? name;
+            var description = _values.Get("service.resource.description", true) ?? name;
+
+            Console.Write("*** CREATING ***");
+            var json = PythonSDKWrapper.CreateResource(_values, subscription, group.Name, name, location.Name, displayName, description);
+
+            Console.WriteLine("\r*** CREATED ***  ");
+
+            var parsed = !string.IsNullOrEmpty(json) ? JToken.Parse(json) : null;
+            return parsed["hub"].ToString();
         }
 
         private async Task DoInitProject(bool interactive)
@@ -262,12 +286,15 @@ namespace Azure.AI.Details.Common.CLI
             var items = parsed?.Type == JTokenType.Object ? parsed["projects"] : new JArray();
 
             var choices = new List<string>();
+            var itemJTokens = new List<JToken>();
             foreach (var item in items)
             {
                 var hub = item["workspace_hub"]?.Value<string>();
 
                 var hubOk = !string.IsNullOrEmpty(hub) && hub == resourceId;
                 if (!hubOk) continue;
+
+                itemJTokens.Add(item);
 
                 var name = item["name"].Value<string>();
                 var location = item["location"].Value<string>();
@@ -292,17 +319,18 @@ namespace Azure.AI.Details.Common.CLI
             }
 
             Console.WriteLine($"\rProject: {choices[picked]}");
+            var project = picked > 0 ? itemJTokens[picked - 1] : null;
             if (picked == 0)
             {
-                TryCreateProjectInteractive();
-                // ThrowNotImplementedApplicationException("CREATE AI PROJECT");
+                var projectJson = TryCreateProjectInteractive();
+                project = JToken.Parse(projectJson);
             } 
 
-            // var resource = resources.ToArray()[picked - 1];
-            // ConfigSearchResource(resource.Endpoint, "????????????????????????????????");
+            _values.Reset("service.project.name", project["name"].Value<string>());
+            _values.Reset("service.project.id", project["id"].Value<string>());
         }
 
-        private void TryCreateProjectInteractive()
+        private string TryCreateProjectInteractive()
         {
             ConsoleHelpers.WriteLineWithHighlight($"\n`CREATE AZURE AI PROJECT`\n");
 
@@ -312,14 +340,16 @@ namespace Azure.AI.Details.Common.CLI
             var location = _values.GetOrDefault("service.region.location", "");
 
             var name = DemandAskPrompt("Name: ");
+            var displayName = _values.Get("service.project.display.name", true) ?? name;
+            var description = _values.Get("service.project.description", true) ?? name;
 
             Console.Write("*** CREATING ***");
-            var projectJson = PythonSDKWrapper.CreateProject(_values, subscription, group, resourceId, name, location);
+            var json = PythonSDKWrapper.CreateProject(_values, subscription, group, resourceId, name, location, displayName, description);
 
             Console.WriteLine("\r*** CREATED ***  ");
 
-            // ThrowNotImplementedButStartedApplicationException(); // TODO: Finish
-
+            var parsed = !string.IsNullOrEmpty(json) ? JToken.Parse(json) : null;
+            return parsed["project"].ToString();
         }
 
         private void DisplayInitServiceBanner()
