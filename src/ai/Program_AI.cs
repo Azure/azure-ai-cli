@@ -21,6 +21,7 @@ namespace Azure.AI.Details.Common.CLI
         public const string Name = "ai";
         public const string DisplayName = "Azure AI CLI";
         public const string WarningBanner = "`#e_;This PRIVATE PREVIEW version may change at any time.\nSee: https://aka.ms/azure-ai-cli-private-preview";
+        public const string TelemetryUserAgent = "ai-cli 0.0.1";
         #endregion
 
         #region assembly data

@@ -4,6 +4,7 @@
 //
 
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
@@ -33,24 +34,29 @@ namespace Azure.AI.Details.Common.CLI
                         : null;
         }
 
-        public static Process StartProcess(string fileName, string arguments)
+        public static Process StartProcess(string fileName, string arguments, Dictionary<string, string> addToEnvironment = null)
         {
             var start = new ProcessStartInfo(fileName, arguments);
             start.UseShellExecute = false;
             start.RedirectStandardOutput = true;
             start.RedirectStandardError = true;
 
+            foreach (var kvp in addToEnvironment)
+            {
+                start.EnvironmentVariables[kvp.Key] = kvp.Value;
+            }
+
             return Process.Start(start);
         }
 
-        public static async Task<(int, string)> RunShellCommandAsync(string command, string arguments)
+        public static async Task<(int, string)> RunShellCommandAsync(string command, string arguments, Dictionary<string, string> addToEnvironment = null)
         {
             var output = new StringBuilder();
             var outputReceived = (object sender, DataReceivedEventArgs e) => {
                 output.AppendLine(e.Data ?? "");
             };
 
-            var process = TryCatchHelpers.TryCatchNoThrow<Process>(() => StartShellCommandProcess(command, arguments), null, out Exception processException);
+            var process = TryCatchHelpers.TryCatchNoThrow<Process>(() => StartShellCommandProcess(command, arguments, addToEnvironment), null, out Exception processException);
             process.OutputDataReceived += (sender, e) => outputReceived(sender, e);
             process.ErrorDataReceived += (sender, e) => outputReceived(sender, e);
 
@@ -62,10 +68,10 @@ namespace Azure.AI.Details.Common.CLI
             return (process.ExitCode, output.ToString());
         }
 
-        public static async Task<ProcessResponse<T>> ParseShellCommandJson<T>(string command, string arguments) where T : JToken, new()
+        public static async Task<ProcessResponse<T>> ParseShellCommandJson<T>(string command, string arguments, Dictionary<string, string> addToEnvironment = null) where T : JToken, new()
         {
-            if (Program.Debug) Console.WriteLine($"COMMAND: {command} {arguments}");
-            var process = TryCatchHelpers.TryCatchNoThrow<Process>(() => StartShellCommandProcess(command, arguments), null, out Exception processException);
+            if (Program.Debug) Console.WriteLine($"COMMAND: {command} {arguments} {addToEnvironment}");
+            var process = TryCatchHelpers.TryCatchNoThrow<Process>(() => StartShellCommandProcess(command, arguments, addToEnvironment), null, out Exception processException);
 
             var response = new ProcessResponse<T>();
             response.StdOutput = process != null ? await process.StandardOutput.ReadToEndAsync() : "";
@@ -83,12 +89,12 @@ namespace Azure.AI.Details.Common.CLI
             return response;
         }
 
-        private static Process StartShellCommandProcess(string command, string arguments)
+        private static Process StartShellCommandProcess(string command, string arguments, Dictionary<string, string> addToEnvironment = null)
         {
             var isWindows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
             return  isWindows
-                ? StartProcess("cmd", $"/c {command} {arguments}")
-                : StartProcess(command,  arguments);
+                ? StartProcess("cmd", $"/c {command} {arguments}", addToEnvironment)
+                : StartProcess(command,  arguments, addToEnvironment);
         }
     }
 }
