@@ -8,6 +8,8 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Collections.Generic;
@@ -279,6 +281,7 @@ namespace Azure.AI.Details.Common.CLI
 
             var subscription = _values.GetOrDefault("init.service.subscription", "");
             var resourceId = _values.GetOrDefault("service.resource.id", null);
+            var groupName = _values.GetOrDefault("service.resource.group.name", null);
 
             var json = PythonSDKWrapper.ListProjects(_values, subscription);
             if (Program.Debug) Console.WriteLine(json);
@@ -327,8 +330,27 @@ namespace Azure.AI.Details.Common.CLI
                 project = JToken.Parse(projectJson);
             } 
 
-            _values.Reset("service.project.name", project["name"].Value<string>());
-            _values.Reset("service.project.id", project["id"].Value<string>());
+            var projectName = project["name"].Value<string>();
+            var projectId = project["id"].Value<string>();
+
+            _values.Reset("service.project.name", projectName);
+            _values.Reset("service.project.id", projectId);
+
+            dynamic configJsonData = new
+            {
+                subscription_id = subscription,
+                resource_group = groupName,
+                project_name = projectName,
+            };
+
+            ConsoleHelpers.WriteLineWithHighlight($"\n`AZURE AI PROJECT CONFIG`\n");
+
+            var configJson = JsonSerializer.Serialize(configJsonData, new JsonSerializerOptions { WriteIndented = true });
+            var configJsonFile = new FileInfo("config.json");
+            File.WriteAllText(configJsonFile.FullName, configJson);
+
+            Console.WriteLine($"{configJsonFile.Name} (saved at {configJsonFile.Directory})\n");
+            Console.WriteLine("  " + configJson.Replace("\n", "\n  "));
         }
 
         private string TryCreateProjectInteractive()
