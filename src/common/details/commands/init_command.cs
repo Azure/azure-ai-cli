@@ -147,7 +147,7 @@ namespace Azure.AI.Details.Common.CLI
                 throw new ApplicationException($"ERROR: Listing search resources\n  {output}");
             }
 
-            var resources = response.Payload.OrderBy(x => x.Name);
+            var resources = response.Payload.OrderBy(x => x.Name).ToList();
             var choices = resources.Select(x => $"{x.Name} ({x.RegionLocation})").ToList();
             choices.Insert(0, "(Create new)");
 
@@ -164,22 +164,22 @@ namespace Azure.AI.Details.Common.CLI
             }
 
             Console.WriteLine($"\rName: {choices[picked]}");
+            var resource = picked > 0 ? resources[picked - 1] : new AzCli.CognitiveSearchResourceInfo();
             if (picked == 0)
             {
-                await TryCreateSearchInteractive();
-                ThrowNotImplementedButStartedApplicationException(); // Need to fix up `resource` picked so that ConfigSearchResource works
+                resource = await TryCreateSearchInteractive();
+                // ThrowNotImplementedButStartedApplicationException(); // Need to fix up `resource` picked so that ConfigSearchResource works
             }
 
-            var resource = resources.ToArray()[picked - 1];
             ConfigSearchResource(resource.Endpoint, "????????????????????????????????");
         }
 
-        private async Task TryCreateSearchInteractive()
+        private async Task<AzCli.CognitiveSearchResourceInfo> TryCreateSearchInteractive()
         {
             ConsoleHelpers.WriteLineWithHighlight($"\n`CREATE COGNITIVE SEARCH RESOURCE`\n");
 
             var subscription = _values.GetOrDefault("init.service.subscription", "");
-            var location = await AzCliConsoleGui.PickRegionLocationAsync(true, null, true);
+            var location = await AzCliConsoleGui.PickRegionLocationAsync(true, null, false);
             var group = await AzCliConsoleGui.PickOrCreateResourceGroup(true, subscription, location.Name);
             var name = DemandAskPrompt("Name: ");
 
@@ -194,8 +194,7 @@ namespace Azure.AI.Details.Common.CLI
             }
 
             Console.WriteLine("\r*** CREATED ***  ");
-
-            // ThrowNotImplementedButStartedApplicationException(); // TODO: Finish
+            return response.Payload;
         }
 
         private async Task DoInitHub(bool interactive)
