@@ -60,10 +60,10 @@ namespace Azure.AI.Details.Common.CLI
             switch (command)
             {
                 case "init": await DoInitService(interactive); break;
-                case "init.openai": await DoInitServiceParts(interactive, 0, 0); break;
-                case "init.search": await DoInitServiceParts(interactive, 0, 1); break;
-                case "init.resource": await DoInitServiceParts(interactive, 0, 3); break;
-                case "init.project": await DoInitServiceParts(interactive, 0, 2); break;
+                case "init.openai": await DoInitServiceParts(interactive, "openai"); break;
+                case "init.search": await DoInitServiceParts(interactive, "openai", "search"); break;
+                case "init.resource": await DoInitServiceParts(interactive, "resource"); break;
+                case "init.project": await DoInitServiceParts(interactive, "openai", "search", "resource", "project"); break;
             }
         }
 
@@ -77,8 +77,16 @@ namespace Azure.AI.Details.Common.CLI
         {
             Console.Write("Initialize: ");
 
-            var choices = new string[] { "Azure OpenAI", "Azure AI Project", "Azure AI Resource", "Azure Cognitive Search" };
-            var choices2 = new string[] { "openai", "search", "resource", "project" };
+            var choiceLookup = new Dictionary<string, string>
+            {
+                ["Azure OpenAI"] = "openai",
+                ["Azure OpenAI + Cognitive Search"] = "openai;search",
+                ["Azure AI Project"] = "resource;project",
+                ["Azure AI Project + OpenAI"] = "openai;resource;project",
+                ["Azure AI Project + OpenAI + Cognitive Search"] = "openai;search;resource;project",
+            };
+
+            var choices = choiceLookup.Keys.ToArray();
 
             var normal = new Colors(ConsoleColor.White, ConsoleColor.Blue);
             var selected = new Colors(ConsoleColor.White, ConsoleColor.Red);
@@ -91,27 +99,26 @@ namespace Azure.AI.Details.Common.CLI
                 return;
             }
     
-            var choice = string.Join(" + ", choices.Take(picked + 1).Select(x => x.Trim()));
+            var choice = choices[picked];
             Console.WriteLine($"\rInitialize: {choice}");
 
-            picked = picked switch
-            {
-                0 => 0,
-                1 => 4,
-                2 => 3,
-                3 => 2,
-                _ => throw new NotImplementedException()
-            };
-
-            await DoInitServiceParts(true, 0, picked);
+            await DoInitServiceParts(true, choiceLookup[choice].Split(';', StringSplitOptions.RemoveEmptyEntries));
         }
 
-        private async Task DoInitServiceParts(bool interactive, int startWith, int stopWith)
+        private async Task DoInitServiceParts(bool interactive, params string[] operations)
         {
-            if (startWith <= 0 && stopWith >= 0) await DoInitOpenAi(interactive);
-            if (startWith <= 1 && stopWith >= 1) await DoInitSearch(interactive);
-            if (startWith <= 2 && stopWith >= 2) await DoInitHub(interactive);
-            if (startWith <= 3 && stopWith >= 3) await DoInitProject(interactive);
+            foreach (var operation in operations)
+            {
+                var task = operation switch
+                {
+                    "openai" => DoInitOpenAi(interactive),
+                    "search" => DoInitSearch(interactive),
+                    "resource" => DoInitHub(interactive),
+                    "project" => DoInitProject(interactive),
+                    _ => throw new ApplicationException($"WARNING: NOT YET IMPLEMENTED")
+                };
+                await task;
+            }
         }
 
         private async Task DoInitOpenAi(bool interactive)
@@ -206,10 +213,15 @@ namespace Azure.AI.Details.Common.CLI
         {
             if (!interactive) ThrowInteractiveNotSupportedApplicationException(); // TODO: Add back non-interactive mode support
 
+            var subscription = _values.GetOrDefault("init.service.subscription", "");
+            if (string.IsNullOrEmpty(subscription))
+            {
+                subscription = await AzCliConsoleGui.PickSubscriptionIdAsync(interactive);
+                _values.Reset("init.service.subscription", subscription);
+            }
+
             ConsoleHelpers.WriteLineWithHighlight($"\n`AZURE AI RESOURCE`\n");
             Console.Write("\rName: *** Loading choices ***");
-
-            var subscription = _values.GetOrDefault("init.service.subscription", "");
 
             var json = PythonSDKWrapper.ListResources(_values, subscription);
             if (Program.Debug) Console.WriteLine(json);
@@ -339,29 +351,39 @@ namespace Azure.AI.Details.Common.CLI
 
             _values.Reset("service.project.name", projectName);
             _values.Reset("service.project.id", projectId);
-           
-            ConsoleHelpers.WriteLineWithHighlight($"\n`AZURE AI PROJECT CONNECTIONS`\n");
 
             var openAiEndpoint = _values.GetOrDefault("service.openai.endpoint", null);
             var openAiKey = _values.GetOrDefault("service.openai.key", null);
-
-            var connectionName = "Azure-OpenAI"; // "Default_AzureOpenAI"; // TODO: when AIClient/service allows, change this back to Default_AzureOpenAI
-            Console.WriteLine($"Connection: {connectionName}");
-            Console.Write("*** CREATING ***");
-            var connectionType = "azure_open_ai";
-            var connectionJson = PythonSDKWrapper.CreateConnection(_values, subscription, groupName, projectName, connectionName, connectionType, openAiEndpoint, openAiKey);
-            Console.WriteLine("\r*** CREATED ***  ");
-            Console.WriteLine();
+            var openAiOk = !string.IsNullOrEmpty(openAiEndpoint) && !string.IsNullOrEmpty(openAiKey);
 
             var searchEndpoint = _values.GetOrDefault("service.search.endpoint", null);
             var searchKey = _values.GetOrDefault("service.search.key", null);
+            var searchOk = !string.IsNullOrEmpty(searchEndpoint) && !string.IsNullOrEmpty(searchKey);
 
-            connectionName = "Default_CognitiveSearch";
-            Console.WriteLine($"Connection: {connectionName}");
-            Console.Write("*** CREATING ***");
-            connectionType = "cognitive_search";
-            connectionJson = PythonSDKWrapper.CreateConnection(_values, subscription, groupName, projectName, connectionName, connectionType, searchEndpoint, searchKey);
-            Console.WriteLine("\r*** CREATED ***  ");
+            var connectionsOk = openAiOk || searchOk;
+            if (connectionsOk) ConsoleHelpers.WriteLineWithHighlight($"\n`AZURE AI PROJECT CONNECTIONS`\n");
+
+            if (openAiOk)
+            {
+                var connectionName = "Default-AzureOpenAI"; // "Default_AzureOpenAI"; // TODO: when AIClient/service allows, change this back to Default_AzureOpenAI
+                Console.WriteLine($"Connection: {connectionName}");
+                Console.Write("*** CREATING ***");
+                var connectionType = "azure_open_ai";
+                var connectionJson = PythonSDKWrapper.CreateConnection(_values, subscription, groupName, projectName, connectionName, connectionType, openAiEndpoint, openAiKey);
+                Console.WriteLine("\r*** CREATED ***  ");
+            }
+
+            if (openAiOk && searchOk) Console.WriteLine();
+
+            if (searchOk)
+            {
+                var connectionName = "Default_CognitiveSearch";
+                Console.WriteLine($"Connection: {connectionName}");
+                Console.Write("*** CREATING ***");
+                var connectionType = "cognitive_search";
+                var connectionJson = PythonSDKWrapper.CreateConnection(_values, subscription, groupName, projectName, connectionName, connectionType, searchEndpoint, searchKey);
+                Console.WriteLine("\r*** CREATED ***  ");
+            }
 
             ConsoleHelpers.WriteLineWithHighlight($"\n`AZURE AI PROJECT CONFIG`\n");
 
