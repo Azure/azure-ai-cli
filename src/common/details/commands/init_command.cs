@@ -340,7 +340,7 @@ namespace Azure.AI.Details.Common.CLI
             var openAiEndpoint = _values.GetOrDefault("service.openai.endpoint", null);
             var openAiKey = _values.GetOrDefault("service.openai.key", null);
 
-            var connectionJson = PythonSDKWrapper.CreateConnection(_values, subscription, groupName, projectName, "Default_AzureOpenAI", "azure_open_ai", openAiEndpoint, openAiKey);
+            var connectionJson = PythonSDKWrapper.CreateConnection(_values, subscription, groupName, projectName, "Default_AzureOpenAI-cli", "azure_open_ai", openAiEndpoint, openAiKey);
 
             dynamic configJsonData = new
             {
