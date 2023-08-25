@@ -73,6 +73,12 @@ namespace Azure.AI.Details.Common.CLI
             public string Endpoint;
         }
 
+        public struct CognitiveSearchKeyInfo
+        {
+            public string Key1;
+            public string Key2;
+        }
+
         private static Dictionary<string, string> GetAzureHttpUserAgentEnvironment()
         {
             var dict = new Dictionary<string, string>();
@@ -365,6 +371,27 @@ namespace Azure.AI.Details.Common.CLI
                 Group = resource?["resourceGroup"]?.Value<string>(),
                 RegionLocation = resource?["location"]?.Value<string>(),
                 Endpoint = $"https://{name}.search.windows.net"             // TODO: Need to find official way of getting this
+            };
+
+            return x;
+        }
+
+        public static async Task<ProcessResponse<CognitiveSearchKeyInfo>> ListSearchAdminKeys(string subscriptionId, string group, string name)
+        {
+            var cmdPart = "search admin-key show";
+            var subPart = subscriptionId != null ? $"--subscription {subscriptionId}" : "";
+
+            var process = await ProcessHelpers.ParseShellCommandJson<JObject>("az", $"{cmdPart} {subPart} -g {group} --service-name {name}", GetAzureHttpUserAgentEnvironment());
+
+            var x = new ProcessResponse<CognitiveSearchKeyInfo>();
+            x.StdOutput = process.StdOutput;
+            x.StdError = process.StdError;
+
+            var keys = process.Payload;
+            x.Payload = new CognitiveSearchKeyInfo()
+            {
+                Key1 = keys?["primaryKey"]?.Value<string>(),
+                Key2 = keys?["secondaryKey"]?.Value<string>()
             };
 
             return x;

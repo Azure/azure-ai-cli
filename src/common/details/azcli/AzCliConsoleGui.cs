@@ -49,6 +49,19 @@ namespace Azure.AI.Details.Common.CLI
             return AiResourcePicker.LoadCognitiveServicesResourceKeys(subscriptionId, resource);
         }
 
+        public static async Task<AzCli.CognitiveSearchKeyInfo> LoadSearchResourceKeys(string subscriptionId, AzCli.CognitiveSearchResourceInfo resource)
+        {
+            ConsoleHelpers.WriteLineWithHighlight($"\n`COGNITIVE SEARCH RESOURCE KEYS`");
+
+            Console.Write("Keys: *** Loading ***");
+            var keys = await AzCli.ListSearchAdminKeys(subscriptionId, resource.Group, resource.Name);
+
+            Console.Write("\r");
+            Console.WriteLine($"Key1: {keys.Payload.Key1.Substring(0, 4)}****************************");
+            Console.WriteLine($"Key2: {keys.Payload.Key2.Substring(0, 4)}****************************");
+            return keys.Payload;
+        }
+
         private static string AskPrompt(string prompt, string value = null, bool useEditBox = false)
         {
             Console.Write(prompt);

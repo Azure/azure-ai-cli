@@ -172,12 +172,11 @@ namespace Azure.AI.Details.Common.CLI
                 resource = await TryCreateSearchInteractive();
             }
 
-            var key = "????????????????????????????????"; // TODO: Get the real key
-            ConfigSearchResource(resource.Endpoint, key);
+            var keys = await AzCliConsoleGui.LoadSearchResourceKeys(subscription, resource);
+            ConfigSearchResource(resource.Endpoint, keys.Key1);
 
             _values.Reset("service.search.endpoint", resource.Endpoint);
-            _values.Reset("service.search.key", key);
-
+            _values.Reset("service.search.key", keys.Key1);
         }
 
         private async Task<AzCli.CognitiveSearchResourceInfo> TryCreateSearchInteractive()
@@ -346,7 +345,7 @@ namespace Azure.AI.Details.Common.CLI
             var openAiEndpoint = _values.GetOrDefault("service.openai.endpoint", null);
             var openAiKey = _values.GetOrDefault("service.openai.key", null);
 
-            var connectionName = "Azure-OpenAI";
+            var connectionName = "Azure-OpenAI"; // "Default_AzureOpenAI"; // TODO: when AIClient/service allows, change this back to Default_AzureOpenAI
             Console.WriteLine($"Connection: {connectionName}");
             Console.Write("*** CREATING ***");
             var connectionType = "azure_open_ai";

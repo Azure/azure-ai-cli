@@ -1,5 +1,7 @@
 import argparse
 import json
+import time
+from datetime import datetime, timedelta
 from azure.ai.generative import AIClient
 from azure.ai.generative.entities import Connection
 from azure.ai.ml.entities._credentials import ApiKeyConfiguration
@@ -34,7 +36,7 @@ def create_api_key_connection(subscription_id, resource_group_name, project_name
     }
 
     print(result);
-    return result;
+    return result
 
 def main():
     """Parse command line arguments and create api key connection."""
@@ -56,11 +58,25 @@ def main():
     endpoint = args.endpoint
     key = args.key
 
-    connection = create_api_key_connection(subscription_id, resource_group_name, project_name, connection_name, connection_type, endpoint, key)
-    formatted = json.dumps({"connection": connection}, indent=2)
+    start_time = datetime.now()
+    timeout = timedelta(minutes=2)
+    success = False
 
-    print("---")
-    print(formatted)
+    while datetime.now() - start_time < timeout:
+        try:
+            connection = create_api_key_connection(subscription_id, resource_group_name, project_name, connection_name, connection_type, endpoint, key)
+            if connection is not None:
+                success = True
+                break
+        except Exception as e:
+            print("An error occurred:", str(e))
+        
+        time.sleep(1)  # Wait for 1 second before the next attempt
+    
+    if success:
+        formatted = json.dumps({"connection": connection}, indent=2)
+        print("---")
+        print(formatted)
 
 if __name__ == "__main__":
     main()
