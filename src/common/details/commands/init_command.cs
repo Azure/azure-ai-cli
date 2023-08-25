@@ -170,10 +170,14 @@ namespace Azure.AI.Details.Common.CLI
             if (picked == 0)
             {
                 resource = await TryCreateSearchInteractive();
-                // ThrowNotImplementedButStartedApplicationException(); // Need to fix up `resource` picked so that ConfigSearchResource works
             }
 
-            ConfigSearchResource(resource.Endpoint, "????????????????????????????????");
+            var key = "????????????????????????????????"; // TODO: Get the real key
+            ConfigSearchResource(resource.Endpoint, key);
+
+            _values.Reset("service.search.endpoint", resource.Endpoint);
+            _values.Reset("service.search.key", key);
+
         }
 
         private async Task<AzCli.CognitiveSearchResourceInfo> TryCreateSearchInteractive()
@@ -336,11 +340,31 @@ namespace Azure.AI.Details.Common.CLI
 
             _values.Reset("service.project.name", projectName);
             _values.Reset("service.project.id", projectId);
+           
+            ConsoleHelpers.WriteLineWithHighlight($"\n`AZURE AI PROJECT CONNECTIONS`\n");
 
             var openAiEndpoint = _values.GetOrDefault("service.openai.endpoint", null);
             var openAiKey = _values.GetOrDefault("service.openai.key", null);
 
-            var connectionJson = PythonSDKWrapper.CreateConnection(_values, subscription, groupName, projectName, "Azure-OpenAI", "azure_open_ai", openAiEndpoint, openAiKey);
+            var connectionName = "Azure-OpenAI";
+            Console.WriteLine($"Connection: {connectionName}");
+            Console.Write("*** CREATING ***");
+            var connectionType = "azure_open_ai";
+            var connectionJson = PythonSDKWrapper.CreateConnection(_values, subscription, groupName, projectName, connectionName, connectionType, openAiEndpoint, openAiKey);
+            Console.WriteLine("\r*** CREATED ***  ");
+            Console.WriteLine();
+
+            var searchEndpoint = _values.GetOrDefault("service.search.endpoint", null);
+            var searchKey = _values.GetOrDefault("service.search.key", null);
+
+            connectionName = "Default_CognitiveSearch";
+            Console.WriteLine($"Connection: {connectionName}");
+            Console.Write("*** CREATING ***");
+            connectionType = "cognitive_search";
+            connectionJson = PythonSDKWrapper.CreateConnection(_values, subscription, groupName, projectName, connectionName, connectionType, searchEndpoint, searchKey);
+            Console.WriteLine("\r*** CREATED ***  ");
+
+            ConsoleHelpers.WriteLineWithHighlight($"\n`AZURE AI PROJECT CONFIG`\n");
 
             dynamic configJsonData = new
             {
@@ -348,8 +372,6 @@ namespace Azure.AI.Details.Common.CLI
                 resource_group = groupName,
                 project_name = projectName,
             };
-
-            ConsoleHelpers.WriteLineWithHighlight($"\n`AZURE AI PROJECT CONFIG`\n");
 
             var configJson = JsonSerializer.Serialize(configJsonData, new JsonSerializerOptions { WriteIndented = true });
             var configJsonFile = new FileInfo("config.json");
