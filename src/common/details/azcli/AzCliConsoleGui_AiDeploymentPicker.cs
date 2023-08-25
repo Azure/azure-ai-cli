@@ -15,16 +15,16 @@ namespace Azure.AI.Details.Common.CLI
     {
         public class AiResourceDeploymentPicker
         {
-            public static async Task<AzCli.CognitiveServicesDeploymentInfo> PickOrCreateDeployment(bool interactive, string subscriptionId, AzCli.CognitiveServicesResourceInfo resource, string deploymentFilter)
+            public static async Task<AzCli.CognitiveServicesDeploymentInfo> PickOrCreateDeployment(bool interactive, string deploymentExtra, string subscriptionId, AzCli.CognitiveServicesResourceInfo resource, string deploymentFilter)
             {
                var createNewItem = !string.IsNullOrEmpty(deploymentFilter)
                    ? $"(Create `{deploymentFilter}`)"
                    : interactive ? "(Create new)" : null;
 
-               (var deployment, var error) = await FindDeployment(interactive, subscriptionId, resource, deploymentFilter, createNewItem);
+               (var deployment, var error) = await FindDeployment(interactive, deploymentExtra, subscriptionId, resource, deploymentFilter, createNewItem);
                if (deployment != null && deployment.Value.Name == null)
                {
-                   (deployment, error) = await TryCreateDeployment(interactive, subscriptionId, resource, deploymentFilter);
+                   (deployment, error) = await TryCreateDeployment(interactive, deploymentExtra, subscriptionId, resource, deploymentFilter);
                }
 
                if (deployment == null && error != null)
@@ -39,14 +39,14 @@ namespace Azure.AI.Details.Common.CLI
                return deployment.Value;
             }
 
-            public static async Task<(AzCli.CognitiveServicesDeploymentInfo? Deployment, string Error)> FindDeployment(bool interactive, string subscriptionId, AzCli.CognitiveServicesResourceInfo resource, string deploymentFilter, string allowCreateDeploymentOption)
+            public static async Task<(AzCli.CognitiveServicesDeploymentInfo? Deployment, string Error)> FindDeployment(bool interactive, string deploymentExtra, string subscriptionId, AzCli.CognitiveServicesResourceInfo resource, string deploymentFilter, string allowCreateDeploymentOption)
             {
                 var allowCreateDeployment = !string.IsNullOrEmpty(allowCreateDeploymentOption);
 
-                Console.Write("Deployment: *** Loading choices ***");
+                Console.Write($"Deployment ({deploymentExtra}): *** Loading choices ***");
                 var response = await AzCli.ListCognitiveServicesDeployments(subscriptionId, resource.Group, resource.Name, "OpenAI");
 
-                Console.Write($"\rDeployment: ");
+                Console.Write($"\rDeployment ({deploymentExtra}): ");
                 if (string.IsNullOrEmpty(response.StdOutput) && !string.IsNullOrEmpty(response.StdError))
                 {
                     ConsoleHelpers.WriteLineError($"ERROR: Loading Cognitive Services resources: {response.StdError}");
@@ -93,9 +93,9 @@ namespace Azure.AI.Details.Common.CLI
                     : (null, null);
             }
 
-            public static async Task<(AzCli.CognitiveServicesDeploymentInfo? Deployment, string Error)> TryCreateDeployment(bool interactive, string subscriptionId, AzCli.CognitiveServicesResourceInfo resource, string deploymentName)
+            public static async Task<(AzCli.CognitiveServicesDeploymentInfo? Deployment, string Error)> TryCreateDeployment(bool interactive, string deploymentExtra, string subscriptionId, AzCli.CognitiveServicesResourceInfo resource, string deploymentName)
             {
-                ConsoleHelpers.WriteLineWithHighlight($"\n`CREATE DEPLOYMENT`");
+                ConsoleHelpers.WriteLineWithHighlight($"\n`CREATE DEPLOYMENT ({deploymentExtra.ToUpper()})`");
 
                 var normal = new Colors(ConsoleColor.White, ConsoleColor.Blue);
                 var selected = new Colors(ConsoleColor.White, ConsoleColor.Red);

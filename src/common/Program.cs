@@ -123,7 +123,7 @@ namespace Azure.AI.Details.Common.CLI
             if (values.GetOrDefault("x.cls", false)) Console.Clear();
 
             Console.WriteLine(GetDisplayBannerText());
-            Console.WriteLine("Copyright (c) 2022 Microsoft Corporation. All Rights Reserved.");
+            Console.WriteLine("Copyright (c) 2023 Microsoft Corporation. All Rights Reserved.");
             Console.WriteLine("");
 
             var warning = Program.WarningBanner;
