@@ -136,16 +136,19 @@ namespace Azure.AI.Details.Common.CLI
             ConsoleHelpers.WriteLineWithHighlight($"\n`{Program.SERVICE_RESOURCE_DISPLAY_NAME_ALL_CAPS}`");
             var regionLocation = new AzCli.AccountRegionLocationInfo(); // await AzCliConsoleGui.PickRegionLocationAsync(interactive, regionFilter);
             var resource = await AzCliConsoleGui.PickOrCreateCognitiveResource(interactive, subscriptionId, regionLocation.Name, groupFilter, resourceFilter, kind, sku, yes);
-
-            var deployment = await AzCliConsoleGui.AiResourceDeploymentPicker.PickOrCreateDeployment(interactive, "Chat", subscriptionId, resource, null);
             var region = resource.RegionLocation;
             var endpoint = resource.Endpoint;
-            var chatDeployment = deployment.Name;
+
+            var deployment = await AzCliConsoleGui.AiResourceDeploymentPicker.PickOrCreateDeployment(interactive, "Chat", subscriptionId, resource, null);
+            var chatDeploymentName = deployment.Name;
+
+            var embeddingsDeployment = await AzCliConsoleGui.AiResourceDeploymentPicker.PickOrCreateDeployment(interactive, "Embeddings", subscriptionId, resource, null);
+            var embeddingsDeploymentName = embeddingsDeployment.Name;
 
             var keys = await AzCliConsoleGui.LoadCognitiveServicesResourceKeys(subscriptionId, resource);
             var key = keys.Key1;
 
-            ConfigServiceResource(subscriptionId, region, endpoint, chatDeployment, key);
+            ConfigServiceResource(subscriptionId, region, endpoint, chatDeploymentName, key);
 
             _values.Reset("init.service.subscription", subscriptionId);
             _values.Reset("service.openai.endpoint", endpoint);
