@@ -167,6 +167,9 @@ namespace Azure.AI.Details.Common.CLI
 
                 if (hasP0) picked--;
                 Console.WriteLine($"{resources[picked].Name}");
+                Console.WriteLine($"Group: {resources[picked].Group}");
+                Console.WriteLine($"Region: {resources[picked].RegionLocation}");
+                
                 return (resources[picked], null);
             }
 

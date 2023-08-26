@@ -140,8 +140,12 @@ namespace Azure.AI.Details.Common.CLI
             var endpoint = resource.Endpoint;
             var id = resource.Id;
 
+            Console.WriteLine();
+
             var deployment = await AzCliConsoleGui.AiResourceDeploymentPicker.PickOrCreateDeployment(interactive, "Chat", subscriptionId, resource, null);
             var chatDeploymentName = deployment.Name;
+
+            Console.WriteLine();
 
             var embeddingsDeployment = await AzCliConsoleGui.AiResourceDeploymentPicker.PickOrCreateDeployment(interactive, "Embeddings", subscriptionId, resource, null);
             var embeddingsDeploymentName = embeddingsDeployment.Name;
@@ -307,15 +311,23 @@ namespace Azure.AI.Details.Common.CLI
             var locationName = _values.GetOrDefault("service.resource.region.name", "");
             var groupName = _values.GetOrDefault("service.resource.group.name", "");
 
-            var location = await AzCliConsoleGui.PickRegionLocationAsync(true, locationName, false);
-            var group = await AzCliConsoleGui.PickOrCreateResourceGroup(true, subscription, location.Name, groupName);
+            var groupOk = !string.IsNullOrEmpty(groupName);
+            if (!groupOk)
+            {
+                var location =  await AzCliConsoleGui.PickRegionLocationAsync(true, locationName, false);
+                locationName = location.Name;
+            }
+
+            var group = await AzCliConsoleGui.PickOrCreateResourceGroup(true, subscription, groupOk ? null : locationName, groupName);
+            groupName = group.Name;
+
             var name = DemandAskPrompt("Name: ");
 
             var displayName = _values.Get("service.resource.display.name", true) ?? name;
             var description = _values.Get("service.resource.description", true) ?? name;
 
             Console.Write("*** CREATING ***");
-            var json = PythonSDKWrapper.CreateResource(_values, subscription, group.Name, name, location.Name, displayName, description);
+            var json = PythonSDKWrapper.CreateResource(_values, subscription, groupName, name, locationName, displayName, description);
 
             Console.WriteLine("\r*** CREATED ***  ");
 
