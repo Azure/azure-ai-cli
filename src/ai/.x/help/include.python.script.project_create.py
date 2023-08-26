@@ -13,8 +13,6 @@ def create_project(subscription_id, resource_id, resource_group_name, project_na
         user_agent="ai-cli 0.0.1"
     )
 
-    # TODO: how to pass openai_resource_id in BYO openai resource scenario
-
     project = Workspace(
         name=project_name,
         location=location,
@@ -23,7 +21,7 @@ def create_project(subscription_id, resource_id, resource_group_name, project_na
         workspace_hub=resource_id
     )
 
-    result = ml_client.workspaces.begin_create(project).result()
+    result = ml_client.workspaces.begin_create(project, byo_open_ai_resource_id=openai_resource_id).result()
     return result._to_dict()
 
 def main():
