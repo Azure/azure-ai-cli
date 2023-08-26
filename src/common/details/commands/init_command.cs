@@ -214,12 +214,20 @@ namespace Azure.AI.Details.Common.CLI
             var locationName = _values.GetOrDefault("service.resource.region.name", "");
             var groupName = _values.GetOrDefault("service.resource.group.name", "");
 
-            var location = await AzCliConsoleGui.PickRegionLocationAsync(true, locationName, false);
-            var group = await AzCliConsoleGui.PickOrCreateResourceGroup(true, subscription, location.Name, groupName);
+            var groupOk = !string.IsNullOrEmpty(groupName);
+            if (!groupOk)
+            {
+                var location =  await AzCliConsoleGui.PickRegionLocationAsync(true, locationName, false);
+                locationName = location.Name;
+            }
+            
+            var group = await AzCliConsoleGui.PickOrCreateResourceGroup(true, subscription, groupOk ? null : locationName, groupName);
+            groupName = group.Name;
+            
             var name = DemandAskPrompt("Name: ");
 
             Console.Write("*** CREATING ***");
-            var response = await AzCli.CreateSearchResource(subscription, group.Name, location.Name, name);
+            var response = await AzCli.CreateSearchResource(subscription, groupName, locationName, name);
 
             Console.Write("\r");
             if (string.IsNullOrEmpty(response.StdOutput) && !string.IsNullOrEmpty(response.StdError))
@@ -296,9 +304,13 @@ namespace Azure.AI.Details.Common.CLI
             ConsoleHelpers.WriteLineWithHighlight($"\n`CREATE AZURE AI RESOURCE`\n");
 
             var subscription = _values.GetOrDefault("init.service.subscription", "");
-            var location = await AzCliConsoleGui.PickRegionLocationAsync(true, null, false);
-            var group = await AzCliConsoleGui.PickOrCreateResourceGroup(true, subscription, location.Name);
+            var locationName = _values.GetOrDefault("service.resource.region.name", "");
+            var groupName = _values.GetOrDefault("service.resource.group.name", "");
+
+            var location = await AzCliConsoleGui.PickRegionLocationAsync(true, locationName, false);
+            var group = await AzCliConsoleGui.PickOrCreateResourceGroup(true, subscription, location.Name, groupName);
             var name = DemandAskPrompt("Name: ");
+
             var displayName = _values.Get("service.resource.display.name", true) ?? name;
             var description = _values.Get("service.resource.description", true) ?? name;
 
