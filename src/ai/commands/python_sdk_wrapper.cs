@@ -33,12 +33,12 @@ namespace Azure.AI.Details.Common.CLI
 
         static public string ListResources(INamedValues values, string subscription)
         {
-            return IfIgnoreErrorReturnThis(() => DoListResourcesViaPython(values, subscription), "[]");
+            return CheckIgnorePythonSdkErrors(() => DoListResourcesViaPython(values, subscription), "[]");
         }
 
         static public string ListProjects(INamedValues values, string subscription)
         {
-            return IfIgnoreErrorReturnThis(() => DoListProjectsViaPython(values, subscription), "[]");
+            return CheckIgnorePythonSdkErrors(() => DoListProjectsViaPython(values, subscription), "[]");
         }
 
         static public string DeleteResource(INamedValues values, string subscription, string group, string name, bool deleteDependentResources)
@@ -254,20 +254,14 @@ namespace Azure.AI.Details.Common.CLI
             if (!quiet) Console.WriteLine($"{message} Done!");
         }
 
-        private static string IfIgnoreErrorReturnThis(Func<string> func, string returnOnError)
+        private static string CheckIgnorePythonSdkErrors(Func<string> func, string returnOnError)
         {
-            // check to see if the environment variable "AZAI_IGNORE_PYTHON_SDK_ERRORS" is set
-            // if so, then we will ignore any errors from the python SDK and just return the value of "returnOnError"
-            // this is useful for testing the CLI without having to install the python SDK, while developing the CLI
+            // Check to see if the environment variable "AZAI_IGNORE_PYTHON_SDK_ERRORS" is set
+            // If it is, then we will ignore any errors from the Python SDK and return the value of "returnOnError"
             var ignorePythonSdkErrors = Environment.GetEnvironmentVariable("AZAI_IGNORE_PYTHON_SDK_ERRORS");
-            try
-            {
-                return func();
-            }
-            catch (Exception e)
-            {
-                return returnOnError;
-            }
+            return ignorePythonSdkErrors != null && ignorePythonSdkErrors != "false" && ignorePythonSdkErrors != "0"
+                ? TryCatchHelpers.TryCatchNoThrow<string>(() => func(), returnOnError, out var exception)
+                : func();
         }
     }
 }
