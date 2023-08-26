@@ -239,6 +239,19 @@ namespace Azure.AI.Details.Common.CLI
                 stops.ForEach(s => options.StopSequences.Add(s));
             }
 
+            var searchKey = _values["service.config.search.api.key"];
+            var searchEndpoint = _values["service.config.search.endpoint.uri"];
+            var indexName = _values["service.config.search.index.name"];
+            var searchExtensionOk = !string.IsNullOrEmpty(searchKey) && !string.IsNullOrEmpty(searchEndpoint) && !string.IsNullOrEmpty(indexName);
+            if (searchExtensionOk)
+            {
+                var acsOptions = new AzureCognitiveSearchChatExtensionConfiguration(AzureChatExtensionType.AzureCognitiveSearch, new Uri(searchEndpoint), new AzureKeyCredential(searchKey), indexName);
+                var extensionOptions = new AzureChatExtensionsOptions();
+                extensionOptions.Extensions.Add(acsOptions);
+
+                options.AzureExtensionsOptions = extensionOptions;
+            }
+
             return options;
         }
 

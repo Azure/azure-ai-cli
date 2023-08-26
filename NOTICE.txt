@@ -231,7 +231,7 @@ limitations under the License.
 
 ---------------------------------------------------------
 
-Azure.AI.OpenAI 1.0.0-beta.6 - MIT
+Azure.AI.OpenAI 1.0.0-beta.7 - MIT
 
 
 (c) Microsoft Corporation

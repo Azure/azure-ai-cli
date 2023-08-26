@@ -60,7 +60,7 @@ EXAMPLES
 
     ai config @myindex --set MyIndex
     ai search index create --name @myindex --files *.txt --interactive
-    ai chat --index @myindex --interactive
+    ai chat --search-index @myindex --interactive
 
 SEE ALSO
 

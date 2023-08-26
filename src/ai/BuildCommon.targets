@@ -3,7 +3,7 @@
 
   <PropertyGroup>
     <CLIAssemblyVersion>1.0.0</CLIAssemblyVersion>
-    <DefaultPublicOAISDKVersion>1.0.0-beta.6</DefaultPublicOAISDKVersion>
+    <DefaultPublicOAISDKVersion>1.0.0-beta.7</DefaultPublicOAISDKVersion>
     <OAISDKVersion Condition="'$(OAISDKVersion)' == ''">$(DefaultPublicOAISDKVersion)</OAISDKVersion>
     <ErrorOnDuplicatePublishOutputFiles>false</ErrorOnDuplicatePublishOutputFiles>
   </PropertyGroup>

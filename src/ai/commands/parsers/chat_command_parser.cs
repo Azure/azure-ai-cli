@@ -37,10 +37,10 @@ namespace Azure.AI.Details.Common.CLI
             new NamedValueTokenParser("--deployment", "service.config.deployment", "001", "1"),
 
             new NamedValueTokenParser(null,             "service.config.embeddings.deployment", "0010", "1"),
-            new NamedValueTokenParser(null,             "service.config.embeddings.index.name", "00010", "1"),
 
             new NamedValueTokenParser(null,             "service.config.search.api.key", "00101", "1"),
             new NamedValueTokenParser(null,             "service.config.search.endpoint.uri", "00110;00101", "1"),
+            new NamedValueTokenParser(null,             "service.config.search.index.name", "00010", "1"),
 
             new NamedValueTokenParser("--interactive",  "chat.input.interactive", "001", "0", null, null, "true"),
 
