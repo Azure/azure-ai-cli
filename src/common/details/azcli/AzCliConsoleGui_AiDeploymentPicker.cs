@@ -43,10 +43,10 @@ namespace Azure.AI.Details.Common.CLI
             {
                 var allowCreateDeployment = !string.IsNullOrEmpty(allowCreateDeploymentOption);
 
-                Console.Write($"Deployment ({deploymentExtra}): *** Loading choices ***");
+                Console.Write($"Name: *** Loading choices ***");
                 var response = await AzCli.ListCognitiveServicesDeployments(subscriptionId, resource.Group, resource.Name, "OpenAI");
 
-                Console.Write($"\rDeployment ({deploymentExtra}): ");
+                Console.Write($"\rName: ");
                 if (string.IsNullOrEmpty(response.StdOutput) && !string.IsNullOrEmpty(response.StdError))
                 {
                     ConsoleHelpers.WriteLineError($"ERROR: Loading Cognitive Services resources: {response.StdError}");

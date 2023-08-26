@@ -140,12 +140,11 @@ namespace Azure.AI.Details.Common.CLI
             var endpoint = resource.Endpoint;
             var id = resource.Id;
 
-            Console.WriteLine();
-
+            ConsoleHelpers.WriteLineWithHighlight($"\n`OPEN AI DEPLOYMENT (CHAT)`");
             var deployment = await AzCliConsoleGui.AiResourceDeploymentPicker.PickOrCreateDeployment(interactive, "Chat", subscriptionId, resource, null);
             var chatDeploymentName = deployment.Name;
 
-            Console.WriteLine();
+            ConsoleHelpers.WriteLineWithHighlight($"\n`OPEN AI DEPLOYMENT (EMBEDDINGS)`");
 
             var embeddingsDeployment = await AzCliConsoleGui.AiResourceDeploymentPicker.PickOrCreateDeployment(interactive, "Embeddings", subscriptionId, resource, null);
             var embeddingsDeploymentName = embeddingsDeployment.Name;
