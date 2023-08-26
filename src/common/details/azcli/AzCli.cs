@@ -63,6 +63,7 @@ namespace Azure.AI.Details.Common.CLI
             public string Name { get; set; }
             public string Format { get; set; }
             public string Version { get; set; }
+            public string DefaultCapacity { get; set; }
         }
 
         public struct CognitiveSearchResourceInfo
@@ -245,7 +246,7 @@ namespace Azure.AI.Details.Common.CLI
             var cmdPart = "cognitiveservices model list";
             var subPart = subscriptionId != null ? $"--subscription {subscriptionId}" : "";
 
-            var process = await ProcessHelpers.ParseShellCommandJson<JArray>("az", $"{cmdPart} {subPart} -l {regionLocation} --query \"[].{{Name:model.name,Format:model.format,Version:model.version}}\"", GetAzureHttpUserAgentEnvironment());
+            var process = await ProcessHelpers.ParseShellCommandJson<JArray>("az", $"{cmdPart} {subPart} -l {regionLocation} --query \"[].{{Name:model.name,Format:model.format,Version:model.version,DefaultCapacity:model.skus[0].capacity.default}}\"", GetAzureHttpUserAgentEnvironment());
 
             var x = new ProcessResponse<CognitiveServicesModelInfo[]>();
             x.StdOutput = process.StdOutput;
@@ -260,6 +261,7 @@ namespace Azure.AI.Details.Common.CLI
                 x.Payload[i].Name = model["Name"].Value<string>();
                 x.Payload[i].Format = model["Format"].Value<string>();
                 x.Payload[i].Version = model["Version"].Value<string>();
+                x.Payload[i].DefaultCapacity = model["DefaultCapacity"].Value<string>();
                 i++;
             }
 
@@ -313,12 +315,12 @@ namespace Azure.AI.Details.Common.CLI
             return x;
         }
 
-        public static async Task<ProcessResponse<CognitiveServicesDeploymentInfo>> CreateCognitiveServicesDeployment(string subscriptionId, string group, string resourceName, string deploymentName, string modelName, string modelVersion, string modelFormat)
+        public static async Task<ProcessResponse<CognitiveServicesDeploymentInfo>> CreateCognitiveServicesDeployment(string subscriptionId, string group, string resourceName, string deploymentName, string modelName, string modelVersion, string modelFormat, string scaleCapacity)
         {
             var cmdPart = "cognitiveservices account deployment create";
             var subPart = subscriptionId != null ? $"--subscription {subscriptionId}" : "";
 
-            var process = await ProcessHelpers.ParseShellCommandJson<JObject>("az", $"{cmdPart} {subPart} -g {group} -n {resourceName} --deployment-name {deploymentName} --model-name {modelName} --model-version {modelVersion} --model-format {modelFormat} --sku-capacity 1 --sku-name \"Standard\"", GetAzureHttpUserAgentEnvironment());
+            var process = await ProcessHelpers.ParseShellCommandJson<JObject>("az", $"{cmdPart} {subPart} -g {group} -n {resourceName} --deployment-name {deploymentName} --model-name {modelName} --model-version {modelVersion} --model-format {modelFormat} --sku-capacity {scaleCapacity} --sku-name \"Standard\"", GetAzureHttpUserAgentEnvironment());
 
             var x = new ProcessResponse<CognitiveServicesDeploymentInfo>();
             x.StdOutput = process.StdOutput;

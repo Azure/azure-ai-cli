@@ -106,15 +106,22 @@ namespace Azure.AI.Details.Common.CLI
                 Console.Write("\rModel: ");
                 var choices = models.Payload.Select(x => x.Name + " (version " + x.Version + ")").ToArray();
 
-                var select = Array.FindIndex(choices, x => x.StartsWith("gpt"));
+                var scanFor = deploymentExtra.ToLower() switch {
+                    "chat" => "gpt",
+                    "embeddings" => "embedding",
+                    _ => deploymentExtra.ToLower()
+                };
+                var select = Math.Max(0, Array.FindIndex(choices, x => x.Contains(scanFor)));
+
                 var index = ListBoxPicker.PickIndexOf(choices, 60, 30, normal, selected, select);
                 if (index < 0) return (null, null);
 
                 var modelName = models.Payload[index].Name;
                 Console.WriteLine($"\rModel: {modelName}");
 
-                var modelVersion = modelName.Contains("gpt") ? "0613" : "2";
                 var modelFormat = "OpenAI";
+                var modelVersion = models.Payload[index].Version;
+                var scaleCapacity = models.Payload[index].DefaultCapacity;
 
                 Console.Write("\rName: ");
                 choices = new string[] {
@@ -134,7 +141,7 @@ namespace Azure.AI.Details.Common.CLI
                 if (pick != choices.Length - 1) Console.WriteLine($"\rName: {deploymentName}");
 
                 Console.Write("*** CREATING ***");
-                var response = await AzCli.CreateCognitiveServicesDeployment(subscriptionId, resource.Group, resource.Name, deploymentName, modelName, modelVersion, modelFormat);
+                var response = await AzCli.CreateCognitiveServicesDeployment(subscriptionId, resource.Group, resource.Name, deploymentName, modelName, modelVersion, modelFormat, scaleCapacity);
 
                 Console.Write("\r");
                 if (string.IsNullOrEmpty(response.StdOutput) && !string.IsNullOrEmpty(response.StdError))
