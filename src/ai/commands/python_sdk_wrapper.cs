@@ -26,9 +26,9 @@ namespace Azure.AI.Details.Common.CLI
             return DoCreateResourceViaPython(values, subscription, group, name, location, displayName, description);
         }
 
-        static public string CreateProject(INamedValues values, string subscription, string group, string resource, string name, string location, string displayName = null, string description = null)
+        static public string CreateProject(INamedValues values, string subscription, string group, string resource, string name, string location, string displayName = null, string description = null, string openAiResourceId = null)
         {
-            return DoCreateProjectViaPython(values, subscription, group, resource, name, location, displayName, description);
+            return DoCreateProjectViaPython(values, subscription, group, resource, name, location, displayName, description, openAiResourceId);
         }
 
         static public string ListResources(INamedValues values, string subscription)
@@ -76,7 +76,7 @@ namespace Azure.AI.Details.Common.CLI
             throw exception;
         }
 
-        private static string DoCreateProjectViaPython(INamedValues values, string subscription, string group, string resource, string name, string location, string displayName, string description)
+        private static string DoCreateProjectViaPython(INamedValues values, string subscription, string group, string resource, string name, string location, string displayName, string description, string openAiResourceId)
         {
             return RunEmbeddedPythonScript(values,
                     "project_create",
@@ -86,7 +86,8 @@ namespace Azure.AI.Details.Common.CLI
                     "--name", name, 
                     "--location", location,
                     "--display-name", displayName,
-                    "--description", description);
+                    "--description", description,
+                    "--openai-resource-id", openAiResourceId);
         }
 
         private static string DoListResourcesViaPython(INamedValues values, string subscription)

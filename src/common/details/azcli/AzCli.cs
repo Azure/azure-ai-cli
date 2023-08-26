@@ -38,6 +38,7 @@ namespace Azure.AI.Details.Common.CLI
 
         public struct CognitiveServicesResourceInfo
         {
+            public string Id;
             public string Group;
             public string Name;
             public string Kind;
@@ -190,7 +191,7 @@ namespace Azure.AI.Details.Common.CLI
             var subPart = subscriptionId != null ? $"--subscription {subscriptionId}" : "";
             var condPart= kind != null ? $"? kind == 'CognitiveServices' || kind == '{kind}'" : null;
 
-            var process = await ProcessHelpers.ParseShellCommandJson<JArray>("az", $"{cmdPart} {subPart} --query \"[{condPart}].{{Name:name,Location: location,Kind:kind,Group:resourceGroup,Endpoint:properties.endpoint}}\"", GetAzureHttpUserAgentEnvironment());
+            var process = await ProcessHelpers.ParseShellCommandJson<JArray>("az", $"{cmdPart} {subPart} --query \"[{condPart}].{{Id:id,Name:name,Location: location,Kind:kind,Group:resourceGroup,Endpoint:properties.endpoint}}\"", GetAzureHttpUserAgentEnvironment());
 
             var x = new ProcessResponse<CognitiveServicesResourceInfo[]>();
             x.StdOutput = process.StdOutput;
@@ -202,6 +203,7 @@ namespace Azure.AI.Details.Common.CLI
             var i = 0;
             foreach (var resource in resources)
             {
+                x.Payload[i].Id = resource["Id"]?.Value<string>();
                 x.Payload[i].Group = resource["Group"].Value<string>();
                 x.Payload[i].Name = resource["Name"].Value<string>();
                 x.Payload[i].Kind = resource["Kind"].Value<string>();
@@ -278,6 +280,7 @@ namespace Azure.AI.Details.Common.CLI
             var resource = process.Payload;
             x.Payload = new CognitiveServicesResourceInfo()
             {
+                Id = resource?["id"]?.Value<string>(),
                 Group = resource?["resourceGroup"]?.Value<string>(),
                 Name = resource?["name"]?.Value<string>(),
                 Kind = resource?["kind"]?.Value<string>(),

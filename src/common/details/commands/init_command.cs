@@ -138,6 +138,7 @@ namespace Azure.AI.Details.Common.CLI
             var resource = await AzCliConsoleGui.PickOrCreateCognitiveResource(interactive, subscriptionId, regionLocation.Name, groupFilter, resourceFilter, kind, sku, yes);
             var region = resource.RegionLocation;
             var endpoint = resource.Endpoint;
+            var id = resource.Id;
 
             var deployment = await AzCliConsoleGui.AiResourceDeploymentPicker.PickOrCreateDeployment(interactive, "Chat", subscriptionId, resource, null);
             var chatDeploymentName = deployment.Name;
@@ -153,6 +154,7 @@ namespace Azure.AI.Details.Common.CLI
             _values.Reset("init.service.subscription", subscriptionId);
             _values.Reset("service.openai.endpoint", endpoint);
             _values.Reset("service.openai.key", key);
+            _values.Reset("service.openai.resource.id", id);
         }
 
         private async Task DoInitSearch(bool interactive)
@@ -427,12 +429,14 @@ namespace Azure.AI.Details.Common.CLI
             var group = _values.GetOrDefault("service.resource.group.name", "");
             var location = _values.GetOrDefault("service.region.location", "");
 
+            var openAiResourceId = _values.GetOrDefault("service.openai.resource.id", "");
+
             var name = DemandAskPrompt("Name: ");
             var displayName = _values.Get("service.project.display.name", true) ?? name;
             var description = _values.Get("service.project.description", true) ?? name;
 
             Console.Write("*** CREATING ***");
-            var json = PythonSDKWrapper.CreateProject(_values, subscription, group, resourceId, name, location, displayName, description);
+            var json = PythonSDKWrapper.CreateProject(_values, subscription, group, resourceId, name, location, displayName, description, openAiResourceId);
 
             Console.WriteLine("\r*** CREATED ***  ");
 
