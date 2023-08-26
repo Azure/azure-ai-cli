@@ -88,8 +88,18 @@ namespace Azure.AI.Details.Common.CLI
                     return (null, null);
                 }
 
+                var scanFor = deploymentExtra.ToLower() switch {
+                    "chat" => "gpt",
+                    "embeddings" => "embedding",
+                    _ => deploymentExtra.ToLower()
+                };
+
+                var choices = deployments.ToArray();
+                var select = Math.Max(0, Array.FindIndex(choices, x => x.Name.Contains(scanFor)));
+                if (allowCreateDeployment) select++;
+
                 return interactive
-                    ? ListBoxPickDeployment(deployments.ToArray(), allowCreateDeploymentOption)
+                    ? ListBoxPickDeployment(choices, allowCreateDeploymentOption, select)
                     : (null, null);
             }
 
@@ -111,7 +121,7 @@ namespace Azure.AI.Details.Common.CLI
                     "embeddings" => "embedding",
                     _ => deploymentExtra.ToLower()
                 };
-                var select = Math.Max(0, Array.FindIndex(choices, x => x.Contains(scanFor)));
+                var select = Math.Max(0, Array.FindLastIndex(choices, x => x.Contains(scanFor)));
 
                 var index = ListBoxPicker.PickIndexOf(choices, 60, 30, normal, selected, select);
                 if (index < 0) return (null, null);
@@ -154,7 +164,7 @@ namespace Azure.AI.Details.Common.CLI
                 return (response.Payload, null);
             }
 
-            private static (AzCli.CognitiveServicesDeploymentInfo? Deployment, string Error) ListBoxPickDeployment(AzCli.CognitiveServicesDeploymentInfo[] deployments, string p0)
+            private static (AzCli.CognitiveServicesDeploymentInfo? Deployment, string Error) ListBoxPickDeployment(AzCli.CognitiveServicesDeploymentInfo[] deployments, string p0, int select = 0)
             {
                 var list = deployments.Select(x => $"{x.Name} ({x.ModelFormat})").ToList();
 
@@ -164,7 +174,7 @@ namespace Azure.AI.Details.Common.CLI
                 var normal = new Colors(ConsoleColor.White, ConsoleColor.Blue);
                 var selected = new Colors(ConsoleColor.White, ConsoleColor.Red);
 
-                var picked = ListBoxPicker.PickIndexOf(list.ToArray(), 60, 30, normal, selected);
+                var picked = ListBoxPicker.PickIndexOf(list.ToArray(), 60, 30, normal, selected, select);
                 if (picked < 0)
                 {
                     return (null, null);
