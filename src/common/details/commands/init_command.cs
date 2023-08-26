@@ -152,6 +152,8 @@ namespace Azure.AI.Details.Common.CLI
             ConfigServiceResource(subscriptionId, region, endpoint, chatDeploymentName, key);
 
             _values.Reset("init.service.subscription", subscriptionId);
+            _values.Reset("service.resource.group.name", resource.Group);
+            _values.Reset("service.resource.region.name", resource.RegionLocation);
             _values.Reset("service.openai.endpoint", endpoint);
             _values.Reset("service.openai.key", key);
             _values.Reset("service.openai.resource.id", id);
@@ -165,7 +167,7 @@ namespace Azure.AI.Details.Common.CLI
             Console.Write("\rName: *** Loading choices ***");
 
             var subscription = _values.GetOrDefault("init.service.subscription", "");
-            var location = _values.GetOrDefault("init.service.resource.region.name", "");
+            var location = _values.GetOrDefault("service.resource.region.name", "");
 
             var response = await AzCli.ListSearchResources(subscription, location);
             if (string.IsNullOrEmpty(response.StdOutput) && !string.IsNullOrEmpty(response.StdError))
@@ -209,8 +211,11 @@ namespace Azure.AI.Details.Common.CLI
             ConsoleHelpers.WriteLineWithHighlight($"\n`CREATE COGNITIVE SEARCH RESOURCE`\n");
 
             var subscription = _values.GetOrDefault("init.service.subscription", "");
-            var location = await AzCliConsoleGui.PickRegionLocationAsync(true, null, false);
-            var group = await AzCliConsoleGui.PickOrCreateResourceGroup(true, subscription, location.Name);
+            var locationName = _values.GetOrDefault("service.resource.region.name", "");
+            var groupName = _values.GetOrDefault("service.resource.group.name", "");
+
+            var location = await AzCliConsoleGui.PickRegionLocationAsync(true, locationName, false);
+            var group = await AzCliConsoleGui.PickOrCreateResourceGroup(true, subscription, location.Name, groupName);
             var name = DemandAskPrompt("Name: ");
 
             Console.Write("*** CREATING ***");

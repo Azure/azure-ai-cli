@@ -133,6 +133,9 @@ namespace Azure.AI.Details.Common.CLI
                 var modelVersion = models.Payload[index].Version;
                 var scaleCapacity = models.Payload[index].DefaultCapacity;
 
+                // HACK: There's a bug in the RP or region specific or something that sometimes 120 doesn't work, and we need to use 119
+                if (scaleCapacity == "120") scaleCapacity = "119";
+
                 Console.Write("\rName: ");
                 choices = new string[] {
                     $"{modelName}-{modelVersion}",
