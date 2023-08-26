@@ -119,7 +119,7 @@ namespace Azure.AI.Details.Common.CLI
                 (var regionLocation, var errorLoc) = await RegionLocationPicker.FindRegionAsync(interactive, regionLocationFilter, true);
                 if (regionLocation == null) return (null, errorLoc);
 
-                var group = await ResourceGroupPicker.PickOrCreateResourceGroup(interactive, subscriptionId, regionLocationFilter, groupFilter);
+                var group = await ResourceGroupPicker.PickOrCreateResourceGroup(interactive, subscriptionId, regionLocation?.Name, groupFilter);
 
                 ConsoleHelpers.WriteLineWithHighlight($"\n`CREATE {Program.SERVICE_RESOURCE_DISPLAY_NAME_ALL_CAPS}`");
                 Console.WriteLine($"Region: {group.RegionLocation}");
