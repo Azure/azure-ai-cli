@@ -95,8 +95,10 @@ namespace Azure.AI.Details.Common.CLI
                 };
 
                 var choices = deployments.ToArray();
-                var select = Math.Max(0, Array.FindIndex(choices, x => x.Name.Contains(scanFor)));
-                if (allowCreateDeployment) select++;
+                var select = Array.FindIndex(choices, x => x.Name.Contains(scanFor));
+
+                if (allowCreateDeployment && select >= 0) select++;
+                select = Math.Max(0, select);
 
                 return interactive
                     ? ListBoxPickDeployment(choices, allowCreateDeploymentOption, select)
