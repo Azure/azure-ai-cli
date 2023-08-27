@@ -131,7 +131,7 @@ namespace Azure.AI.Details.Common.CLI
                 Console.Write("\r*** CREATED ***  ");
                 Console.WriteLine();
 
-                var process = StartShellAiInitProcess($"--subscription {subscription.Id}");
+                var process = StartShellAiInitProcess($"project --subscription {subscription.Id}");
                 if (process.ExitCode == 0)
                 {
                     ConsoleHelpers.WriteLineWithHighlight("\n`CONFIG AI SCENARIO DATA`");
@@ -204,7 +204,7 @@ namespace Azure.AI.Details.Common.CLI
 
         private static void SimpleChatScenario(string scenario)
         {
-            Process process = StartShellAiInitProcess();
+            Process process = StartShellAiInitProcess("openai");
             if (process.ExitCode == 0)
             {
                 StartShellAiChatScenario(scenario).WaitForExit();;
@@ -241,7 +241,7 @@ namespace Azure.AI.Details.Common.CLI
         private static Process StartShellAiInitProcess(string extraArguments = "")
         {
             var command = "ai";
-            var arguments = $"init --quiet {extraArguments}";
+            var arguments = $"init {extraArguments} --quiet";
 
             var process = TryCatchHelpers.TryCatchNoThrow<Process>(() => StartShellCommandProcess(command, arguments), null, out Exception processException);
             process?.WaitForExit();
