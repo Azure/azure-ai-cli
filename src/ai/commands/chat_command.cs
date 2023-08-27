@@ -4,7 +4,6 @@
 //
 
 using System;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -24,7 +23,6 @@ using Azure.Core.Diagnostics;
 using Azure.Core.Pipeline;
 using Azure.Core;
 using System.Diagnostics.Tracing;
-using Microsoft.CognitiveServices.Speech.Diagnostics.Logging;
 
 namespace Azure.AI.Details.Common.CLI
 {
@@ -376,37 +374,6 @@ namespace Azure.AI.Details.Common.CLI
             }
         }
 
-        private void EnsureStartLogFile()
-        {
-            var log = _values["diagnostics.config.log.file"];
-            if (!string.IsNullOrEmpty(log))
-            {
-                // var id = _values.GetOrDefault("vision.input.id", "");
-                // if (log.Contains("{id}")) log = log.Replace("{id}", id);
-
-                var pid = Process.GetCurrentProcess().Id.ToString();
-                if (log.Contains("{pid}")) log = log.Replace("{pid}", pid);
-
-                var time = DateTime.Now.ToFileTime().ToString();
-                if (log.Contains("{time}")) log = log.Replace("{time}", time);
-
-                var runTime = _values.GetOrDefault("x.run.time", "");
-                if (log.Contains("{run.time}")) log = log.Replace("{run.time}", runTime);
-
-                log = FileHelpers.GetOutputDataFileName(log, _values);
-                FileLogger.Start(log);
-            }
-        }
-
-        private void EnsureStopLogFile()
-        {
-            var log = _values["diagnostics.config.log.file"];
-            if (!string.IsNullOrEmpty(log))
-            {
-                FileLogger.Stop();
-            }
-        }
-
         private void EventSourceAiLoggerLog(EventWrittenEventArgs e, string message)
         {
             message = message.Replace("\r", "\\r").Replace("\n", "\\n");
@@ -434,7 +401,7 @@ namespace Azure.AI.Details.Common.CLI
         {
             CheckPath();
             // CheckChatInput();
-            EnsureStartLogFile();
+            LogHelpers.EnsureStartLogFile(_values);
 
             // _display = new DisplayHelper(_values);
 
@@ -453,7 +420,7 @@ namespace Azure.AI.Details.Common.CLI
         {
             _lock.StopLock(5000);
 
-            EnsureStopLogFile();
+            LogHelpers.EnsureStopLogFile(_values);
             // _output.CheckOutput();
             // _output.StopOutput();
 
