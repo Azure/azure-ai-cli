@@ -1,3 +1,17 @@
+# next steps
+
+you should try to get this to work:
+
+```
+ai init project
+ai help list topics --dump
+ai search index update --files *.md --index ai-help
+ai chat --interactive --index ai-help
+```
+
+then you'll have all the parts to update the `ai wizard` for the `/w your data` scenario
+
+
 # `ai` CLI Tasks to complete  
 
 (similar breakdwon on ADO at [https://crbn.us/ai.ado](https://crbn.us/ai.ado))  
