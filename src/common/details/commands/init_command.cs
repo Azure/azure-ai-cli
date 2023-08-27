@@ -59,12 +59,72 @@ namespace Azure.AI.Details.Common.CLI
             var interactive = _values.GetOrDefault("init.service.interactive", true);
             switch (command)
             {
-                case "init": await DoInitService(interactive); break;
-                case "init.openai": await DoInitServiceParts(interactive, "openai"); break;
-                case "init.search": await DoInitServiceParts(interactive, "openai", "search"); break;
-                case "init.resource": await DoInitServiceParts(interactive, "resource"); break;
-                case "init.project": await DoInitServiceParts(interactive, "openai", "search", "resource", "project"); break;
+                case "init": await DoInitServiceCommand(); break;
+                case "init.openai": await DoInitOpenAiCommand(); break;
+                case "init.search": await DoInitSearchCommand(); break;
+                case "init.resource": await DoInitResourceCommand(); break;
+                case "init.project": await DoInitProjectCommand(); break;
             }
+        }
+
+        private async Task DoInitServiceCommand()
+        {
+            StartCommand();
+
+            var interactive = _values.GetOrDefault("init.service.interactive", true);
+            await DoInitService(interactive);
+
+            StopCommand();
+            DisposeAfterStop();
+            DeleteTemporaryFiles();
+        }
+
+        private async Task DoInitOpenAiCommand()
+        {
+            StartCommand();
+
+            var interactive = _values.GetOrDefault("init.service.interactive", true);
+            await DoInitServiceParts(interactive, "openai");
+
+            StopCommand();
+            DisposeAfterStop();
+            DeleteTemporaryFiles();
+        }
+
+        private async Task DoInitSearchCommand()
+        {
+            StartCommand();
+
+            var interactive = _values.GetOrDefault("init.service.interactive", true);
+            await DoInitServiceParts(interactive, "openai", "search");
+
+            StopCommand();
+            DisposeAfterStop();
+            DeleteTemporaryFiles();
+        }
+
+        private async Task DoInitResourceCommand()
+        {
+            StartCommand();
+
+            var interactive = _values.GetOrDefault("init.service.interactive", true);
+            await DoInitServiceParts(interactive, "resource");
+
+            StopCommand();
+            DisposeAfterStop();
+            DeleteTemporaryFiles();
+        }
+
+        private async Task DoInitProjectCommand()
+        {
+            StartCommand();
+
+            var interactive = _values.GetOrDefault("init.service.interactive", true);
+            await DoInitServiceParts(interactive, "openai", "search", "resource", "project");
+
+            StopCommand();
+            DisposeAfterStop();
+            DeleteTemporaryFiles();
         }
 
         private async Task DoInitService(bool interactive)
@@ -587,6 +647,32 @@ namespace Azure.AI.Details.Common.CLI
             throw new ApplicationException($"CANCELED: No input provided.");
         }
 
+        private void StartCommand()
+        {
+            CheckPath();
+            LogHelpers.EnsureStartLogFile(_values);
+
+            // _display = new DisplayHelper(_values);
+
+            // _output = new OutputHelper(_values);
+            // _output.StartOutput();
+
+            _lock = new SpinLock();
+            _lock.StartLock();
+        }
+
+        private void StopCommand()
+        {
+            _lock.StopLock(5000);
+
+            LogHelpers.EnsureStopLogFile(_values);
+            // _output.CheckOutput();
+            // _output.StopOutput();
+
+            _stopEvent.Set();
+        }
+
+        private SpinLock _lock = null;
         private readonly bool _quiet = false;
         private readonly bool _verbose = false;
     }
