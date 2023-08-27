@@ -69,13 +69,13 @@ namespace Azure.AI.Details.Common.CLI
                 Console.ReadLine();
             }
 
-            if (Program.Debug)
-            {
-                DebugDumpCommandLineArgs(mainArgs);
-            }
+            var dumpArgs = string.Join(" ", mainArgs);
+            DebugDumpCommandLineArgs(dumpArgs);
 
             if (OS.IsLinux()) Console.WriteLine();
 
+            AI.DBG_TRACE_INFO($"Command line was: {dumpArgs}");
+            AI.DBG_TRACE_INFO($"Exit code: {exitCode}");
             return exitCode;
         }
 
@@ -89,11 +89,14 @@ namespace Azure.AI.Details.Common.CLI
             Console.WriteLine();
         }
 
-        private static void DebugDumpCommandLineArgs(string[] mainArgs)
+        private static void DebugDumpCommandLineArgs(string args)
         {
-            Console.WriteLine("\nDEBUG: Command line was: {0}", string.Join(" ", mainArgs));
-            //Console.WriteLine($"LOCATION: {typeof(Program).Assembly.Location}");
-            Console.WriteLine($"LOCATION: {AppContext.BaseDirectory}");
+            if (Program.Debug)
+            {
+                Console.WriteLine("\nDEBUG: Command line was: {0}", args);
+                //Console.WriteLine($"LOCATION: {typeof(Program).Assembly.Location}");
+                Console.WriteLine($"LOCATION: {AppContext.BaseDirectory}");
+            }
         }
 
         private static int ParseCommand(INamedValueTokens tokens, ICommandValues values)

@@ -6,6 +6,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using Newtonsoft.Json.Linq;
@@ -73,18 +74,16 @@ namespace Azure.AI.Details.Common.CLI
 
         public static async Task<ProcessResponse<T>> ParseShellCommandJson<T>(string command, string arguments, Dictionary<string, string> addToEnvironment = null) where T : JToken, new()
         {
-            if (Program.Debug) Console.WriteLine($"COMMAND: {command} {arguments} {addToEnvironment}");
+            SHELL_DEBUG_TRACE($"COMMAND: {command} {arguments} {DictionaryToString(addToEnvironment)}");
+
             var process = TryCatchHelpers.TryCatchNoThrow<Process>(() => StartShellCommandProcess(command, arguments, addToEnvironment), null, out Exception processException);
 
             var response = new ProcessResponse<T>();
             response.StdOutput = process != null ? await process.StandardOutput.ReadToEndAsync() : "";
             response.StdError = process != null ? await process.StandardError.ReadToEndAsync() : processException.ToString();
 
-            if (Program.Debug)
-            {
-                if (!string.IsNullOrEmpty(response.StdOutput)) Console.WriteLine($"---\nSTDOUT\n---\n{response.StdOutput}");
-                if (!string.IsNullOrEmpty(response.StdError)) Console.WriteLine($"---\nSTDERR\n---\n{response.StdError}");
-            }
+            if (!string.IsNullOrEmpty(response.StdOutput)) SHELL_DEBUG_TRACE($"---\nSTDOUT\n---\n{response.StdOutput}");
+            if (!string.IsNullOrEmpty(response.StdError)) SHELL_DEBUG_TRACE($"---\nSTDERR\n---\n{response.StdError}");
 
             var parsed = !string.IsNullOrEmpty(response.StdOutput) ? JToken.Parse(response.StdOutput) : null;
             response.Payload = parsed is T ? parsed as T : new T();
@@ -98,6 +97,27 @@ namespace Azure.AI.Details.Common.CLI
             return  isWindows
                 ? StartProcess("cmd", $"/c {command} {arguments}", addToEnvironment)
                 : StartProcess(command,  arguments, addToEnvironment);
+        }
+
+        private static void SHELL_DEBUG_TRACE(string message,[CallerLineNumber] int line = 0, [CallerMemberName] string? caller = null, [CallerFilePath] string? file = null)
+        {
+            if (Program.Debug) Console.WriteLine(message);
+
+            message = message.Replace("\n", "\\n").Replace("\r", "\\r");
+            AI.DBG_TRACE_INFO(message, line, caller, file);
+        }
+
+        private static string DictionaryToString(Dictionary<string, string> dictionary)
+        {
+            var kvps = new List<string>();
+            if (dictionary != null)
+            {
+                foreach (var kvp in dictionary)
+                {
+                    kvps.Add($"{kvp.Key}={kvp.Value}");
+                }
+            }
+            return string.Join(' ', kvps);
         }
     }
 }

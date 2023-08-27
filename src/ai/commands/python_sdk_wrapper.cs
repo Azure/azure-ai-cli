@@ -150,13 +150,16 @@ namespace Azure.AI.Details.Common.CLI
             if (Program.Debug) Console.WriteLine($"DEBUG: {scriptName}.py:\n{script}");
             if (Program.Debug) Console.WriteLine($"DEBUG: PythonRunner.RunScriptAsync: '{scriptName}' {scriptArgs}");
 
-            AI.DBG_TRACE_VERBOSE($"RunEmbeddedPythonScript: {scriptName}.py:\n{script}");
+            var dbgOut = script.Replace("\n", "\\n").Replace("\r", "");
+            AI.DBG_TRACE_VERBOSE($"RunEmbeddedPythonScript: {scriptName}.py: {dbgOut}");
             AI.DBG_TRACE_VERBOSE($"RunEmbeddedPythonScript: '{scriptName}' {scriptArgs}");
 
             (var exit, var output)= PythonRunner.RunScriptAsync(script, scriptArgs).Result;
+            if (exit != 0) AI.DBG_TRACE_WARNING($"RunEmbeddedPythonScript: exit={exit}");
 
+            dbgOut = output.Replace("\n", "\\n").Replace("\r", "");
+            AI.DBG_TRACE_INFO($"RunEmbeddedPythonScript: exit={exit}; output:{dbgOut}");
             if (Program.Debug) Console.WriteLine($"DEBUG: RunEmbeddedPythonScript: exit={exit}; output=\n<---start--->{output}\n<---stop--->");
-            AI.DBG_TRACE_INFO($"RunEmbeddedPythonScript: exit={exit}; output=\n<---start--->{output}\n<---stop--->");
 
             if (exit != 0)
             {

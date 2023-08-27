@@ -665,7 +665,7 @@ namespace Azure.AI.Details.Common.CLI
         {
             _lock.StopLock(5000);
 
-            LogHelpers.EnsureStopLogFile(_values);
+            // LogHelpers.EnsureStopLogFile(_values);
             // _output.CheckOutput();
             // _output.StopOutput();
 
