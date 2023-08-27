@@ -136,23 +136,30 @@ namespace Azure.AI.Details.Common.CLI
 
         public static async Task<ProcessResponse<AccountRegionLocationInfo[]>> ListAccountRegionLocations()
         {
+            var supportedRegions = await ListSupportedResourceRegions();
+
             var process = await ProcessHelpers.ParseShellCommandJson<JArray>("az", "account list-locations --query \"[].{Name:name,RegionalDisplayName:regionalDisplayName,DisplayName:displayName}\"", GetAzureHttpUserAgentEnvironment());
 
             var x = new ProcessResponse<AccountRegionLocationInfo[]>();
             x.StdOutput = process.StdOutput;
             x.StdError = process.StdError;
 
-            var regionLocations = process.Payload;
-            x.Payload = new AccountRegionLocationInfo[regionLocations.Count];
-
-            var i = 0;
-            foreach (var regionLocation in regionLocations)
+            var list = new List<AccountRegionLocationInfo>();
+            foreach (var regionLocation in process.Payload)
             {
-                x.Payload[i].Name = regionLocation["Name"].Value<string>();
-                x.Payload[i].DisplayName = regionLocation["DisplayName"].Value<string>();
-                x.Payload[i].RegionalDisplayName = regionLocation["RegionalDisplayName"].Value<string>();
-                i++;
+                if (supportedRegions.Count == 0 || supportedRegions.Contains(regionLocation["Name"].Value<string>().ToLower()))
+                {
+                    list.Add(new AccountRegionLocationInfo()
+                    {
+                        Name = regionLocation["Name"].Value<string>(),
+                        DisplayName = regionLocation["DisplayName"].Value<string>(),
+                        RegionalDisplayName = regionLocation["RegionalDisplayName"].Value<string>()
+                    });
+                }
             }
+
+            var regionLocations = process.Payload;
+            x.Payload = list.ToArray();
 
             return x;
         }
@@ -431,5 +438,19 @@ namespace Azure.AI.Details.Common.CLI
 
             return x;
         }
+
+        private static async Task<List<string>> ListSupportedResourceRegions()
+        {
+            var process2 = await ProcessHelpers.ParseShellCommandJson<JArray>("az", $"cognitiveservices account list-skus --kind {Program.CognitiveServiceResourceKind} --query \"[].{{Name:locations[0]}}\"", GetAzureHttpUserAgentEnvironment());
+            var supportedRegions = new List<string>();
+            foreach (var regionLocation in process2.Payload)
+            {
+                supportedRegions.Add(regionLocation["Name"].Value<string>().ToLower());
+            }
+
+            return supportedRegions;
+        }
+
+
     }
 }

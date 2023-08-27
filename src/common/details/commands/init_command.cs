@@ -166,7 +166,7 @@ namespace Azure.AI.Details.Common.CLI
         {
             if (!interactive) ThrowInteractiveNotSupportedApplicationException(); // TODO: Add back non-interactive mode support
 
-            ConsoleHelpers.WriteLineWithHighlight($"\n`COGNITIVE SEARCH RESOURCE`\n");
+            ConsoleHelpers.WriteLineWithHighlight($"\n`COGNITIVE SEARCH RESOURCE`");
             Console.Write("\rName: *** Loading choices ***");
 
             var subscription = _values.GetOrDefault("init.service.subscription", "");
