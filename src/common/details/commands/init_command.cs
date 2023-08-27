@@ -450,7 +450,7 @@ namespace Azure.AI.Details.Common.CLI
             {
                 var projectJson = TryCreateProjectInteractive();
                 project = JToken.Parse(projectJson);
-            } 
+            }
 
             var projectName = project["name"].Value<string>();
             var projectId = project["id"].Value<string>();
@@ -585,19 +585,20 @@ namespace Azure.AI.Details.Common.CLI
             ConsoleHelpers.WriteLineWithHighlight($"\n`CONFIG {Program.SERVICE_RESOURCE_DISPLAY_NAME_ALL_CAPS}`");
             Console.WriteLine();
 
-            if (Program.InitConfigsSubscription)
-            {
-                ConfigSet("@subscription", subscriptionId, $"Subscription: {subscriptionId}");
-            }
-
-            if (Program.InitConfigsEndpoint)
-            {
-                ConfigSet("@endpoint", endpoint, $"    Endpoint: {endpoint}");
-            }
-
-            ConfigSet("@deployment", deployment, $"  Deployment: {deployment}");
-            ConfigSet("@region", region, $"      Region: {region}");
-            ConfigSet("@key", key, $"         Key: {key.Substring(0, 4)}****************************");
+            int maxLabelWidth = 0;
+            var actions = new List<Action<int>>(new Action<int>[] {
+                Program.InitConfigsSubscription ?
+                ConfigSetLambda("@subscription", subscriptionId, "Subscription", subscriptionId, ref maxLabelWidth) : null,
+                Program.InitConfigsEndpoint ?
+                ConfigSetLambda("@chat.endpoint", endpoint, "Endpoint (chat)", endpoint, ref maxLabelWidth) : null,
+                ConfigSetLambda("@chat.deployment", deployment, "Deployment (chat)", deployment, ref maxLabelWidth),
+                ConfigSetLambda("@chat.key", key, "Key (chat)", key.Substring(0, 4) + "****************************", ref maxLabelWidth),
+                Program.InitConfigsEndpoint ?
+                ConfigSetLambda("@search.embeddings.endpoint", endpoint, "Endpoint (embeddings)", endpoint, ref maxLabelWidth) : null,
+                ConfigSetLambda("@search.embeddings.key", key, "Key (embeddings)", key.Substring(0, 4) + "****************************", ref maxLabelWidth),
+                ConfigSetLambda("@chat.region", region, "Region", region, ref maxLabelWidth),
+            });
+            actions.ForEach(x => x?.Invoke(maxLabelWidth));
         }
 
         private static void ConfigSearchResource(string endpoint, string key)
@@ -605,8 +606,13 @@ namespace Azure.AI.Details.Common.CLI
             ConsoleHelpers.WriteLineWithHighlight($"\n`CONFIG COGNITIVE SEARCH RESOURCE`");
             Console.WriteLine();
 
-            ConfigSet("@search.endpoint", endpoint, $"Endpoint: {endpoint}");
-            ConfigSet("@search.key", key, $"     Key: {key.Substring(0, 4)}****************************");
+            int maxLabelWidth = 0;
+            var actions = new List<Action<int>>(new Action<int>[]
+            {
+                ConfigSetLambda("@search.endpoint", endpoint, "Endpoint (search)", endpoint, ref maxLabelWidth),
+                ConfigSetLambda("@search.key", key, "Key (search)", key.Substring(0, 4) + "****************************", ref maxLabelWidth),
+            });
+            actions.ForEach(x => x(maxLabelWidth));
         }
 
         private static void ConfigSet(string atFile, string setValue, string message)
@@ -614,6 +620,24 @@ namespace Azure.AI.Details.Common.CLI
             Console.Write($"*** SETTING *** {message}");
             ConfigSet(atFile, setValue);
             Console.WriteLine($"\r  *** SET ***   {message}");
+        }
+
+        private static Action<int> ConfigSetLambda(string atFile, string setValue, string displayLabel, string displayValue, ref int maxWidth)
+        {
+            maxWidth = Math.Max(maxWidth, displayLabel.Length);
+            return (int labelWidth) =>
+            {
+                ConfigSet(atFile, setValue, labelWidth, displayLabel, displayValue);
+            };
+        }
+
+        private static void ConfigSet(string atFile, string setValue, int labelWidth, string displayLabel, string displayValue)
+        {
+            displayLabel = displayLabel.PadLeft(labelWidth);
+            Console.Write($"*** SETTING *** {displayLabel}");
+            ConfigSet(atFile, setValue);
+            // Thread.Sleep(50);
+            Console.WriteLine($"\r  *** SET ***   {displayLabel}: {displayValue}");
         }
 
         private static void ConfigSet(string atFile, string setValue)
