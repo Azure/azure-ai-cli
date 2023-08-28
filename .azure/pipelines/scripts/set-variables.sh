@@ -6,17 +6,13 @@ echo "Source branch: $BUILD_SOURCEBRANCH"
 REGEX='^refs\/tags\/v?([[:digit:]]+)\.([[:digit:]]+)\.([[:digit:]]+)(-.+)?'
 
 # If tag is a release tag, set up release variables.
-if [[ $BUILD_SOURCEBRANCH =~ $REGEX ]]; then
-    echo "##vso[task.setvariable variable=ShouldCreateRelease; isOutput=true;]true"
+[[ $BUILD_SOURCEBRANCH =~ $REGEX ]] && echo "##vso[task.setvariable variable=IsRelease; isOutput=true;]true" || echo "##vso[task.setvariable variable=IsRelease; isOutput=true;]false"
 
-    # Extract version from the tag.
-    VERSION=$(echo $BUILD_SOURCEBRANCH | sed -r 's/'$REGEX'/\1.\2.\3\4/')
+# Extract version from the tag.
+VERSION=$([[ $BUILD_SOURCEBRANCH =~ $REGEX ]] && echo $(echo $BUILD_SOURCEBRANCH | sed -r 's/'$REGEX'/\1.\2.\3\4/') || echo "0.0.0-dev")
 
-    # Set the AICLIVersion variable in the pipeline.
-    echo "##vso[task.setvariable variable=AICLIVersion; isOutput=true;]$VERSION"
+# Set the AICLIVersion variable in the pipeline.
+echo "##vso[task.setvariable variable=AICLIVersion; isOutput=true;]$VERSION"
 
-    # Set the AICLINuPkgFileName variable in the pipeline.
-    echo "##vso[task.setvariable variable=AICLINuPkgFileName; isOutput=true;]Azure.AI.CLI.$VERSION.nupkg"
-else
-    echo "##vso[task.setvariable variable=ShouldCreateRelease; isOutput=true;]false"
-fi
+# Set the AICLINuPkgFileName variable in the pipeline.
+echo "##vso[task.setvariable variable=AICLINuPkgFileName; isOutput=true;]Azure.AI.CLI.$VERSION.nupkg"
