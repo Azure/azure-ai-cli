@@ -11,6 +11,42 @@ ai chat --interactive --index ai-help
 
 then you'll have all the parts to update the `ai wizard` for the `/w your data` scenario
 
+# making names easier to enter
+
+```c#
+private IEnumerable<string> GetResourceNamesFromResourceGroupName(string rg, string resourceKindAbbreviation, string resourceKindName)
+{
+    var startsWith = rg.StartsWith("rg-") ? "rg-" : rg.StartsWith("ResourceGroup") ? "ResourceGroup" : null;
+    var endsWith = rg.EndsWith("-rg") ? "-rg" : rg.EndsWith("ResourceGroup") ? "ResourceGroup" : null;
+    var contains = rg.Contains("-rg-") ? "-rg-" : rg.Contains("ResourceGroup") ? "ResourceGroup" : null;
+
+    if (!startsWith || !endsWith || !contains) yield break;
+
+    if (startsWith)
+    {
+        var name = rg.Substring(startsWith.Length);
+        yield return $"{resourceKindName}-{name}";
+        yield return $"{resourceKindAbbreviation}-{name}"
+    }
+
+    if (endsWith)
+    {
+        var name = rg.Substring(0, rg.Length - endsWith.Length);
+        yield return $"{name}-{resourceKindName}";
+        yield return $"{name}-{resourceKindAbbreviation}"
+    }
+
+    if (contains)
+    {
+        var parts = rg.Split(contains);
+        if (parts.Length == 2)
+        {
+            yield return $"{parts[0]}-{resourceKindName}-{parts[1]}";
+            yield return $"{parts[0]}-{resourceKindAbbreviation}-{parts[1]}";
+        }
+    }
+}
+```
 
 # `ai` CLI Tasks to complete  
 

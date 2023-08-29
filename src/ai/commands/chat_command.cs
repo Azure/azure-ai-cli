@@ -67,6 +67,7 @@ namespace Azure.AI.Details.Common.CLI
             var options = CreateChatCompletionOptions();
 
             var userPrompt = _values["chat.message.user.prompt"];
+            userPrompt = userPrompt.ReplaceValues(_values);
 
             while (true)
             {
@@ -122,7 +123,7 @@ namespace Azure.AI.Details.Common.CLI
 
             DisplayUserChatPrompt();
 
-            var text = userPrompt;
+            var text = userPrompt.ReplaceValues(_values);
             Console.ForegroundColor = ConsoleColor.Yellow;
             Console.WriteLine(text);
 
@@ -271,7 +272,7 @@ namespace Azure.AI.Details.Common.CLI
                 var line = lines[i];
                 role = UpdateRole(ref line, role);
 
-                if (role == ChatRole.System)
+                if (role == ChatRole.System || role == ChatRole.User)
                 {
                     line = line.ReplaceValues(_values);
                 }
