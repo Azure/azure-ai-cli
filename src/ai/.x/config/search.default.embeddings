@@ -1,0 +1,4 @@
+search.embeddings.endpoint.uri=@embeddings.endpoint
+search.embeddings.api.key=@embeddings.key
+search.embeddings.deployment=@embeddings.deployment
+search.embeddings.index.name=@embeddings.index.name

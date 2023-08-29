@@ -212,7 +212,7 @@ namespace Azure.AI.Details.Common.CLI
             var keys = await AzCliConsoleGui.LoadCognitiveServicesResourceKeys(subscriptionId, resource);
             var key = keys.Key1;
 
-            ConfigServiceResource(subscriptionId, region, endpoint, chatDeploymentName, key);
+            ConfigServiceResource(subscriptionId, region, endpoint, chatDeploymentName, embeddingsDeploymentName, key);
 
             _values.Reset("init.service.subscription", subscriptionId);
             _values.Reset("service.resource.group.name", resource.Group);
@@ -580,7 +580,7 @@ namespace Azure.AI.Details.Common.CLI
             return answer;
         }
 
-        private static void ConfigServiceResource(string subscriptionId, string region, string endpoint, string deployment, string key)
+        private static void ConfigServiceResource(string subscriptionId, string region, string endpoint, string chatDeployment, string embeddingsDeployment, string key)
         {
             ConsoleHelpers.WriteLineWithHighlight($"\n`CONFIG {Program.SERVICE_RESOURCE_DISPLAY_NAME_ALL_CAPS}`");
             Console.WriteLine();
@@ -591,10 +591,11 @@ namespace Azure.AI.Details.Common.CLI
                 ConfigSetLambda("@subscription", subscriptionId, "Subscription", subscriptionId, ref maxLabelWidth) : null,
                 Program.InitConfigsEndpoint ?
                 ConfigSetLambda("@chat.endpoint", endpoint, "Endpoint (chat)", endpoint, ref maxLabelWidth) : null,
-                ConfigSetLambda("@chat.deployment", deployment, "Deployment (chat)", deployment, ref maxLabelWidth),
+                ConfigSetLambda("@chat.deployment", chatDeployment, "Deployment (chat)", chatDeployment, ref maxLabelWidth),
                 ConfigSetLambda("@chat.key", key, "Key (chat)", key.Substring(0, 4) + "****************************", ref maxLabelWidth),
                 Program.InitConfigsEndpoint ?
                 ConfigSetLambda("@search.embeddings.endpoint", endpoint, "Endpoint (embeddings)", endpoint, ref maxLabelWidth) : null,
+                ConfigSetLambda("@search.embeddings.deployment", embeddingsDeployment, "Deployment (embeddings)", embeddingsDeployment, ref maxLabelWidth),
                 ConfigSetLambda("@search.embeddings.key", key, "Key (embeddings)", key.Substring(0, 4) + "****************************", ref maxLabelWidth),
                 ConfigSetLambda("@chat.region", region, "Region", region, ref maxLabelWidth),
             });

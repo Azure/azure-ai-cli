@@ -96,13 +96,13 @@ namespace Azure.AI.Details.Common.CLI
             await process.WaitForExitAsync();
 
             var response = new ProcessResponse<T>();
-            response.StdOutput = process != null ? stdOut.ToString() : "";
-            response.StdError = process != null ? stdErr.ToString() : processException.ToString();
+            response.StdOutput = process != null ? stdOut.ToString().Trim(' ', '\r', '\n') : "";
+            response.StdError = process != null ? stdErr.ToString().Trim(' ', '\r', '\n') : processException.ToString();
 
             if (!string.IsNullOrEmpty(response.StdOutput)) SHELL_DEBUG_TRACE($"---\nSTDOUT\n---\n{response.StdOutput}");
             if (!string.IsNullOrEmpty(response.StdError)) SHELL_DEBUG_TRACE($"---\nSTDERR\n---\n{response.StdError}");
 
-            var parsed = !string.IsNullOrEmpty(response.StdOutput) ? JToken.Parse(response.StdOutput) : null;
+            var parsed = !string.IsNullOrWhiteSpace(response.StdOutput) ? JToken.Parse(response.StdOutput) : null;
             response.Payload = parsed is T ? parsed as T : new T();
 
             return response;
