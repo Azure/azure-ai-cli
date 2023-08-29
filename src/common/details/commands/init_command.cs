@@ -471,7 +471,7 @@ namespace Azure.AI.Details.Common.CLI
 
             if (openAiOk)
             {
-                var connectionName = "Default-AzureOpenAI"; // "Default_AzureOpenAI"; // TODO: when AIClient/service allows, change this back to Default_AzureOpenAI
+                var connectionName = "Default_AzureOpenAI";
                 Console.WriteLine($"Connection: {connectionName}");
                 Console.Write("*** CREATING ***");
                 var connectionType = "azure_open_ai";

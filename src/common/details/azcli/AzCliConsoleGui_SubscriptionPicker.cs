@@ -72,17 +72,25 @@ namespace Azure.AI.Details.Common.CLI
                 if (response.Payload.Count() == 0 && needLogin)
                 {
                     bool cancelLogin = !interactive;
+                    bool useDeviceCode = false;
                     if (interactive)
                     {
                         ConsoleHelpers.WriteError("*** WARNING: `az login` required ***");
                         Console.Write(" ");
 
-                        var choices = "LAUNCH: `az login` (interactive browser);CANCEL: `az login ...` (non-interactive)".Split(';').ToArray();
+                        var choices = new string[] {
+                            "LAUNCH: `az login` (interactive browser)",
+                            "LAUNCH: `az login` (interactive device code)",
+                            "CANCEL: `az login ...` (non-interactive)",
+                        };
                         var normal = new Colors(ConsoleColor.White, ConsoleColor.Blue);
                         var selected = new Colors(ConsoleColor.White, ConsoleColor.Red);
 
-                        var picked = ListBoxPicker.PickIndexOf(choices, int.MinValue, 30, normal, selected);
-                        cancelLogin = (picked < 0 || picked == 1);
+                        var selection = OS.IsLinux() ? 1 : 0;
+                        var picked = ListBoxPicker.PickIndexOf(choices, int.MinValue, 30, normal, selected, selection);
+
+                        cancelLogin = (picked < 0 || picked == 2);
+                        useDeviceCode = (picked == 1);
                     }
 
                     if (cancelLogin)
@@ -93,7 +101,7 @@ namespace Azure.AI.Details.Common.CLI
                     }
 
                     Console.Write("\rSubscription: *** Launching `az login` (interactive) ***");
-                    response = await AzCli.Login();
+                    response = await AzCli.Login(useDeviceCode);
                     Console.Write("\rSubscription: ");
                 }
 

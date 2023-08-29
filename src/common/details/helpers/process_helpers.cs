@@ -56,13 +56,13 @@ namespace Azure.AI.Details.Common.CLI
         public static async Task<(int, string)> RunShellCommandAsync(string command, string arguments, Dictionary<string, string> addToEnvironment = null)
         {
             var output = new StringBuilder();
-            var outputReceived = (object sender, DataReceivedEventArgs e) => {
-                output.AppendLine(e.Data ?? "");
+            var outputReceived = (string data) => {
+                output.AppendLine(data);
             };
 
             var process = TryCatchHelpers.TryCatchNoThrow<Process>(() => StartShellCommandProcess(command, arguments, addToEnvironment), null, out Exception processException);
-            process.OutputDataReceived += (sender, e) => outputReceived(sender, e);
-            process.ErrorDataReceived += (sender, e) => outputReceived(sender, e);
+            process.OutputDataReceived += (sender, e) => outputReceived(e.Data ?? "");
+            process.ErrorDataReceived += (sender, e) => outputReceived(e.Data ?? "");
 
             process.BeginOutputReadLine();
             process.BeginErrorReadLine();
@@ -72,15 +72,32 @@ namespace Azure.AI.Details.Common.CLI
             return (process.ExitCode, output.ToString());
         }
 
-        public static async Task<ProcessResponse<T>> ParseShellCommandJson<T>(string command, string arguments, Dictionary<string, string> addToEnvironment = null) where T : JToken, new()
+        public static async Task<ProcessResponse<T>> ParseShellCommandJson<T>(string command, string arguments, Dictionary<string, string> addToEnvironment = null, Action<string> stdOutHandler = null, Action<string> stdErrHandler = null) where T : JToken, new()
         {
             SHELL_DEBUG_TRACE($"COMMAND: {command} {arguments} {DictionaryToString(addToEnvironment)}");
 
+            var stdOut = new StringBuilder();
+            var stdErr = new StringBuilder();
+            var stdOutReceived = (string data) => {
+                if (stdOutHandler != null) stdOutHandler(data);
+                stdOut.AppendLine(data);
+            };
+            var stdErrReceived = (string data) => {
+                if (stdErrHandler != null) stdErrHandler(data);
+                stdErr.AppendLine(data);
+            };
+
             var process = TryCatchHelpers.TryCatchNoThrow<Process>(() => StartShellCommandProcess(command, arguments, addToEnvironment), null, out Exception processException);
+            process.OutputDataReceived += (sender, e) => stdOutReceived(e.Data ?? "");
+            process.ErrorDataReceived += (sender, e) => stdErrReceived(e.Data ?? "");
+            process.BeginOutputReadLine();
+            process.BeginErrorReadLine();
+
+            await process.WaitForExitAsync();
 
             var response = new ProcessResponse<T>();
-            response.StdOutput = process != null ? await process.StandardOutput.ReadToEndAsync() : "";
-            response.StdError = process != null ? await process.StandardError.ReadToEndAsync() : processException.ToString();
+            response.StdOutput = process != null ? stdOut.ToString() : "";
+            response.StdError = process != null ? stdErr.ToString() : processException.ToString();
 
             if (!string.IsNullOrEmpty(response.StdOutput)) SHELL_DEBUG_TRACE($"---\nSTDOUT\n---\n{response.StdOutput}");
             if (!string.IsNullOrEmpty(response.StdError)) SHELL_DEBUG_TRACE($"---\nSTDERR\n---\n{response.StdError}");
