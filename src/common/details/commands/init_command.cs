@@ -148,11 +148,7 @@ namespace Azure.AI.Details.Common.CLI
 
             var choices = choiceLookup.Keys.ToArray();
 
-            var normal = new Colors(ConsoleColor.White, ConsoleColor.Blue);
-            var selected = new Colors(ConsoleColor.White, ConsoleColor.Red);
-
-            var width = Math.Max(choices.Max(x => x.Length) + 4, 29);
-            var picked = ListBoxPicker.PickIndexOf(choices.ToArray(), width, 30, normal, selected);
+            var picked = ListBoxPicker.PickIndexOf(choices.ToArray());
             if (picked < 0)
             {
                 Console.WriteLine("\rInitialize: (canceled)");
@@ -245,11 +241,7 @@ namespace Azure.AI.Details.Common.CLI
 
             Console.Write("\rName: ");
 
-            var normal = new Colors(ConsoleColor.White, ConsoleColor.Blue);
-            var selected = new Colors(ConsoleColor.White, ConsoleColor.Red);
-
-            var width = Math.Max(choices.Max(x => x.Length) + 4, 29);
-            var picked = ListBoxPicker.PickIndexOf(choices.ToArray(), width, 30, normal, selected);
+            var picked = ListBoxPicker.PickIndexOf(choices.ToArray());
             if (picked < 0)
             {
                 throw new ApplicationException($"CANCELED: No resource selected");
@@ -336,13 +328,9 @@ namespace Azure.AI.Details.Common.CLI
             }
 
             choices.Insert(0, "(Create new)");
-            var width = Math.Max(choices.Max(x => x.Length) + 4, 29);
-
-            var normal = new Colors(ConsoleColor.White, ConsoleColor.Blue);
-            var selected = new Colors(ConsoleColor.White, ConsoleColor.Red);
 
             Console.Write("\rName: ");
-            var picked = ListBoxPicker.PickIndexOf(choices.ToArray(), width, 30, normal, selected);
+            var picked = ListBoxPicker.PickIndexOf(choices.ToArray());
             if (picked < 0)
             {
                 throw new ApplicationException($"CANCELED: No resource selected");
@@ -432,13 +420,9 @@ namespace Azure.AI.Details.Common.CLI
             }
 
             choices.Insert(0, "(Create new)");
-            var width = Math.Max(choices.Max(x => x.Length) + 4, 29);
-
-            var normal = new Colors(ConsoleColor.White, ConsoleColor.Blue);
-            var selected = new Colors(ConsoleColor.White, ConsoleColor.Red);
 
             Console.Write("\rProject: ");
-            var picked = ListBoxPicker.PickIndexOf(choices.ToArray(), width, 30, normal, selected);
+            var picked = ListBoxPicker.PickIndexOf(choices.ToArray());
             if (picked < 0)
             {
                 throw new ApplicationException($"CANCELED: No project selected");

@@ -130,10 +130,7 @@ namespace Azure.AI.Details.Common.CLI
                 var hasP0 = !string.IsNullOrEmpty(p0);
                 if (hasP0) list.Insert(0, p0);
 
-                var normal = new Colors(ConsoleColor.White, ConsoleColor.Blue);
-                var selected = new Colors(ConsoleColor.White, ConsoleColor.Red);
-
-                var picked = ListBoxPicker.PickIndexOf(list.ToArray(), 60, 30, normal, selected);
+                var picked = ListBoxPicker.PickIndexOf(list.ToArray());
                 if (picked < 0)
                 {
                     return (null, null);

@@ -109,9 +109,6 @@ namespace Azure.AI.Details.Common.CLI
             {
                 ConsoleHelpers.WriteLineWithHighlight($"\n`CREATE DEPLOYMENT ({deploymentExtra.ToUpper()})`");
 
-                var normal = new Colors(ConsoleColor.White, ConsoleColor.Blue);
-                var selected = new Colors(ConsoleColor.White, ConsoleColor.Red);
-                
                 Console.Write("\rModel: *** Loading choices ***");
                 var models = await AzCli.ListCognitiveServicesModels(subscriptionId, resource.RegionLocation);
 
@@ -125,7 +122,7 @@ namespace Azure.AI.Details.Common.CLI
                 };
                 var select = Math.Max(0, Array.FindLastIndex(choices, x => x.Contains(scanFor)));
 
-                var index = ListBoxPicker.PickIndexOf(choices, 60, 30, normal, selected, select);
+                var index = ListBoxPicker.PickIndexOf(choices, select);
                 if (index < 0) return (null, null);
 
                 var modelName = models.Payload[index].Name;
@@ -143,8 +140,7 @@ namespace Azure.AI.Details.Common.CLI
                     $"{modelName}-{modelVersion}",
                     "(Enter custom name)"
                 };
-                var width = Math.Max(choices.Max(x => x.Length) + 5, 30);
-                var pick = ListBoxPicker.PickIndexOf(choices, width, 30, normal, selected);
+                var pick = ListBoxPicker.PickIndexOf(choices);
 
                 deploymentName = pick switch{
                     0 => $"{modelName}-{modelVersion}",
@@ -176,10 +172,7 @@ namespace Azure.AI.Details.Common.CLI
                 var hasP0 = !string.IsNullOrEmpty(p0);
                 if (hasP0) list.Insert(0, p0);
 
-                var normal = new Colors(ConsoleColor.White, ConsoleColor.Blue);
-                var selected = new Colors(ConsoleColor.White, ConsoleColor.Red);
-
-                var picked = ListBoxPicker.PickIndexOf(list.ToArray(), 60, 30, normal, selected, select);
+                var picked = ListBoxPicker.PickIndexOf(list.ToArray(), select);
                 if (picked < 0)
                 {
                     return (null, null);

@@ -150,10 +150,7 @@ namespace Azure.AI.Details.Common.CLI
                 var hasP0 = !string.IsNullOrEmpty(p0);
                 if (hasP0) list.Insert(0, p0);
 
-                var normal = new Colors(ConsoleColor.White, ConsoleColor.Blue);
-                var selected = new Colors(ConsoleColor.White, ConsoleColor.Red);
-
-                var picked = ListBoxPicker.PickIndexOf(list.ToArray(), 60, 30, normal, selected);
+                var picked = ListBoxPicker.PickIndexOf(list.ToArray());
                 if (picked < 0)
                 {
                     return (null, null);
@@ -234,10 +231,7 @@ namespace Azure.AI.Details.Common.CLI
             private static bool ListBoxPickYesNo()
             {
                 var choices = "Yes;No".Split(';').ToArray();
-                var normal = new Colors(ConsoleColor.White, ConsoleColor.Blue);
-                var selected = new Colors(ConsoleColor.White, ConsoleColor.Red);
-
-                var picked = ListBoxPicker.PickIndexOf(choices, int.MinValue, 4, normal, selected);
+                var picked = ListBoxPicker.PickIndexOf(choices);
                 Console.WriteLine(picked switch {
                     0 => "Yes",
                     1 => "No",

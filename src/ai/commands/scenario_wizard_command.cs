@@ -118,7 +118,7 @@ namespace Azure.AI.Details.Common.CLI
             var projects = GetProjects();
             Console.Write("\rProject: ");
 
-            var project = PickProject(projects);
+            var project = ListBoxPicker.PickString(projects);
             Console.WriteLine($"\rProject: {project}");
 
             if (project == projects[0]) // (Create new)
@@ -137,7 +137,7 @@ namespace Azure.AI.Details.Common.CLI
                     ConsoleHelpers.WriteLineWithHighlight("\n`CONFIG AI SCENARIO DATA`");
 
                     Console.Write("\rWhere: ");
-                    var source = PickDataLocation(GetDataLocationChoices());
+                    var source = ListBoxPicker.PickString(GetDataLocationChoices());
                     Console.WriteLine($"\rWhere: {source}");
 
                     if (!source.Contains("files"))
@@ -275,12 +275,6 @@ namespace Azure.AI.Details.Common.CLI
             };
         }
 
-        private static string PickDataLocation(string[] choices)
-        {
-            var width = Math.Max(choices.Max(x => x.Length) + 4, 29);
-            return ListBoxPicker.PickString(choices, width, 30, new Colors(ConsoleColor.White, ConsoleColor.Blue), new Colors(ConsoleColor.White, ConsoleColor.Red));
-        }
-
         private static string[] GetProjects()
         {
             Thread.Sleep(400);
@@ -290,12 +284,6 @@ namespace Azure.AI.Details.Common.CLI
                 "Copilot-project-1",
                 "My-2nd-attempt",
             };
-        }
-
-        private static string PickProject(string[] choices)
-        {
-            var width = Math.Max(choices.Max(x => x.Length) + 4, 29);
-            return ListBoxPicker.PickString(choices, width, 30, new Colors(ConsoleColor.White, ConsoleColor.Blue), new Colors(ConsoleColor.White, ConsoleColor.Red));
         }
 
         private static void DisplayScenarioBanner()

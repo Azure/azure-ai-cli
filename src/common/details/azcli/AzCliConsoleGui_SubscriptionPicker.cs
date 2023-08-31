@@ -83,11 +83,9 @@ namespace Azure.AI.Details.Common.CLI
                             "LAUNCH: `az login` (interactive device code)",
                             "CANCEL: `az login ...` (non-interactive)",
                         };
-                        var normal = new Colors(ConsoleColor.White, ConsoleColor.Blue);
-                        var selected = new Colors(ConsoleColor.White, ConsoleColor.Red);
 
                         var selection = OS.IsLinux() ? 1 : 0;
-                        var picked = ListBoxPicker.PickIndexOf(choices, int.MinValue, 30, normal, selected, selection);
+                        var picked = ListBoxPicker.PickIndexOf(choices, selection);
 
                         cancelLogin = (picked < 0 || picked == 2);
                         useDeviceCode = (picked == 1);
@@ -137,10 +135,7 @@ namespace Azure.AI.Details.Common.CLI
             private static (AzCli.SubscriptionInfo? Subscription, string Error) ListBoxPickSubscription(AzCli.SubscriptionInfo[] subscriptions)
             {
                 var list = subscriptions.Select(x => x.Name).ToArray();
-                var normal = new Colors(ConsoleColor.White, ConsoleColor.Blue);
-                var selected = new Colors(ConsoleColor.White, ConsoleColor.Red);
-
-                var picked = ListBoxPicker.PickIndexOf(list, 60, 30, normal, selected);
+                var picked = ListBoxPicker.PickIndexOf(list);
                 if (picked < 0)
                 {
                     return (null, null);
