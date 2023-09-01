@@ -80,11 +80,11 @@ namespace Azure.AI.Details.Common.CLI
                 }
 
                 return interactive
-                    ? ListBoxPickAccountRegionLocation(regions.ToArray(), p0)
+                    ? (ListBoxPickAccountRegionLocation(regions.ToArray(), p0), null)
                     : (null, null);
             }
 
-            private static (AzCli.AccountRegionLocationInfo? RegionLocation, string Error) ListBoxPickAccountRegionLocation(AzCli.AccountRegionLocationInfo[] items, string p0)
+            private static AzCli.AccountRegionLocationInfo? ListBoxPickAccountRegionLocation(AzCli.AccountRegionLocationInfo[] items, string p0)
             {
                 var list = items.Select(x => x.RegionalDisplayName).ToList();
 
@@ -94,20 +94,20 @@ namespace Azure.AI.Details.Common.CLI
                 var picked = ListBoxPicker.PickIndexOf(list.ToArray());
                 if (picked < 0)
                 {
-                    return (null, null);
+                    return null;
                 }
 
                 if (hasP0 && picked == 0)
                 {
                     Console.WriteLine(p0);
-                    return (new AzCli.AccountRegionLocationInfo(), null);
+                    return new AzCli.AccountRegionLocationInfo();
                 }
 
                 if (hasP0) picked--;
                 var regionLocation = items[picked];
 
                 DisplayNameAndDisplayName(regionLocation);
-                return (regionLocation, null);
+                return regionLocation;
             }
 
             static bool ExactMatchRegionLocation(AzCli.AccountRegionLocationInfo regionLocation, string regionLocationFilter)
