@@ -141,9 +141,9 @@ namespace Azure.AI.Details.Common.CLI
             {
                 ["Azure OpenAI"] = "openai",
                 ["Azure OpenAI + Cognitive Search"] = "openai;search",
-                ["Azure AI Project"] = "resource;project",
-                ["Azure AI Project + OpenAI"] = "openai;resource;project",
-                ["Azure AI Project + OpenAI + Cognitive Search"] = "openai;search;resource;project",
+                ["Azure AI Resource + Project"] = "resource;project",
+                ["Azure AI Resource + Project + OpenAI"] = "openai;resource;project",
+                ["Azure AI Resource + Project + OpenAI + Cognitive Search"] = "openai;search;resource;project",
             };
 
             var choices = choiceLookup.Keys.ToArray();
