@@ -7,19 +7,19 @@ USAGE: ai speech <command> [...]
 
 COMMANDS
 
-  ai speech recognize [...]       (see: ai help speech recognize)`#e_;*`
-  ai speech synthesize [...]      (see: ai help speech synthesize)`#e_;*`
+`#e_;*` ai speech recognize [...]       (see: ai help speech recognize
+`#e_;*` ai speech synthesize [...]      (see: ai help speech synthesize
 
-  ai speech intent [...]          (see: ai help speech intent)`#e_;*`
-  ai speech translate [...]       (see: ai help speech translate)`#e_;*`
+`#e_;*` ai speech intent [...]          (see: ai help speech intent
+`#e_;*` ai speech translate [...]       (see: ai help speech translate
 
-  ai speech batch [...]           (see: ai help speech batch)`#e_;*`
-  ai speech csr [...]             (see: ai help speech csr)`#e_;*`
+`#e_;*` ai speech batch [...]           (see: ai help speech batch
+`#e_;*` ai speech csr [...]             (see: ai help speech csr
 
-  ai speech profile [...]         (see: ai help speech profile)`#e_;*`
-  ai speech speaker [...]         (see: ai help speech speaker)`#e_;*`
+`#e_;*` ai speech profile [...]         (see: ai help speech profile
+`#e_;*` ai speech speaker [...]         (see: ai help speech speaker
 
-  `#e_;* - NOT IMPLEMENTED YET`
+`#e_;* - COMING SOON`
 
 ADDITIONAL TOPICS
 

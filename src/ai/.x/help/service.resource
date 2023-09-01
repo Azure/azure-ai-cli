@@ -5,10 +5,10 @@ COMMANDS
   ai service resource create [...]        (see: ai help service resource create)
   ai service resource list [...]          (see: ai help service resource list)
 
-  ai service resource update [...]        (see: ai help service resource update)`#e_;*
+`#e_;*` ai service resource update [...]        (see: ai help service resource update)
   ai service resource delete [...]        (see: ai help service resource delete)
 
-  `#e_;* - NOT IMPLEMENTED YET`
+`#e_;* - COMING SOON`
 
 ADDITIONAL TOPICS
 
