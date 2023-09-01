@@ -51,6 +51,11 @@ namespace Azure.AI.Details.Common.CLI
             return DoCreateConnectionViaPython(values, subscription, group, projectName, connectionName, connectionType, endpoint, key);
         }
 
+        static public string GetConnection(INamedValues values, string subscription, string group, string projectName, string connectionName)
+        {
+            return DoGetConnectionViaPython(values, subscription, group, projectName, connectionName);
+        }
+
         private static string DoCreateResourceViaPython(INamedValues values, string subscription, string group, string name, string location, string displayName, string description)
         {
             var createResource = () => RunEmbeddedPythonScript(values,
@@ -121,6 +126,16 @@ namespace Azure.AI.Details.Common.CLI
                     "--connection-type", connectionType,
                     "--endpoint", endpoint,
                     "--key", key);
+        }
+
+        private static string DoGetConnectionViaPython(INamedValues values, string subscription, string group, string projectName, string connectionName)
+        {
+            return RunEmbeddedPythonScript(values,
+                    "api_key_connection_get",
+                    "--subscription", subscription,
+                    "--group", group,
+                    "--project-name", projectName,
+                    "--connection-name", connectionName);
         }
 
         private static string BuildPythonScriptArgs(params string[] args)
