@@ -148,7 +148,7 @@ namespace Azure.AI.Details.Common.CLI
 
             var choices = choiceLookup.Keys.ToArray();
 
-            var picked = ListBoxPicker.PickIndexOf(choices.ToArray());
+            var picked = ListBoxPicker.PickIndexOf(choices.ToArray(), choices.Count() - 1);
             if (picked < 0)
             {
                 Console.WriteLine("\rInitialize: (canceled)");
