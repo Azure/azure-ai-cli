@@ -8,7 +8,9 @@ USAGE: ai search <command> [...]
 COMMANDS
 
   ai search index [...]       (see: ai help search index)
-  ai search query [...]       (see: ai help search query)
+  ai search query [...]       (see: ai help search query)`#e_;*`
+
+  `#e_;* - NOT IMPLEMENTED YET`
 
 ADDITIONAL TOPICS
 

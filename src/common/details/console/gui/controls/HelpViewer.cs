@@ -67,6 +67,11 @@ namespace Azure.AI.Details.Common.CLI.ConsoleGui
                         helpCommand = helpCommand.Substring(0, helpCommand.Length - 1);
                     }
 
+                    if (helpCommand.EndsWith(")`#e_;*`"))
+                    {
+                        helpCommand = helpCommand.Substring(0, helpCommand.Length - 8);
+                    }
+
                     var programExe = OperatingSystem.IsWindows() ? Program.Exe : Program.Exe.Replace(".exe", "");
                     var start = new ProcessStartInfo(programExe, $"quiet {helpCommand}");
                     start.UseShellExecute = false;
@@ -92,7 +97,10 @@ namespace Azure.AI.Details.Common.CLI.ConsoleGui
                     if (at > 0)
                     {
                         var tryCommand = text.Substring(at + tryItPrefix.Length);
-                        tryCommand = tryCommand.TrimEnd(')');
+                        if (tryCommand.EndsWith(")`#e_;*`"))
+                        {
+                            tryCommand = tryCommand.Substring(0, tryCommand.Length - 8);
+                        }
 
                         var programExe = OperatingSystem.IsWindows() ? Program.Exe : Program.Exe.Replace(".exe", "");
                         var start = new ProcessStartInfo(programExe, $"cls {tryCommand}");

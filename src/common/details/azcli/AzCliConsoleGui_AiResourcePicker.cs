@@ -211,12 +211,15 @@ namespace Azure.AI.Details.Common.CLI
                 {
                     "face" => true,
                     "cognitiveservices" => true,
+                    "openai" => true,
                     _ => false
                 };
 
                 if (checkAttestation)
                 {
-                    Console.Write("\nI certify that use of this service is not by or for a police department in the United States: ");
+                    ConsoleHelpers.WriteLineWithHighlight("`#e_;\nI confirm that I have reviewed and acknowledge the terms in the Responsible AI notice.`");
+                    ConsoleHelpers.WriteLineWithHighlight("`#e_;See: https://aka.ms/azure-ai-cli-responsible-ai-notice`");
+                    Console.Write("\n     ");
                     var yesOrNo = ListBoxPickYesNo();
                     Console.WriteLine();
                     return yesOrNo;

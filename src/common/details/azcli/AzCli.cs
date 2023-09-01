@@ -295,7 +295,7 @@ namespace Azure.AI.Details.Common.CLI
             var cmdPart = "cognitiveservices account create";
             var subPart = subscriptionId != null ? $"--subscription {subscriptionId}" : "";
 
-            var process = await ProcessHelpers.ParseShellCommandJson<JObject>("az", $"{cmdPart} {subPart} --kind {kind} --location {regionLocation} --sku {sku} -g {group} -n {name} --custom-domain {name} --yes", GetUserAgentEnv());
+            var process = await ProcessHelpers.ParseShellCommandJson<JObject>("az", $"{cmdPart} {subPart} --kind {kind} --location {regionLocation} --sku {sku} -g {group} -n {name} --custom-domain {name}", GetUserAgentEnv());
 
             var x = new ProcessResponse<CognitiveServicesResourceInfo?>();
             x.StdOutput = process.StdOutput;

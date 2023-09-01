@@ -8,16 +8,18 @@ USAGE: ai tool <command> [...]
 
 COMMANDS
 
-  ai tool text split [...]          (see: ai help tool text split)
-  ai tool text jsonl [...]          (see: ai help tool text jsonl)
-  ai tool text json [...]           (see: ai help tool text json)
+  ai tool text split [...]          (see: ai help tool text split)`#e_;*`
+  ai tool text jsonl [...]          (see: ai help tool text jsonl)`#e_;*`
+  ai tool text json [...]           (see: ai help tool text json)`#e_;*`
 
-  ai tool audio [...]               (see: ai help tool audio)
-  ai tool image [...]               (see: ai help tool image)
-  ai tool video [...]               (see: ai help tool video)
+  ai tool audio [...]               (see: ai help tool audio)`#e_;*`
+  ai tool image [...]               (see: ai help tool image)`#e_;*`
+  ai tool video [...]               (see: ai help tool video)`#e_;*`
 
-  ai tool files [...]               (see: ai help tool files)
-  ai tool http [...]                (see: ai help tool http)
+  ai tool files [...]               (see: ai help tool files)`#e_;*`
+  ai tool http [...]                (see: ai help tool http)`#e_;*`
+
+  `#e_;* - NOT IMPLEMENTED YET`
 
 ADDITIONAL TOPICS
 
