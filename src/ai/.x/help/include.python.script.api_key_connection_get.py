@@ -7,7 +7,7 @@ from azure.ai.generative.entities import Connection
 from azure.ai.ml.entities._credentials import ApiKeyConfiguration
 from azure.identity import DefaultAzureCredential
 
-def get_api_key_connection(subscription_id, resource_group_name, project_name, connection_name, connection_type):
+def get_api_key_connection(subscription_id, resource_group_name, project_name, connection_name):
 
     client = AIClient(
         credential=DefaultAzureCredential(),
