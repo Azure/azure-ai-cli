@@ -34,19 +34,15 @@ namespace Azure.AI.Details.Common.CLI
 
             public static async Task<AzCli.SubscriptionInfo> PickSubscriptionAsync(bool interactive, string subscriptionFilter = null)
             {
-                (var subscription, var error) = await FindSubscriptionAsync(interactive, subscriptionFilter);
-                if (subscription == null && error != null)
-                {
-                    throw new ApplicationException($"ERROR: Loading subscriptions:\n{error}");
-                }
-                else if (subscription == null)
+                var subscription = await FindSubscriptionAsync(interactive, subscriptionFilter);
+                if (subscription == null)
                 {
                     throw new ApplicationException($"CANCELED: No subscription selected.");
                 }
                 return subscription.Value;
             }
 
-            private static async Task<(AzCli.SubscriptionInfo? Subscription, string Error)> FindSubscriptionAsync(bool interactive, string subscriptionFilter = null)
+            private static async Task<AzCli.SubscriptionInfo?> FindSubscriptionAsync(bool interactive, string subscriptionFilter = null)
             {
                 Console.Write("\rSubscription: *** Loading choices ***");
                 var response = await AzCli.ListAccounts();
@@ -58,14 +54,11 @@ namespace Azure.AI.Details.Common.CLI
                 Console.Write("\rSubscription: ");
                 if (noOutput && hasError && hasErrorNotFound)
                 {
-                    ConsoleHelpers.WriteLineError("*** Please install the Azure CLI - https://aka.ms/azcli ***");
-                    Console.Write("\nNOTE: If it's already installed ensure it's in the system PATH and working (try: `az account list`)");
-                    return (null, response.StdError);
+                    throw new ApplicationException("*** Please install the Azure CLI - https://aka.ms/azcli ***\n\nNOTE: If it's already installed ensure it's in the system PATH and working (try: `az account list`)");
                 }
                 else if (noOutput && hasError)
                 {
-                    ConsoleHelpers.WriteLineError("*** ERROR: Loading subscriptions ***");
-                    return (null, response.StdError);
+                    throw new ApplicationException($"*** ERROR: Loading subscriptions ***\n{response.StdError}");
                 }
 
                 var needLogin = response.StdError != null && response.StdError.Contains("az login");
@@ -95,7 +88,7 @@ namespace Azure.AI.Details.Common.CLI
                     {
                         Console.Write("\rSubscription: ");
                         ConsoleHelpers.WriteLineError("*** Please run `az login` and try again ***");
-                        return (null, null);
+                        return null;
                     }
 
                     Console.Write("\rSubscription: *** Launching `az login` (interactive) ***");
@@ -113,37 +106,37 @@ namespace Azure.AI.Details.Common.CLI
                     ConsoleHelpers.WriteLineError(response.Payload.Count() > 0
                         ? "*** No matching subscriptions found ***"
                         : "*** No subscriptions found ***");
-                    return (null, null);
+                    return null;
                 }
                 else if (subscriptions.Count() == 1)
                 {
                     var subscription = subscriptions[0];
                     DisplayNameAndId(subscription);
-                    return (subscription, null);
+                    return subscription;
                 }
                 else if (!interactive)
                 {
                     ConsoleHelpers.WriteLineError("*** More than 1 subscription found ***");
                     Console.WriteLine();
                     DisplaySubscriptions(subscriptions, "  ");
-                    return (null, null);
+                    return null;
                 }
 
                 return ListBoxPickSubscription(subscriptions);
             }
 
-            private static (AzCli.SubscriptionInfo? Subscription, string Error) ListBoxPickSubscription(AzCli.SubscriptionInfo[] subscriptions)
+            private static AzCli.SubscriptionInfo? ListBoxPickSubscription(AzCli.SubscriptionInfo[] subscriptions)
             {
                 var list = subscriptions.Select(x => x.Name).ToArray();
                 var picked = ListBoxPicker.PickIndexOf(list);
                 if (picked < 0)
                 {
-                    return (null, null);
+                    return null;
                 }
 
                 var subscription = subscriptions[picked];
                 DisplayNameAndId(subscription);
-                return (subscription, null);
+                return subscription;
             }
 
             private static bool MatchSubscriptionFilter(AzCli.SubscriptionInfo subscription, string subscriptionFilter)

@@ -111,11 +111,8 @@ namespace Azure.AI.Details.Common.CLI
             {
                 ConsoleHelpers.WriteLineWithHighlight("\n`RESOURCE GROUP`");
 
-                (var regionLocation, var errorLoc) = await RegionLocationPicker.FindRegionAsync(interactive, regionLocationFilter, true);
-                if (regionLocation == null && errorLoc != null)
-                {
-                    throw new ApplicationException($"ERROR: Loading regions: {errorLoc}");
-                }
+                var regionLocation = await RegionLocationPicker.FindRegionAsync(interactive, regionLocationFilter, true);
+                if (regionLocation == null) return null;
 
                 var group = await ResourceGroupPicker.PickOrCreateResourceGroup(interactive, subscriptionId, regionLocation?.Name, groupFilter);
 
