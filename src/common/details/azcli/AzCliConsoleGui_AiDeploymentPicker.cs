@@ -21,17 +21,13 @@ namespace Azure.AI.Details.Common.CLI
                    ? $"(Create `{deploymentFilter}`)"
                    : interactive ? "(Create new)" : null;
 
-               (var deployment, var error) = await FindDeployment(interactive, deploymentExtra, subscriptionId, groupName, resourceName, deploymentFilter, createNewItem);
+               var deployment = await FindDeployment(interactive, deploymentExtra, subscriptionId, groupName, resourceName, deploymentFilter, createNewItem);
                if (deployment != null && deployment.Value.Name == null)
                {
-                   (deployment, error) = await TryCreateDeployment(interactive, deploymentExtra, subscriptionId, groupName, resourceRegionLocation, resourceName, deploymentFilter);
+                   deployment = await TryCreateDeployment(interactive, deploymentExtra, subscriptionId, groupName, resourceRegionLocation, resourceName, deploymentFilter);
                }
 
-               if (deployment == null && error != null)
-               {
-                   throw new ApplicationException($"ERROR: Loading or creating deployment:\n{error}");
-               }
-               else if (deployment == null)
+               if (deployment == null)
                {
                    throw new ApplicationException($"CANCELED: No deployment selected");
                }
@@ -39,7 +35,7 @@ namespace Azure.AI.Details.Common.CLI
                return deployment.Value;
             }
 
-            public static async Task<(AzCli.CognitiveServicesDeploymentInfo? Deployment, string Error)> FindDeployment(bool interactive, string deploymentExtra, string subscriptionId, string groupName, string resourceName, string deploymentFilter, string allowCreateDeploymentOption)
+            public static async Task<AzCli.CognitiveServicesDeploymentInfo?> FindDeployment(bool interactive, string deploymentExtra, string subscriptionId, string groupName, string resourceName, string deploymentFilter, string allowCreateDeploymentOption)
             {
                 var allowCreateDeployment = !string.IsNullOrEmpty(allowCreateDeploymentOption);
 
@@ -49,8 +45,7 @@ namespace Azure.AI.Details.Common.CLI
                 Console.Write($"\rName: ");
                 if (string.IsNullOrEmpty(response.StdOutput) && !string.IsNullOrEmpty(response.StdError))
                 {
-                    ConsoleHelpers.WriteLineError($"ERROR: Loading Cognitive Services resources: {response.StdError}");
-                    return (null, response.StdError);
+                    throw new ApplicationException($"ERROR: Loading deployments:\n{response.StdError}");
                 }
 
                 var deployments = response.Payload
@@ -66,26 +61,26 @@ namespace Azure.AI.Details.Common.CLI
                     if (!allowCreateDeployment)
                     {
                         ConsoleHelpers.WriteLineError($"*** No deployments found ***");
-                        return (null, null);
+                        return null;
                     }
                     else if (!interactive)
                     {
                         Console.WriteLine(allowCreateDeploymentOption);
-                        return (new AzCli.CognitiveServicesDeploymentInfo(), null);
+                        return new AzCli.CognitiveServicesDeploymentInfo();
                     }
                 }
                 else if (deployments.Count() == 1 && (!interactive || exactMatch))
                 {
                     var deployment = deployments.First();
                     DisplayName(deployment);
-                    return (deployment, null);
+                    return deployment;
                 }
                 else if (!interactive)
                 {
                     ConsoleHelpers.WriteLineError("*** More than 1 deployment found ***");
                     Console.WriteLine();
                     DisplayDeployments(deployments, "  ");
-                    return (null, null);
+                    return null;
                 }
 
                 var scanFor = deploymentExtra.ToLower() switch {
@@ -102,10 +97,10 @@ namespace Azure.AI.Details.Common.CLI
 
                 return interactive
                     ? ListBoxPickDeployment(choices, allowCreateDeploymentOption, select)
-                    : (null, null);
+                    : null;
             }
 
-            public static async Task<(AzCli.CognitiveServicesDeploymentInfo? Deployment, string Error)> TryCreateDeployment(bool interactive, string deploymentExtra, string subscriptionId, string groupName, string resourceRegionLocation, string resourceName, string deploymentName)
+            public static async Task<AzCli.CognitiveServicesDeploymentInfo?> TryCreateDeployment(bool interactive, string deploymentExtra, string subscriptionId, string groupName, string resourceRegionLocation, string resourceName, string deploymentName)
             {
                 ConsoleHelpers.WriteLineWithHighlight($"\n`CREATE DEPLOYMENT ({deploymentExtra.ToUpper()})`");
 
@@ -123,7 +118,7 @@ namespace Azure.AI.Details.Common.CLI
                 var select = Math.Max(0, Array.FindLastIndex(choices, x => x.Contains(scanFor)));
 
                 var index = ListBoxPicker.PickIndexOf(choices, select);
-                if (index < 0) return (null, null);
+                if (index < 0) return null;
 
                 var modelName = models.Payload[index].Name;
                 Console.WriteLine($"\rModel: {modelName}");
@@ -148,7 +143,7 @@ namespace Azure.AI.Details.Common.CLI
                     _ => null
                 };
 
-                if (string.IsNullOrEmpty(deploymentName)) return (null, null);
+                if (string.IsNullOrEmpty(deploymentName)) return null;
                 if (pick != choices.Length - 1) Console.WriteLine($"\rName: {deploymentName}");
 
                 Console.Write("*** CREATING ***");
@@ -157,15 +152,14 @@ namespace Azure.AI.Details.Common.CLI
                 Console.Write("\r");
                 if (string.IsNullOrEmpty(response.StdOutput) && !string.IsNullOrEmpty(response.StdError))
                 {
-                    ConsoleHelpers.WriteLineError($"ERROR: Creating deployment: {response.StdError}");
-                    return (null, response.StdError);
+                    throw new ApplicationException($"ERROR: Creating deployment: {response.StdError}");
                 }
 
                 Console.WriteLine("\r*** CREATED ***  ");
-                return (response.Payload, null);
+                return response.Payload;
             }
 
-            private static (AzCli.CognitiveServicesDeploymentInfo? Deployment, string Error) ListBoxPickDeployment(AzCli.CognitiveServicesDeploymentInfo[] deployments, string p0, int select = 0)
+            private static AzCli.CognitiveServicesDeploymentInfo? ListBoxPickDeployment(AzCli.CognitiveServicesDeploymentInfo[] deployments, string p0, int select = 0)
             {
                 var list = deployments.Select(x => $"{x.Name} ({x.ModelFormat})").ToList();
 
@@ -175,18 +169,18 @@ namespace Azure.AI.Details.Common.CLI
                 var picked = ListBoxPicker.PickIndexOf(list.ToArray(), select);
                 if (picked < 0)
                 {
-                    return (null, null);
+                    return null;
                 }
 
                 if (hasP0 && picked == 0)
                 {
                     Console.WriteLine(p0);
-                    return (new AzCli.CognitiveServicesDeploymentInfo(), null);
+                    return new AzCli.CognitiveServicesDeploymentInfo();
                 }
 
                 if (hasP0) picked--;
                 Console.WriteLine($"{deployments[picked].Name}");
-                return (deployments[picked], null);
+                return deployments[picked];
             }
 
             private static bool ExactMatchDeployment(AzCli.CognitiveServicesDeploymentInfo deployment, string deploymentFilter)

@@ -7,15 +7,15 @@ USAGE: ai vision <command> [...]
 
 COMMANDS
 
-  ai vision form [...]            (see: ai help vision form)`#e_;*`
-  ai vision document [...]        (see: ai help vision document)`#e_;*`
+`#e_;*` ai vision form [...]            (see: ai help vision form
+`#e_;*` ai vision document [...]        (see: ai help vision document
 
-  ai vision image [...]           (see: ai help vision image)`#e_;*`
+`#e_;*` ai vision image [...]           (see: ai help vision image
 
-  ai vision person [...]          (see: ai help vision person)`#e_;*`
-  ai vision face [...]            (see: ai help vision face)`#e_;*`
+`#e_;*` ai vision person [...]          (see: ai help vision person
+`#e_;*` ai vision face [...]            (see: ai help vision face
 
-  `#e_;* - NOT IMPLEMENTED YET`
+`#e_;* - COMING SOON`
 
 ADDITIONAL TOPICS
 

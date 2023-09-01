@@ -2,14 +2,14 @@ USAGE: ai service evaluation <command> [...]
 
 COMMANDS
 
-  ai service evaluation create [...]        (see: ai help service evaluation create)`#e_;*`
-  ai service evaluation status [...]        (see: ai help service evaluation status)`#e_;*`
-  ai service evaluation list [...]          (see: ai help service evaluation list)`#e_;*`
+`#e_;*` ai service evaluation create [...]        (see: ai help service evaluation create
+`#e_;*` ai service evaluation status [...]        (see: ai help service evaluation status
+`#e_;*` ai service evaluation list [...]          (see: ai help service evaluation list
 
-  ai service evaluation update [...]        (see: ai help service evaluation update)`#e_;*`
-  ai service evaluation delete [...]        (see: ai help service evaluation delete)`#e_;*`
+`#e_;*` ai service evaluation update [...]        (see: ai help service evaluation update
+`#e_;*` ai service evaluation delete [...]        (see: ai help service evaluation delete
 
-  `#e_;* - NOT IMPLEMENTED YET`
+`#e_;* - COMING SOON`
 
 ADDITIONAL TOPICS
 

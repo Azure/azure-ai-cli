@@ -10,15 +10,15 @@ COMMANDS
   ai service resource [...]         (see: ai help service resource)
   ai service project [...]          (see: ai help service project)
 
-  ai service connection [...]       (see: ai help service connection)`#e_;*`
-  ai service deployment [...]       (see: ai help service deployment)`#e_;*`
+`#e_;*` ai service connection [...]       (see: ai help service connection)
+`#e_;*` ai service deployment [...]       (see: ai help service deployment)
 
-  ai service search [...]           (see: ai help service search)`#e_;*`
+`#e_;*` ai service search [...]           (see: ai help service search)
 
-  ai service flow [...]             (see: ai help service flow)`#e_;*`
-  ai service evaluation [...]       (see: ai help service evaluation)`#e_;*`
+`#e_;*` ai service flow [...]             (see: ai help service flow)
+`#e_;*` ai service evaluation [...]       (see: ai help service evaluation)
 
-  `#e_;* - NOT IMPLEMENTED YET`
+`#e_;* - COMING SOON`
 
 ADDITIONAL TOPICS
 

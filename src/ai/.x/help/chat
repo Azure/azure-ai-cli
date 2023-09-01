@@ -13,21 +13,21 @@ USAGE: ai chat [...]
   INPUT                                 (see: ai help chat input)
     --interactive                       (see: ai help chat interactive)
     --system PROMPT                     (see: ai help chat system prompt)
-    --file FILE                         (see: ai help chat history file)`#e_;*`
-    --files PATTERN                     (see: ai help chat history files)`#e_;*`
-    --files @FILELIST.txt               (see: ai help chat history files)`#e_;*`
-    --json FILE                         (see: ai help chat history json)`#e_;*`
-    --jsonl FILE                        (see: ai help chat history jsonl)`#e_;*`
+  `#e_;*` --file FILE                         (see: ai help chat history file)
+  `#e_;*` --files PATTERN                     (see: ai help chat history files)
+  `#e_;*` --files @FILELIST.txt               (see: ai help chat history files)
+  `#e_;*` --json FILE                         (see: ai help chat history json)
+  `#e_;*` --jsonl FILE                        (see: ai help chat history jsonl)
     --user MESSAGE                      (see: ai help chat user message)
 
-  `#e_;* - NOT IMPLEMENTED YET`
+  `#e_;* - COMING SOON`
 
   CHAT WITH DATA                        (see: ai help chat with data)
-    --data DATA                         (see: ai help chat data)`#e_;*`
-    --data-file FILE                    (see: ai help chat data file)`#e_;*`
-    --data-files PATTERN                (see: ai help chat data files)`#e_;*`
-    --data-files @FILELIST.txt          (see: ai help chat data files)`#e_;*`
-    --embeddings-deployment DEPLOYMENT  (see: ai help chat embeddings deployment)`#e_;*`
+  `#e_;*` --data DATA                         (see: ai help chat data)
+  `#e_;*` --data-file FILE                    (see: ai help chat data file)
+  `#e_;*` --data-files PATTERN                (see: ai help chat data files)
+  `#e_;*` --data-files @FILELIST.txt          (see: ai help chat data files)
+  `#e_;*` --embeddings-deployment DEPLOYMENT  (see: ai help chat embeddings deployment)
     --search-index INDEX                (see: ai help search index)
     --search-endpoint ENDPOINT          (see: ai help search endpoint)
     --search-api-key KEY                (see: ai help search key)

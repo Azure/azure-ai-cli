@@ -23,19 +23,15 @@ namespace Azure.AI.Details.Common.CLI
         {
             public static async Task<AzCli.AccountRegionLocationInfo> PickRegionLocationAsync(bool interactive, string regionFilter = null, bool allowAnyRegionOption = true)
             {
-                (var regionLocation, var error) = await FindRegionAsync(interactive, regionFilter, allowAnyRegionOption);
-                if (regionLocation == null && error != null)
-                {
-                    throw new ApplicationException($"ERROR: Loading resource regions/locations:\n{error}");
-                }
-                else if (regionLocation == null)
+                var regionLocation = await FindRegionAsync(interactive, regionFilter, allowAnyRegionOption);
+                if (regionLocation == null)
                 {
                     throw new ApplicationException($"CANCELED: No resource region/location selected.");
                 }
                 return regionLocation.Value;
             }
 
-            public static async Task<(AzCli.AccountRegionLocationInfo? RegionLocation, string Error)> FindRegionAsync(bool interactive, string regionFilter = null, bool allowAnyRegionOption = false)
+            public static async Task<AzCli.AccountRegionLocationInfo?> FindRegionAsync(bool interactive, string regionFilter = null, bool allowAnyRegionOption = false)
             {
                 var p0 = allowAnyRegionOption ? "(Any region/location)" : null;
                 var hasP0 = !string.IsNullOrEmpty(p0);
@@ -46,8 +42,7 @@ namespace Azure.AI.Details.Common.CLI
                 Console.Write("\rRegion: ");
                 if (string.IsNullOrEmpty(response.StdOutput) && !string.IsNullOrEmpty(response.StdError))
                 {
-                    ConsoleHelpers.WriteLineError($"ERROR: Loading resource region/locations\n{response.StdError}");
-                    return (null, response.StdError);
+                    throw new ApplicationException($"ERROR: Loading resource region/locations\n{response.StdError}");
                 }
 
                 var regions = response.Payload
@@ -63,28 +58,28 @@ namespace Azure.AI.Details.Common.CLI
                     ConsoleHelpers.WriteLineError(response.Payload.Count() > 0
                         ? "*** No matching resource region/locations found ***"
                         : "*** No resource region/locations found ***");
-                    return (null, null);
+                    return null;
                 }
                 else if (regions.Count() == 1 && (!interactive || exactMatch))
                 {
                     var region = regions.First();
                     DisplayNameAndDisplayName(region);
-                    return (region, null);
+                    return region;
                 }
                 else if (!interactive)
                 {
                     ConsoleHelpers.WriteLineError("*** More than 1 region/location found ***");
                     Console.WriteLine();
                     DisplayRegionLocations(regions, "  ");
-                    return (null, null);
+                    return null;
                 }
 
                 return interactive
                     ? ListBoxPickAccountRegionLocation(regions.ToArray(), p0)
-                    : (null, null);
+                    : null;
             }
 
-            private static (AzCli.AccountRegionLocationInfo? RegionLocation, string Error) ListBoxPickAccountRegionLocation(AzCli.AccountRegionLocationInfo[] items, string p0)
+            private static AzCli.AccountRegionLocationInfo? ListBoxPickAccountRegionLocation(AzCli.AccountRegionLocationInfo[] items, string p0)
             {
                 var list = items.Select(x => x.RegionalDisplayName).ToList();
 
@@ -94,20 +89,20 @@ namespace Azure.AI.Details.Common.CLI
                 var picked = ListBoxPicker.PickIndexOf(list.ToArray());
                 if (picked < 0)
                 {
-                    return (null, null);
+                    return null;
                 }
 
                 if (hasP0 && picked == 0)
                 {
                     Console.WriteLine(p0);
-                    return (new AzCli.AccountRegionLocationInfo(), null);
+                    return new AzCli.AccountRegionLocationInfo();
                 }
 
                 if (hasP0) picked--;
                 var regionLocation = items[picked];
 
                 DisplayNameAndDisplayName(regionLocation);
-                return (regionLocation, null);
+                return regionLocation;
             }
 
             static bool ExactMatchRegionLocation(AzCli.AccountRegionLocationInfo regionLocation, string regionLocationFilter)
