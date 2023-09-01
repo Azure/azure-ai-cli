@@ -8,13 +8,15 @@ USAGE: ai language <command> [...]
 
 COMMANDS
 
-  ai language extract [...]         (see: ai help language extract)
-  ai language classify [...]        (see: ai help language classify)
+  ai language extract [...]         (see: ai help language extract)`#e_;*`
+  ai language classify [...]        (see: ai help language classify)`#e_;*`
 
-  ai language understand [...]      (see: ai help language understand)
-  ai language summarize [...]       (see: ai help language summarize)
+  ai language understand [...]      (see: ai help language understand)`#e_;*`
+  ai language summarize [...]       (see: ai help language summarize)`#e_;*`
 
-  ai language translate [...]       (see: ai help language translate)
+  ai language translate [...]       (see: ai help language translate)`#e_;*`
+
+  `#e_;* - NOT IMPLEMENTED YET`
 
 ADDITIONAL TOPICS
 

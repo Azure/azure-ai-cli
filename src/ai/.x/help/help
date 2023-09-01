@@ -24,7 +24,7 @@ USAGE: ai <command> [...]
 
   `INTERACTIVE`
 
-    ai help                   (see: ai help get started)
+    ai help                   (see: ai help get started)`#e_;*`
     ai wizard                 (see: ai help wizard)
 
   `CONFIGURATION`
@@ -36,19 +36,21 @@ USAGE: ai <command> [...]
 
     ai chat [...]             (see: ai help chat)
 
-    ai speech [...]           (see: ai help speech)
-    ai vision [...]           (see: ai help vision)
-    ai language [...]         (see: ai help language)
+    ai speech [...]           (see: ai help speech)`#e_;*`
+    ai vision [...]           (see: ai help vision)`#e_;*`
+    ai language [...]         (see: ai help language)`#e_;*`
     ai search [...]           (see: ai help search)
 
     ai service [...]          (see: ai help service)
-    ai tool [...]             (see: ai help tool)
+    ai tool [...]             (see: ai help tool)`#e_;*`
+
+    `#e_;* - NOT IMPLEMENTED YET`
 
   `AI DEVELOPMENT`
 
-    ai samples [...]          (see: ai help samples)
-    ai code [...]             (see: ai help code)
-    ai eval [...]             (see: ai help eval)
+    ai samples [...]          (see: ai help samples)`#e_;*`
+    ai code [...]             (see: ai help code)`#e_;*`
+    ai eval [...]             (see: ai help eval)`#e_;*`
 
 `EXAMPLES`
 

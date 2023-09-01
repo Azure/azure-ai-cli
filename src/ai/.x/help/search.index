@@ -7,12 +7,13 @@ USAGE: ai search index <command> [...]
 
 COMMANDS
 
-  ai search index create [...]         (see: ai help search index create)
-;  ai search index status [...]         (see: ai help search index status)
-;  ai search index list [...]           (see: ai help search index list)
-;
+  ai search index create [...]         (see: ai help search index create)`#e_;*`
+  ai search index list [...]           (see: ai help search index list)`#e_;*`
+
   ai search index update [...]         (see: ai help search index update)
-  ai search index delete [...]         (see: ai help search index delete)
+  ai search index delete [...]         (see: ai help search index delete)`#e_;*`
+
+  `#e_;* - NOT IMPLEMENTED YET`
 
 ADDITIONAL TOPICS
 

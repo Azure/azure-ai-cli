@@ -2,12 +2,14 @@ USAGE: ai service connection <command> [...]
 
 COMMANDS
 
-  ai service connection create [...]        (see: ai help service connection create)
-  ai service connection status [...]        (see: ai help service connection status)
-  ai service connection list [...]          (see: ai help service connection list)
+  ai service connection create [...]        (see: ai help service connection create)`#e_;*`
+  ai service connection status [...]        (see: ai help service connection status)`#e_;*`
+  ai service connection list [...]          (see: ai help service connection list)`#e_;*`
 
-  ai service connection update [...]        (see: ai help service connection update)
-  ai service connection delete [...]        (see: ai help service connection delete)
+  ai service connection update [...]        (see: ai help service connection update)`#e_;*`
+  ai service connection delete [...]        (see: ai help service connection delete)`#e_;*`
+
+  `#e_;* - NOT IMPLEMENTED YET`
 
 ADDITIONAL TOPICS
 

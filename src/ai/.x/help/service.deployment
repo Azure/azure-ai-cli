@@ -2,12 +2,14 @@ USAGE: ai service deployment <command> [...]
 
 COMMANDS
 
-  ai service deployment create [...]        (see: ai help service deployment create)
-  ai service deployment status [...]        (see: ai help service deployment status)
-  ai service deployment list [...]          (see: ai help service deployment list)
+  ai service deployment create [...]        (see: ai help service deployment create)`#e_;*`
+  ai service deployment status [...]        (see: ai help service deployment status)`#e_;*`
+  ai service deployment list [...]          (see: ai help service deployment list)`#e_;*`
 
-  ai service deployment update [...]        (see: ai help service deployment update)
-  ai service deployment delete [...]        (see: ai help service deployment delete)
+  ai service deployment update [...]        (see: ai help service deployment update)`#e_;*`
+  ai service deployment delete [...]        (see: ai help service deployment delete)`#e_;*`
+
+  `#e_;* - NOT IMPLEMENTED YET`
 
 ADDITIONAL TOPICS
 
