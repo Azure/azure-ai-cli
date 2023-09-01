@@ -430,11 +430,15 @@ namespace Azure.AI.Details.Common.CLI
 
             Console.WriteLine($"\rProject: {choices[picked]}");
             var project = picked > 0 ? itemJTokens[picked - 1] : null;
-            if (picked == 0)
+            var createNew = picked == 0;
+            if (createNew)
             {
                 var projectJson = TryCreateProjectInteractive();
                 project = JToken.Parse(projectJson);
             }
+
+            var checkForExistingOpenAiConnection = !createNew;
+            var checkForExistingSearchConnection = !createNew;
 
             var projectName = project["name"].Value<string>();
             var projectId = project["id"].Value<string>();
@@ -444,35 +448,55 @@ namespace Azure.AI.Details.Common.CLI
 
             var openAiEndpoint = _values.GetOrDefault("service.openai.endpoint", null);
             var openAiKey = _values.GetOrDefault("service.openai.key", null);
-            var openAiOk = !string.IsNullOrEmpty(openAiEndpoint) && !string.IsNullOrEmpty(openAiKey);
+            var createOpenAiConnection = !string.IsNullOrEmpty(openAiEndpoint) && !string.IsNullOrEmpty(openAiKey) && !checkForExistingOpenAiConnection;
 
             var searchEndpoint = _values.GetOrDefault("service.search.endpoint", null);
             var searchKey = _values.GetOrDefault("service.search.key", null);
-            var searchOk = !string.IsNullOrEmpty(searchEndpoint) && !string.IsNullOrEmpty(searchKey);
+            var createSearchConnection = !string.IsNullOrEmpty(searchEndpoint) && !string.IsNullOrEmpty(searchKey) && !checkForExistingSearchConnection;
 
-            var connectionsOk = openAiOk || searchOk;
+            var connectionsOk = createOpenAiConnection || createSearchConnection || checkForExistingOpenAiConnection || checkForExistingSearchConnection;
             if (connectionsOk) ConsoleHelpers.WriteLineWithHighlight($"\n`AZURE AI PROJECT CONNECTIONS`\n");
 
-            if (openAiOk)
+            var connectionCount = 0;
+
+            if (createOpenAiConnection || checkForExistingOpenAiConnection)
             {
+                if (connectionCount > 0) Console.WriteLine();
+
                 var connectionName = "Default_AzureOpenAI";
                 Console.WriteLine($"Connection: {connectionName}");
-                Console.Write("*** CREATING ***");
+
+                Console.Write(createOpenAiConnection ? "*** CREATING ***" : "*** CHECKING ***");
+
                 var connectionType = "azure_open_ai";
-                var connectionJson = PythonSDKWrapper.CreateConnection(_values, subscription, groupName, projectName, connectionName, connectionType, openAiEndpoint, openAiKey);
-                Console.WriteLine("\r*** CREATED ***  ");
+                var connectionJson = createOpenAiConnection
+                    ? PythonSDKWrapper.CreateConnection(_values, subscription, groupName, projectName, connectionName, connectionType, openAiEndpoint, openAiKey)
+                    : PythonSDKWrapper.GetConnection(_values, subscription, groupName, projectName, connectionName);
+
+                Console.WriteLine(createOpenAiConnection
+                    ? "\r*** CREATED ***  "
+                    : "\r*** CHECKED ***  ");
+                connectionCount++;
             }
 
-            if (openAiOk && searchOk) Console.WriteLine();
-
-            if (searchOk)
+            if (createSearchConnection || checkForExistingSearchConnection)
             {
+                if (connectionCount > 0) Console.WriteLine();
+
                 var connectionName = "Default_CognitiveSearch";
                 Console.WriteLine($"Connection: {connectionName}");
-                Console.Write("*** CREATING ***");
+
+                Console.Write(createSearchConnection ? "*** CREATING ***" : "*** CHECKING ***");
+
                 var connectionType = "cognitive_search";
-                var connectionJson = PythonSDKWrapper.CreateConnection(_values, subscription, groupName, projectName, connectionName, connectionType, searchEndpoint, searchKey);
-                Console.WriteLine("\r*** CREATED ***  ");
+                var connectionJson = createSearchConnection
+                    ? PythonSDKWrapper.CreateConnection(_values, subscription, groupName, projectName, connectionName, connectionType, searchEndpoint, searchKey)
+                    : PythonSDKWrapper.GetConnection(_values, subscription, groupName, projectName, connectionName);
+
+                Console.WriteLine(createSearchConnection
+                    ? "\r*** CREATED ***  "
+                    : "\r*** CHECKED ***  ");
+                connectionCount++;
             }
 
             ConsoleHelpers.WriteLineWithHighlight($"\n`AZURE AI PROJECT CONFIG`\n");
