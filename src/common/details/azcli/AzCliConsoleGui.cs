@@ -62,6 +62,70 @@ namespace Azure.AI.Details.Common.CLI
             return keys.Payload;
         }
 
+        public static async Task<AzCli.CognitiveSearchResourceInfo> PickOrCreateCognitiveSearchResource(string subscription, string location, string groupName)
+        {
+            ConsoleHelpers.WriteLineWithHighlight($"\n`COGNITIVE SEARCH RESOURCE`");
+            Console.Write("\rName: *** Loading choices ***");
+
+            var response = await AzCli.ListSearchResources(subscription, location);
+            if (string.IsNullOrEmpty(response.StdOutput) && !string.IsNullOrEmpty(response.StdError))
+            {
+                var output = response.StdError.Replace("\n", "\n  ");
+                throw new ApplicationException($"ERROR: Listing search resources\n  {output}");
+            }
+
+            var resources = response.Payload.OrderBy(x => x.Name).ToList();
+            var choices = resources.Select(x => $"{x.Name} ({x.RegionLocation})").ToList();
+            choices.Insert(0, "(Create new)");
+
+            Console.Write("\rName: ");
+
+            var picked = ListBoxPicker.PickIndexOf(choices.ToArray());
+            if (picked < 0)
+            {
+                throw new ApplicationException($"CANCELED: No resource selected");
+            }
+
+            Console.WriteLine($"\rName: {choices[picked]}");
+            var resource = picked > 0 ? resources[picked - 1] : new AzCli.CognitiveSearchResourceInfo();
+            if (picked == 0)
+            {
+                resource = await TryCreateSearchInteractive(subscription, location, groupName);
+            }
+
+            return resource;
+        }
+
+        private static async Task<AzCli.CognitiveSearchResourceInfo> TryCreateSearchInteractive(string subscription, string locationName, string groupName)
+        {
+            ConsoleHelpers.WriteLineWithHighlight($"\n`CREATE COGNITIVE SEARCH RESOURCE`\n");
+
+            var groupOk = !string.IsNullOrEmpty(groupName);
+            if (!groupOk)
+            {
+                var location =  await AzCliConsoleGui.PickRegionLocationAsync(true, locationName, false);
+                locationName = location.Name;
+            }
+            
+            var group = await AzCliConsoleGui.PickOrCreateResourceGroup(true, subscription, groupOk ? null : locationName, groupName);
+            groupName = group.Name;
+            
+            var name = DemandAskPrompt("Name: ");
+
+            Console.Write("*** CREATING ***");
+            var response = await AzCli.CreateSearchResource(subscription, groupName, locationName, name);
+
+            Console.Write("\r");
+            if (string.IsNullOrEmpty(response.StdOutput) && !string.IsNullOrEmpty(response.StdError))
+            {
+                var output = response.StdError.Replace("\n", "\n  ");
+                throw new ApplicationException($"ERROR: Creating resource:\n\n  {output}");
+            }
+
+            Console.WriteLine("\r*** CREATED ***  ");
+            return response.Payload;
+        }
+
         private static string AskPrompt(string prompt, string value = null, bool useEditBox = false)
         {
             Console.Write(prompt);
@@ -81,6 +145,21 @@ namespace Azure.AI.Details.Common.CLI
             }
 
             return Console.ReadLine();
+        }
+
+        private static string DemandAskPrompt(string prompt, string value = null, bool useEditBox = false)
+        {
+            var answer = AskPrompt(prompt, value, useEditBox);
+            if (string.IsNullOrEmpty(answer))
+            {
+                ThrowPromptNotAnsweredApplicationException();
+            }
+            return answer;
+        }
+
+        private static void ThrowPromptNotAnsweredApplicationException()
+        {
+            throw new ApplicationException($"CANCELED: No input provided.");
         }
     }
 }
