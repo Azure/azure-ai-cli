@@ -19,6 +19,14 @@ using Azure.AI.Details.Common.CLI.ConsoleGui;
 
 namespace Azure.AI.Details.Common.CLI
 {
+    public struct AiHubResourceInfo
+    {
+        public string Id;
+        public string Group;
+        public string Name;
+        public string RegionLocation;
+    }
+
     public class InitCommand : Command
     {
         internal InitCommand(ICommandValues values)
@@ -306,139 +314,18 @@ namespace Azure.AI.Details.Common.CLI
                 _values.Reset("init.service.subscription", subscription);
             }
 
-            ConsoleHelpers.WriteLineWithHighlight($"\n`AZURE AI RESOURCE`\n");
-            Console.Write("\rName: *** Loading choices ***");
-
-            var json = PythonSDKWrapper.ListResources(_values, subscription);
-            if (Program.Debug) Console.WriteLine(json);
-
-            var parsed = !string.IsNullOrEmpty(json) ? JToken.Parse(json) : null;
-            var items = parsed?.Type == JTokenType.Object ? parsed["resources"] : new JArray();
-
-            var choices = new List<string>();
-            foreach (var item in items)
-            {
-                var name = item["name"].Value<string>();
-                var location = item["location"].Value<string>();
-                var displayName = item["display_name"].Value<string>();
-
-                choices.Add(string.IsNullOrEmpty(displayName)
-                    ? $"{name} ({location})"
-                    : $"{displayName} ({location})");
-            }
-
-            choices.Insert(0, "(Create new)");
-
-            Console.Write("\rName: ");
-            var picked = ListBoxPicker.PickIndexOf(choices.ToArray());
-            if (picked < 0)
-            {
-                throw new ApplicationException($"CANCELED: No resource selected");
-            }
-
-            Console.WriteLine($"\rName: {choices[picked]}");
-            var resource = picked > 0 ? items.ToArray()[picked - 1] : null;
-            if (picked == 0)
-            {
-                var resourceJson = await TryCreateHubInteractive();
-                resource = JToken.Parse(resourceJson);
-            }
-
-            _values.Reset("service.resource.name", resource["name"].Value<string>());
-            _values.Reset("service.resource.id", resource["id"].Value<string>());
-            _values.Reset("service.resource.group.name", resource["resource_group"].Value<string>());
-            _values.Reset("service.region.location", resource["location"].Value<string>());
-        }
-
-        private async Task<string> TryCreateHubInteractive()
-        {
-            ConsoleHelpers.WriteLineWithHighlight($"\n`CREATE AZURE AI RESOURCE`\n");
-
-            var subscription = _values.GetOrDefault("init.service.subscription", "");
-            var locationName = _values.GetOrDefault("service.resource.region.name", "");
-            var groupName = _values.GetOrDefault("service.resource.group.name", "");
-
-            var groupOk = !string.IsNullOrEmpty(groupName);
-            if (!groupOk)
-            {
-                var location =  await AzCliConsoleGui.PickRegionLocationAsync(true, locationName, false);
-                locationName = location.Name;
-            }
-
-            var group = await AzCliConsoleGui.PickOrCreateResourceGroup(true, subscription, groupOk ? null : locationName, groupName);
-            groupName = group.Name;
-
-            var name = DemandAskPrompt("Name: ");
-
-            var displayName = _values.Get("service.resource.display.name", true) ?? name;
-            var description = _values.Get("service.resource.description", true) ?? name;
-
-            Console.Write("*** CREATING ***");
-            var json = PythonSDKWrapper.CreateResource(_values, subscription, groupName, name, locationName, displayName, description);
-
-            Console.WriteLine("\r*** CREATED ***  ");
-
-            var parsed = !string.IsNullOrEmpty(json) ? JToken.Parse(json) : null;
-            return parsed["hub"].ToString();
+            var aiHubResource = await PickOrCreateAiHubResource(_values, subscription);
         }
 
         private async Task DoInitProject(bool interactive)
         {
             if (!interactive) ThrowInteractiveNotSupportedApplicationException(); // TODO: Add back non-interactive mode support
 
-            ConsoleHelpers.WriteLineWithHighlight($"\n`AZURE AI PROJECT`\n");
-            Console.Write("\rProject: *** Loading choices ***");
-
             var subscription = _values.GetOrDefault("init.service.subscription", "");
             var resourceId = _values.GetOrDefault("service.resource.id", null);
             var groupName = _values.GetOrDefault("service.resource.group.name", null);
 
-            var json = PythonSDKWrapper.ListProjects(_values, subscription);
-            if (Program.Debug) Console.WriteLine(json);
-
-            var parsed = !string.IsNullOrEmpty(json) ? JToken.Parse(json) : null;
-            var items = parsed?.Type == JTokenType.Object ? parsed["projects"] : new JArray();
-
-            var choices = new List<string>();
-            var itemJTokens = new List<JToken>();
-            foreach (var item in items)
-            {
-                var hub = item["workspace_hub"]?.Value<string>();
-
-                var hubOk = !string.IsNullOrEmpty(hub) && hub == resourceId;
-                if (!hubOk) continue;
-
-                itemJTokens.Add(item);
-
-                var name = item["name"].Value<string>();
-                var location = item["location"].Value<string>();
-                var displayName = item["display_name"].Value<string>();
-
-                choices.Add(string.IsNullOrEmpty(displayName)
-                    ? $"{name} ({location})"
-                    : $"{displayName} ({location})");
-            }
-
-            choices.Insert(0, "(Create new)");
-
-            Console.Write("\rProject: ");
-            var picked = ListBoxPicker.PickIndexOf(choices.ToArray());
-            if (picked < 0)
-            {
-                throw new ApplicationException($"CANCELED: No project selected");
-            }
-
-            Console.WriteLine($"\rProject: {choices[picked]}");
-            var project = picked > 0 ? itemJTokens[picked - 1] : null;
-            var createNew = picked == 0;
-            if (createNew)
-            {
-                var projectJson = TryCreateProjectInteractive();
-                project = JToken.Parse(projectJson);
-            }
-
-            var checkForExistingOpenAiConnection = !createNew;
-            var checkForExistingSearchConnection = !createNew;
+            var project = PickOrCreateAiHubProject(_values, subscription, resourceId, out var createdProject);
 
             var projectName = project["name"].Value<string>();
             var projectId = project["id"].Value<string>();
@@ -446,98 +333,13 @@ namespace Azure.AI.Details.Common.CLI
             _values.Reset("service.project.name", projectName);
             _values.Reset("service.project.id", projectId);
 
-            var openAiEndpoint = _values.GetOrDefault("service.openai.endpoint", null);
-            var openAiKey = _values.GetOrDefault("service.openai.key", null);
-            var createOpenAiConnection = !string.IsNullOrEmpty(openAiEndpoint) && !string.IsNullOrEmpty(openAiKey) && !checkForExistingOpenAiConnection;
+            GetOrCreateAiHubProjectConnections(_values, createdProject, subscription, groupName, projectName,
+                _values.GetOrDefault("service.openai.endpoint", null),
+                _values.GetOrDefault("service.openai.key", null),
+                _values.GetOrDefault("service.search.endpoint", null),
+                _values.GetOrDefault("service.search.key", null));
 
-            var searchEndpoint = _values.GetOrDefault("service.search.endpoint", null);
-            var searchKey = _values.GetOrDefault("service.search.key", null);
-            var createSearchConnection = !string.IsNullOrEmpty(searchEndpoint) && !string.IsNullOrEmpty(searchKey) && !checkForExistingSearchConnection;
-
-            var connectionsOk = createOpenAiConnection || createSearchConnection || checkForExistingOpenAiConnection || checkForExistingSearchConnection;
-            if (connectionsOk) ConsoleHelpers.WriteLineWithHighlight($"\n`AZURE AI PROJECT CONNECTIONS`\n");
-
-            var connectionCount = 0;
-
-            if (createOpenAiConnection || checkForExistingOpenAiConnection)
-            {
-                if (connectionCount > 0) Console.WriteLine();
-
-                var connectionName = "Default_AzureOpenAI";
-                Console.WriteLine($"Connection: {connectionName}");
-
-                Console.Write(createOpenAiConnection ? "*** CREATING ***" : "*** CHECKING ***");
-
-                var connectionType = "azure_open_ai";
-                var connectionJson = createOpenAiConnection
-                    ? PythonSDKWrapper.CreateConnection(_values, subscription, groupName, projectName, connectionName, connectionType, openAiEndpoint, openAiKey)
-                    : PythonSDKWrapper.GetConnection(_values, subscription, groupName, projectName, connectionName);
-
-                Console.WriteLine(createOpenAiConnection
-                    ? "\r*** CREATED ***  "
-                    : "\r*** CHECKED ***  ");
-                connectionCount++;
-            }
-
-            if (createSearchConnection || checkForExistingSearchConnection)
-            {
-                if (connectionCount > 0) Console.WriteLine();
-
-                var connectionName = "Default_CognitiveSearch";
-                Console.WriteLine($"Connection: {connectionName}");
-
-                Console.Write(createSearchConnection ? "*** CREATING ***" : "*** CHECKING ***");
-
-                var connectionType = "cognitive_search";
-                var connectionJson = createSearchConnection
-                    ? PythonSDKWrapper.CreateConnection(_values, subscription, groupName, projectName, connectionName, connectionType, searchEndpoint, searchKey)
-                    : PythonSDKWrapper.GetConnection(_values, subscription, groupName, projectName, connectionName);
-
-                Console.WriteLine(createSearchConnection
-                    ? "\r*** CREATED ***  "
-                    : "\r*** CHECKED ***  ");
-                connectionCount++;
-            }
-
-            ConsoleHelpers.WriteLineWithHighlight($"\n`AZURE AI PROJECT CONFIG`\n");
-
-            dynamic configJsonData = new
-            {
-                subscription_id = subscription,
-                resource_group = groupName,
-                project_name = projectName,
-            };
-
-            var configJson = JsonSerializer.Serialize(configJsonData, new JsonSerializerOptions { WriteIndented = true });
-            var configJsonFile = new FileInfo("config.json");
-            File.WriteAllText(configJsonFile.FullName, configJson + "\n");
-
-            Console.WriteLine($"{configJsonFile.Name} (saved at {configJsonFile.Directory})\n");
-            Console.WriteLine("  " + configJson.Replace("\n", "\n  "));
-        }
-
-        private string TryCreateProjectInteractive()
-        {
-            ConsoleHelpers.WriteLineWithHighlight($"\n`CREATE AZURE AI PROJECT`\n");
-
-            var subscription = _values.GetOrDefault("init.service.subscription", "");
-            var resourceId = _values.GetOrDefault("service.resource.id", "");
-            var group = _values.GetOrDefault("service.resource.group.name", "");
-            var location = _values.GetOrDefault("service.region.location", "");
-
-            var openAiResourceId = _values.GetOrDefault("service.openai.resource.id", "");
-
-            var name = DemandAskPrompt("Name: ");
-            var displayName = _values.Get("service.project.display.name", true) ?? name;
-            var description = _values.Get("service.project.description", true) ?? name;
-
-            Console.Write("*** CREATING ***");
-            var json = PythonSDKWrapper.CreateProject(_values, subscription, group, resourceId, name, location, displayName, description, openAiResourceId);
-
-            Console.WriteLine("\r*** CREATED ***  ");
-
-            var parsed = !string.IsNullOrEmpty(json) ? JToken.Parse(json) : null;
-            return parsed["project"].ToString();
+            CreatAiHubProjectConfigJsonFile(subscription, groupName, projectName);
         }
 
         private void DisplayInitServiceBanner()
@@ -554,38 +356,6 @@ namespace Azure.AI.Details.Common.CLI
             {
                 ConsoleHelpers.WriteLineWithHighlight($"`{Program.Name.ToUpper()} INIT`");
             }
-        }
-
-        private static string AskPrompt(string prompt, string value = null, bool useEditBox = false)
-        {
-            Console.Write(prompt);
-
-            if (useEditBox)
-            {
-                var normal = new Colors(ConsoleColor.White, ConsoleColor.Blue);
-                var text = EditBoxQuickEdit.Edit(40, 1, normal, value, 128);
-                ColorHelpers.ResetColor();
-                Console.WriteLine(text);
-                return text;
-            }
-
-            if (!string.IsNullOrEmpty(value))
-            {
-                Console.WriteLine(value);
-                return value;
-            }
-
-            return Console.ReadLine();
-        }
-
-        private static string DemandAskPrompt(string prompt, string value = null, bool useEditBox = false)
-        {
-            var answer = AskPrompt(prompt, value, useEditBox);
-            if (string.IsNullOrEmpty(answer))
-            {
-                ThrowPromptNotAnsweredApplicationException();
-            }
-            return answer;
         }
 
         private static void ConfigServiceResource(string subscriptionId, string region, string endpoint, string chatDeployment, string embeddingsDeployment, string key)
@@ -675,11 +445,6 @@ namespace Azure.AI.Details.Common.CLI
             throw new ApplicationException($"WARNING: NOT YET IMPLEMENTED ... started though! 😁");
         }
 
-        private static void ThrowPromptNotAnsweredApplicationException()
-        {
-            throw new ApplicationException($"CANCELED: No input provided.");
-        }
-
         private void StartCommand()
         {
             CheckPath();
@@ -703,6 +468,278 @@ namespace Azure.AI.Details.Common.CLI
             // _output.StopOutput();
 
             _stopEvent.Set();
+        }
+
+        private static async Task<AiHubResourceInfo> PickOrCreateAiHubResource(ICommandValues values, string subscription)
+        {
+            ConsoleHelpers.WriteLineWithHighlight($"\n`AZURE AI RESOURCE`\n");
+            Console.Write("\rName: *** Loading choices ***");
+
+            var json = PythonSDKWrapper.ListResources(values, subscription);
+            if (Program.Debug) Console.WriteLine(json);
+
+            var parsed = !string.IsNullOrEmpty(json) ? JToken.Parse(json) : null;
+            var items = parsed?.Type == JTokenType.Object ? parsed["resources"] : new JArray();
+
+            var choices = new List<string>();
+            foreach (var item in items)
+            {
+                var name = item["name"].Value<string>();
+                var location = item["location"].Value<string>();
+                var displayName = item["display_name"].Value<string>();
+
+                choices.Add(string.IsNullOrEmpty(displayName)
+                    ? $"{name} ({location})"
+                    : $"{displayName} ({location})");
+            }
+
+            choices.Insert(0, "(Create new)");
+
+            Console.Write("\rName: ");
+            var picked = ListBoxPicker.PickIndexOf(choices.ToArray());
+            if (picked < 0)
+            {
+                throw new ApplicationException($"CANCELED: No resource selected");
+            }
+
+            Console.WriteLine($"\rName: {choices[picked]}");
+            var resource = picked > 0 ? items.ToArray()[picked - 1] : null;
+            if (picked == 0)
+            {
+                var locationName = values.GetOrDefault("service.resource.region.name", "");
+                var groupName = values.GetOrDefault("service.resource.group.name", "");
+                var displayName = values.Get("service.resource.display.name", true);
+                var description = values.Get("service.resource.description", true);
+
+                resource = await TryCreateAiHubResourceInteractive(values, subscription, locationName, groupName, displayName, description);
+            }
+
+            var aiHubResource = new AiHubResourceInfo
+            {
+                Id = resource["id"].Value<string>(),
+                Group = resource["resource_group"].Value<string>(),
+                Name = resource["name"].Value<string>(),
+                RegionLocation = resource["location"].Value<string>(),
+            };
+
+            values.Reset("service.resource.name", aiHubResource.Name);
+            values.Reset("service.resource.id", aiHubResource.Id);
+            values.Reset("service.resource.group.name", aiHubResource.Group);
+            values.Reset("service.region.location", aiHubResource.RegionLocation);
+
+            return aiHubResource;
+        }
+
+        private static async Task<JToken> TryCreateAiHubResourceInteractive(ICommandValues values, string subscription, string locationName, string groupName, string displayName, string description)
+        {
+            ConsoleHelpers.WriteLineWithHighlight($"\n`CREATE AZURE AI RESOURCE`\n");
+
+            var groupOk = !string.IsNullOrEmpty(groupName);
+            if (!groupOk)
+            {
+                var location =  await AzCliConsoleGui.PickRegionLocationAsync(true, locationName, false);
+                locationName = location.Name;
+            }
+
+            var group = await AzCliConsoleGui.PickOrCreateResourceGroup(true, subscription, groupOk ? null : locationName, groupName);
+            groupName = group.Name;
+
+            var name = DemandAskPrompt("Name: ");
+            displayName ??= name;
+            description ??= name;
+
+            Console.Write("*** CREATING ***");
+            var json = PythonSDKWrapper.CreateResource(values, subscription, groupName, name, locationName, displayName, description);
+
+            Console.WriteLine("\r*** CREATED ***  ");
+
+            var parsed = !string.IsNullOrEmpty(json) ? JToken.Parse(json) : null;
+            return parsed["hub"];
+        }
+
+        private static JToken PickOrCreateAiHubProject(ICommandValues values, string subscription, string resourceId, out bool createNew)
+        {
+            ConsoleHelpers.WriteLineWithHighlight($"\n`AZURE AI PROJECT`\n");
+            Console.Write("\rProject: *** Loading choices ***");
+
+            var json = PythonSDKWrapper.ListProjects(values, subscription);
+            if (Program.Debug) Console.WriteLine(json);
+
+            var parsed = !string.IsNullOrEmpty(json) ? JToken.Parse(json) : null;
+            var items = parsed?.Type == JTokenType.Object ? parsed["projects"] : new JArray();
+
+            var choices = new List<string>();
+            var itemJTokens = new List<JToken>();
+            foreach (var item in items)
+            {
+                var hub = item["workspace_hub"]?.Value<string>();
+
+                var hubOk = !string.IsNullOrEmpty(hub) && hub == resourceId;
+                if (!hubOk) continue;
+
+                itemJTokens.Add(item);
+
+                var name = item["name"].Value<string>();
+                var location = item["location"].Value<string>();
+                var displayName = item["display_name"].Value<string>();
+
+                choices.Add(string.IsNullOrEmpty(displayName)
+                    ? $"{name} ({location})"
+                    : $"{displayName} ({location})");
+            }
+
+            choices.Insert(0, "(Create new)");
+
+            Console.Write("\rProject: ");
+            var picked = ListBoxPicker.PickIndexOf(choices.ToArray());
+            if (picked < 0)
+            {
+                throw new ApplicationException($"CANCELED: No project selected");
+            }
+
+            Console.WriteLine($"\rProject: {choices[picked]}");
+            var project = picked > 0 ? itemJTokens[picked - 1] : null;
+            createNew = picked == 0;
+            if (createNew)
+            {
+                var group = values.GetOrDefault("service.resource.group.name", "");
+                var location = values.GetOrDefault("service.region.location", "");
+                var displayName = values.Get("service.project.display.name", true);
+                var description = values.Get("service.project.description", true);
+
+                var openAiResourceId = values.GetOrDefault("service.openai.resource.id", "");
+
+                project = TryCreateAiHubProjectInteractive(values, subscription, resourceId, group, location, ref displayName, ref description, openAiResourceId);
+            }
+
+            return project;
+        }
+
+        private static JToken TryCreateAiHubProjectInteractive(ICommandValues values, string subscription, string resourceId, string group, string location, ref string displayName, ref string description, string openAiResourceId)
+        {
+            ConsoleHelpers.WriteLineWithHighlight($"\n`CREATE AZURE AI PROJECT`\n");
+
+            var name = DemandAskPrompt("Name: ");
+            displayName ??= name;
+            description ??= name;
+
+            Console.Write("*** CREATING ***");
+            var json = PythonSDKWrapper.CreateProject(values, subscription, group, resourceId, name, location, displayName, description, openAiResourceId);
+
+            Console.WriteLine("\r*** CREATED ***  ");
+
+            var parsed = !string.IsNullOrEmpty(json) ? JToken.Parse(json) : null;
+            return parsed["project"];
+        }
+
+        private static void GetOrCreateAiHubProjectConnections(ICommandValues values, bool create, string subscription, string groupName, string projectName, string openAiEndpoint, string openAiKey, string searchEndpoint, string searchKey)
+        {
+            var checkForExistingOpenAiConnection = !create;
+            var createOpenAiConnection = !string.IsNullOrEmpty(openAiEndpoint) && !string.IsNullOrEmpty(openAiKey) && !checkForExistingOpenAiConnection;
+
+            var checkForExistingSearchConnection = !create;
+            var createSearchConnection = !string.IsNullOrEmpty(searchEndpoint) && !string.IsNullOrEmpty(searchKey) && !checkForExistingSearchConnection;
+
+            var connectionsOk = createOpenAiConnection || createSearchConnection || checkForExistingOpenAiConnection || checkForExistingSearchConnection;
+            if (connectionsOk) ConsoleHelpers.WriteLineWithHighlight($"\n`AZURE AI PROJECT CONNECTIONS`\n");
+
+            var connectionCount = 0;
+
+            if (createOpenAiConnection || checkForExistingOpenAiConnection)
+            {
+                if (connectionCount > 0) Console.WriteLine();
+
+                var connectionName = "Default_AzureOpenAI";
+                Console.WriteLine($"Connection: {connectionName}");
+
+                Console.Write(createOpenAiConnection ? "*** CREATING ***" : "*** CHECKING ***");
+
+                var connectionType = "azure_open_ai";
+                var connectionJson = createOpenAiConnection
+                    ? PythonSDKWrapper.CreateConnection(values, subscription, groupName, projectName, connectionName, connectionType, openAiEndpoint, openAiKey)
+                    : PythonSDKWrapper.GetConnection(values, subscription, groupName, projectName, connectionName);
+
+                Console.WriteLine(createOpenAiConnection
+                    ? "\r*** CREATED ***  "
+                    : "\r*** CHECKED ***  ");
+                connectionCount++;
+            }
+
+            if (createSearchConnection || checkForExistingSearchConnection)
+            {
+                if (connectionCount > 0) Console.WriteLine();
+
+                var connectionName = "Default_CognitiveSearch";
+                Console.WriteLine($"Connection: {connectionName}");
+
+                Console.Write(createSearchConnection ? "*** CREATING ***" : "*** CHECKING ***");
+
+                var connectionType = "cognitive_search";
+                var connectionJson = createSearchConnection
+                    ? PythonSDKWrapper.CreateConnection(values, subscription, groupName, projectName, connectionName, connectionType, searchEndpoint, searchKey)
+                    : PythonSDKWrapper.GetConnection(values, subscription, groupName, projectName, connectionName);
+
+                Console.WriteLine(createSearchConnection
+                    ? "\r*** CREATED ***  "
+                    : "\r*** CHECKED ***  ");
+                connectionCount++;
+            }
+        }
+
+        private static void CreatAiHubProjectConfigJsonFile(string subscription, string groupName, string projectName)
+        {
+            ConsoleHelpers.WriteLineWithHighlight($"\n`AZURE AI PROJECT CONFIG`\n");
+
+            dynamic configJsonData = new
+            {
+                subscription_id = subscription,
+                resource_group = groupName,
+                project_name = projectName,
+            };
+
+            var configJson = JsonSerializer.Serialize(configJsonData, new JsonSerializerOptions { WriteIndented = true });
+            var configJsonFile = new FileInfo("config.json");
+            File.WriteAllText(configJsonFile.FullName, configJson + "\n");
+
+            Console.WriteLine($"{configJsonFile.Name} (saved at {configJsonFile.Directory})\n");
+            Console.WriteLine("  " + configJson.Replace("\n", "\n  "));
+        }
+
+        private static string AskPrompt(string prompt, string value = null, bool useEditBox = false)
+        {
+            Console.Write(prompt);
+
+            if (useEditBox)
+            {
+                var normal = new Colors(ConsoleColor.White, ConsoleColor.Blue);
+                var text = EditBoxQuickEdit.Edit(40, 1, normal, value, 128);
+                ColorHelpers.ResetColor();
+                Console.WriteLine(text);
+                return text;
+            }
+
+            if (!string.IsNullOrEmpty(value))
+            {
+                Console.WriteLine(value);
+                return value;
+            }
+
+            return Console.ReadLine();
+        }
+
+        private static string DemandAskPrompt(string prompt, string value = null, bool useEditBox = false)
+        {
+            var answer = AskPrompt(prompt, value, useEditBox);
+            if (string.IsNullOrEmpty(answer))
+            {
+                ThrowPromptNotAnsweredApplicationException();
+            }
+            return answer;
+        }
+
+        private static void ThrowPromptNotAnsweredApplicationException()
+        {
+            throw new ApplicationException($"CANCELED: No input provided.");
         }
 
         private SpinLock _lock = null;
