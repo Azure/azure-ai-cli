@@ -198,7 +198,6 @@ namespace Azure.AI.Details.Common.CLI
             var chatDeploymentName = deployment.Name;
 
             ConsoleHelpers.WriteLineWithHighlight($"\n`OPEN AI DEPLOYMENT (EMBEDDINGS)`");
-
             var embeddingsDeployment = await AzCliConsoleGui.AiResourceDeploymentPicker.PickOrCreateDeployment(interactive, "Embeddings", subscriptionId, resource.Group, resource.RegionLocation, resource.Name, null);
             var embeddingsDeploymentName = embeddingsDeployment.Name;
 

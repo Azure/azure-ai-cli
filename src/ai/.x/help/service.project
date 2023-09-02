@@ -5,8 +5,8 @@ COMMANDS
   ai service project create [...]        (see: ai help service project create)
   ai service project list [...]          (see: ai help service project list)
 
-`#e_;*` ai service project update [...]        (see: ai help service project update
-`#e_;*` ai service project delete [...]        (see: ai help service project delete
+`#e_;*` ai service project update [...]        (see: ai help service project update)
+`#e_;*` ai service project delete [...]        (see: ai help service project delete)
 
 `#e_;* - COMING SOON`
 

@@ -2,12 +2,12 @@ USAGE: ai service flow <command> [...]
 
 COMMANDS
 
-`#e_;*` ai service flow create [...]        (see: ai help service flow create
-`#e_;*` ai service flow status [...]        (see: ai help service flow status
-`#e_;*` ai service flow list [...]          (see: ai help service flow list
+`#e_;*` ai service flow create [...]        (see: ai help service flow create)
+`#e_;*` ai service flow status [...]        (see: ai help service flow status)
+`#e_;*` ai service flow list [...]          (see: ai help service flow list)
 
-`#e_;*` ai service flow update [...]        (see: ai help service flow update
-`#e_;*` ai service flow delete [...]        (see: ai help service flow delete
+`#e_;*` ai service flow update [...]        (see: ai help service flow update)
+`#e_;*` ai service flow delete [...]        (see: ai help service flow delete)
 
 `#e_;* - COMING SOON`
 

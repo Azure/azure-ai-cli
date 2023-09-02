@@ -2,11 +2,11 @@ USAGE: ai service search <command> [...]
 
 COMMANDS
 
-`#e_;*` ai service search create [...]        (see: ai help service search create
-`#e_;*` ai service search list [...]          (see: ai help service search list
+`#e_;*` ai service search create [...]        (see: ai help service search create)
+`#e_;*` ai service search list [...]          (see: ai help service search list)
 
-`#e_;*` ai service search update [...]        (see: ai help service search update
-`#e_;*` ai service search delete [...]        (see: ai help service search delete
+`#e_;*` ai service search update [...]        (see: ai help service search update)
+`#e_;*` ai service search delete [...]        (see: ai help service search delete)
 
 `#e_;* - COMING SOON`
 
