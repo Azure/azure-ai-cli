@@ -192,9 +192,6 @@ namespace Azure.AI.Details.Common.CLI
             ConsoleHelpers.WriteLineWithHighlight($"\n`{Program.SERVICE_RESOURCE_DISPLAY_NAME_ALL_CAPS}`");
             var regionLocation = new AzCli.AccountRegionLocationInfo(); // await AzCliConsoleGui.PickRegionLocationAsync(interactive, regionFilter);
             var resource = await AzCliConsoleGui.PickOrCreateCognitiveResource(interactive, subscriptionId, regionLocation.Name, groupFilter, resourceFilter, kind, sku, yes);
-            var region = resource.RegionLocation;
-            var endpoint = resource.Endpoint;
-            var id = resource.Id;
 
             ConsoleHelpers.WriteLineWithHighlight($"\n`OPEN AI DEPLOYMENT (CHAT)`");
             var deployment = await AzCliConsoleGui.AiResourceDeploymentPicker.PickOrCreateDeployment(interactive, "Chat", subscriptionId, resource.Group, resource.RegionLocation, resource.Name, null);
@@ -208,14 +205,14 @@ namespace Azure.AI.Details.Common.CLI
             var keys = await AzCliConsoleGui.LoadCognitiveServicesResourceKeys(subscriptionId, resource);
             var key = keys.Key1;
 
-            ConfigServiceResource(subscriptionId, region, endpoint, chatDeploymentName, embeddingsDeploymentName, key);
+            ConfigServiceResource(subscriptionId, resource.RegionLocation, resource.Endpoint, chatDeploymentName, embeddingsDeploymentName, key);
 
             _values.Reset("init.service.subscription", subscriptionId);
             _values.Reset("service.resource.group.name", resource.Group);
             _values.Reset("service.resource.region.name", resource.RegionLocation);
-            _values.Reset("service.openai.endpoint", endpoint);
+            _values.Reset("service.openai.endpoint", resource.Endpoint);
             _values.Reset("service.openai.key", key);
-            _values.Reset("service.openai.resource.id", id);
+            _values.Reset("service.openai.resource.id", resource.Id);
         }
 
         private async Task DoInitSearch(bool interactive)
@@ -323,13 +320,6 @@ namespace Azure.AI.Details.Common.CLI
                 ConfigSetLambda("@search.key", key, "Key (search)", key.Substring(0, 4) + "****************************", ref maxLabelWidth),
             });
             actions.ForEach(x => x(maxLabelWidth));
-        }
-
-        private static void ConfigSet(string atFile, string setValue, string message)
-        {
-            Console.Write($"*** SETTING *** {message}");
-            ConfigSet(atFile, setValue);
-            Console.WriteLine($"\r  *** SET ***   {message}");
         }
 
         private static Action<int> ConfigSetLambda(string atFile, string setValue, string displayLabel, string displayValue, ref int maxWidth)
