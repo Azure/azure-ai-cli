@@ -1,14 +1,107 @@
-# Project
+<style>
+    .options { display: flex; }
+    .option { padding: 5px; border: 1px solid #ccc; cursor: pointer; margin-right: 6px; }
+    .option.selected { background-color: #000000; color: #fff; }
+    .content { display: none; }
+    .content.active { display: block; }
+</style>
 
-> This repo has been populated by an initial template to help get you started. Please
-> make sure to update the content to build a great experience for community-building.
+# Using the Azure AI CLI
 
-As the maintainer of this project, please make a few updates:
+The Azure `AI` Command-Line Interface (CLI) is a cross-platform command-line tool to connect to Azure AI services and execute control-plane and data-plane operations without having to write any code. The CLI allows the execution of commands through a terminal using interactive command-line prompts or via script. 
 
-- Improving this README.MD file to provide a great experience
-- Updating SUPPORT.MD with content about this project's support experience
-- Understanding the security reporting process in SECURITY.MD
-- Remove this section from the README
+You can easily use the `AI` CLI to experiment with key Azure AI service features and see how they work with your use cases. Within minutes, you can setup all the required Azure resources needed, and build a customized Copilot using OpenAI's chat completions APIs and your own data. You can try it out interactively, or script larger processes to automate your own workflows and evaluations as part of your CI/CD system.
+
+In the future, you'll even be able to use the `AI` CLI to dynamically create code in the programming language of your choice to integrate with your own applications.
+
+## **STEP 1**: Setup your development environment
+
+You can install the Azure `AI` CLI locally on Linux, Mac, or Windows computers, or use it thru an internet browser or Docker container. 
+
+During this private preview, we recommend using the Azure `AI` CLI thru GitHub Codespaces. This will allow you to quickly get started without having to install anything locally.
+
+<div class="options">
+    <div class="option selected" onclick="showContent(1)">GitHub Codespaces</div>
+    <div class="option" onclick="showContent(2)">VS Code Dev Container</div>
+    <div class="option" onclick="showContent(3)">Install locally</div>
+</div>
+<div class="content" id="content1">
+
+### GitHub Codespaces
+
+You can run the Azure `AI` CLI in a browser using GitHub Codespaces:
+
+[![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/Azure/aistudio-chat-demo?quickstart=1)
+
+</div><div class="content" id="content2">
+
+### VS Code Devcontainer
+
+You can run the Azure `AI` CLI in a Docker container using VS Code Dev Containers:
+
+1. Follow the [installation instructions](https://code.visualstudio.com/docs/devcontainers/containers#_installation) for VS Code Dev Containers.
+2. Clone the [aistudio-chat-demo](https://github.com/Azure/aistudio-chat-demo) repository and open it with VS Code:
+    ```
+    git clone https://github.com/azure/aistudio-chat-demo
+    code aistudio-chat-demo
+    ```
+3. Click the button "Reopen in Dev Containers", if it does not appear open the command pallete (`Ctrl+Shift+P` on Windows/Linux, `Cmd+Shift+P` on Mac) and run the `Dev Containers: Reopen in Container` command
+
+</div><div class="content" id="content3">
+
+### Install locally
+
+You can install the Azure `AI` CLI locally on Linux, Mac, or Windows computers:
+
+1. Install the [Azure CLI](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli)
+2. Install the [Generative AI SDK Packages](./use_azureai_sdk.md#install-the-generative-ai-sdk-packages)
+3. Install the [Azure AI CLI](https://csspeechstorage.blob.core.windows.net/drop/private/ai/Azure.AI.CLI.1.0.0-alpha9.nupkg)
+    ```
+    wget https://csspeechstorage.blob.core.windows.net/drop/private/ai/Azure.AI.CLI.1.0.0-alpha9.nupkg && \
+    dotnet tool install --global --add-source . Azure.AI.CLI --version 1.0.0-alpha9 && \
+    rm Azure.AI.CLI.1.0.0-alpha9.nupkg
+    ```
+
+</div>
+
+<script>
+    showContent(1);
+    function showContent(optionNumber) {
+        for (let i = 1; i <= 3; i++) {
+            const content = document.getElementById("content" + i);
+            const option = document.querySelector(".option:nth-child(" + i + ")");
+            if (i === optionNumber) {
+                content.classList.add("active");
+                option.classList.add("selected");
+            } else {
+                content.classList.remove("active");
+                option.classList.remove("selected");
+            }
+        }
+    }
+</script>
+
+
+
+
+
+
+## **STEP 2**: Initialize the Azure AI CLI
+
+You can initialize the Azure `AI` CLI by running the following command:
+
+```
+ai init
+```
+
+## ai chat
+
+Chats with an AOAI deployment, supports chatting with data and is interactive
+
+```
+ai chat --interactive
+```
+
 
 ## Contributing
 
