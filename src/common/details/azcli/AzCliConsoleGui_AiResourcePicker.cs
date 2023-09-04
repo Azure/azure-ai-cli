@@ -23,6 +23,8 @@ namespace Azure.AI.Details.Common.CLI
         {
             public static async Task<AzCli.CognitiveServicesResourceInfo> PickOrCreateCognitiveResource(bool interactive, string subscriptionId = null, string regionFilter = null, string groupFilter = null, string resourceFilter = null, string kind = null, string sku = "F0", bool agreeTerms = false)
             {
+                ConsoleHelpers.WriteLineWithHighlight($"\n`{Program.SERVICE_RESOURCE_DISPLAY_NAME_ALL_CAPS}`");
+
                 var createNewItem = !string.IsNullOrEmpty(resourceFilter)
                     ? $"(Create `{resourceFilter}`)"
                     : interactive ? "(Create new)" : null;

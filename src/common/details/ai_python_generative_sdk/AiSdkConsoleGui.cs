@@ -26,7 +26,7 @@ namespace Azure.AI.Details.Common.CLI
     {
         public static async Task<AiHubResourceInfo> PickOrCreateAiHubResource(ICommandValues values, string subscription)
         {
-            ConsoleHelpers.WriteLineWithHighlight($"\n`AZURE AI RESOURCE`\n");
+            ConsoleHelpers.WriteLineWithHighlight($"\n`AZURE AI RESOURCE`");
             Console.Write("\rName: *** Loading choices ***");
 
             var json = PythonSDKWrapper.ListResources(values, subscription);
@@ -86,7 +86,7 @@ namespace Azure.AI.Details.Common.CLI
 
         private static async Task<JToken> TryCreateAiHubResourceInteractive(ICommandValues values, string subscription, string locationName, string groupName, string displayName, string description)
         {
-            ConsoleHelpers.WriteLineWithHighlight($"\n`CREATE AZURE AI RESOURCE`\n");
+            ConsoleHelpers.WriteLineWithHighlight($"\n`CREATE AZURE AI RESOURCE`");
 
             var groupOk = !string.IsNullOrEmpty(groupName);
             if (!groupOk)
@@ -113,8 +113,8 @@ namespace Azure.AI.Details.Common.CLI
 
         public static JToken PickOrCreateAiHubProject(ICommandValues values, string subscription, string resourceId, out bool createNew)
         {
-            ConsoleHelpers.WriteLineWithHighlight($"\n`AZURE AI PROJECT`\n");
-            Console.Write("\rProject: *** Loading choices ***");
+            ConsoleHelpers.WriteLineWithHighlight($"\n`AZURE AI PROJECT`");
+            Console.Write("\rName: *** Loading choices ***");
 
             var json = PythonSDKWrapper.ListProjects(values, subscription);
             if (Program.Debug) Console.WriteLine(json);
@@ -144,14 +144,14 @@ namespace Azure.AI.Details.Common.CLI
 
             choices.Insert(0, "(Create new)");
 
-            Console.Write("\rProject: ");
+            Console.Write("\rName: ");
             var picked = ListBoxPicker.PickIndexOf(choices.ToArray());
             if (picked < 0)
             {
                 throw new ApplicationException($"CANCELED: No project selected");
             }
 
-            Console.WriteLine($"\rProject: {choices[picked]}");
+            Console.WriteLine($"\rName: {choices[picked]}");
             var project = picked > 0 ? itemJTokens[picked - 1] : null;
             createNew = picked == 0;
             if (createNew)
@@ -171,7 +171,7 @@ namespace Azure.AI.Details.Common.CLI
 
         private static JToken TryCreateAiHubProjectInteractive(ICommandValues values, string subscription, string resourceId, string group, string location, ref string displayName, ref string description, string openAiResourceId)
         {
-            ConsoleHelpers.WriteLineWithHighlight($"\n`CREATE AZURE AI PROJECT`\n");
+            ConsoleHelpers.WriteLineWithHighlight($"\n`CREATE AZURE AI PROJECT`");
 
             var name = DemandAskPrompt("Name: ");
             displayName ??= name;

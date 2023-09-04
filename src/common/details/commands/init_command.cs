@@ -188,29 +188,13 @@ namespace Azure.AI.Details.Common.CLI
             var yes = _values.GetOrDefault("init.service.cognitiveservices.terms.agree", false);
 
             var subscriptionId = await AzCliConsoleGui.PickSubscriptionIdAsync(interactive, subscriptionFilter);
-
-            ConsoleHelpers.WriteLineWithHighlight($"\n`{Program.SERVICE_RESOURCE_DISPLAY_NAME_ALL_CAPS}`");
-            var regionLocation = new AzCli.AccountRegionLocationInfo(); // await AzCliConsoleGui.PickRegionLocationAsync(interactive, regionFilter);
-            var resource = await AzCliConsoleGui.PickOrCreateCognitiveResource(interactive, subscriptionId, regionLocation.Name, groupFilter, resourceFilter, kind, sku, yes);
-
-            ConsoleHelpers.WriteLineWithHighlight($"\n`OPEN AI DEPLOYMENT (CHAT)`");
-            var deployment = await AzCliConsoleGui.AiResourceDeploymentPicker.PickOrCreateDeployment(interactive, "Chat", subscriptionId, resource.Group, resource.RegionLocation, resource.Name, null);
-            var chatDeploymentName = deployment.Name;
-
-            ConsoleHelpers.WriteLineWithHighlight($"\n`OPEN AI DEPLOYMENT (EMBEDDINGS)`");
-            var embeddingsDeployment = await AzCliConsoleGui.AiResourceDeploymentPicker.PickOrCreateDeployment(interactive, "Embeddings", subscriptionId, resource.Group, resource.RegionLocation, resource.Name, null);
-            var embeddingsDeploymentName = embeddingsDeployment.Name;
-
-            var keys = await AzCliConsoleGui.LoadCognitiveServicesResourceKeys(subscriptionId, resource);
-            var key = keys.Key1;
-
-            ConfigSetHelpers.ConfigServiceResource(subscriptionId, resource.RegionLocation, resource.Endpoint, chatDeploymentName, embeddingsDeploymentName, key);
+            var resource = await AzCliConsoleGui.InitAndConfigOpenAiResource(interactive, subscriptionId, regionFilter, groupFilter, resourceFilter, kind, sku, yes);
 
             _values.Reset("init.service.subscription", subscriptionId);
             _values.Reset("service.resource.group.name", resource.Group);
             _values.Reset("service.resource.region.name", resource.RegionLocation);
             _values.Reset("service.openai.endpoint", resource.Endpoint);
-            _values.Reset("service.openai.key", key);
+            _values.Reset("service.openai.key", resource.Key);
             _values.Reset("service.openai.resource.id", resource.Id);
         }
 
@@ -222,12 +206,10 @@ namespace Azure.AI.Details.Common.CLI
             var location = _values.GetOrDefault("service.resource.region.name", "");
             var groupName = _values.GetOrDefault("service.resource.group.name", "");
 
-            var resource = await AzCliConsoleGui.PickOrCreateCognitiveSearchResource(subscription, location, groupName);
-            var keys = await AzCliConsoleGui.LoadSearchResourceKeys(subscription, resource);
-            ConfigSetHelpers.ConfigSearchResource(resource.Endpoint, keys.Key1);
+            var resource = await AzCliConsoleGui.InitAndConfigCogSearchResource(subscription, location, groupName);
 
             _values.Reset("service.search.endpoint", resource.Endpoint);
-            _values.Reset("service.search.key", keys.Key1);
+            _values.Reset("service.search.key", resource.Key);
         }
 
         private async Task DoInitHub(bool interactive)

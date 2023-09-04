@@ -44,6 +44,11 @@ namespace Azure.AI.Details.Common.CLI
             return AiResourcePicker.PickOrCreateCognitiveResource(interactive, subscriptionId, regionFilter, groupFilter, resourceFilter, kind, sku, agreeTerms);
         }
 
+        public static async Task<AzCli.CognitiveServicesDeploymentInfo> PickOrCreateDeployment(bool interactive, string deploymentExtra, string subscriptionId, string groupName, string resourceRegionLocation, string resourceName, string deploymentFilter)
+        {
+            return await AzCliConsoleGui.AiResourceDeploymentPicker.PickOrCreateDeployment(interactive, deploymentExtra, subscriptionId, groupName, resourceRegionLocation, resourceName, deploymentFilter);
+        }
+
         public static Task<AzCli.CognitiveServicesKeyInfo> LoadCognitiveServicesResourceKeys(string subscriptionId, AzCli.CognitiveServicesResourceInfo resource)
         {
             return AiResourcePicker.LoadCognitiveServicesResourceKeys(subscriptionId, resource);
@@ -98,7 +103,7 @@ namespace Azure.AI.Details.Common.CLI
 
         private static async Task<AzCli.CognitiveSearchResourceInfo> TryCreateSearchInteractive(string subscription, string locationName, string groupName)
         {
-            ConsoleHelpers.WriteLineWithHighlight($"\n`CREATE COGNITIVE SEARCH RESOURCE`\n");
+            ConsoleHelpers.WriteLineWithHighlight($"\n`CREATE COGNITIVE SEARCH RESOURCE`");
 
             var groupOk = !string.IsNullOrEmpty(groupName);
             if (!groupOk)
