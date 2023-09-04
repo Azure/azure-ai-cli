@@ -4,20 +4,23 @@
 //
 
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Net;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Net;
 using Newtonsoft.Json.Linq;
+using Microsoft.SemanticKernel;
+using Microsoft.SemanticKernel.Memory;
+using Microsoft.SemanticKernel.Connectors.Memory.AzureCognitiveSearch;
 using Azure.AI.Details.Common.CLI.ConsoleGui;
-using System.Runtime.InteropServices;
 
 namespace Azure.AI.Details.Common.CLI
 {
-
     public class ScenarioWizardCommand : Command
     {
         internal ScenarioWizardCommand(ICommandValues values)
@@ -110,11 +113,13 @@ namespace Azure.AI.Details.Common.CLI
 
         private async Task ChatWithYourDataScenarioAsync(string scenario)
         {
+            StartCommand();
+
             var subscription = await AzCliConsoleGui.PickSubscriptionAsync(true);
             var openAiResource = await AzCliConsoleGui.InitAndConfigOpenAiResource(true, subscription.Id);
             var cogSearchResource = await AzCliConsoleGui.InitAndConfigCogSearchResource(subscription.Id, openAiResource.RegionLocation, openAiResource.Group);
-            var aiHubResource = await AiSdkConsoleGui.PickOrCreateAiHubResource(_values, subscription.Id);
-            var aiHubProject = AiSdkConsoleGui.InitAndConfigAiHubProject(_values, subscription.Id, aiHubResource.Id, openAiResource.Group, openAiResource.Endpoint, openAiResource.Key, cogSearchResource.Endpoint, cogSearchResource.Key);
+            // var aiHubResource = await AiSdkConsoleGui.PickOrCreateAiHubResource(_values, subscription.Id);
+            // var aiHubProject = AiSdkConsoleGui.InitAndConfigAiHubProject(_values, subscription.Id, aiHubResource.Id, openAiResource.Group, openAiResource.Endpoint, openAiResource.Key, cogSearchResource.Endpoint, cogSearchResource.Key);
 
             ConsoleHelpers.WriteLineWithHighlight("\n`CONFIG AI SCENARIO DATA`");
 
@@ -136,33 +141,33 @@ namespace Azure.AI.Details.Common.CLI
                 : Directory.GetFiles(fi.DirectoryName, fi.Name);
             Console.WriteLine($"Found: {files.Count()}");
 
-            ConsoleHelpers.WriteLineWithHighlight("\n`CONFIG AI SCENARIO ADDITIONAL RESOURCES`");
+            ConsoleHelpers.WriteLineWithHighlight("\n`UPDATE COGNITIVE SEARCH INDEX`");
 
             var indexName = AskPrompt("Search Index Name: ");
             Console.WriteLine();
 
-            // TODO: Actually create the index here, saving the indexName
-            Console.Write("*** CREATING ***");
-            Thread.Sleep(1500);
-            Console.Write("\r*** CREATED ***  ");
+            Console.WriteLine("*** UPDATING ***");
+
+            var kernel = CreateSemanticKernel(cogSearchResource.Endpoint, cogSearchResource.Key, openAiResource.Endpoint, openAiResource.EmbeddingsDeployment, openAiResource.Key);
+            await StoreMemoryAsync(kernel, indexName, files.Select(x => new KeyValuePair<string, string>(x, FileHelpers.ReadAllHelpText(x, Encoding.UTF8))));
+
+            Console.Write("\r*** UPDATED ***  ");
             Console.WriteLine();
 
-            // TODO: Actually use the index here to do the chat scenario
-            StartShellAiChatScenario(scenario).WaitForExit();
+            StartShellAiChatScenario(scenario, $"--index-name {indexName}").WaitForExit();
 
-            // TODO: Refactor this "next steps" into a common method
             ConsoleHelpers.WriteLineWithHighlight($"\n`NEXT STEPS: {scenario}`");
             Console.WriteLine("");
             Console.WriteLine("  To chat w/ your data as configured here, try:");
             Console.WriteLine("");
             Console.ForegroundColor = ConsoleColor.Yellow;
-            Console.WriteLine($"      ai chat --interactive --project \"{aiHubProject.Id}\"");
+            Console.WriteLine($"      ai chat --interactive --index-name \"{indexName}\"");
             Console.ResetColor();
             Console.WriteLine("");
             Console.WriteLine("  To share with others, try:");
             Console.WriteLine("");
             Console.ForegroundColor = ConsoleColor.Yellow;
-            Console.WriteLine($"      ai chat --interactive --project \"{aiHubProject.Id}\" --zip \"{aiHubProject.Name}.zip\"");
+            Console.WriteLine($"      ai chat --interactive --index-name \"{indexName}\" --zip \"{indexName}.zip\"");
             Console.ResetColor();
             Console.WriteLine("");
             Console.WriteLine("  To generate code, try:");
@@ -177,6 +182,10 @@ namespace Azure.AI.Details.Common.CLI
             Console.WriteLine("      ai wizard --scenario \"Chat (OpenAI)\" --explore");
             Console.ResetColor();
             Console.WriteLine("");
+
+            StopCommand();
+            DisposeAfterStop();
+            DeleteTemporaryFiles();
         }
 
         private static void SimpleChatScenario(string scenario)
@@ -226,16 +235,16 @@ namespace Azure.AI.Details.Common.CLI
             return process;
         }
 
-        private static Process StartShellAiChatScenario(string scenario)
+        private static Process StartShellAiChatScenario(string scenario, string extraArguments = "")
         {
             ConsoleHelpers.WriteLineWithHighlight($"\r\n`SCENARIO: {scenario}`\n");
-            return StartShellAiChatProcess();
+            return StartShellAiChatProcess(extraArguments);
         }
 
-        private static Process StartShellAiChatProcess()
+        private static Process StartShellAiChatProcess(string extraArguments = "")
         {
             var command = "ai";
-            var arguments = "chat --interactive --quiet";
+            var arguments = $"chat --interactive --quiet {extraArguments}";
 
             var process = TryCatchHelpers.TryCatchNoThrow<Process>(() => StartShellCommandProcess(command, arguments), null, out var processException);
             process?.WaitForExit();
@@ -331,6 +340,60 @@ namespace Azure.AI.Details.Common.CLI
             return Console.ReadLine();
         }
 
+        private IKernel? CreateSemanticKernel(string searchEndpoint, string searchApiKey, string embeddingsEndpoint, string embeddingsDeployment, string embeddingsApiKey)
+        {
+            var store = new AzureCognitiveSearchMemoryStore(searchEndpoint, searchApiKey);
+            var kernelWithACS = Kernel.Builder
+                .WithAzureTextEmbeddingGenerationService(embeddingsDeployment, embeddingsEndpoint, embeddingsApiKey)
+                .WithMemoryStorage(store)
+                .Build();
+
+            return kernelWithACS;
+        }
+
+        private static async Task StoreMemoryAsync(IKernel kernel, string index, IEnumerable<KeyValuePair<string, string>> kvps)
+        {
+            var list = kvps.ToList();
+            if (list.Count() == 0) return;
+
+            foreach (var entry in list)
+            {
+                await kernel.Memory.SaveInformationAsync(
+                    collection: index,
+                    text: entry.Value,
+                    id: entry.Key);
+
+                 Console.WriteLine($"{entry.Key}: {entry.Value.Length} bytes");
+            }
+            Console.WriteLine();
+        }
+
+        private void StartCommand()
+        {
+            CheckPath();
+            LogHelpers.EnsureStartLogFile(_values);
+
+            // _display = new DisplayHelper(_values);
+
+            // _output = new OutputHelper(_values);
+            // _output.StartOutput();
+
+            _lock = new SpinLock();
+            _lock.StartLock();
+        }
+
+        private void StopCommand()
+        {
+            _lock.StopLock(5000);
+
+            // LogHelpers.EnsureStopLogFile(_values);
+            // _output.CheckOutput();
+            // _output.StopOutput();
+
+            _stopEvent.Set();
+        }
+
+        private SpinLock _lock = null;
         private readonly bool _quiet = false;
         private readonly bool _verbose = false;
     }
