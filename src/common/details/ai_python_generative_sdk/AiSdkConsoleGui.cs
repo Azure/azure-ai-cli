@@ -22,6 +22,15 @@ namespace Azure.AI.Details.Common.CLI
         public string RegionLocation;
     }
 
+    public struct AiHubProjectInfo
+    {
+        public string Id;
+        public string Group;
+        public string Name;
+        public string DisplayName;
+        public string RegionLocation;
+    }
+
     public class AiSdkConsoleGui
     {
         public static async Task<AiHubResourceInfo> PickOrCreateAiHubResource(ICommandValues values, string subscription)
@@ -111,7 +120,17 @@ namespace Azure.AI.Details.Common.CLI
             return parsed["hub"];
         }
 
-        public static JToken PickOrCreateAiHubProject(ICommandValues values, string subscription, string resourceId, out bool createNew)
+        public static AiHubProjectInfo InitAndConfigAiHubProject(ICommandValues values, string subscription, string resourceId, string groupName, string openAiEndpoint, string openAiKey, string searchEndpoint, string searchKey)
+        {
+            var project = AiSdkConsoleGui.PickOrCreateAiHubProject(values, subscription, resourceId, out var createdProject);
+
+            AiSdkConsoleGui.GetOrCreateAiHubProjectConnections(values, createdProject, subscription, groupName, project.Name, openAiEndpoint, openAiKey, searchEndpoint, searchKey);
+            AiSdkConsoleGui.CreatAiHubProjectConfigJsonFile(subscription, groupName, project.Name);
+
+            return project;
+        }
+
+        public static AiHubProjectInfo PickOrCreateAiHubProject(ICommandValues values, string subscription, string resourceId, out bool createNew)
         {
             ConsoleHelpers.WriteLineWithHighlight($"\n`AZURE AI PROJECT`");
             Console.Write("\rName: *** Loading choices ***");
@@ -166,7 +185,16 @@ namespace Azure.AI.Details.Common.CLI
                 project = TryCreateAiHubProjectInteractive(values, subscription, resourceId, group, location, ref displayName, ref description, openAiResourceId);
             }
 
-            return project;
+            var aiHubProject = new AiHubProjectInfo
+            {
+                Id = project["id"].Value<string>(),
+                Group = project["resource_group"].Value<string>(),
+                Name = project["name"].Value<string>(),
+                DisplayName = project["display_name"].Value<string>(),
+                RegionLocation = project["location"].Value<string>(),
+            };
+
+            return aiHubProject;
         }
 
         private static JToken TryCreateAiHubProjectInteractive(ICommandValues values, string subscription, string resourceId, string group, string location, ref string displayName, ref string description, string openAiResourceId)
@@ -185,7 +213,6 @@ namespace Azure.AI.Details.Common.CLI
             var parsed = !string.IsNullOrEmpty(json) ? JToken.Parse(json) : null;
             return parsed["project"];
         }
-
 
         public static void GetOrCreateAiHubProjectConnections(ICommandValues values, bool create, string subscription, string groupName, string projectName, string openAiEndpoint, string openAiKey, string searchEndpoint, string searchKey)
         {
@@ -259,7 +286,6 @@ namespace Azure.AI.Details.Common.CLI
             Console.WriteLine($"{configJsonFile.Name} (saved at {configJsonFile.Directory})\n");
             Console.WriteLine("  " + configJson.Replace("\n", "\n  "));
         }
-
 
         private static string AskPrompt(string prompt, string value = null, bool useEditBox = false)
         {

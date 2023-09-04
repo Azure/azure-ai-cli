@@ -19,8 +19,10 @@ namespace Azure.AI.Details.Common.CLI
 {
     public partial class AzCliConsoleGui
     {
-        public static async Task<AzCli.CognitiveServicesOpenAiResourceInfo> InitAndConfigOpenAiResource(bool interactive, string subscriptionId, string regionFilter, string groupFilter, string resourceFilter, string kind, string sku, bool yes)
+        public static async Task<AzCli.CognitiveServicesOpenAiResourceInfo> InitAndConfigOpenAiResource(bool interactive, string subscriptionId, string regionFilter = null, string groupFilter = null, string resourceFilter = null, string kind = null, string sku = null, bool yes = false)
         {
+            kind ??= "OpenAI";
+
             var regionLocation = !string.IsNullOrEmpty(regionFilter) ? await AzCliConsoleGui.PickRegionLocationAsync(interactive, regionFilter) : new AzCli.AccountRegionLocationInfo();
             var resource = await AzCliConsoleGui.PickOrCreateCognitiveResource(interactive, subscriptionId, regionLocation.Name, groupFilter, resourceFilter, kind, sku, yes);
 

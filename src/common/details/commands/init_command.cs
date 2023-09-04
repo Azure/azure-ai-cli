@@ -234,21 +234,15 @@ namespace Azure.AI.Details.Common.CLI
             var resourceId = _values.GetOrDefault("service.resource.id", null);
             var groupName = _values.GetOrDefault("service.resource.group.name", null);
 
-            var project = AiSdkConsoleGui.PickOrCreateAiHubProject(_values, subscription, resourceId, out var createdProject);
+            var openAiEndpoint = _values.GetOrDefault("service.openai.endpoint", null);
+            var openAiKey = _values.GetOrDefault("service.openai.key", null);
+            var searchEndpoint = _values.GetOrDefault("service.search.endpoint", null);
+            var searchKey = _values.GetOrDefault("service.search.key", null);
 
-            var projectName = project["name"].Value<string>();
-            var projectId = project["id"].Value<string>();
+            var project = AiSdkConsoleGui.InitAndConfigAiHubProject(_values, subscription, resourceId, groupName, openAiEndpoint, openAiKey, searchEndpoint, searchKey);
 
-            _values.Reset("service.project.name", projectName);
-            _values.Reset("service.project.id", projectId);
-
-            AiSdkConsoleGui.GetOrCreateAiHubProjectConnections(_values, createdProject, subscription, groupName, projectName,
-                _values.GetOrDefault("service.openai.endpoint", null),
-                _values.GetOrDefault("service.openai.key", null),
-                _values.GetOrDefault("service.search.endpoint", null),
-                _values.GetOrDefault("service.search.key", null));
-
-            AiSdkConsoleGui.CreatAiHubProjectConfigJsonFile(subscription, groupName, projectName);
+            _values.Reset("service.project.name", project.Name);
+            _values.Reset("service.project.id", project.Id);
         }
 
         private void DisplayInitServiceBanner()

@@ -92,7 +92,7 @@ namespace Azure.AI.Details.Common.CLI
 
             if (scenario.ToLower().Contains("your data") && action.Action.ToLower().Contains("quickstart"))
             {
-                ChatWithYourDataScenario(scenario);
+                await ChatWithYourDataScenarioAsync(scenario);
             }
             else if (scenario.ToLower().StartsWith("chat") && action.Action.ToLower().Contains("quickstart"))
             {
@@ -108,84 +108,61 @@ namespace Azure.AI.Details.Common.CLI
             }
         }
 
-        private static async void ChatWithYourDataScenario(string scenario)
+        private async Task ChatWithYourDataScenarioAsync(string scenario)
         {
-            var subscription = AzCliConsoleGui.PickSubscriptionAsync(true).Result;
+            var subscription = await AzCliConsoleGui.PickSubscriptionAsync(true);
+            var openAiResource = await AzCliConsoleGui.InitAndConfigOpenAiResource(true, subscription.Id);
+            var cogSearchResource = await AzCliConsoleGui.InitAndConfigCogSearchResource(subscription.Id, openAiResource.RegionLocation, openAiResource.Group);
+            var aiHubResource = await AiSdkConsoleGui.PickOrCreateAiHubResource(_values, subscription.Id);
+            var aiHubProject = AiSdkConsoleGui.InitAndConfigAiHubProject(_values, subscription.Id, aiHubResource.Id, openAiResource.Group, openAiResource.Endpoint, openAiResource.Key, cogSearchResource.Endpoint, cogSearchResource.Key);
 
-            ConsoleHelpers.WriteLineWithHighlight($"\n`AI PROJECT`");
-            Console.Write("\rProject: *** Loading choices ***");
+            ConsoleHelpers.WriteLineWithHighlight("\n`CONFIG AI SCENARIO DATA`");
 
-            var projects = GetProjects();
-            Console.Write("\rProject: ");
+            Console.Write("\rWhere: ");
+            var source = ListBoxPicker.PickString(GetDataLocationChoices());
+            Console.WriteLine($"\rWhere: {source}");
 
-            var project = ListBoxPicker.PickString(projects);
-            Console.WriteLine($"\rProject: {project}");
-
-            if (project == projects[0]) // (Create new)
+            if (!source.Contains("files"))
             {
-                project = AskPrompt("Name: ");
-                if (string.IsNullOrEmpty(project)) return;
-
-                Console.Write("*** CREATING ***");
-                Thread.Sleep(400);
-                Console.Write("\r*** CREATED ***  ");
                 Console.WriteLine();
-
-                var process = StartShellAiInitProcess($"project --subscription {subscription.Id}");
-                if (process.ExitCode == 0)
-                {
-                    ConsoleHelpers.WriteLineWithHighlight("\n`CONFIG AI SCENARIO DATA`");
-
-                    Console.Write("\rWhere: ");
-                    var source = ListBoxPicker.PickString(GetDataLocationChoices());
-                    Console.WriteLine($"\rWhere: {source}");
-
-                    if (!source.Contains("files"))
-                    {
-                        Console.WriteLine();
-                        ConsoleHelpers.WriteLineError($"SCENARIO: {scenario} w/ source={source} is not yet implemented.");
-                        return;
-                    }
-
-                    var path = AskPrompt("Files: ");
-                    var fi = new FileInfo(path);
-                    var files = Directory.Exists(path)
-                        ? Directory.GetFiles(path)
-                        : Directory.GetFiles(fi.DirectoryName, fi.Name);
-                    Console.WriteLine($"Found: {files.Count()}");
-
-                    ConsoleHelpers.WriteLineWithHighlight("\n`CONFIG AI SCENARIO ADDITIONAL RESOURCES`");
-
-                    var searchName = AskPrompt("Cognitive Search Resource Name: ");
-                    var storageName = AskPrompt("Blob Storage Resource Name: ");
-                    var indexName = AskPrompt("Search Index Name: ");
-                    Console.WriteLine();
-
-                    Console.Write("*** CREATING ***");
-                    Thread.Sleep(1500);
-                    Console.Write("\r*** CREATED ***  ");
-                    Console.WriteLine();
-
-                    StartShellAiChatScenario(scenario).WaitForExit();
-                }
-            }
-            else
-            {
-                StartShellAiChatScenario(scenario).WaitForExit();
+                ConsoleHelpers.WriteLineError($"SCENARIO: {scenario} w/ source={source} is not yet implemented.");
+                return;
             }
 
+            var path = AskPrompt("Files: ");
+            var fi = new FileInfo(path);
+            var files = Directory.Exists(path)
+                ? Directory.GetFiles(path)
+                : Directory.GetFiles(fi.DirectoryName, fi.Name);
+            Console.WriteLine($"Found: {files.Count()}");
+
+            ConsoleHelpers.WriteLineWithHighlight("\n`CONFIG AI SCENARIO ADDITIONAL RESOURCES`");
+
+            var indexName = AskPrompt("Search Index Name: ");
+            Console.WriteLine();
+
+            // TODO: Actually create the index here, saving the indexName
+            Console.Write("*** CREATING ***");
+            Thread.Sleep(1500);
+            Console.Write("\r*** CREATED ***  ");
+            Console.WriteLine();
+
+            // TODO: Actually use the index here to do the chat scenario
+            StartShellAiChatScenario(scenario).WaitForExit();
+
+            // TODO: Refactor this "next steps" into a common method
             ConsoleHelpers.WriteLineWithHighlight($"\n`NEXT STEPS: {scenario}`");
             Console.WriteLine("");
             Console.WriteLine("  To chat w/ your data as configured here, try:");
             Console.WriteLine("");
             Console.ForegroundColor = ConsoleColor.Yellow;
-            Console.WriteLine($"      ai chat --interactive --project \"{project}\"");
+            Console.WriteLine($"      ai chat --interactive --project \"{aiHubProject.Id}\"");
             Console.ResetColor();
             Console.WriteLine("");
             Console.WriteLine("  To share with others, try:");
             Console.WriteLine("");
             Console.ForegroundColor = ConsoleColor.Yellow;
-            Console.WriteLine($"      ai chat --interactive --project \"{project}\" --zip \"{project}.zip\"");
+            Console.WriteLine($"      ai chat --interactive --project \"{aiHubProject.Id}\" --zip \"{aiHubProject.Name}.zip\"");
             Console.ResetColor();
             Console.WriteLine("");
             Console.WriteLine("  To generate code, try:");
