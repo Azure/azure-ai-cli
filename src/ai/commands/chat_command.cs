@@ -547,7 +547,7 @@ namespace Azure.AI.Details.Common.CLI
            };
         }
 
-        private const string DefaultSystemPrompt = "You are an AI assistant that helps people find information regarding Azure AI.";
+        public const string DefaultSystemPrompt = "You are an AI assistant that helps people find information regarding Azure AI.";
 
         private const int _defaultMaxTokens = 800;
         private const float _defaultTemperature = 0.7f;

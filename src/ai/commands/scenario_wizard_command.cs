@@ -154,20 +154,23 @@ namespace Azure.AI.Details.Common.CLI
             Console.Write("\r*** UPDATED ***  ");
             Console.WriteLine();
 
-            StartShellAiChatScenario(scenario, $"--index-name {indexName}").WaitForExit();
+            var systemPrompt = AskChatSystemPrompt(_values);
+            if (string.IsNullOrEmpty(systemPrompt)) return;
+
+            StartShellAiChatScenario(scenario, $"--index-name {indexName} --system-prompt @prompt.txt").WaitForExit();
 
             ConsoleHelpers.WriteLineWithHighlight($"\n`NEXT STEPS: {scenario}`");
             Console.WriteLine("");
             Console.WriteLine("  To chat w/ your data as configured here, try:");
             Console.WriteLine("");
             Console.ForegroundColor = ConsoleColor.Yellow;
-            Console.WriteLine($"      ai chat --interactive --index-name \"{indexName}\"");
+            Console.WriteLine($"      ai chat --interactive --index-name \"{indexName}\" --system-prompt @prompt.txt");
             Console.ResetColor();
             Console.WriteLine("");
             Console.WriteLine("  To share with others, try:");
             Console.WriteLine("");
             Console.ForegroundColor = ConsoleColor.Yellow;
-            Console.WriteLine($"      ai chat --interactive --index-name \"{indexName}\" --zip \"{indexName}.zip\"");
+            Console.WriteLine($"      ai chat --interactive --index-name \"{indexName}\" --system-prompt @prompt.txt --zip \"{indexName}.zip\"");
             Console.ResetColor();
             Console.WriteLine("");
             Console.WriteLine("  To generate code, try:");
@@ -188,25 +191,28 @@ namespace Azure.AI.Details.Common.CLI
             DeleteTemporaryFiles();
         }
 
-        private static void SimpleChatScenario(string scenario)
+        private void SimpleChatScenario(string scenario)
         {
             Process process = StartShellAiInitProcess("openai");
             if (process.ExitCode == 0)
             {
-                StartShellAiChatScenario(scenario).WaitForExit();;
+                var systemPrompt = AskChatSystemPrompt(_values);
+                if (string.IsNullOrEmpty(systemPrompt)) return;
+
+                StartShellAiChatScenario(scenario, $"--system-prompt @prompt.txt").WaitForExit();
 
                 ConsoleHelpers.WriteLineWithHighlight($"\n`NEXT STEPS: {scenario}`");
                 Console.WriteLine("");
                 Console.WriteLine("  To chat as configured here, try:");
                 Console.WriteLine("");
                 Console.ForegroundColor = ConsoleColor.Yellow;
-                Console.WriteLine("      ai chat --interactive");
+                Console.WriteLine("      ai chat --interactive --system @prompt.txt");
                 Console.ResetColor();
                 Console.WriteLine("");
                 Console.WriteLine("  To share with others, try:");
                 Console.WriteLine("");
                 Console.ForegroundColor = ConsoleColor.Yellow;
-                Console.WriteLine("      ai chat --interactive --zip chat.zip");
+                Console.WriteLine("      ai chat --interactive --system @prompt.txt --zip chat.zip");
                 Console.ResetColor();
                 Console.WriteLine("");
                 Console.WriteLine("  To generate code, try:");
@@ -338,6 +344,49 @@ namespace Azure.AI.Details.Common.CLI
             }
 
             return Console.ReadLine();
+        }
+
+        private static string AskChatSystemPrompt(INamedValues values)
+        {
+            var existing = FileHelpers.FindFileInDataPath("chat.prompt.txt", values);
+            var defaultSystemPrompt = existing != null
+                ? FileHelpers.ReadAllText(existing, Encoding.Default)
+                : ChatCommand.DefaultSystemPrompt;
+
+            ConsoleHelpers.WriteLineWithHighlight("\n`CONFIG CHAT SYSTEM PROMPT`");
+            Console.WriteLine($"Default: {defaultSystemPrompt}");
+
+            Console.Write("Use default? ");
+            var useDefault = ListBoxPickYesNo();
+            if (useDefault) return defaultSystemPrompt;
+
+            Console.WriteLine("\nSystem prompt:");
+            var sb = new StringBuilder();
+            while (true)
+            {
+                var line = AskPrompt("> ");
+                if (string.IsNullOrEmpty(line)) break;
+                sb.AppendLine(line);
+            }
+
+            var newSystemPrompt = !string.IsNullOrEmpty(sb.ToString())
+                ? sb.ToString()
+                : ChatCommand.DefaultSystemPrompt;
+
+            ConfigSetHelpers.ConfigSet("chat.prompt.txt", newSystemPrompt);
+            return newSystemPrompt;
+        }
+
+        private static bool ListBoxPickYesNo()
+        {
+            var choices = "Yes;No".Split(';').ToArray();
+            var picked = ListBoxPicker.PickIndexOf(choices);
+            Console.WriteLine(picked switch {
+                0 => "Yes",
+                1 => "No",
+                _ => "Canceled"
+            });
+            return (picked == 0);
         }
 
         private IKernel? CreateSemanticKernel(string searchEndpoint, string searchApiKey, string embeddingsEndpoint, string embeddingsDeployment, string embeddingsApiKey)

@@ -65,7 +65,7 @@ namespace Azure.AI.Details.Common.CLI
             Console.WriteLine($"\r  *** SET ***   {displayLabel}: {displayValue}");
         }
 
-        private static void ConfigSet(string atFile, string setValue)
+        public static void ConfigSet(string atFile, string setValue)
         {
             var setCommandValues = new CommandValues();
             setCommandValues.Add("x.command", "config");
