@@ -1,10 +1,5 @@
-<style>
-    .options { display: flex; }
-    .option { padding: 5px; border: 1px solid #ccc; cursor: pointer; margin-right: 6px; }
-    .option.selected { background-color: #000000; color: #fff; }
-    .content { display: none; }
-    .content.active { display: block; }
-</style>
+Status: Draft in Progress  
+Owner: Rob Chambers
 
 # Using the Azure AI CLI
 
@@ -20,14 +15,7 @@ You can install the Azure `AI` CLI locally on Linux, Mac, or Windows computers, 
 
 During this private preview, we recommend using the Azure `AI` CLI thru GitHub Codespaces. This will allow you to quickly get started without having to install anything locally.
 
-<div class="options">
-    <div class="option selected" onclick="showContent(1)">GitHub Codespaces</div>
-    <div class="option" onclick="showContent(2)">VS Code Dev Container</div>
-    <div class="option" onclick="showContent(3)">Install locally</div>
-</div>
-<div class="content" id="content1">
-
-### GitHub Codespaces
+### OPTION 1: GitHub Codespaces
 
 You can run the Azure `AI` CLI in a browser using GitHub Codespaces:
 
@@ -35,7 +23,7 @@ You can run the Azure `AI` CLI in a browser using GitHub Codespaces:
 
 </div><div class="content" id="content2">
 
-### VS Code Devcontainer
+### OPTION 2: VS Code Dev Container
 
 You can run the Azure `AI` CLI in a Docker container using VS Code Dev Containers:
 
@@ -49,7 +37,7 @@ You can run the Azure `AI` CLI in a Docker container using VS Code Dev Container
 
 </div><div class="content" id="content3">
 
-### Install locally
+### OPTION 3: Install locally
 
 You can install the Azure `AI` CLI locally on Linux, Mac, or Windows computers:
 
@@ -64,29 +52,7 @@ You can install the Azure `AI` CLI locally on Linux, Mac, or Windows computers:
 
 </div>
 
-<script>
-    showContent(1);
-    function showContent(optionNumber) {
-        for (let i = 1; i <= 3; i++) {
-            const content = document.getElementById("content" + i);
-            const option = document.querySelector(".option:nth-child(" + i + ")");
-            if (i === optionNumber) {
-                content.classList.add("active");
-                option.classList.add("selected");
-            } else {
-                content.classList.remove("active");
-                option.classList.remove("selected");
-            }
-        }
-    }
-</script>
-
-
-
-
-
-
-## **STEP 2**: Initialize the Azure AI CLI
+## **STEP 2**: Initialize resource connections and configuration w/ `ai init`
 
 You can initialize the Azure `AI` CLI by running the following command:
 
@@ -94,33 +60,146 @@ You can initialize the Azure `AI` CLI by running the following command:
 ai init
 ```
 
-## ai chat
+<img src="./media/ai-cli-init.png" height=200 alt="ai init console screen showing listbox of choices"/>
 
-Chats with an AOAI deployment, supports chatting with data and is interactive
+Follow the prompts, selecting the Azure subscription, followed by selecting or creating the Azure AI services you want to use.
+
+
+## **STEP 3**: Inspect various command options and examples w/ `ai help`
+
+You can interactively browse and explore the Azure `AI` CLI commands and options by running the following command:
 
 ```
-ai chat --interactive
+ai help
 ```
 
+<img src="./media/ai-cli-help.png" width=500 alt="ai help console screen help content"/>
 
-## Contributing
 
-This project welcomes contributions and suggestions.  Most contributions require you to agree to a
-Contributor License Agreement (CLA) declaring that you have the right to, and actually do, grant us
-the rights to use your contribution. For details, visit https://cla.opensource.microsoft.com.
+## **STEP 4**:  Chat with your LLM w/ `ai chat`
 
-When you submit a pull request, a CLA bot will automatically determine whether you need to provide
-a CLA and decorate the PR appropriately (e.g., status check, comment). Simply follow the instructions
-provided by the bot. You will only need to do this once across all repos using our CLA.
+You can chat interactively or non-interactively with an AI language model using the `ai chat` command.
 
-This project has adopted the [Microsoft Open Source Code of Conduct](https://opensource.microsoft.com/codeofconduct/).
-For more information see the [Code of Conduct FAQ](https://opensource.microsoft.com/codeofconduct/faq/) or
-contact [opencode@microsoft.com](mailto:opencode@microsoft.com) with any additional questions or comments.
+**Interactive chat**
 
-## Trademarks
+```bash
+ai chat --interactive --system @prompt.txt
+```
 
-This project may contain trademarks or logos for projects, products, or services. Authorized use of Microsoft 
-trademarks or logos is subject to and must follow 
-[Microsoft's Trademark & Brand Guidelines](https://www.microsoft.com/en-us/legal/intellectualproperty/trademarks/usage/general).
-Use of Microsoft trademarks or logos in modified versions of this project must not cause confusion or imply Microsoft sponsorship.
-Any use of third-party trademarks or logos are subject to those third-party's policies.
+**Non-interactive chat**
+
+```bash
+ai chat --system @prompt.txt --user "Tell me about Azure AI Studio"
+```
+
+**Command line options**
+
+```
+USAGE: ai chat [...]
+
+  CONNECTION                            (see: ai help connection)    
+    --deployment DEPLOYMENT             (see: ai help chat deployment)
+    --endpoint ENDPOINT                 (see: ai help chat endpoint) 
+    --key KEY                           (see: ai help chat key)      
+
+  INPUT                                 (see: ai help chat input)    
+    --interactive                       (see: ai help chat interactive)
+    --system PROMPT                     (see: ai help chat system prompt)
+  * --file FILE                         (see: ai help chat history file)
+  * --files PATTERN                     (see: ai help chat history files)
+  * --files @FILELIST.txt               (see: ai help chat history files)
+  * --json FILE                         (see: ai help chat history json)
+  * --jsonl FILE                        (see: ai help chat history jsonl)
+    --user MESSAGE                      (see: ai help chat user message)
+
+  * - COMING SOON
+
+  OPTIONS                               (see: ai help chat options)
+    --temperature TEMPERATURE           (see: ai help chat options temperature)
+    --max-tokens MAX_TOKENS             (see: ai help chat options max-tokens)
+    --top-p TOP_P                       (see: ai help chat options top-p)
+    --n N                               (see: ai help chat options n)
+```
+
+## **STEP 5**: Create and update a Cognitive Search Index w/ `ai search index update`
+
+You can create a Cognitive Search Index using the `ai search index create` command.
+
+```bash
+ai search index update --files "../../data/3-product-info/*.md" --index-name "product-info"
+```
+
+**Command line options**
+
+```
+AI - Azure AI CLI, Version 1.0.0
+Copyright (c) 2023 Microsoft Corporation. All Rights Reserved.
+
+This PRIVATE PREVIEW version may change at any time.
+See: https://aka.ms/azure-ai-cli-private-preview
+
+SEARCH INDEX UPDATE
+
+  The ai search index update command updates a vector index.
+
+USAGE: ai index update [...]
+
+  EMBEDDINGS
+    --embeddings-index-name NAME            (see: ai help search index embeddings name)
+    --embeddings-deployment DEPLOYMENT      (see: ai help search index embeddings deployment)
+
+  ITEM
+    --id ID                                 (see: ai help search index id)
+    --metadata METADATA                     (see: ai help search index metadata)
+    --description DESCRIPTION               (see: ai help search index description)
+
+  DATA
+    --text TEXT                             (see: ai help search index text)
+    --file FILE                             (see: ai help search index file)
+    --files FILEs                           (see: ai help search index files)
+    --url URL                               (see: ai help search index url)
+    --urls URLs                             (see: ai help search index urls)
+
+  REFERENCE
+    --external-source                       (see: ai help search index external source)
+
+  AZURE SEARCH
+    --search-endpoint ENDPOINT               (see: ai help search endpoint)
+    --search-api-key KEY                     (see: ai help search api key)
+```
+
+## **STEP 6**: Chat with your LLM using your Cognitive Search Index w/ `ai chat --index-name`
+
+You can chat interactively or non-interactively with an AI language model with your Cognitive Search indexed data using the `ai chat` command with the `--index-name` option.
+
+First, let's create a system prompt file that will be used to seed the chat with a question about a product:
+
+```bash
+nano prompt.txt
+```
+
+Copy and paste the following text into the file:
+
+```
+You are an AI assistant helping users with queries related to
+outdoor/camping gear and clothing. Use the following pieces of context
+to answer the questions about outdoor/camping gear and clothing as
+completely, correctly, and concisely as possible. If the question is not
+related to outdoor/camping gear and clothing, just say Sorry, I only can
+answer question related to outdoor/camping gear and clothing. So how can
+I help? Don't try to make up an answer. If the question is related to
+outdoor/camping gear and clothing but vague ask for clarifying questions.
+Do not add documentation reference in the response.
+```
+
+**Interactive chat**
+
+```bash
+ai chat --interactive --system @prompt.txt --index-name "product-info"
+```
+
+**Non-interactive chat**
+
+```bash
+ai chat --system @prompt.txt --index-name "product-info" --user "Which tent has the highest rainfly waterproof rating?"
+```
