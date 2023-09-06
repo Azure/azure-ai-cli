@@ -238,38 +238,78 @@ namespace Azure.AI.Details.Common.CLI
                 stops.ForEach(s => options.StopSequences.Add(s));
             }
 
-            AddAzureExtensionOptionss(options);
+            AddAzureExtensionOptions(options);
 
             return options;
         }
 
-        private void AddAzureExtensionOptionss(ChatCompletionsOptions options)
+        private void AddAzureExtensionOptions(ChatCompletionsOptions options)
         {
+            var indexName = _values["service.config.search.index.name"];
+            var indexOk = !string.IsNullOrEmpty(indexName);
+            if (!indexOk) return;
+
             var searchKey = _values["service.config.search.api.key"];
             var searchEndpoint = _values["service.config.search.endpoint.uri"];
-            var indexName = _values["service.config.search.index.name"];
-            var searchExtensionOk = !string.IsNullOrEmpty(searchKey) && !string.IsNullOrEmpty(searchEndpoint) && !string.IsNullOrEmpty(indexName);
+            var searchOk = !string.IsNullOrEmpty(searchKey) && !string.IsNullOrEmpty(searchEndpoint);
 
-            var embeddingsKey = _values["service.config.key"];
             var embeddingEndpoint = GetEmbeddingsDeploymentEndpoint();
+            var embeddingsKey = _values["service.config.key"];
             var embeddingsOk = embeddingEndpoint != null && !string.IsNullOrEmpty(embeddingsKey);
 
-            if (searchExtensionOk && embeddingsOk)
+            if (!searchOk)
             {
-                options.AzureExtensionsOptions = new()
-                {
-                    Extensions =
-                    {
-                        new AzureCognitiveSearchChatExtensionConfiguration(AzureChatExtensionType.AzureCognitiveSearch,
-                        new Uri(searchEndpoint), new AzureKeyCredential(searchKey), indexName) {
-                            QueryType = AzureCognitiveSearchQueryType.VectorSimpleHybrid,
-                            EmbeddingEndpoint = embeddingEndpoint,
-                            EmbeddingKey = new AzureKeyCredential(embeddingsKey),
-                            DocumentCount = 16,
-                        }
-                    }
-                };
+                _values.AddThrowError("ERROR:", $"Creating Azure Cognitive Search extension; requires search key and endpoint.");
             }
+            else if (!embeddingsOk)
+            {
+                _values.AddThrowError("ERROR:", $"Creating Azure Cognitive Search extension; requires embeddings key and endpoint.");
+            }
+
+            var queryType = QueryTypeFrom(_values["service.config.search.query.type"]) ?? AzureCognitiveSearchQueryType.Vector;
+
+            options.AzureExtensionsOptions = new()
+            {
+                Extensions =
+                {
+                    new AzureCognitiveSearchChatExtensionConfiguration(
+                            AzureChatExtensionType.AzureCognitiveSearch,
+                            new Uri(searchEndpoint),
+                            new AzureKeyCredential(searchKey),
+                            indexName)
+                    {
+                        QueryType = queryType,
+                        EmbeddingEndpoint = embeddingEndpoint,
+                        EmbeddingKey = new AzureKeyCredential(embeddingsKey),
+                        DocumentCount = 16,
+                    }
+                }
+            };
+        }
+
+        private static AzureCognitiveSearchQueryType? QueryTypeFrom(string queryType)
+        {
+            if (string.IsNullOrEmpty(queryType)) return null;
+
+            return queryType.ToLower() switch
+            {
+                "semantic" => AzureCognitiveSearchQueryType.Semantic,
+                "simple" => AzureCognitiveSearchQueryType.Simple,
+                "vector" => AzureCognitiveSearchQueryType.Vector,
+
+                "hybrid"
+                or "simplehybrid"
+                or "simple-hybrid"
+                or "vectorsimplehybrid"
+                or "vector-simple-hybrid" => AzureCognitiveSearchQueryType.VectorSimpleHybrid,
+
+                "semantichybrid"
+                or "semantic-hybrid"
+                or "vectorsemantichybrid"
+                or "vector-semantic-hybrid" => AzureCognitiveSearchQueryType.VectorSemanticHybrid,
+
+                _ => throw new ArgumentException($"Invalid query type: {queryType}")
+            };
         }
 
         private Uri GetEmbeddingsDeploymentEndpoint()
