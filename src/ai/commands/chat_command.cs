@@ -263,7 +263,7 @@ namespace Azure.AI.Details.Common.CLI
             }
             else if (!embeddingsOk)
             {
-                _values.AddThrowError("ERROR:", $"Creating Azure Cognitive Search extension; requires embeddings key and endpoint.");
+                _values.AddThrowError("ERROR:", $"Creating Azure Cognitive Search extension; requires embeddings key, endpoint, and deployment.");
             }
 
             var queryType = QueryTypeFrom(_values["service.config.search.query.type"]) ?? AzureCognitiveSearchQueryType.Vector;
