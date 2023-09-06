@@ -41,6 +41,7 @@ namespace Azure.AI.Details.Common.CLI
             new NamedValueTokenParser(null,             "service.config.search.api.key", "00101", "1"),
             new NamedValueTokenParser(null,             "service.config.search.endpoint.uri", "00110;00101", "1"),
             new NamedValueTokenParser(null,             "service.config.search.index.name", "00010", "1"),
+            new NamedValueTokenParser(null,             "service.config.search.query.type", "00011", "1"),
 
             new NamedValueTokenParser("--interactive",  "chat.input.interactive", "001", "0", null, null, "true"),
 

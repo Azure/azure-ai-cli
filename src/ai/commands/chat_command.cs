@@ -225,7 +225,7 @@ namespace Azure.AI.Details.Common.CLI
             var temperature = _values["chat.options.temperature"];
             var frequencyPenalty = _values["chat.options.frequency.penalty"];
             var presencePenalty = _values["chat.options.presence.penalty"];
-            
+
             options.MaxTokens = TryParse(maxTokens, _defaultMaxTokens);
             options.Temperature = TryParse(temperature, _defaultTemperature);
             options.FrequencyPenalty = TryParse(frequencyPenalty, _defaultFrequencyPenalty);
@@ -238,20 +238,103 @@ namespace Azure.AI.Details.Common.CLI
                 stops.ForEach(s => options.StopSequences.Add(s));
             }
 
-            var searchKey = _values["service.config.search.api.key"];
-            var searchEndpoint = _values["service.config.search.endpoint.uri"];
-            var indexName = _values["service.config.search.index.name"];
-            var searchExtensionOk = !string.IsNullOrEmpty(searchKey) && !string.IsNullOrEmpty(searchEndpoint) && !string.IsNullOrEmpty(indexName);
-            if (searchExtensionOk)
-            {
-                var acsOptions = new AzureCognitiveSearchChatExtensionConfiguration(AzureChatExtensionType.AzureCognitiveSearch, new Uri(searchEndpoint), new AzureKeyCredential(searchKey), indexName);
-                var extensionOptions = new AzureChatExtensionsOptions();
-                extensionOptions.Extensions.Add(acsOptions);
-
-                options.AzureExtensionsOptions = extensionOptions;
-            }
+            AddAzureExtensionOptions(options);
 
             return options;
+        }
+
+        private void AddAzureExtensionOptions(ChatCompletionsOptions options)
+        {
+            var indexName = _values["service.config.search.index.name"];
+            var indexOk = !string.IsNullOrEmpty(indexName);
+            if (!indexOk) return;
+
+            var searchKey = _values["service.config.search.api.key"];
+            var searchEndpoint = _values["service.config.search.endpoint.uri"];
+            var searchOk = !string.IsNullOrEmpty(searchKey) && !string.IsNullOrEmpty(searchEndpoint);
+
+            var embeddingEndpoint = GetEmbeddingsDeploymentEndpoint();
+            var embeddingsKey = _values["service.config.key"];
+            var embeddingsOk = embeddingEndpoint != null && !string.IsNullOrEmpty(embeddingsKey);
+
+            if (!searchOk)
+            {
+                _values.AddThrowError("ERROR:", $"Creating Azure Cognitive Search extension; requires search key and endpoint.");
+            }
+            else if (!embeddingsOk)
+            {
+                _values.AddThrowError("ERROR:", $"Creating Azure Cognitive Search extension; requires embeddings key, endpoint, and deployment.");
+            }
+
+            var queryType = QueryTypeFrom(_values["service.config.search.query.type"]) ?? AzureCognitiveSearchQueryType.Vector;
+
+            options.AzureExtensionsOptions = new()
+            {
+                Extensions =
+                {
+                    new AzureCognitiveSearchChatExtensionConfiguration(
+                            AzureChatExtensionType.AzureCognitiveSearch,
+                            new Uri(searchEndpoint),
+                            new AzureKeyCredential(searchKey),
+                            indexName)
+                    {
+                        QueryType = queryType,
+                        EmbeddingEndpoint = embeddingEndpoint,
+                        EmbeddingKey = new AzureKeyCredential(embeddingsKey),
+                        DocumentCount = 16,
+                    }
+                }
+            };
+        }
+
+        private static AzureCognitiveSearchQueryType? QueryTypeFrom(string queryType)
+        {
+            if (string.IsNullOrEmpty(queryType)) return null;
+
+            return queryType.ToLower() switch
+            {
+                "semantic" => AzureCognitiveSearchQueryType.Semantic,
+                "simple" => AzureCognitiveSearchQueryType.Simple,
+                "vector" => AzureCognitiveSearchQueryType.Vector,
+
+                "hybrid"
+                or "simplehybrid"
+                or "simple-hybrid"
+                or "vectorsimplehybrid"
+                or "vector-simple-hybrid" => AzureCognitiveSearchQueryType.VectorSimpleHybrid,
+
+                "semantichybrid"
+                or "semantic-hybrid"
+                or "vectorsemantichybrid"
+                or "vector-semantic-hybrid" => AzureCognitiveSearchQueryType.VectorSemanticHybrid,
+
+                _ => throw new ArgumentException($"Invalid query type: {queryType}")
+            };
+        }
+
+        private Uri GetEmbeddingsDeploymentEndpoint()
+        {
+            var embeddingsEndpoint = _values["service.config.endpoint.uri"];
+            var embeddingsDeployment = _values["service.config.embeddings.deployment"];
+
+            var baseOk = !string.IsNullOrEmpty(embeddingsEndpoint) && !string.IsNullOrEmpty(embeddingsDeployment);
+            var pathOk = embeddingsEndpoint.Contains("embeddings?") && embeddingsEndpoint.Contains("api-version=");
+
+            if (baseOk && !pathOk)
+            {
+                var apiVersion = GetOpenAIClientVersionNumber();
+                embeddingsEndpoint = $"{embeddingsEndpoint.Trim('/')}/openai/deployments/{embeddingsDeployment}/embeddings?api-version={apiVersion}";
+                pathOk = true;
+            }
+
+            return baseOk && pathOk ? new Uri(embeddingsEndpoint) : null;
+        }
+
+        private static string GetOpenAIClientVersionNumber()
+        {
+            var latest = ((OpenAIClientOptions.ServiceVersion[])Enum.GetValues(typeof(OpenAIClientOptions.ServiceVersion))).MaxBy(i => (int)i);
+            var latestVersion = latest.ToString().ToLower().Replace("_", "-").Substring(1);
+            return latestVersion;
         }
 
         private void AddChatMessagesFromTextFile(ChatCompletionsOptions options, string textFile)
