@@ -225,7 +225,7 @@ namespace Azure.AI.Details.Common.CLI
             var temperature = _values["chat.options.temperature"];
             var frequencyPenalty = _values["chat.options.frequency.penalty"];
             var presencePenalty = _values["chat.options.presence.penalty"];
-            
+
             options.MaxTokens = TryParse(maxTokens, _defaultMaxTokens);
             options.Temperature = TryParse(temperature, _defaultTemperature);
             options.FrequencyPenalty = TryParse(frequencyPenalty, _defaultFrequencyPenalty);
@@ -238,21 +238,23 @@ namespace Azure.AI.Details.Common.CLI
                 stops.ForEach(s => options.StopSequences.Add(s));
             }
 
+            AddAzureExtensionOptionss(options);
+
+            return options;
+        }
+
+        private void AddAzureExtensionOptionss(ChatCompletionsOptions options)
+        {
             var searchKey = _values["service.config.search.api.key"];
             var searchEndpoint = _values["service.config.search.endpoint.uri"];
             var indexName = _values["service.config.search.index.name"];
-
-            var embeddingsEndpoint = _values["service.config.endpoint.uri"];
-            var embeddingsDeployment = _values["service.config.embeddings.deployment"];
-            var embeddingsKey = _values["service.config.key"];
-            var embeddingsOk = !string.IsNullOrEmpty(embeddingsEndpoint) && !string.IsNullOrEmpty(embeddingsDeployment) && !string.IsNullOrEmpty(embeddingsKey);
-            if (embeddingsOk && !embeddingsEndpoint.Contains("embeddings?"))
-            {
-                embeddingsEndpoint = $"{embeddingsEndpoint.Trim('/')}/openai/deployments/{embeddingsDeployment}/embeddings?api-version=2023-08-01-preview";
-            }
-
             var searchExtensionOk = !string.IsNullOrEmpty(searchKey) && !string.IsNullOrEmpty(searchEndpoint) && !string.IsNullOrEmpty(indexName);
-            if (searchExtensionOk)
+
+            var embeddingsKey = _values["service.config.key"];
+            var embeddingEndpoint = GetEmbeddingsDeploymentEndpoint();
+            var embeddingsOk = embeddingEndpoint != null && !string.IsNullOrEmpty(embeddingsKey);
+
+            if (searchExtensionOk && embeddingsOk)
             {
                 options.AzureExtensionsOptions = new()
                 {
@@ -261,15 +263,38 @@ namespace Azure.AI.Details.Common.CLI
                         new AzureCognitiveSearchChatExtensionConfiguration(AzureChatExtensionType.AzureCognitiveSearch,
                         new Uri(searchEndpoint), new AzureKeyCredential(searchKey), indexName) {
                             QueryType = AzureCognitiveSearchQueryType.VectorSimpleHybrid,
-                            EmbeddingEndpoint = new Uri(embeddingsEndpoint),
+                            EmbeddingEndpoint = embeddingEndpoint,
                             EmbeddingKey = new AzureKeyCredential(embeddingsKey),
                             DocumentCount = 16,
                         }
                     }
                 };
             }
+        }
 
-            return options;
+        private Uri GetEmbeddingsDeploymentEndpoint()
+        {
+            var embeddingsEndpoint = _values["service.config.endpoint.uri"];
+            var embeddingsDeployment = _values["service.config.embeddings.deployment"];
+
+            var baseOk = !string.IsNullOrEmpty(embeddingsEndpoint) && !string.IsNullOrEmpty(embeddingsDeployment);
+            var pathOk = embeddingsEndpoint.Contains("embeddings?") && embeddingsEndpoint.Contains("api-version=");
+
+            if (baseOk && !pathOk)
+            {
+                var apiVersion = GetOpenAIClientVersionNumber();
+                embeddingsEndpoint = $"{embeddingsEndpoint.Trim('/')}/openai/deployments/{embeddingsDeployment}/embeddings?api-version={apiVersion}";
+                pathOk = true;
+            }
+
+            return baseOk && pathOk ? new Uri(embeddingsEndpoint) : null;
+        }
+
+        private static string GetOpenAIClientVersionNumber()
+        {
+            var latest = ((OpenAIClientOptions.ServiceVersion[])Enum.GetValues(typeof(OpenAIClientOptions.ServiceVersion))).MaxBy(i => (int)i);
+            var latestVersion = latest.ToString().ToLower().Replace("_", "-").Substring(1);
+            return latestVersion;
         }
 
         private void AddChatMessagesFromTextFile(ChatCompletionsOptions options, string textFile)
