@@ -241,14 +241,32 @@ namespace Azure.AI.Details.Common.CLI
             var searchKey = _values["service.config.search.api.key"];
             var searchEndpoint = _values["service.config.search.endpoint.uri"];
             var indexName = _values["service.config.search.index.name"];
+
+            var embeddingsEndpoint = _values["service.config.endpoint.uri"];
+            var embeddingsDeployment = _values["service.config.embeddings.deployment"];
+            var embeddingsKey = _values["service.config.key"];
+            var embeddingsOk = !string.IsNullOrEmpty(embeddingsEndpoint) && !string.IsNullOrEmpty(embeddingsDeployment) && !string.IsNullOrEmpty(embeddingsKey);
+            if (embeddingsOk && !embeddingsEndpoint.Contains("embeddings?"))
+            {
+                embeddingsEndpoint = $"{embeddingsEndpoint.Trim('/')}/openai/deployments/{embeddingsDeployment}/embeddings?api-version=2023-08-01-preview";
+            }
+
             var searchExtensionOk = !string.IsNullOrEmpty(searchKey) && !string.IsNullOrEmpty(searchEndpoint) && !string.IsNullOrEmpty(indexName);
             if (searchExtensionOk)
             {
-                var acsOptions = new AzureCognitiveSearchChatExtensionConfiguration(AzureChatExtensionType.AzureCognitiveSearch, new Uri(searchEndpoint), new AzureKeyCredential(searchKey), indexName);
-                var extensionOptions = new AzureChatExtensionsOptions();
-                extensionOptions.Extensions.Add(acsOptions);
-
-                options.AzureExtensionsOptions = extensionOptions;
+                options.AzureExtensionsOptions = new()
+                {
+                    Extensions =
+                    {
+                        new AzureCognitiveSearchChatExtensionConfiguration(AzureChatExtensionType.AzureCognitiveSearch,
+                        new Uri(searchEndpoint), new AzureKeyCredential(searchKey), indexName) {
+                            QueryType = AzureCognitiveSearchQueryType.VectorSimpleHybrid,
+                            EmbeddingEndpoint = new Uri(embeddingsEndpoint),
+                            EmbeddingKey = new AzureKeyCredential(embeddingsKey),
+                            DocumentCount = 16,
+                        }
+                    }
+                };
             }
 
             return options;
