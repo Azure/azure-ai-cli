@@ -2,9 +2,16 @@
 
   <PropertyGroup>
     <TargetFramework>net7.0</TargetFramework>
-    <AssemblyName>ai</AssemblyName>
-    <SelfContained>false</SelfContained>
+
     <OutputType>Exe</OutputType>
+    <AssemblyName>ai</AssemblyName>
+    <IsTrimmable>false</IsTrimmable>
+
+    <!-- <PublishAot>true</PublishAot> -->
+    <PublishSingleFile>true</PublishSingleFile>
+    <PublishTrimmed>false</PublishTrimmed>
+    <LinkerDescriptor>linker.xml</LinkerDescriptor>
+
     <RuntimeIdentifiers>win-x64;linux-x64</RuntimeIdentifiers>
     <Configurations>Debug;Release</Configurations>
     <RootNamespace>Azure.AI.Details.Common.CLI</RootNamespace>
