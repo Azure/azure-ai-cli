@@ -41,6 +41,11 @@ namespace Azure.AI.Details.Common.CLI
             return CheckIgnorePythonSdkErrors(() => DoListProjectsViaPython(values, subscription), "[]");
         }
 
+        static public string ListConnections(INamedValues values, string subscription, string group, string projectName)
+        {
+            return CheckIgnorePythonSdkErrors(() => DoListConnectionsViaPython(values, subscription, group, projectName), "[]");
+        }
+
         static public string DeleteResource(INamedValues values, string subscription, string group, string name, bool deleteDependentResources)
         {
             return DoDeleteResourceViaPython(values, subscription, group, name, deleteDependentResources);
@@ -103,6 +108,11 @@ namespace Azure.AI.Details.Common.CLI
         private static string DoListProjectsViaPython(INamedValues values, string subscription)
         {
             return RunEmbeddedPythonScript(values, "project_list", "--subscription", subscription);
+        }
+
+        private static string DoListConnectionsViaPython(INamedValues values, string subscription, string group, string projectName)
+        {
+            return RunEmbeddedPythonScript(values, "connection_list", "--subscription", subscription, "--group", group, "--project-name", projectName);
         }
 
         private static string DoDeleteResourceViaPython(INamedValues values, string subscription, string group, string name, bool deleteDependentResources)

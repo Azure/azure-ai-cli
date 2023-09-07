@@ -60,6 +60,7 @@ namespace Azure.AI.Details.Common.CLI
                 case "service.resource.delete": DoDeleteResource(); break;
                 case "service.project.create": DoCreateProject(); break;
                 case "service.project.list": DoListProjects(); break;
+                case "service.connection.list": DoListConnections(); break;
 
                 default:
                     _values.AddThrowError("WARNING:", $"'{command.Replace('.', ' ')}' NOT YET IMPLEMENTED!!");
@@ -140,6 +141,24 @@ namespace Azure.AI.Details.Common.CLI
 
             if (!_quiet) Console.WriteLine(message);
             var output = PythonSDKWrapper.ListProjects(_values, subscription);
+            if (!_quiet) Console.WriteLine($"{message} Done!\n");
+
+            if (!_quiet) Console.WriteLine(output);
+            CheckWriteOutputValueFromJson("service.output", "json", output);
+        }
+
+        private void DoListConnections()
+        {
+            var action = "Listing Project connections";
+            var command = "service connection list";
+            var subscription = DemandSubscription(action, command);
+            var group = DemandGroup(action, command);
+            var project = DemandName("service.project.name", action, command);
+
+            var message = $"{action} for '{project}'";
+
+            if (!_quiet) Console.WriteLine(message);
+            var output = PythonSDKWrapper.ListConnections(_values, subscription, group, project);
             if (!_quiet) Console.WriteLine($"{message} Done!\n");
 
             if (!_quiet) Console.WriteLine(output);
