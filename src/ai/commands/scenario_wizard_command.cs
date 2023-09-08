@@ -134,7 +134,7 @@ namespace Azure.AI.Details.Common.CLI
                 return;
             }
 
-            var path = AskPrompt("Files: ");
+            var path = AskPromptHelper.AskPrompt("Files: ");
             var fi = new FileInfo(path);
             var files = Directory.Exists(path)
                 ? Directory.GetFiles(path)
@@ -143,7 +143,7 @@ namespace Azure.AI.Details.Common.CLI
 
             ConsoleHelpers.WriteLineWithHighlight("\n`UPDATE COGNITIVE SEARCH INDEX`");
 
-            var indexName = AskPrompt("Search Index Name: ");
+            var indexName = AskPromptHelper.AskPrompt("Search Index Name: ");
             Console.WriteLine();
 
             Console.WriteLine("*** UPDATING ***");
@@ -324,28 +324,6 @@ namespace Azure.AI.Details.Common.CLI
             return Process.Start(start);
         }
 
-        private static string AskPrompt(string prompt, string value = null, bool useEditBox = false)
-        {
-            Console.Write(prompt);
-
-            if (useEditBox)
-            {
-                var normal = new Colors(ConsoleColor.White, ConsoleColor.Blue);
-                var text = EditBoxQuickEdit.Edit(40, 1, normal, value, 128);
-                ColorHelpers.ResetColor();
-                Console.WriteLine(text);
-                return text;
-            }
-
-            if (!string.IsNullOrEmpty(value))
-            {
-                Console.WriteLine(value);
-                return value;
-            }
-
-            return Console.ReadLine();
-        }
-
         private static string AskChatSystemPrompt(INamedValues values)
         {
             var existing = FileHelpers.FindFileInDataPath("chat.prompt.txt", values);
@@ -364,7 +342,7 @@ namespace Azure.AI.Details.Common.CLI
             var sb = new StringBuilder();
             while (true)
             {
-                var line = AskPrompt("> ");
+                var line = AskPromptHelper.AskPrompt("> ");
                 if (string.IsNullOrEmpty(line)) break;
                 sb.AppendLine(line);
             }

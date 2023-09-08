@@ -141,7 +141,7 @@ namespace Azure.AI.Details.Common.CLI
 
                 deploymentName = pick switch{
                     0 => $"{modelName}-{modelVersion}",
-                    1 => NamePickerHelper.AskPrompt("\rName: "),
+                    1 => AskPromptHelper.AskPrompt("\rName: "),
                     _ => null
                 };
 

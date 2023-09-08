@@ -304,42 +304,5 @@ namespace Azure.AI.Details.Common.CLI
             Console.WriteLine($"{configJsonFile.Name} (saved at {configJsonFile.Directory})\n");
             Console.WriteLine("  " + configJson.Replace("\n", "\n  "));
         }
-
-        private static string AskPrompt(string prompt, string value = null, bool useEditBox = false)
-        {
-            Console.Write(prompt);
-
-            if (useEditBox)
-            {
-                var normal = new Colors(ConsoleColor.White, ConsoleColor.Blue);
-                var text = EditBoxQuickEdit.Edit(40, 1, normal, value, 128);
-                ColorHelpers.ResetColor();
-                Console.WriteLine(text);
-                return text;
-            }
-
-            if (!string.IsNullOrEmpty(value))
-            {
-                Console.WriteLine(value);
-                return value;
-            }
-
-            return Console.ReadLine();
-        }
-
-        private static string DemandAskPrompt(string prompt, string value = null, bool useEditBox = false)
-        {
-            var answer = AskPrompt(prompt, value, useEditBox);
-            if (string.IsNullOrEmpty(answer))
-            {
-                ThrowPromptNotAnsweredApplicationException();
-            }
-            return answer;
-        }
-
-        private static void ThrowPromptNotAnsweredApplicationException()
-        {
-            throw new ApplicationException($"CANCELED: No input provided.");
-        }
     }
 }

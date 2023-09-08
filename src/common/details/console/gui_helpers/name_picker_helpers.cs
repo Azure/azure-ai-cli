@@ -65,36 +65,16 @@ namespace Azure.AI.Details.Common.CLI
                 choices.Add($"{nameOutKind}-{nameIn}");
             }
 
+            choices.Sort();
             choices.Add("(Enter custom name)");
 
             var x = choices.ToArray();
             return x;
         }
 
-        public static string AskPrompt(string prompt, string value = null, bool useEditBox = false)
-        {
-            Console.Write(prompt);
-
-            if (useEditBox)
-            {
-                var normal = new Colors(ConsoleColor.White, ConsoleColor.Blue);
-                var text = EditBoxQuickEdit.Edit(40, 1, normal, value, 128);
-                Console.WriteLine(text);
-                return text;
-            }
-
-            if (!string.IsNullOrEmpty(value))
-            {
-                Console.WriteLine(value);
-                return value;
-            }
-
-            return Console.ReadLine();
-        }
-
         private static string DemandAskPrompt(string prompt, string value = null, bool useEditBox = false)
         {
-            var answer = AskPrompt(prompt, value, useEditBox);
+            var answer = AskPromptHelper.AskPrompt(prompt, value, useEditBox);
             if (string.IsNullOrEmpty(answer))
             {
                 ThrowPromptNotAnsweredApplicationException();
