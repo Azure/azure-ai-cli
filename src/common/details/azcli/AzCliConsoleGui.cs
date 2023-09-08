@@ -67,7 +67,7 @@ namespace Azure.AI.Details.Common.CLI
             return keys.Payload;
         }
 
-        public static async Task<AzCli.CognitiveSearchResourceInfo> PickOrCreateCognitiveSearchResource(string subscription, string location, string groupName)
+        public static async Task<AzCli.CognitiveSearchResourceInfo> PickOrCreateCognitiveSearchResource(string subscription, string location, string groupName, string smartName = null, string smartNameKind = null)
         {
             ConsoleHelpers.WriteLineWithHighlight($"\n`COGNITIVE SEARCH RESOURCE`");
             Console.Write("\rName: *** Loading choices ***");
@@ -95,13 +95,13 @@ namespace Azure.AI.Details.Common.CLI
             var resource = picked > 0 ? resources[picked - 1] : new AzCli.CognitiveSearchResourceInfo();
             if (picked == 0)
             {
-                resource = await TryCreateSearchInteractive(subscription, location, groupName);
+                resource = await TryCreateSearchInteractive(subscription, location, groupName, smartName, smartNameKind);
             }
 
             return resource;
         }
 
-        private static async Task<AzCli.CognitiveSearchResourceInfo> TryCreateSearchInteractive(string subscription, string locationName, string groupName)
+        private static async Task<AzCli.CognitiveSearchResourceInfo> TryCreateSearchInteractive(string subscription, string locationName, string groupName, string smartName = null, string smartNameKind = null)
         {
             ConsoleHelpers.WriteLineWithHighlight($"\n`CREATE COGNITIVE SEARCH RESOURCE`");
 
@@ -114,8 +114,10 @@ namespace Azure.AI.Details.Common.CLI
             
             var group = await AzCliConsoleGui.PickOrCreateResourceGroup(true, subscription, groupOk ? null : locationName, groupName);
             groupName = group.Name;
-            
-            var name = DemandAskPrompt("Name: ");
+
+            smartName ??= group.Name;
+            smartNameKind ??= "rg";
+            var name = DemandPickOrEnterName("Name: ", smartName, smartNameKind, "cogsearch");
 
             Console.Write("*** CREATING ***");
             var response = await AzCli.CreateSearchResource(subscription, groupName, locationName, name);
@@ -129,6 +131,65 @@ namespace Azure.AI.Details.Common.CLI
 
             Console.WriteLine("\r*** CREATED ***  ");
             return response.Payload;
+        }
+
+        private static string DemandPickOrEnterName(string namePrompt, string nameIn, string nameInKind, string nameOutKind)
+        {
+            var choices = GetNameChoices(nameIn, nameInKind, nameOutKind);
+            var usePicker = choices != null && choices.Count() > 1;
+
+            if (usePicker)
+            {
+                Console.Write(namePrompt);
+                var pick = ListBoxPicker.PickIndexOf(choices);
+                if (pick < 0) ThrowPromptNotAnsweredApplicationException();
+
+                Console.Write("\r");
+
+                var pickedUseCustomName = pick == choices.Length - 1;
+                if (!pickedUseCustomName)
+                {
+                    Console.WriteLine($"{namePrompt}{choices[pick]}");
+                    return choices[pick];
+                }
+            }
+
+            return DemandAskPrompt(namePrompt);
+        }
+
+        private static string[] GetNameChoices(string nameIn, string nameInKind, string nameOutKind)
+        {
+            if (string.IsNullOrEmpty(nameIn)) return null;
+
+            var choices = new List<string>();
+            if (nameIn.StartsWith($"{nameInKind}-"))
+            {
+                var nameBase = nameIn.Substring(nameInKind.Length + 1);
+                choices.Add($"{nameOutKind}-{nameBase}");
+            }
+
+            if (nameIn.EndsWith($"-{nameInKind}"))
+            {
+                var nameBase = nameIn.Substring(0, nameIn.Length - nameInKind.Length - 1);
+                choices.Add($"{nameBase}-{nameOutKind}");
+            }
+
+            if (nameIn.Contains($"-{nameInKind}-"))
+            {
+                var nameBase = nameIn.Replace($"-{nameInKind}-", $"-{nameOutKind}-");
+                choices.Add(nameBase);
+            }
+
+            if (choices.Count() == 0)
+            {
+                choices.Add($"{nameIn}-{nameOutKind}");
+                choices.Add($"{nameOutKind}-{nameIn}");
+            }
+
+            choices.Add("(Enter custom name)");
+
+            var x = choices.ToArray();
+            return x;
         }
 
         private static string AskPrompt(string prompt, string value = null, bool useEditBox = false)
