@@ -122,7 +122,7 @@ namespace Azure.AI.Details.Common.CLI
                 Console.WriteLine($"Region: {group.RegionLocation}");
                 Console.WriteLine($"Group: {group.Name}");
 
-                var name = AskPrompt("Name: ", resourceFilter);
+                var name = NamePickerHelper.AskPrompt("Name: ", resourceFilter);
                 if (string.IsNullOrEmpty(name)) return null;
                 if (!agreeTerms && !CheckAgreeTerms(kind)) return null;
 

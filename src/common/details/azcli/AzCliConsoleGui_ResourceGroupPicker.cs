@@ -101,7 +101,7 @@ namespace Azure.AI.Details.Common.CLI
                 var regionLocation = await RegionLocationPicker.FindRegionAsync(interactive, regionLocationFilter, false);
                 if (regionLocation == null) return null;
 
-                var name = AskPrompt("Name: ", groupName);
+                var name = NamePickerHelper.AskPrompt("Name: ", groupName);
                 if (string.IsNullOrEmpty(name)) return null;
 
                 Console.Write("*** CREATING ***");
