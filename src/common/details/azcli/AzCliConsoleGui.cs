@@ -121,7 +121,7 @@ namespace Azure.AI.Details.Common.CLI
                 smartNameKind = "rg";
             }
 
-            var name = NamePickerHelper.DemandPickOrEnterName("Name: ", smartName, smartNameKind, "cogsearch");
+            var name = NamePickerHelper.DemandPickOrEnterName("Name: ", "cogsearch", smartName, smartNameKind);
 
             Console.Write("*** CREATING ***");
             var response = await AzCli.CreateSearchResource(subscription, groupName, locationName, name);

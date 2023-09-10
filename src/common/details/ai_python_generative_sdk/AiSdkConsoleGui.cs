@@ -116,7 +116,7 @@ namespace Azure.AI.Details.Common.CLI
                 smartNameKind = "rg";
             }
 
-            var name = NamePickerHelper.DemandPickOrEnterName("Name: ", smartName, smartNameKind, "aihub"); // TODO: What will this really be called?
+            var name = NamePickerHelper.DemandPickOrEnterName("Name: ", "aihub", smartName, smartNameKind); // TODO: What will this really be called?
             displayName ??= name;
             description ??= name;
 
@@ -219,7 +219,7 @@ namespace Azure.AI.Details.Common.CLI
                 smartNameKind = "rg";
             }
 
-            var name = NamePickerHelper.DemandPickOrEnterName("Name: ", smartName, smartNameKind, "aiproj"); // TODO: What will this really be called?
+            var name = NamePickerHelper.DemandPickOrEnterName("Name: ", "aiproj", smartName, smartNameKind); // TODO: What will this really be called?
             displayName ??= name;
             description ??= name;
 
