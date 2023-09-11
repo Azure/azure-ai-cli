@@ -134,10 +134,10 @@ namespace Azure.AI.Details.Common.CLI
                 _values.AddThrowError(
                     "ERROR:", $"{action}; requires search endpoint uri.",
                             "",
-                      "TRY:", $"{Program.Name} config search --set endpoint ENDPOINT",
-                              $"{Program.Name} {command} --search-endpoint ENDPOINT",
+                      "TRY:", $"{CLIContext.Name} config search --set endpoint ENDPOINT",
+                              $"{CLIContext.Name} {command} --search-endpoint ENDPOINT",
                             "",
-                      "SEE:", $"{Program.Name} help {command}");
+                      "SEE:", $"{CLIContext.Name} help {command}");
             }
             return endpointUri;
         }
@@ -150,10 +150,10 @@ namespace Azure.AI.Details.Common.CLI
                 _values.AddThrowError(
                     "ERROR:", $"{action}; requires search api key.",
                             "",
-                      "TRY:", $"{Program.Name} config search --set api.key KEY",
-                              $"{Program.Name} {command} --search-api-key KEY",
+                      "TRY:", $"{CLIContext.Name} config search --set api.key KEY",
+                              $"{CLIContext.Name} {command} --search-api-key KEY",
                             "",
-                      "SEE:", $"{Program.Name} help {command}");
+                      "SEE:", $"{CLIContext.Name} help {command}");
             }
             return searchApiKey;
         }
@@ -166,10 +166,10 @@ namespace Azure.AI.Details.Common.CLI
                 _values.AddThrowError(
                     "ERROR:", $"{action}; requires embeddings endpoint uri.",
                             "",
-                      "TRY:", $"{Program.Name} config search --set embeddings.endpoint ENDPOINT",
-                              $"{Program.Name} {command} --embeddings-endpoint ENDPOINT",
+                      "TRY:", $"{CLIContext.Name} config search --set embeddings.endpoint ENDPOINT",
+                              $"{CLIContext.Name} {command} --embeddings-endpoint ENDPOINT",
                             "",
-                      "SEE:", $"{Program.Name} help {command}");
+                      "SEE:", $"{CLIContext.Name} help {command}");
             }
             return endpointUri;
         }
@@ -182,10 +182,10 @@ namespace Azure.AI.Details.Common.CLI
                 _values.AddThrowError(
                     "ERROR:", $"{action}; requires embeddings deployment.",
                             "",
-                      "TRY:", $"{Program.Name} config search --set embeddings.deployment DEPLOYMENT",
-                              $"{Program.Name} {command} --embeddings-deployment DEPLOYMENT",
+                      "TRY:", $"{CLIContext.Name} config search --set embeddings.deployment DEPLOYMENT",
+                              $"{CLIContext.Name} {command} --embeddings-deployment DEPLOYMENT",
                             "",
-                      "SEE:", $"{Program.Name} help {command}");
+                      "SEE:", $"{CLIContext.Name} help {command}");
             }
             return deployment;
         }
@@ -198,10 +198,10 @@ namespace Azure.AI.Details.Common.CLI
                 _values.AddThrowError(
                     "ERROR:", $"{action}; requires embeddings api key.",
                             "",
-                      "TRY:", $"{Program.Name} config search --set embeddings.api.key KEY",
-                              $"{Program.Name} {command} --embeddings-api-key KEY",
+                      "TRY:", $"{CLIContext.Name} config search --set embeddings.api.key KEY",
+                              $"{CLIContext.Name} {command} --embeddings-api-key KEY",
                             "",
-                      "SEE:", $"{Program.Name} help {command}");
+                      "SEE:", $"{CLIContext.Name} help {command}");
             }
             return embeddingsApiKey;
         }

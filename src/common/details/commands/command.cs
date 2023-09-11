@@ -59,7 +59,7 @@ namespace Azure.AI.Details.Common.CLI
                 return Command.RunCommand(values, queue, expandOk, parallelOk);
             }
 
-            return Program.DispatchRunCommand(values);
+            return CLIExecutable.DelegateDispatchRunCommand(values);
         }
 
         public static bool SaveCommand(ICommandValues values, string saveAsFile)
@@ -110,14 +110,14 @@ namespace Azure.AI.Details.Common.CLI
 
             if (targetWebJob)
             {
-                var prefix = $"{Program.Name.ToUpper()}_X";
+                var prefix = $"{CLIContext.Name.ToUpper()}_X";
                 var setOutputPath = isWindows
                     ? $"set {prefix}_OUTPUT_PATH=\nif not '%WEBJOBS_DATA_PATH%'=='' set {prefix}_OUTPUT_PATH=%WEBJOBS_DATA_PATH%\\%WEBJOBS_RUN_ID%"
                     : $"{prefix}_OUTPUT_PATH=; if [ ! -z \"$WEBJOBS_DATA_PATH\" ]; then {prefix}_OUTPUT_PATH=$(WEBJOBS_DATA_PATH)/$(WEBJOBS_RUN_ID); fi;";
                 FileHelpers.WriteAllText(runScriptPath, setOutputPath + Environment.NewLine, Encoding.Default);
             }
 
-            var app = isWindows ? Program.Name : $"./{Program.Name}";
+            var app = isWindows ? CLIContext.Name : $"./{CLIContext.Name}";
             FileHelpers.AppendAllText(runScriptPath, $"{app} {command} --nodefaults @{commandJob}" + Environment.NewLine, Encoding.Default);
 
             // settings.job
@@ -142,34 +142,33 @@ namespace Azure.AI.Details.Common.CLI
             // binaries
             var sourcePath = AppContext.BaseDirectory;
 
-            var programExe = OperatingSystem.IsWindows() ? Program.Exe : Program.Exe.Replace(".exe", "");
-            FileHelpers.CopyFile(sourcePath, programExe, tempDirectory, null, verbose);
+            FileHelpers.CopyFile(sourcePath, CLIContext.Exe, tempDirectory, null, verbose);
 
             #if NETCOREAPP
-            FileHelpers.CopyFile(sourcePath, Program.Name, tempDirectory, null, verbose);
-            FileHelpers.CopyFile(sourcePath, Program.Dll, tempDirectory, null, verbose);
+            FileHelpers.CopyFile(sourcePath, CLIContext.Name, tempDirectory, null, verbose);
+            FileHelpers.CopyFile(sourcePath, CLIContext.Dll, tempDirectory, null, verbose);
             FileHelpers.CopyFile(sourcePath, "runtimeconfig.json", tempDirectory, null, verbose);
-            FileHelpers.CopyFile(sourcePath, $"{Program.Name}.runtimeconfig.json", tempDirectory, null, verbose);
+            FileHelpers.CopyFile(sourcePath, $"{CLIContext.Name}.runtimeconfig.json", tempDirectory, null, verbose);
             #endif
 
-            var bindingAssembly = FileHelpers.GetAssemblyFileInfo(Program.BindingAssemblySdkType);
+            var bindingAssembly = FileHelpers.GetAssemblyFileInfo(CLIContext.Info.AssemblyData.BindingAssemblySdkType);
             sourcePath = bindingAssembly.DirectoryName;
             FileHelpers.CopyFile(sourcePath, bindingAssembly.Name, tempDirectory, null, verbose);
 
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
             {
                 string[] locations = { "", "runtimes/win-x64/native/", "../runtimes/win-x64/native/" };
-                FileHelpers.CopyFiles(PathHelpers.Combine(sourcePath, locations), Program.ZipIncludes, tempDirectory, null, null, verbose);
+                FileHelpers.CopyFiles(PathHelpers.Combine(sourcePath, locations), CLIContext.ZipIncludes, tempDirectory, null, null, verbose);
             }
             else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
             {
                 string[] locations = { "", "runtimes/linux-x64/native/", "../../runtimes/linux-x64/native/" };
-                FileHelpers.CopyFiles(PathHelpers.Combine(sourcePath, locations), Program.ZipIncludes, tempDirectory, "lib", ".so", verbose);
+                FileHelpers.CopyFiles(PathHelpers.Combine(sourcePath, locations), CLIContext.ZipIncludes, tempDirectory, "lib", ".so", verbose);
             }
             else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
             {
                 string[] locations = { "", "runtimes/osx-x64/native/", "../../runtimes/osx-x64/native/" };
-                FileHelpers.CopyFiles(PathHelpers.Combine(sourcePath, locations), Program.ZipIncludes, tempDirectory, "lib", ".dylib", verbose);
+                FileHelpers.CopyFiles(PathHelpers.Combine(sourcePath, locations), CLIContext.ZipIncludes, tempDirectory, "lib", ".dylib", verbose);
             }
 
             // Dependent type assemblies (Newtonsoft, Linq Async, System.Interactive.Async and JMESPath)
@@ -499,13 +498,16 @@ namespace Azure.AI.Details.Common.CLI
 
         private static async Task<bool> CheckExpectedLogOutputAsync(IEnumerable<string> expected, IEnumerable<string> notExpected, bool autoExpect, string autoExpectLogFilter, AutoResetEvent signalStop)
         {
+            var helper = CLIContext.ServiceProvider.GetService(typeof(IEventLoggerHelper)) as IEventLoggerHelper;
+            Debug.Assert(helper != null, "IEventLoggerHelper service not found");
+
             // if we're supposed to filter the log, do it
-            EventLoggerHelpers.SetFilters(autoExpectLogFilter);
+            helper.SetFilters(autoExpectLogFilter);
 
             // start writing log lines into the TextWriterReadLineHelper
             var readLineHelper = new TextWriterReadLineHelper();
             var readLineHandler = new EventHandler<string>((sender, message) => readLineHelper.WriteLine(message.TrimEnd('\r', '\n')));
-            EventLoggerHelpers.OnMessage += readLineHandler;
+            helper.OnMessage += readLineHandler;
 
             // start checking expectations, using all the lines asychronously from the TextWriterReadLineHelper
             var lines = readLineHelper.ReadAllLinesAsync();
@@ -513,7 +515,7 @@ namespace Azure.AI.Details.Common.CLI
 
             // wait for the stop signal, and then stop receiving log lines
             await Task.Run(() => signalStop.WaitOne());
-            EventLoggerHelpers.OnMessage -= readLineHandler;
+            helper.OnMessage -= readLineHandler;
 
             // signal the TextWriterReadLineHelper to not wait for more data, once it's finished with the data it has
             // this must happen after unhooking the log message callback (above) (can't write log lines to closed helper)
@@ -605,7 +607,7 @@ namespace Azure.AI.Details.Common.CLI
                 var fileNames = values.SaveAs(values.Names, Path.GetTempFileName());
                 var fileName = fileNames.Split(';').First();
 
-                var start = new ProcessStartInfo(Program.Exe, $"{values.GetCommand()} --nodefaults @{fileName}");
+                var start = new ProcessStartInfo(CLIContext.Exe, $"{values.GetCommand()} --nodefaults @{fileName}");
                 start.UseShellExecute = false;
 
                 var process = Process.Start(start);

@@ -268,7 +268,7 @@ namespace Azure.AI.Details.Common.CLI
                 {
                     _values.AddThrowError(
                         "ERROR:", $"'{item}' is not a valid visual feature.",
-                          "SEE:", $"{Program.Name} help image analyze feature");
+                          "SEE:", $"{CLIContext.Name} help image analyze feature");
                 }
 
                 features |= feature;

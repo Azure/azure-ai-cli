@@ -21,14 +21,14 @@ namespace Azure.AI.Details.Common.CLI
 {
     public class InitCommand : Command
     {
-        internal InitCommand(ICommandValues values)
+        public InitCommand(ICommandValues values)
         {
             _values = values.ReplaceValues();
             _quiet = _values.GetOrDefault("x.quiet", false);
             _verbose = _values.GetOrDefault("x.verbose", true);
         }
 
-        internal bool RunCommand()
+        public bool RunCommand()
         {
             RunInitCommand().Wait();
             return _values.GetOrDefault("passed", true);
@@ -154,7 +154,7 @@ namespace Azure.AI.Details.Common.CLI
                 Console.WriteLine("\rInitialize: (canceled)");
                 return;
             }
-    
+
             var choice = choices[picked];
             Console.WriteLine($"\rInitialize: {choice}");
 
@@ -183,8 +183,8 @@ namespace Azure.AI.Details.Common.CLI
             var regionFilter = _values.GetOrDefault("init.service.resource.region.name", "");
             var groupFilter = _values.GetOrDefault("init.service.resource.group.name", "");
             var resourceFilter = _values.GetOrDefault("init.service.cognitiveservices.resource.name", "");
-            var kind = _values.GetOrDefault("init.service.cognitiveservices.resource.kind", Program.CognitiveServiceResourceKind);
-            var sku = _values.GetOrDefault("init.service.cognitiveservices.resource.sku", Program.CognitiveServiceResourceSku);
+            var kind = _values.GetOrDefault("init.service.cognitiveservices.resource.kind", CLIContext.Info.InitCommandData.CognitiveServiceResourceKind);
+            var sku = _values.GetOrDefault("init.service.cognitiveservices.resource.sku", CLIContext.Info.InitCommandData.CognitiveServiceResourceSku);
             var yes = _values.GetOrDefault("init.service.cognitiveservices.terms.agree", false);
 
             var subscriptionId = await AzCliConsoleGui.PickSubscriptionIdAsync(interactive, subscriptionFilter);
@@ -249,7 +249,7 @@ namespace Azure.AI.Details.Common.CLI
         {
             if (_quiet) return;
 
-            var logo = FileHelpers.FindFileInHelpPath($"help/include.{Program.Name}.init.ascii.logo");
+            var logo = FileHelpers.FindFileInHelpPath($"help/include.{CLIContext.Name}.init.ascii.logo");
             if (!string.IsNullOrEmpty(logo))
             {
                 var text = FileHelpers.ReadAllHelpText(logo, Encoding.UTF8);
@@ -257,7 +257,7 @@ namespace Azure.AI.Details.Common.CLI
             }
             else
             {
-                ConsoleHelpers.WriteLineWithHighlight($"`{Program.Name.ToUpper()} INIT`");
+                ConsoleHelpers.WriteLineWithHighlight($"`{CLIContext.Name.ToUpper()} INIT`");
             }
         }
 

@@ -34,7 +34,7 @@ namespace Azure.AI.Details.Common.CLI
 
             if (!string.IsNullOrEmpty(atFile)) return DoAtFile(atFile, values);
 
-            return DoAtFile($"{Program.Name}.defaults", values);
+            return DoAtFile($"{CLIContext.Name}.defaults", values);
         }
 
         private static bool DoSetValue(string setValue, string fileName, ICommandValues values)
@@ -58,11 +58,11 @@ namespace Azure.AI.Details.Common.CLI
             values.AddThrowError(
                 "WARNING:", $"\"--set {setValue}\" is invalid; missing @NAME, NAME, or VALUE",
                             "",
-                    "TRY:", $"{Program.Name} config --set NAME VALUE",
-                            $"{Program.Name} config @NAME --set VALUE",
-                            $"{Program.Name} config @CONFIG-FILENAME --set NAME VALUE",
+                    "TRY:", $"{CLIContext.Name} config --set NAME VALUE",
+                            $"{CLIContext.Name} config @NAME --set VALUE",
+                            $"{CLIContext.Name} config @CONFIG-FILENAME --set NAME VALUE",
                             "",
-                    "SEE:", $"{Program.Name} help config set");
+                    "SEE:", $"{CLIContext.Name} help config set");
 
             return false;
         }
@@ -88,11 +88,11 @@ namespace Azure.AI.Details.Common.CLI
             values.AddThrowError(
                 "WARNING:", $"\"--add {addValue}\" is invalid; missing @NAME, NAME, or VALUE",
                             "",
-                    "TRY:", $"{Program.Name} config --add NAME VALUE",
-                            $"{Program.Name} config @NAME --add VALUE",
-                            $"{Program.Name} config @CONFIG-FILENAME --add NAME VALUE",
+                    "TRY:", $"{CLIContext.Name} config --add NAME VALUE",
+                            $"{CLIContext.Name} config @NAME --add VALUE",
+                            $"{CLIContext.Name} config @CONFIG-FILENAME --add NAME VALUE",
                             "",
-                    "SEE:", $"{Program.Name} help config add");
+                    "SEE:", $"{CLIContext.Name} help config add");
 
             return false;
         }
@@ -162,43 +162,43 @@ namespace Azure.AI.Details.Common.CLI
         private static bool DoClearValue(string clearValue, string atFile, ICommandValues values)
         {
             var fileName = !string.IsNullOrEmpty(atFile)
-                ? atFile.TrimStart('@') 
+                ? atFile.TrimStart('@')
                 : !string.IsNullOrEmpty(clearValue) && clearValue != "*"
                     ? clearValue.TrimStart('@')
-                    : $"{Program.Name}.defaults";
+                    : $"{CLIContext.Name}.defaults";
             var existing = FileHelpers.FindFileInConfigPath(fileName, values);
             if (existing == null)
             {
                 values.AddThrowError(
                     "WARNING:", $"Cannot delete '@{fileName}'; not found!",
                                 "",
-                        "USE:", $"{Program.Name} config @{fileName} --set VALUE",
-                                $"{Program.Name} config @{fileName} --add VALUE",
+                        "USE:", $"{CLIContext.Name} config @{fileName} --set VALUE",
+                                $"{CLIContext.Name} config @{fileName} --add VALUE",
                                 "",
-                        "SEE:", $"{Program.Name} help config");
+                        "SEE:", $"{CLIContext.Name} help config");
             }
-            else if (existing.Contains($"{Program.Exe}.exe/") || existing.Contains($"${Program.Name.ToUpper()}/"))
+            else if (existing.Contains($"{CLIContext.Exe}/") || existing.Contains($"${CLIContext.Name.ToUpper()}/"))
             {
                 values.AddThrowError(
                     "WARNING:", $"Cannot delete '@{existing}'",
                                 "",
-                        "USE:", $"{Program.Name} config @{fileName} --set @@none",
-                                $"{Program.Name} config @{fileName} --set VALUE",
-                                $"{Program.Name} config @{fileName} --add VALUE",
+                        "USE:", $"{CLIContext.Name} config @{fileName} --set @@none",
+                                $"{CLIContext.Name} config @{fileName} --set VALUE",
+                                $"{CLIContext.Name} config @{fileName} --add VALUE",
                                 "",
-                        "SEE:", $"{Program.Name} help config");
+                        "SEE:", $"{CLIContext.Name} help config");
             }
-            else if (existing.Contains($".{Program.Name}/config") || existing.Contains($".{Program.Name}\\config"))
+            else if (existing.Contains($".{CLIContext.Name}/config") || existing.Contains($".{CLIContext.Name}\\config"))
             {
                 var fi = new FileInfo(existing);
                 values.AddThrowError(
                     "WARNING:", $"Cannot delete '@{fi.Name}' from '{fi.DirectoryName}'",
                                 "",
-                        "USE:", $"{Program.Name} config @{fi.Name} --set @@none",
-                                $"{Program.Name} config @{fi.Name} --set VALUE",
-                                $"{Program.Name} config @{fi.Name} --add VALUE",
+                        "USE:", $"{CLIContext.Name} config @{fi.Name} --set @@none",
+                                $"{CLIContext.Name} config @{fi.Name} --set VALUE",
+                                $"{CLIContext.Name} config @{fi.Name} --add VALUE",
                                 "",
-                        "SEE:", $"{Program.Name} help config");
+                        "SEE:", $"{CLIContext.Name} help config");
             }
 
             DoShowValue(existing, "deleted from", values);

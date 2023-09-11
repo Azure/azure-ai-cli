@@ -163,7 +163,7 @@ namespace Azure.AI.Details.Common.CLI
             {
                 _values.AddThrowError(
                     "WARNING:", $"Service did not return valid json payload!",
-                        "TRY:", $"{Program.Name} csr download --url URL");
+                        "TRY:", $"{CLIContext.Name} csr download --url URL");
             }
 
             var json = ReadWritePrintJson(response);
@@ -181,7 +181,7 @@ namespace Azure.AI.Details.Common.CLI
             {
                 _values.AddThrowError(
                     "WARNING:", $"Cannot create project; project name not found!",
-                        "USE:", $"{Program.Name} csr project create --name NAME [...]");
+                        "USE:", $"{CLIContext.Name} csr project create --name NAME [...]");
             }
 
             var message = $"Creating project '{name}' ...";
@@ -253,7 +253,7 @@ namespace Azure.AI.Details.Common.CLI
             {
                 _values.AddThrowError(
                     "WARNING:", $"Cannot create dataset; dataset name not found!",
-                        "USE:", $"{Program.Name} csr dataset create --name NAME [...]");
+                        "USE:", $"{CLIContext.Name} csr dataset create --name NAME [...]");
             }
 
             var message = $"Start creating dataset '{name}' ...";
@@ -278,7 +278,7 @@ namespace Azure.AI.Details.Common.CLI
             {
                 _values.AddThrowError(
                     "WARNING:", $"Cannot upload dataset; dataset name not found!",
-                        "USE:", $"{Program.Name} csr dataset upload --name NAME [...]");
+                        "USE:", $"{CLIContext.Name} csr dataset upload --name NAME [...]");
             }
 
             var message = $"Start uploading dataset '{name}' ...";
@@ -290,7 +290,7 @@ namespace Azure.AI.Details.Common.CLI
 
             var formData = GetUploadDatasetPostFormData(name, boundary);
             CheckWriteOutputRequest(request, Encoding.UTF8.GetString(formData));
-            
+
             var response = HttpHelpers.GetWebResponse(request, formData);
 
             if (!_quiet) Console.WriteLine($"{message} Done!\n");
@@ -342,7 +342,7 @@ namespace Azure.AI.Details.Common.CLI
             {
                 _values.AddThrowError(
                     "WARNING:", $"Cannot check dataset status for projectid!",
-                        "USE:", $"{Program.Name} csr dataset status --id ID [...]");
+                        "USE:", $"{CLIContext.Name} csr dataset status --id ID [...]");
             }
 
             var message = $"Getting status for dataset {id}...";
@@ -366,7 +366,7 @@ namespace Azure.AI.Details.Common.CLI
             {
                 _values.AddThrowError(
                     "WARNING:", $"Cannot create model; model name not found!",
-                        "USE:", $"{Program.Name} csr model create --name NAME [...]");
+                        "USE:", $"{CLIContext.Name} csr model create --name NAME [...]");
             }
 
             var message = $"Start creating model '{name}' ...";
@@ -425,7 +425,7 @@ namespace Azure.AI.Details.Common.CLI
             {
                 _values.AddThrowError(
                     "WARNING:", $"Cannot check model status for projectid!",
-                        "USE:", $"{Program.Name} csr model status --id ID [...]");
+                        "USE:", $"{CLIContext.Name} csr model status --id ID [...]");
             }
 
             var message = $"Getting status for model {id}...";
@@ -452,13 +452,13 @@ namespace Azure.AI.Details.Common.CLI
             {
                 _values.AddThrowError(
                     "WARNING:", $"Cannot copy model for projectid!",
-                        "USE:", $"{Program.Name} csr model copy --id ID [...]");
+                        "USE:", $"{CLIContext.Name} csr model copy --id ID [...]");
             }
             else if (string.IsNullOrEmpty(targetKey))
             {
                 _values.AddThrowError(
                     "WARNING:", $"Cannot copy model; requires valid target subscription key.",
-                        "USE:", $"{Program.Name} csr model copy --target key KEY [...]");
+                        "USE:", $"{CLIContext.Name} csr model copy --target key KEY [...]");
             }
 
             var message = $"Copying model {id}...";
@@ -481,7 +481,7 @@ namespace Azure.AI.Details.Common.CLI
             {
                 _values.AddThrowError(
                     "WARNING:", $"Cannot create evaluation; evaluation name not found!",
-                        "USE:", $"{Program.Name} csr evaluation create --name NAME [...]");
+                        "USE:", $"{CLIContext.Name} csr evaluation create --name NAME [...]");
             }
 
             var message = $"Start creating evaluation '{name}' ...";
@@ -540,7 +540,7 @@ namespace Azure.AI.Details.Common.CLI
             {
                 _values.AddThrowError(
                     "WARNING:", $"Cannot check evaluation status for projectid!",
-                        "USE:", $"{Program.Name} csr evaluation status --id ID [...]");
+                        "USE:", $"{CLIContext.Name} csr evaluation status --id ID [...]");
             }
 
             var message = $"Getting status for evaluation {id}...";
@@ -564,7 +564,7 @@ namespace Azure.AI.Details.Common.CLI
             {
                 _values.AddThrowError(
                     "WARNING:", $"Cannot create endpoint; endpoint name not found!",
-                        "USE:", $"{Program.Name} csr endpoint create --name NAME [...]");
+                        "USE:", $"{CLIContext.Name} csr endpoint create --name NAME [...]");
             }
 
             var message = $"Start creating endpoint '{name}' ...";
@@ -623,7 +623,7 @@ namespace Azure.AI.Details.Common.CLI
             {
                 _values.AddThrowError(
                     "WARNING:", $"Cannot check endpoint status for projectid!",
-                        "USE:", $"{Program.Name} csr endpoint status --id ID [...]");
+                        "USE:", $"{CLIContext.Name} csr endpoint status --id ID [...]");
             }
 
             var message = $"Getting status for endpoint {id}...";
@@ -643,7 +643,7 @@ namespace Azure.AI.Details.Common.CLI
         private void GetListParameters(string kind, out string path, out string message, out string query)
         {
             kind = _values.GetOrDefault("csr.list.kind", kind);
-            
+
             var listLanguages = _values.GetOrDefault("csr.list.languages", false);
             var languageKind = _values.GetOrDefault("csr.list.languages.kind", listLanguages ? kind.TrimEnd('s') : "");
 
@@ -664,7 +664,7 @@ namespace Azure.AI.Details.Common.CLI
             {
                 _values.AddThrowError(
                     "WARNING:", $"Cannot list dataset files without a valid dataset ID/URL!",
-                        "USE:", $"{Program.Name} csr dataset list --dataset ID/URL --files");
+                        "USE:", $"{CLIContext.Name} csr dataset list --dataset ID/URL --files");
             }
 
             var evaluation = _values.GetOrDefault("csr.evaluation.id", "");
@@ -679,7 +679,7 @@ namespace Azure.AI.Details.Common.CLI
             {
                 _values.AddThrowError(
                     "WARNING:", $"Cannot list evaluation files without a valid evaluation ID/URL!",
-                        "USE:", $"{Program.Name} csr evaluation list --evaluation ID/URL --files");
+                        "USE:", $"{CLIContext.Name} csr evaluation list --evaluation ID/URL --files");
             }
 
             var endpoint = _values.GetOrDefault("csr.endpoint.id", "");
@@ -694,7 +694,7 @@ namespace Azure.AI.Details.Common.CLI
             {
                 _values.AddThrowError(
                     "WARNING:", $"Cannot list endpoint logs without a valid endpoint ID/URL!",
-                        "USE:", $"{Program.Name} csr endpoint list --endpoint ID/URL --logs");
+                        "USE:", $"{CLIContext.Name} csr endpoint list --endpoint ID/URL --logs");
             }
 
             path = "";
@@ -761,7 +761,7 @@ namespace Azure.AI.Details.Common.CLI
             {
                 _values.AddThrowError(
                     "WARNING:", $"Couldn't find resource type to list!",
-                        "SEE:", $"{Program.Name} help csr");
+                        "SEE:", $"{CLIContext.Name} help csr");
             }
 
             var top = _values.GetOrDefault("csr.top", "");
@@ -786,7 +786,7 @@ namespace Azure.AI.Details.Common.CLI
                 var command = _values.GetCommandForDisplay();
                 _values.AddThrowError(
                     "WARNING:", $"Couldn't determine what to download!",
-                        "SEE:", $"{Program.Name} help {command}");
+                        "SEE:", $"{CLIContext.Name} help {command}");
             }
         }
 
@@ -1012,7 +1012,7 @@ namespace Azure.AI.Details.Common.CLI
             {
                 _values.AddThrowError(
                     "WARNING:", $"Cannot upload data; missing data file!",
-                        "USE:", $"{Program.Name} csr dataset upload --data FILENAME [...]");
+                        "USE:", $"{CLIContext.Name} csr dataset upload --data FILENAME [...]");
             }
 
             var zipFile = FileHelpers.FindFileInDataPath(dataFile, _values);
@@ -1111,7 +1111,7 @@ namespace Azure.AI.Details.Common.CLI
         {
             var loggingEnabled = _values.GetOrDefault("service.config.content.logging.enabled", "false");
             var loggingPart = thing == "endpoint" ? $"\"contentLoggingEnabled\": {loggingEnabled}" : "";
-            
+
             return $"\"properties\": {{ {loggingPart} }},";
         }
 

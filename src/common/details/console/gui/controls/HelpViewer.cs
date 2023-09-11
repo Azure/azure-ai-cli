@@ -72,13 +72,12 @@ namespace Azure.AI.Details.Common.CLI.ConsoleGui
                         helpCommand = helpCommand.Substring(0, helpCommand.Length - 8);
                     }
 
-                    var programExe = OperatingSystem.IsWindows() ? Program.Exe : Program.Exe.Replace(".exe", "");
-                    var start = new ProcessStartInfo(programExe, $"quiet {helpCommand}");
+                    var start = new ProcessStartInfo(CLIContext.Exe, $"quiet {helpCommand}");
                     start.UseShellExecute = false;
-                    
+
                     var process = Process.Start(start);
                     process.WaitForExit();
-                    
+
                     if (process.ExitCode == -1)
                     {
                         Environment.Exit(process.ExitCode);
@@ -92,7 +91,7 @@ namespace Azure.AI.Details.Common.CLI.ConsoleGui
                 }
                 else
                 {
-                    var tryItPrefix = $"try: {Program.Name} ";
+                    var tryItPrefix = $"try: {CLIContext.Name} ";
                     var at = text.ToLower().LastIndexOf(tryItPrefix);
                     if (at > 0)
                     {
@@ -102,8 +101,7 @@ namespace Azure.AI.Details.Common.CLI.ConsoleGui
                             tryCommand = tryCommand.Substring(0, tryCommand.Length - 8);
                         }
 
-                        var programExe = OperatingSystem.IsWindows() ? Program.Exe : Program.Exe.Replace(".exe", "");
-                        var start = new ProcessStartInfo(programExe, $"cls {tryCommand}");
+                        var start = new ProcessStartInfo(CLIContext.Exe, $"cls {tryCommand}");
                         start.UseShellExecute = false;
                         Process.Start(start).WaitForExit();
                         Environment.Exit(-1);
@@ -120,8 +118,7 @@ namespace Azure.AI.Details.Common.CLI.ConsoleGui
                 if (selectedRow < 0) break;
 
                 var helpCommand = topics[selectedRow];
-                var programExe = OperatingSystem.IsWindows() ? Program.Exe : Program.Exe.Replace(".exe", "");
-                var start = new ProcessStartInfo(programExe, $"quiet {helpCommand}");
+                var start = new ProcessStartInfo(CLIContext.Exe, $"quiet {helpCommand}");
 
                 start.UseShellExecute = false;
                 Process.Start(start).WaitForExit();
@@ -156,7 +153,7 @@ namespace Azure.AI.Details.Common.CLI.ConsoleGui
             base.PaintWindow(colors, border);
             if (border != null)
             {
-                var banner = Program.GetDisplayBannerText();
+                var banner = CLIExecutable.GetDisplayBannerText();
                 WriteText(SelectedColors, ColumnOffset + 1, RowOffset + 0, banner);
             }
         }
@@ -173,13 +170,13 @@ namespace Azure.AI.Details.Common.CLI.ConsoleGui
             var text = base.GetSpeedSearchText();
             var helpCommand = GetProgramHelpCommand();
             return string.IsNullOrEmpty(text) || text == helpCommand
-                ? $"(\\(see: {helpCommand}.*\\))|({helpCommand}[^()]*)|(https://[^ ]+)|(try: {Program.Name} .*)|(TRY: {Program.Name} .*)"
+                ? $"(\\(see: {helpCommand}.*\\))|({helpCommand}[^()]*)|(https://[^ ]+)|(try: {CLIContext.Name} .*)|(TRY: {CLIContext.Name} .*)"
                 : text;
         }
 
         private static string GetProgramHelpCommand()
         {
-            return $"{Program.Name} help ";
+            return $"{CLIContext.Name} help ";
         }
 
         #endregion

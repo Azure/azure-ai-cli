@@ -2,7 +2,7 @@ using System.Linq;
 
 namespace Azure.AI.Details.Common.CLI
 {
-    class RunJobCommandParser : CommandParser
+    public class RunJobCommandParser : CommandParser
     {
         public static bool ParseCommand(INamedValueTokens tokens, ICommandValues values)
         {
@@ -28,16 +28,16 @@ namespace Azure.AI.Details.Common.CLI
             new NamedValueTokenParser("--retry",      "run.retries", "01", "1;0", null, null, "1"),
             new NamedValueTokenParser("--timeout",    "run.timeout", "01", "1"),
 
-            new NamedValueTokenParser(null,           $"run.input.{Program.Name}.pre.command.args", "000110", "1", null, null, Program.Name, "run.input.process"),
-            new NamedValueTokenParser(null,           $"run.input.{Program.Name}.post.command.args", "000110;000011", "1", null, null, Program.Name, "run.input.process"),
-            new NamedValueTokenParser(null,           $"run.input.{Program.Name}.command", "0001", "1", null, null, Program.Name, "run.input.process"),
+            new NamedValueTokenParser(null,           $"run.input.{CLIContext.Name}.pre.command.args", "000110", "1", null, null, CLIContext.Name, "run.input.process"),
+            new NamedValueTokenParser(null,           $"run.input.{CLIContext.Name}.post.command.args", "000110;000011", "1", null, null, CLIContext.Name, "run.input.process"),
+            new NamedValueTokenParser(null,           $"run.input.{CLIContext.Name}.command", "0001", "1", null, null, CLIContext.Name, "run.input.process"),
 
-            new NamedValueTokenParser(null,           $"run.input.{Program.Name}.pre.job.args", "000110", "1", null, null, Program.Name, "run.input.process"),
-            new NamedValueTokenParser(null,           $"run.input.{Program.Name}.post.job.args", "000110;000011", "1", null, null, Program.Name, "run.input.process"),
-            new NamedValueTokenParser("--job",        $"run.input.{Program.Name}.job", "0001", "1", null, null, Program.Name, "run.input.process"),
-            new NamedValueTokenParser("--jobs",       $"run.input.{Program.Name}.jobs", "0001", "1", null, null, $"run.input.{Program.Name}.job", "x.command.expand.file.name"),
+            new NamedValueTokenParser(null,           $"run.input.{CLIContext.Name}.pre.job.args", "000110", "1", null, null, CLIContext.Name, "run.input.process"),
+            new NamedValueTokenParser(null,           $"run.input.{CLIContext.Name}.post.job.args", "000110;000011", "1", null, null, CLIContext.Name, "run.input.process"),
+            new NamedValueTokenParser("--job",        $"run.input.{CLIContext.Name}.job", "0001", "1", null, null, CLIContext.Name, "run.input.process"),
+            new NamedValueTokenParser("--jobs",       $"run.input.{CLIContext.Name}.jobs", "0001", "1", null, null, $"run.input.{CLIContext.Name}.job", "x.command.expand.file.name"),
 
-            new NamedValueTokenParser($"--{Program.Name}",       $"run.input.{Program.Name}", "001", "0", null, null, Program.Name, "run.input.process"),
+            new NamedValueTokenParser($"--{CLIContext.Name}",       $"run.input.{CLIContext.Name}", "001", "0", null, null, CLIContext.Name, "run.input.process"),
 
             new NamedValueTokenParser("--cmd",        "run.input.shell.cmd", "0001", "0", null, null, "cmd", "run.input.process"),
             new NamedValueTokenParser("--bash",       "run.input.shell.bash", "0001", "0", null, null, "bash", "run.input.process"),

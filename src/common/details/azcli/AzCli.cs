@@ -108,10 +108,10 @@ namespace Azure.AI.Details.Common.CLI
         private static Dictionary<string, string> GetUserAgentEnv()
         {
             var dict = new Dictionary<string, string>();
-            dict.Add("AZURE_HTTP_USER_AGENT", Program.TelemetryUserAgent);
+            dict.Add("AZURE_HTTP_USER_AGENT", CLIContext.TelemetryUserAgent);
             return dict;
         }
-        
+
         public static async Task<ProcessResponse<SubscriptionInfo[]>> Login(bool useDeviceCode = false)
         {
             var showDeviceCodeMessage = (string message) => {
@@ -480,7 +480,7 @@ namespace Azure.AI.Details.Common.CLI
 
         private static async Task<List<string>> ListSupportedResourceRegions()
         {
-            var process2 = await ProcessHelpers.ParseShellCommandJson<JArray>("az", $"cognitiveservices account list-skus --kind {Program.CognitiveServiceResourceKind} --query \"[].{{Name:locations[0]}}\"", GetUserAgentEnv());
+            var process2 = await ProcessHelpers.ParseShellCommandJson<JArray>("az", $"cognitiveservices account list-skus --kind {CLIContext.Info.InitCommandData.CognitiveServiceResourceKind} --query \"[].{{Name:locations[0]}}\"", GetUserAgentEnv());
             var supportedRegions = new List<string>();
             foreach (var regionLocation in process2.Payload)
             {

@@ -155,7 +155,7 @@ namespace Azure.AI.Details.Common.CLI
 
             CreateSourceLanguageConfig(config, out SourceLanguageConfig language, out AutoDetectSourceLanguageConfig autoDetect);
 
-            var recognizer = autoDetect != null 
+            var recognizer = autoDetect != null
                 ? new SpeechRecognizer(config, autoDetect, audioConfig)
                 : language != null
                     ? new SpeechRecognizer(config, language, audioConfig)
@@ -270,7 +270,7 @@ namespace Azure.AI.Details.Common.CLI
             {
                 _values.AddThrowError(
                     "WARNING:", $"Missing or invalid speech recognition model path!", "",
-                        "USE:", $"{Program.Name} recognize --embedded --embeddedModelPath PATH [...]");
+                        "USE:", $"{CLIContext.Name} recognize --embedded --embeddedModelPath PATH [...]");
             }
             config.SetProperty("SPEECH-RecoModelIniFile", modelIniFileFullPath);
         }
@@ -282,7 +282,7 @@ namespace Azure.AI.Details.Common.CLI
 
         private void CheckNotYetImplementedConfigProperties()
         {
-            var notYetImplemented = 
+            var notYetImplemented =
                 ";config.token.type;config.token.password;config.token.username" +
                 ";config.language.target;recognizer.property";
 
@@ -560,7 +560,7 @@ namespace Azure.AI.Details.Common.CLI
                 }
             }
         }
-        
+
         private void WaitForKeywordCancelKeyOrTimeout(SpeechRecognizer recognizer, int timeout)
         {
             var interval = 100;

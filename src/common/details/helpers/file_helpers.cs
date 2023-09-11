@@ -97,7 +97,7 @@ namespace Azure.AI.Details.Common.CLI
 
                 if (IsResource(item) || IsOverride(item)) continue;
 
-                if (Program.Debug) Console.WriteLine($"  Searching for files '{fileNames}'");
+                if (CLIContext.Debug) Console.WriteLine($"  Searching for files '{fileNames}'");
 
                 var i1 = item.LastIndexOf(Path.DirectorySeparatorChar);
                 var i2 = item.LastIndexOf(Path.AltDirectorySeparatorChar);
@@ -120,11 +120,11 @@ namespace Azure.AI.Details.Common.CLI
 
         public static IEnumerable<string> FindFilesInConfigPath(string fileNames, INamedValues values)
         {
-            if (Program.Debug) Console.WriteLine($"DEBUG: Searching for CONFIG '{fileNames}'\n");
-            
+            if (CLIContext.Debug) Console.WriteLine($"DEBUG: Searching for CONFIG '{fileNames}'\n");
+
             var found = FindFilesInPath(fileNames, values, GetConfigPath(values));
 
-            if (Program.Debug) Console.WriteLine();
+            if (CLIContext.Debug) Console.WriteLine();
 
             return found;
         }
@@ -186,22 +186,22 @@ namespace Azure.AI.Details.Common.CLI
 
         public static IEnumerable<string> FindFilesInHelpPath(string fileNames, INamedValues values)
         {
-            if (Program.Debug) Console.WriteLine($"DEBUG: Searching for HELP '{fileNames}'\n");
-            
+            if (CLIContext.Debug) Console.WriteLine($"DEBUG: Searching for HELP '{fileNames}'\n");
+
             var found = FindFilesInPath(fileNames, values, GetHelpPath());
 
-            if (Program.Debug) Console.WriteLine();
+            if (CLIContext.Debug) Console.WriteLine();
 
             return found;
         }
 
         public static IEnumerable<string> FindFilesInDataPath(string fileNames, INamedValues values)
         {
-            if (Program.Debug) Console.WriteLine($"DEBUG: Searching for DATA '{fileNames}'\n");
+            if (CLIContext.Debug) Console.WriteLine($"DEBUG: Searching for DATA '{fileNames}'\n");
 
             var found = FindFilesInPath(fileNames, values, GetDataPath(values));
 
-            if (Program.Debug) Console.WriteLine();
+            if (CLIContext.Debug) Console.WriteLine();
 
             return found;
         }
@@ -262,8 +262,8 @@ namespace Azure.AI.Details.Common.CLI
                     lastLocation = location;
                 }
 
-                Console.WriteLine(verbose 
-                    ? $"  {prefix}{location}/{name}" 
+                Console.WriteLine(verbose
+                    ? $"  {prefix}{location}/{name}"
                     : $"  {prefix}{name}");
             }
         }
@@ -271,7 +271,7 @@ namespace Azure.AI.Details.Common.CLI
         public static void PrintFoundHelpFiles(List<string> found, INamedValues values)
         {
             found = found.Select(x => x.Replace('.', ' ')).ToList();
-            FileHelpers.PrintFoundFiles(found, values, false, $"{Program.Name} help ");
+            FileHelpers.PrintFoundFiles(found, values, false, $"{CLIContext.Name} help ");
         }
 
         public static string ExpandFoundHelpFiles(List<string> found)
@@ -314,7 +314,7 @@ namespace Azure.AI.Details.Common.CLI
         {
             var lastSlash = item.LastIndexOfAny("/\\".ToCharArray());
             var lastPart = lastSlash >= 0 ? item.Substring(lastSlash + 1) : item;
-            return $"{Program.Name} help {lastPart.Replace('.', ' ')}";
+            return $"{CLIContext.Name} help {lastPart.Replace('.', ' ')}";
         }
 
         public static void PrintHelpFile(string path)
@@ -325,22 +325,22 @@ namespace Azure.AI.Details.Common.CLI
 
         public static string DemandFindFileInConfigPath(string fileName, INamedValues values, string fileKind)
         {
-            if (Program.Debug) Console.WriteLine($"DEBUG: CONFIG '{fileName}' MUST exist! \n");
-            
+            if (CLIContext.Debug) Console.WriteLine($"DEBUG: CONFIG '{fileName}' MUST exist! \n");
+
             var found = DemandFindFileInPath(fileName, values, fileKind, GetConfigPath(values));
 
-            if (Program.Debug) Console.WriteLine();
+            if (CLIContext.Debug) Console.WriteLine();
 
             return found;
         }
 
         public static string DemandFindFileInDataPath(string fileName, INamedValues values, string fileKind)
         {
-            if (Program.Debug) Console.WriteLine($"DEBUG: DATA '{fileName}' MUST exist!'\n");
+            if (CLIContext.Debug) Console.WriteLine($"DEBUG: DATA '{fileName}' MUST exist!'\n");
 
             var found = DemandFindFileInPath(fileName, values, fileKind, GetDataPath(values));
 
-            if (Program.Debug) Console.WriteLine();
+            if (CLIContext.Debug) Console.WriteLine();
 
             return found;
         }
@@ -367,33 +367,33 @@ namespace Azure.AI.Details.Common.CLI
 
         public static string FindFileInConfigPath(string fileName, INamedValues values)
         {
-            if (Program.Debug) Console.WriteLine($"DEBUG: CONFIG '{fileName}' EXIST?\n");
+            if (CLIContext.Debug) Console.WriteLine($"DEBUG: CONFIG '{fileName}' EXIST?\n");
 
             var found = FindFileInPath(fileName, values, GetConfigPath(values));
 
-            if (Program.Debug) Console.WriteLine();
+            if (CLIContext.Debug) Console.WriteLine();
 
             return found;
         }
 
         public static string FindFileInDataPath(string fileName, INamedValues values)
         {
-            if (Program.Debug) Console.WriteLine($"DEBUG: DATA '{fileName}' EXIST?\n");
+            if (CLIContext.Debug) Console.WriteLine($"DEBUG: DATA '{fileName}' EXIST?\n");
 
             var found = FindFileInPath(fileName, values, GetDataPath(values));
 
-            if (Program.Debug) Console.WriteLine();
+            if (CLIContext.Debug) Console.WriteLine();
 
             return found;
         }
 
         public static string FindFileInHelpPath(string fileName)
         {
-            if (Program.Debug) Console.WriteLine($"DEBUG: HELP '{fileName}' EXIST?\n");
+            if (CLIContext.Debug) Console.WriteLine($"DEBUG: HELP '{fileName}' EXIST?\n");
 
             var found = FindFileInPath(fileName, null, GetHelpPath());
 
-            if (Program.Debug) Console.WriteLine();
+            if (CLIContext.Debug) Console.WriteLine();
 
             return found;
         }
@@ -452,7 +452,7 @@ namespace Azure.AI.Details.Common.CLI
                 return ConsoleHelpers.ReadAllStandardInputText();
             }
             else if (atFileValue.StartsWith("@@--"))
-            { 
+            {
                 return atFileValue[2..];
             }
             return atFileValue;
@@ -485,7 +485,7 @@ namespace Azure.AI.Details.Common.CLI
             var dir = GetConfigOutputDir(values);
             var outputFile = Path.Combine(dir, file);
 
-            if (Program.Debug) Console.WriteLine($"DEBUG: Output CONFIG file '{file}'='{outputFile}'");
+            if (CLIContext.Debug) Console.WriteLine($"DEBUG: Output CONFIG file '{file}'='{outputFile}'");
 
             return outputFile;
         }
@@ -500,7 +500,7 @@ namespace Azure.AI.Details.Common.CLI
             if (file == null) return null;
             if (file.StartsWith("@")) return GetOutputConfigFileName(file, values);
             if (IsStandardOutputReference(file)) return file;
-            
+
             var i1 = file.LastIndexOf(Path.DirectorySeparatorChar);
             var i2 = file.LastIndexOf(Path.AltDirectorySeparatorChar);
             var hasPath = i1 >= 0 || i2 >= 0;
@@ -509,7 +509,7 @@ namespace Azure.AI.Details.Common.CLI
             var outputDir = values != null ? values.GetOrDefault("x.output.path", _outputPath) : _outputPath;
             var outputFile = !hasPath ? PathHelpers.Combine(outputDir, file) : file;
 
-            if (Program.Debug) Console.WriteLine($"DEBUG: Output DATA file '{file}'='{outputFile}'");
+            if (CLIContext.Debug) Console.WriteLine($"DEBUG: Output DATA file '{file}'='{outputFile}'");
 
             return outputFile;
         }
@@ -545,7 +545,7 @@ namespace Azure.AI.Details.Common.CLI
                         using var file = File.Open(fileName, FileMode.Append, FileAccess.Write, FileShare.None);
                         byte[] byteArray = encoding.GetBytes(text);
                         file.Write(byteArray, 0, byteArray.Length);
-                        file.Close();                        
+                        file.Close();
                     }
                     finally
                     {
@@ -559,7 +559,7 @@ namespace Azure.AI.Details.Common.CLI
         {
             EnsureDirectoryForFileExists(fileName);
             TryCatchHelpers.TryCatchRetry(() => {
-                
+
                 if (IsStandardOutputReference(fileName))
                 {
                     Console.Write(text);
@@ -638,7 +638,7 @@ namespace Azure.AI.Details.Common.CLI
 
         public static string ReadWriteAllStream(Stream stream, string fileName, string message, bool returnAsText)
         {
-            // we need to know if we're writing to standard output 
+            // we need to know if we're writing to standard output
             var isStandardOutput = IsStandardOutputReference(fileName);
 
             // we'll use a temp file if we don't get a fileName passed in, or if it's a standard output reference
@@ -714,7 +714,7 @@ namespace Azure.AI.Details.Common.CLI
             if (!FileExists(source)) return;
 
             if (verbose) Console.WriteLine($"  Saving {file2} ... ");
-            
+
             var dest = PathHelpers.Combine(path2, file2);
             FileHelpers.EnsureDirectoryForFileExists(dest);
 
@@ -739,7 +739,7 @@ namespace Azure.AI.Details.Common.CLI
 
         public static FileInfo GetAssemblyFileInfo(Type type)
         {
-            // GetAssembly.Location always returns empty when the project is built as 
+            // GetAssembly.Location always returns empty when the project is built as
             // a single-file app (which we do when publishing the Dependency package),
             // warning IL3000
             string assemblyPath = Assembly.GetAssembly(type).Location;
@@ -753,7 +753,7 @@ namespace Azure.AI.Details.Common.CLI
 
         public static void LogException(ICommandValues values, Exception ex)
         {
-            var file = $"exception.{{run.time}}.{{pid}}.{{time}}.{Program.Name}.error.log";
+            var file = $"exception.{{run.time}}.{{pid}}.{{time}}.{CLIContext.Name}.error.log";
 
             var runTime = values.GetOrDefault("x.run.time", "");
             file = file.Replace("{run.time}", runTime);
@@ -773,7 +773,7 @@ namespace Azure.AI.Details.Common.CLI
             if (string.IsNullOrEmpty(fileName)) return false;
 
             var found = IsStandardInputReference(fileName) || OverrideExists(fileName) || ResourceExists(fileName) || File.Exists(fileName);
-            if (Program.Debug) Console.WriteLine(found ?  $"  FOUND `{fileName}`" : $"  not found `{fileName}`");
+            if (CLIContext.Debug) Console.WriteLine(found ?  $"  FOUND `{fileName}`" : $"  not found `{fileName}`");
 
             return found;
         }
@@ -816,7 +816,7 @@ namespace Azure.AI.Details.Common.CLI
         {
             if (!IsOverride(find)) yield break;
 
-            if (Program.Debug) Console.WriteLine($"  Searching for overrides '{find}'");
+            if (CLIContext.Debug) Console.WriteLine($"  Searching for overrides '{find}'");
 
             find = OverrideNameFromFileName(find);
             if (OverrideExists(find))
@@ -834,7 +834,7 @@ namespace Azure.AI.Details.Common.CLI
                 if (match.Success) yield return FileNameFromOverrideName(name);
             }
 
-            yield break;            
+            yield break;
         }
 
         private static string ReadAllOverrideText(string fileName)
@@ -855,32 +855,33 @@ namespace Azure.AI.Details.Common.CLI
 
         public static bool IsResource(string fileName)
         {
-            return !string.IsNullOrEmpty(fileName) && fileName.StartsWith(Program.Exe);
+            return !string.IsNullOrEmpty(fileName) && fileName.StartsWith(CLIContext.Info.AssemblyData.Exe);
         }
 
         private static string ResourceNameFromFileName(string fileName)
         {
-            return fileName.Replace(Program.Exe, resourcePrefix).Replace('/', '.').Replace('\\', '.');
+            return fileName.Replace(CLIContext.Info.AssemblyData.Exe, resourcePrefix).Replace('/', '.').Replace('\\', '.');
         }
 
         public static string FileNameFromResourceName(string name)
         {
+            var cliInfo = CLIContext.Info;
             name = name.Replace(resourcePrefix, "");
 
             var subDir = "";
-            if (name.StartsWith($"..{Program.Name}.config."))
+            if (name.StartsWith($"..{CLIContext.Name}.config."))
             {
                 subDir = "config/";
                 name = name.Replace("." + dotDirectory.Replace("/", ".") + "config", "");
             }
 
-            if (name.StartsWith($"..{Program.Name}.data."))
+            if (name.StartsWith($"..{CLIContext.Name}.data."))
             {
                 subDir = "data/";
                 name = name.Replace("." + dotDirectory.Replace("/", ".") + "data", "");
             }
 
-            if (name.StartsWith($"..{Program.Name}.help."))
+            if (name.StartsWith($"..{CLIContext.Name}.help."))
             {
                 subDir = "help/";
                 name = name.Replace("." + dotDirectory.Replace("/", ".") + "help", "");
@@ -889,15 +890,16 @@ namespace Azure.AI.Details.Common.CLI
             name = name.Replace("." + dotDirectory.Replace("/", "."), "");
             name = name.Trim('.', '/');
 
-            name = $"{Program.Exe}/{dotDirectory}{subDir}{name}";
+            name = $"{cliInfo.AssemblyData.Exe}/{dotDirectory}{subDir}{name}";
             return name.EndsWith("._") ? name.Substring(0, name.Length - 2) : name;
         }
 
         public static IEnumerable<string> FindResources(string find)
         {
+            var cliInfo = CLIContext.Info;
             if (!IsResource(find)) yield break;
 
-            if (Program.Debug) Console.WriteLine($"  Searching for resources '{find}'");
+            if (CLIContext.Debug) Console.WriteLine($"  Searching for resources '{find}'");
 
             find = ResourceNameFromFileName(find);
             if (ResourceExists(find))
@@ -914,7 +916,7 @@ namespace Azure.AI.Details.Common.CLI
                 if (match.Success) yield return FileNameFromResourceName(name);
             }
 
-            yield break;            
+            yield break;
         }
 
         private static Stream GetResourceStream(string fileName)
@@ -1111,11 +1113,11 @@ namespace Azure.AI.Details.Common.CLI
             var sb = new StringBuilder();
             foreach (var path in paths.Split(";".ToCharArray(), StringSplitOptions.RemoveEmptyEntries))
             {
-                if (Program.Debug) Console.WriteLine($"  CONFIG DATASTORE: '{path}'");
+                if (CLIContext.Debug) Console.WriteLine($"  CONFIG DATASTORE: '{path}'");
                 sb.Append($"{path}data/;{path}config/;{path};");
             }
 
-            if (Program.Debug) Console.WriteLine();
+            if (CLIContext.Debug) Console.WriteLine();
 
             return path0.TrimEnd(';') + ";" + sb.ToString().TrimEnd(';');
         }
@@ -1164,7 +1166,7 @@ namespace Azure.AI.Details.Common.CLI
                 default: dotdir = hive.TrimEnd('/', '\\') + "/"; break;
             }
 
-            if (Program.Debug)
+            if (CLIContext.Debug)
             {
                 Console.WriteLine(string.IsNullOrEmpty(dotdir)
                     ? $"  CONFIG DATASTORE ('{hive}'): does NOT exist !!\n"
@@ -1189,14 +1191,14 @@ namespace Azure.AI.Details.Common.CLI
             if (fileName.StartsWith(system)) return "system";
             if (fileName.StartsWith(global)) return "global";
             if (fileName.StartsWith(user)) return "user";
-            if (fileName.StartsWith(app)) return Program.Name;
+            if (fileName.StartsWith(app)) return CLIContext.Name;
 
             return null;
         }
 
         private static string GetAppResourceConfigDotDir()
         {
-            return $"{Program.Exe}/{dotDirectory}";
+            return $"{CLIContext.Info.AssemblyData.Exe}/{dotDirectory}";
         }
 
         private static string GetAssemblyConfigDotDir(bool mustExist = true, bool createIfDoesnt = false)
@@ -1274,10 +1276,10 @@ namespace Azure.AI.Details.Common.CLI
 
         private static Assembly _assembly = typeof(FileHelpers).Assembly;
         private const string resourcePrefix = "Azure.AI.Details.Common.CLI.resources";
-        private static readonly string overridePrefix = $"${Program.Name.ToUpper()}";
+        private static readonly string overridePrefix = $"${CLIContext.Name.ToUpper()}";
 
         private const string defaultDataPath = @";./;../;../../;../../../;../../../../;{config.path};";
-        
+
         private static string _configPath = null;
         private static string _configPathScoped = null;
 
@@ -1287,7 +1289,7 @@ namespace Azure.AI.Details.Common.CLI
         private static string _dataPath = defaultDataPath;
         private static string _outputPath = "";
 
-        private static readonly string dotDirectory = $".{Program.Name}/";
+        private static readonly string dotDirectory = $".{CLIContext.Name}/";
 
         private static ReaderWriterLockSlim _lockSlim = new ReaderWriterLockSlim();
     }

@@ -17,6 +17,16 @@ namespace Azure.AI.Details.Common.CLI
 {
     public partial class Program
     {
+        public static CLIInfo CLIInfo = new CLIInfo
+        {
+            NameData = new NameDataRecord(Name, DisplayName, WarningBanner),
+            AssemblyData = new AssemblyDataRecord(Exe, Dll, BindingAssemblySdkType),
+            InitCommandData = new InitCommandDataRecord(InitConfigsEndpoint, InitConfigsSubscription),
+            HelpCommandData = new HelpCommandDataRecord(HelpCommandTokens),
+            ConfigCommandData = new ConfigCommandDataRecord(ConfigScopeTokens),
+            ZipOptionData = new ZipOptionDataRecord(ZipIncludes)
+        };
+        public static ICL
         #region name data
         public const string Name = "spx";
         public const string DisplayName = "Azure Speech CLI";
@@ -46,7 +56,7 @@ namespace Azure.AI.Details.Common.CLI
         #endregion
 
         #region zip option data
-        public static string[] ZipIncludes = 
+        public static string[] ZipIncludes =
         {
             "LICENSE.txt",
             "THIRD_PARTY_NOTICE.txt",
@@ -88,7 +98,7 @@ namespace Azure.AI.Details.Common.CLI
             var command = values.GetCommand(null) ?? tokens.PeekNextToken();
             var root = command.Split('.').FirstOrDefault();
 
-            return root switch 
+            return root switch
             {
                 "help" => HelpCommandParser.ParseCommand(tokens, values),
                 "init" => InitCommandParser.ParseCommand(tokens, values),
@@ -140,10 +150,10 @@ namespace Azure.AI.Details.Common.CLI
 
                 ErrorHelpers.WriteLineMessage(
                        "ERROR:", $"Invalid file format: \"{file}\"",
-                         "TRY:", $"{Program.Name} {values.GetCommandForDisplay()} --file \"{file}\" --format ANY",
-                    "SEE ALSO:", $"{Program.Name} help find topic format",
-                                 $"{Program.Name} help find topic input",
-                                 $"{Program.Name} help documentation\n");
+                         "TRY:", $"{CLIContext.Name} {values.GetCommandForDisplay()} --file \"{file}\" --format ANY",
+                    "SEE ALSO:", $"{CLIContext.Name} help find topic format",
+                                 $"{CLIContext.Name} help find topic input",
+                                 $"{CLIContext.Name} help documentation\n");
 
                 values.Reset("x.verbose", "false");
                 return true;

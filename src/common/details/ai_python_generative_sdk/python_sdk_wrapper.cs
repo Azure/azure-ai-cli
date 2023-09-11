@@ -62,7 +62,7 @@ namespace Azure.AI.Details.Common.CLI
                     "hub_create",
                     "--subscription", subscription,
                     "--group", group,
-                    "--name", name, 
+                    "--name", name,
                     "--location", location,
                     "--display-name", displayName,
                     "--description", description);
@@ -88,7 +88,7 @@ namespace Azure.AI.Details.Common.CLI
                     "--subscription", subscription,
                     "--group", group,
                     "--resource", resource,
-                    "--name", name, 
+                    "--name", name,
                     "--location", location,
                     "--display-name", displayName,
                     "--description", description,
@@ -111,7 +111,7 @@ namespace Azure.AI.Details.Common.CLI
                     "hub_delete",
                     "--subscription", subscription,
                     "--group", group,
-                    "--name", name, 
+                    "--name", name,
                     "--delete-dependent-resources", deleteDependentResources ? "true" : "false");
         }
 
@@ -162,8 +162,8 @@ namespace Azure.AI.Details.Common.CLI
             var script = FileHelpers.ReadAllHelpText(path, Encoding.UTF8);
             var scriptArgs = BuildPythonScriptArgs(args);
 
-            if (Program.Debug) Console.WriteLine($"DEBUG: {scriptName}.py:\n{script}");
-            if (Program.Debug) Console.WriteLine($"DEBUG: PythonRunner.RunScriptAsync: '{scriptName}' {scriptArgs}");
+            if (CLIContext.Debug) Console.WriteLine($"DEBUG: {scriptName}.py:\n{script}");
+            if (CLIContext.Debug) Console.WriteLine($"DEBUG: PythonRunner.RunScriptAsync: '{scriptName}' {scriptArgs}");
 
             var dbgOut = script.Replace("\n", "\\n").Replace("\r", "");
             AI.DBG_TRACE_VERBOSE($"RunEmbeddedPythonScript: {scriptName}.py: {dbgOut}");
@@ -174,7 +174,7 @@ namespace Azure.AI.Details.Common.CLI
 
             dbgOut = output.Replace("\n", "\\n").Replace("\r", "");
             AI.DBG_TRACE_INFO($"RunEmbeddedPythonScript: exit={exit}; output:{dbgOut}");
-            if (Program.Debug) Console.WriteLine($"DEBUG: RunEmbeddedPythonScript: exit={exit}; output=\n<---start--->{output}\n<---stop--->");
+            if (CLIContext.Debug) Console.WriteLine($"DEBUG: RunEmbeddedPythonScript: exit={exit}; output=\n<---start--->{output}\n<---stop--->");
 
             if (exit != 0)
             {

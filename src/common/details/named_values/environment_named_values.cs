@@ -12,7 +12,7 @@ namespace Azure.AI.Details.Common.CLI
     public class EnvironmentNamedValues : INamedValues
     {
         public static INamedValues Current = new EnvironmentNamedValues();
-        
+
         public EnvironmentNamedValues()
         {
             _values = new NamedValues();
@@ -20,7 +20,7 @@ namespace Azure.AI.Details.Common.CLI
             var vars = Environment.GetEnvironmentVariables();
             foreach (var key in vars.Keys)
             {
-                if (key.ToString().ToLower().StartsWith($"{Program.Name}_"))
+                if (key.ToString().ToLower().StartsWith($"{CLIContext.Name}_"))
                 {
                     var name = key.ToString().Substring(4).Replace("_", ".").ToLower();
                     var value = vars[key].ToString();

@@ -105,7 +105,7 @@ namespace Azure.AI.Details.Common.CLI
             {
                 _values.AddThrowError(
                     "WARNING:", $"Cannot create {kind} person group; group name not specified!", "",
-                        "USE:", $"{Program.Name} person group create --name NAME [...]");
+                        "USE:", $"{CLIContext.Name} person group create --name NAME [...]");
             }
 
             var message = $"Creating {kind} person group '{name}' ...";
@@ -197,7 +197,7 @@ namespace Azure.AI.Details.Common.CLI
             {
                 _values.AddThrowError(
                     "WARNING:", $"Cannot create {kind} person; person name not specified!", "",
-                        "USE:", $"{Program.Name} person create --name NAME [...]");
+                        "USE:", $"{CLIContext.Name} person create --name NAME [...]");
             }
 
             var message = $"Creating {kind} person '{name}' ...";
@@ -325,21 +325,21 @@ namespace Azure.AI.Details.Common.CLI
             {
                 _values.AddThrowError(
                     "WARNING:", $"Group id not specified!", "",
-                        "USE:", $"{Program.Name} {_values.GetCommandForDisplay()} --group id ID [...]");
+                        "USE:", $"{CLIContext.Name} {_values.GetCommandForDisplay()} --group id ID [...]");
             }
             personId = _values.GetOrDefault("person.id", "");
             if (string.IsNullOrEmpty(personId) && personIdRequired)
             {
                 _values.AddThrowError(
                     "WARNING:", $"Person id not specified!", "",
-                        "USE:", $"{Program.Name} {_values.GetCommandForDisplay()} --person id ID [...]");
+                        "USE:", $"{CLIContext.Name} {_values.GetCommandForDisplay()} --person id ID [...]");
             }
             id = _values.GetOrDefault("person.face.id", "");
             if (string.IsNullOrEmpty(id) && faceIdRequired)
             {
                 _values.AddThrowError(
                     "WARNING:", $"Face id not specified!", "",
-                        "USE:", $"{Program.Name} {_values.GetCommandForDisplay()} --face id ID [...]");
+                        "USE:", $"{CLIContext.Name} {_values.GetCommandForDisplay()} --face id ID [...]");
             }
         }
 
@@ -350,9 +350,9 @@ namespace Azure.AI.Details.Common.CLI
             {
                 _values.AddThrowError(
                   "ERROR:", $"Unknown group kind '{groupKind}'!", "",
-                    "USE:", $"{Program.Name} person [...] list --group kind large",
-                            $"{Program.Name} person [...] list --group kind dynamic",
-                    "SEE:", $"{Program.Name} help person group");
+                    "USE:", $"{CLIContext.Name} person [...] list --group kind large",
+                            $"{CLIContext.Name} person [...] list --group kind dynamic",
+                    "SEE:", $"{CLIContext.Name} help person group");
             }
 
             var groupId = _values.GetOrDefault("person.group.id", null);
@@ -366,15 +366,15 @@ namespace Azure.AI.Details.Common.CLI
             {
                 _values.AddThrowError(
                     "WARNING:", $"Cannot list {groupKind} {kind}; group id required!", "",
-                        "USE:", $"{Program.Name} person [...] --group id ID",
-                        "SEE:", $"{Program.Name} help person group id");
+                        "USE:", $"{CLIContext.Name} person [...] --group id ID",
+                        "SEE:", $"{CLIContext.Name} help person group id");
             }
             else if (listFaces && string.IsNullOrEmpty(personId))
             {
                 _values.AddThrowError(
                     "WARNING:", $"Cannot list person faces; person id required!", "",
-                        "USE:", $"{Program.Name} person [...] --person id ID",
-                        "SEE:", $"{Program.Name} help person id");
+                        "USE:", $"{CLIContext.Name} person [...] --person id ID",
+                        "SEE:", $"{CLIContext.Name} help person id");
             }
 
             path = "";
@@ -407,7 +407,7 @@ namespace Azure.AI.Details.Common.CLI
             {
                 _values.AddThrowError(
                     "WARNING:", $"Couldn't find resource type to list!", "",
-                        "SEE:", $"{Program.Name} help person");
+                        "SEE:", $"{CLIContext.Name} help person");
             }
 
             var top = _values.GetOrDefault("person.top", "");

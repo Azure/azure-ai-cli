@@ -75,7 +75,7 @@ namespace Azure.AI.Details.Common.CLI
                 case "interactive":
                     // SynthesizeInteractive(false);
                     // break;
-                    
+
                 case "interactive+":
                     SynthesizeInteractive(true);
                     break;
@@ -328,7 +328,7 @@ namespace Azure.AI.Details.Common.CLI
             {
                 _values.AddThrowError(
                     "ERROR:", $"Missing or invalid speech synthesis model path!", "",
-                      "USE:", $"{Program.Name} synthesize --embedded --embeddedModelPath PATH [...]");
+                      "USE:", $"{CLIContext.Name} synthesize --embedded --embeddedModelPath PATH [...]");
             }
             config.SetProperty("SPEECH-SynthesisOfflineDataPath", modelPath);
         }
@@ -341,7 +341,7 @@ namespace Azure.AI.Details.Common.CLI
 
         private void CheckNotYetImplementedConfigProperties()
         {
-            var notYetImplemented = 
+            var notYetImplemented =
                 ";config.token.type;config.token.password;config.token.username" +
                 ";synthesizer.property";
 

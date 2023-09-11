@@ -39,7 +39,7 @@ namespace Azure.AI.Details.Common.CLI
             Console.Write("\rName: *** Loading choices ***");
 
             var json = PythonSDKWrapper.ListResources(values, subscription);
-            if (Program.Debug) Console.WriteLine(json);
+            if (CLIContext.Debug) Console.WriteLine(json);
 
             var parsed = !string.IsNullOrEmpty(json) ? JToken.Parse(json) : null;
             var items = parsed?.Type == JTokenType.Object ? parsed["resources"] : new JArray();
@@ -136,7 +136,7 @@ namespace Azure.AI.Details.Common.CLI
             Console.Write("\rName: *** Loading choices ***");
 
             var json = PythonSDKWrapper.ListProjects(values, subscription);
-            if (Program.Debug) Console.WriteLine(json);
+            if (CLIContext.Debug) Console.WriteLine(json);
 
             var parsed = !string.IsNullOrEmpty(json) ? JToken.Parse(json) : null;
             var items = parsed?.Type == JTokenType.Object ? parsed["projects"] : new JArray();

@@ -46,20 +46,20 @@ namespace Azure.AI.Details.Common.CLI
             var token = PeekNextToken();
             while (!string.IsNullOrEmpty(token))
             {
-                if (token == Program.Name)
+                if (token == CLIContext.Name)
                 {
                 }
                 else if (token == "debug")
                 {
-                    Program.Debug = true;
+                    CLIContext.Debug = true;
                 }
-                else if (Program.Debug && token == "wait")
+                else if (CLIContext.Debug && token == "wait")
                 {
                     WaitForDebugger();
                 }
                 else if (token == "dump")
                 {
-                    Program.DebugDumpResources();
+                    CLIExecutable.DebugDumpResources();
                 }
                 else if (token == "cls")
                 {
@@ -163,7 +163,7 @@ namespace Azure.AI.Details.Common.CLI
                 else
                 {
                     list.Add(token);
-                }   
+                }
             }
             return list.ToArray();
         }

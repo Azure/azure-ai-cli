@@ -5,6 +5,10 @@ VisualStudioVersion = 17.5.33516.290
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ai-cli", "src\ai\ai-cli.csproj", "{D79D76D8-4E60-46DC-80B6-D5039C5D67F8}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{FBAFA693-0E87-47E2-8ECC-0FC1026C7372}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "common", "src\common\common.csproj", "{BBFE6927-7880-4726-AA41-355F23778221}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,11 +19,18 @@ Global
 		{D79D76D8-4E60-46DC-80B6-D5039C5D67F8}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D79D76D8-4E60-46DC-80B6-D5039C5D67F8}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D79D76D8-4E60-46DC-80B6-D5039C5D67F8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BBFE6927-7880-4726-AA41-355F23778221}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BBFE6927-7880-4726-AA41-355F23778221}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BBFE6927-7880-4726-AA41-355F23778221}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BBFE6927-7880-4726-AA41-355F23778221}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {002655B1-E1E1-4F2A-8D53-C9CD55136AE2}
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{BBFE6927-7880-4726-AA41-355F23778221} = {FBAFA693-0E87-47E2-8ECC-0FC1026C7372}
 	EndGlobalSection
 EndGlobal

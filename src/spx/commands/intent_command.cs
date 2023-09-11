@@ -22,7 +22,7 @@ namespace Azure.AI.Details.Common.CLI
     // TODO: should support PhraseListGrammars
     // TODO: should support Pattern Matching
     // TODO: support auto source language detection, and other source language detection scenarios once carbon does w/intent recognizer
-    
+
     public class IntentCommand : Command
     {
         internal IntentCommand(ICommandValues values)
@@ -154,7 +154,7 @@ namespace Azure.AI.Details.Common.CLI
             var audioConfig = ConfigHelpers.CreateAudioConfig(_values);
 
             // CreateSourceLanguageConfig(config, out SourceLanguageConfig language, out AutoDetectSourceLanguageConfig autoDetect);
-            // var recognizer = autoDetect != null 
+            // var recognizer = autoDetect != null
             //     ? new IntentRecognizer(config, autoDetect, audioConfig)
             //     : language != null
             //         ? new IntentRecognizer(config, language, audioConfig)
@@ -282,7 +282,7 @@ namespace Azure.AI.Details.Common.CLI
             {
                 _values.AddThrowError(
                     "WARNING:", $"Missing or invalid speech recognition model path!", "",
-                        "USE:", $"{Program.Name} intent --embedded --embeddedModelPath PATH [...]");
+                        "USE:", $"{CLIContext.Name} intent --embedded --embeddedModelPath PATH [...]");
             }
             config.SetProperty("SPEECH-RecoModelIniFile", modelIniFileFullPath);
         }
@@ -294,7 +294,7 @@ namespace Azure.AI.Details.Common.CLI
 
         private void CheckNotYetImplementedConfigProperties()
         {
-            var notYetImplemented = 
+            var notYetImplemented =
                 ";config.token.type;config.token.password;config.token.username" +
                 ";config.language.target;recognizer.property";
 
@@ -643,7 +643,7 @@ namespace Azure.AI.Details.Common.CLI
                 }
             }
         }
-        
+
         private void WaitForKeywordCancelKeyOrTimeout(IntentRecognizer recognizer, int timeout)
         {
             var interval = 100;

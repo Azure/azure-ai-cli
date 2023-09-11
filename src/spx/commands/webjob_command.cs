@@ -117,7 +117,7 @@ namespace Azure.AI.Details.Common.CLI
             var response = HttpHelpers.GetWebResponse(request, payload);
 
             if (!_quiet) Console.WriteLine($"{message} Done!\n");
-            
+
             var json = ReadWritePrintJson(response);
             UrlHelpers.CheckWriteOutputUrlOrId(json, "url", _values, "webjob", IdKind.FlatDateTime);
 
@@ -311,9 +311,9 @@ namespace Azure.AI.Details.Common.CLI
                 _values.AddThrowError(
                     "WARNING:", $"Uploading file; file name required!",
                                 "",
-                        "USE:", $"{Program.Name} webjob upload --file FILENAME [...]",
+                        "USE:", $"{CLIContext.Name} webjob upload --file FILENAME [...]",
                                 "",
-                        "SEE:", $"{Program.Name} help webjob upload");
+                        "SEE:", $"{CLIContext.Name} help webjob upload");
             }
 
             var jobNameOk = !string.IsNullOrEmpty(jobName);
@@ -390,15 +390,15 @@ namespace Azure.AI.Details.Common.CLI
             return _values.DemandGetOrDefault("webjob.job.name", name,
                 ErrorHelpers.CreateMessage(
                     "WARNING:", $"Requires valid name.", "",
-                        "USE:", $"{Program.Name} webjob [...] --name NAME"));
+                        "USE:", $"{CLIContext.Name} webjob [...] --name NAME"));
         }
 
         private string DemandWebJobId(string id = null)
         {
-            return _values.DemandGetOrDefault("webjob.job.id", id, 
+            return _values.DemandGetOrDefault("webjob.job.id", id,
                 ErrorHelpers.CreateMessage(
                     "WARNING:", $"Requires valid ID.", "",
-                        "USE:", $"{Program.Name} webjob [...] --id ID"));
+                        "USE:", $"{CLIContext.Name} webjob [...] --id ID"));
         }
 
         private HttpWebRequest CreateWebRequest(string method, string path, string name = null, string nameAction = null, string id = null, string contentType = null)

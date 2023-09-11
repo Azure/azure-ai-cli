@@ -91,7 +91,7 @@ namespace Azure.AI.Details.Common.CLI
             var json = ReadWritePrintJson(response);
 
             if (!_quiet) Console.WriteLine($"Fetched onprem batch transcriptions.\n");
-            
+
             var batchPaths = new StringBuilder();
             var parsed = JToken.Parse(json);
             var items = parsed.Type == JTokenType.Object ? parsed["values"] : new JArray();
@@ -141,7 +141,7 @@ namespace Azure.AI.Details.Common.CLI
             string id = _values.GetOrDefault("batch.transcription.onprem.id", "");
             int waitTimeout = _values.GetOrDefault("batch.transcription.onprem.status.waitms", 0);
 
-            var message = waitTimeout <= 0 ? 
+            var message = waitTimeout <= 0 ?
                 $"Getting status for transcription batch {id} ..." :
                 $"Waiting for transcription batch {id} ...";
             if (!_quiet) Console.WriteLine(message);
@@ -222,16 +222,16 @@ namespace Azure.AI.Details.Common.CLI
             }
         }
 
-        private void DoApplyOnPremEndpoints() 
+        private void DoApplyOnPremEndpoints()
         {
             var config = _values.GetOrDefault("batch.transcription.onprem.endpoints.config", "");
             if (string.IsNullOrEmpty(config))
             {
                 _values.AddThrowError(
                     "WARNING:", "Invalid endpoint config file", "",
-                        "USE:", $"{Program.Name} batch transcription onprem endpoints --config /path/to/config.yaml");
+                        "USE:", $"{CLIContext.Name} batch transcription onprem endpoints --config /path/to/config.yaml");
             }
-            
+
             File.Copy(config, "/batchkit_config/config.yaml");
 
             RunOnPremBatchkitIdempotent();
@@ -240,9 +240,9 @@ namespace Azure.AI.Details.Common.CLI
         private void RunOnPremBatchkitIdempotent()
         {
             string pidMarker = "/tmp/.batchkit";
-            if (File.Exists(pidMarker)) { 
+            if (File.Exists(pidMarker)) {
                 Console.WriteLine("Batchkit already running (singleton instance lock held). File lock with PID: " + pidMarker);
-                return; 
+                return;
             }
 
             // Attempt to create a new file as lock. Could still have race condition detected as IOException.
@@ -269,7 +269,7 @@ namespace Azure.AI.Details.Common.CLI
                 p.StartInfo = info;
                 p.Start();
                 Thread.Sleep(3000);
-                
+
                 var writeStr = p.Id.ToString();
                 stream.Write(enc.GetBytes(writeStr), 0, enc.GetByteCount(writeStr));
                 stream.Flush();
@@ -360,7 +360,7 @@ namespace Azure.AI.Details.Common.CLI
             {
                 _values.AddThrowError(
                     "WARNING:", $"Service did not return valid json payload!", "",
-                        "TRY:", $"{Program.Name} batch download --url URL");
+                        "TRY:", $"{CLIContext.Name} batch download --url URL");
             }
 
             var json = ReadWritePrintJson(response);
@@ -378,7 +378,7 @@ namespace Azure.AI.Details.Common.CLI
             {
                 _values.AddThrowError(
                     "WARNING:", "Cannot create transcription; transcription name not found!", "",
-                        "USE:", $"{Program.Name} batch transcription create --name NAME [...]");
+                        "USE:", $"{CLIContext.Name} batch transcription create --name NAME [...]");
             }
 
             var message = $"Creating transcription '{name}' ...";
@@ -460,7 +460,7 @@ namespace Azure.AI.Details.Common.CLI
             {
                 _values.AddThrowError(
                     "WARNING:", $"Cannot list transcription files; transcription id required!", "",
-                        "USE:", $"{Program.Name} batch transcription list --transcription files --transcription id ID [...]");
+                        "USE:", $"{CLIContext.Name} batch transcription list --transcription files --transcription id ID [...]");
             }
 
             path = "";
@@ -484,7 +484,7 @@ namespace Azure.AI.Details.Common.CLI
             {
                 _values.AddThrowError(
                     "WARNING:", $"Couldn't find resource type to list!", "",
-                        "SEE:", $"{Program.Name} help batch transcription");
+                        "SEE:", $"{CLIContext.Name} help batch transcription");
             }
 
             var top = _values.GetOrDefault("batch.top", "");
@@ -507,7 +507,7 @@ namespace Azure.AI.Details.Common.CLI
                 var command = _values.GetCommandForDisplay();
                 _values.AddThrowError(
                     "WARNING:", $"Couldn't determine what to download!", "",
-                        "SEE:", $"{Program.Name} help {command}");
+                        "SEE:", $"{CLIContext.Name} help {command}");
             }
         }
 
@@ -570,16 +570,16 @@ namespace Azure.AI.Details.Common.CLI
             var urls = _values.GetOrDefault("batch.transcription.create.content.urls", _values.GetOrDefault("batch.transcription.create.content.url", ""));
             var urlList = urls.Split(";\r\n".ToCharArray()).ToList();
             Predicate<string> fileLikeUrl = url => !url.StartsWith("@") && !url.StartsWith("http");
-            
+
             if (urlList.Exists(fileLikeUrl))
             {
                 var url = urlList.Find(fileLikeUrl);
                 _values.AddThrowError(
                     "WARNING:", $"Cannot create transcription with content='{url}'",
                                 "",
-                        "USE:", $"{Program.Name} batch transcription create [...] --content URL",
-                                $"{Program.Name} batch transcription create [...] --content URL1;URL1[;...]",
-                                $"{Program.Name} batch transcription create [...] --content @URLs.txt");
+                        "USE:", $"{CLIContext.Name} batch transcription create [...] --content URL",
+                                $"{CLIContext.Name} batch transcription create [...] --content URL1;URL1[;...]",
+                                $"{CLIContext.Name} batch transcription create [...] --content @URLs.txt");
             }
             foreach (var url in urlList)
             {

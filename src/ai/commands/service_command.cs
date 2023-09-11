@@ -207,11 +207,11 @@ namespace Azure.AI.Details.Common.CLI
                 _values.AddThrowError(
                     "ERROR:", $"{action}; requires subscription.",
                             "",
-                      "TRY:", $"{Program.Name} init",
-                              $"{Program.Name} config --set subscription SUBSCRIPTION",
-                              $"{Program.Name} {command} --subscription SUBSCRIPTION",
+                      "TRY:", $"{CLIContext.Name} init",
+                              $"{CLIContext.Name} config --set subscription SUBSCRIPTION",
+                              $"{CLIContext.Name} {command} --subscription SUBSCRIPTION",
                             "",
-                      "SEE:", $"{Program.Name} help {command}");
+                      "SEE:", $"{CLIContext.Name} help {command}");
             }
             return subscription;
         }
@@ -223,8 +223,8 @@ namespace Azure.AI.Details.Common.CLI
             {
                 _values.AddThrowError(
                     "ERROR:", $"{action}; requires name.",
-                      "TRY:", $"{Program.Name} {command} --name NAME",
-                      "SEE:", $"{Program.Name} help {command}");
+                      "TRY:", $"{CLIContext.Name} {command} --name NAME",
+                      "SEE:", $"{CLIContext.Name} help {command}");
             }
             return name;
         }
@@ -236,8 +236,8 @@ namespace Azure.AI.Details.Common.CLI
             {
                 _values.AddThrowError(
                     "ERROR:", $"{action}; requires group.",
-                      "TRY:", $"{Program.Name} {command} --group GROUP",
-                      "SEE:", $"{Program.Name} help {command}");
+                      "TRY:", $"{CLIContext.Name} {command} --group GROUP",
+                      "SEE:", $"{CLIContext.Name} help {command}");
             }
             return group;
         }
@@ -249,8 +249,8 @@ namespace Azure.AI.Details.Common.CLI
             {
                 _values.AddThrowError(
                     "ERROR:", $"{action}; requires resource.",
-                      "TRY:", $"{Program.Name} {command} --resource RESOURCE",
-                      "SEE:", $"{Program.Name} help {command}");
+                      "TRY:", $"{CLIContext.Name} {command} --resource RESOURCE",
+                      "SEE:", $"{CLIContext.Name} help {command}");
             }
             return resource;
         }
@@ -262,8 +262,8 @@ namespace Azure.AI.Details.Common.CLI
             {
                 _values.AddThrowError(
                     "ERROR:", $"{action}; requires location.",
-                      "TRY:", $"{Program.Name} {command} --location LOCATION",
-                      "SEE:", $"{Program.Name} help {command}");
+                      "TRY:", $"{CLIContext.Name} {command} --location LOCATION",
+                      "SEE:", $"{CLIContext.Name} help {command}");
             }
             return location;
         }

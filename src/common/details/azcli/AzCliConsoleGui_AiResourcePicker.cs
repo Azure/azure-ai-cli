@@ -23,7 +23,7 @@ namespace Azure.AI.Details.Common.CLI
         {
             public static async Task<AzCli.CognitiveServicesResourceInfo> PickOrCreateCognitiveResource(bool interactive, string subscriptionId = null, string regionFilter = null, string groupFilter = null, string resourceFilter = null, string kind = null, string sku = "F0", bool agreeTerms = false)
             {
-                ConsoleHelpers.WriteLineWithHighlight($"\n`{Program.SERVICE_RESOURCE_DISPLAY_NAME_ALL_CAPS}`");
+                ConsoleHelpers.WriteLineWithHighlight($"\n`{CLIContext.Info.InitCommandData.ServiceResourceDisplayNameAllCaps}`");
 
                 var createNewItem = !string.IsNullOrEmpty(resourceFilter)
                     ? $"(Create `{resourceFilter}`)"
@@ -45,7 +45,7 @@ namespace Azure.AI.Details.Common.CLI
 
             public static async Task<AzCli.CognitiveServicesKeyInfo> LoadCognitiveServicesResourceKeys(string subscriptionId, AzCli.CognitiveServicesResourceInfo resource)
             {
-                ConsoleHelpers.WriteLineWithHighlight($"\n`{Program.SERVICE_RESOURCE_DISPLAY_NAME_ALL_CAPS} KEYS`");
+                ConsoleHelpers.WriteLineWithHighlight($"\n`{CLIContext.Info.InitCommandData.ServiceResourceDisplayNameAllCaps} KEYS`");
 
                 Console.Write("Keys: *** Loading ***");
                 var keys = await AzCli.ListCognitiveServicesKeys(subscriptionId, resource.Group, resource.Name);
@@ -118,7 +118,7 @@ namespace Azure.AI.Details.Common.CLI
 
                 var group = await ResourceGroupPicker.PickOrCreateResourceGroup(interactive, subscriptionId, regionLocation?.Name, groupFilter);
 
-                ConsoleHelpers.WriteLineWithHighlight($"\n`CREATE {Program.SERVICE_RESOURCE_DISPLAY_NAME_ALL_CAPS}`");
+                ConsoleHelpers.WriteLineWithHighlight($"\n`CREATE {CLIContext.Info.InitCommandData.ServiceResourceDisplayNameAllCaps}`");
                 Console.WriteLine($"Region: {group.RegionLocation}");
                 Console.WriteLine($"Group: {group.Name}");
 
@@ -162,7 +162,7 @@ namespace Azure.AI.Details.Common.CLI
                 Console.WriteLine($"{resources[picked].Name}");
                 Console.WriteLine($"Group: {resources[picked].Group}");
                 Console.WriteLine($"Region: {resources[picked].RegionLocation}");
-                
+
                 return resources[picked];
             }
 

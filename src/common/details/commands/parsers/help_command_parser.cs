@@ -11,7 +11,7 @@ using System.Linq;
 
 namespace Azure.AI.Details.Common.CLI
 {
-    class HelpCommandParser : CommandParser
+    public class HelpCommandParser : CommandParser
     {
         public static bool ParseCommand(INamedValueTokens tokens, ICommandValues values)
         {
@@ -96,7 +96,7 @@ namespace Azure.AI.Details.Common.CLI
 
         private static bool IsHelpCommandToken(string token)
         {
-            return $";{Program.HelpCommandTokens};".Contains($";{token};");
+            return $";{CLIContext.Info.HelpCommandData.HelpCommandTokens};".Contains($";{token};");
         }
 
         private static string ParseHelpCommandOptionToken(INamedValueTokens tokens, ref string token)
@@ -224,10 +224,10 @@ namespace Azure.AI.Details.Common.CLI
             {
                 ErrorHelpers.WriteLineMessage(
                     "WARNING:", $"Cannot find help topic for \"{allTokens}\"\n",
-                        "TRY:", $"{Program.Name} help find \"{allTokens}\"",
-                                $"{Program.Name} help find topics \"{allTokens}\"",
-                                $"{Program.Name} help find text \"{allTokens}\" --expand",
-                                $"{Program.Name} help documentation\n");
+                        "TRY:", $"{CLIContext.Name} help find \"{allTokens}\"",
+                                $"{CLIContext.Name} help find topics \"{allTokens}\"",
+                                $"{CLIContext.Name} help find text \"{allTokens}\" --expand",
+                                $"{CLIContext.Name} help documentation\n");
                 values?.Add("display.help.exit.code", "1");
             }
 
@@ -267,7 +267,7 @@ namespace Azure.AI.Details.Common.CLI
             Console.WriteLine(@" \___ \/ ___/   <");
             Console.WriteLine(@"/____ /_/  /__/\_\");
             Console.WriteLine();
-            Console.WriteLine($"USAGE: {Program.Name} <command> [...]");
+            Console.WriteLine($"USAGE: {CLIContext.Name} <command> [...]");
             Console.WriteLine();
             return false;
         }
@@ -279,9 +279,9 @@ namespace Azure.AI.Details.Common.CLI
             {
                 ErrorHelpers.WriteLineMessage(
                     "WARNING:", $"Cannot find \"{find}\"; help topic not found!\n",
-                        "TRY:", $"{Program.Name} help find \"{find}\"",
-                                $"{Program.Name} help find text \"{find}\" --expand",
-                                $"{Program.Name} help documentation\n");
+                        "TRY:", $"{CLIContext.Name} help find \"{find}\"",
+                                $"{CLIContext.Name} help find text \"{find}\" --expand",
+                                $"{CLIContext.Name} help documentation\n");
                 return false;
             }
 
@@ -299,9 +299,9 @@ namespace Azure.AI.Details.Common.CLI
             {
                 ErrorHelpers.WriteLineMessage(
                     "WARNING:", $"Cannot find text \"{search}\"; no help topics not found!\n",
-                        "TRY:", $"{Program.Name} help find \"{search}\"",
-                                $"{Program.Name} help find topics \"{search}\"",
-                                $"{Program.Name} help documentation\n");
+                        "TRY:", $"{CLIContext.Name} help find \"{search}\"",
+                                $"{CLIContext.Name} help find topics \"{search}\"",
+                                $"{CLIContext.Name} help documentation\n");
                 return false;
             }
 
@@ -311,8 +311,8 @@ namespace Azure.AI.Details.Common.CLI
 
         private static void DisplayFoundHelpFiles(List<string> found, INamedValues values)
         {
-            var interactive = values.GetOrDefault("x.help.interactive", true) && 
-                !Console.IsInputRedirected && 
+            var interactive = values.GetOrDefault("x.help.interactive", true) &&
+                !Console.IsInputRedirected &&
                 !Console.IsOutputRedirected;
 
             if (values.ExpandHelpRequested())

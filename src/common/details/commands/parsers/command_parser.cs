@@ -33,7 +33,7 @@ namespace Azure.AI.Details.Common.CLI
                 }
             }
 
-            var parsed = Program.DispatchParseCommand(tokens, values);
+            var parsed = CLIExecutable.DelegateDispatchParseCommand(tokens, values);
             if (parsed || values.DisplayHelpRequested()) return parsed;
 
             switch (command.Split('.')[0])
@@ -56,11 +56,11 @@ namespace Azure.AI.Details.Common.CLI
 
         public static bool ParseCommandValues(INamedValueTokens tokens, ICommandValues values)
         {
-            return Program.DispatchParseCommandValues(tokens, values);
+            return CLIExecutable.DelegateDispatchParseCommandValues(tokens, values);
         }
     }
 
-    class CommandParser
+    public class CommandParser
     {
         protected static bool ParseCommandValues(string commandName, IEnumerable<INamedValueTokenParser> parsers, INamedValueTokens tokens, ICommandValues values)
         {
@@ -185,10 +185,10 @@ namespace Azure.AI.Details.Common.CLI
                     return true;
                 }
 
-                var existing = FileHelpers.FindFileInConfigPath($"{Program.Name}.defaults", values);
+                var existing = FileHelpers.FindFileInConfigPath($"{CLIContext.Name}.defaults", values);
                 if (existing != null)
                 {
-                    return ParseIniFile($"{Program.Name}.defaults", parsers, values);
+                    return ParseIniFile($"{CLIContext.Name}.defaults", parsers, values);
                 }
             }
 
@@ -325,7 +325,7 @@ namespace Azure.AI.Details.Common.CLI
                 var command = values.GetCommandForDisplay();
                 values.AddError(
                     "ERROR:", $"Invalid {kind} at \"{restOfTokens}\".", "",
-                      "SEE:", $"{Program.Name} help {command}");
+                      "SEE:", $"{CLIContext.Name} help {command}");
             }
         }
     }

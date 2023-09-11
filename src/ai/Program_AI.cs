@@ -15,8 +15,61 @@ using System.Threading.Tasks;
 
 namespace Azure.AI.Details.Common.CLI
 {
-    public partial class Program
+    public partial class Program: CLIExecutable
     {
+        public static int Main(string[] args)
+        {
+            CLIExecutable executable = new Program();
+            return executable.Main(args);
+        }
+
+        protected override IServiceProvider InitializeServices()
+        {
+            var serviceRegistry = new ServiceRegistry();
+            serviceRegistry.RegisterService<IEventLoggerHelper, EventLoggerHelper>();
+            return serviceRegistry;
+        }
+
+        protected override CLIInfo CLIInfo { get
+        {
+            return new CLIInfo
+            {
+                NameData = new CLIInfo.NameDataRecord
+                {
+                    Name = Name,
+                    DisplayName = DisplayName,
+                    WarningBanner = WarningBanner,
+                    TelemetryUserAgent = TelemetryUserAgent
+                },
+                AssemblyData = new CLIInfo.AssemblyDataRecord
+                {
+                    Exe = Exe,
+                    Dll = Dll,
+                    BindingAssemblySdkType = BindingAssemblySdkType
+                },
+                InitCommandData = new CLIInfo.InitCommandDataRecord
+                {
+                    ServiceResourceDisplayNameAllCaps = SERVICE_RESOURCE_DISPLAY_NAME_ALL_CAPS,
+                    CognitiveServiceResourceKind = CognitiveServiceResourceKind,
+                    CognitiveServiceResourceSku = CognitiveServiceResourceSku,
+                    InitConfigsEndpoint = InitConfigsEndpoint,
+                    InitConfigsSubscription = InitConfigsSubscription
+                },
+                HelpCommandData = new CLIInfo.HelpCommandDataRecord
+                {
+                    HelpCommandTokens = HelpCommandTokens
+                },
+                ConfigCommandData = new CLIInfo.ConfigCommandDataRecord
+                {
+                    ConfigScopeTokens = ConfigScopeTokens
+                },
+                ZipOptionData = new CLIInfo.ZipOptionDataRecord
+                {
+                    ZipIncludes = ZipIncludes
+                }
+            };
+        } }
+
         #region name data
         public const string Name = "ai";
         public const string DisplayName = "Azure AI CLI";
@@ -47,7 +100,7 @@ namespace Azure.AI.Details.Common.CLI
         #endregion
 
         #region zip option data
-        public static string[] ZipIncludes = 
+        public static string[] ZipIncludes =
         {
             "LICENSE.txt",
             // "THIRD_PARTY_NOTICE.txt",
@@ -78,7 +131,7 @@ namespace Azure.AI.Details.Common.CLI
         };
         #endregion
 
-        public static bool DispatchRunCommand(ICommandValues values)
+        protected override bool DispatchRunCommand(ICommandValues values)
         {
             var command = values.GetCommand();
             var root = command.Split('.').FirstOrDefault();
@@ -101,12 +154,12 @@ namespace Azure.AI.Details.Common.CLI
             };
         }
 
-        public static bool DispatchParseCommand(INamedValueTokens tokens, ICommandValues values)
+        protected override bool DispatchParseCommand(INamedValueTokens tokens, ICommandValues values)
         {
             var command = values.GetCommand(null) ?? tokens.PeekNextToken();
             var root = command.Split('.').FirstOrDefault();
 
-            return root switch 
+            return root switch
             {
                 "help" => HelpCommandParser.ParseCommand(tokens, values),
                 "init" => InitCommandParser.ParseCommand(tokens, values),
@@ -127,7 +180,7 @@ namespace Azure.AI.Details.Common.CLI
             };
         }
 
-        public static bool DispatchParseCommandValues(INamedValueTokens tokens, ICommandValues values)
+        protected override bool DispatchParseCommandValues(INamedValueTokens tokens, ICommandValues values)
         {
             var root = values.GetCommandRoot();
             return root switch
@@ -151,7 +204,7 @@ namespace Azure.AI.Details.Common.CLI
             };
         }
 
-        private static bool DisplayKnownErrors(ICommandValues values, Exception ex)
+        protected override bool DisplayKnownErrors(ICommandValues values, Exception ex)
         {
             return false;
         }

@@ -20,12 +20,12 @@ namespace Azure.AI.Details.Common.CLI
 {
     public class RunJobCommand : Command
     {
-        internal RunJobCommand(ICommandValues values)
+        public RunJobCommand(ICommandValues values)
         {
             _values = values.ReplaceValues();
         }
 
-        internal bool RunCommand()
+        public bool RunCommand()
         {
             var passed = DoRunJob();
             return _values.GetOrDefault("passed", passed);
@@ -42,13 +42,13 @@ namespace Azure.AI.Details.Common.CLI
 
             var process = _values.GetOrDefault("run.input.process", "");
 
-            var command = _values.GetOrDefault($"run.input.{Program.Name}.command", "");
-            var commandArgs = _values.GetOrDefault($"run.input.{Program.Name}.post.command.args", "").Replace(';', ' ');
-            var preCommandArgs = _values.GetOrDefault($"run.input.{Program.Name}.pre.command.args", "").Replace(';', ' ');
+            var command = _values.GetOrDefault($"run.input.{CLIContext.Name}.command", "");
+            var commandArgs = _values.GetOrDefault($"run.input.{CLIContext.Name}.post.command.args", "").Replace(';', ' ');
+            var preCommandArgs = _values.GetOrDefault($"run.input.{CLIContext.Name}.pre.command.args", "").Replace(';', ' ');
 
-            var job = _values.GetOrDefault($"run.input.{Program.Name}.job", "");
-            var jobArgs = _values.GetOrDefault($"run.input.{Program.Name}.post.job.args", "").Replace(';', ' ');
-            var preJobArgs = _values.GetOrDefault($"run.input.{Program.Name}.pre.job.args", "").Replace(';', ' ');
+            var job = _values.GetOrDefault($"run.input.{CLIContext.Name}.job", "");
+            var jobArgs = _values.GetOrDefault($"run.input.{CLIContext.Name}.post.job.args", "").Replace(';', ' ');
+            var preJobArgs = _values.GetOrDefault($"run.input.{CLIContext.Name}.pre.job.args", "").Replace(';', ' ');
 
             var line = _values.GetOrDefault("run.input.line", "");
             var lineArgs = _values.GetOrDefault("run.input.post.line.args", "").Replace(';', ' ');
@@ -72,7 +72,7 @@ namespace Azure.AI.Details.Common.CLI
             var fileOk = !string.IsNullOrEmpty(file);
             var jobOk = !string.IsNullOrEmpty(job);
 
-            var app = processOk && process == Program.Name;
+            var app = processOk && process == CLIContext.Name;
             if (app && jobOk && !job.StartsWith("@")) job = $"@{job}";
 
             var startPath = UpdateJobStartPath(ref job, _values.GetOrDefault("x.input.path", Directory.GetCurrentDirectory()));
@@ -135,11 +135,11 @@ namespace Azure.AI.Details.Common.CLI
                 _values.AddThrowError(
                     "WARNING:", $"Missing arguments; requires one of process, command, script, file, or job!",
                         "",
-                        "TRY:", $"{Program.Name} run --command COMMAND --args ARGS",
-                                $"{Program.Name} run --script SCRIPT --args ARGS",
-                                $"{Program.Name} run --job JOB",
+                        "TRY:", $"{CLIContext.Name} run --command COMMAND --args ARGS",
+                                $"{CLIContext.Name} run --script SCRIPT --args ARGS",
+                                $"{CLIContext.Name} run --job JOB",
                         "",
-                        "SEE:", $"{Program.Name} help run");
+                        "SEE:", $"{CLIContext.Name} help run");
             }
 
             var retries = _values.GetOrDefault("run.retries", 0);
@@ -195,7 +195,7 @@ namespace Azure.AI.Details.Common.CLI
 
             var startTime = DateTime.Now;
 
-            var exitCode = (start == Program.Name && startArgs.StartsWith("wait "))
+            var exitCode = (start == CLIContext.Name && startArgs.StartsWith("wait "))
                 ? RunJobWait(startArgs)
                 : RunJobProcess(start, startArgs, startPath, expected, notExpected, autoExpect, timeout);
 
@@ -256,7 +256,7 @@ namespace Azure.AI.Details.Common.CLI
         private async Task<bool> CheckExpectedAsync(Process process, string expected, string notExpected, bool autoExpect, int timeout)
         {
             System.Diagnostics.Debug.Assert(process != null);
-            
+
             var expectedItems = expected.Split(new char[] { ';', '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
             var notExpectedItems = notExpected.Split(new char[] { ';', '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
             var checkExpected = ExpectHelper.CheckExpectedConsoleOutputAsync(process, expectedItems, notExpectedItems, autoExpect, !autoExpect);

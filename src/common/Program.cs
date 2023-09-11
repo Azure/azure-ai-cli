@@ -15,12 +15,30 @@ using System.Threading.Tasks;
 
 namespace Azure.AI.Details.Common.CLI
 {
-    public partial class Program
+    public abstract class CLIExecutable
     {
-        public static bool Debug { get; internal set; }
+        protected abstract CLIInfo CLIInfo { get; }
+        protected abstract IServiceProvider InitializeServices();
+        protected abstract bool DisplayKnownErrors(ICommandValues values, Exception ex);
+        protected abstract bool DispatchRunCommand(ICommandValues values);
+        protected abstract bool DispatchParseCommand(INamedValueTokens tokens, ICommandValues values);
+        protected abstract bool DispatchParseCommandValues(INamedValueTokens tokens, ICommandValues values);
 
-        public static int Main(string[] mainArgs)
+
+        private static CLIExecutable? Instance { get; set; }
+
+        public int Main(string[] mainArgs)
         {
+            /* Initialize context with info from the concrete implementation */
+            CLIContext.Info = CLIInfo;
+
+            /* Initialize the singleton instance */
+            /* TODO: Probably we can keep this in the service provider */
+            Instance = this;
+
+            /* Initialize the services */
+            CLIContext.ServiceProvider = InitializeServices();
+
             Console.OutputEncoding = Encoding.UTF8;
             Console.CancelKeyPress += (s, e) =>
             {
@@ -81,7 +99,7 @@ namespace Azure.AI.Details.Common.CLI
 
         internal static void DebugDumpResources()
         {
-            var assembly = typeof(Program).Assembly;
+            var assembly = CLIContext.Info.AssemblyData.BindingAssemblySdkType.Assembly;
             var names = assembly.GetManifestResourceNames();
 
             Console.WriteLine($"\nDEBUG: {names.Count()} resources found!\n");
@@ -91,7 +109,7 @@ namespace Azure.AI.Details.Common.CLI
 
         private static void DebugDumpCommandLineArgs(string args)
         {
-            if (Program.Debug)
+            if (CLIContext.Debug)
             {
                 Console.WriteLine("\nDEBUG: Command line was: {0}", args);
                 //Console.WriteLine($"LOCATION: {typeof(Program).Assembly.Location}");
@@ -117,7 +135,7 @@ namespace Azure.AI.Details.Common.CLI
             string version = GetVersionFromAssembly();
             version = string.IsNullOrEmpty(version) ? "" : $", Version {version}";
 
-            return $"{Program.Name.ToUpper()} - {Program.DisplayName}" + version;
+            return $"{CLIContext.Name.ToUpper()} - {CLIContext.DisplayName}" + version;
         }
 
         private static void DisplayBanner(ICommandValues values)
@@ -129,7 +147,7 @@ namespace Azure.AI.Details.Common.CLI
             Console.WriteLine("Copyright (c) 2023 Microsoft Corporation. All Rights Reserved.");
             Console.WriteLine("");
 
-            var warning = Program.WarningBanner;
+            var warning = CLIContext.WarningBanner;
             if (!string.IsNullOrEmpty(warning))
             {
                 ConsoleHelpers.WriteLineWithHighlight(warning);
@@ -139,9 +157,9 @@ namespace Azure.AI.Details.Common.CLI
 
         private static string GetVersionFromAssembly()
         {
-            var sdkAssembly = Program.BindingAssemblySdkType?.Assembly;
+            var sdkAssembly = CLIContext.Info.AssemblyData.BindingAssemblySdkType?.Assembly;
             var sdkVersionAttribute = sdkAssembly?.GetCustomAttribute<AssemblyInformationalVersionAttribute>();
-            var thisVersionAttribute = typeof(Program).Assembly?.GetCustomAttribute<AssemblyInformationalVersionAttribute>();
+            var thisVersionAttribute = typeof(CLIExecutable).Assembly?.GetCustomAttribute<AssemblyInformationalVersionAttribute>();
             return sdkVersionAttribute?.InformationalVersion ??
                 thisVersionAttribute?.InformationalVersion;
         }
@@ -266,7 +284,7 @@ namespace Azure.AI.Details.Common.CLI
             {
                 DisplayErrorOrException(values, ex.InnerException);
             }
-            else if (!DisplayErrorValue(values) && !DisplayKnownErrors(values, ex))
+            else if (!DisplayErrorValue(values) && !Instance.DisplayKnownErrors(values, ex))
             {
                 DisplayLogException(values, ex);
             }
@@ -307,6 +325,21 @@ namespace Azure.AI.Details.Common.CLI
             });
 
             return passed;
+        }
+
+        public static bool DelegateDispatchRunCommand(ICommandValues values)
+        {
+            return Instance.DispatchRunCommand(values);
+        }
+
+        public static bool DelegateDispatchParseCommand(INamedValueTokens tokens, ICommandValues values)
+        {
+            return Instance.DispatchParseCommand(tokens, values);
+        }
+
+        public static bool DelegateDispatchParseCommandValues(INamedValueTokens tokens, ICommandValues values)
+        {
+            return Instance.DispatchParseCommandValues(tokens, values);
         }
     }
 }

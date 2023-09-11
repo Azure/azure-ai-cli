@@ -280,11 +280,11 @@ namespace Azure.AI.Details.Common.CLI
 
         private static void DisplayScenarioBanner()
         {
-            var logo = FileHelpers.FindFileInHelpPath($"help/include.{Program.Name}.wizard.ascii.logo")
-                    ?? FileHelpers.FindFileInHelpPath($"help/include.{Program.Name}.ascii.logo");
+            var logo = FileHelpers.FindFileInHelpPath($"help/include.{CLIContext.Name}.wizard.ascii.logo")
+                    ?? FileHelpers.FindFileInHelpPath($"help/include.{CLIContext.Name}.ascii.logo");
             var text = !string.IsNullOrEmpty(logo)
                      ? FileHelpers.ReadAllHelpText(logo, Encoding.UTF8) + "\n"
-                     : $"`{Program.Name.ToUpper()} SCENARIO`";
+                     : $"`{CLIContext.Name.ToUpper()} SCENARIO`";
             ConsoleHelpers.WriteLineWithHighlight(text);
 
             ConsoleHelpers.WriteLineWithHighlight("`SCENARIO`");

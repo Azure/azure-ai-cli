@@ -8,7 +8,8 @@ using System.IO;
 
 namespace Azure.AI.Details.Common.CLI
 {
-    class ConfigCommandParser : CommandParser
+
+    public class ConfigCommandParser : CommandParser
     {
         public static bool ParseCommand(INamedValueTokens tokens, ICommandValues values)
         {
@@ -70,7 +71,8 @@ namespace Azure.AI.Details.Common.CLI
 
         public static bool IsValidConfigScope(string check)
         {
-            return $";{Program.ConfigScopeTokens};".Contains($";{check};");
+            var configScopeTokens = CLIContext.Info.ConfigCommandData.ConfigScopeTokens;
+            return $";{configScopeTokens};".Contains($";{check};");
         }
 
         #region private data
@@ -89,7 +91,7 @@ namespace Azure.AI.Details.Common.CLI
 
             new NamedValueTokenParser("--hive",       "x.config.scope.hive", "0001", "1"),
             new NamedValueTokenParser("--region",     "x.config.scope.region", "0001", "1"),
-            new NamedValueTokenParser("--scope",      "x.config.scope.command", "0001", "1", Program.ConfigScopeTokens),
+            new NamedValueTokenParser("--scope",      "x.config.scope.command", "0001", "1", CLIContext.Info.ConfigCommandData.ConfigScopeTokens),
 
             new NamedValueTokenParser("-s",           "x.config.command.set", "0001", "2;1"),
             new NamedValueTokenParser("-a",           "x.config.command.add", "0001", "2;1"),

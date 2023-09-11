@@ -8,7 +8,7 @@ using System.Linq;
 
 namespace Azure.AI.Details.Common.CLI
 {
-    class InitCommandParser : CommandParser
+    public class InitCommandParser : CommandParser
     {
         public static bool ParseCommand(INamedValueTokens tokens, ICommandValues values)
         {

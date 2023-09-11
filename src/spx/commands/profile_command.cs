@@ -61,7 +61,7 @@ namespace Azure.AI.Details.Common.CLI
                 case "profile.status": DoProfileStatus(); break;
                 case "profile.enroll": DoEnrollProfile(); break;
 
-                case "speaker.identify": Recognize(VoiceProfileType.TextIndependentIdentification); break; 
+                case "speaker.identify": Recognize(VoiceProfileType.TextIndependentIdentification); break;
                 case "speaker.verify": Recognize(); break;
 
                 default:
@@ -90,14 +90,14 @@ namespace Azure.AI.Details.Common.CLI
         private void WriteJsonToFile(string json)
         {
             var saveAs = _values.GetOrDefault("profile.output.file", null);
-            if (saveAs != null) 
-            { 
+            if (saveAs != null)
+            {
               saveAs = FileHelpers.GetOutputDataFileName(saveAs, _values);
               var saveMessage = $"Saving as {saveAs} ...";
               if (!_quiet) Console.WriteLine(saveMessage);
               File.WriteAllText(saveAs, json);
               if (!_quiet) Console.WriteLine($"{saveMessage} Done!\n");
-            } 
+            }
         }
 
         private void DoCreateProfile()
@@ -124,9 +124,9 @@ namespace Azure.AI.Details.Common.CLI
                 _values.AddThrowError(
                     "WARNING:", $"Cannot delete profile; id or file input not found!",
                                 "",
-                        "USE:", $"{Program.Name} profile delete --id ID",
+                        "USE:", $"{CLIContext.Name} profile delete --id ID",
                                 "",
-                        "SEE:", $"{Program.Name} help profile delete");
+                        "SEE:", $"{CLIContext.Name} help profile delete");
             }
 
             var ids = new List<string> { profileId };
@@ -136,7 +136,7 @@ namespace Azure.AI.Details.Common.CLI
             }
 
             foreach (string id in ids)
-            { 
+            {
               var message = $"Deleting profile '{id}' ...";
               if (!_quiet) Console.WriteLine(message);
               using (var client = GetVoiceProfileClient())
@@ -150,9 +150,9 @@ namespace Azure.AI.Details.Common.CLI
                       ReadWritePrintResultJson(getCancellationDetails(result), result.Reason.ToString());
                   }
                   else
-                  { 
+                  {
                       ReadWritePrintResultJson(result, result.Reason.ToString());
-                  }    
+                  }
               }
             }
         }
@@ -181,7 +181,7 @@ namespace Azure.AI.Details.Common.CLI
             foreach (var token in array)
             {
                 var id = token[key].Value<string>();
-                ids.Add(id); 
+                ids.Add(id);
             }
 
             return ids;
@@ -195,9 +195,9 @@ namespace Azure.AI.Details.Common.CLI
                 _values.AddThrowError(
                     "WARNING:", $"Cannot get status; id not found!",
                                 "",
-                        "USE:", $"{Program.Name} profile status --id ID [...]",
+                        "USE:", $"{CLIContext.Name} profile status --id ID [...]",
                                 "",
-                        "SEE:", $"{Program.Name} help profile status");
+                        "SEE:", $"{CLIContext.Name} help profile status");
             }
 
             var message = $"Getting status for profile {id} ...";
@@ -214,9 +214,9 @@ namespace Azure.AI.Details.Common.CLI
                     json = ReadWritePrintResultJson(getCancellationDetails(result), result.Reason.ToString());
                 }
                 else
-                { 
+                {
                     json = ReadWritePrintResultJson(result, result.Reason.ToString());
-                }    
+                }
                 CheckWriteOutputSelf(json, "ProfileId");
                 WriteJsonToFile(json);
             }
@@ -244,9 +244,9 @@ namespace Azure.AI.Details.Common.CLI
                 _values.AddThrowError(
                     "WARNING:", $"Cannot enroll profile; id not found!",
                                 "",
-                        "USE:", $"{Program.Name} profile enroll --id ID --file FILE [...]",
+                        "USE:", $"{CLIContext.Name} profile enroll --id ID --file FILE [...]",
                                 "",
-                        "SEE:", $"{Program.Name} help profile enroll");
+                        "SEE:", $"{CLIContext.Name} help profile enroll");
 
             }
 
@@ -266,9 +266,9 @@ namespace Azure.AI.Details.Common.CLI
                     json = ReadWritePrintResultJson(getCancellationDetails(result), result.Reason.ToString());
                 }
                 else
-                { 
+                {
                     json = ReadWritePrintResultJson(result, result.Reason.ToString());
-                }    
+                }
                 WriteJsonToFile(json);
             }
         }
@@ -283,7 +283,7 @@ namespace Azure.AI.Details.Common.CLI
         {
             var kind = GetVoiceProfileType();
             if(!areTypesCompatible(type, kind))
-            { 
+            {
                 _values.AddThrowError("WARNING:", $"Wrong VoiceProfile type {type} for given operation;");
             }
             if (string.IsNullOrEmpty(id))
@@ -292,9 +292,9 @@ namespace Azure.AI.Details.Common.CLI
                 _values.AddThrowError(
                     "WARNING:", $"Cannot invoke recognize operation on audio; id(s) not found!",
                                 "",
-                        "USE:", $"{Program.Name} {command} --id ID --file FILE [...]",
+                        "USE:", $"{CLIContext.Name} {command} --id ID --file FILE [...]",
                                 "",
-                        "SEE:", $"{Program.Name} help speaker id");
+                        "SEE:", $"{CLIContext.Name} help speaker id");
             }
 
             var audioConfig = GetAudioConfig();
@@ -311,7 +311,7 @@ namespace Azure.AI.Details.Common.CLI
             var message = $"invoking recognizeOnceAsync on {input} against id(s) {id} ...";
             if (!_quiet) Console.WriteLine(message);
 
-            SpeakerRecognitionResult result = (kind == VoiceProfileType.TextIndependentIdentification) ? 
+            SpeakerRecognitionResult result = (kind == VoiceProfileType.TextIndependentIdentification) ?
                 speakerRecognizer.RecognizeOnceAsync(SpeakerIdentificationModel.FromProfiles(voiceProfiles)).Result :
                 speakerRecognizer.RecognizeOnceAsync(SpeakerVerificationModel.FromProfile(voiceProfiles[0])).Result;
 
@@ -323,15 +323,15 @@ namespace Azure.AI.Details.Common.CLI
                 json = ReadWritePrintResultJson(getCancellationDetails(result), result.Reason.ToString());
             }
             else
-            { 
+            {
                 json = ReadWritePrintResultJson(result, result.Reason.ToString());
-            }    
+            }
             WriteJsonToFile(json);
         }
 
         private bool areTypesCompatible(VoiceProfileType type1, VoiceProfileType type2)
         {
-            switch (type1) 
+            switch (type1)
             {
                 case VoiceProfileType.TextDependentVerification:
                 case VoiceProfileType.TextIndependentVerification:
@@ -420,10 +420,10 @@ namespace Azure.AI.Details.Common.CLI
             foreach (var token in items)
             {
                 var id = token[key].Value<string>();
-                if (ids != null) ids.AppendLine(id); 
-            } 
-            if (ids != null) 
-            { 
+                if (ids != null) ids.AppendLine(id);
+            }
+            if (ids != null)
+            {
                 var atIdsFile = FileHelpers.GetOutputDataFileName(atIds, _values);
                 FileHelpers.WriteAllText(atIdsFile, ids.ToString(), Encoding.UTF8);
             }
@@ -454,9 +454,9 @@ namespace Azure.AI.Details.Common.CLI
                     _values.AddThrowError(
                         "WARNING:", $"Cannot {action}; file not found!",
                                     "",
-                            "USE:", $"{Program.Name} {command} --id ID --file FILE [...]",
+                            "USE:", $"{CLIContext.Name} {command} --id ID --file FILE [...]",
                                     "",
-                            "SEE:", $"{Program.Name} help {command}");
+                            "SEE:", $"{CLIContext.Name} help {command}");
                 }
                 audioConfig = AudioHelpers.CreateAudioConfigFromFile(_file, null);
             }

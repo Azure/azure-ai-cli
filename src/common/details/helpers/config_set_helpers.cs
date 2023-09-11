@@ -13,19 +13,22 @@ namespace Azure.AI.Details.Common.CLI
     {
         public static void ConfigServiceResource(string subscriptionId, string region, string endpoint, string chatDeployment, string embeddingsDeployment, string key)
         {
-            ConsoleHelpers.WriteLineWithHighlight($"\n`CONFIG {Program.SERVICE_RESOURCE_DISPLAY_NAME_ALL_CAPS}`");
+            ConsoleHelpers.WriteLineWithHighlight($"\n`CONFIG {CLIContext.Info.InitCommandData.ServiceResourceDisplayNameAllCaps}`");
             Console.WriteLine();
 
             int maxLabelWidth = 0;
             var actions = new List<Action<int>>(new Action<int>[] {
-                Program.InitConfigsSubscription ?
-                ConfigSetLambda("@subscription", subscriptionId, "Subscription", subscriptionId, ref maxLabelWidth) : null,
-                Program.InitConfigsEndpoint ?
-                ConfigSetLambda("@chat.endpoint", endpoint, "Endpoint (chat)", endpoint, ref maxLabelWidth) : null,
+                CLIContext.Info.InitCommandData.InitConfigsSubscription ?
+                    ConfigSetLambda("@subscription", subscriptionId, "Subscription", subscriptionId, ref maxLabelWidth) :
+                    null,
+                CLIContext.Info.InitCommandData.InitConfigsEndpoint ?
+                    ConfigSetLambda("@chat.endpoint", endpoint, "Endpoint (chat)", endpoint, ref maxLabelWidth) :
+                    null,
                 ConfigSetLambda("@chat.deployment", chatDeployment, "Deployment (chat)", chatDeployment, ref maxLabelWidth),
                 ConfigSetLambda("@chat.key", key, "Key (chat)", key.Substring(0, 4) + "****************************", ref maxLabelWidth),
-                Program.InitConfigsEndpoint ?
-                ConfigSetLambda("@search.embeddings.endpoint", endpoint, "Endpoint (embeddings)", endpoint, ref maxLabelWidth) : null,
+                CLIContext.Info.InitCommandData.InitConfigsEndpoint ?
+                    ConfigSetLambda("@search.embeddings.endpoint", endpoint, "Endpoint (embeddings)", endpoint, ref maxLabelWidth) :
+                    null,
                 ConfigSetLambda("@search.embeddings.deployment", embeddingsDeployment, "Deployment (embeddings)", embeddingsDeployment, ref maxLabelWidth),
                 ConfigSetLambda("@search.embeddings.key", key, "Key (embeddings)", key.Substring(0, 4) + "****************************", ref maxLabelWidth),
                 ConfigSetLambda("@chat.region", region, "Region", region, ref maxLabelWidth),

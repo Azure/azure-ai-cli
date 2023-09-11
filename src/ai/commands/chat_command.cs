@@ -109,10 +109,10 @@ namespace Azure.AI.Details.Common.CLI
             {
                 _values.AddThrowError(
                     "ERROR:", $"Cannot start chat; option missing!\n",
-                        "TRY:", $"{Program.Name} chat --interactive",
-                                $"{Program.Name} chat --user PROMPT",
+                        "TRY:", $"{CLIContext.Name} chat --interactive",
+                                $"{CLIContext.Name} chat --user PROMPT",
                                 "",
-                        "SEE:", $"{Program.Name} help chat");
+                        "SEE:", $"{CLIContext.Name} help chat");
             }
 
             var kernel = CreateSemanticKernel(out var acsIndex);
@@ -579,7 +579,7 @@ namespace Azure.AI.Details.Common.CLI
         private static async Task<string?> SearchMemoryAsync(IKernel? kernel, string collection, string text)
         {
            if (kernel == null) return null;
-            
+
            var sb = new StringBuilder();
            var memories = kernel.Memory.SearchAsync(collection, text, limit: 2, minRelevanceScore: 0.5);
            int i = 0;

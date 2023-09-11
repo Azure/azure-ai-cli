@@ -118,7 +118,7 @@ namespace Azure.AI.Details.Common.CLI
 
         private static void SHELL_DEBUG_TRACE(string message,[CallerLineNumber] int line = 0, [CallerMemberName] string? caller = null, [CallerFilePath] string? file = null)
         {
-            if (Program.Debug) Console.WriteLine(message);
+            if (CLIContext.Debug) Console.WriteLine(message);
 
             message = message.Replace("\n", "\\n").Replace("\r", "\\r");
             AI.DBG_TRACE_INFO(message, line, caller, file);
