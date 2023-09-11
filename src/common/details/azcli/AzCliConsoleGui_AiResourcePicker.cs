@@ -122,8 +122,11 @@ namespace Azure.AI.Details.Common.CLI
                 Console.WriteLine($"Region: {group.RegionLocation}");
                 Console.WriteLine($"Group: {group.Name}");
 
+                var smartName = group.Name;
+                var smartNameKind = "rg";
+
                 var name = string.IsNullOrEmpty(resourceFilter)
-                    ? NamePickerHelper.DemandPickOrEnterName("Name: ", kind ?? "cs")
+                    ? NamePickerHelper.DemandPickOrEnterName("Name: ", kind.ToLower() ?? "cs", smartName, smartNameKind)
                     : AskPromptHelper.AskPrompt("Name: ", resourceFilter);
                 if (string.IsNullOrEmpty(name)) return null;
 
