@@ -19,9 +19,9 @@ namespace Azure.AI.Details.Common.CLI
 {
     public partial class AzCliConsoleGui
     {
-        public static async Task<AzCli.CognitiveSearchResourceInfoEx> InitAndConfigCogSearchResource(string subscription, string location, string groupName)
+        public static async Task<AzCli.CognitiveSearchResourceInfoEx> InitAndConfigCogSearchResource(string subscription, string location, string groupName, string smartName = null, string smartNameKind = null)
         {
-            var resource = await AzCliConsoleGui.PickOrCreateCognitiveSearchResource(subscription, location, groupName);
+            var resource = await AzCliConsoleGui.PickOrCreateCognitiveSearchResource(subscription, location, groupName, smartName, smartNameKind);
             var keys = await AzCliConsoleGui.LoadSearchResourceKeys(subscription, resource);
 
             ConfigSetHelpers.ConfigSearchResource(resource.Endpoint, keys.Key1);

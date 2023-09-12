@@ -74,7 +74,10 @@ namespace Azure.AI.Details.Common.CLI
                 var displayName = values.Get("service.resource.display.name", true);
                 var description = values.Get("service.resource.description", true);
 
-                resource = await TryCreateAiHubResourceInteractive(values, subscription, locationName, groupName, displayName, description);
+                var smartName = values.GetOrDefault("service.resource.name", null); 
+                var smartNameKind = smartName != null && smartName.Contains("openai") ? "openai" : "oai";
+
+                resource = await TryCreateAiHubResourceInteractive(values, subscription, locationName, groupName, displayName, description, smartName, smartNameKind);
             }
 
             var aiHubResource = new AiHubResourceInfo
@@ -93,7 +96,7 @@ namespace Azure.AI.Details.Common.CLI
             return aiHubResource;
         }
 
-        private static async Task<JToken> TryCreateAiHubResourceInteractive(ICommandValues values, string subscription, string locationName, string groupName, string displayName, string description)
+        private static async Task<JToken> TryCreateAiHubResourceInteractive(ICommandValues values, string subscription, string locationName, string groupName, string displayName, string description, string smartName = null, string smartNameKind = null)
         {
             ConsoleHelpers.WriteLineWithHighlight($"\n`CREATE AZURE AI RESOURCE`");
 
@@ -107,7 +110,13 @@ namespace Azure.AI.Details.Common.CLI
             var group = await AzCliConsoleGui.PickOrCreateResourceGroup(true, subscription, groupOk ? null : locationName, groupName);
             groupName = group.Name;
 
-            var name = DemandAskPrompt("Name: ");
+            if (string.IsNullOrEmpty(smartName))
+            {
+                smartName = group.Name;
+                smartNameKind = "rg";
+            }
+
+            var name = NamePickerHelper.DemandPickOrEnterName("Name: ", "aihub", smartName, smartNameKind); // TODO: What will this really be called?
             displayName ??= name;
             description ??= name;
 
@@ -182,7 +191,10 @@ namespace Azure.AI.Details.Common.CLI
 
                 var openAiResourceId = values.GetOrDefault("service.openai.resource.id", "");
 
-                project = TryCreateAiHubProjectInteractive(values, subscription, resourceId, group, location, ref displayName, ref description, openAiResourceId);
+                var smartName = values.GetOrDefault("service.resource.name", null); 
+                var smartNameKind = smartName != null && smartName.Contains("openai") ? "openai" : "oai";
+
+                project = TryCreateAiHubProjectInteractive(values, subscription, resourceId, group, location, ref displayName, ref description, openAiResourceId, smartName, smartNameKind);
             }
 
             var aiHubProject = new AiHubProjectInfo
@@ -197,11 +209,17 @@ namespace Azure.AI.Details.Common.CLI
             return aiHubProject;
         }
 
-        private static JToken TryCreateAiHubProjectInteractive(ICommandValues values, string subscription, string resourceId, string group, string location, ref string displayName, ref string description, string openAiResourceId)
+        private static JToken TryCreateAiHubProjectInteractive(ICommandValues values, string subscription, string resourceId, string group, string location, ref string displayName, ref string description, string openAiResourceId, string smartName = null, string smartNameKind = null)
         {
             ConsoleHelpers.WriteLineWithHighlight($"\n`CREATE AZURE AI PROJECT`");
 
-            var name = DemandAskPrompt("Name: ");
+            if (string.IsNullOrEmpty(smartName))
+            {
+                smartName = group;
+                smartNameKind = "rg";
+            }
+
+            var name = NamePickerHelper.DemandPickOrEnterName("Name: ", "aiproj", smartName, smartNameKind); // TODO: What will this really be called?
             displayName ??= name;
             description ??= name;
 
@@ -285,43 +303,6 @@ namespace Azure.AI.Details.Common.CLI
 
             Console.WriteLine($"{configJsonFile.Name} (saved at {configJsonFile.Directory})\n");
             Console.WriteLine("  " + configJson.Replace("\n", "\n  "));
-        }
-
-        private static string AskPrompt(string prompt, string value = null, bool useEditBox = false)
-        {
-            Console.Write(prompt);
-
-            if (useEditBox)
-            {
-                var normal = new Colors(ConsoleColor.White, ConsoleColor.Blue);
-                var text = EditBoxQuickEdit.Edit(40, 1, normal, value, 128);
-                ColorHelpers.ResetColor();
-                Console.WriteLine(text);
-                return text;
-            }
-
-            if (!string.IsNullOrEmpty(value))
-            {
-                Console.WriteLine(value);
-                return value;
-            }
-
-            return Console.ReadLine();
-        }
-
-        private static string DemandAskPrompt(string prompt, string value = null, bool useEditBox = false)
-        {
-            var answer = AskPrompt(prompt, value, useEditBox);
-            if (string.IsNullOrEmpty(answer))
-            {
-                ThrowPromptNotAnsweredApplicationException();
-            }
-            return answer;
-        }
-
-        private static void ThrowPromptNotAnsweredApplicationException()
-        {
-            throw new ApplicationException($"CANCELED: No input provided.");
         }
     }
 }

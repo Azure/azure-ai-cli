@@ -67,7 +67,7 @@ namespace Azure.AI.Details.Common.CLI
             return keys.Payload;
         }
 
-        public static async Task<AzCli.CognitiveSearchResourceInfo> PickOrCreateCognitiveSearchResource(string subscription, string location, string groupName)
+        public static async Task<AzCli.CognitiveSearchResourceInfo> PickOrCreateCognitiveSearchResource(string subscription, string location, string groupName, string smartName = null, string smartNameKind = null)
         {
             ConsoleHelpers.WriteLineWithHighlight($"\n`COGNITIVE SEARCH RESOURCE`");
             Console.Write("\rName: *** Loading choices ***");
@@ -95,13 +95,13 @@ namespace Azure.AI.Details.Common.CLI
             var resource = picked > 0 ? resources[picked - 1] : new AzCli.CognitiveSearchResourceInfo();
             if (picked == 0)
             {
-                resource = await TryCreateSearchInteractive(subscription, location, groupName);
+                resource = await TryCreateSearchInteractive(subscription, location, groupName, smartName, smartNameKind);
             }
 
             return resource;
         }
 
-        private static async Task<AzCli.CognitiveSearchResourceInfo> TryCreateSearchInteractive(string subscription, string locationName, string groupName)
+        private static async Task<AzCli.CognitiveSearchResourceInfo> TryCreateSearchInteractive(string subscription, string locationName, string groupName, string smartName = null, string smartNameKind = null)
         {
             ConsoleHelpers.WriteLineWithHighlight($"\n`CREATE COGNITIVE SEARCH RESOURCE`");
 
@@ -114,8 +114,14 @@ namespace Azure.AI.Details.Common.CLI
             
             var group = await AzCliConsoleGui.PickOrCreateResourceGroup(true, subscription, groupOk ? null : locationName, groupName);
             groupName = group.Name;
-            
-            var name = DemandAskPrompt("Name: ");
+
+            if (string.IsNullOrEmpty(smartName))
+            {
+                smartName = group.Name;
+                smartNameKind = "rg";
+            }
+
+            var name = NamePickerHelper.DemandPickOrEnterName("Name: ", "cogsearch", smartName, smartNameKind);
 
             Console.Write("*** CREATING ***");
             var response = await AzCli.CreateSearchResource(subscription, groupName, locationName, name);
@@ -129,42 +135,6 @@ namespace Azure.AI.Details.Common.CLI
 
             Console.WriteLine("\r*** CREATED ***  ");
             return response.Payload;
-        }
-
-        private static string AskPrompt(string prompt, string value = null, bool useEditBox = false)
-        {
-            Console.Write(prompt);
-
-            if (useEditBox)
-            {
-                var normal = new Colors(ConsoleColor.White, ConsoleColor.Blue);
-                var text = EditBoxQuickEdit.Edit(40, 1, normal, value, 128);
-                Console.WriteLine(text);
-                return text;
-            }
-
-            if (!string.IsNullOrEmpty(value))
-            {
-                Console.WriteLine(value);
-                return value;
-            }
-
-            return Console.ReadLine();
-        }
-
-        private static string DemandAskPrompt(string prompt, string value = null, bool useEditBox = false)
-        {
-            var answer = AskPrompt(prompt, value, useEditBox);
-            if (string.IsNullOrEmpty(answer))
-            {
-                ThrowPromptNotAnsweredApplicationException();
-            }
-            return answer;
-        }
-
-        private static void ThrowPromptNotAnsweredApplicationException()
-        {
-            throw new ApplicationException($"CANCELED: No input provided.");
         }
     }
 }

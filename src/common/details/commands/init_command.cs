@@ -191,6 +191,7 @@ namespace Azure.AI.Details.Common.CLI
             var resource = await AzCliConsoleGui.InitAndConfigOpenAiResource(interactive, subscriptionId, regionFilter, groupFilter, resourceFilter, kind, sku, yes);
 
             _values.Reset("init.service.subscription", subscriptionId);
+            _values.Reset("service.resource.name", resource.Name);
             _values.Reset("service.resource.group.name", resource.Group);
             _values.Reset("service.resource.region.name", resource.RegionLocation);
             _values.Reset("service.openai.endpoint", resource.Endpoint);
@@ -206,7 +207,10 @@ namespace Azure.AI.Details.Common.CLI
             var location = _values.GetOrDefault("service.resource.region.name", "");
             var groupName = _values.GetOrDefault("service.resource.group.name", "");
 
-            var resource = await AzCliConsoleGui.InitAndConfigCogSearchResource(subscription, location, groupName);
+            var smartName = _values.GetOrDefault("service.resource.name", null); 
+            var smartNameKind = smartName != null && smartName.Contains("openai") ? "openai" : "oai";
+
+            var resource = await AzCliConsoleGui.InitAndConfigCogSearchResource(subscription, location, groupName, smartName, smartNameKind);
 
             _values.Reset("service.search.endpoint", resource.Endpoint);
             _values.Reset("service.search.key", resource.Key);
