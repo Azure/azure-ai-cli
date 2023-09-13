@@ -90,6 +90,7 @@ namespace Azure.AI.Details.Common.CLI
 
                 case "service.project.create": return _projectCreateParsers;
                 case "service.project.list": return _projectListParsers;
+                case "service.project.delete": return _projectDeleteParsers;
 
                 case "service.connection.list": return _connectionListParsers;
 
@@ -186,6 +187,17 @@ namespace Azure.AI.Details.Common.CLI
         private static INamedValueTokenParser[] _projectListParsers = {
             
             new CommonServiceNamedValueTokenParsers(),
+
+            new NamedValueTokenParser(null, "service.output.json", "011", "1")
+        };
+
+        private static INamedValueTokenParser[] _projectDeleteParsers = {
+            
+            new CommonServiceNamedValueTokenParsers(),
+          
+            new NamedValueTokenParser("--group", "service.resource.group.name", "0010", "1"),
+            new NamedValueTokenParser("--name", "service.project.name", "010;001", "1"),
+            new NamedValueTokenParser(null, "service.project.delete.dependent.resources", "00111", "1;0", "true;false", null, "true"),
 
             new NamedValueTokenParser(null, "service.output.json", "011", "1")
         };

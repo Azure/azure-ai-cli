@@ -1,1 +1,25 @@
-@include.not.written.yet
+SERVICE PROJECT CREATE
+
+  The `ai service project delete` command deletes an AI resource project.
+
+USAGE: ai service project delete [...]
+
+  AZURE
+    --subscription SUBSCRIPTION     (see: ai help subscription)
+    --group GROUP                   (see: ai help resource group)
+
+  DELETE
+    --name NAME                     (see: ai help service project name)
+
+  OUTPUT
+    --output-json @FILE             (see: ai help service output json)
+
+EXAMPLE
+
+  ai service project delete --group MyResourceGroup --name MyProject
+
+SEE ALSO
+
+  ai help init
+  ai help service project examples
+  ai help find topics service project
