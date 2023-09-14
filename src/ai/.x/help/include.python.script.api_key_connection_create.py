@@ -58,7 +58,7 @@ def main():
     endpoint = args.endpoint
     key = args.key
 
-    timeout_seconds = 10;
+    timeout_seconds = 10
 
     start_time = datetime.now()
     timeout = timedelta(seconds=timeout_seconds)
