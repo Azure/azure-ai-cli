@@ -92,6 +92,7 @@ namespace Azure.AI.Details.Common.CLI
                 case "service.project.list": return _projectListParsers;
                 case "service.project.delete": return _projectDeleteParsers;
 
+                case "service.connection.create": return _connectionCreateParsers;
                 case "service.connection.list": return _connectionListParsers;
 
                 case "service.search.create": return _searchCreateParsers;
@@ -198,6 +199,20 @@ namespace Azure.AI.Details.Common.CLI
             new NamedValueTokenParser("--group", "service.resource.group.name", "0010", "1"),
             new NamedValueTokenParser("--name", "service.project.name", "010;001", "1"),
             new NamedValueTokenParser(null, "service.project.delete.dependent.resources", "00111", "1;0", "true;false", null, "true"),
+
+            new NamedValueTokenParser(null, "service.output.json", "011", "1")
+        };
+
+        private static INamedValueTokenParser[] _connectionCreateParsers = {
+            
+            new CommonServiceNamedValueTokenParsers(),
+          
+            new NamedValueTokenParser("--group", "service.resource.group.name", "0010", "1"),
+            new NamedValueTokenParser("--project", "service.project.name", "010", "1"),
+            new NamedValueTokenParser(null, "service.project.connection.name", "0011;0001", "1"),
+            new NamedValueTokenParser(null, "service.project.connection.type", "0011", "1"),
+            new NamedValueTokenParser(null, "service.project.connection.endpoint", "0011", "1"),
+            new NamedValueTokenParser(null, "service.project.connection.key", "0011", "1"),
 
             new NamedValueTokenParser(null, "service.output.json", "011", "1")
         };

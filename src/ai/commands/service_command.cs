@@ -61,6 +61,7 @@ namespace Azure.AI.Details.Common.CLI
                 case "service.project.create": DoCreateProject(); break;
                 case "service.project.list": DoListProjects(); break;
                 case "service.project.delete": DoDeleteProject(); break;
+                case "service.connection.create": DoCreateConnection(); break;
                 case "service.connection.list": DoListConnections(); break;
 
                 default:
@@ -114,6 +115,29 @@ namespace Azure.AI.Details.Common.CLI
             if (!_quiet) Console.WriteLine(output);
             CheckWriteOutputValueFromJson("service.output", "json", output);
             CheckWriteOutputValueFromJson("service.output", "project.id", output, "id");
+        }
+
+        private void DoCreateConnection()
+        {
+            var action = "Creating AI connection";
+            var command = "service connection create";
+            var subscription = DemandSubscription(action, command);
+            var project = DemandProject(action, command);
+            var group = DemandGroup(action, command);
+
+            var connectionName = DemandName("service.project.connection.name", action, command);
+            var connectionType = DemandConnectionType(action, command);
+            var connectionEndpoint = DemandConnectionEndpoint(action, command);
+            var connectionKey = DemandConnectionKey(action, command);
+
+            var message = $"{action} '{connectionName}'";
+
+            if (!_quiet) Console.WriteLine(message);
+            var output = PythonSDKWrapper.CreateConnection(_values, subscription, group, project, connectionName, connectionType, connectionEndpoint, connectionKey);
+            if (!_quiet) Console.WriteLine($"{message} Done!\n");
+
+            if (!_quiet) Console.WriteLine(output);
+            CheckWriteOutputValueFromJson("service.output", "json", output);
         }
 
         private void DoListResources()
@@ -259,54 +283,55 @@ namespace Azure.AI.Details.Common.CLI
 
         private string DemandName(string valuesName, string action, string command)
         {
-            var name = _values.Get(valuesName, true);
-            if (string.IsNullOrEmpty(name))
-            {
-                _values.AddThrowError(
-                    "ERROR:", $"{action}; requires name.",
-                      "TRY:", $"{Program.Name} {command} --name NAME",
-                      "SEE:", $"{Program.Name} help {command}");
-            }
-            return name;
+            return Demand(valuesName, "name", "--name NAME", action, command);
         }
 
         private string DemandGroup(string action, string command)
         {
-            var group = _values.Get("service.resource.group.name", true);
-            if (string.IsNullOrEmpty(group))
-            {
-                _values.AddThrowError(
-                    "ERROR:", $"{action}; requires group.",
-                      "TRY:", $"{Program.Name} {command} --group GROUP",
-                      "SEE:", $"{Program.Name} help {command}");
-            }
-            return group;
+            return Demand("service.resource.group.name", "group", "--group GROUP", action, command);
         }
 
         private string DemandResource(string action, string command)
         {
-            var resource = _values.Get("service.resource.name", true);
-            if (string.IsNullOrEmpty(resource))
-            {
-                _values.AddThrowError(
-                    "ERROR:", $"{action}; requires resource.",
-                      "TRY:", $"{Program.Name} {command} --resource RESOURCE",
-                      "SEE:", $"{Program.Name} help {command}");
-            }
-            return resource;
+            return Demand("service.resource.name", "resource", "--resource RESOURCE", action, command);
         }
 
         private string DemandRegionLocation(string action, string command)
         {
-            var location = _values.Get("service.region.location", true);
-            if (string.IsNullOrEmpty(location))
+            return Demand("service.region.location", "location.", "--location LOCATION", action, command);
+        }
+
+        private string DemandProject(string action, string command)
+        {
+            return Demand("service.project.name", "project name", "--project NAME", action, command);
+        }
+
+        private string DemandConnectionType(string action, string command)
+        {
+            return Demand("service.project.connection.type", "connection type", "--connection-type TYPE", action, command);
+        }
+
+        private string DemandConnectionEndpoint(string action, string command)
+        {
+            return Demand("service.project.connection.endpoint", "connection endpoint", "--connection-endpoint ENDPOINT", action, command);
+        }
+
+        private string DemandConnectionKey(string action, string command)
+        {
+            return Demand("service.project.connection.key", "connection key", "--connection-key KEY", action, command);
+        }
+
+        private string Demand(string valueName, string requires, string option, string action, string command)
+        {
+            var value = _values.Get(valueName, true);
+            if (string.IsNullOrEmpty(value))
             {
                 _values.AddThrowError(
-                    "ERROR:", $"{action}; requires location.",
-                      "TRY:", $"{Program.Name} {command} --location LOCATION",
+                    "ERROR:", $"{action}; requires {requires}.",
+                      "TRY:", $"{Program.Name} {command} {option}",
                       "SEE:", $"{Program.Name} help {command}");
             }
-            return location;
+            return value;
         }
 
         private string GetGroupName()
