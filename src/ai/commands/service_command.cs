@@ -60,6 +60,7 @@ namespace Azure.AI.Details.Common.CLI
                 case "service.resource.delete": DoDeleteResource(); break;
                 case "service.project.create": DoCreateProject(); break;
                 case "service.project.list": DoListProjects(); break;
+                case "service.project.delete": DoDeleteProject(); break;
                 case "service.connection.list": DoListConnections(); break;
 
                 default:
@@ -180,6 +181,27 @@ namespace Azure.AI.Details.Common.CLI
 
             if (!_quiet) Console.WriteLine(message);
             var output = PythonSDKWrapper.DeleteResource(_values, subscription, group, resourceName, deleteDependentResources);
+            if (!_quiet) Console.WriteLine($"{message} Done!\n");
+
+            if (!_quiet) Console.WriteLine(output);
+            CheckWriteOutputValueFromJson("service.output", "json", output);
+        }
+
+        private void DoDeleteProject()
+        {
+            var action = "Deleting AI project";
+            var command = "service project delete";
+
+            var subscription = DemandSubscription(action, command);
+            var projectName = DemandName("service.project.name", action, command);
+            var group = DemandGroup(action, command);
+
+            var deleteDependentResources = _values.GetOrDefault("service.project.delete.dependent.resources", false);
+
+            var message = $"{action} for '{projectName}'";
+
+            if (!_quiet) Console.WriteLine(message);
+            var output = PythonSDKWrapper.DeleteProject(_values, subscription, group, projectName, deleteDependentResources);
             if (!_quiet) Console.WriteLine($"{message} Done!\n");
 
             if (!_quiet) Console.WriteLine(output);

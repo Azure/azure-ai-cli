@@ -6,7 +6,7 @@ COMMANDS
   ai service project list [...]          (see: ai help service project list)
 
 `#e_;*` ai service project update [...]        (see: ai help service project update)
-`#e_;*` ai service project delete [...]        (see: ai help service project delete)
+  ai service project delete [...]        (see: ai help service project delete)
 
 `#e_;* - COMING SOON`
 

@@ -51,6 +51,11 @@ namespace Azure.AI.Details.Common.CLI
             return DoDeleteResourceViaPython(values, subscription, group, name, deleteDependentResources);
         }
 
+        static public string DeleteProject(INamedValues values, string subscription, string group, string name, bool deleteDependentResources)
+        {
+            return DoDeleteProjectViaPython(values, subscription, group, name, deleteDependentResources);
+        }
+
         static public string CreateConnection(INamedValues values, string subscription, string group, string projectName, string connectionName, string connectionType, string endpoint, string key)
         {
             return DoCreateConnectionViaPython(values, subscription, group, projectName, connectionName, connectionType, endpoint, key);
@@ -119,6 +124,16 @@ namespace Azure.AI.Details.Common.CLI
         {
             return RunEmbeddedPythonScript(values,
                     "hub_delete",
+                    "--subscription", subscription,
+                    "--group", group,
+                    "--name", name, 
+                    "--delete-dependent-resources", deleteDependentResources ? "true" : "false");
+        }
+
+        private static string DoDeleteProjectViaPython(INamedValues values, string subscription, string group, string name, bool deleteDependentResources)
+        {
+            return RunEmbeddedPythonScript(values,
+                    "project_delete",
                     "--subscription", subscription,
                     "--group", group,
                     "--name", name, 

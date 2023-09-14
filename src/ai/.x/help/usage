@@ -24,7 +24,7 @@ USAGE: ai <command> [...]
 `#e_;*` ai language [...]         (see: ai help language)
   ai search [...]           (see: ai help search)
 
-`#e_;*` ai service [...]          (see: ai help service)
+  ai service [...]          (see: ai help service)
 `#e_;*` ai tool [...]             (see: ai help tool)
 
 `#e_;* - COMING SOON`
