@@ -2,11 +2,11 @@ USAGE: ai service connection <command> [...]
 
 COMMANDS
 
-`#e_;*` ai service connection create [...]        (see: ai help service connection create)
+  ai service connection create [...]        (see: ai help service connection create)
   ai service connection list [...]          (see: ai help service connection list)
 
 `#e_;*` ai service connection update [...]        (see: ai help service connection update)
-`#e_;*` ai service connection delete [...]        (see: ai help service connection delete)
+  ai service connection delete [...]        (see: ai help service connection delete)
 
 `#e_;* - COMING SOON`
 

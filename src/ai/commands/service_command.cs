@@ -63,6 +63,7 @@ namespace Azure.AI.Details.Common.CLI
                 case "service.project.delete": DoDeleteProject(); break;
                 case "service.connection.create": DoCreateConnection(); break;
                 case "service.connection.list": DoListConnections(); break;
+                case "service.connection.delete": DoDeleteConnection(); break;
 
                 default:
                     _values.AddThrowError("WARNING:", $"'{command.Replace('.', ' ')}' NOT YET IMPLEMENTED!!");
@@ -178,7 +179,7 @@ namespace Azure.AI.Details.Common.CLI
             var command = "service connection list";
             var subscription = DemandSubscription(action, command);
             var group = DemandGroup(action, command);
-            var project = DemandName("service.project.name", action, command);
+            var project = DemandProject(action, command);
 
             var message = $"{action} for '{project}'";
 
@@ -226,6 +227,26 @@ namespace Azure.AI.Details.Common.CLI
 
             if (!_quiet) Console.WriteLine(message);
             var output = PythonSDKWrapper.DeleteProject(_values, subscription, group, projectName, deleteDependentResources);
+            if (!_quiet) Console.WriteLine($"{message} Done!\n");
+
+            if (!_quiet) Console.WriteLine(output);
+            CheckWriteOutputValueFromJson("service.output", "json", output);
+        }
+
+        private void DoDeleteConnection()
+        {
+            var action = "Deleting AI connection";
+            var command = "service connection delete";
+
+            var subscription = DemandSubscription(action, command);
+            var group = DemandGroup(action, command);
+            var projectName = DemandProject(action, command);
+            var connectionName = DemandName("service.project.connection.name", action, command);
+
+            var message = $"{action} for '{connectionName}'";
+
+            if (!_quiet) Console.WriteLine(message);
+            var output = PythonSDKWrapper.DeleteConnection(_values, subscription, group, projectName, connectionName);
             if (!_quiet) Console.WriteLine($"{message} Done!\n");
 
             if (!_quiet) Console.WriteLine(output);

@@ -1,1 +1,27 @@
-@include.not.written.yet
+SERVICE CONNECTION CREATE
+
+  The `ai service connection create` command creates an AI project connection.
+
+USAGE: ai service connection create [...]
+
+  AZURE
+    --subscription SUBSCRIPTION     (see: ai help subscription)
+    --group GROUP                   (see: ai help resource group)
+
+  PROJECT
+    --project NAME                  (see: ai help service project name)
+
+  CONNECTION
+    --connection-name NAME          (see: ai help service connection name)
+    --connection-type TYPE          (see: ai help service connection type)
+    --connection-endpoint ENDPOINT  (see: ai help service connection endpoint)
+    --connection-key KEY            (see: ai help serivce connection key)
+
+  OUTPUT
+    --output-json @FILE             (see: ai help service output json)
+
+SEE ALSO
+
+  ai help init
+  ai help service connection examples
+  ai help find topics service connection

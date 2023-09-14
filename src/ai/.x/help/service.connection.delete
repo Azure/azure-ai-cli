@@ -1,1 +1,18 @@
-@include.not.written.yet
+SERVICE CONNECTION DELETE
+
+  The `ai service connection delete` command deletes an AI project connection.
+
+USAGE: ai service connection delete [...]
+
+  AZURE
+    --subscription SUBSCRIPTION     (see: ai help subscription)
+    --group GROUP                   (see: ai help resource group)
+
+  DELETE
+    --connection-name NAME          (see: ai help service connection name)
+
+SEE ALSO
+
+  ai help init
+  ai help service connection examples
+  ai help find topics service connection
