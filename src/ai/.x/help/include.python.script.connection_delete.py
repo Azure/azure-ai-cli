@@ -5,7 +5,7 @@ from azure.ai.generative.entities import Connection
 from azure.ai.ml.entities._credentials import ApiKeyConfiguration
 from azure.identity import DefaultAzureCredential
 
-def list_connections(subscription_id, resource_group_name, project_name):
+def delete_connection(subscription_id, resource_group_name, project_name, connection_name):
 
     client = AIClient(
         credential=DefaultAzureCredential(),
@@ -15,35 +15,32 @@ def list_connections(subscription_id, resource_group_name, project_name):
         user_agent="ai-cli 0.0.1"
     )
 
-    items = client.connections.list()
-    connections = []
+    client.connections.delete(connection_name)
 
-    for item in items:
-        connection = {
-            "name": item.name,
-            "type": item.type,
-            "target": item.target,
-            "credentials": item.credentials.values()
-        }
-        connections.append(connection)
+    result = {
+        "name": connection_name,
+        "deleted": True
+    }
 
-    return connections
+    print(result)
+    return result
 
 def main():
-    """Parse command line arguments and list connections."""
-    parser = argparse.ArgumentParser(description="List connection")
+    """Parse command line arguments and delete the connection."""
+    parser = argparse.ArgumentParser(description="Delete api key connection")
     parser.add_argument("--subscription", required=True, help="Azure subscription ID")
     parser.add_argument("--group", required=False, help="Azure resource group name")
     parser.add_argument("--project-name", required=True, help="Azure AI project project name.")
+    parser.add_argument("--connection-name", required=True, help="Azure AI project connection name.")
     args = parser.parse_args()
 
     subscription_id = args.subscription
     resource_group_name = args.group
     project_name = args.project_name
+    connection_name = args.connection_name
 
-    connections = list_connections(subscription_id, resource_group_name, project_name)
-    formatted = json.dumps({"connections": connections}, indent=2)
-
+    result = delete_connection(subscription_id, resource_group_name, project_name, connection_name)
+    formatted = json.dumps({"result": result}, indent=2)
     print("---")
     print(formatted)
 

@@ -47,7 +47,7 @@ def main():
     parser.add_argument("--connection-name", required=True, help="Azure AI project connection name.")
     parser.add_argument("--connection-type", required=True, help="Azure AI project connection type.")
     parser.add_argument("--endpoint", required=True, help="Azure AI Project connection endpoint.")
-    parser.add_argument("--key", required=True, help="Azure AI PRoject connection key.")
+    parser.add_argument("--key", required=True, help="Azure AI Project connection key.")
     args = parser.parse_args()
 
     subscription_id = args.subscription
@@ -58,8 +58,10 @@ def main():
     endpoint = args.endpoint
     key = args.key
 
+    timeout_seconds = 10
+
     start_time = datetime.now()
-    timeout = timedelta(minutes=2)
+    timeout = timedelta(seconds=timeout_seconds)
     success = False
 
     while datetime.now() - start_time < timeout:

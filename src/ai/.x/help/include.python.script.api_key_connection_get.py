@@ -43,8 +43,10 @@ def main():
     project_name = args.project_name
     connection_name = args.connection_name
 
+    timeout_seconds = 10
+
     start_time = datetime.now()
-    timeout = timedelta(minutes=2)
+    timeout = timedelta(seconds=timeout_seconds)
     success = False
 
     while datetime.now() - start_time < timeout:
