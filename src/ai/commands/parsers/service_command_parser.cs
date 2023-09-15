@@ -126,7 +126,7 @@ namespace Azure.AI.Details.Common.CLI
 
                     new NamedValueTokenParser("--uri", "service.config.endpoint.uri", "0010;0001", "1"),
                     new NamedValueTokenParser("--deployment", "service.config.deployment", "001", "1"),
-                    new SubscriptionToken.Parser()
+                    SubscriptionToken.Parser()
                 )
             {
             }
@@ -142,11 +142,11 @@ namespace Azure.AI.Details.Common.CLI
             
             new CommonServiceNamedValueTokenParsers(),
           
-            new ResourceGroupNameToken.Parser(),
-            new ResourceNameToken.Parser(),
-            new RegionLocationToken.Parser(),
-            new NamedValueTokenParser("--display-name", "service.resource.display.name", "0011", "1"),
-            new NamedValueTokenParser("--description", "service.resource.description", "001", "1"),
+            ResourceGroupNameToken.Parser(),
+            ResourceNameToken.Parser(),
+            RegionLocationToken.Parser(),
+            ResourceDisplayNameToken.Parser(),
+            ResourceDescriptionToken.Parser(),
 
             new NamedValueTokenParser("--output-resource-id", "service.output.resource.id", "0110;0101", "1"),
             new NamedValueTokenParser(null, "service.output.json", "011", "1")
@@ -163,8 +163,8 @@ namespace Azure.AI.Details.Common.CLI
             
             new CommonServiceNamedValueTokenParsers(),
           
-            new ResourceGroupNameToken.Parser(),
-            new ResourceNameToken.Parser(),
+            ResourceGroupNameToken.Parser(),
+            ResourceNameToken.Parser(),
             new NamedValueTokenParser(null, "service.resource.delete.dependent.resources", "00111", "1;0", "true;false", null, "true"),
 
             new NamedValueTokenParser(null, "service.output.json", "011", "1")
@@ -174,12 +174,12 @@ namespace Azure.AI.Details.Common.CLI
             
             new CommonServiceNamedValueTokenParsers(),
           
-            new ResourceGroupNameToken.Parser(),
-            new ResourceNameToken.Parser(requireResourcePart: true),
-            new ProjectNameToken.Parser(),
-            new RegionLocationToken.Parser(),
-            new NamedValueTokenParser("--display-name", "service.project.display.name", "0011", "1"),
-            new NamedValueTokenParser("--description", "service.project.description", "001", "1"),
+            ResourceGroupNameToken.Parser(),
+            ResourceNameToken.Parser(requireResourcePart: true),
+            RegionLocationToken.Parser(),
+            ProjectNameToken.Parser(),
+            ProjectDisplayNameToken.Parser(),
+            ProjectDescriptionToken.Parser(),
 
             new NamedValueTokenParser("--output-project-id", "service.output.project.id", "0110;0101", "1"),
             new NamedValueTokenParser(null, "service.output.json", "011", "1")
@@ -196,8 +196,8 @@ namespace Azure.AI.Details.Common.CLI
             
             new CommonServiceNamedValueTokenParsers(),
           
-            new ResourceGroupNameToken.Parser(),
-            new ProjectNameToken.Parser(),
+            ResourceGroupNameToken.Parser(),
+            ProjectNameToken.Parser(),
             new NamedValueTokenParser(null, "service.project.delete.dependent.resources", "00111", "1;0", "true;false", null, "true"),
 
             new NamedValueTokenParser(null, "service.output.json", "011", "1")
@@ -207,12 +207,12 @@ namespace Azure.AI.Details.Common.CLI
             
             new CommonServiceNamedValueTokenParsers(),
           
-            new ResourceGroupNameToken.Parser(),
-            new ProjectNameToken.Parser(requireProjectPart: true),
-            new NamedValueTokenParser(null, "service.project.connection.name", "0011;0001", "1"),
-            new NamedValueTokenParser(null, "service.project.connection.type", "0011", "1"),
-            new NamedValueTokenParser(null, "service.project.connection.endpoint", "0011", "1"),
-            new NamedValueTokenParser(null, "service.project.connection.key", "0011", "1"),
+            ResourceGroupNameToken.Parser(),
+            ProjectNameToken.Parser(requireProjectPart: true),
+            ProjectConnectionNameToken.Parser(),
+            ProjectConnectionTypeToken.Parser(),
+            ProjectConnectionEndpointToken.Parser(),
+            ProjectConnectionKeyToken.Parser(),
 
             new NamedValueTokenParser(null, "service.output.json", "011", "1")
         };
@@ -221,8 +221,8 @@ namespace Azure.AI.Details.Common.CLI
             
             new CommonServiceNamedValueTokenParsers(),
 
-            new ResourceGroupNameToken.Parser(),
-            new ProjectNameToken.Parser(requireProjectPart: true),
+            ResourceGroupNameToken.Parser(),
+            ProjectNameToken.Parser(requireProjectPart: true),
 
             new NamedValueTokenParser(null, "service.output.json", "011", "1")
         };
@@ -231,9 +231,9 @@ namespace Azure.AI.Details.Common.CLI
             
             new CommonServiceNamedValueTokenParsers(),
           
-            new ResourceGroupNameToken.Parser(),
-            new ProjectNameToken.Parser(requireProjectPart: true),
-            new NamedValueTokenParser(null, "service.project.connection.name", "0010;0001", "1"),
+            ResourceGroupNameToken.Parser(),
+            ProjectNameToken.Parser(requireProjectPart: true),
+            ProjectConnectionNameToken.Parser(),
 
             new NamedValueTokenParser(null, "service.output.json", "011", "1")
         };
@@ -242,12 +242,12 @@ namespace Azure.AI.Details.Common.CLI
             
             new CommonServiceNamedValueTokenParsers(),
           
-            // new ResourceGroupNameToken.Parser(),
-            // new ResourceNameToken.Parser(requireResourcePart: true),
-            // new ProjectNameToken.Parser(requireProjectPart: true),
-            // new RegionLocationToken.Parser(),
-            // new NamedValueTokenParser("--display-name", "service.project.display.name", "0011", "1"),
-            // new NamedValueTokenParser("--description", "service.project.description", "001", "1"),
+            // ResourceGroupNameToken.Parser(),
+            // ResourceNameToken.Parser(requireResourcePart: true),
+            // ProjectNameToken.Parser(requireProjectPart: true),
+            // RegionLocationToken.Parser(),
+            // ProjectDisplayNameToken.Parser(),
+            // ProjectDescriptionToken.Parser(),
 
             // new NamedValueTokenParser("--output-project-id", "service.output.project.id", "0110;0101", "1"),
             // new NamedValueTokenParser(null, "service.output.json", "011", "1")

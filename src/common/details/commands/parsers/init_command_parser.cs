@@ -67,7 +67,7 @@ namespace Azure.AI.Details.Common.CLI
 
                 new NamedValueTokenParser("--ini",  "ini.file", "10", "1", "@"),
 
-                new SubscriptionToken.Parser(),
+                SubscriptionToken.Parser(),
                 new NamedValueTokenParser("--region", "init.service.resource.region.name", "00010", "1"),
                 new NamedValueTokenParser("--group", "init.service.resource.group.name", "00010", "1"),
                 new NamedValueTokenParser("--name", "init.service.cognitiveservices.resource.name", "00001", "1"),

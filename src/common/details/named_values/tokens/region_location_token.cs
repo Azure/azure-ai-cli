@@ -7,30 +7,11 @@ namespace Azure.AI.Details.Common.CLI
 {
     class RegionLocationToken
     {
-        public class Parser : NamedValueTokenParser
-        {
-            public Parser() : base(_optionName, _fullName, _fullNameRequiredParts, _valueCount)
-            {
-            }
-        }
-
-        public static string Demand(INamedValues values, string action, string command)
-        {
-            return NamedValueTokenParserHelpers.Demand(values, _fullName, _requiredDisplayName, $"{_optionName} {_optionExample}", action, command);
-        }
-
-        public static string GetOrDefault(INamedValues values, string defaultValue = null)
-        {
-            return values.GetOrDefault(_fullName, defaultValue);
-        }
-
-        public static void Set(INamedValues values, string value = null)
-        {
-            values.Reset(_fullName, value);
-        }
+        public static NamedValueTokenData Data() => new NamedValueTokenData(_optionName, _fullName, _valueCount, _optionExample, _requiredDisplayName);
+        public static INamedValueTokenParser Parser() => new NamedValueTokenParser(_optionName, _fullName, _fullNameRequiredParts, _valueCount);
 
         private const string _requiredDisplayName = "location";
-        private const string _optionName = "--locaation";
+        private const string _optionName = "--location";
         private const string _optionExample = "LOCATION";
         private const string _fullName = "service.region.location";
         private const string _fullNameRequiredParts = "010;001";

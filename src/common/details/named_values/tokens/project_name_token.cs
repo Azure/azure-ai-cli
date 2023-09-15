@@ -7,27 +7,8 @@ namespace Azure.AI.Details.Common.CLI
 {
     class ProjectNameToken
     {
-        public class Parser : NamedValueTokenParser
-        {
-            public Parser(bool requireProjectPart = false) : base(_optionName, _fullName, requireProjectPart ? "010" : "010;001", _valueCount)
-            {
-            }
-        }
-
-        public static string Demand(INamedValues values, string action, string command)
-        {
-            return NamedValueTokenParserHelpers.Demand(values, _fullName, _requiredDisplayName, $"{_optionName} {_optionExample}", action, command);
-        }
-
-        public static string GetOrDefault(INamedValues values, string defaultValue = null)
-        {
-            return values.GetOrDefault(_fullName, defaultValue);
-        }
-
-        public static void Set(INamedValues values, string value = null)
-        {
-            values.Reset(_fullName, value);
-        }
+        public static NamedValueTokenData Data() => new NamedValueTokenData(_optionName, _fullName, _valueCount, _optionExample, _requiredDisplayName);
+        public static INamedValueTokenParser Parser(bool requireProjectPart = false) => new NamedValueTokenParser(_optionName, _fullName, requireProjectPart ? "010" : "010;001", _valueCount);
 
         private const string _requiredDisplayName = "project name";
         private const string _optionName = "--project-name";

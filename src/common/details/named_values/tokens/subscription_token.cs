@@ -7,13 +7,8 @@ namespace Azure.AI.Details.Common.CLI
 {
     class SubscriptionToken
     {
-        public class Parser : NamedValueTokenParser
-        {
-
-            public Parser() : base(_optionName, _fullName, _fullNameRequiredParts, _valueCount)
-            {
-            }
-        }
+        public static NamedValueTokenData Data() => new NamedValueTokenData(_optionName, _fullName, _valueCount, _optionExample, _requiredDisplayName);
+        public static INamedValueTokenParser Parser() => new NamedValueTokenParser(_optionName, _fullName, _fullNameRequiredParts, _valueCount);
 
         public static string Demand(INamedValues values, string action, string command)
         {
@@ -30,16 +25,6 @@ namespace Azure.AI.Details.Common.CLI
                       "SEE:", $"{Program.Name} help {command}");
             }
             return subscription;
-        }
-
-        public static string GetOrDefault(INamedValues values, string defaultValue = null)
-        {
-            return values.GetOrDefault(_fullName, defaultValue);
-        }
-
-        public static void Set(INamedValues values, string value = null)
-        {
-            values.Reset(_fullName, value);
         }
 
         private const string _requiredDisplayName = "subscription";

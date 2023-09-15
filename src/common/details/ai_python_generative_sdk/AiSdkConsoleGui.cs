@@ -70,11 +70,11 @@ namespace Azure.AI.Details.Common.CLI
             if (picked == 0)
             {
                 var locationName = values.GetOrDefault("service.resource.region.name", "");
-                var groupName = ResourceGroupNameToken.GetOrDefault(values);
-                var displayName = values.Get("service.resource.display.name", true);
-                var description = values.Get("service.resource.description", true);
+                var groupName = ResourceGroupNameToken.Data().GetOrDefault(values);
+                var displayName = ResourceDisplayNameToken.Data().GetOrDefault(values);
+                var description = ResourceDescriptionToken.Data().GetOrDefault(values);
 
-                var smartName = ResourceNameToken.GetOrDefault(values); 
+                var smartName = ResourceNameToken.Data().GetOrDefault(values); 
                 var smartNameKind = smartName != null && smartName.Contains("openai") ? "openai" : "oai";
 
                 resource = await TryCreateAiHubResourceInteractive(values, subscription, locationName, groupName, displayName, description, smartName, smartNameKind);
@@ -89,9 +89,9 @@ namespace Azure.AI.Details.Common.CLI
             };
 
             values.Reset("service.resource.id", aiHubResource.Id);
-            ResourceNameToken.Set(values, aiHubResource.Name);
-            ResourceGroupNameToken.Set(values, aiHubResource.Group);
-            RegionLocationToken.Set(values, aiHubResource.RegionLocation);
+            ResourceNameToken.Data().Set(values, aiHubResource.Name);
+            ResourceGroupNameToken.Data().Set(values, aiHubResource.Group);
+            RegionLocationToken.Data().Set(values, aiHubResource.RegionLocation);
 
             return aiHubResource;
         }
@@ -184,14 +184,14 @@ namespace Azure.AI.Details.Common.CLI
             createNew = picked == 0;
             if (createNew)
             {
-                var group = ResourceGroupNameToken.GetOrDefault(values);
-                var location = RegionLocationToken.GetOrDefault(values, "");
-                var displayName = values.Get("service.project.display.name", true);
-                var description = values.Get("service.project.description", true);
+                var group = ResourceGroupNameToken.Data().GetOrDefault(values);
+                var location = RegionLocationToken.Data().GetOrDefault(values, "");
+                var displayName = ProjectDisplayNameToken.Data().GetOrDefault(values);
+                var description = ProjectDescriptionToken.Data().GetOrDefault(values);
 
                 var openAiResourceId = values.GetOrDefault("service.openai.resource.id", "");
 
-                var smartName = ResourceNameToken.GetOrDefault(values);
+                var smartName = ResourceNameToken.Data().GetOrDefault(values);
                 var smartNameKind = smartName != null && smartName.Contains("openai") ? "openai" : "oai";
 
                 project = TryCreateAiHubProjectInteractive(values, subscription, resourceId, group, location, ref displayName, ref description, openAiResourceId, smartName, smartNameKind);

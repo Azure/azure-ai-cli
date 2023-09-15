@@ -5,7 +5,7 @@
 
 namespace Azure.AI.Details.Common.CLI
 {
-    public class NamedValueTokenParserHelpers
+    public class NamedValueTokenDataHelpers
     {
         public static string Demand(INamedValues values, string valueName, string requires, string option, string action, string command)
         {
