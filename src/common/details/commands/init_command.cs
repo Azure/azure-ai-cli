@@ -179,7 +179,7 @@ namespace Azure.AI.Details.Common.CLI
 
         private async Task DoInitOpenAi(bool interactive)
         {
-            var subscriptionFilter = _values.GetOrDefault("init.service.subscription", "");
+            var subscriptionFilter = SubscriptionToken.GetOrDefault(_values, "");
             var regionFilter = _values.GetOrDefault("init.service.resource.region.name", "");
             var groupFilter = _values.GetOrDefault("init.service.resource.group.name", "");
             var resourceFilter = _values.GetOrDefault("init.service.cognitiveservices.resource.name", "");
@@ -190,13 +190,13 @@ namespace Azure.AI.Details.Common.CLI
             var subscriptionId = await AzCliConsoleGui.PickSubscriptionIdAsync(interactive, subscriptionFilter);
             var resource = await AzCliConsoleGui.InitAndConfigOpenAiResource(interactive, subscriptionId, regionFilter, groupFilter, resourceFilter, kind, sku, yes);
 
-            _values.Reset("init.service.subscription", subscriptionId);
-            _values.Reset("service.resource.name", resource.Name);
-            _values.Reset("service.resource.group.name", resource.Group);
+            SubscriptionToken.Set(_values, subscriptionId);
             _values.Reset("service.resource.region.name", resource.RegionLocation);
             _values.Reset("service.openai.endpoint", resource.Endpoint);
             _values.Reset("service.openai.key", resource.Key);
             _values.Reset("service.openai.resource.id", resource.Id);
+            ResourceNameToken.Set(_values, resource.Name);
+            ResourceGroupNameToken.Set(_values, resource.Group);
         }
 
         private async Task DoInitSearch(bool interactive)
@@ -205,9 +205,9 @@ namespace Azure.AI.Details.Common.CLI
 
             var subscription = _values.GetOrDefault("init.service.subscription", "");
             var location = _values.GetOrDefault("service.resource.region.name", "");
-            var groupName = _values.GetOrDefault("service.resource.group.name", "");
+            var groupName = ResourceGroupNameToken.GetOrDefault(_values, "");
 
-            var smartName = _values.GetOrDefault("service.resource.name", null); 
+            var smartName = ResourceNameToken.GetOrDefault(_values);
             var smartNameKind = smartName != null && smartName.Contains("openai") ? "openai" : "oai";
 
             var resource = await AzCliConsoleGui.InitAndConfigCogSearchResource(subscription, location, groupName, smartName, smartNameKind);
@@ -220,7 +220,7 @@ namespace Azure.AI.Details.Common.CLI
         {
             if (!interactive) ThrowInteractiveNotSupportedApplicationException(); // TODO: Add back non-interactive mode support
 
-            var subscription = _values.GetOrDefault("init.service.subscription", "");
+            var subscription = SubscriptionToken.GetOrDefault(_values, "");
             if (string.IsNullOrEmpty(subscription))
             {
                 subscription = await AzCliConsoleGui.PickSubscriptionIdAsync(interactive);
@@ -234,9 +234,9 @@ namespace Azure.AI.Details.Common.CLI
         {
             if (!interactive) ThrowInteractiveNotSupportedApplicationException(); // TODO: Add back non-interactive mode support
 
-            var subscription = _values.GetOrDefault("init.service.subscription", "");
+            var subscription = SubscriptionToken.GetOrDefault(_values, "");
             var resourceId = _values.GetOrDefault("service.resource.id", null);
-            var groupName = _values.GetOrDefault("service.resource.group.name", null);
+            var groupName = ResourceGroupNameToken.GetOrDefault(_values);
 
             var openAiEndpoint = _values.GetOrDefault("service.openai.endpoint", null);
             var openAiKey = _values.GetOrDefault("service.openai.key", null);
@@ -245,7 +245,7 @@ namespace Azure.AI.Details.Common.CLI
 
             var project = AiSdkConsoleGui.InitAndConfigAiHubProject(_values, subscription, resourceId, groupName, openAiEndpoint, openAiKey, searchEndpoint, searchKey);
 
-            _values.Reset("service.project.name", project.Name);
+            ProjectNameToken.Set(_values, project.Name);
             _values.Reset("service.project.id", project.Id);
         }
 

@@ -126,8 +126,7 @@ namespace Azure.AI.Details.Common.CLI
 
                     new NamedValueTokenParser("--uri", "service.config.endpoint.uri", "0010;0001", "1"),
                     new NamedValueTokenParser("--deployment", "service.config.deployment", "001", "1"),
-                    new NamedValueTokenParser("--subscription", "service.subscription", "01", "1")
-
+                    new SubscriptionToken.Parser()
                 )
             {
             }
@@ -143,9 +142,9 @@ namespace Azure.AI.Details.Common.CLI
             
             new CommonServiceNamedValueTokenParsers(),
           
-            new NamedValueTokenParser("--group", "service.resource.group.name", "0010", "1"),
-            new NamedValueTokenParser("--name", "service.resource.name", "010;001", "1"),
-            new NamedValueTokenParser("--location", "service.region.location", "010;001", "1"),
+            new ResourceGroupNameToken.Parser(),
+            new ResourceNameToken.Parser(),
+            new RegionLocationToken.Parser(),
             new NamedValueTokenParser("--display-name", "service.resource.display.name", "0011", "1"),
             new NamedValueTokenParser("--description", "service.resource.description", "001", "1"),
 
@@ -164,8 +163,8 @@ namespace Azure.AI.Details.Common.CLI
             
             new CommonServiceNamedValueTokenParsers(),
           
-            new NamedValueTokenParser("--group", "service.resource.group.name", "0010", "1"),
-            new NamedValueTokenParser("--name", "service.resource.name", "010;001", "1"),
+            new ResourceGroupNameToken.Parser(),
+            new ResourceNameToken.Parser(),
             new NamedValueTokenParser(null, "service.resource.delete.dependent.resources", "00111", "1;0", "true;false", null, "true"),
 
             new NamedValueTokenParser(null, "service.output.json", "011", "1")
@@ -175,10 +174,10 @@ namespace Azure.AI.Details.Common.CLI
             
             new CommonServiceNamedValueTokenParsers(),
           
-            new NamedValueTokenParser("--group", "service.resource.group.name", "0010", "1"),
-            new NamedValueTokenParser("--resource", "service.resource.name", "010", "1"),
-            new NamedValueTokenParser("--name", "service.project.name", "010;001", "1"),
-            new NamedValueTokenParser("--location", "service.region.location", "010;001", "1"),
+            new ResourceGroupNameToken.Parser(),
+            new ResourceNameToken.Parser(requireResourcePart: true),
+            new ProjectNameToken.Parser(),
+            new RegionLocationToken.Parser(),
             new NamedValueTokenParser("--display-name", "service.project.display.name", "0011", "1"),
             new NamedValueTokenParser("--description", "service.project.description", "001", "1"),
 
@@ -197,8 +196,8 @@ namespace Azure.AI.Details.Common.CLI
             
             new CommonServiceNamedValueTokenParsers(),
           
-            new NamedValueTokenParser("--group", "service.resource.group.name", "0010", "1"),
-            new NamedValueTokenParser("--name", "service.project.name", "010;001", "1"),
+            new ResourceGroupNameToken.Parser(),
+            new ProjectNameToken.Parser(),
             new NamedValueTokenParser(null, "service.project.delete.dependent.resources", "00111", "1;0", "true;false", null, "true"),
 
             new NamedValueTokenParser(null, "service.output.json", "011", "1")
@@ -208,8 +207,8 @@ namespace Azure.AI.Details.Common.CLI
             
             new CommonServiceNamedValueTokenParsers(),
           
-            new NamedValueTokenParser("--group", "service.resource.group.name", "0010", "1"),
-            new NamedValueTokenParser("--project", "service.project.name", "010", "1"),
+            new ResourceGroupNameToken.Parser(),
+            new ProjectNameToken.Parser(requireProjectPart: true),
             new NamedValueTokenParser(null, "service.project.connection.name", "0011;0001", "1"),
             new NamedValueTokenParser(null, "service.project.connection.type", "0011", "1"),
             new NamedValueTokenParser(null, "service.project.connection.endpoint", "0011", "1"),
@@ -222,8 +221,8 @@ namespace Azure.AI.Details.Common.CLI
             
             new CommonServiceNamedValueTokenParsers(),
 
-            new NamedValueTokenParser("--group", "service.resource.group.name", "0010", "1"),
-            new NamedValueTokenParser("--project", "service.project.name", "010;001", "1"),
+            new ResourceGroupNameToken.Parser(),
+            new ProjectNameToken.Parser(requireProjectPart: true),
 
             new NamedValueTokenParser(null, "service.output.json", "011", "1")
         };
@@ -232,8 +231,8 @@ namespace Azure.AI.Details.Common.CLI
             
             new CommonServiceNamedValueTokenParsers(),
           
-            new NamedValueTokenParser("--group", "service.resource.group.name", "0010", "1"),
-            new NamedValueTokenParser("--project", "service.project.name", "010", "1"),
+            new ResourceGroupNameToken.Parser(),
+            new ProjectNameToken.Parser(requireProjectPart: true),
             new NamedValueTokenParser(null, "service.project.connection.name", "0010;0001", "1"),
 
             new NamedValueTokenParser(null, "service.output.json", "011", "1")
@@ -243,10 +242,10 @@ namespace Azure.AI.Details.Common.CLI
             
             new CommonServiceNamedValueTokenParsers(),
           
-            // new NamedValueTokenParser("--group", "service.resource.group.name", "0010", "1"),
-            // new NamedValueTokenParser("--resource", "service.resource.name", "010", "1"),
-            // new NamedValueTokenParser("--name", "service.project.name", "010;001", "1"),
-            // new NamedValueTokenParser("--location", "service.region.location", "010;001", "1"),
+            // new ResourceGroupNameToken.Parser(),
+            // new ResourceNameToken.Parser(requireResourcePart: true),
+            // new ProjectNameToken.Parser(requireProjectPart: true),
+            // new RegionLocationToken.Parser(),
             // new NamedValueTokenParser("--display-name", "service.project.display.name", "0011", "1"),
             // new NamedValueTokenParser("--description", "service.project.description", "001", "1"),
 
