@@ -7,13 +7,12 @@ namespace Azure.AI.Details.Common.CLI
 {
     class ResourceNameToken
     {
-        public static NamedValueTokenData Data() => new NamedValueTokenData(_optionName, _fullName, _valueCount, _optionExample, _requiredDisplayName);
-        public static INamedValueTokenParser Parser(bool requireResourcePart = false) => new NamedValueTokenParser(_optionName, _fullName, requireResourcePart ? "010" : "010;001", _valueCount);
+        public static NamedValueTokenData Data() => new NamedValueTokenData(_optionName, _fullName, _optionExample, _requiredDisplayName);
+        public static INamedValueTokenParser Parser(bool requireResourcePart = false) => new NamedValueTokenParser(_optionName, _fullName, requireResourcePart ? "010" : "010;001", "1");
 
         private const string _requiredDisplayName = "resource name";
         private const string _optionName = "--resource-name";
         private const string _optionExample = "NAME";
         private const string _fullName = "service.resource.name";
-        private const string _valueCount = "1";
     }
 }

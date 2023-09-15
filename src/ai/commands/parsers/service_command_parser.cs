@@ -124,8 +124,8 @@ namespace Azure.AI.Details.Common.CLI
 
                     new NamedValueTokenParser(null, "x.command.expand.file.name", "11111", "1"),
 
-                    new NamedValueTokenParser("--uri", "service.config.endpoint.uri", "0010;0001", "1"),
-                    new NamedValueTokenParser("--deployment", "service.config.deployment", "001", "1"),
+                    ConfigEndpointUriToken.Parser(),
+                    ConfigDeploymentToken.Parser(),
                     SubscriptionToken.Parser()
                 )
             {
@@ -165,7 +165,7 @@ namespace Azure.AI.Details.Common.CLI
           
             ResourceGroupNameToken.Parser(),
             ResourceNameToken.Parser(),
-            new NamedValueTokenParser(null, "service.resource.delete.dependent.resources", "00111", "1;0", "true;false", null, "true"),
+            DeleteDependentResourcesToken.Parser(),
 
             new NamedValueTokenParser(null, "service.output.json", "011", "1")
         };
@@ -198,7 +198,7 @@ namespace Azure.AI.Details.Common.CLI
           
             ResourceGroupNameToken.Parser(),
             ProjectNameToken.Parser(),
-            new NamedValueTokenParser(null, "service.project.delete.dependent.resources", "00111", "1;0", "true;false", null, "true"),
+            DeleteDependentResourcesToken.Parser(),
 
             new NamedValueTokenParser(null, "service.output.json", "011", "1")
         };

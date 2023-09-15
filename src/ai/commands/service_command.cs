@@ -200,7 +200,7 @@ namespace Azure.AI.Details.Common.CLI
             var resourceName = ResourceNameToken.Data().Demand(_values, action, command);
             var group = ResourceGroupNameToken.Data().Demand(_values, action, command);
 
-            var deleteDependentResources = _values.GetOrDefault("service.resource.delete.dependent.resources", false);
+            var deleteDependentResources = DeleteDependentResourcesToken.Data().GetOrDefault(_values);
 
             var message = $"{action} for '{resourceName}'";
 
@@ -221,7 +221,7 @@ namespace Azure.AI.Details.Common.CLI
             var projectName = ProjectNameToken.Data().Demand(_values, action, command);
             var group = ResourceGroupNameToken.Data().Demand(_values, action, command);
 
-            var deleteDependentResources = _values.GetOrDefault("service.project.delete.dependent.resources", false);
+            var deleteDependentResources = DeleteDependentResourcesToken.Data().GetOrDefault(_values);
 
             var message = $"{action} for '{projectName}'";
 

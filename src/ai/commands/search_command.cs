@@ -213,7 +213,7 @@ namespace Azure.AI.Details.Common.CLI
 
         private string GetSearchEndpointUri()
         {
-            return _values.Get("service.config.endpoint.uri", true);
+            return ConfigEndpointUriToken.Data().GetOrDefault(_values);
         }
 
         private string GetEmbeddingsEndpointUri()

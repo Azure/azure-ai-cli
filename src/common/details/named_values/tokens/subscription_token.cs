@@ -7,8 +7,8 @@ namespace Azure.AI.Details.Common.CLI
 {
     class SubscriptionToken
     {
-        public static NamedValueTokenData Data() => new NamedValueTokenData(_optionName, _fullName, _valueCount, _optionExample, _requiredDisplayName);
-        public static INamedValueTokenParser Parser() => new NamedValueTokenParser(_optionName, _fullName, _fullNameRequiredParts, _valueCount);
+        public static NamedValueTokenData Data() => new NamedValueTokenData(_optionName, _fullName, _optionExample, _requiredDisplayName);
+        public static INamedValueTokenParser Parser() => new NamedValueTokenParser(_optionName, _fullName, "01", "1");
 
         public static string Demand(INamedValues values, string action, string command)
         {
@@ -31,7 +31,5 @@ namespace Azure.AI.Details.Common.CLI
         private const string _optionName = "--subscription";
         private const string _optionExample = "SUBSCRIPTION";
         private const string _fullName = "service.subscription";
-        private const string _fullNameRequiredParts = "01";
-        private const string _valueCount = "1";
     }
 }
