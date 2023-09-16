@@ -75,13 +75,13 @@ namespace Azure.AI.Details.Common.CLI
         {
             var action = "Creating AI resource";
             var command = "service resource create";
-            var subscription = DemandSubscription(action, command);
-            var location = DemandRegionLocation(action, command);
+            var subscription = SubscriptionToken.Demand(_values, action, command);
+            var location = RegionLocationToken.Data().Demand(_values, action, command);
 
-            var name = DemandName("service.resource.name", action, command);
-            var group = GetGroupName() ?? $"{name}-rg";
-            var displayName = _values.Get("service.resource.display.name", true) ?? name;
-            var description = _values.Get("service.resource.description", true) ?? name;
+            var name = ResourceNameToken.Data().Demand(_values, action, command);
+            var group = ResourceGroupNameToken.Data().GetOrDefault(_values) ?? $"{name}-rg";
+            var displayName = ResourceDisplayNameToken.Data().GetOrDefault(_values, name);
+            var description = ResourceDescriptionToken.Data().GetOrDefault(_values, name);
 
             var message = $"{action} '{name}'";
 
@@ -98,14 +98,14 @@ namespace Azure.AI.Details.Common.CLI
         {
             var action = "Creating AI project";
             var command = "service project create";
-            var subscription = DemandSubscription(action, command);
-            var location = DemandRegionLocation(action, command);
-            var resource = DemandResource(action, command);
+            var subscription = SubscriptionToken.Demand(_values, action, command);
+            var location = RegionLocationToken.Data().Demand(_values, action, command);
+            var resource = ResourceNameToken.Data().Demand(_values, action, command);
 
-            var name = DemandName("service.project.name", action, command);
-            var group = GetGroupName() ?? $"{name}-rg";
-            var displayName = _values.Get("service.project.display.name", true) ?? name;
-            var description = _values.Get("service.project.description", true) ?? name;
+            var name = ProjectNameToken.Data().Demand(_values, action, command);
+            var group = ResourceGroupNameToken.Data().GetOrDefault(_values) ?? $"{name}-rg";
+            var displayName = ProjectDisplayNameToken.Data().GetOrDefault(_values, name);
+            var description = ProjectDescriptionToken.Data().GetOrDefault(_values, name);
 
             var message = $"{action} '{name}'";
 
@@ -122,14 +122,14 @@ namespace Azure.AI.Details.Common.CLI
         {
             var action = "Creating AI connection";
             var command = "service connection create";
-            var subscription = DemandSubscription(action, command);
-            var project = DemandProject(action, command);
-            var group = DemandGroup(action, command);
+            var subscription = SubscriptionToken.Demand(_values, action, command);
+            var project = ProjectNameToken.Data().Demand(_values, action, command);
+            var group = ResourceGroupNameToken.Data().Demand(_values, action, command);
 
-            var connectionName = DemandName("service.project.connection.name", action, command);
-            var connectionType = DemandConnectionType(action, command);
-            var connectionEndpoint = DemandConnectionEndpoint(action, command);
-            var connectionKey = DemandConnectionKey(action, command);
+            var connectionName = ProjectConnectionNameToken.Data().Demand(_values, action, command);
+            var connectionType = ProjectConnectionTypeToken.Data().Demand(_values, action, command);
+            var connectionEndpoint = ProjectConnectionEndpointToken.Data().Demand(_values, action, command);
+            var connectionKey = ProjectConnectionKeyToken.Data().Demand(_values, action, command);
 
             var message = $"{action} '{connectionName}'";
 
@@ -145,7 +145,7 @@ namespace Azure.AI.Details.Common.CLI
         {
             var action = "Listing AI resources";
             var command = "service resource list";
-            var subscription = DemandSubscription(action, command);
+            var subscription = SubscriptionToken.Demand(_values, action, command);
 
             var message = $"{action} for '{subscription}'";
 
@@ -161,7 +161,7 @@ namespace Azure.AI.Details.Common.CLI
         {
             var action = "Listing AI projects";
             var command = "service project list";
-            var subscription = DemandSubscription(action, command);
+            var subscription = SubscriptionToken.Demand(_values, action, command);
 
             var message = $"{action} for '{subscription}'";
 
@@ -177,9 +177,9 @@ namespace Azure.AI.Details.Common.CLI
         {
             var action = "Listing Project connections";
             var command = "service connection list";
-            var subscription = DemandSubscription(action, command);
-            var group = DemandGroup(action, command);
-            var project = DemandProject(action, command);
+            var subscription = SubscriptionToken.Demand(_values, action, command);
+            var group = ResourceGroupNameToken.Data().Demand(_values, action, command);
+            var project = ProjectNameToken.Data().Demand(_values, action, command);
 
             var message = $"{action} for '{project}'";
 
@@ -196,11 +196,11 @@ namespace Azure.AI.Details.Common.CLI
             var action = "Deleting AI resource";
             var command = "service resource delete";
 
-            var subscription = DemandSubscription(action, command);
-            var resourceName = DemandName("service.resource.name", action, command);
-            var group = DemandGroup(action, command);
+            var subscription = SubscriptionToken.Demand(_values, action, command);
+            var resourceName = ResourceNameToken.Data().Demand(_values, action, command);
+            var group = ResourceGroupNameToken.Data().Demand(_values, action, command);
 
-            var deleteDependentResources = _values.GetOrDefault("service.resource.delete.dependent.resources", false);
+            var deleteDependentResources = DeleteDependentResourcesToken.Data().GetOrDefault(_values, false);
 
             var message = $"{action} for '{resourceName}'";
 
@@ -217,11 +217,11 @@ namespace Azure.AI.Details.Common.CLI
             var action = "Deleting AI project";
             var command = "service project delete";
 
-            var subscription = DemandSubscription(action, command);
-            var projectName = DemandName("service.project.name", action, command);
-            var group = DemandGroup(action, command);
+            var subscription = SubscriptionToken.Demand(_values, action, command);
+            var projectName = ProjectNameToken.Data().Demand(_values, action, command);
+            var group = ResourceGroupNameToken.Data().Demand(_values, action, command);
 
-            var deleteDependentResources = _values.GetOrDefault("service.project.delete.dependent.resources", false);
+            var deleteDependentResources = DeleteDependentResourcesToken.Data().GetOrDefault(_values, false);
 
             var message = $"{action} for '{projectName}'";
 
@@ -238,10 +238,10 @@ namespace Azure.AI.Details.Common.CLI
             var action = "Deleting AI connection";
             var command = "service connection delete";
 
-            var subscription = DemandSubscription(action, command);
-            var group = DemandGroup(action, command);
-            var projectName = DemandProject(action, command);
-            var connectionName = DemandName("service.project.connection.name", action, command);
+            var subscription = SubscriptionToken.Demand(_values, action, command);
+            var group = ResourceGroupNameToken.Data().Demand(_values, action, command);
+            var projectName = ProjectNameToken.Data().Demand(_values, action, command);
+            var connectionName = ProjectConnectionNameToken.Data().Demand(_values, action, command);
 
             var message = $"{action} for '{connectionName}'";
 
@@ -283,81 +283,6 @@ namespace Azure.AI.Details.Common.CLI
                 var fi = new FileInfo(addValueFile);
                 if (!_quiet) Console.WriteLine($"{fi.Name} (saved/added at {fi.DirectoryName})\n\n  {value}");
             }
-        }
-
-        private string DemandSubscription(string action, string command)
-        {
-            var subscription = _values.Get("service.subscription", true);
-            if (string.IsNullOrEmpty(subscription) || subscription.Contains("rror"))
-            {
-                _values.AddThrowError(
-                    "ERROR:", $"{action}; requires subscription.",
-                            "",
-                      "TRY:", $"{Program.Name} init",
-                              $"{Program.Name} config --set subscription SUBSCRIPTION",
-                              $"{Program.Name} {command} --subscription SUBSCRIPTION",
-                            "",
-                      "SEE:", $"{Program.Name} help {command}");
-            }
-            return subscription;
-        }
-
-        private string DemandName(string valuesName, string action, string command)
-        {
-            return Demand(valuesName, "name", "--name NAME", action, command);
-        }
-
-        private string DemandGroup(string action, string command)
-        {
-            return Demand("service.resource.group.name", "group", "--group GROUP", action, command);
-        }
-
-        private string DemandResource(string action, string command)
-        {
-            return Demand("service.resource.name", "resource", "--resource RESOURCE", action, command);
-        }
-
-        private string DemandRegionLocation(string action, string command)
-        {
-            return Demand("service.region.location", "location.", "--location LOCATION", action, command);
-        }
-
-        private string DemandProject(string action, string command)
-        {
-            return Demand("service.project.name", "project name", "--project NAME", action, command);
-        }
-
-        private string DemandConnectionType(string action, string command)
-        {
-            return Demand("service.project.connection.type", "connection type", "--connection-type TYPE", action, command);
-        }
-
-        private string DemandConnectionEndpoint(string action, string command)
-        {
-            return Demand("service.project.connection.endpoint", "connection endpoint", "--connection-endpoint ENDPOINT", action, command);
-        }
-
-        private string DemandConnectionKey(string action, string command)
-        {
-            return Demand("service.project.connection.key", "connection key", "--connection-key KEY", action, command);
-        }
-
-        private string Demand(string valueName, string requires, string option, string action, string command)
-        {
-            var value = _values.Get(valueName, true);
-            if (string.IsNullOrEmpty(value))
-            {
-                _values.AddThrowError(
-                    "ERROR:", $"{action}; requires {requires}.",
-                      "TRY:", $"{Program.Name} {command} {option}",
-                      "SEE:", $"{Program.Name} help {command}");
-            }
-            return value;
-        }
-
-        private string GetGroupName()
-        {
-            return _values.Get("service.resource.group.name", true);
         }
 
         private bool _quiet = false;

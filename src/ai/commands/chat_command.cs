@@ -314,7 +314,7 @@ namespace Azure.AI.Details.Common.CLI
 
         private Uri GetEmbeddingsDeploymentEndpoint()
         {
-            var embeddingsEndpoint = _values["service.config.endpoint.uri"];
+            var embeddingsEndpoint = ConfigEndpointUriToken.Data().GetOrDefault(_values);
             var embeddingsDeployment = _values["service.config.embeddings.deployment"];
 
             var baseOk = !string.IsNullOrEmpty(embeddingsEndpoint) && !string.IsNullOrEmpty(embeddingsDeployment);
@@ -403,10 +403,10 @@ namespace Azure.AI.Details.Common.CLI
             var key = _values["service.config.key"];
             var host = _values["service.config.host"];
             var region = _values["service.config.region"];
-            var endpoint = _values["service.config.endpoint.uri"];
+            var endpoint = ConfigEndpointUriToken.Data().GetOrDefault(_values);
             var tokenValue = _values["service.config.token.value"];
 
-            deployment = _values["service.config.deployment"];
+            deployment = ConfigDeploymentToken.Data().GetOrDefault(_values);
 
             if (string.IsNullOrEmpty(endpoint) && string.IsNullOrEmpty(region) && string.IsNullOrEmpty(host))
             {
@@ -530,7 +530,7 @@ namespace Azure.AI.Details.Common.CLI
         private IKernel? CreateSemanticKernel(out string acsIndex)
         {
            var key = _values["service.config.key"];
-           var endpoint = _values["service.config.endpoint.uri"];
+           var endpoint = ConfigEndpointUriToken.Data().GetOrDefault(_values);
            var deployment = _values["service.config.embeddings.deployment"];
 
            acsIndex = _values["service.config.embeddings.index.name"];
