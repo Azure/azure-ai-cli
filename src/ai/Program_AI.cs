@@ -62,6 +62,7 @@ namespace Azure.AI.Details.Common.CLI
             // "THIRD_PARTY_NOTICE.txt",
             "Azure.Core.dll",
             "Azure.Identity.dll",
+            "Azure.AI.CLI.Common.dll",
             "Azure.AI.OpenAI.dll",
             "Azure.Core.dll",
             "Azure.Search.Documents.dll",
