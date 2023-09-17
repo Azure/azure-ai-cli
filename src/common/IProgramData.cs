@@ -20,6 +20,7 @@ namespace Azure.AI.Details.Common.CLI
         #region assembly data
         string Exe { get; }
         string Dll { get; }
+        Type ResourceAssemblyType { get; }
         Type BindingAssemblySdkType { get; }
         #endregion
 
@@ -47,5 +48,7 @@ namespace Azure.AI.Details.Common.CLI
         bool DispatchParseCommand(INamedValueTokens tokens, ICommandValues values);
         bool DispatchParseCommandValues(INamedValueTokens tokens, ICommandValues values);
         bool DisplayKnownErrors(ICommandValues values, Exception ex);
+
+        IEventLoggerHelpers EventLoggerHelpers { get; }
     }
 }

@@ -8,15 +8,15 @@ using System;
 
 namespace Azure.AI.Details.Common.CLI
 {
-    public class EventLoggerHelpers
+    public class AiEventLoggerHelpers : IEventLoggerHelpers
     {
-        public static void SetFilters(string autoExpectLogFilter)
+        public void SetFilters(string autoExpectLogFilter)
         {
             // var filterLog = !string.IsNullOrEmpty(autoExpectLogFilter);
             // if (filterLog) EventLogger.SetFilters(autoExpectLogFilter.Split(';', StringSplitOptions.RemoveEmptyEntries));
         }
 
-        public static event EventHandler<string> OnMessage
+        public event EventHandler<string> OnMessage
         {
             add
             {

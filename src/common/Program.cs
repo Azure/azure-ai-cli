@@ -83,7 +83,7 @@ namespace Azure.AI.Details.Common.CLI
 
         internal static void DebugDumpResources()
         {
-            var assembly = typeof(Program).Assembly;
+            var assembly = Program.ResourceAssemblyType.Assembly;
             var names = assembly.GetManifestResourceNames();
 
             Console.WriteLine($"\nDEBUG: {names.Count()} resources found!\n");
@@ -96,7 +96,6 @@ namespace Azure.AI.Details.Common.CLI
             if (Program.Debug)
             {
                 Console.WriteLine("\nDEBUG: Command line was: {0}", args);
-                //Console.WriteLine($"LOCATION: {typeof(Program).Assembly.Location}");
                 Console.WriteLine($"LOCATION: {AppContext.BaseDirectory}");
             }
         }
@@ -325,6 +324,10 @@ namespace Azure.AI.Details.Common.CLI
 
         public static string Dll => _data.Dll;
 
+        public static Type ResourceAssemblyType => _data.ResourceAssemblyType;
+
+        public static Assembly ResourceAssembly => _data.ResourceAssemblyType.Assembly;
+
         public static Type BindingAssemblySdkType => _data.BindingAssemblySdkType;
 
         public static string SERVICE_RESOURCE_DISPLAY_NAME_ALL_CAPS => _data.SERVICE_RESOURCE_DISPLAY_NAME_ALL_CAPS;
@@ -347,5 +350,7 @@ namespace Azure.AI.Details.Common.CLI
         public static bool DispatchParseCommand(INamedValueTokens tokens, ICommandValues values) => _data.DispatchParseCommand(tokens, values);
         public static bool DispatchParseCommandValues(INamedValueTokens tokens, ICommandValues values) => _data.DispatchParseCommandValues(tokens, values);
         public static bool DisplayKnownErrors(ICommandValues values, Exception ex) => _data.DisplayKnownErrors(values, ex);
+
+        public static IEventLoggerHelpers EventLoggerHelpers => _data.EventLoggerHelpers;
     }
 }

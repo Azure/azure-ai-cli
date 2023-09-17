@@ -2,7 +2,7 @@ using System.Linq;
 
 namespace Azure.AI.Details.Common.CLI
 {
-    class RunJobCommandParser : CommandParser
+    public class RunJobCommandParser : CommandParser
     {
         public static bool ParseCommand(INamedValueTokens tokens, ICommandValues values)
         {

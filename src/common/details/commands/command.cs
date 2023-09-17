@@ -500,12 +500,12 @@ namespace Azure.AI.Details.Common.CLI
         private static async Task<bool> CheckExpectedLogOutputAsync(IEnumerable<string> expected, IEnumerable<string> notExpected, bool autoExpect, string autoExpectLogFilter, AutoResetEvent signalStop)
         {
             // if we're supposed to filter the log, do it
-            EventLoggerHelpers.SetFilters(autoExpectLogFilter);
+            Program.EventLoggerHelpers.SetFilters(autoExpectLogFilter);
 
             // start writing log lines into the TextWriterReadLineHelper
             var readLineHelper = new TextWriterReadLineHelper();
             var readLineHandler = new EventHandler<string>((sender, message) => readLineHelper.WriteLine(message.TrimEnd('\r', '\n')));
-            EventLoggerHelpers.OnMessage += readLineHandler;
+            Program.EventLoggerHelpers.OnMessage += readLineHandler;
 
             // start checking expectations, using all the lines asychronously from the TextWriterReadLineHelper
             var lines = readLineHelper.ReadAllLinesAsync();
@@ -513,7 +513,7 @@ namespace Azure.AI.Details.Common.CLI
 
             // wait for the stop signal, and then stop receiving log lines
             await Task.Run(() => signalStop.WaitOne());
-            EventLoggerHelpers.OnMessage -= readLineHandler;
+            Program.EventLoggerHelpers.OnMessage -= readLineHandler;
 
             // signal the TextWriterReadLineHelper to not wait for more data, once it's finished with the data it has
             // this must happen after unhooking the log message callback (above) (can't write log lines to closed helper)

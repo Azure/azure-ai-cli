@@ -907,7 +907,7 @@ namespace Azure.AI.Details.Common.CLI
             }
 
             var pattern = find.Replace(@".", @"\.").Replace(@"?", @".").Replace("*", @"([^\/]+)");
-            var names = _assembly.GetManifestResourceNames();
+            var names = Program.ResourceAssembly.GetManifestResourceNames();
             foreach (var name in names)
             {
                 var match = Regex.Match(name, pattern);
@@ -920,8 +920,8 @@ namespace Azure.AI.Details.Common.CLI
         private static Stream GetResourceStream(string fileName)
         {
             var resource = ResourceNameFromFileName(fileName);
-            return _assembly.GetManifestResourceStream(resource)
-                ?? _assembly.GetManifestResourceStream(resource + "._");
+            return Program.ResourceAssembly.GetManifestResourceStream(resource)
+                ?? Program.ResourceAssembly.GetManifestResourceStream(resource + "._");
         }
 
         private static string ReadAllResourceText(string fileName, Encoding encoding)
@@ -1272,7 +1272,6 @@ namespace Azure.AI.Details.Common.CLI
                         : $"{checkPath}/";
         }
 
-        private static Assembly _assembly = typeof(FileHelpers).Assembly;
         private const string resourcePrefix = "Azure.AI.Details.Common.CLI.resources";
         private static readonly string overridePrefix = $"${Program.Name.ToUpper()}";
 

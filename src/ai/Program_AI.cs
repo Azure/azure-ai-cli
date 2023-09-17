@@ -35,6 +35,7 @@ namespace Azure.AI.Details.Common.CLI
         #region assembly data
         public string Exe => "ai.exe";
         public string Dll => "ai.dll";
+        public Type ResourceAssemblyType => typeof(AiProgramData);
         public Type BindingAssemblySdkType => typeof(AiProgramData);
         #endregion
 
@@ -163,5 +164,7 @@ namespace Azure.AI.Details.Common.CLI
         {
             return false;
         }
+
+        public IEventLoggerHelpers EventLoggerHelpers => new AiEventLoggerHelpers();
     }
 }

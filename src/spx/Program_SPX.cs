@@ -26,6 +26,7 @@ namespace Azure.AI.Details.Common.CLI
         #region assembly data
         public const string Exe = "spx.exe";
         public const string Dll = "spx.dll";
+        public static Type ResourceAssemblyType = typeof(Program);
         public static Type BindingAssemblySdkType = typeof(SpeechConfig);
         #endregion
 

@@ -5,7 +5,7 @@
 
 namespace Azure.AI.Details.Common.CLI
 {
-    class NamedValueTokenData
+    public class NamedValueTokenData
     {
         public NamedValueTokenData(string optionName, string fullName, string optionExample, string requiredDisplayName)
         {

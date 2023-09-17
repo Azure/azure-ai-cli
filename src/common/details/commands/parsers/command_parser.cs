@@ -60,7 +60,7 @@ namespace Azure.AI.Details.Common.CLI
         }
     }
 
-    class CommandParser
+    public class CommandParser
     {
         protected static bool ParseCommandValues(string commandName, IEnumerable<INamedValueTokenParser> parsers, INamedValueTokens tokens, ICommandValues values)
         {

@@ -11,7 +11,7 @@ using System.Linq;
 
 namespace Azure.AI.Details.Common.CLI
 {
-    class HelpCommandParser : CommandParser
+    public class HelpCommandParser : CommandParser
     {
         public static bool ParseCommand(INamedValueTokens tokens, ICommandValues values)
         {
