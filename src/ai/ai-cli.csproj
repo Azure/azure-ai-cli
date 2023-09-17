@@ -36,7 +36,7 @@
 
   <PropertyGroup>
     <IncludeSymbols>false</IncludeSymbols>
-    <StartupObject>Azure.AI.Details.Common.CLI.Program</StartupObject>
+    <StartupObject>Azure.AI.Details.Common.CLI.AiProgram</StartupObject>
   </PropertyGroup>
 
   <Choose>

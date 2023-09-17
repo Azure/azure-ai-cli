@@ -15,12 +15,14 @@ using System.Threading.Tasks;
 
 namespace Azure.AI.Details.Common.CLI
 {
-    public partial class Program
+    public class Program
     {
         public static bool Debug { get; internal set; }
 
-        public static int Main(string[] mainArgs)
+        public static int Main(IProgramData data, string[] mainArgs)
         {
+            _data = data;
+
             Console.OutputEncoding = Encoding.UTF8;
             Console.CancelKeyPress += (s, e) =>
             {
@@ -308,5 +310,42 @@ namespace Azure.AI.Details.Common.CLI
 
             return passed;
         }
+
+        private static IProgramData _data;
+
+        public static string Name => _data.Name;
+
+        public static string DisplayName => _data.DisplayName;
+
+        public static string WarningBanner => _data.WarningBanner;
+
+        public static string TelemetryUserAgent => _data.TelemetryUserAgent;
+
+        public static string Exe => _data.Exe;
+
+        public static string Dll => _data.Dll;
+
+        public static Type BindingAssemblySdkType => _data.BindingAssemblySdkType;
+
+        public static string SERVICE_RESOURCE_DISPLAY_NAME_ALL_CAPS => _data.SERVICE_RESOURCE_DISPLAY_NAME_ALL_CAPS;
+
+        public static string CognitiveServiceResourceKind => _data.CognitiveServiceResourceKind;
+
+        public static string CognitiveServiceResourceSku => _data.CognitiveServiceResourceSku;
+
+        public static bool InitConfigsEndpoint => _data.InitConfigsEndpoint;
+
+        public static bool InitConfigsSubscription => _data.InitConfigsSubscription;
+
+        public static string HelpCommandTokens => _data.HelpCommandTokens;
+
+        public static string ConfigScopeTokens => _data.ConfigScopeTokens;
+
+        public static string[] ZipIncludes => _data.ZipIncludes;
+
+        public static bool DispatchRunCommand(ICommandValues values) => _data.DispatchRunCommand(values);
+        public static bool DispatchParseCommand(INamedValueTokens tokens, ICommandValues values) => _data.DispatchParseCommand(tokens, values);
+        public static bool DispatchParseCommandValues(INamedValueTokens tokens, ICommandValues values) => _data.DispatchParseCommandValues(tokens, values);
+        public static bool DisplayKnownErrors(ICommandValues values, Exception ex) => _data.DisplayKnownErrors(values, ex);
     }
 }
