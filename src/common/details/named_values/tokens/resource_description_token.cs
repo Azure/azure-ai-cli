@@ -5,7 +5,7 @@
 
 namespace Azure.AI.Details.Common.CLI
 {
-    class ResourceDescriptionToken
+    public class ResourceDescriptionToken
     {
         public static NamedValueTokenData Data() => new NamedValueTokenData(_optionName, _fullName, _optionExample, _requiredDisplayName);
         public static INamedValueTokenParser Parser() => new NamedValueTokenParser(_optionName, _fullName, "001", "1");

@@ -20,12 +20,12 @@ namespace Azure.AI.Details.Common.CLI
 {
     public class RunJobCommand : Command
     {
-        internal RunJobCommand(ICommandValues values)
+        public RunJobCommand(ICommandValues values)
         {
             _values = values.ReplaceValues();
         }
 
-        internal bool RunCommand()
+        public bool RunCommand()
         {
             var passed = DoRunJob();
             return _values.GetOrDefault("passed", passed);

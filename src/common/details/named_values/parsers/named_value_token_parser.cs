@@ -13,7 +13,7 @@ namespace Azure.AI.Details.Common.CLI
         public abstract bool Parse(INamedValueTokens tokens, INamedValues values);
     }
 
-    class NamedValueTokenParser : INamedValueTokenParser
+    public class NamedValueTokenParser : INamedValueTokenParser
     {
         public NamedValueTokenParser(
                     string name, string fullName, string requiredParts,

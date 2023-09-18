@@ -21,14 +21,14 @@ namespace Azure.AI.Details.Common.CLI
 {
     public class InitCommand : Command
     {
-        internal InitCommand(ICommandValues values)
+        public InitCommand(ICommandValues values)
         {
             _values = values.ReplaceValues();
             _quiet = _values.GetOrDefault("x.quiet", false);
             _verbose = _values.GetOrDefault("x.verbose", true);
         }
 
-        internal bool RunCommand()
+        public bool RunCommand()
         {
             RunInitCommand().Wait();
             return _values.GetOrDefault("passed", true);

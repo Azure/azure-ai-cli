@@ -25,6 +25,7 @@ namespace Azure.AI.Details.Common.CLI
         #region assembly data
         public const string Exe = "vz.exe";
         public const string Dll = "vz.dll";
+        public static Type ResourceAssemblyType = typeof(Program);
         public static Type BindingAssemblySdkType = typeof(Program); // typeof(VisionServiceOptions);
         #endregion
 

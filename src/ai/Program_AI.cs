@@ -15,44 +15,54 @@ using System.Threading.Tasks;
 
 namespace Azure.AI.Details.Common.CLI
 {
-    public partial class Program
+    public class AiProgram
+    {
+        static void Main(string[] args)
+        {
+            Program.Main(new AiProgramData(), args);
+        }
+    }
+
+    public class AiProgramData : IProgramData
     {
         #region name data
-        public const string Name = "ai";
-        public const string DisplayName = "Azure AI CLI";
-        public const string WarningBanner = "`#e_;This PRIVATE PREVIEW version may change at any time.\nSee: https://aka.ms/azure-ai-cli-private-preview";
-        public const string TelemetryUserAgent = "ai-cli 0.0.1";
+        public string Name => "ai";
+        public string DisplayName => "Azure AI CLI";
+        public string WarningBanner => "`#e_;This PRIVATE PREVIEW version may change at any time.\nSee: https://aka.ms/azure-ai-cli-private-preview";
+        public string TelemetryUserAgent => "ai-cli 0.0.1";
         #endregion
 
         #region assembly data
-        public const string Exe = "ai.exe";
-        public const string Dll = "ai.dll";
-        public static Type BindingAssemblySdkType = typeof(Program); // typeof(OpenAIClient);
+        public string Exe => "ai.exe";
+        public string Dll => "ai.dll";
+        public Type ResourceAssemblyType => typeof(AiProgramData);
+        public Type BindingAssemblySdkType => typeof(AiProgramData);
         #endregion
 
         #region init command data
-        public const string SERVICE_RESOURCE_DISPLAY_NAME_ALL_CAPS = "OPEN AI RESOURCE";
-        public const string CognitiveServiceResourceKind = "OpenAI";
-        public const string CognitiveServiceResourceSku = "s0";
-        public static bool InitConfigsEndpoint = true;
-        public static bool InitConfigsSubscription = true;
+        public string SERVICE_RESOURCE_DISPLAY_NAME_ALL_CAPS => "OPEN AI RESOURCE";
+        public string CognitiveServiceResourceKind => "OpenAI";
+        public string CognitiveServiceResourceSku => "s0";
+        public bool InitConfigsEndpoint => true;
+        public bool InitConfigsSubscription => true;
         #endregion
 
         #region help command data
-        public const string HelpCommandTokens = "wizard;init;config;chat;speech;vision;language;search;service;tool;samples;code;eval;run";
+        public string HelpCommandTokens => "wizard;init;config;chat;speech;vision;language;search;service;tool;samples;code;eval;run";
         #endregion
 
         #region config command data
-        public static string ConfigScopeTokens = $"wizard;init;chat;speech;vision;language;search;service;tool;samples;code;eval;run;*";
+        public string ConfigScopeTokens => $"wizard;init;chat;speech;vision;language;search;service;tool;samples;code;eval;run;*";
         #endregion
 
         #region zip option data
-        public static string[] ZipIncludes = 
+        public string[] ZipIncludes => new string[]
         {
             "LICENSE.txt",
             // "THIRD_PARTY_NOTICE.txt",
             "Azure.Core.dll",
             "Azure.Identity.dll",
+            "Azure.AI.CLI.Common.dll",
             "Azure.AI.OpenAI.dll",
             "Azure.Core.dll",
             "Azure.Search.Documents.dll",
@@ -78,7 +88,7 @@ namespace Azure.AI.Details.Common.CLI
         };
         #endregion
 
-        public static bool DispatchRunCommand(ICommandValues values)
+        public bool DispatchRunCommand(ICommandValues values)
         {
             var command = values.GetCommand();
             var root = command.Split('.').FirstOrDefault();
@@ -101,7 +111,7 @@ namespace Azure.AI.Details.Common.CLI
             };
         }
 
-        public static bool DispatchParseCommand(INamedValueTokens tokens, ICommandValues values)
+        public bool DispatchParseCommand(INamedValueTokens tokens, ICommandValues values)
         {
             var command = values.GetCommand(null) ?? tokens.PeekNextToken();
             var root = command.Split('.').FirstOrDefault();
@@ -127,7 +137,7 @@ namespace Azure.AI.Details.Common.CLI
             };
         }
 
-        public static bool DispatchParseCommandValues(INamedValueTokens tokens, ICommandValues values)
+        public bool DispatchParseCommandValues(INamedValueTokens tokens, ICommandValues values)
         {
             var root = values.GetCommandRoot();
             return root switch
@@ -151,9 +161,11 @@ namespace Azure.AI.Details.Common.CLI
             };
         }
 
-        private static bool DisplayKnownErrors(ICommandValues values, Exception ex)
+        public bool DisplayKnownErrors(ICommandValues values, Exception ex)
         {
             return false;
         }
+
+        public IEventLoggerHelpers EventLoggerHelpers => new AiEventLoggerHelpers();
     }
 }

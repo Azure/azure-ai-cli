@@ -5,7 +5,7 @@
 
 namespace Azure.AI.Details.Common.CLI
 {
-    class ProjectNameToken
+    public class ProjectNameToken
     {
         public static NamedValueTokenData Data() => new NamedValueTokenData(_optionName, _fullName, _optionExample, _requiredDisplayName);
         public static INamedValueTokenParser Parser(bool requireProjectPart = false) => new NamedValueTokenParser(_optionName, _fullName, requireProjectPart ? "010" : "010;001", "1");
