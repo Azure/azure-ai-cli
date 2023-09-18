@@ -60,11 +60,7 @@ namespace Azure.AI.Details.Common.CLI
 
         private async Task ChatInteractively()
         {
-            var kernel = CreateSemanticKernel(out var acsIndex);
-            if (kernel != null) await StoreMemoryAsync(kernel, acsIndex);
-
-            var client = CreateOpenAIClient(out var deployment);
-            var options = CreateChatCompletionOptions();
+            var chatTextHandler = await GetChatTextHandler();
 
             var userPrompt = _values["chat.message.user.prompt"];
             userPrompt = userPrompt.ReplaceValues(_values);
@@ -87,13 +83,7 @@ namespace Azure.AI.Details.Common.CLI
                 if (text.ToLower() == "quit") break;
                 if (text.ToLower() == "exit") break;
 
-                var relevantMemories = await SearchMemoryAsync(kernel, acsIndex, text);
-                if (relevantMemories != null)
-                {
-                    text = UpdateUserInputWithSearchResultInfo(text, relevantMemories);
-                }
-
-                var task = GetChatCompletionsAsync(client, deployment, options, text);
+                var task = chatTextHandler(text);
                 WaitForStopOrCancel(task);
 
                 if (_canceledEvent.WaitOne(0)) break;
@@ -104,6 +94,8 @@ namespace Azure.AI.Details.Common.CLI
 
         private async Task ChatNonInteractively()
         {
+            var chatTextHandler = await GetChatTextHandler();
+
             var userPrompt = _values["chat.message.user.prompt"];
             if (string.IsNullOrEmpty(userPrompt))
             {
@@ -114,29 +106,44 @@ namespace Azure.AI.Details.Common.CLI
                                 "",
                         "SEE:", $"{Program.Name} help chat");
             }
+            userPrompt = userPrompt.ReplaceValues(_values);
 
+            DisplayUserChatPrompt();
+            var text = userPrompt;
+
+            Console.ForegroundColor = ConsoleColor.Yellow;
+            Console.WriteLine(text);
+
+            var task = chatTextHandler(text);
+            WaitForStopOrCancel(task);
+
+            Console.ResetColor();
+        }
+
+        private async Task<Func<string, Task>> GetChatTextHandler()
+        {
+            return await GetNormalChatTextHandler();
+        }
+
+        private async Task<Func<string, Task>> GetNormalChatTextHandler()
+        {
             var kernel = CreateSemanticKernel(out var acsIndex);
             if (kernel != null) await StoreMemoryAsync(kernel, acsIndex);
 
             var client = CreateOpenAIClient(out var deployment);
             var options = CreateChatCompletionOptions();
 
-            DisplayUserChatPrompt();
-
-            var text = userPrompt.ReplaceValues(_values);
-            Console.ForegroundColor = ConsoleColor.Yellow;
-            Console.WriteLine(text);
-
-            var relevantMemories = await SearchMemoryAsync(kernel, acsIndex, text);
-            if (relevantMemories != null)
+            var handler = async (string text) =>
             {
-                text = UpdateUserInputWithSearchResultInfo(text, relevantMemories);
-            }
+                var relevantMemories = await SearchMemoryAsync(kernel, acsIndex, text);
+                if (relevantMemories != null)
+                {
+                    text = UpdateUserInputWithSearchResultInfo(text, relevantMemories);
+                }
 
-            var task = GetChatCompletionsAsync(client, deployment, options, text);
-            WaitForStopOrCancel(task);
-
-            Console.ResetColor();
+                await GetChatCompletionsAsync(client, deployment, options, text);
+            };
+            return handler;
         }
 
         private static string ReadLineOrSimulateInput(ref string inputToSimulate)
@@ -447,7 +454,7 @@ namespace Azure.AI.Details.Common.CLI
             }
         }
 
-        private void WaitForStopOrCancel(Task<Response<StreamingChatCompletions>> task)
+        private void WaitForStopOrCancel(Task task)
         {
             var interval = 100;
 
