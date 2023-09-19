@@ -203,7 +203,7 @@ namespace Azure.AI.Details.Common.CLI
         {
             if (!interactive) ThrowInteractiveNotSupportedApplicationException(); // TODO: Add back non-interactive mode support
 
-            var subscription = _values.GetOrDefault("init.service.subscription", "");
+            var subscription = SubscriptionToken.Data().GetOrDefault(_values, "");
             var location = _values.GetOrDefault("service.resource.region.name", "");
             var groupName = ResourceGroupNameToken.Data().GetOrDefault(_values, "");
 
