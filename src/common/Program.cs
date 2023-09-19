@@ -37,10 +37,18 @@ namespace Azure.AI.Details.Common.CLI
             {
                 DisplayBanner(new CommandValues());
 
-                var path = FileHelpers.FindFileInHelpPath($"help/include.python.script.temp.py");
+                var path = FileHelpers.FindFileInHelpPath($"help/include.python.script.function_call.py");
                 var script = FileHelpers.ReadAllHelpText(path, Encoding.UTF8);
 
-                (var exit, var output)= PythonRunner.RunScriptAsync(script, "").Result;
+                var index = mainArgs.ToList().FindIndex(x => x == "--call-function");
+                if (index < 0 || index + 1 >= mainArgs.Length)
+                {
+                    ConsoleHelpers.WriteLineError("\nERROR: --call-function option not found!\n");
+                    return -1;
+                }
+                var function = mainArgs[index + 1];
+
+                (var exit, var output)= PythonRunner.RunScriptAsync(script, function).Result;
                 if (exit == 0)
                 {
                     Console.WriteLine(output);
