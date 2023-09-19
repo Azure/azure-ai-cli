@@ -122,7 +122,35 @@ namespace Azure.AI.Details.Common.CLI
 
         private async Task<Func<string, Task>> GetChatTextHandler()
         {
-            return await GetNormalChatTextHandler();
+            var function = ChatFunctionToken.Data().GetOrDefault(_values);
+            return function != null
+                ? await GetChatFunctionTextHandler(function)
+                : await GetNormalChatTextHandler();
+        }
+
+        private async Task<Func<string, Task>> GetChatFunctionTextHandler(string function)
+        {
+            return await Task.Run(() => {
+                var handler = (string text) => {
+
+                    Console.ForegroundColor = ConsoleColor.Green;
+                    Console.Write("assistant");
+
+                    Console.ForegroundColor = ConsoleColor.White;
+                    Console.Write(": ");
+
+                    Console.ForegroundColor = ConsoleColor.Gray;
+
+                    var parameters = $"{{\"question\": \"{text}\"}}";
+                    var output = PythonRunner.RunEmbeddedPythonScript(_values, "function_call", "--function", function, "--parameters", parameters);
+
+                    output = output.Replace("\n", "\n           ");
+                    Console.WriteLine(output);
+
+                    return Task.CompletedTask;
+                };
+                return handler;
+            });
         }
 
         private async Task<Func<string, Task>> GetNormalChatTextHandler()

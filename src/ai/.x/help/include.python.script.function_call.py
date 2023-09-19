@@ -7,15 +7,6 @@ import sys
 from typing import Generator
 
 def ensure_and_strip_module_path(module_path) -> str:
-    """
-    Ensure the module path is in the sys.path list and return the module name.
-
-    Args:
-        module_path (str): The full path of the module to import.
-
-    Returns:
-        str: The name of the module to import.
-    """
     module_path = os.path.join(os.getcwd(), module_path)
     module_name = os.path.basename(module_path)
 
@@ -28,14 +19,6 @@ def ensure_and_strip_module_path(module_path) -> str:
     raise ModuleNotFoundError("Module not found: " + module_path)
     
 def call_function(module_path: str, function_name: str, json_params: str):
-    """
-    Call a function in a module with the specified parameters.
-
-    Args:
-        module_path (str): The fqn of the module to import.
-        function_name (str): The name of the function to call.
-        json_params (str): A JSON string containing the parameters to pass to the function.
-    """
     try:
         module_name = ensure_and_strip_module_path(module_path)
 
@@ -78,42 +61,25 @@ def call_function(module_path: str, function_name: str, json_params: str):
         raise
 
 def ensure_args() -> list:
-    """
-    Check the command line arguments for the module name and function name.
-    """
-    args = sys.argv[1:]
-    if len(args) < 1:
-        print("Usage: callit.py module_name:function_name [json_params]")
-        sys.exit(1)
-    return args
-
-def get_args(args) -> tuple[str, str, str]:
-    """
-    Get the module name, function name, and JSON parameters from the command line arguments.
+    parser = argparse.ArgumentParser(description="Call a function in a module with specified parameters.")
+    parser.add_argument("--function", required=True, help="Module and function name in the format MODULE:FUNCTION.")
+    parser.add_argument("--parameters", default="{}", help="JSON string containing parameters.")
+    args = parser.parse_args()
     
-    Args:
-        args (list): A list of command line arguments.
-        
-    Returns:
-        tuple: A tuple containing the module name, function name, and JSON parameters.
-    """
-    module_function_parts = args[0].rsplit(":", 1)
+    return args.function, args.parameters
 
+def main():
+    function, json_params = ensure_args()
+    module_function_parts = function.rsplit(":", 1)
+    
     if len(module_function_parts) != 2:
-        print("Invalid argument format. Please use module_name:function_name.")
+        print("Invalid argument format. Please use MODULE:FUNCTION.")
         sys.exit(1)
 
     module_name = module_function_parts[0]
     function_name = module_function_parts[1]
 
-    json_params = args[1] if len(args) == 2 else "{}"
-    return module_name,function_name,json_params
-
-def main():
-    """Parse the command line arguments and call the specified function."""
-
-    module_path, function_name, json_params = get_args(ensure_args())
-    result = call_function(module_path, function_name, json_params)
+    result = call_function(module_name, function_name, json_params)
 
     if result is not None:
         # if it's a string...
