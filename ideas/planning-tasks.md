@@ -1,8 +1,25 @@
 # planning with dan
 
 ⏹️ `ai search index create/udpate` using `build_mlindex` instead of SK  
+⏹️ `ai chat --foreach @questions.txt --output ...` to generate `jsonl` file w/ truth  
+⏹️ `ai eval --foreach @data.jsonl --output ...` to evaluate ai assisted metrics  
+⏹️ ... or `ai flow test --function chat-flow:qna --test-data test_data.jsonl`  
+⏹️ ... or with `--remote` option  
+⏹️ `ai dev init code --language Python --scenario "chat w/ data" ...`  
+⏹️ ... and/or using langchain w/ acs, or searchclient, or whatever...  
+⏹️ `ai dev init code --language C# --scenario "chat w/ data" ...`  
+⏹️ ... and/or using SK w/acs, or searchclient, or whatever...  
 🟦 `ai chat --function MODULE:FUNCTION` finish: e.g. how to deal with parameters  
-⏹️ 
+⏹️ `ai eval --function MODULE:FUNCTION --foreach temperature in 0;.5;1 ...` sweeps across parameters  
+⏹️ `ai chat/eval` "number of docs" parameter  
+⏹️ `curl -sL https://aka.ms/InstallAzureAICLIDeb | sudo bash`  
+⏹️ anything specific to do with ninja2 templates?  
+⏹️ `ai flow publish --flow chat-flow` or similar  
+⏹️ `ai flow deploy --flow chat-flow --deployment-name productretail-copilot` or similar  
+⏹️ `ai deployment invoke --deployment-name mychat-deployment sample-request.json` or similar  
+⏹️ `ai init` project w/o oai/search creation/selection, and get the values from the connections  
+
+
 
 # next steps
 
