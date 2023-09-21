@@ -1,34 +1,61 @@
 #!/bin/bash
 
-# Check the Ubuntu version
-UBUNTU_VERSION=$(lsb_release -rs)
-
 # Check if dotnet 7.0 is installed
 if ! command -v dotnet &> /dev/null; then
-    # Dotnet 7.0 is not installed, so we need to install it
-    echo "Dotnet 7.0 is not installed."
 
     # Ask the user if they want to install dotnet 7.0 (default is Yes)
-    read -p "Install dotnet 7.0? [Y/n] " -n 1 -r
+    read -p "Dotnet 7.0 is not installed. Install? [Y/n] " -n 1 -r
     if [[ $REPLY =~ ^[Nn]$ ]]; then
         exit 1
     fi
 
-    # Check the Ubuntu version
-    UBUNTU_VERSION=$(grep -oP '(?<=VERSION_ID=").*(?=")' /etc/os-release)
+    # Update the package list
+    sudo apt-get update
 
-    if [[ $UBUNTU_VERSION == "20.04" ]]; then
-        # Add Microsoft package repository for Ubuntu 20.04
-        sudo apt-get update
-        wget https://packages.microsoft.com/config/ubuntu/20.04/packages-microsoft-prod.deb -O packages-microsoft-prod.deb
-        sudo dpkg -i packages-microsoft-prod.deb
-        rm packages-microsoft-prod.deb
-    elif [[ $UBUNTU_VERSION == "18.04" ]]; then
-        # Add Microsoft package repository for Ubuntu 20.04
-        sudo apt-get update
-        wget https://packages.microsoft.com/config/ubuntu/18.04/packages-microsoft-prod.deb -O packages-microsoft-prod.deb
-        sudo dpkg -i packages-microsoft-prod.deb
-        rm packages-microsoft-prod.deb
+    # Check the distribution (Ubuntu or Debian) AND version using /etc/os-release
+    CHECK_DISTRO=$(awk -F= '/^ID=/{print $2}' /etc/os-release)
+    CHECK_VERSION=$(grep -oP '(?<=VERSION_ID=").*(?=")' /etc/os-release)
+
+    if [[ "$CHECK_DISTRO" == "ubuntu" ]]; then
+        if [[ "$CHECK_VERSION" == "20.04" ]]; then
+            # Install the Microsoft package signing key for Ubuntu 20.04
+            wget https://packages.microsoft.com/config/ubuntu/20.04/packages-microsoft-prod.deb -O packages-microsoft-prod.deb
+            sudo dpkg -i packages-microsoft-prod.deb
+            rm packages-microsoft-prod.deb
+        elif [[ "$CHECK_VERSION" == "22.04" ]]; then
+            # Install the Microsoft package signing key for Ubuntu 22.04
+            wget https://packages.microsoft.com/config/ubuntu/22.04/packages-microsoft-prod.deb -O packages-microsoft-prod.deb
+            sudo dpkg -i packages-microsoft-prod.deb
+            rm packages-microsoft-prod.deb
+        else
+            echo "Unsupported Ubuntu version: $CHECK_VERSION"
+            exit 1
+        fi
+    elif [[ "$CHECK_DISTRO" == "debian" ]]; then
+        if [[ "$CHECK_VERSION" == "10" ]]; then
+            # Install the Microsoft package signing key for Debian 10
+            wget https://packages.microsoft.com/config/debian/10/packages-microsoft-prod.deb -O packages-microsoft-prod.deb
+            sudo dpkg -i packages-microsoft-prod.deb
+            rm packages-microsoft-prod.deb
+        elif [[ "$CHECK_VERSION" == "11" ]]; then
+            # Install the Microsoft package signing key for Debian 11
+            wget https://packages.microsoft.com/config/debian/11/packages-microsoft-prod.deb -O packages-microsoft-prod.deb
+            sudo dpkg -i packages-microsoft-prod.deb
+            rm packages-microsoft-prod.deb
+        elif [[ "$CHECK_VERSION" == "12" ]]; then
+            # Install the Microsoft package signing key for Debian 12
+            wget https://packages.microsoft.com/config/debian/12/packages-microsoft-prod.deb -O packages-microsoft-prod.deb
+            sudo dpkg -i packages-microsoft-prod.deb
+            rm packages-microsoft-prod.deb
+        else
+            # Unsupported Debian version
+            echo "Unsupported Debian version: $CHECK_VERSION"
+            exit 1
+        fi
+    else
+        # Unsupported distribution
+        echo "Unsupported distribution: $CHECK_DISTRO"
+        exit 1
     fi
     
     # Install dotnet 7.0 runtime
@@ -39,12 +66,7 @@ if ! command -v dotnet &> /dev/null; then
     if [ $? -ne 0 ]; then
         echo "Failed to install Dotnet 7.0."
         exit 1
-    else
-        echo "Dotnet 7.0 has been successfully installed."
     fi
-else
-    # Dotnet 7.0 is already installed
-    echo "Dotnet 7.0 is already installed."
 fi
 
 # Download the Azure.AI.CLI nuget package
@@ -55,8 +77,6 @@ wget https://csspeechstorage.blob.core.windows.net/drop/private/ai/Azure.AI.CLI.
 if [ $? -ne 0 ]; then
     echo "Failed to download Azure.AI.CLI package."
     exit 1
-else
-    echo "Azure.AI.CLI package has been successfully downloaded."
 fi
 
 # Install the Azure.AI.CLI dotnet tool
@@ -66,6 +86,20 @@ dotnet tool install --global --add-source . Azure.AI.CLI --version 1.0.0-alpha11
 # Check if the installation was successful
 if [ $? -eq 0 ]; then
     echo "Azure.AI.CLI has been successfully installed."
+
+    # Add the .NET tools directory to the PATH
+    DOTNET_TOOLS_PATH="$HOME/.dotnet/tools"
+    if [ -d "$DOTNET_TOOLS_PATH" ]; then
+        echo "Adding $DOTNET_TOOLS_PATH to PATH..."
+        echo "export PATH=\"$DOTNET_TOOLS_PATH:\$PATH\"" >> "$HOME/.bashrc"  # For bash
+        echo "export PATH=\"$DOTNET_TOOLS_PATH:\$PATH\"" >> "$HOME/.zshrc"   # For zsh (if using)
+        echo "Don't forget to source your shell's rc file, for example:"
+        echo ""
+        echo "source ~/.bashrc"
+        echo ""
+    else
+        echo "Warning: $DOTNET_TOOLS_PATH directory not found."
+    fi
 else
     echo "Failed to install Azure.AI.CLI."
 fi
