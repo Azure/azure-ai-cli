@@ -14,6 +14,9 @@ if ! command -v dotnet &> /dev/null; then
         exit 1
     fi
 
+    # Check the Ubuntu version
+    UBUNTU_VERSION=$(grep -oP '(?<=VERSION_ID=").*(?=")' /etc/os-release)
+
     if [[ $UBUNTU_VERSION == "20.04" ]]; then
         # Add Microsoft package repository for Ubuntu 20.04
         sudo apt-get update
