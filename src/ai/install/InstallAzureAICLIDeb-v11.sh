@@ -1,13 +1,14 @@
 #!/bin/bash
 
-# Check the Ubuntu version
-UBUNTU_VERSION=$(lsb_release -rs)
-
 # Check if dotnet 7.0 is installed
 if ! command -v dotnet &> /dev/null; then
+
     # Dotnet 7.0 is not installed, so we need to install it
     echo "Dotnet 7.0 is not installed. Installing..."
     
+    # Check the Ubuntu version
+    UBUNTU_VERSION=$(grep -oP '(?<=VERSION_ID=").*(?=")' /etc/os-release)
+
     if [[ $UBUNTU_VERSION == "20.04" ]]; then
         # Add Microsoft package repository for Ubuntu 20.04
         sudo apt-get update
