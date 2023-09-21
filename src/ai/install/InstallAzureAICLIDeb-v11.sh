@@ -1,28 +1,31 @@
 #!/bin/bash
 
+# Check the Ubuntu version
+UBUNTU_VERSION=$(lsb_release -rs)
+
 # Check if dotnet 7.0 is installed
 if ! command -v dotnet &> /dev/null; then
-
     # Dotnet 7.0 is not installed, so we need to install it
-    echo "Dotnet 7.0 is not installed. Installing..."
-    
-    # Check the Ubuntu version
-    UBUNTU_VERSION=$(grep -oP '(?<=VERSION_ID=").*(?=")' /etc/os-release)
+    echo "Dotnet 7.0 is not installed."
+
+    # Ask the user if they want to install dotnet 7.0 (default is Yes)
+    read -p "Install dotnet 7.0? [Y/n] " -n 1 -r
+    if [[ $REPLY =~ ^[Nn]$ ]]; then
+        exit 1
+    fi
 
     if [[ $UBUNTU_VERSION == "20.04" ]]; then
         # Add Microsoft package repository for Ubuntu 20.04
         sudo apt-get update
-        sudo apt-get install -y software-properties-common
-        sudo apt-add-repository -y https://packages.microsoft.com/ubuntu/20.04/prod
-    elif [[ $UBUNTU_VERSION == "22.04" ]]; then
-        # Add Microsoft package repository for Ubuntu 22.04
+        wget https://packages.microsoft.com/config/ubuntu/20.04/packages-microsoft-prod.deb -O packages-microsoft-prod.deb
+        sudo dpkg -i packages-microsoft-prod.deb
+        rm packages-microsoft-prod.deb
+    elif [[ $UBUNTU_VERSION == "18.04" ]]; then
+        # Add Microsoft package repository for Ubuntu 20.04
         sudo apt-get update
-        sudo apt-get install -y software-properties-common
-        sudo apt-add-repository -y https://packages.microsoft.com/ubuntu/22.04/prod
-    else
-        # Unsupported Ubuntu version
-        echo "Unsupported Ubuntu version: $UBUNTU_VERSION"
-        exit 1
+        wget https://packages.microsoft.com/config/ubuntu/18.04/packages-microsoft-prod.deb -O packages-microsoft-prod.deb
+        sudo dpkg -i packages-microsoft-prod.deb
+        rm packages-microsoft-prod.deb
     fi
     
     # Install dotnet 7.0 runtime
