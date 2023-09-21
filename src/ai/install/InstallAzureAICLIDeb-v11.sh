@@ -1,5 +1,38 @@
 #!/bin/bash
 
+# Check if Azure CLI is installed
+if ! command -v az &> /dev/null; then
+    # Ask the user if they want to install Azure CLI (default is Yes)
+    read -p "Azure CLI is not installed. Install? [Y/n] " -n 1 -r
+    if [[ $REPLY =~ ^[Nn]$ ]]; then
+        exit 1
+    fi
+
+    # Install Azure CLI
+    echo "Installing Azure CLI..."
+    curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
+
+    # Check if the installation was successful
+    if [ $? -ne 0 ]; then
+        echo "Failed to install Azure CLI."
+        exit 1
+    else
+        echo "Azure CLI has been successfully installed."
+    fi
+else
+    # Check if Azure CLI is up to date
+    echo "Checking if Azure CLI is up to date..."
+    az upgrade --yes
+
+    # Check if the upgrade was successful
+    if [ $? -ne 0 ]; then
+        echo "Failed to upgrade Azure CLI."
+        exit 1
+    else
+        echo "Azure CLI is up to date."
+    fi
+fi
+
 # Check if dotnet 7.0 is installed
 if ! command -v dotnet &> /dev/null; then
 
