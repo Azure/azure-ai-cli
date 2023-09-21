@@ -99,9 +99,11 @@ if [ $? -eq 0 ]; then
         echo ""
     else
         echo "Warning: $DOTNET_TOOLS_PATH directory not found."
+        exit 1
     fi
 else
     echo "Failed to install Azure.AI.CLI."
+    exit 1
 fi
 
 # Clean up - remove the downloaded package
