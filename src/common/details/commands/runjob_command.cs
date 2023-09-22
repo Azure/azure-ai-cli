@@ -228,8 +228,8 @@ namespace Azure.AI.Details.Common.CLI
             var process = Process.Start(startInfo);
 
             return checkExpected || checkNotExpected || autoExpect
-                ? (CheckExpectedAsync(process, expected, notExpected, autoExpect, timeout).Result ? 0 : -4)
-                : (WaitForExit(process, timeout).Result ? process.ExitCode : -3);
+                ? (CheckExpectedAsync(process, expected, notExpected, autoExpect, timeout).Result ? 0 : 4)
+                : (WaitForExit(process, timeout).Result ? process.ExitCode : 3);
         }
 
         private Task<bool> WaitForExit(Process process, int timeout)

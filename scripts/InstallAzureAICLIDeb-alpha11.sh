@@ -17,7 +17,7 @@ if ! command -v az &> /dev/null; then
         echo "Failed to install Azure CLI."
         exit 1
     else
-        echo "Azure CLI has been successfully installed."
+        echo "Installing Azure CLI... Done!"
     fi
 else
     # Check if Azure CLI is up to date
@@ -29,13 +29,12 @@ else
         echo "Failed to upgrade Azure CLI."
         exit 1
     else
-        echo "Azure CLI is up to date."
+        echo "Azure CLI is up to date!"
     fi
 fi
 
 # Check if dotnet 7.0 is installed
 if ! command -v dotnet &> /dev/null; then
-
     # Ask the user if they want to install dotnet 7.0 (default is Yes)
     read -p "Dotnet 7.0 is not installed. Install? [Y/n] " -n 1 -r
     if [[ $REPLY =~ ^[Nn]$ ]]; then
@@ -111,37 +110,45 @@ wget https://csspeechstorage.blob.core.windows.net/drop/private/ai/Azure.AI.CLI.
 if [ $? -ne 0 ]; then
     echo "Failed to download Azure.AI.CLI package."
     exit 1
+else
+    echo "Downloading Azure.AI.CLI package... Done!"
 fi
 
 # Install the Azure.AI.CLI dotnet tool
 echo "Installing Azure.AI.CLI..."
 dotnet tool install --global --add-source . Azure.AI.CLI --version 1.0.0-alpha11
+DOTNET_TOOLS_PATH="$HOME/.dotnet/tools"
 
 # Check if the installation was successful
-if [ $? -eq 0 ]; then
-    echo "Azure.AI.CLI has been successfully installed."
-
-    # Add the .NET tools directory to the PATH
-    DOTNET_TOOLS_PATH="$HOME/.dotnet/tools"
-    if [ -d "$DOTNET_TOOLS_PATH" ]; then
-        echo "Adding $DOTNET_TOOLS_PATH to PATH..."
-        echo "export PATH=\"$DOTNET_TOOLS_PATH:\$PATH\"" >> "$HOME/.bashrc"  # For bash
-        echo "export PATH=\"$DOTNET_TOOLS_PATH:\$PATH\"" >> "$HOME/.zshrc"   # For zsh (if using)
-        echo "Don't forget to source your shell's rc file, for example:"
-        echo ""
-        echo "source ~/.bashrc"
-        echo ""
-    else
-        echo "Warning: $DOTNET_TOOLS_PATH directory not found."
-        exit 1
-    fi
-else
+if [ $? -ne 0 ]; then
     echo "Failed to install Azure.AI.CLI."
     exit 1
+elif [ ! -d "$DOTNET_TOOLS_PATH" ]; then
+    echo "Warning: $DOTNET_TOOLS_PATH directory not found."
+    exit 1
+else
+    echo "Azure.AI.CLI has been successfully installed at $DOTNET_TOOLS_PATH"
+    rm Azure.AI.CLI.1.0.0-alpha11.nupkg
 fi
 
-# Clean up - remove the downloaded package
-rm Azure.AI.CLI.1.0.0-alpha11.nupkg
+# Add the .NET tools directory to the PATH
+echo ""
+echo "Adding $DOTNET_TOOLS_PATH to PATH..."
+export PATH="$DOTNET_TOOLS_PATH:$PATH"                               # For current shell
+echo "export PATH=\"$DOTNET_TOOLS_PATH:\$PATH\"" >> "$HOME/.bashrc"  # For bash
+echo "export PATH=\"$DOTNET_TOOLS_PATH:\$PATH\"" >> "$HOME/.zshrc"   # For zsh (if using)
+echo ""
+echo "Don't forget to source your shell's rc file, for example:"
+echo ""
+echo "source ~/.bashrc"
+echo ""
+
+# find where the `ai` command is installed using find
+AI_COMMAND=$(find "/" -name ai -type f)
+echo "ai command found at $AI_COMMAND" 1>&2
+
+# run the `ai` command
+$AI_COMMAND 1>&2
 
 # Exit with appropriate status code
 exit 0

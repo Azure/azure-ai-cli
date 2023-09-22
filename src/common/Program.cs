@@ -44,7 +44,7 @@ namespace Azure.AI.Details.Common.CLI
                 if (index < 0 || index + 1 >= mainArgs.Length)
                 {
                     ConsoleHelpers.WriteLineError("\nERROR: --call-function option not found!\n");
-                    return -1;
+                    return 1;
                 }
                 var function = mainArgs[index + 1];
 
@@ -70,7 +70,7 @@ namespace Azure.AI.Details.Common.CLI
             {
                 DisplayBanner(values);
                 DisplayParsedValues(values);
-                exitCode = RunCommand(values) ? 0 : -1;
+                exitCode = RunCommand(values) ? 0 : 1;
             }
 
             if (values.GetOrDefault("x.pause", false))
@@ -258,7 +258,7 @@ namespace Azure.AI.Details.Common.CLI
             {
                 if (displayBanner) DisplayBanner(values);
                 DisplayLogException(values, ex);
-                return -1;
+                return 1;
             }
 
             return 0;
