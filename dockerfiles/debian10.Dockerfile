@@ -29,8 +29,8 @@ RUN chmod +x InstallAzureAICLIDeb-${AZURE_CLI_VERSION}.sh
 # Install Azure AI CLI as a non-root user
 USER vscode
 RUN sudo chown -R vscode /_scratch && \
-    /bin/bash InstallAzureAICLIDeb-alpha11.sh && \
-    rm ./InstallAzureAICLIDeb-alpha11.sh
+    /bin/bash InstallAzureAICLIDeb-${AZURE_CLI_VERSION}.sh && \
+    rm ./InstallAzureAICLIDeb-${AZURE_CLI_VERSION}.sh
 
 # TEST layer -----------------------------------------------
 FROM base AS test
