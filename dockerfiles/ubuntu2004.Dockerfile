@@ -4,7 +4,7 @@
 FROM mcr.microsoft.com/devcontainers/base:focal AS base
 
 # Feature flags/arguments
-ARG AZURE_CLI_VERSION=1.0.0-alpha11
+ARG AZURE_CLI_VERSION=1.0.0-alpha12
 ARG DOWNLOAD_SCRIPT=false
 
 # Copy the required scripts into the container
