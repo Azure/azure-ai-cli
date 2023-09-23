@@ -43,11 +43,11 @@ You can install the Azure `AI` CLI locally on Linux, Mac, or Windows computers:
 
 1. Install the [Azure CLI](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli)
 2. Install the [Generative AI SDK Packages](./use_azureai_sdk.md#install-the-generative-ai-sdk-packages)
-3. Install the [Azure AI CLI](https://csspeechstorage.blob.core.windows.net/drop/private/ai/Azure.AI.CLI.1.0.0-alpha9.nupkg)
+3. Install the [Azure AI CLI](https://csspeechstorage.blob.core.windows.net/drop/private/ai/Azure.AI.CLI.1.0.0-alpha12d.nupkg)
     ```
-    wget https://csspeechstorage.blob.core.windows.net/drop/private/ai/Azure.AI.CLI.1.0.0-alpha9.nupkg && \
-    dotnet tool install --global --add-source . Azure.AI.CLI --version 1.0.0-alpha9 && \
-    rm Azure.AI.CLI.1.0.0-alpha9.nupkg
+    wget https://csspeechstorage.blob.core.windows.net/drop/private/ai/Azure.AI.CLI.1.0.0-alpha12d.nupkg && \
+    dotnet tool install --global --add-source . Azure.AI.CLI --version 1.0.0-alpha12d && \
+    rm Azure.AI.CLI.1.0.0-alpha12d.nupkg
     ```
 
 </div>
