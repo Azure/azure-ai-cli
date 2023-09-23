@@ -1,5 +1,23 @@
 #!/bin/bash
 
+# Function to read user input or use a default value
+read_input() {
+    local prompt="$1"
+    local default_value="$2"
+    local input
+
+    if [ -t 0 ]; then
+        # Input is from the terminal (interactive)
+        read -p "$prompt" input
+        [ -z "$input" ] && input="$default_value"  # Use default if input is empty
+    else
+        # Input is from a pipe
+        input="$default_value"
+    fi
+
+    echo "$input"
+}
+
 # Check to see if we need to have the user specify the version of Azure.AI.CLI they want to install
 AICLI_VERSION="PLACEHOLDER_VERSION"
 if [ "$AICLI_VERSION" == "PLACEHOLDER_VERSION" ]; then
@@ -19,12 +37,6 @@ AICLI_NUPKG_FILENAME="Azure.AI.CLI.${AICLI_VERSION}.nupkg"
 
 # Check if Azure CLI is installed
 if ! command -v az &> /dev/null; then
-    # Ask the user if they want to install Azure CLI (default is Yes)
-    read -p "Azure CLI is not installed. Install? [Y/n] " -n 1 -r
-    if [[ $REPLY =~ ^[Nn]$ ]]; then
-        exit 1
-    fi
-
     # Install Azure CLI
     echo "Installing Azure CLI..."
     curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
@@ -36,28 +48,10 @@ if ! command -v az &> /dev/null; then
     else
         echo "Installing Azure CLI... Done!"
     fi
-else
-    # Check if Azure CLI is up to date
-    echo "Checking if Azure CLI is up to date..."
-    az upgrade --yes
-
-    # Check if the upgrade was successful
-    if [ $? -ne 0 ]; then
-        echo "Failed to upgrade Azure CLI."
-        exit 1
-    else
-        echo "Azure CLI is up to date!"
-    fi
 fi
 
 # Check if dotnet 7.0 is installed
 if ! command -v dotnet &> /dev/null; then
-    # Ask the user if they want to install dotnet 7.0 (default is Yes)
-    read -p "Dotnet 7.0 is not installed. Install? [Y/n] " -n 1 -r
-    if [[ $REPLY =~ ^[Nn]$ ]]; then
-        exit 1
-    fi
-
     # Update the package list
     sudo apt-get update
 
