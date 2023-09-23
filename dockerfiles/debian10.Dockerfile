@@ -3,10 +3,28 @@
 # Use the base image for Debian 10 (buster)
 FROM mcr.microsoft.com/devcontainers/base:buster AS base
 
-# Copy installation script into the container, and make sure it is executable
+# Feature flags/arguments
+ARG AZURE_CLI_VERSION=1.0.0-alpha11
+ARG DOWNLOAD_SCRIPT=false
+
+# Copy the required scripts into the container
 WORKDIR /_scratch
-COPY ./scripts/InstallAzureAICLIDeb-alpha11.sh /_scratch/
-RUN chmod +x InstallAzureAICLIDeb-alpha11.sh
+COPY ./scripts/InstallAzureAICLIDeb.sh /_scratch/
+COPY ./scripts/InstallAzureAICLIDeb-UpdateVersion.sh /_scratch/
+
+# If we're downloading the script, do so
+RUN if [ "${DOWNLOAD_SCRIPT}" = "true" ]; then \
+    wget https://csspeechstorage.blob.core.windows.net/drop/private/ai/InstallAzureAICLIDeb-${AZURE_CLI_VERSION}.sh -O /_scratch/InstallAzureAICLIDeb-${AZURE_CLI_VERSION}.sh; \
+    fi
+
+# If we're not downloading the script, update the version
+RUN if [ "${DOWNLOAD_SCRIPT}" = "false" ]; then \
+    chmod +x InstallAzureAICLIDeb-UpdateVersion.sh && \
+    /bin/bash InstallAzureAICLIDeb-UpdateVersion.sh ${AZURE_CLI_VERSION} /_scratch/; \
+    fi
+
+# Copy installation script into the container, and make sure it is executable
+RUN chmod +x InstallAzureAICLIDeb-${AZURE_CLI_VERSION}.sh
 
 # Install Azure AI CLI as a non-root user
 USER vscode

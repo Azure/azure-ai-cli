@@ -1,5 +1,22 @@
 #!/bin/bash
 
+# Check to see if we need to have the user specify the version of Azure.AI.CLI they want to install
+AICLI_VERSION="PLACEHOLDER_VERSION"
+if [ "$AICLI_VERSION" == "PLACEHOLDER_VERSION" ]; then
+    # if arg1 is set, use it as the version
+    if [ ! -z "$1" ]; then
+        AICLI_VERSION="$1"
+    fi
+    if [ "$AICLI_VERSION" == "PLACEHOLDER_VERSION" ]; then
+        echo "Please specify the version of Azure.AI.CLI you want to install."
+        echo "Usage: $0 <version>"
+        exit 1
+    fi
+fi
+
+# Set the Azure.AI.CLI nuget package filename
+AICLI_NUPKG_FILENAME="Azure.AI.CLI.${AICLI_VERSION}.nupkg"
+
 # Check if Azure CLI is installed
 if ! command -v az &> /dev/null; then
     # Ask the user if they want to install Azure CLI (default is Yes)
@@ -104,7 +121,7 @@ fi
 
 # Download the Azure.AI.CLI nuget package
 echo "Downloading Azure.AI.CLI package..."
-wget https://csspeechstorage.blob.core.windows.net/drop/private/ai/Azure.AI.CLI.1.0.0-alpha11.nupkg -O Azure.AI.CLI.1.0.0-alpha11.nupkg
+wget "https://csspeechstorage.blob.core.windows.net/drop/private/ai/${AICLI_NUPKG_FILENAME}" -O "${AICLI_NUPKG_FILENAME}"
 
 # Check if the download was successful
 if [ $? -ne 0 ]; then
@@ -116,7 +133,7 @@ fi
 
 # Install the Azure.AI.CLI dotnet tool
 echo "Installing Azure.AI.CLI..."
-dotnet tool install --global --add-source . Azure.AI.CLI --version 1.0.0-alpha11
+dotnet tool install --global --add-source . Azure.AI.CLI --version ${AICLI_VERSION}
 DOTNET_TOOLS_PATH="$HOME/.dotnet/tools"
 
 # Check if the installation was successful
@@ -128,7 +145,7 @@ elif [ ! -d "$DOTNET_TOOLS_PATH" ]; then
     exit 1
 else
     echo "Azure.AI.CLI has been successfully installed at $DOTNET_TOOLS_PATH"
-    rm Azure.AI.CLI.1.0.0-alpha11.nupkg
+    rm "${AICLI_NUPKG_FILENAME}"
 fi
 
 # Add the .NET tools directory to the PATH
@@ -142,13 +159,6 @@ echo "Don't forget to source your shell's rc file, for example:"
 echo ""
 echo "source ~/.bashrc"
 echo ""
-
-# find where the `ai` command is installed using find
-AI_COMMAND=$(find "/" -name ai -type f)
-echo "ai command found at $AI_COMMAND" 1>&2
-
-# run the `ai` command
-$AI_COMMAND 1>&2
 
 # Exit with appropriate status code
 exit 0
