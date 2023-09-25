@@ -26,6 +26,9 @@ Script hosting and redirecting:
 - Registered link (`aka.ms/InstallAzureAICLIDeb`) will point to versioned URL (`${HOST}/${PATH}/InstallAzureAICLIDeb-${VERSION}.sh`)
 - Registered link will be updated post human verification of release pipeline success
 
+ADDITIONAL OPEN QUESTIONS:
+- Should we support installation on other Linux distros? Like RHEL, CentOS? Alpine?
+
 ## Installation/usage from Docker container
 
 To support usage from Docker containers, we will support the following approach:
@@ -49,7 +52,26 @@ CI/CD Requirements:
 - Images are built, tested, and uploaded to container registry via "release" pipeline
 
 ADDITIONAL OPEN QUESTIONS:
-- What should the working directory be?
-- How best to map in `.ai` directory into running container?
+- What should the working directory be? (currently /home/vscode)
+- Should the user be `vscode` as it is in VS Code base images? (currently vscode)
 - How should we manage keeping Python SDK `requirements.txt` up to date?
 - Should `aistudio-chat-demo` `devcontainer.json` use `${REGISTRY}/azure-ai-cli:bookworm`?
+
+
+## Installation via script on macOS
+
+```bash
+dotnet tool install -g Azure.AI.CLI
+```
+
+ADDITIONAL OPEN QUESTIONS:
+- Should we support installation on macOS in macOS specific way, like with Homebrew?
+
+## Installation via script on Windows
+
+```bash
+dotnet tool install -g Azure.AI.CLI
+```
+
+ADDITIONAL OPEN QUESTIONS:
+- Should we support installation on Windows in Windows specific way, like with MSI via WIX?
