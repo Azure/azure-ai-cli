@@ -136,6 +136,9 @@ namespace Azure.AI.Details.Common.CLI
 
             var getFiles = () => {
 
+                Console.WriteLine("\nPlease enter the path to the files you want to upload. You can use wildcards to upload multiple files. You can also use relative paths to upload files from your current working directory.");
+                Console.WriteLine("EXAMPLE: *.md\n");
+
                 while (true)
                 {
                     var path = AskPromptHelper.AskPrompt("Files: ");
