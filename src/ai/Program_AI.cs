@@ -171,6 +171,16 @@ namespace Azure.AI.Details.Common.CLI
 
         public bool DisplayKnownErrors(ICommandValues values, Exception ex)
         {
+            if (ex.Message.Contains("refresh token") && ex.Message.Contains("expired"))
+            {
+                ErrorHelpers.WriteLineMessage(
+                       "ERROR:", $"Refresh token expired.",
+                                 "",
+                         "TRY:", $"az login");
+                values.Reset("x.verbose", "false");
+                return true;
+            }
+
             return false;
         }
 
