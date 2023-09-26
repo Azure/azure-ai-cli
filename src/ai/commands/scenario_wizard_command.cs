@@ -161,7 +161,7 @@ namespace Azure.AI.Details.Common.CLI
             };
             var files = getFiles();
 
-            ConsoleHelpers.WriteLineWithHighlight("\n`UPDATE COGNITIVE SEARCH INDEX`");
+            ConsoleHelpers.WriteLineWithHighlight("\n`CREATE OR UPDATE COGNITIVE SEARCH INDEX`");
 
             var indexName = AskPromptHelper.AskPrompt("Search Index Name: ");
             Console.WriteLine();
