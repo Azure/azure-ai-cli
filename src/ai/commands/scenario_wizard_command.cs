@@ -134,14 +134,34 @@ namespace Azure.AI.Details.Common.CLI
                 return;
             }
 
-            var path = AskPromptHelper.AskPrompt("Files: ");
-            var fi = new FileInfo(path);
-            var files = Directory.Exists(path)
-                ? Directory.GetFiles(path)
-                : Directory.GetFiles(fi.DirectoryName, fi.Name);
-            Console.WriteLine($"Found: {files.Count()}");
+            var getFiles = () => {
 
-            ConsoleHelpers.WriteLineWithHighlight("\n`UPDATE COGNITIVE SEARCH INDEX`");
+                Console.WriteLine("\nPlease enter the path to the files you want to upload. You can use wildcards to upload multiple files. You can also use relative paths to upload files from your current working directory.");
+                Console.WriteLine("EXAMPLE: *.md\n");
+
+                while (true)
+                {
+                    var path = AskPromptHelper.AskPrompt("Files: ");
+                    var fi = new FileInfo(path);
+                    var files = Directory.Exists(path)
+                        ? Directory.GetFiles(path)
+                        : Directory.GetFiles(fi.DirectoryName, fi.Name);
+                    
+                    var count = files.Count();
+                    Console.WriteLine($"Found: {count}");
+                    if (count > 0) return files;
+
+                    Console.Write("\nTry again? ");
+                    if (!ListBoxPickYesNo()) return null;
+
+                    Console.WriteLine();
+                }
+
+                return null;
+            };
+            var files = getFiles();
+
+            ConsoleHelpers.WriteLineWithHighlight("\n`CREATE OR UPDATE COGNITIVE SEARCH INDEX`");
 
             var indexName = AskPromptHelper.AskPrompt("Search Index Name: ");
             Console.WriteLine();
