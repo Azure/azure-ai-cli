@@ -62,6 +62,8 @@ namespace Azure.AI.Details.Common.CLI
 
             new NamedValueTokenParser(null,             "chat.replace.value.*", "0011;0101", "1;0", null, null, "="),
 
+            new NamedValueTokenParser(null,             "chat.speech.input", "010", "1;0", "true;false", null, "true"),
+
             ChatFunctionToken.Parser(),
         };
 

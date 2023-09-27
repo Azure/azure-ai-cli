@@ -23,6 +23,7 @@ using Azure.Core.Diagnostics;
 using Azure.Core.Pipeline;
 using Azure.Core;
 using System.Diagnostics.Tracing;
+using Microsoft.CognitiveServices.Speech;
 
 namespace Azure.AI.Details.Common.CLI
 {
@@ -62,8 +63,11 @@ namespace Azure.AI.Details.Common.CLI
         {
             var chatTextHandler = await GetChatTextHandler();
 
+            var speechInput = _values.GetOrDefault("chat.speech.input", false);
             var userPrompt = _values["chat.message.user.prompt"];
             userPrompt = userPrompt.ReplaceValues(_values);
+
+            Console.WriteLine("Press ENTER for more options.\n");
 
             while (true)
             {
@@ -72,8 +76,12 @@ namespace Azure.AI.Details.Common.CLI
                 var text = ReadLineOrSimulateInput(ref userPrompt);
                 if (text.ToLower() == "")
                 {
-                    text = PickInteractiveContextMenu();
+                    text = PickInteractiveContextMenu(speechInput);
                     if (text == null) continue;
+                    if (text == "speech")
+                    {
+                        text = await GetSpeechInputAsync();
+                    }
 
                     Console.ForegroundColor = ConsoleColor.Yellow;
                     Console.WriteLine(text);
@@ -186,15 +194,63 @@ namespace Azure.AI.Details.Common.CLI
             return input;
         }
 
-        private static string PickInteractiveContextMenu()
+        private SpeechConfig CreateSpeechConfig()
+        {
+            var existing = FileHelpers.DemandFindFileInDataPath("speech.key", _values, "speech.key");
+            var key = FileHelpers.ReadAllText(existing, Encoding.Default);
+            existing = FileHelpers.DemandFindFileInDataPath("speech.region", _values, "speech.region");
+            var region = FileHelpers.ReadAllText(existing, Encoding.Default);
+
+            return SpeechConfig.FromSubscription(key, region);
+        }
+
+        private async Task<string> GetSpeechInputAsync()
+        {
+            Console.Write("\r");
+            DisplayUserChatPrompt();
+            Console.ForegroundColor = ConsoleColor.DarkGray;
+
+            var text = "(listening)";
+            Console.Write($"{text} ...");
+            var lastTextDisplayed = text;
+
+            var config = CreateSpeechConfig();
+            var recognizer = new SpeechRecognizer(config);
+            recognizer.Recognizing += (s, e) =>
+            {
+                Console.Write("\r");
+                DisplayUserChatPrompt();
+                Console.ForegroundColor = ConsoleColor.DarkGray;
+
+                Console.Write($"{e.Result.Text} ...");
+                if (e.Result.Text.Length < lastTextDisplayed.Length) Console.Write(new string(' ', lastTextDisplayed.Length - e.Result.Text.Length));
+                lastTextDisplayed = text;
+            };
+
+            var result = await recognizer.RecognizeOnceAsync();
+
+            Console.Write("\r");
+            DisplayUserChatPrompt();
+            Console.Write(new string(' ', result.Text.Length + 4));
+
+            Console.Write("\r");
+            DisplayUserChatPrompt();
+
+            return result.Text;
+        }
+
+        private static string PickInteractiveContextMenu(bool allowSpeechInput)
         {
             if (Console.CursorTop > 0)
             {
                 Console.SetCursorPosition(11, Console.CursorTop - 1);
             }
 
-            var choices = new string[] { "exit", "reset conversation" };
-            return ListBoxPicker.PickString(choices, 20, 4, new Colors(ConsoleColor.White, ConsoleColor.Blue), new Colors(ConsoleColor.White, ConsoleColor.Red));
+            var choices = allowSpeechInput
+                ? new string[] { "speech", "---", "reset conversation", "exit" }
+                : new string[] { "reset conversation", "exit" };
+            var select = allowSpeechInput ? 0 : choices.Length - 1;
+            return ListBoxPicker.PickString(choices, 20, choices.Length + 2, new Colors(ConsoleColor.White, ConsoleColor.Blue), new Colors(ConsoleColor.White, ConsoleColor.Red), select);
         }
 
         private static void DisplayUserChatPrompt()
