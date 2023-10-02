@@ -22,7 +22,7 @@ def create_project(subscription_id, resource_id, resource_group_name, project_na
     )
 
     result = ai_client.projects.begin_create(project=project, byo_open_ai_resource_id=openai_resource_id).result()
-    return result
+    return result._workspace._to_dict()
 
 def main():
     """Parse command line arguments and print created project."""

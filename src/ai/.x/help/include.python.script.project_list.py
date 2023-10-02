@@ -17,7 +17,7 @@ def list_projects(subscription_id, resource_group_name):
     results = []
 
     for item in items:
-        results.append(item)
+        results.append(item._workspace._to_dict())
 
     return results
 

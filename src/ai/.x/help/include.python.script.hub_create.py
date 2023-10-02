@@ -27,7 +27,7 @@ def create_hub(subscription_id, resource_group_name, resource_name, location, di
 
     # TODO allow setting of optional bool update_dependent_resources?
     result = ai_client.resources.begin_create(resource=resource).result()
-    return result
+    return result._workspace_hub._to_dict()
 
 def main():
     """Parse command line arguments and print created hub."""

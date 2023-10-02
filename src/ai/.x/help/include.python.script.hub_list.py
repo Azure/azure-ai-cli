@@ -17,7 +17,7 @@ def list_hubs(subscription_id, resource_group_name):
     results = []
 
     for item in items:
-        results.append(item)
+        results.append(item._workspace_hub._to_dict())
 
     return results
 
