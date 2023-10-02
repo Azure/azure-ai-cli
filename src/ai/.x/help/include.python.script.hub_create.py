@@ -1,19 +1,20 @@
 import argparse
 import json
-from azure.ai.ml import MLClient
-from azure.ai.ml.entities import WorkspaceHub, ManagedNetwork, WorkspaceHubConfig
+from azure.ai.generative import AIClient
+from azure.ai.generative.entities import Resource
+from azure.ai.ml.entities import ManagedNetwork
 from azure.identity import DefaultAzureCredential
 
 def create_hub(subscription_id, resource_group_name, resource_name, location, display_name, description):
     """Create Azure ML hub."""
-    ml_client = MLClient(
+    ai_client = AIClient(
         credential=DefaultAzureCredential(),
         subscription_id=subscription_id,
         resource_group_name=resource_group_name,
         user_agent="ai-cli 0.0.1"
     )
 
-    wshub = WorkspaceHub(
+    resource = Resource(
         name=resource_name,
         location=location,
         display_name=display_name,
@@ -24,8 +25,9 @@ def create_hub(subscription_id, resource_group_name, resource_name, location, di
         )
     )
 
-    result = ml_client.workspace_hubs.begin_create(wshub).result()
-    return result._to_dict()
+    # TODO allow setting of optional bool update_dependent_resources?
+    result = ai_client.resources.begin_create(resource=resource).result()
+    return result
 
 def main():
     """Parse command line arguments and print created hub."""

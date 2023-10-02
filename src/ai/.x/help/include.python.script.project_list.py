@@ -1,22 +1,23 @@
 import argparse
 import json
-from azure.ai.ml import MLClient
+from azure.ai.generative import AIClient
 from azure.identity import DefaultAzureCredential
+from azure.ai.ml.constants._common import Scope
 
 def list_projects(subscription_id, resource_group_name):
     """List Azure ML projects."""
-    ml_client = MLClient(
+    ai_client = AIClient(
         credential=DefaultAzureCredential(),
         subscription_id=subscription_id,
         resource_group_name=resource_group_name,
         user_agent="ai-cli 0.0.1"
     )
 
-    items = ml_client.workspaces.list(scope="subscription")
+    items = ai_client.projects.list(scope=Scope.SUBSCRIPTION)
     results = []
 
     for item in items:
-        results.append(item._to_dict())
+        results.append(item)
 
     return results
 

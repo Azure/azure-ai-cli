@@ -1,28 +1,28 @@
 import argparse
 import json
-from azure.ai.ml import MLClient
-from azure.ai.ml.entities import Workspace
+from azure.ai.generative import AIClient
+from azure.ai.generative.entities import Project
 from azure.identity import DefaultAzureCredential
 
 def create_project(subscription_id, resource_id, resource_group_name, project_name, location, display_name, description, openai_resource_id):
     """Create Azure ML project."""
-    ml_client = MLClient(
+    ai_client = AIClient(
         credential=DefaultAzureCredential(),
         subscription_id=subscription_id,
         resource_group_name=resource_group_name,
         user_agent="ai-cli 0.0.1"
     )
 
-    project = Workspace(
+    project = Project(
         name=project_name,
         location=location,
         display_name=display_name,
         description=description,
-        workspace_hub=resource_id
+        resource=resource_id,
     )
 
-    result = ml_client.workspaces.begin_create(project, byo_open_ai_resource_id=openai_resource_id).result()
-    return result._to_dict()
+    result = ai_client.projects.begin_create(project=project, byo_open_ai_resource_id=openai_resource_id).result()
+    return result
 
 def main():
     """Parse command line arguments and print created project."""

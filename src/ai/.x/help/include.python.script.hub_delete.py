@@ -1,18 +1,19 @@
 import argparse
 import json
-from azure.ai.ml import MLClient
+from azure.ai.generative import AIClient
 from azure.identity import DefaultAzureCredential
 
 def delete_hub(subscription_id, resource_group_name, resource_name, delete_dependent_resources):
     """Delete Azure ML hubs."""
-    ml_client = MLClient(
+    ai_client = AIClient(
         credential=DefaultAzureCredential(),
         subscription_id=subscription_id,
         resource_group_name=resource_group_name,
         user_agent="ai-cli 0.0.1"
     )
 
-    result = ml_client.workspace_hubs.begin_delete(resource_name, delete_dependent_resources=delete_dependent_resources).result()
+    # TODO should we allow setting of optional bool permanetly_delete?
+    result = ai_client.resources.begin_delete(name=resource_name, delete_dependent_resources=delete_dependent_resources).result()
     return result
 
 def main():

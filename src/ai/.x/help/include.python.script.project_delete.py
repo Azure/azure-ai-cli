@@ -1,18 +1,18 @@
 import argparse
 import json
-from azure.ai.ml import MLClient
+from azure.ai.generative import AIClient
 from azure.identity import DefaultAzureCredential
 
 def delete_project(subscription_id, resource_group_name, project_name, delete_dependent_resources):
     """Delete Azure ML projects."""
-    ml_client = MLClient(
+    ai_client = AIClient(
         credential=DefaultAzureCredential(),
         subscription_id=subscription_id,
         resource_group_name=resource_group_name,
         user_agent="ai-cli 0.0.1"
     )
-
-    result = ml_client.workspaces.begin_delete(project_name, delete_dependent_resources=delete_dependent_resources).result()
+    # TODO should we allow assigning optional permanently_delete bool? 
+    result = ai_client.projects.begin_delete(name=project_name, delete_dependent_resources=delete_dependent_resources).result()
     return result
 
 def main():
