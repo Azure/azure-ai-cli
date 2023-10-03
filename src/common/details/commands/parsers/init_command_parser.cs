@@ -65,7 +65,7 @@ namespace Azure.AI.Details.Common.CLI
                 new DiagnosticLogTokenParser(),
                 new CommonNamedValueTokenParsers(false),
 
-                new NamedValueTokenParser("--ini",  "ini.file", "10", "1", "@"),
+                new NamedValueTokenParser("--ini", "ini.file", "10", "1", "@"),
 
                 SubscriptionToken.Parser(),
                 new NamedValueTokenParser("--region", "init.service.resource.region.name", "00010", "1"),

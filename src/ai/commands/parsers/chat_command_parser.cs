@@ -31,6 +31,8 @@ namespace Azure.AI.Details.Common.CLI
             new DiagnosticLogTokenParser(),
             new CommonNamedValueTokenParsers(),
 
+            new NamedValueTokenParser("--ini", "ini.file", "10", "1", "@"),
+
             new NamedValueTokenParser(null, "x.command.expand.file.name", "11111", "1"),
 
             ConfigEndpointUriToken.Parser(),
@@ -43,7 +45,7 @@ namespace Azure.AI.Details.Common.CLI
             new NamedValueTokenParser(null,             "service.config.search.index.name", "00010", "1"),
             new NamedValueTokenParser(null,             "service.config.search.query.type", "00011", "1"),
 
-            new NamedValueTokenParser("--interactive",  "chat.input.interactive", "001", "0", null, null, "true"),
+            new NamedValueTokenParser("--interactive",  "chat.input.interactive", "001", "1;0", "true;false", null, "true"),
 
             new NamedValueTokenParser(null,             "chat.message.history.json.file", "00011", "1", null, null, "json.file", "chat.history.type"),
             new NamedValueTokenParser(null,             "chat.message.history.jsonl.file", "00011", "1", null, null, "jsonl.file", "chat.history.type"),
