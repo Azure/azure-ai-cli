@@ -82,6 +82,7 @@ namespace Azure.AI.Details.Common.CLI
                     new NamedValueTokenParser(null, "x.command", "11", "1"),
 
                     new CommonNamedValueTokenParsers(),
+                    new NamedValueTokenParser("--ini", "ini.file", "10", "1", "@"),
                     new NamedValueTokenParser(null, "x.command.expand.file.name", "11111", "1"),
 
                     new ExpectConsoleOutputTokenParser(),

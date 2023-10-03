@@ -87,7 +87,7 @@ namespace Azure.AI.Details.Common.CLI
                 new ExpectConsoleOutputTokenParser(),
                 new ParallelCommandsTokenParser(),
 
-                new NamedValueTokenParser("--ini",  "ini.file", "10", "1", "@"),
+                new NamedValueTokenParser("--ini", "ini.file", "10", "1", "@"),
 
                 new NamedValueTokenParser("--user", "webjob.config.username", "001", "1"),
                 new NamedValueTokenParser("--pass", "webjob.config.password", "001", "1"),
