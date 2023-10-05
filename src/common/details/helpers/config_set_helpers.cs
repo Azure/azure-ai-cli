@@ -35,7 +35,7 @@ namespace Azure.AI.Details.Common.CLI
 
         public static void ConfigSearchResource(string endpoint, string key)
         {
-            ConsoleHelpers.WriteLineWithHighlight($"\n`CONFIG COGNITIVE SEARCH RESOURCE`");
+            ConsoleHelpers.WriteLineWithHighlight($"\n`CONFIG AI SEARCH RESOURCE`");
             Console.WriteLine();
 
             int maxLabelWidth = 0;
