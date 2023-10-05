@@ -1,23 +1,5 @@
 #!/bin/bash
 
-# Function to read user input or use a default value
-read_input() {
-    local prompt="$1"
-    local default_value="$2"
-    local input
-
-    if [ -t 0 ]; then
-        # Input is from the terminal (interactive)
-        read -p "$prompt" input
-        [ -z "$input" ] && input="$default_value"  # Use default if input is empty
-    else
-        # Input is from a pipe
-        input="$default_value"
-    fi
-
-    echo "$input"
-}
-
 # Check to see if we need to have the user specify the version of Azure.AI.CLI they want to install
 AICLI_VERSION="PLACEHOLDER_VERSION"
 if [ "$AICLI_VERSION" == "PLACEHOLDER_VERSION" ]; then
