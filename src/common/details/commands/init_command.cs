@@ -140,10 +140,10 @@ namespace Azure.AI.Details.Common.CLI
             var choiceLookup = new Dictionary<string, string>
             {
                 ["Azure OpenAI"] = "openai",
-                ["Azure OpenAI + Cognitive Search"] = "openai;search",
+                ["Azure OpenAI + AI Search"] = "openai;search",
                 ["Azure AI Resource + Project"] = "resource;project",
                 ["Azure AI Resource + Project + OpenAI"] = "openai;resource;project",
-                ["Azure AI Resource + Project + OpenAI + Cognitive Search"] = "openai;search;resource;project",
+                ["Azure AI Resource + Project + OpenAI + AI Search"] = "openai;search;resource;project",
             };
 
             var choices = choiceLookup.Keys.ToArray();
