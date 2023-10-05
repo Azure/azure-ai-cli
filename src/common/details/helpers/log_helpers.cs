@@ -25,8 +25,15 @@ namespace Azure.AI.Details.Common.CLI
                 var runTime = values.GetOrDefault("x.run.time", "");
                 if (log.Contains("{run.time}")) log = log.Replace("{run.time}", runTime);
 
-                log = FileHelpers.GetOutputDataFileName(log, values);
-                FileLogger.Start(log);
+                try
+                {
+                    log = FileHelpers.GetOutputDataFileName(log, values);
+                    FileLogger.Start(log);
+                }
+                catch
+                {
+                    ConsoleHelpers.WriteError($"WARNING: Cannot create log file: '{log}'\n\n");
+                }
             }
         }
 
