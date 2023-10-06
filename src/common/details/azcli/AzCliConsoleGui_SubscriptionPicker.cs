@@ -39,6 +39,9 @@ namespace Azure.AI.Details.Common.CLI
                 {
                     throw new ApplicationException($"CANCELED: No subscription selected.");
                 }
+
+                await AzCli.SetAccount(subscription.Value.Id);
+
                 return subscription.Value;
             }
 
