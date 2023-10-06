@@ -161,7 +161,7 @@ namespace Azure.AI.Details.Common.CLI
             };
             var files = getFiles();
 
-            ConsoleHelpers.WriteLineWithHighlight("\n`CREATE OR UPDATE COGNITIVE SEARCH INDEX`");
+            ConsoleHelpers.WriteLineWithHighlight("\n`CREATE OR UPDATE AI SEARCH INDEX`");
 
             var indexName = AskPromptHelper.AskPrompt("Search Index Name: ");
             Console.WriteLine();
@@ -283,7 +283,7 @@ namespace Azure.AI.Details.Common.CLI
             return new string[] {
                 "Upload files",
                 "Azure Blob Storage",
-                "Azure Cognitive Search"
+                "Azure AI Search"
             };
         }
 
