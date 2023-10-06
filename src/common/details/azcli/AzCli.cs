@@ -173,6 +173,19 @@ namespace Azure.AI.Details.Common.CLI
             return x;
         }
 
+        public static async Task<ProcessResponse<string>> SetAccount(string subscriptionId)
+        {
+            var process = await ProcessHelpers.ParseShellCommandJson<JObject>("az", $"account set --subscription {subscriptionId}", GetUserAgentEnv());
+
+            var x = new ProcessResponse<string>();
+            x.StdOutput = process.StdOutput;
+            x.StdError = process.StdError;
+
+            x.Payload = subscriptionId;
+
+            return x;
+        }
+
         public static async Task<ProcessResponse<AccountRegionLocationInfo[]>> ListAccountRegionLocations()
         {
             var supportedRegions = await ListSupportedResourceRegions();
