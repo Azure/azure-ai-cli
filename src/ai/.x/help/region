@@ -25,6 +25,6 @@ USAGE: ai <command> [...] --region REGION
 
 SEE ALSO
 
-  ai help setup
+  ai help init
   ai help examples
   ai help key overview

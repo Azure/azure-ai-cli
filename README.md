@@ -121,9 +121,9 @@ USAGE: ai chat [...]
     --n N                               (see: ai help chat options n)
 ```
 
-## **STEP 5**: Create and update a Cognitive Search Index w/ `ai search index update`
+## **STEP 5**: Create and update an AI Search Index w/ `ai search index update`
 
-You can create a Cognitive Search Index using the `ai search index create` command.
+You can create an AI Search Index using the `ai search index create` command.
 
 ```bash
 ai search index update --files "../../data/3-product-info/*.md" --index-name "product-info"
@@ -168,9 +168,9 @@ USAGE: ai index update [...]
     --search-api-key KEY                     (see: ai help search api key)
 ```
 
-## **STEP 6**: Chat with your LLM using your Cognitive Search Index w/ `ai chat --index-name`
+## **STEP 6**: Chat with your LLM using your AI Search Index w/ `ai chat --index-name`
 
-You can chat interactively or non-interactively with an AI language model with your Cognitive Search indexed data using the `ai chat` command with the `--index-name` option.
+You can chat interactively or non-interactively with an AI language model with your AI Search indexed data using the `ai chat` command with the `--index-name` option.
 
 First, let's create a system prompt file that will be used to seed the chat with a question about a product:
 

@@ -16,6 +16,6 @@ USAGE: ai <command> [...] --key KEY
 
 SEE ALSO
 
-  ai help setup
+  ai help init
   ai help examples
   ai help region overview

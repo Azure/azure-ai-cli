@@ -1249,13 +1249,13 @@ namespace Azure.AI.Details.Common.CLI
         private static string GetAppDataDir()
         {
             var path = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
-            return path.Trim('/', '\\') + "/";
+            return path.TrimEnd('/', '\\') + "/";
         }
 
         private static string GetAppUserDir()
         {
             var path = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
-            return path.Trim('/', '\\') + "/";
+            return path.TrimEnd('/', '\\') + "/";
         }
 
         private static string CheckDotDirectory(string checkPath, bool mustExist = true, bool createIfDoesnt = false)
