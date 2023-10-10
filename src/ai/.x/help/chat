@@ -28,7 +28,7 @@ USAGE: ai chat [...]
   `#e_;*` --data-files PATTERN                (see: ai help chat data files)
   `#e_;*` --data-files @FILELIST.txt          (see: ai help chat data files)
   `#e_;*` --embeddings-deployment DEPLOYMENT  (see: ai help chat embeddings deployment)
-    --search-index INDEX                (see: ai help search index)
+    --index-name INDEX                  (see: ai help index name)
     --search-endpoint ENDPOINT          (see: ai help search endpoint)
     --search-api-key KEY                (see: ai help search key)
 
@@ -62,7 +62,7 @@ EXAMPLES
 
     ai config @myindex --set MyIndex
     ai search index create --name @myindex --files *.txt --interactive
-    ai chat --search-index @myindex --interactive
+    ai chat --index-name @myindex --interactive
 
 SEE ALSO
 
