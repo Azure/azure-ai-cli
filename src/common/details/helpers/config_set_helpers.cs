@@ -69,7 +69,7 @@ namespace Azure.AI.Details.Common.CLI
         {
             var setCommandValues = new CommandValues();
             setCommandValues.Add("x.command", "config");
-            setCommandValues.Add("x.config.scope.hive", "user");
+            setCommandValues.Add("x.config.scope.hive", "local");
             setCommandValues.Add("x.config.command.at.file", atFile);
             setCommandValues.Add("x.config.command.set", setValue);
             var fileName = FileHelpers.GetOutputConfigFileName(atFile, setCommandValues);
