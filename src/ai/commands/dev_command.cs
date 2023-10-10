@@ -116,7 +116,7 @@ namespace Azure.AI.Details.Common.CLI
             }
             else
             {
-                Console.WriteLine("ai dev shell exited successfully");
+                Console.WriteLine("(ai dev shell) exited successfully");
             }
         }
 
