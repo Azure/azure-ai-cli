@@ -24,7 +24,7 @@ def create_hub(subscription_id, resource_group_name, resource_name, location, di
         )
     )
 
-    result = ml_client.workspace_hubs.begin_create(wshub).result()
+    result = ml_client.workspace_hubs.begin_create(workspace_hub=wshub).result()
     return result._to_dict()
 
 def main():
