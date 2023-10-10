@@ -29,6 +29,8 @@ USAGE: ai <command> [...]
   ai init [...]             (see: ai help init)
   ai config [...]           (see: ai help config)
 
+  ai dev [...]              (see: ai help dev)
+
   ai chat [...]             (see: ai help chat)
   ai search [...]           (see: ai help search)
 
