@@ -5,6 +5,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Net;
 using System.Text;
 
@@ -46,8 +47,9 @@ namespace Azure.AI.Details.Common.CLI
 
             switch (command)
             {
+                case "dev.new.env": DoNewEnv(); break;
                 case "dev.new": DoNew(); break;
-                case "dev.shell": DoShell(); break;
+                case "dev.shell": DoDevShell(); break;
 
                 default:
                     _values.AddThrowError("WARNING:", $"'{command.Replace('.', ' ')}' NOT YET IMPLEMENTED!!");
@@ -60,6 +62,43 @@ namespace Azure.AI.Details.Common.CLI
             _values.AddThrowError("WARNING:", $"''ai dev new' NOT YET IMPLEMENTED!!");
         }
 
+        private void DoNewEnv()
+        {
+            var fileName = ".env";
+
+            var env = GetEnvironment();
+            var fqn = SaveEnvironment(env, fileName);
+
+            Console.WriteLine($"{fileName} (saved at '{fqn}')\n");
+            PrintEnvironment(env);
+        }
+
+        private void DoDevShell()
+        {
+            DisplayBanner("dev.shell");
+
+            Console.WriteLine("Environment populated:\n");
+
+            var env = GetEnvironment();
+            PrintEnvironment(env);
+            SetEnvironment(env);
+
+            var fileName = OS.IsLinux() ? "bash" : "cmd.exe";
+            var arguments = OS.IsLinux() ? "-li" : "/k PROMPT (ai dev shell) %PROMPT%& title (ai dev shell)";
+
+            var process = ProcessHelpers.StartProcess(fileName, arguments, env, false);
+            process.WaitForExit();
+
+            if (process.ExitCode != 0)
+            {
+                _values.AddThrowError("ERROR:", $"Shell exited with code {process.ExitCode}");
+            }
+            else
+            {
+                Console.WriteLine("(ai dev shell) exited successfully");
+            }
+        }
+
         private string ReadConfig(string name)
         {
             return FileHelpers.FileExistsInConfigPath(name, _values)
@@ -67,12 +106,8 @@ namespace Azure.AI.Details.Common.CLI
                 : null;
         }
 
-        private void DoShell()
+        private Dictionary<string, string> GetEnvironment()
         {
-            DisplayBanner("dev.shell");
-
-            Console.WriteLine("Environment populated:\n");
-
             var env = new Dictionary<string, string>();
             env.Add("AZURE_SUBSCRIPTION_ID", ReadConfig("subscription"));
             env.Add("AZURE_RESOURCE_GROUP", ReadConfig("group"));
@@ -91,7 +126,32 @@ namespace Azure.AI.Details.Common.CLI
             env.Add("AZURE_AI_SEARCH_ENDPOINT", ReadConfig("search.endpoint"));
             env.Add("AZURE_AI_SEARCH_INDEX_NAME", ReadConfig("chat.search.index"));
             env.Add("AZURE_AI_SEARCH_KEY", ReadConfig("search.key"));
+            return env;
+        }
 
+        private static void SetEnvironment(Dictionary<string, string> env)
+        {
+            foreach (var item in env)
+            {
+                if (string.IsNullOrEmpty(item.Value)) continue;
+                Environment.SetEnvironmentVariable(item.Key, item.Value);
+            }
+        }
+
+        private string SaveEnvironment(Dictionary<string, string> env, string fileName)
+        {
+            var sb = new StringBuilder();
+            foreach (var item in env)
+            {
+                sb.AppendLine($"{item.Key}={item.Value}");
+            }
+
+            FileHelpers.WriteAllText(fileName, sb.ToString(), Encoding.Default);
+            return new FileInfo(FileHelpers.DemandFindFileInDataPath(fileName, null, fileName)).DirectoryName;
+        }
+
+        private static void PrintEnvironment(Dictionary<string, string> env)
+        {
             foreach (var item in env)
             {
                 if (string.IsNullOrEmpty(item.Value)) continue;
@@ -101,22 +161,6 @@ namespace Azure.AI.Details.Common.CLI
                     : item.Value;
 
                 Console.WriteLine($"  {item.Key} = {value}");
-                Environment.SetEnvironmentVariable(item.Key, item.Value);
-            }
-
-            var fileName = OS.IsLinux() ? "bash" : "cmd.exe";
-            var arguments = OS.IsLinux() ? "-li" : "/k PROMPT (ai dev shell) %PROMPT%& title (ai dev shell)";
-
-            var process = ProcessHelpers.StartProcess(fileName, arguments, env, false);
-            process.WaitForExit();
-
-            if (process.ExitCode != 0)
-            {
-                _values.AddThrowError("ERROR:", $"Shell exited with code {process.ExitCode}");
-            }
-            else
-            {
-                Console.WriteLine("(ai dev shell) exited successfully");
             }
         }
 

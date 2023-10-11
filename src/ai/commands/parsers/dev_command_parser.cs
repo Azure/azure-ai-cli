@@ -20,12 +20,14 @@ namespace Azure.AI.Details.Common.CLI
         }
 
         private static readonly (string name, bool valuesRequired)[] _commands =  {
+            ("dev.new.env", false),
             ("dev.new", true),
             ("dev.shell", false),
             ("dev", true)
         };
 
         private static readonly string[] _partialCommands = {
+            "dev.new.env",
             "dev.new",
             "dev.shell",
             "dev"
@@ -37,6 +39,7 @@ namespace Azure.AI.Details.Common.CLI
 
             switch (commandName)
             {
+                case "dev.new.env": return _devNewParsers;
                 case "dev.new": return _devNewParsers;
                 case "dev.shell": return _devShellParsers;
             }
