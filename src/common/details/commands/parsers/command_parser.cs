@@ -155,7 +155,8 @@ namespace Azure.AI.Details.Common.CLI
             var skip = 0;
             foreach (var part in commandName.Split('.'))
             {
-                if (tokens.PeekNextTokenValue(skip) != part)
+                var check = tokens.PeekNextTokenValue(skip);
+                if (check == null || check.Trim('.') != part)
                 {
                     parsed = false;
                     break;

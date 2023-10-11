@@ -48,11 +48,11 @@ namespace Azure.AI.Details.Common.CLI
         #endregion
 
         #region help command data
-        public string HelpCommandTokens => "wizard;init;config;chat;speech;vision;language;search;service;tool;samples;code;eval;run";
+        public string HelpCommandTokens => "wizard;dev;init;config;chat;speech;vision;language;search;service;tool;samples;code;eval;run";
         #endregion
 
         #region config command data
-        public string ConfigScopeTokens => $"wizard;init;chat;speech;vision;language;search;service;tool;samples;code;eval;run;*";
+        public string ConfigScopeTokens => $"wizard;dev;init;chat;speech;vision;language;search;service;tool;samples;code;eval;run;*";
         #endregion
 
         #region zip option data
@@ -114,6 +114,7 @@ namespace Azure.AI.Details.Common.CLI
                 "code" => (new CodeCommand(values)).RunCommand(),
                 "eval" => (new EvalCommand(values)).RunCommand(),
                 "wizard" => (new ScenarioWizardCommand(values)).RunCommand(),
+                "dev" => (new DevCommand(values)).RunCommand(),
                 "run" => (new RunJobCommand(values)).RunCommand(),
                 _ => false
             };
@@ -140,6 +141,7 @@ namespace Azure.AI.Details.Common.CLI
                 "samples" => SamplesCommandParser.ParseCommand(tokens, values),
                 "code" => CodeCommandParser.ParseCommand(tokens, values),
                 "wizard" => ScenarioWizardCommandParser.ParseCommand(tokens, values),
+                "dev" => DevCommandParser.ParseCommand(tokens, values),
                 "run" => RunJobCommandParser.ParseCommand(tokens, values),
                 _ => false
             };
@@ -164,6 +166,7 @@ namespace Azure.AI.Details.Common.CLI
                 "code" => CodeCommandParser.ParseCommandValues(tokens, values),
                 "complete" => CompleteCommandParser.ParseCommandValues(tokens, values),
                 "wizard" => ScenarioWizardCommandParser.ParseCommandValues(tokens, values),
+                "dev" => DevCommandParser.ParseCommandValues(tokens, values),
                 "run" => RunJobCommandParser.ParseCommandValues(tokens, values),
                 _ => false
             };

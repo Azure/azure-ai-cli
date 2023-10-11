@@ -1,0 +1,16 @@
+   ___ ____  ___  _____   ___  _____   __
+  / _ /_  / / _ |/_  _/  / _ \/ __/ | / /
+ / __ |/ /_/ __ |_/ /_  / // / _/ | |/ /
+/_/ |_/___/_/ |_/____/ /____/___/ |___/
+
+USAGE: ai dev <command> [...]
+
+COMMANDS
+
+  ai dev new [...]            (see: ai help dev new)
+  ai dev shell [...]          (see: ai help dev shell)
+
+ADDITIONAL TOPICS
+
+  ai help dev examples
+  ai help find topics dev
