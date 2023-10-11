@@ -32,6 +32,7 @@ USAGE: ai <command> [...]
   ai dev [...]              (see: ai help dev)
 
   ai chat [...]             (see: ai help chat)
+  ai flow [...]             (see: ai help flow)
   ai search [...]           (see: ai help search)
 
   ai service [...]          (see: ai help service)

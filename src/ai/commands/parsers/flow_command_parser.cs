@@ -7,7 +7,7 @@ using System.Collections.Generic;
 
 namespace Azure.AI.Details.Common.CLI
 {
-    class DevCommandParser : CommandParser
+    class FlowCommandParser : CommandParser
     {
         public static bool ParseCommand(INamedValueTokens tokens, ICommandValues values)
         {
@@ -16,17 +16,18 @@ namespace Azure.AI.Details.Common.CLI
 
         public static bool ParseCommandValues(INamedValueTokens tokens, ICommandValues values)
         {
-            return ParseCommandValues("dev", GetCommandParsers(values), tokens, values);
+            return ParseCommandValues("flow", GetCommandParsers(values), tokens, values);
         }
 
         private static readonly (string name, bool valuesRequired)[] _commands =  {
-            ("dev.new.env", false),
-            ("dev.shell", false),
+            ("flow.new", true),
+            ("flow.invoke", true),
+            ("flow.deploy", true),
+            ("flow.serve", true),
         };
 
         private static readonly string[] _partialCommands = {
-            "dev.new",
-            "dev"
+            "flow"
         };
 
         private static IEnumerable<INamedValueTokenParser> GetCommandParsers(ICommandValues values)
@@ -35,25 +36,26 @@ namespace Azure.AI.Details.Common.CLI
 
             switch (commandName)
             {
-                case "dev.new.env": return _devNewParsers;
-                case "dev.new": return _devNewParsers;
-                case "dev.shell": return _devShellParsers;
+                case "flow.new": return _flowNewParsers;
+                case "flow.invoke": return _flowInvokeParsers;
+                case "flow.deploy": return _flowDeployParsers;
+                case "flow.serve": return _flowServeParsers;
             }
 
             foreach (var command in _commands)
             {
                 if (commandName == command.name)
                 {
-                    return _devPlaceHolderParsers;
+                    return _flowPlaceHolderParsers;
                 }
             }
 
             return null;
         }
 
-        public class CommonDevNamedValueTokenParsers : NamedValueTokenParserList
+        public class CommonFlowNamedValueTokenParsers : NamedValueTokenParserList
         {
-            public CommonDevNamedValueTokenParsers() : base(
+            public CommonFlowNamedValueTokenParsers() : base(
 
                     new NamedValueTokenParser(null, "x.command", "11", "1"),
 
@@ -70,16 +72,24 @@ namespace Azure.AI.Details.Common.CLI
             }
         }
 
-        private static INamedValueTokenParser[] _devPlaceHolderParsers = {
-            new CommonDevNamedValueTokenParsers()
+        private static INamedValueTokenParser[] _flowPlaceHolderParsers = {
+            new CommonFlowNamedValueTokenParsers()
         };
 
-        private static INamedValueTokenParser[] _devNewParsers = {
-            new CommonDevNamedValueTokenParsers()
+        private static INamedValueTokenParser[] _flowNewParsers = {
+            new CommonFlowNamedValueTokenParsers()
         };
 
-        private static INamedValueTokenParser[] _devShellParsers = {
-            new CommonDevNamedValueTokenParsers()
+        private static INamedValueTokenParser[] _flowInvokeParsers = {
+            new CommonFlowNamedValueTokenParsers()
+        };
+
+        private static INamedValueTokenParser[] _flowDeployParsers = {
+            new CommonFlowNamedValueTokenParsers()
+        };
+
+        private static INamedValueTokenParser[] _flowServeParsers = {
+            new CommonFlowNamedValueTokenParsers()
         };
     }
 }
