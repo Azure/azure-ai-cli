@@ -73,16 +73,16 @@ namespace Azure.AI.Details.Common.CLI
             var stdErr = new StringBuilder();
             var mergedOutput = new StringBuilder();
             var stdOutReceived = (string data) => {
-                if (stdOutHandler != null) stdOutHandler(data);
-                if (mergedOutputHandler != null) mergedOutputHandler(data);
                 stdOut.AppendLine(data);
                 mergedOutput.AppendLine(data);
+                if (stdOutHandler != null) stdOutHandler(data);
+                if (mergedOutputHandler != null) mergedOutputHandler(data);
             };
             var stdErrReceived = (string data) => {
-                if (stdErrHandler != null) stdErrHandler(data);
-                if (mergedOutputHandler != null) mergedOutputHandler(data);
                 stdErr.AppendLine(data);
                 mergedOutput.AppendLine(data);
+                if (stdErrHandler != null) stdErrHandler(data);
+                if (mergedOutputHandler != null) mergedOutputHandler(data);
             };
 
             var process = TryCatchHelpers.TryCatchNoThrow<Process>(() => StartShellCommandProcess(command, arguments, addToEnvironment), null, out Exception processException);
