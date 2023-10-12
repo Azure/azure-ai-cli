@@ -186,11 +186,11 @@ namespace Azure.AI.Details.Common.CLI
             if (!quiet) Console.WriteLine(message);
 
             var response = AzCli.CreateResourceGroup(subscription, location, group).Result;
-            if (string.IsNullOrEmpty(response.StdOutput) && !string.IsNullOrEmpty(response.StdError))
+            if (string.IsNullOrEmpty(response.Output.StdOutput) && !string.IsNullOrEmpty(response.Output.StdError))
             {
                 values.AddThrowError(
                     "ERROR:", "Creating resource group",
-                    "OUTPUT:", response.StdError);
+                    "OUTPUT:", response.Output.StdError);
             }
 
             if (!quiet) Console.WriteLine($"{message} Done!");

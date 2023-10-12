@@ -40,9 +40,9 @@ namespace Azure.AI.Details.Common.CLI
                 var response = await AzCli.ListAccountRegionLocations();
 
                 Console.Write("\rRegion: ");
-                if (string.IsNullOrEmpty(response.StdOutput) && !string.IsNullOrEmpty(response.StdError))
+                if (string.IsNullOrEmpty(response.Output.StdOutput) && !string.IsNullOrEmpty(response.Output.StdError))
                 {
-                    throw new ApplicationException($"ERROR: Loading resource region/locations\n{response.StdError}");
+                    throw new ApplicationException($"ERROR: Loading resource region/locations\n{response.Output.StdError}");
                 }
 
                 var regions = response.Payload

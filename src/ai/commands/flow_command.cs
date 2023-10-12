@@ -80,7 +80,7 @@ namespace Azure.AI.Details.Common.CLI
                 _values.AddThrowError("ERROR:", response.StdError);
             }
 
-            Console.WriteLine(response.StdOutput);
+            Console.WriteLine(response.MergedOutput);
         }
 
         private static void SplitFunctionReference(string functionData, out string entryFile, out string functionName)

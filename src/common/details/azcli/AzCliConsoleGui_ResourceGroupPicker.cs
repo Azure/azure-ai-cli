@@ -49,9 +49,9 @@ namespace Azure.AI.Details.Common.CLI
                 var response = await AzCli.ListResourceGroups(subscription, regionLocation);
 
                 Console.Write("\rGroup: ");
-                if (string.IsNullOrEmpty(response.StdOutput) && !string.IsNullOrEmpty(response.StdError))
+                if (string.IsNullOrEmpty(response.Output.StdOutput) && !string.IsNullOrEmpty(response.Output.StdError))
                 {
-                    throw new ApplicationException($"ERROR: Loading resource groups: {response.StdError}");
+                    throw new ApplicationException($"ERROR: Loading resource groups: {response.Output.StdError}");
                 }
 
                 var groups = response.Payload
@@ -110,9 +110,9 @@ namespace Azure.AI.Details.Common.CLI
                 var response = await AzCli.CreateResourceGroup(subscriptionId, regionLocation.Value.Name, name);
 
                 Console.Write("\r");
-                if (string.IsNullOrEmpty(response.StdOutput) && !string.IsNullOrEmpty(response.StdError))
+                if (string.IsNullOrEmpty(response.Output.StdOutput) && !string.IsNullOrEmpty(response.Output.StdError))
                 {
-                    throw new ApplicationException($"ERROR: Creating resource group.\n{response.StdError}");
+                    throw new ApplicationException($"ERROR: Creating resource group.\n{response.Output.StdError}");
                 }
 
                 Console.WriteLine("\r*** CREATED ***  ");
