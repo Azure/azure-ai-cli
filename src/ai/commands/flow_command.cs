@@ -6,6 +6,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Net;
 using System.Text;
 using System.Threading.Tasks;
@@ -49,6 +50,10 @@ namespace Azure.AI.Details.Common.CLI
             switch (command)
             {
                 case "flow.new": await DoNewFlow(); break;
+                case "flow.invoke": await DoInvokeFlow(); break;
+                // case "flow.serve": await DoServeFlow(); break;
+                // case "flow.package": await DoPackageFlow(); break;
+                // case "flow.deploy": await DoDeployFlow(); break;
 
                 default:
                     _values.AddThrowError("WARNING:", $"'{command.Replace('.', ' ')}' NOT YET IMPLEMENTED!!");
@@ -60,8 +65,8 @@ namespace Azure.AI.Details.Common.CLI
         {
             StartCommand();
 
-            string flow = FlowNameToken.Data().Demand(_values, "Creating flow", "flow new");
-            string prompt = SystemPromptTemplateToken.Data().GetOrDefault(_values);
+            var flow = FlowNameToken.Data().Demand(_values, "Creating flow", "flow new");
+            var prompt = SystemPromptTemplateToken.Data().GetOrDefault(_values);
             var function = FunctionToken.Data().GetOrDefault(_values, "");
             SplitFunctionReference(function, out var module, out function);
 
@@ -72,9 +77,34 @@ namespace Azure.AI.Details.Common.CLI
             DeleteTemporaryFiles();
         }
 
+        private async Task DoInvokeFlow()
+        {
+            StartCommand();
+
+            var flowName = FlowNameToken.Data().Demand(_values, "Invoking flow", "flow invoke");
+            var nodeName = FlowNodeToken.Data().GetOrDefault(_values);
+            var inputs = string.Join(" ", InputWildcardToken.GetNames(_values)
+                .Select(name => $"{name}={InputWildcardToken.Data(name).GetOrDefault(_values)}"));
+
+            await DoFlowTestConsoleGui(flowName, inputs, nodeName);
+            
+            StopCommand();
+            DisposeAfterStop();
+            DeleteTemporaryFiles();
+        }
+
         private async Task DoFlowInitConsoleGui(string flow, string prompt, string function, string module)
         {
             var response = await PfCli.FlowInit(flow, module, function, prompt, "chat", true);
+            if (!string.IsNullOrEmpty(response.StdError))
+            {
+                _values.AddThrowError("ERROR:", response.StdError);
+            }
+        }
+
+        private async Task DoFlowTestConsoleGui(string flowName, string inputs, string nodeName)
+        {
+            var response = await PfCli.FlowTest(flowName, inputs, nodeName);
             if (!string.IsNullOrEmpty(response.StdError))
             {
                 _values.AddThrowError("ERROR:", response.StdError);
