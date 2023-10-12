@@ -60,28 +60,34 @@ namespace Azure.AI.Details.Common.CLI
         {
             StartCommand();
 
-            string flowPath = FlowNameToken.Data().Demand(_values, "Creating flow", "flow new");
-            string promptTemplate = SystemPromptTemplateToken.Data().GetOrDefault(_values);
+            string flow = FlowNameToken.Data().Demand(_values, "Creating flow", "flow new");
+            string prompt = SystemPromptTemplateToken.Data().GetOrDefault(_values);
+            var function = FunctionToken.Data().GetOrDefault(_values, "");
+            SplitFunctionReference(function, out var module, out function);
 
-            string functionData = FunctionToken.Data().GetOrDefault(_values, "");
-            var parts = functionData.Split(':');
-            var entryFile = parts != null && parts.Length > 0 ? parts[0] : "";
-            var functionName = parts != null && parts.Length > 1 ? parts[1] : "";
-            
-            string type = "chat";
-            bool yes = true;
+            await DoFlowInitConsoleGui(flow, prompt, function, module);
 
-            var response = await PfCli.FlowInit(flowPath, entryFile, functionName, promptTemplate, type, yes);
+            StopCommand();
+            DisposeAfterStop();
+            DeleteTemporaryFiles();
+        }
+
+        private async Task DoFlowInitConsoleGui(string flow, string prompt, string function, string module)
+        {
+            var response = await PfCli.FlowInit(flow, module, function, prompt, "chat", true);
             if (!string.IsNullOrEmpty(response.StdError))
             {
                 _values.AddThrowError("ERROR:", response.StdError);
             }
 
             Console.WriteLine(response.StdOutput);
+        }
 
-            StopCommand();
-            DisposeAfterStop();
-            DeleteTemporaryFiles();
+        private static void SplitFunctionReference(string functionData, out string entryFile, out string functionName)
+        {
+            var parts = functionData.Split(':');
+            entryFile = parts != null && parts.Length > 0 ? parts[0] : "";
+            functionName = parts != null && parts.Length > 1 ? parts[1] : "";
         }
 
         private void DisplayBanner(string which)
