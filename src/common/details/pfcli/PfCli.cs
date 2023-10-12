@@ -164,12 +164,23 @@ namespace Azure.AI.Details.Common.CLI
 
         private static Action<string> StandardErrorHandler()
         {
-            return x => Console.Error.WriteLine(x);
+            return x => Console.Error.WriteLine(RemapStrings(x));
         }
 
         private static Action<string> StdOutputHandler()
         {
-            return x => Console.WriteLine(x);
+            return x => Console.WriteLine(RemapStrings(x));
+        }
+
+        private static string RemapStrings(string x)
+        {
+            var check = "You can execute this command to test the flow, pf flow test";
+            if (x.StartsWith(check))
+            {
+                x = x.Replace(check, "You can execute this command to test the flow, ai flow invoke");
+                x = x.Replace(" --interactive", "");
+            }
+            return x;
         }
     }
 }
