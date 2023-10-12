@@ -25,7 +25,7 @@ namespace Azure.AI.Details.Common.CLI
             var typePart = string.IsNullOrEmpty(type) ? "" : $"--type {type}";
             var yesPart = yes ? "--yes" : "";
 
-            return await ProcessHelpers.RunShellCommandAsync("pf", $"{cmdPart} {flowPart} {entryPart} {functionPart} {promptPart} {typePart} {yesPart}", null, x => Console.WriteLine(x), x => Console.Error.WriteLine(x));
+            return await ProcessHelpers.RunShellCommandAsync("pf", $"{cmdPart} {flowPart} {entryPart} {functionPart} {promptPart} {typePart} {yesPart}", null, StdOutputHandler(), StandardErrorHandler());
         }
 
         public static async Task<ProcessOutput> FlowTest(string flowPath, string inputs, string node, string variant, bool debug, bool interactive, bool verbose)
@@ -160,6 +160,16 @@ namespace Azure.AI.Details.Common.CLI
             var namePart = string.IsNullOrEmpty(name) ? "" : $"--name {name}";
 
             return await ProcessHelpers.RunShellCommandAsync("pf", $"{cmdPart} {namePart}");
+        }
+
+        private static Action<string> StandardErrorHandler()
+        {
+            return x => Console.Error.WriteLine(x);
+        }
+
+        private static Action<string> StdOutputHandler()
+        {
+            return x => Console.WriteLine(x);
         }
     }
 }
