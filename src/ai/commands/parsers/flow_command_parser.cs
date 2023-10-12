@@ -22,8 +22,9 @@ namespace Azure.AI.Details.Common.CLI
         private static readonly (string name, bool valuesRequired)[] _commands =  {
             ("flow.new", true),
             ("flow.invoke", true),
-            ("flow.deploy", true),
             ("flow.serve", true),
+            ("flow.package", true),
+            ("flow.deploy", true),
         };
 
         private static readonly string[] _partialCommands = {
@@ -39,6 +40,7 @@ namespace Azure.AI.Details.Common.CLI
                 case "flow.new": return _flowNewParsers;
                 case "flow.invoke": return _flowInvokeParsers;
                 case "flow.deploy": return _flowDeployParsers;
+                case "flow.package": return _flowPackageParsers;
                 case "flow.serve": return _flowServeParsers;
             }
 
@@ -77,19 +79,37 @@ namespace Azure.AI.Details.Common.CLI
         };
 
         private static INamedValueTokenParser[] _flowNewParsers = {
-            new CommonFlowNamedValueTokenParsers()
+            new CommonFlowNamedValueTokenParsers(),
+            FlowNameToken.Parser(),
+            FunctionToken.Parser(),
+            SystemPromptTemplateToken.Parser(),
+            // --type TYPE (can be chat/evaluate/standard) default is chat, and only chat is implemented at the moment
+            // --yes (we'll always pass --yes, as we don't want `pf flow init` to prompt for anything)
         };
 
         private static INamedValueTokenParser[] _flowInvokeParsers = {
-            new CommonFlowNamedValueTokenParsers()
+            new CommonFlowNamedValueTokenParsers(),
+            FlowNameToken.Parser(),
+            FlowNodeToken.Parser(),
+            InputWildcardToken.Parser(),
         };
 
         private static INamedValueTokenParser[] _flowDeployParsers = {
-            new CommonFlowNamedValueTokenParsers()
+            new CommonFlowNamedValueTokenParsers(),
+            FlowNameToken.Parser()
+        };
+
+        private static INamedValueTokenParser[] _flowPackageParsers = {
+            new CommonFlowNamedValueTokenParsers(),
+            FlowNameToken.Parser(),
+            DockerBuildContextToken.Parser()
         };
 
         private static INamedValueTokenParser[] _flowServeParsers = {
-            new CommonFlowNamedValueTokenParsers()
+            new CommonFlowNamedValueTokenParsers(),
+            HostToken.Parser(),
+            PortToken.Parser(),
+            EnvironmentVariablesToken.Parser(),
         };
     }
 }

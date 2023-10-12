@@ -4,8 +4,10 @@ COMMANDS
 
   ai flow new [...]             (see: ai help flow new)
   ai flow invoke [...]          (see: ai help flow invoke)
-  ai flow deploy [...]          (see: ai help flow deploy)
   ai flow serve [...]           (see: ai help flow serve)
+
+  ai flow package [...]         (see: ai help flow package)
+  ai flow deploy [...]          (see: ai help flow deploy)
 
 ADDITIONAL TOPICS
 

@@ -66,7 +66,7 @@ namespace Azure.AI.Details.Common.CLI
 
             new NamedValueTokenParser(null,             "chat.speech.input", "010", "1;0", "true;false", null, "true"),
 
-            ChatFunctionToken.Parser(),
+            FunctionToken.Parser(),
         };
 
         #endregion
