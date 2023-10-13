@@ -42,7 +42,7 @@ namespace Azure.AI.Details.Common.CLI
             return await ProcessHelpers.RunShellCommandAsync("pf", $"{cmdPart} {flowPart} {inputsPart} {nodePart} {variantPart} {debugPart} {interactivePart} {verbosePart}", null, StdOutputHandler(), StandardErrorHandler());
         }
 
-        public static async Task<ProcessOutput> FlowBuild(string flowPath, string output, string format, string variant, bool verbose, bool debug)
+        public static async Task<ProcessOutput> FlowBuild(string flowPath, string output, string format, string variant = null, bool verbose = false, bool debug = false)
         {
             var cmdPart = "flow build";
             var flowPart = $"--source {flowPath}";
@@ -52,7 +52,7 @@ namespace Azure.AI.Details.Common.CLI
             var verbosePart = verbose ? "--verbose" : "";
             var debugPart = debug ? "--debug" : "";
 
-            return await ProcessHelpers.RunShellCommandAsync("pf", $"{cmdPart} {flowPart} {outputPart} {formatPart} {variantPart} {verbosePart} {debugPart}");
+            return await ProcessHelpers.RunShellCommandAsync("pf", $"{cmdPart} {flowPart} {outputPart} {formatPart} {variantPart} {verbosePart} {debugPart}", null, StdOutputHandler(), StandardErrorHandler());
         }
 
         public static async Task<ProcessOutput> FlowServe(string flowPath, string port = null, string host = null, string environmentVariables = null, bool verbose = false, bool debug = false)

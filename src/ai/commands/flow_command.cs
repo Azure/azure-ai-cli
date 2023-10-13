@@ -52,7 +52,7 @@ namespace Azure.AI.Details.Common.CLI
                 case "flow.new": await DoNewFlow(); break;
                 case "flow.invoke": await DoInvokeFlow(); break;
                 case "flow.serve": await DoServeFlow(); break;
-                // case "flow.package": await DoPackageFlow(); break;
+                case "flow.package": await DoPackageFlow(); break;
                 // case "flow.deploy": await DoDeployFlow(); break;
 
                 default:
@@ -118,6 +118,23 @@ namespace Azure.AI.Details.Common.CLI
             DeleteTemporaryFiles();
         }
 
+        private async Task DoPackageFlow()
+        {
+            var action = "Packaging flow";
+            var command = "flow package";
+
+            StartCommand();
+
+            var flowName = FlowNameToken.Data().Demand(_values, action, command);
+            var dockerBuildContext = DockerBuildContextToken.Data().Demand(_values, action, command);
+
+            await DoFlowBuild(flowName, dockerBuildContext, "docker");
+
+            StopCommand();
+            DisposeAfterStop();
+            DeleteTemporaryFiles();
+        }
+
         private async Task DoFlowInitConsoleGui(string flow, string prompt, string function, string module)
         {
             var response = await PfCli.FlowInit(flow, module, function, prompt, "chat", true);
@@ -139,6 +156,15 @@ namespace Azure.AI.Details.Common.CLI
         private async Task DoFlowServeConsoleGui(string flowName, string port, string host, string env)
         {
             var response = await PfCli.FlowServe(flowName, port, host, env);
+            if (!string.IsNullOrEmpty(response.StdError))
+            {
+                _values.AddThrowError("ERROR:", response.StdError);
+            }
+        }
+
+        private async Task DoFlowBuild(string flowName, string dockerBuildContext, string format)
+        {
+            var response = await PfCli.FlowBuild(flowName, dockerBuildContext, format);
             if (!string.IsNullOrEmpty(response.StdError))
             {
                 _values.AddThrowError("ERROR:", response.StdError);
