@@ -1,3 +1,7 @@
+FLOW
+
+@include.the.flow.command
+
 USAGE: ai flow <command> [...]
 
 COMMANDS

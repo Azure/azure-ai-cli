@@ -19,7 +19,9 @@ USAGE: ai <command> [...]
 
   ai chat [...]             (see: ai help chat)
   ai flow [...]             (see: ai help flow)
+
   ai search [...]           (see: ai help search)
+  ai speech [...]           (see: ai help speech)
 
   ai service [...]          (see: ai help service)
 
