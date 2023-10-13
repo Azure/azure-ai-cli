@@ -46,7 +46,7 @@ namespace Azure.AI.Details.Common.CLI
         {
             var path = FileHelpers.FindFileInHelpPath($"help/include.python.script.{scriptName}.py");
             var script = FileHelpers.ReadAllHelpText(path, Encoding.UTF8);
-            var scriptArgs = BuildPythonScriptArgs(args);
+            var scriptArgs = CliHelpers.BuildCliArgs(args);
 
             if (Program.Debug) Console.WriteLine($"DEBUG: {scriptName}.py:\n{script}");
             if (Program.Debug) Console.WriteLine($"DEBUG: PythonRunner.RunScriptAsync: '{scriptName}' {scriptArgs}");
@@ -119,34 +119,6 @@ namespace Azure.AI.Details.Common.CLI
             }
 
             return ParseOutputAndSkipLinesUntilStartsWith(output, "---").Trim('\r', '\n', ' ');
-        }
-
-        private static string BuildPythonScriptArgs(params string[] args)
-        {
-            var sb = new StringBuilder();
-            for (int i = 0; i + 1 < args.Length; i += 2)
-            {
-                var argName = args[i];
-                var argValue = args[i + 1];
-
-                if (string.IsNullOrWhiteSpace(argValue)) continue;
-
-                // if the argValue contains quotes or anything that needs to be "escaped" or enclosed in 
-                // double quotes so we can successfully execute on the command shell, do that here.
-
-                if (!argValue.Contains('\"') && !argValue.Contains('\'') && !argValue.Contains(' ') && !argValue.Contains('\t'))
-                {
-                    sb.Append($"{argName} {argValue}");
-                    sb.Append(' ');
-                    continue;
-                }
-
-                argValue = argValue.Replace("\"", "\\\"");
-
-                sb.Append($"{argName} \"{argValue}\"");
-                sb.Append(' ');
-            }
-            return sb.ToString().Trim();
         }
 
         private static string ParseOutputAndSkipLinesUntilStartsWith(string output, string startsWith)
