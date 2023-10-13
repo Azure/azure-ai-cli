@@ -55,7 +55,7 @@ namespace Azure.AI.Details.Common.CLI
             return await ProcessHelpers.RunShellCommandAsync("pf", $"{cmdPart} {flowPart} {outputPart} {formatPart} {variantPart} {verbosePart} {debugPart}");
         }
 
-        public static async Task<ProcessOutput> FlowServe(string flowPath, string port, string host, string environmentVariables, bool verbose, bool debug)
+        public static async Task<ProcessOutput> FlowServe(string flowPath, string port = null, string host = null, string environmentVariables = null, bool verbose = false, bool debug = false)
         {
             var cmdPart = "flow serve";
             var flowPart = $"--source {flowPath}";

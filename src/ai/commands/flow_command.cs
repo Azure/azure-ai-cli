@@ -51,7 +51,7 @@ namespace Azure.AI.Details.Common.CLI
             {
                 case "flow.new": await DoNewFlow(); break;
                 case "flow.invoke": await DoInvokeFlow(); break;
-                // case "flow.serve": await DoServeFlow(); break;
+                case "flow.serve": await DoServeFlow(); break;
                 // case "flow.package": await DoPackageFlow(); break;
                 // case "flow.deploy": await DoDeployFlow(); break;
 
@@ -63,9 +63,12 @@ namespace Azure.AI.Details.Common.CLI
 
         private async Task DoNewFlow()
         {
+            var action = "Creating flow";
+            var command = "flow new";
+
             StartCommand();
 
-            var flow = FlowNameToken.Data().Demand(_values, "Creating flow", "flow new");
+            var flow = FlowNameToken.Data().Demand(_values, action, command);
             var prompt = SystemPromptTemplateToken.Data().GetOrDefault(_values);
             var function = FunctionToken.Data().GetOrDefault(_values, "");
             SplitFunctionReference(function, out var module, out function);
@@ -79,15 +82,37 @@ namespace Azure.AI.Details.Common.CLI
 
         private async Task DoInvokeFlow()
         {
+            var action = "Invoking flow";
+            var command = "flow invoke";
+
             StartCommand();
 
-            var flowName = FlowNameToken.Data().Demand(_values, "Invoking flow", "flow invoke");
+            var flowName = FlowNameToken.Data().Demand(_values, action, command);
             var nodeName = FlowNodeToken.Data().GetOrDefault(_values);
             var inputs = string.Join(" ", InputWildcardToken.GetNames(_values)
                 .Select(name => $"{name}={InputWildcardToken.Data(name).GetOrDefault(_values)}"));
 
             await DoFlowTestConsoleGui(flowName, inputs, nodeName);
             
+            StopCommand();
+            DisposeAfterStop();
+            DeleteTemporaryFiles();
+        }
+
+        private async Task DoServeFlow()
+        {
+            var action = "Serving flow";
+            var command = "flow serve";
+
+            StartCommand();
+
+            var flowName = FlowNameToken.Data().Demand(_values, action, command);
+            var port = PortToken.Data().GetOrDefault(_values);
+            var host = HostToken.Data().GetOrDefault(_values);
+            var env = EnvironmentVariablesToken.Data().GetOrDefault(_values);
+
+            await DoFlowServeConsoleGui(flowName, port, host, env);
+
             StopCommand();
             DisposeAfterStop();
             DeleteTemporaryFiles();
@@ -105,6 +130,15 @@ namespace Azure.AI.Details.Common.CLI
         private async Task DoFlowTestConsoleGui(string flowName, string inputs, string nodeName)
         {
             var response = await PfCli.FlowTest(flowName, inputs, nodeName);
+            if (!string.IsNullOrEmpty(response.StdError))
+            {
+                _values.AddThrowError("ERROR:", response.StdError);
+            }
+        }
+
+        private async Task DoFlowServeConsoleGui(string flowName, string port, string host, string env)
+        {
+            var response = await PfCli.FlowServe(flowName, port, host, env);
             if (!string.IsNullOrEmpty(response.StdError))
             {
                 _values.AddThrowError("ERROR:", response.StdError);

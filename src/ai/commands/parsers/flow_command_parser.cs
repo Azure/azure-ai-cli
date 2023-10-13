@@ -107,6 +107,7 @@ namespace Azure.AI.Details.Common.CLI
 
         private static INamedValueTokenParser[] _flowServeParsers = {
             new CommonFlowNamedValueTokenParsers(),
+            FlowNameToken.Parser(),
             HostToken.Parser(),
             PortToken.Parser(),
             EnvironmentVariablesToken.Parser(),
