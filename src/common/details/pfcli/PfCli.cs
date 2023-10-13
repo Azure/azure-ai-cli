@@ -65,7 +65,7 @@ namespace Azure.AI.Details.Common.CLI
             var verbosePart = verbose ? "--verbose" : "";
             var debugPart = debug ? "--debug" : "";
 
-            return await ProcessHelpers.RunShellCommandAsync("pf", $"{cmdPart} {flowPart} {portPart} {hostPart} {environmentVariablesPart} {verbosePart} {debugPart}");
+            return await ProcessHelpers.RunShellCommandAsync("pf", $"{cmdPart} {flowPart} {portPart} {hostPart} {environmentVariablesPart} {verbosePart} {debugPart}", null, StdOutputHandler(), StandardErrorHandler());
         }
 
         public static async Task<ProcessOutput> RunCreate(string flowPath, string file, string flow, string data, string columnMapping, string run, string variant, bool stream, string environmentVariables, string connections, string set)
