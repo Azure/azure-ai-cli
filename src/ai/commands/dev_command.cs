@@ -126,6 +126,13 @@ namespace Azure.AI.Details.Common.CLI
             env.Add("AZURE_AI_SEARCH_ENDPOINT", ReadConfig("search.endpoint"));
             env.Add("AZURE_AI_SEARCH_INDEX_NAME", ReadConfig("chat.search.index"));
             env.Add("AZURE_AI_SEARCH_KEY", ReadConfig("search.key"));
+
+            // HACK: this is a temporary hack to allow the CLI to work with the current
+            //      version of various SDKs
+
+            env.Add("AZURE_COGNITIVE_SEARCH_TARGET", env["AZURE_AI_SEARCH_ENDPOINT"]);
+            env.Add("AZURE_COGNITIVE_SEARCH_KEY", env["AZURE_AI_SEARCH_KEY"]);
+
             return env;
         }
 

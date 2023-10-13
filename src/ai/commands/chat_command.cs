@@ -130,7 +130,7 @@ namespace Azure.AI.Details.Common.CLI
 
         private async Task<Func<string, Task>> GetChatTextHandler()
         {
-            var function = ChatFunctionToken.Data().GetOrDefault(_values);
+            var function = FunctionToken.Data().GetOrDefault(_values);
             return function != null
                 ? await GetChatFunctionTextHandler(function)
                 : await GetNormalChatTextHandler();

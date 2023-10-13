@@ -33,7 +33,8 @@ namespace Azure.AI.Details.Common.CLI
                 args = args != null
                     ? $"\"{tempFile}\" {args}"
                     : $"\"{tempFile}\"";
-                return await ProcessHelpers.RunShellCommandAsync(_pythonBinary, args);
+                var process = await ProcessHelpers.RunShellCommandAsync(_pythonBinary, args);
+                return (process.ExitCode, process.MergedOutput);
             }
             finally
             {
@@ -178,15 +179,15 @@ namespace Azure.AI.Details.Common.CLI
 
         private static string FindPython()
         {
-            (var code, var version) = ProcessHelpers.RunShellCommandAsync("python3", "--version").Result;
-            if (code == 0 && version.Contains("Python 3.")) return "python3";
+            var process = ProcessHelpers.RunShellCommandAsync("python3", "--version").Result;
+            if (process.ExitCode == 0 && process.MergedOutput.Contains("Python 3.")) return "python3";
 
-            (code, version) = ProcessHelpers.RunShellCommandAsync("python", "--version").Result;
-            if (code == 0 && version.Contains("Python 3.")) return "python";
+            process = ProcessHelpers.RunShellCommandAsync("python", "--version").Result;
+            if (process.ExitCode == 0 && process.MergedOutput.Contains("Python 3.")) return "python";
 
             var lastTry = FindPythonBinaryInOsPath();
-            (code, version) = ProcessHelpers.RunShellCommandAsync("python", "--version").Result;
-            if (code == 0 && version.Contains("Python 3.")) return lastTry;
+            process = ProcessHelpers.RunShellCommandAsync("python", "--version").Result;
+            if (process.ExitCode == 0 && process.MergedOutput.Contains("Python 3.")) return lastTry;
 
             return null;
         }

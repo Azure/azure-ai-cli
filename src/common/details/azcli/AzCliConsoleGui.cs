@@ -73,9 +73,9 @@ namespace Azure.AI.Details.Common.CLI
             Console.Write("\rName: *** Loading choices ***");
 
             var response = await AzCli.ListSearchResources(subscription, location);
-            if (string.IsNullOrEmpty(response.StdOutput) && !string.IsNullOrEmpty(response.StdError))
+            if (string.IsNullOrEmpty(response.Output.StdOutput) && !string.IsNullOrEmpty(response.Output.StdError))
             {
-                var output = response.StdError.Replace("\n", "\n  ");
+                var output = response.Output.StdError.Replace("\n", "\n  ");
                 throw new ApplicationException($"ERROR: Listing search resources\n  {output}");
             }
 
@@ -127,9 +127,9 @@ namespace Azure.AI.Details.Common.CLI
             var response = await AzCli.CreateSearchResource(subscription, groupName, locationName, name);
 
             Console.Write("\r");
-            if (string.IsNullOrEmpty(response.StdOutput) && !string.IsNullOrEmpty(response.StdError))
+            if (string.IsNullOrEmpty(response.Output.StdOutput) && !string.IsNullOrEmpty(response.Output.StdError))
             {
-                var output = response.StdError.Replace("\n", "\n  ");
+                var output = response.Output.StdError.Replace("\n", "\n  ");
                 throw new ApplicationException($"ERROR: Creating resource:\n\n  {output}");
             }
 
