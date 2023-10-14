@@ -7,6 +7,18 @@ FROM mcr.microsoft.com/devcontainers/base:focal AS base
 ARG AZURE_CLI_VERSION=1.0.0-alpha1010.2
 ARG DOWNLOAD_SCRIPT=false
 
+# Install dependencies
+WORKDIR /
+
+# Install dependencies via apt-get (fuse, python3.10, pip, etc.)
+RUN apt-get update
+RUN apt-get install python3.10 -y
+RUN apt install python3-pip -y
+RUN apt install fuse -y
+COPY requirements.txt .
+RUN pip install -r requirements.txt --break-system-packages
+RUN apt install dos2unix -y
+
 # Copy the required scripts into the container
 WORKDIR /_scratch
 COPY ./scripts/InstallAzureAICLIDeb.sh /_scratch/
@@ -20,7 +32,8 @@ RUN if [ "${DOWNLOAD_SCRIPT}" = "true" ]; then \
 # If we're not downloading the script, update the version
 RUN if [ "${DOWNLOAD_SCRIPT}" = "false" ]; then \
     chmod +x InstallAzureAICLIDeb-UpdateVersion.sh && \
-    /bin/bash InstallAzureAICLIDeb-UpdateVersion.sh ${AZURE_CLI_VERSION} /_scratch/; \
+    /bin/bash InstallAzureAICLIDeb-UpdateVersion.sh ${AZURE_CLI_VERSION} /_scratch/ && \
+    dos2unix /_scratch/InstallAzureAICLIDeb-${AZURE_CLI_VERSION}.sh; \
     fi
 
 # Copy installation script into the container, and make sure it is executable
