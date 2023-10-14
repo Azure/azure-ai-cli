@@ -2,6 +2,7 @@
 
 # Use the base image for Ubuntu 20.04 (focal)
 FROM mcr.microsoft.com/devcontainers/base:focal AS base
+ENV DEBIAN_FRONTEND=noninteractive
 
 # Install dependencies
 WORKDIR /
@@ -10,7 +11,7 @@ WORKDIR /
 RUN apt-get update
 RUN apt install fuse -y
 RUN apt install dos2unix -y
-RUN apt-get install python3.10 -y
+RUN apt-get install python3.10 -y --no-install-recommends
 RUN apt install python3-pip -y
 COPY requirements.txt .
 RUN pip install -r requirements.txt
