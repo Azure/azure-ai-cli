@@ -2,6 +2,7 @@
 
 # Use the base image for Debian 11 (bullseye)
 FROM mcr.microsoft.com/devcontainers/python:3.10-bullseye AS base
+ENV DEBIAN_FRONTEND=noninteractive
 
 # Install dependencies
 WORKDIR /

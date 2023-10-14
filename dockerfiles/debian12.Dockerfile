@@ -2,6 +2,7 @@
 
 # Use the base image for Debian 12 (bookworm)
 FROM mcr.microsoft.com/devcontainers/python:3.10-bookworm AS base
+ENV DEBIAN_FRONTEND=noninteractive
 
 # Install dependencies
 WORKDIR /
