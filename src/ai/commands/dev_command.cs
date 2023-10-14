@@ -6,6 +6,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Net;
 using System.Text;
 
@@ -133,22 +134,24 @@ namespace Azure.AI.Details.Common.CLI
             env.Add("AZURE_COGNITIVE_SEARCH_TARGET", env["AZURE_AI_SEARCH_ENDPOINT"]);
             env.Add("AZURE_COGNITIVE_SEARCH_KEY", env["AZURE_AI_SEARCH_KEY"]);
 
-            return env;
+            return env.Where(x => !string.IsNullOrEmpty(x.Value)).ToDictionary(x => x.Key, x => x.Value);
         }
 
         private static void SetEnvironment(Dictionary<string, string> env)
         {
             foreach (var item in env)
             {
-                if (string.IsNullOrEmpty(item.Value)) continue;
                 Environment.SetEnvironmentVariable(item.Key, item.Value);
             }
         }
 
         private string SaveEnvironment(Dictionary<string, string> env, string fileName)
         {
+            var items = env.ToList();
+            items.Sort((x, y) => x.Key.CompareTo(y.Key));
+
             var sb = new StringBuilder();
-            foreach (var item in env)
+            foreach (var item in items)
             {
                 sb.AppendLine($"{item.Key}={item.Value}");
             }
@@ -159,14 +162,14 @@ namespace Azure.AI.Details.Common.CLI
 
         private static void PrintEnvironment(Dictionary<string, string> env)
         {
-            foreach (var item in env)
-            {
-                if (string.IsNullOrEmpty(item.Value)) continue;
+            var items = env.ToList();
+            items.Sort((x, y) => x.Key.CompareTo(y.Key));
 
+            foreach (var item in items)
+            {
                 var value = item.Key.EndsWith("_KEY")
                     ? item.Value.Substring(0, 4) + "****************************"
                     : item.Value;
-
                 Console.WriteLine($"  {item.Key} = {value}");
             }
         }
