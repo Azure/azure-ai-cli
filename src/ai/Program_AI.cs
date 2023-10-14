@@ -48,11 +48,11 @@ namespace Azure.AI.Details.Common.CLI
         #endregion
 
         #region help command data
-        public string HelpCommandTokens => "wizard;dev;init;config;chat;speech;vision;language;search;service;tool;samples;code;eval;run";
+        public string HelpCommandTokens => "wizard;dev;init;config;chat;flow;speech;vision;language;search;service;tool;samples;code;eval;run";
         #endregion
 
         #region config command data
-        public string ConfigScopeTokens => $"wizard;dev;init;chat;speech;vision;language;search;service;tool;samples;code;eval;run;*";
+        public string ConfigScopeTokens => $"wizard;dev;init;chat;flow;speech;vision;language;search;service;tool;samples;code;eval;run;*";
         #endregion
 
         #region zip option data
@@ -104,6 +104,7 @@ namespace Azure.AI.Details.Common.CLI
             return root switch {
                 "init" => (new InitCommand(values)).RunCommand(),
                 "chat" => (new ChatCommand(values)).RunCommand(),
+                "flow" => (new FlowCommand(values)).RunCommand(),
                 "speech" => (new SpeechCommand(values)).RunCommand(),
                 "vision" => (new VisionCommand(values)).RunCommand(),
                 "language" => (new LanguageCommand(values)).RunCommand(),
@@ -131,6 +132,7 @@ namespace Azure.AI.Details.Common.CLI
                 "init" => InitCommandParser.ParseCommand(tokens, values),
                 "config" => ConfigCommandParser.ParseCommand(tokens, values),
                 "chat" => ChatCommandParser.ParseCommand(tokens, values),
+                "flow" => FlowCommandParser.ParseCommand(tokens, values),
                 "eval" => EvalCommandParser.ParseCommand(tokens, values),
                 "speech" => SpeechCommandParser.ParseCommand(tokens, values),
                 "vision" => VisionCommandParser.ParseCommand(tokens, values),
@@ -155,6 +157,7 @@ namespace Azure.AI.Details.Common.CLI
                 "init" => InitCommandParser.ParseCommandValues(tokens, values),
                 "config" => ConfigCommandParser.ParseCommandValues(tokens, values),
                 "chat" => ChatCommandParser.ParseCommandValues(tokens, values),
+                "flow" => FlowCommandParser.ParseCommandValues(tokens, values),
                 "eval" => EvalCommandParser.ParseCommandValues(tokens, values),
                 "speech" => SpeechCommandParser.ParseCommandValues(tokens, values),
                 "vision" => VisionCommandParser.ParseCommandValues(tokens, values),

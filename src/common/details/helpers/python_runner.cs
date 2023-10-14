@@ -33,7 +33,8 @@ namespace Azure.AI.Details.Common.CLI
                 args = args != null
                     ? $"\"{tempFile}\" {args}"
                     : $"\"{tempFile}\"";
-                return await ProcessHelpers.RunShellCommandAsync(_pythonBinary, args);
+                var process = await ProcessHelpers.RunShellCommandAsync(_pythonBinary, args);
+                return (process.ExitCode, process.MergedOutput);
             }
             finally
             {
@@ -45,7 +46,7 @@ namespace Azure.AI.Details.Common.CLI
         {
             var path = FileHelpers.FindFileInHelpPath($"help/include.python.script.{scriptName}.py");
             var script = FileHelpers.ReadAllHelpText(path, Encoding.UTF8);
-            var scriptArgs = BuildPythonScriptArgs(args);
+            var scriptArgs = CliHelpers.BuildCliArgs(args);
 
             if (Program.Debug) Console.WriteLine($"DEBUG: {scriptName}.py:\n{script}");
             if (Program.Debug) Console.WriteLine($"DEBUG: PythonRunner.RunScriptAsync: '{scriptName}' {scriptArgs}");
@@ -120,34 +121,6 @@ namespace Azure.AI.Details.Common.CLI
             return ParseOutputAndSkipLinesUntilStartsWith(output, "---").Trim('\r', '\n', ' ');
         }
 
-        private static string BuildPythonScriptArgs(params string[] args)
-        {
-            var sb = new StringBuilder();
-            for (int i = 0; i + 1 < args.Length; i += 2)
-            {
-                var argName = args[i];
-                var argValue = args[i + 1];
-
-                if (string.IsNullOrWhiteSpace(argValue)) continue;
-
-                // if the argValue contains quotes or anything that needs to be "escaped" or enclosed in 
-                // double quotes so we can successfully execute on the command shell, do that here.
-
-                if (!argValue.Contains('\"') && !argValue.Contains('\'') && !argValue.Contains(' ') && !argValue.Contains('\t'))
-                {
-                    sb.Append($"{argName} {argValue}");
-                    sb.Append(' ');
-                    continue;
-                }
-
-                argValue = argValue.Replace("\"", "\\\"");
-
-                sb.Append($"{argName} \"{argValue}\"");
-                sb.Append(' ');
-            }
-            return sb.ToString().Trim();
-        }
-
         private static string ParseOutputAndSkipLinesUntilStartsWith(string output, string startsWith)
         {
             var lines = output.Split('\n');
@@ -178,15 +151,15 @@ namespace Azure.AI.Details.Common.CLI
 
         private static string FindPython()
         {
-            (var code, var version) = ProcessHelpers.RunShellCommandAsync("python3", "--version").Result;
-            if (code == 0 && version.Contains("Python 3.")) return "python3";
+            var process = ProcessHelpers.RunShellCommandAsync("python3", "--version").Result;
+            if (process.ExitCode == 0 && process.MergedOutput.Contains("Python 3.")) return "python3";
 
-            (code, version) = ProcessHelpers.RunShellCommandAsync("python", "--version").Result;
-            if (code == 0 && version.Contains("Python 3.")) return "python";
+            process = ProcessHelpers.RunShellCommandAsync("python", "--version").Result;
+            if (process.ExitCode == 0 && process.MergedOutput.Contains("Python 3.")) return "python";
 
             var lastTry = FindPythonBinaryInOsPath();
-            (code, version) = ProcessHelpers.RunShellCommandAsync("python", "--version").Result;
-            if (code == 0 && version.Contains("Python 3.")) return lastTry;
+            process = ProcessHelpers.RunShellCommandAsync("python", "--version").Result;
+            if (process.ExitCode == 0 && process.MergedOutput.Contains("Python 3.")) return lastTry;
 
             return null;
         }

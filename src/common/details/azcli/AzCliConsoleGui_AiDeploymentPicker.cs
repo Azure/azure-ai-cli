@@ -45,9 +45,9 @@ namespace Azure.AI.Details.Common.CLI
                 var response = await AzCli.ListCognitiveServicesDeployments(subscriptionId, groupName, resourceName, "OpenAI");
 
                 Console.Write($"\rName: ");
-                if (string.IsNullOrEmpty(response.StdOutput) && !string.IsNullOrEmpty(response.StdError))
+                if (string.IsNullOrEmpty(response.Output.StdOutput) && !string.IsNullOrEmpty(response.Output.StdError))
                 {
-                    throw new ApplicationException($"ERROR: Loading deployments:\n{response.StdError}");
+                    throw new ApplicationException($"ERROR: Loading deployments:\n{response.Output.StdError}");
                 }
 
                 var deployments = response.Payload
@@ -152,9 +152,9 @@ namespace Azure.AI.Details.Common.CLI
                 var response = await AzCli.CreateCognitiveServicesDeployment(subscriptionId, groupName, resourceName, deploymentName, modelName, modelVersion, modelFormat, scaleCapacity);
 
                 Console.Write("\r");
-                if (string.IsNullOrEmpty(response.StdOutput) && !string.IsNullOrEmpty(response.StdError))
+                if (string.IsNullOrEmpty(response.Output.StdOutput) && !string.IsNullOrEmpty(response.Output.StdError))
                 {
-                    throw new ApplicationException($"ERROR: Creating deployment: {response.StdError}");
+                    throw new ApplicationException($"ERROR: Creating deployment: {response.Output.StdError}");
                 }
 
                 Console.WriteLine("\r*** CREATED ***  ");

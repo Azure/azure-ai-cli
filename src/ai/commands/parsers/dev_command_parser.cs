@@ -21,15 +21,11 @@ namespace Azure.AI.Details.Common.CLI
 
         private static readonly (string name, bool valuesRequired)[] _commands =  {
             ("dev.new.env", false),
-            ("dev.new", true),
             ("dev.shell", false),
-            ("dev", true)
         };
 
         private static readonly string[] _partialCommands = {
-            "dev.new.env",
             "dev.new",
-            "dev.shell",
             "dev"
         };
 

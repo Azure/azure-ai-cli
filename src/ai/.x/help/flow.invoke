@@ -1,0 +1,21 @@
+FLOW INVOKE
+
+@include.the.flow.invoke.command
+
+USAGE: ai flow invoke [...]
+
+  FLOW
+    --flow NAME
+    --node NODE
+    --input KEY=VALUE
+
+EXAMPLE
+
+  ai flow invoke --flow my.flow chat --input question=hello
+
+SEE ALSO
+
+  ai help flow
+  ai help flow new
+  ai help flow examples
+  ai help find topics flow
