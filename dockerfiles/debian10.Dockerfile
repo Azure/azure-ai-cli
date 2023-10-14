@@ -7,17 +7,10 @@ FROM mcr.microsoft.com/devcontainers/base:buster AS base
 ARG AZURE_CLI_VERSION=1.0.0-alpha1010.2
 ARG DOWNLOAD_SCRIPT=false
 
-# needed for build_mlindex
-RUN apt update && apt install -y fuse
-
 # Copy the required scripts into the container
 WORKDIR /_scratch
 COPY ./scripts/InstallAzureAICLIDeb.sh /_scratch/
 COPY ./scripts/InstallAzureAICLIDeb-UpdateVersion.sh /_scratch/
-
-# Install Python SDK
-COPY ./dockerfiles/requirements.txt /_scratch/
-RUN pip install -r requirements.txt 
 
 # If we're downloading the script, do so
 RUN if [ "${DOWNLOAD_SCRIPT}" = "true" ]; then \
