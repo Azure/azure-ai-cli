@@ -3,26 +3,26 @@
 # Use the base image for Ubuntu 22.04 (jammy)
 FROM mcr.microsoft.com/devcontainers/base:jammy AS base
 
-# Feature flags/arguments
-ARG AZURE_CLI_VERSION=1.0.0-alpha1010.2
-ARG DOWNLOAD_SCRIPT=false
-
 # Install dependencies
 WORKDIR /
 
-# Install dependencies via apt-get (fuse, python3.10, pip, etc.)
+# Install dependencies
 RUN apt-get update
+RUN apt install fuse -y
+RUN apt install dos2unix -y
 RUN apt-get install python3.10 -y
 RUN apt install python3-pip -y
-RUN apt install fuse -y
 COPY requirements.txt .
-RUN pip install -r requirements.txt --break-system-packages
-RUN apt install dos2unix -y
+RUN pip install -r requirements.txt
 
 # Copy the required scripts into the container
 WORKDIR /_scratch
 COPY ./scripts/InstallAzureAICLIDeb.sh /_scratch/
 COPY ./scripts/InstallAzureAICLIDeb-UpdateVersion.sh /_scratch/
+
+# Feature flags/arguments
+ARG AZURE_CLI_VERSION=1.0.0-alpha1010.2
+ARG DOWNLOAD_SCRIPT=false
 
 # If we're downloading the script, do so
 RUN if [ "${DOWNLOAD_SCRIPT}" = "true" ]; then \
