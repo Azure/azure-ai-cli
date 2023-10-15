@@ -78,25 +78,49 @@ namespace Azure.AI.Details.Common.CLI
         {
             DisplayBanner("dev.shell");
 
+            var fileName = OS.IsLinux() ? "bash" : "cmd.exe";
+            var arguments = OS.IsLinux() ? "-li" : "/k PROMPT (ai dev shell) %PROMPT%& title (ai dev shell)";
+
             Console.WriteLine("Environment populated:\n");
 
             var env = GetEnvironment();
             PrintEnvironment(env);
             SetEnvironment(env);
+            Console.WriteLine();
 
-            var fileName = OS.IsLinux() ? "bash" : "cmd.exe";
-            var arguments = OS.IsLinux() ? "-li" : "/k PROMPT (ai dev shell) %PROMPT%& title (ai dev shell)";
+            var runCommand = RunCommandToken.Data().GetOrDefault(_values);
+            UpdateFileNameArguments(runCommand, ref fileName, ref arguments);
 
             var process = ProcessHelpers.StartProcess(fileName, arguments, env, false);
             process.WaitForExit();
 
             if (process.ExitCode != 0)
             {
+                Console.WriteLine("\n(ai dev shell) FAILED!\n");
                 _values.AddThrowError("ERROR:", $"Shell exited with code {process.ExitCode}");
             }
             else
             {
-                Console.WriteLine("(ai dev shell) exited successfully");
+                Console.WriteLine("\n(ai dev shell) exited successfully");
+            }
+        }
+
+        private static void UpdateFileNameArguments(string runCommand, ref string fileName, ref string arguments)
+        {
+            if (!string.IsNullOrEmpty(runCommand))
+            {
+                var parts = runCommand.Split(new char[] { ' ' }, 2);
+                var inPath = FileHelpers.FileExistsInOsPath(parts[0]) || (OS.IsWindows() && FileHelpers.FileExistsInOsPath(parts[0] + ".exe"));
+
+                var filePart = parts[0];
+                var argsPart = parts.Length == 2 ? parts[1] : null;
+
+                fileName = inPath ? filePart : fileName;
+                arguments = inPath ? argsPart : (OS.IsLinux()
+                    ? $"-lic \"{runCommand}\""
+                    : $"/c \"{runCommand}\"");
+
+                Console.WriteLine($"Running command: {runCommand}\n");
             }
         }
 
