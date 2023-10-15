@@ -170,19 +170,7 @@ namespace Azure.AI.Details.Common.CLI
                 ? "python.exe"
                 : "python3";
 
-            var lookIn = Environment.GetEnvironmentVariable("PATH")!.Split(System.IO.Path.PathSeparator);
-            var found = lookIn.SelectMany(x =>
-            {
-                try
-                {
-                    return System.IO.Directory.GetFiles(x, search);
-                }
-                catch (Exception)
-                {
-                    return Enumerable.Empty<string>();
-                }
-            });
-            return found.FirstOrDefault();
+            return FileHelpers.FindFileInOsPath(search);
         }
 
         private static string? _pythonBinary;
