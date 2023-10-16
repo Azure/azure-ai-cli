@@ -52,6 +52,8 @@ namespace Azure.AI.Details.Common.CLI
 
         private async Task DoCommand(string command)
         {
+            StartCommand();
+
             DisplayInitServiceBanner();
 
             CheckPath();
@@ -59,72 +61,121 @@ namespace Azure.AI.Details.Common.CLI
             var interactive = _values.GetOrDefault("init.service.interactive", true);
             switch (command)
             {
-                case "init": await DoInitServiceCommand(); break;
+                // case "init": await DoInitServiceCommand(); break;
+                case "init": await DoInitRoot(); break;
                 case "init.openai": await DoInitOpenAiCommand(); break;
                 case "init.search": await DoInitSearchCommand(); break;
                 case "init.resource": await DoInitResourceCommand(); break;
                 case "init.project": await DoInitProjectCommand(); break;
+
+                default:
+                    _values.AddThrowError("WARNING", $"Unknown command '{command}'");
+                    break;
             }
+
+            StopCommand();
+            DisposeAfterStop();
+            DeleteTemporaryFiles();
+        }
+
+        private async Task DoInitRoot()
+        {
+            var interactive = _values.GetOrDefault("init.service.interactive", true);
+            if (!interactive) ThrowInteractiveNotSupportedApplicationException(); // TODO: Add back non-interactive mode support
+
+            ConsoleHelpers.WriteLineWithHighlight("AI INIT\n\n  The `ai init` command initializes (create, select, or attach to) AI Projects and services.\n");
+
+            var existing = FileHelpers.FindFileInDataPath("config.json", _values);
+            if (existing != null)
+            {
+                await DoInitRootVerifyConfig(existing);
+            }
+            else
+            {
+                await DoInitRootMenuPick();
+            }
+        }
+
+        private Task DoInitRootVerifyConfig(string fileName)
+        {
+            throw new NotImplementedException();
+        }
+
+        private async Task DoInitRootMenuPick()
+        {
+            Console.WriteLine("  Choose between initializing:");
+            ConsoleHelpers.WriteLineWithHighlight("  - AI Project resource: Recommended when using `Azure AI Studio` and/or connecting to multiple AI services.");
+            Console.WriteLine("  - Standalone resources: Recommended when building simple solutions connecting to a single AI service.");
+            Console.WriteLine();
+
+            var label = "  Task";
+            Console.Write($"{label}: ");
+            var choiceToPart = new Dictionary<string, string>
+            {
+                ["INIT: a new AI Project"] = "init-root-project-new",
+                ["  or: an existing AI Project"] = "init-root-project-pick",
+                ["  or: standalone service resources"] = "init-root-standalone-select-or-create",
+            };
+            var partToLabelDisplay = new Dictionary<string, string>()
+            {
+                ["init-root-project-new"] = "New AI Project",
+                ["init-root-project-pick"] = "Existing AI Project",
+                ["init-root-standalone-select-or-create"] = "Standalone service resources",
+            };
+
+            var choices = choiceToPart.Keys.ToArray();
+            var picked = ListBoxPicker.PickIndexOf(choices.ToArray());
+            if (picked < 0)
+            {
+                Console.WriteLine($"\r{label}: (canceled)");
+                return;
+            }
+
+            var part = choiceToPart[choices[picked]];
+            var display = partToLabelDisplay[part];
+
+            ConsoleHelpers.WriteLineWithHighlight($"\r`AI INIT: {display.ToUpper()}`\n");
+
+            // HACK
+            if (part == "init-root-standalone-select-or-create")
+            {
+                part = "openai;search";
+            }
+
+            var interactive = true;
+            await DoInitServiceParts(interactive, part.Split(';').ToArray());
+
+            await Task.CompletedTask;
         }
 
         private async Task DoInitServiceCommand()
         {
-            StartCommand();
-
             var interactive = _values.GetOrDefault("init.service.interactive", true);
             await DoInitService(interactive);
-
-            StopCommand();
-            DisposeAfterStop();
-            DeleteTemporaryFiles();
         }
 
         private async Task DoInitOpenAiCommand()
         {
-            StartCommand();
-
             var interactive = _values.GetOrDefault("init.service.interactive", true);
             await DoInitServiceParts(interactive, "openai");
-
-            StopCommand();
-            DisposeAfterStop();
-            DeleteTemporaryFiles();
         }
 
         private async Task DoInitSearchCommand()
         {
-            StartCommand();
-
             var interactive = _values.GetOrDefault("init.service.interactive", true);
             await DoInitServiceParts(interactive, "openai", "search");
-
-            StopCommand();
-            DisposeAfterStop();
-            DeleteTemporaryFiles();
         }
 
         private async Task DoInitResourceCommand()
         {
-            StartCommand();
-
             var interactive = _values.GetOrDefault("init.service.interactive", true);
             await DoInitServiceParts(interactive, "resource");
-
-            StopCommand();
-            DisposeAfterStop();
-            DeleteTemporaryFiles();
         }
 
         private async Task DoInitProjectCommand()
         {
-            StartCommand();
-
             var interactive = _values.GetOrDefault("init.service.interactive", true);
             await DoInitServiceParts(interactive, "openai", "search", "resource", "project");
-
-            StopCommand();
-            DisposeAfterStop();
-            DeleteTemporaryFiles();
         }
 
         private async Task DoInitService(bool interactive)
@@ -171,6 +222,10 @@ namespace Azure.AI.Details.Common.CLI
                     "search" => DoInitSearch(interactive),
                     "resource" => DoInitHub(interactive),
                     "project" => DoInitProject(interactive),
+
+                    "init-root-project-pick" => DoInitProject(interactive), // TODO: Replace with new flow
+                    "init-root-project-new" => DoInitProject(interactive), // TODO: Replace with new flow
+
                     _ => throw new ApplicationException($"WARNING: NOT YET IMPLEMENTED")
                 };
                 await task;
