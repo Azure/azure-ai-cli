@@ -110,6 +110,16 @@ namespace Azure.AI.Details.Common.CLI
 
         private bool VerifyConfigGood(string fileName)
         {
+            var message = $"  Verifying config.json: {fileName}... ";
+            Console.Write(message);
+            
+            Thread.Sleep(1000);
+            Console.WriteLine($"\r{message} Done!");
+
+            ConsoleHelpers.WriteLineWithHighlight("  `#e_;WARNING: config.json is not valid; Please fix it and try again.`");
+            ConsoleHelpers.WriteLineWithHighlight("  `#e_;    FYI: Didn't really check, truth be told; not implemented yet 😁...`");
+            Console.WriteLine();
+             
             // TODO: Actually verify that it's a good config.json
             return true;
         }
