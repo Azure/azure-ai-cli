@@ -18,7 +18,7 @@ def create_project(subscription_id, resource_id, resource_group_name, project_na
         location=location,
         display_name=display_name,
         description=description,
-        resource=resource_id,
+        ai_resource=resource_id,
     )
 
     result = ai_client.projects.begin_create(project=project, byo_open_ai_resource_id=openai_resource_id).result()

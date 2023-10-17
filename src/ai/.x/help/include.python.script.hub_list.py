@@ -13,7 +13,7 @@ def list_hubs(subscription_id, resource_group_name):
         user_agent="ai-cli 0.0.1"
     )
 
-    items = ai_client.resources.list(scope=Scope.SUBSCRIPTION)
+    items = ai_client.ai_resources.list(scope=Scope.RESOURCE_GROUP)
     results = []
 
     for item in items:

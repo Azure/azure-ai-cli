@@ -3,7 +3,7 @@ import json
 from azure.ai.generative import AIClient
 from azure.identity import DefaultAzureCredential
 
-def delete_hub(subscription_id, resource_group_name, resource_name, delete_dependent_resources):
+def delete_hub(subscription_id, resource_group_name, ai_resource_name, delete_dependent_resources):
     """Delete Azure ML hubs."""
     ai_client = AIClient(
         credential=DefaultAzureCredential(),
@@ -12,8 +12,7 @@ def delete_hub(subscription_id, resource_group_name, resource_name, delete_depen
         user_agent="ai-cli 0.0.1"
     )
 
-    # TODO should we allow setting of optional bool permanetly_delete?
-    result = ai_client.resources.begin_delete(name=resource_name, delete_dependent_resources=delete_dependent_resources).result()
+    result = ai_client.ai_resources.begin_delete(name=ai_resource_name, delete_dependent_resources=delete_dependent_resources).result()
     return result
 
 def main():
@@ -27,10 +26,10 @@ def main():
 
     subscription_id = args.subscription
     resource_group_name = args.group
-    resource_name = args.name;
+    ai_resource_name = args.name;
     delete_dependent_resources = args.delete_dependent_resources
 
-    result = delete_hub(subscription_id, resource_group_name, resource_name, delete_dependent_resources)
+    result = delete_hub(subscription_id, resource_group_name, ai_resource_name, delete_dependent_resources)
     formatted = json.dumps(result, indent=2)
 
     print("---")
