@@ -1,23 +1,5 @@
 #!/bin/bash
 
-# Function to read user input or use a default value
-read_input() {
-    local prompt="$1"
-    local default_value="$2"
-    local input
-
-    if [ -t 0 ]; then
-        # Input is from the terminal (interactive)
-        read -p "$prompt" input
-        [ -z "$input" ] && input="$default_value"  # Use default if input is empty
-    else
-        # Input is from a pipe
-        input="$default_value"
-    fi
-
-    echo "$input"
-}
-
 # Check to see if we need to have the user specify the version of Azure.AI.CLI they want to install
 AICLI_VERSION="PLACEHOLDER_VERSION"
 if [ "$AICLI_VERSION" == "PLACEHOLDER_VERSION" ]; then
@@ -127,8 +109,17 @@ fi
 
 # Install the Azure.AI.CLI dotnet tool
 echo "Installing Azure.AI.CLI..."
-dotnet tool install --global --add-source . Azure.AI.CLI --version ${AICLI_VERSION}
-DOTNET_TOOLS_PATH="$HOME/.dotnet/tools"
+
+if [ "$EUID" -ne 0 ]; then # if we're not root
+    dotnet tool install --global --add-source . Azure.AI.CLI --version ${AICLI_VERSION}
+    DOTNET_TOOLS_PATH="$HOME/.dotnet/tools"
+elif [ -n "$SUDO_USER" ]; then # if we're root and SUDO_USER is set, run as SUDO_USER
+    sudo -u $SUDO_USER dotnet tool install --global --add-source . Azure.AI.CLI --version ${AICLI_VERSION}
+    DOTNET_TOOLS_PATH="/home/$SUDO_USER/.dotnet/tools"
+else # if we're root and SUDO_USER is not set, we can't proceed
+    echo "Cannot determine the user to install the Azure.AI.CLI dotnet tool for."
+    exit 1
+fi
 
 # Check if the installation was successful
 if [ $? -ne 0 ]; then

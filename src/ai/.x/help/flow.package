@@ -1,0 +1,20 @@
+FLOW PACKAGE
+
+@include.the.flow.package.command
+
+USAGE: ai flow package [...]
+
+  FLOW
+    --flow NAME
+    --docker LOCATION
+
+EXAMPLE
+
+  ai flow package --flow myflow --docker /tmp/myflow
+
+SEE ALSO
+
+  ai help flow
+  ai help flow new
+  ai help flow examples
+  ai help find topics flow

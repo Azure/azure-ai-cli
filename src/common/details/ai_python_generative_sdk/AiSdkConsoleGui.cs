@@ -288,7 +288,7 @@ namespace Azure.AI.Details.Common.CLI
 
         public static void CreatAiHubProjectConfigJsonFile(string subscription, string groupName, string projectName)
         {
-            ConsoleHelpers.WriteLineWithHighlight($"\n`AZURE AI PROJECT CONFIG`\n");
+            ConfigSetHelpers.ConfigureProject(subscription, groupName, projectName);
 
             dynamic configJsonData = new
             {

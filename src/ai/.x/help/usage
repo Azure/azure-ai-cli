@@ -5,35 +5,33 @@
 
 USAGE: ai <command> [...]
 
-`INTERACTIVE`
+`HELP`
 
-  ai help                   (see: ai help get started)
-  ai wizard                 (see: ai help wizard)
+  ai help
+  ai help init
 
-`CONFIGURATION`
+`COMMANDS`
 
   ai init [...]             (see: ai help init)
   ai config [...]           (see: ai help config)
 
-`AI SERVICES and TOOLS`
+  ai dev [...]              (see: ai help dev)
 
   ai chat [...]             (see: ai help chat)
+  ai flow [...]             (see: ai help flow)
 
-`#e_;*` ai speech [...]           (see: ai help speech)
-`#e_;*` ai vision [...]           (see: ai help vision)
-`#e_;*` ai language [...]         (see: ai help language)
   ai search [...]           (see: ai help search)
+  ai speech [...]           (see: ai help speech)
 
   ai service [...]          (see: ai help service)
-`#e_;*` ai tool [...]             (see: ai help tool)
 
-`#e_;* - COMING SOON`
+`EXAMPLES`
 
-`AI DEVELOPMENT`
+  ai init
+  ai chat --interactive --system @prompt.txt
 
-`#e_;*` ai samples [...]          (see: ai help samples)
-`#e_;*` ai code [...]             (see: ai help code)
-`#e_;*` ai eval [...]             (see: ai help eval)
+  ai search index update --name MyIndex --files *.md
+  ai chat --interactive --system @prompt.txt --index-name MyIndex
 
 `SEE ALSO`
 
@@ -46,4 +44,3 @@ USAGE: ai <command> [...]
   ai help list topics
 
   ai help documentation
-

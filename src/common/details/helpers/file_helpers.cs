@@ -398,6 +398,23 @@ namespace Azure.AI.Details.Common.CLI
             return found;
         }
 
+        public static string FindFileInOsPath(string fileName)
+        {
+            var lookIn = Environment.GetEnvironmentVariable("PATH")!.Split(System.IO.Path.PathSeparator);
+            var found = lookIn.SelectMany(x =>
+            {
+                try
+                {
+                    return System.IO.Directory.GetFiles(x, fileName);
+                }
+                catch (Exception)
+                {
+                    return Enumerable.Empty<string>();
+                }
+            });
+            return found.FirstOrDefault();
+        }
+
         private static string FindFileInPath(string fileName, INamedValues values, string searchPaths)
         {
             if (IsStandardInputReference(fileName)) return fileName;
@@ -433,6 +450,12 @@ namespace Azure.AI.Details.Common.CLI
         public static bool FileExistsInHelpPath(string fileName, INamedValues values)
         {
             return FileExistsInPath(fileName, values, GetHelpPath());
+        }
+
+        public static bool FileExistsInOsPath(string fileName)
+        {
+            var existing = FindFileInOsPath(fileName);
+            return existing != null;
         }
 
         private static bool FileExistsInPath(string fileName, INamedValues values, string searchPath)
@@ -1249,13 +1272,13 @@ namespace Azure.AI.Details.Common.CLI
         private static string GetAppDataDir()
         {
             var path = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
-            return path.Trim('/', '\\') + "/";
+            return path.TrimEnd('/', '\\') + "/";
         }
 
         private static string GetAppUserDir()
         {
             var path = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
-            return path.Trim('/', '\\') + "/";
+            return path.TrimEnd('/', '\\') + "/";
         }
 
         private static string CheckDotDirectory(string checkPath, bool mustExist = true, bool createIfDoesnt = false)

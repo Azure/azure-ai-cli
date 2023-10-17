@@ -28,7 +28,6 @@ USAGE: ai init [...]
 
 SEE ALSO
 
-  ai help setup
   ai help config
   ai help config hive
   ai help init examples

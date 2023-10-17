@@ -64,9 +64,9 @@ namespace Azure.AI.Details.Common.CLI
                 var response = await AzCli.ListCognitiveServicesResources(subscriptionId, kind);
 
                 Console.Write("\rName: ");
-                if (string.IsNullOrEmpty(response.StdOutput) && !string.IsNullOrEmpty(response.StdError))
+                if (string.IsNullOrEmpty(response.Output.StdOutput) && !string.IsNullOrEmpty(response.Output.StdError))
                 {
-                    throw new ApplicationException($"ERROR: Loading Cognitive Services resources: {response.StdError}");
+                    throw new ApplicationException($"ERROR: Loading Cognitive Services resources: {response.Output.StdError}");
                 }
 
                 var resources = response.Payload
@@ -136,9 +136,9 @@ namespace Azure.AI.Details.Common.CLI
                 var response = await AzCli.CreateCognitiveServicesResource(subscriptionId, group.Name, group.RegionLocation, name, kind, sku);
 
                 Console.Write("\r");
-                if (string.IsNullOrEmpty(response.StdOutput) && !string.IsNullOrEmpty(response.StdError))
+                if (string.IsNullOrEmpty(response.Output.StdOutput) && !string.IsNullOrEmpty(response.Output.StdError))
                 {
-                    throw new ApplicationException($"ERROR: Creating Cognitive Services resource: {response.StdError}");
+                    throw new ApplicationException($"ERROR: Creating Cognitive Services resource: {response.Output.StdError}");
                 }
 
                 Console.WriteLine("\r*** CREATED ***  ");

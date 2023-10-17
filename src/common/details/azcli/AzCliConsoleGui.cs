@@ -56,7 +56,7 @@ namespace Azure.AI.Details.Common.CLI
 
         public static async Task<AzCli.CognitiveSearchKeyInfo> LoadSearchResourceKeys(string subscriptionId, AzCli.CognitiveSearchResourceInfo resource)
         {
-            ConsoleHelpers.WriteLineWithHighlight($"\n`COGNITIVE SEARCH RESOURCE KEYS`");
+            ConsoleHelpers.WriteLineWithHighlight($"\n`AI SEARCH RESOURCE KEYS`");
 
             Console.Write("Keys: *** Loading ***");
             var keys = await AzCli.ListSearchAdminKeys(subscriptionId, resource.Group, resource.Name);
@@ -69,13 +69,13 @@ namespace Azure.AI.Details.Common.CLI
 
         public static async Task<AzCli.CognitiveSearchResourceInfo> PickOrCreateCognitiveSearchResource(string subscription, string location, string groupName, string smartName = null, string smartNameKind = null)
         {
-            ConsoleHelpers.WriteLineWithHighlight($"\n`COGNITIVE SEARCH RESOURCE`");
+            ConsoleHelpers.WriteLineWithHighlight($"\n`AI SEARCH RESOURCE`");
             Console.Write("\rName: *** Loading choices ***");
 
             var response = await AzCli.ListSearchResources(subscription, location);
-            if (string.IsNullOrEmpty(response.StdOutput) && !string.IsNullOrEmpty(response.StdError))
+            if (string.IsNullOrEmpty(response.Output.StdOutput) && !string.IsNullOrEmpty(response.Output.StdError))
             {
-                var output = response.StdError.Replace("\n", "\n  ");
+                var output = response.Output.StdError.Replace("\n", "\n  ");
                 throw new ApplicationException($"ERROR: Listing search resources\n  {output}");
             }
 
@@ -103,7 +103,7 @@ namespace Azure.AI.Details.Common.CLI
 
         private static async Task<AzCli.CognitiveSearchResourceInfo> TryCreateSearchInteractive(string subscription, string locationName, string groupName, string smartName = null, string smartNameKind = null)
         {
-            ConsoleHelpers.WriteLineWithHighlight($"\n`CREATE COGNITIVE SEARCH RESOURCE`");
+            ConsoleHelpers.WriteLineWithHighlight($"\n`CREATE AI SEARCH RESOURCE`");
 
             var groupOk = !string.IsNullOrEmpty(groupName);
             if (!groupOk)
@@ -121,15 +121,15 @@ namespace Azure.AI.Details.Common.CLI
                 smartNameKind = "rg";
             }
 
-            var name = NamePickerHelper.DemandPickOrEnterName("Name: ", "cogsearch", smartName, smartNameKind);
+            var name = NamePickerHelper.DemandPickOrEnterName("Name: ", "search", smartName, smartNameKind);
 
             Console.Write("*** CREATING ***");
             var response = await AzCli.CreateSearchResource(subscription, groupName, locationName, name);
 
             Console.Write("\r");
-            if (string.IsNullOrEmpty(response.StdOutput) && !string.IsNullOrEmpty(response.StdError))
+            if (string.IsNullOrEmpty(response.Output.StdOutput) && !string.IsNullOrEmpty(response.Output.StdError))
             {
-                var output = response.StdError.Replace("\n", "\n  ");
+                var output = response.Output.StdError.Replace("\n", "\n  ");
                 throw new ApplicationException($"ERROR: Creating resource:\n\n  {output}");
             }
 

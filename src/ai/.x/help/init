@@ -25,13 +25,8 @@ EXAMPLES
 
     ai init --name "ai-westus2" --region westus2
 
-  `EXAMPLE 3`: non-interactively select or create a resource by specifying all parameters
-
-    ai init --interactive false --subscription "Pay-As-You-Go" --region westus2 --group "ai-4372626e-rg" --name "ai-4372626e"
-
 SEE ALSO
 
-  ai help setup
   ai help config
   ai help config hive
   ai help init advanced

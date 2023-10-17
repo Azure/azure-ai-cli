@@ -39,6 +39,9 @@ namespace Azure.AI.Details.Common.CLI
                 {
                     throw new ApplicationException($"CANCELED: No subscription selected.");
                 }
+
+                await AzCli.SetAccount(subscription.Value.Id);
+
                 return subscription.Value;
             }
 
@@ -47,9 +50,9 @@ namespace Azure.AI.Details.Common.CLI
                 Console.Write("\rSubscription: *** Loading choices ***");
                 var response = await AzCli.ListAccounts();
 
-                var noOutput = string.IsNullOrEmpty(response.StdOutput);
-                var hasError = !string.IsNullOrEmpty(response.StdError);
-                var hasErrorNotFound = hasError && (response.StdError.Contains(" not ") || response.StdError.Contains("No such file"));
+                var noOutput = string.IsNullOrEmpty(response.Output.StdOutput);
+                var hasError = !string.IsNullOrEmpty(response.Output.StdError);
+                var hasErrorNotFound = hasError && (response.Output.StdError.Contains(" not ") || response.Output.StdError.Contains("No such file"));
 
                 Console.Write("\rSubscription: ");
                 if (noOutput && hasError && hasErrorNotFound)
@@ -58,10 +61,10 @@ namespace Azure.AI.Details.Common.CLI
                 }
                 else if (noOutput && hasError)
                 {
-                    throw new ApplicationException($"*** ERROR: Loading subscriptions ***\n{response.StdError}");
+                    throw new ApplicationException($"*** ERROR: Loading subscriptions ***\n{response.Output.StdError}");
                 }
 
-                var needLogin = response.StdError != null && response.StdError.Contains("az login");
+                var needLogin = response.Output.StdError != null && response.Output.StdError.Contains("az login");
                 if (response.Payload.Count() == 0 && needLogin)
                 {
                     bool cancelLogin = !interactive;

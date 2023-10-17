@@ -9,12 +9,6 @@ EXAMPLES
 
   ai init
   
-  ai config --set region westus2
-  ai config --set key 436172626F6E20697320636F6F6C2121
-
-  ai complete --file prompt.txt
-  ai complete --files *.txt
-
   ai chat --file prompt.txt
 
 ADDITIONAL EXAMPLES

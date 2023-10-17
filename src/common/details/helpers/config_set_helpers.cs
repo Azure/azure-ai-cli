@@ -11,6 +11,20 @@ namespace Azure.AI.Details.Common.CLI
 {
     public class ConfigSetHelpers
     {
+        public static void ConfigureProject(string subscriptionId, string groupName, string projectName)
+        {
+            ConsoleHelpers.WriteLineWithHighlight($"\n`AZURE AI PROJECT CONFIG`\n");
+            Console.WriteLine();
+
+            int maxLabelWidth = 0;
+            var actions = new List<Action<int>>(new Action<int>[] {
+                ConfigSetLambda("@subscription", subscriptionId, "Subscription", subscriptionId, ref maxLabelWidth),
+                ConfigSetLambda("@group", groupName, "Group", groupName, ref maxLabelWidth),
+                ConfigSetLambda("@project", projectName, "Project", projectName, ref maxLabelWidth)
+            });
+            actions.ForEach(x => x?.Invoke(maxLabelWidth));
+        }
+
         public static void ConfigServiceResource(string subscriptionId, string region, string endpoint, string chatDeployment, string embeddingsDeployment, string key)
         {
             ConsoleHelpers.WriteLineWithHighlight($"\n`CONFIG {Program.SERVICE_RESOURCE_DISPLAY_NAME_ALL_CAPS}`");
@@ -35,7 +49,7 @@ namespace Azure.AI.Details.Common.CLI
 
         public static void ConfigSearchResource(string endpoint, string key)
         {
-            ConsoleHelpers.WriteLineWithHighlight($"\n`CONFIG COGNITIVE SEARCH RESOURCE`");
+            ConsoleHelpers.WriteLineWithHighlight($"\n`CONFIG AI SEARCH RESOURCE`");
             Console.WriteLine();
 
             int maxLabelWidth = 0;

@@ -1,0 +1,22 @@
+FLOW NEW
+
+@include.the.flow.new.command
+
+USAGE: ai flow new [...]
+
+  FLOW
+    --flow NAME
+    --function MODULE:FUNCTION
+    --prompt-template TEMPLATE
+
+EXAMPLES
+
+  ai flow new --name my.flow
+  ai flow new --name my.flow --function MyModule:chat_function
+
+SEE ALSO
+
+  ai help flow
+  ai help flow invoke
+  ai help flow examples
+  ai help find topics flow

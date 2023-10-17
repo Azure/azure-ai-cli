@@ -6,6 +6,13 @@ define_variable () {
 
 echo "Source branch: $BUILD_SOURCEBRANCH"
 
+# if the user passed in a custom dev branch, use it
+if [ ! -z "$1" ]; then
+    DEV_VERSION="$1"
+else
+    DEV_VERSION="0.0.0-dev"
+fi
+
 # If the build was triggered from a tag, use the tag as the version. Otherwise, set the version to dev.
 REGEX='^refs\/tags\/v?([[:digit:]]+)\.([[:digit:]]+)\.([[:digit:]]+)(-.+)?'
 
@@ -13,7 +20,7 @@ REGEX='^refs\/tags\/v?([[:digit:]]+)\.([[:digit:]]+)\.([[:digit:]]+)(-.+)?'
 [[ $BUILD_SOURCEBRANCH =~ $REGEX ]] && define_variable "IsRelease" "true" || define_variable "IsRelease" "false"
 
 # Extract version from the tag.
-VERSION=$([[ $BUILD_SOURCEBRANCH =~ $REGEX ]] && echo $(echo $BUILD_SOURCEBRANCH | sed -r 's/'$REGEX'/\1.\2.\3\4/') || echo "0.0.0-dev")
+VERSION=$([[ $BUILD_SOURCEBRANCH =~ $REGEX ]] && echo $(echo $BUILD_SOURCEBRANCH | sed -r 's/'$REGEX'/\1.\2.\3\4/') || echo "$DEV_VERSION")
 
 # Set the AICLIVersion variable in the pipeline.
 define_variable "AICLIVersion" "$VERSION"
