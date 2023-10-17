@@ -243,9 +243,9 @@ namespace Azure.AI.Details.Common.CLI
 
                     "init-root-standalone-select-or-create" => DoInitServiceParts(interactive, "openai", "search"), // TODO: Replace with new flow
 
-                    "init-root-project" => DoInitHub(interactive), // TODO: Replace with new flow
-                    "init-root-project-pick" => DoInitProject(interactive), // TODO: Replace with new flow
-                    "init-root-project-new" => DoInitProject(interactive), // TODO: Replace with new flow
+                    "init-root-project" => DoInitProjectCommand(), // TODO: Replace with new flow
+                    "init-root-project-pick" => DoInitProjectCommand(), // TODO: Replace with new flow
+                    "init-root-project-new" => DoInitProjectCommand(), // TODO: Replace with new flow
 
                     _ => throw new ApplicationException($"WARNING: NOT YET IMPLEMENTED")
                 };
