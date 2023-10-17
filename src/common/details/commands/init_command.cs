@@ -52,6 +52,8 @@ namespace Azure.AI.Details.Common.CLI
 
         private async Task DoCommand(string command)
         {
+            StartCommand();
+
             DisplayInitServiceBanner();
 
             CheckPath();
@@ -59,72 +61,137 @@ namespace Azure.AI.Details.Common.CLI
             var interactive = _values.GetOrDefault("init.service.interactive", true);
             switch (command)
             {
-                case "init": await DoInitServiceCommand(); break;
+                // case "init": await DoInitServiceCommand(); break;
+                case "init": await DoInitRoot(); break;
                 case "init.openai": await DoInitOpenAiCommand(); break;
                 case "init.search": await DoInitSearchCommand(); break;
                 case "init.resource": await DoInitResourceCommand(); break;
                 case "init.project": await DoInitProjectCommand(); break;
+
+                default:
+                    _values.AddThrowError("WARNING", $"Unknown command '{command}'");
+                    break;
             }
-        }
-
-        private async Task DoInitServiceCommand()
-        {
-            StartCommand();
-
-            var interactive = _values.GetOrDefault("init.service.interactive", true);
-            await DoInitService(interactive);
 
             StopCommand();
             DisposeAfterStop();
             DeleteTemporaryFiles();
+        }
+
+        private async Task DoInitRoot()
+        {
+            var interactive = _values.GetOrDefault("init.service.interactive", true);
+            if (!interactive) ThrowInteractiveNotSupportedApplicationException(); // TODO: Add back non-interactive mode support
+
+            ConsoleHelpers.WriteLineWithHighlight("`AI INIT`\n\n  Initializes (creates, selects, or attaches to) AI Projects and services.\n");
+
+            var existing = FileHelpers.FindFileInDataPath("config.json", _values);
+            if (existing != null)
+            {
+                await DoInitRootVerifyConfig(existing);
+            }
+            else
+            {
+                await DoInitRootMenuPick();
+            }
+        }
+
+        private async Task DoInitRootVerifyConfig(string fileName)
+        {
+            if (VerifyConfigGood(fileName))
+            {
+                await DoInitRootConfirmVerifiedConfig(fileName);
+            }
+            else
+            {
+                await DoInitRootMenuPick();
+            }
+        }
+
+        private bool VerifyConfigGood(string fileName)
+        {
+            // TODO: Actually verify that it's a good config.json
+            return true;
+        }
+
+        private async Task DoInitRootConfirmVerifiedConfig(string fileName)
+        {
+            // TODO: Actually do the confirmation with the user
+
+            // ┌────────────────────────────────────────────────────────┐  
+            // │ PROJECT: Use this project: my-project (eastus)         │*default
+            // │      or: (Initialize different resources)              │  
+            // └───────────────────────────── ↑↓  <?> Find  <ESC> Close ┘
+            
+            await DoInitRootMenuPick();
+        }
+
+        private async Task DoInitRootMenuPick()
+        {
+            Console.WriteLine("  Choose between initializing:");
+            ConsoleHelpers.WriteLineWithHighlight("  - AI Project resource: Recommended when using `Azure AI Studio` and/or connecting to multiple AI services.");
+            Console.WriteLine("  - Standalone resources: Recommended when building simple solutions connecting to a single AI service.");
+            Console.WriteLine();
+
+            var label = "  Initialize";
+            Console.Write($"{label}: ");
+            var choiceToPart = new Dictionary<string, string>
+            {
+                ["AI Project resource"] = "init-root-project",
+                // ["New AI Project"] = "init-root-project-new",
+                // ["Existing AI Project"] = "init-root-project-pick",
+                ["Standalone resources"] = "init-root-standalone-select-or-create",
+            };
+            var partToLabelDisplay = new Dictionary<string, string>()
+            {
+                ["init-root-project"] = "AI Project resource",
+                // ["init-root-project-new"] = "New AI Project",
+                // ["init-root-project-pick"] = "Existing AI Project",
+                ["init-root-standalone-select-or-create"] = "Standalone service resources",
+            };
+
+            var choices = choiceToPart.Keys.ToArray();
+            var picked = ListBoxPicker.PickIndexOf(choices.ToArray());
+            if (picked < 0)
+            {
+                Console.WriteLine($"\r{label}: CANCELED (no selection)");
+                return;
+            }
+
+            var part = choiceToPart[choices[picked]];
+            var display = partToLabelDisplay[part];
+
+            // ConsoleHelpers.WriteLineWithHighlight($"\r{label.Trim()}: {display}");
+            ConsoleHelpers.WriteLineWithHighlight($"\r{label.Trim()}: {display}");
+
+            var interactive = true;
+            await DoInitServiceParts(interactive, part.Split(';').ToArray());
+
+            await Task.CompletedTask;
         }
 
         private async Task DoInitOpenAiCommand()
         {
-            StartCommand();
-
             var interactive = _values.GetOrDefault("init.service.interactive", true);
             await DoInitServiceParts(interactive, "openai");
-
-            StopCommand();
-            DisposeAfterStop();
-            DeleteTemporaryFiles();
         }
 
         private async Task DoInitSearchCommand()
         {
-            StartCommand();
-
             var interactive = _values.GetOrDefault("init.service.interactive", true);
             await DoInitServiceParts(interactive, "openai", "search");
-
-            StopCommand();
-            DisposeAfterStop();
-            DeleteTemporaryFiles();
         }
 
         private async Task DoInitResourceCommand()
         {
-            StartCommand();
-
             var interactive = _values.GetOrDefault("init.service.interactive", true);
             await DoInitServiceParts(interactive, "resource");
-
-            StopCommand();
-            DisposeAfterStop();
-            DeleteTemporaryFiles();
         }
 
         private async Task DoInitProjectCommand()
         {
-            StartCommand();
-
             var interactive = _values.GetOrDefault("init.service.interactive", true);
             await DoInitServiceParts(interactive, "openai", "search", "resource", "project");
-
-            StopCommand();
-            DisposeAfterStop();
-            DeleteTemporaryFiles();
         }
 
         private async Task DoInitService(bool interactive)
@@ -165,12 +232,21 @@ namespace Azure.AI.Details.Common.CLI
         {
             foreach (var operation in operations)
             {
+                if (Program.Debug) Console.WriteLine($"OPERATION: {operation}");
+
                 var task = operation switch
                 {
                     "openai" => DoInitOpenAi(interactive),
                     "search" => DoInitSearch(interactive),
                     "resource" => DoInitHub(interactive),
                     "project" => DoInitProject(interactive),
+
+                    "init-root-standalone-select-or-create" => DoInitServiceParts(interactive, "openai", "search"), // TODO: Replace with new flow
+
+                    "init-root-project" => DoInitProjectCommand(), // TODO: Replace with new flow
+                    "init-root-project-pick" => DoInitProjectCommand(), // TODO: Replace with new flow
+                    "init-root-project-new" => DoInitProjectCommand(), // TODO: Replace with new flow
+
                     _ => throw new ApplicationException($"WARNING: NOT YET IMPLEMENTED")
                 };
                 await task;
@@ -235,6 +311,12 @@ namespace Azure.AI.Details.Common.CLI
             if (!interactive) ThrowInteractiveNotSupportedApplicationException(); // TODO: Add back non-interactive mode support
 
             var subscription = SubscriptionToken.Data().GetOrDefault(_values, "");
+            if (string.IsNullOrEmpty(subscription))
+            {
+                subscription = await AzCliConsoleGui.PickSubscriptionIdAsync(interactive);
+                _values.Reset("init.service.subscription", subscription);
+            }
+
             var resourceId = _values.GetOrDefault("service.resource.id", null);
             var groupName = ResourceGroupNameToken.Data().GetOrDefault(_values);
 
