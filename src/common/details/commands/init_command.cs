@@ -65,8 +65,8 @@ namespace Azure.AI.Details.Common.CLI
                 case "init": await DoInitRoot(); break;
                 case "init.openai": await DoInitRootOpenAi(interactive); break;
                 case "init.search": await DoInitRootSearch(interactive); break;
+                case "init.project": await DoInitRootProject(interactive); break;
                 case "init.resource": await DoInitResourceCommand(); break;
-                case "init.project": await DoInitProjectCommand(); break;
 
                 default:
                     _values.AddThrowError("WARNING", $"Unknown command '{command}'");
@@ -233,28 +233,10 @@ namespace Azure.AI.Details.Common.CLI
             await DoInitServiceParts(interactive, part.Split(';').ToArray());
         }
 
-        private async Task DoInitRootOpenAiCommand()
-        {
-            var interactive = _values.GetOrDefault("init.service.interactive", true);
-            await DoInitServiceParts(interactive, "openai");
-        }
-
-        private async Task DoInitSearchCommand()
-        {
-            var interactive = _values.GetOrDefault("init.service.interactive", true);
-            await DoInitServiceParts(interactive, "openai", "search");
-        }
-
         private async Task DoInitResourceCommand()
         {
             var interactive = _values.GetOrDefault("init.service.interactive", true);
             await DoInitServiceParts(interactive, "resource");
-        }
-
-        private async Task DoInitProjectCommand()
-        {
-            var interactive = _values.GetOrDefault("init.service.interactive", true);
-            await DoInitServiceParts(interactive, "openai", "search", "resource", "project");
         }
 
         private async Task DoInitStandaloneResources(bool interactive)
@@ -301,16 +283,16 @@ namespace Azure.AI.Details.Common.CLI
                     "init-root-openai-deployment-evaluation-create-or-select" => DoInitRootOpenAi(interactive), // TODO: Replace with sub-flow for just the deployment
 
                     "init-root-search-create-or-select" => DoInitRootSearch(interactive),
-                    // "init-root-speech-create-or-select" => DoInitRootSpeech(interactive), // TODO: Replace with new flow
+                    "init-root-speech-create-or-select" => DoInitRootSpeech(interactive),
 
                     "openai" => DoInitOpenAi(interactive),
                     "search" => DoInitSearch(interactive),
                     "resource" => DoInitHub(interactive),
                     "project" => DoInitProject(interactive),
 
-                    "init-root-project-hack" => DoInitProjectCommand(),         // TODO: Replace with new flows below  | | |
-                    "init-root-project-pick" => DoInitProjectCommand(),         //                                     v v v
-                    "init-root-project-new" => DoInitProjectCommand(),
+                    "init-root-project-hack" => DoInitRootProject(interactive),         // TODO: Replace with new flows below  | | |
+                    "init-root-project-pick" => DoInitRootProject(interactive),         //                                     v v v
+                    "init-root-project-new" => DoInitRootProject(interactive),
 
                     _ => throw new ApplicationException($"WARNING: NOT YET IMPLEMENTED")
                 };
@@ -318,30 +300,52 @@ namespace Azure.AI.Details.Common.CLI
             }
         }
 
+        private async Task DoInitRootProject(bool interactive)
+        {
+            var subscriptionFilter = SubscriptionToken.Data().GetOrDefault(_values, "");
+            var subscriptionId = await AzCliConsoleGui.PickSubscriptionIdAsync(interactive, subscriptionFilter);
+            SubscriptionToken.Data().Set(_values, subscriptionId);
+
+            await DoInitServiceParts(interactive, "openai", "search", "resource", "project");
+        }
+
+        private async Task DoInitProject(bool interactive)
+        {
+            if (!interactive) ThrowInteractiveNotSupportedApplicationException(); // POST-IGNITE: TODO: Add back non-interactive mode support
+
+            var subscription = SubscriptionToken.Data().GetOrDefault(_values, "");
+            if (string.IsNullOrEmpty(subscription))
+            {
+                subscription = await AzCliConsoleGui.PickSubscriptionIdAsync(interactive);
+                _values.Reset("init.service.subscription", subscription);
+            }
+
+            var resourceId = _values.GetOrDefault("service.resource.id", null);
+            var groupName = ResourceGroupNameToken.Data().GetOrDefault(_values);
+
+            var openAiEndpoint = _values.GetOrDefault("service.openai.endpoint", null);
+            var openAiKey = _values.GetOrDefault("service.openai.key", null);
+            var searchEndpoint = _values.GetOrDefault("service.search.endpoint", null);
+            var searchKey = _values.GetOrDefault("service.search.key", null);
+
+            var project = AiSdkConsoleGui.InitAndConfigAiHubProject(_values, subscription, resourceId, groupName, openAiEndpoint, openAiKey, searchEndpoint, searchKey);
+
+            ProjectNameToken.Data().Set(_values, project.Name);
+            _values.Reset("service.project.id", project.Id);
+        }
+
         private async Task DoInitRootOpenAi(bool interactive)
         {
             var subscriptionFilter = SubscriptionToken.Data().GetOrDefault(_values, "");
-            var regionFilter = _values.GetOrDefault("init.service.resource.region.name", "");
-            var groupFilter = _values.GetOrDefault("init.service.resource.group.name", "");
-            var resourceFilter = _values.GetOrDefault("init.service.cognitiveservices.resource.name", "");
-            var kind = _values.GetOrDefault("init.service.cognitiveservices.resource.kind", Program.CognitiveServiceResourceKind);
-            var sku = _values.GetOrDefault("init.service.cognitiveservices.resource.sku", Program.CognitiveServiceResourceSku);
-            var yes = _values.GetOrDefault("init.service.cognitiveservices.terms.agree", false);
-
             var subscriptionId = await AzCliConsoleGui.PickSubscriptionIdAsync(interactive, subscriptionFilter);
-            var resource = await AzCliConsoleGui.InitAndConfigOpenAiResource(interactive, subscriptionId, regionFilter, groupFilter, resourceFilter, kind, sku, yes);
-
             SubscriptionToken.Data().Set(_values, subscriptionId);
-            _values.Reset("service.resource.region.name", resource.RegionLocation);
-            _values.Reset("service.openai.endpoint", resource.Endpoint);
-            _values.Reset("service.openai.key", resource.Key);
-            _values.Reset("service.openai.resource.id", resource.Id);
-            ResourceNameToken.Data().Set(_values, resource.Name);
-            ResourceGroupNameToken.Data().Set(_values, resource.Group);
+
+            await DoInitOpenAi(interactive);
         }
 
         private async Task DoInitOpenAi(bool interactive)
         {
+            var subscriptionId = SubscriptionToken.Data().GetOrDefault(_values, "");
             var regionFilter = _values.GetOrDefault("init.service.resource.region.name", "");
             var groupFilter = _values.GetOrDefault("init.service.resource.group.name", "");
             var resourceFilter = _values.GetOrDefault("init.service.cognitiveservices.resource.name", "");
@@ -349,7 +353,6 @@ namespace Azure.AI.Details.Common.CLI
             var sku = _values.GetOrDefault("init.service.cognitiveservices.resource.sku", Program.CognitiveServiceResourceSku);
             var yes = _values.GetOrDefault("init.service.cognitiveservices.terms.agree", false);
 
-            var subscriptionId = SubscriptionToken.Data().GetOrDefault(_values, "");
             var resource = await AzCliConsoleGui.InitAndConfigOpenAiResource(interactive, subscriptionId, regionFilter, groupFilter, resourceFilter, kind, sku, yes);
 
             SubscriptionToken.Data().Set(_values, subscriptionId);
@@ -387,6 +390,36 @@ namespace Azure.AI.Details.Common.CLI
             _values.Reset("service.search.key", resource.Key);
         }
 
+        private async Task DoInitRootSpeech(bool interactive)
+        {
+            var subscriptionFilter = SubscriptionToken.Data().GetOrDefault(_values, "");
+            var subscriptionId = await AzCliConsoleGui.PickSubscriptionIdAsync(interactive, subscriptionFilter);
+            SubscriptionToken.Data().Set(_values, subscriptionId);
+
+            await DoInitSpeech(interactive);
+        }
+
+        private async Task DoInitSpeech(bool interactive)
+        {
+            var subscriptionId = SubscriptionToken.Data().GetOrDefault(_values, "");
+            var regionFilter = _values.GetOrDefault("init.service.resource.region.name", "");
+            var groupFilter = _values.GetOrDefault("init.service.resource.group.name", "");
+            var resourceFilter = _values.GetOrDefault("init.service.cognitiveservices.resource.name", "");
+            var kind = _values.GetOrDefault("init.service.cognitiveservices.resource.kind", "SpeechServices");
+            var sku = _values.GetOrDefault("init.service.cognitiveservices.resource.sku", "S0");
+            var yes = _values.GetOrDefault("init.service.cognitiveservices.terms.agree", false);
+
+            var resource = await AzCliConsoleGui.InitAndConfigSpeechResource(interactive, subscriptionId, regionFilter, groupFilter, resourceFilter, kind, sku, yes);
+
+            SubscriptionToken.Data().Set(_values, subscriptionId);
+            _values.Reset("service.resource.region.name", resource.RegionLocation);
+            _values.Reset("service.openai.endpoint", resource.Endpoint);
+            _values.Reset("service.openai.key", resource.Key);
+            _values.Reset("service.openai.resource.id", resource.Id);
+            ResourceNameToken.Data().Set(_values, resource.Name);
+            ResourceGroupNameToken.Data().Set(_values, resource.Group);
+        }
+
         private async Task DoInitHub(bool interactive)
         {
             if (!interactive) ThrowInteractiveNotSupportedApplicationException(); // POST-IGNITE: TODO: Add back non-interactive mode support
@@ -399,31 +432,6 @@ namespace Azure.AI.Details.Common.CLI
             }
 
             var aiHubResource = await AiSdkConsoleGui.PickOrCreateAiHubResource(_values, subscription);
-        }
-
-        private async Task DoInitProject(bool interactive)
-        {
-            if (!interactive) ThrowInteractiveNotSupportedApplicationException(); // POST-IGNITE: TODO: Add back non-interactive mode support
-
-            var subscription = SubscriptionToken.Data().GetOrDefault(_values, "");
-            if (string.IsNullOrEmpty(subscription))
-            {
-                subscription = await AzCliConsoleGui.PickSubscriptionIdAsync(interactive);
-                _values.Reset("init.service.subscription", subscription);
-            }
-
-            var resourceId = _values.GetOrDefault("service.resource.id", null);
-            var groupName = ResourceGroupNameToken.Data().GetOrDefault(_values);
-
-            var openAiEndpoint = _values.GetOrDefault("service.openai.endpoint", null);
-            var openAiKey = _values.GetOrDefault("service.openai.key", null);
-            var searchEndpoint = _values.GetOrDefault("service.search.endpoint", null);
-            var searchKey = _values.GetOrDefault("service.search.key", null);
-
-            var project = AiSdkConsoleGui.InitAndConfigAiHubProject(_values, subscription, resourceId, groupName, openAiEndpoint, openAiKey, searchEndpoint, searchKey);
-
-            ProjectNameToken.Data().Set(_values, project.Name);
-            _values.Reset("service.project.id", project.Id);
         }
 
         private void DisplayInitServiceBanner()

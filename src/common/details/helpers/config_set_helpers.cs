@@ -25,9 +25,9 @@ namespace Azure.AI.Details.Common.CLI
             actions.ForEach(x => x?.Invoke(maxLabelWidth));
         }
 
-        public static void ConfigServiceResource(string subscriptionId, string region, string endpoint, string chatDeployment, string embeddingsDeployment, string key)
+        public static void ConfigOpenAiResource(string subscriptionId, string region, string endpoint, string chatDeployment, string embeddingsDeployment, string key)
         {
-            ConsoleHelpers.WriteLineWithHighlight($"\n`CONFIG {Program.SERVICE_RESOURCE_DISPLAY_NAME_ALL_CAPS}`");
+            ConsoleHelpers.WriteLineWithHighlight($"\n`CONFIG OPEN AI RESOURCE`");
             Console.WriteLine();
 
             int maxLabelWidth = 0;
@@ -43,6 +43,21 @@ namespace Azure.AI.Details.Common.CLI
                 ConfigSetLambda("@search.embeddings.deployment", embeddingsDeployment, "Deployment (embeddings)", embeddingsDeployment, ref maxLabelWidth),
                 ConfigSetLambda("@search.embeddings.key", key, "Key (embeddings)", key.Substring(0, 4) + "****************************", ref maxLabelWidth),
                 ConfigSetLambda("@chat.region", region, "Region", region, ref maxLabelWidth),
+            });
+            actions.ForEach(x => x?.Invoke(maxLabelWidth));
+        }
+
+        public static void ConfigSpeechResource(string subscriptionId, string region, string endpoint, string key)
+        {
+            ConsoleHelpers.WriteLineWithHighlight($"\n`CONFIG SPEECH RESOURCE`");
+            Console.WriteLine();
+
+            int maxLabelWidth = 0;
+            var actions = new List<Action<int>>(new Action<int>[] {
+                ConfigSetLambda("@subscription", subscriptionId, "Subscription", subscriptionId, ref maxLabelWidth),
+                ConfigSetLambda("@speech.endpoint", endpoint, "Endpoint (speech)", endpoint, ref maxLabelWidth),
+                ConfigSetLambda("@speech.key", key, "Key (speech)", key.Substring(0, 4) + "****************************", ref maxLabelWidth),
+                ConfigSetLambda("@speech.region", region, "Region (speech)", region, ref maxLabelWidth),
             });
             actions.ForEach(x => x?.Invoke(maxLabelWidth));
         }
