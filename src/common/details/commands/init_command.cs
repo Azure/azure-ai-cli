@@ -83,7 +83,7 @@ namespace Azure.AI.Details.Common.CLI
             var interactive = _values.GetOrDefault("init.service.interactive", true);
             if (!interactive) ThrowInteractiveNotSupportedApplicationException(); // TODO: Add back non-interactive mode support
 
-            ConsoleHelpers.WriteLineWithHighlight("AI INIT\n\n  The `ai init` command initializes (create, select, or attach to) AI Projects and services.\n");
+            ConsoleHelpers.WriteLineWithHighlight("`AI INIT`\n\n  Initializes (creates, selects, or attaches to) AI Projects and services.\n");
 
             var existing = FileHelpers.FindFileInDataPath("config.json", _values);
             if (existing != null)
@@ -133,18 +133,20 @@ namespace Azure.AI.Details.Common.CLI
             Console.WriteLine("  - Standalone resources: Recommended when building simple solutions connecting to a single AI service.");
             Console.WriteLine();
 
-            var label = "  INIT";
+            var label = "  Initialize";
             Console.Write($"{label}: ");
             var choiceToPart = new Dictionary<string, string>
             {
-                ["New AI Project"] = "init-root-project-new",
-                ["Existing AI Project"] = "init-root-project-pick",
-                ["Standalone service resources"] = "init-root-standalone-select-or-create",
+                ["AI Project resource"] = "init-root-project",
+                // ["New AI Project"] = "init-root-project-new",
+                // ["Existing AI Project"] = "init-root-project-pick",
+                ["Standalone resources"] = "init-root-standalone-select-or-create",
             };
             var partToLabelDisplay = new Dictionary<string, string>()
             {
-                ["init-root-project-new"] = "New AI Project",
-                ["init-root-project-pick"] = "Existing AI Project",
+                ["init-root-project"] = "AI Project resource",
+                // ["init-root-project-new"] = "New AI Project",
+                // ["init-root-project-pick"] = "Existing AI Project",
                 ["init-root-standalone-select-or-create"] = "Standalone service resources",
             };
 
@@ -159,7 +161,8 @@ namespace Azure.AI.Details.Common.CLI
             var part = choiceToPart[choices[picked]];
             var display = partToLabelDisplay[part];
 
-            ConsoleHelpers.WriteLineWithHighlight($"\r`INIT {display.ToUpper()}`\n");
+            // ConsoleHelpers.WriteLineWithHighlight($"\r{label.Trim()}: {display}");
+            ConsoleHelpers.WriteLineWithHighlight($"\r{label.Trim()}: {display}");
 
             var interactive = true;
             await DoInitServiceParts(interactive, part.Split(';').ToArray());
@@ -240,6 +243,7 @@ namespace Azure.AI.Details.Common.CLI
 
                     "init-root-standalone-select-or-create" => DoInitServiceParts(interactive, "openai", "search"), // TODO: Replace with new flow
 
+                    "init-root-project" => DoInitHub(interactive), // TODO: Replace with new flow
                     "init-root-project-pick" => DoInitProject(interactive), // TODO: Replace with new flow
                     "init-root-project-new" => DoInitProject(interactive), // TODO: Replace with new flow
 
@@ -307,6 +311,12 @@ namespace Azure.AI.Details.Common.CLI
             if (!interactive) ThrowInteractiveNotSupportedApplicationException(); // TODO: Add back non-interactive mode support
 
             var subscription = SubscriptionToken.Data().GetOrDefault(_values, "");
+            if (string.IsNullOrEmpty(subscription))
+            {
+                subscription = await AzCliConsoleGui.PickSubscriptionIdAsync(interactive);
+                _values.Reset("init.service.subscription", subscription);
+            }
+
             var resourceId = _values.GetOrDefault("service.resource.id", null);
             var groupName = ResourceGroupNameToken.Data().GetOrDefault(_values);
 
