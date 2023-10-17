@@ -96,9 +96,34 @@ namespace Azure.AI.Details.Common.CLI
             }
         }
 
-        private Task DoInitRootVerifyConfig(string fileName)
+        private async Task DoInitRootVerifyConfig(string fileName)
         {
-            throw new NotImplementedException();
+            if (VerifyConfigGood(fileName))
+            {
+                await DoInitRootConfirmVerifiedConfig(fileName);
+            }
+            else
+            {
+                await DoInitRootMenuPick();
+            }
+        }
+
+        private bool VerifyConfigGood(string fileName)
+        {
+            // TODO: Actually verify that it's a good config.json
+            return true;
+        }
+
+        private async Task DoInitRootConfirmVerifiedConfig(string fileName)
+        {
+            // TODO: Actually do the confirmation with the user
+
+            // ┌────────────────────────────────────────────────────────┐  
+            // │ PROJECT: Use this project: my-project (eastus)         │*default
+            // │      or: (Initialize different resources)              │  
+            // └───────────────────────────── ↑↓  <?> Find  <ESC> Close ┘
+            
+            await DoInitRootMenuPick();
         }
 
         private async Task DoInitRootMenuPick()
@@ -108,13 +133,13 @@ namespace Azure.AI.Details.Common.CLI
             Console.WriteLine("  - Standalone resources: Recommended when building simple solutions connecting to a single AI service.");
             Console.WriteLine();
 
-            var label = "  Task";
+            var label = "  INIT";
             Console.Write($"{label}: ");
             var choiceToPart = new Dictionary<string, string>
             {
-                ["INIT: a new AI Project"] = "init-root-project-new",
-                ["  or: an existing AI Project"] = "init-root-project-pick",
-                ["  or: standalone service resources"] = "init-root-standalone-select-or-create",
+                ["New AI Project"] = "init-root-project-new",
+                ["Existing AI Project"] = "init-root-project-pick",
+                ["Standalone service resources"] = "init-root-standalone-select-or-create",
             };
             var partToLabelDisplay = new Dictionary<string, string>()
             {
@@ -127,31 +152,19 @@ namespace Azure.AI.Details.Common.CLI
             var picked = ListBoxPicker.PickIndexOf(choices.ToArray());
             if (picked < 0)
             {
-                Console.WriteLine($"\r{label}: (canceled)");
+                Console.WriteLine($"\r{label}: CANCELED (no selection)");
                 return;
             }
 
             var part = choiceToPart[choices[picked]];
             var display = partToLabelDisplay[part];
 
-            ConsoleHelpers.WriteLineWithHighlight($"\r`AI INIT: {display.ToUpper()}`\n");
-
-            // HACK
-            if (part == "init-root-standalone-select-or-create")
-            {
-                part = "openai;search";
-            }
+            ConsoleHelpers.WriteLineWithHighlight($"\r`INIT {display.ToUpper()}`\n");
 
             var interactive = true;
             await DoInitServiceParts(interactive, part.Split(';').ToArray());
 
             await Task.CompletedTask;
-        }
-
-        private async Task DoInitServiceCommand()
-        {
-            var interactive = _values.GetOrDefault("init.service.interactive", true);
-            await DoInitService(interactive);
         }
 
         private async Task DoInitOpenAiCommand()
@@ -216,12 +229,16 @@ namespace Azure.AI.Details.Common.CLI
         {
             foreach (var operation in operations)
             {
+                if (Program.Debug) Console.WriteLine($"OPERATION: {operation}");
+
                 var task = operation switch
                 {
                     "openai" => DoInitOpenAi(interactive),
                     "search" => DoInitSearch(interactive),
                     "resource" => DoInitHub(interactive),
                     "project" => DoInitProject(interactive),
+
+                    "init-root-standalone-select-or-create" => DoInitServiceParts(interactive, "openai", "search"), // TODO: Replace with new flow
 
                     "init-root-project-pick" => DoInitProject(interactive), // TODO: Replace with new flow
                     "init-root-project-new" => DoInitProject(interactive), // TODO: Replace with new flow
