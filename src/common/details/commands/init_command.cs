@@ -287,6 +287,10 @@ namespace Azure.AI.Details.Common.CLI
 
                 var task = operation switch
                 {
+                    "init-root-project-hack" => DoInitRootProject(interactive),         // TODO: Replace with new flows below  | | |
+                    "init-root-project-pick" => DoInitRootProject(interactive),         //                                     v v v
+                    "init-root-project-new" => DoInitRootProject(interactive),
+
                     "init-root-standalone-select-or-create" => DoInitStandaloneResources(interactive),
                     "init-root-openai-create-or-select" => DoInitRootOpenAi(interactive),
                     "init-root-search-create-or-select" => DoInitRootSearch(interactive),
@@ -296,10 +300,6 @@ namespace Azure.AI.Details.Common.CLI
                     "search" => DoInitSearch(interactive),
                     "resource" => DoInitHub(interactive),
                     "project" => DoInitProject(interactive),
-
-                    "init-root-project-hack" => DoInitRootProject(interactive),         // TODO: Replace with new flows below  | | |
-                    "init-root-project-pick" => DoInitRootProject(interactive),         //                                     v v v
-                    "init-root-project-new" => DoInitRootProject(interactive),
 
                     _ => throw new ApplicationException($"WARNING: NOT YET IMPLEMENTED")
                 };
