@@ -137,7 +137,7 @@ namespace Azure.AI.Details.Common.CLI
         {
             // TODO: Actually verify the config.json is good
             Thread.Sleep(1000);
-            return true;
+            return false;
         }
 
         private async Task DoInitRootConfirmVerifiedConfig(string fileName)
