@@ -120,7 +120,8 @@ namespace Azure.AI.Details.Common.CLI
             if (VerifyConfigGood(subscription, groupName, projectName))
             {
                 Console.Write($"\r{new string(' ', message1.Length + message2.Length + 3)}");
-                ConsoleHelpers.WriteLineWithHighlight($"\r{message1} - `#2_;Configuration validated!`");
+                ConsoleHelpers.WriteLineWithHighlight($"\r  `PROJECT`: {projectName}");
+                ConsoleHelpers.WriteLineWithHighlight("\n  `ATTACHED RESOURCES`");
                 Console.WriteLine();
                 return true;
             }
@@ -137,6 +138,7 @@ namespace Azure.AI.Details.Common.CLI
         {
             // TODO: Actually verify the config.json is good
             Thread.Sleep(1000);
+            // return true;
             return false;
         }
 
@@ -172,7 +174,7 @@ namespace Azure.AI.Details.Common.CLI
                 return;
             }
 
-            Console.WriteLine($"\rProject: {projectName}");
+            Console.WriteLine($"\rAttaching to Project: {projectName}");
             await AzCliConsoleGui.PickSubscriptionAsync(false, subscription);
 
             ConsoleHelpers.WriteLineWithHighlight("\n`INIT PROJECT FROM CONFIG`\n");
