@@ -252,6 +252,10 @@ namespace Azure.AI.Details.Common.CLI
                 "OpenAI" => "? kind == 'OpenAI' || kind == 'AIServices'",
                 "ComputerVision" => "? kind == 'ComputerVision' || kind == 'CognitiveServices' || kind == 'AIServices'",
                 "SpeechServices" => "? kind == 'SpeechServices' || kind == 'CognitiveServices' || kind == 'AIServices'",
+
+                "AIServices" => $"? kind == '{kind}'",
+                "CognitiveServices" => $"? kind == '{kind}'",
+
                 _ => kind != null ? $"? kind == '{kind}' || kind == 'CognitiveServices' || kind == 'AIServices'" : null
             };
 
