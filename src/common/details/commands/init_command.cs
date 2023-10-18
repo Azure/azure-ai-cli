@@ -140,6 +140,15 @@ namespace Azure.AI.Details.Common.CLI
         {
             ParseConfigJson(fileName, out string subscription, out string groupName, out string projectName);
 
+            // TODO: Print correct stuff here... 
+            Console.WriteLine($"  PROJECT: {projectName}\n");
+            ConsoleHelpers.WriteLineWithHighlight("    OPEN AI RESOURCE: {openai-resource-name}                         `#e_;<== work in progress`");
+            ConsoleHelpers.WriteLineWithHighlight("    OPEN AI DEPLOYMENT (CHAT): {chat-deployment-name}                `#e_;<== work in progress`");
+            ConsoleHelpers.WriteLineWithHighlight("    OPEN AI DEPLOYMENT (EMBEDDINGS): {embeddings-deployment-name}    `#e_;<== work in progress`");
+            ConsoleHelpers.WriteLineWithHighlight("    OPEN AI DEPLOYMENT (EVALUATION): {evaluation-deployment-name}    `#e_;<== work in progress`");
+            ConsoleHelpers.WriteLineWithHighlight("    AI SEARCH RESOURCE: {search-resource-name}                       `#e_;<== work in progress`");
+
+            Console.WriteLine();
             var label = "  Initialize";
             Console.Write($"{label}: ");
 
