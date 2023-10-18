@@ -114,20 +114,20 @@ namespace Azure.AI.Details.Common.CLI
             ParseConfigJson(fileName, out string subscription, out string groupName, out string projectName);
 
             var message1 = $"  PROJECT: {projectName}";
-            var message2 = "Validating Connections";
+            var message2 = "Validating configuration (config.json) ...";
             Console.Write($"\r{message1} - {message2}");
             
             if (VerifyConfigGood(subscription, groupName, projectName))
             {
                 Console.Write($"\r{new string(' ', message1.Length + message2.Length + 3)}");
-                ConsoleHelpers.WriteLineWithHighlight($"\r{message1} - `#2_;Connections validated!`");
+                ConsoleHelpers.WriteLineWithHighlight($"\r{message1} - `#2_;Configuration validated!`");
                 Console.WriteLine();
                 return true;
             }
             else
             {
                 Console.Write($"\r{new string(' ', message1.Length + message2.Length + 3)}");
-                ConsoleHelpers.WriteLineWithHighlight($"\r{message1} - `#e_;WARNING: Cconnections could not be validated!`");
+                ConsoleHelpers.WriteLineWithHighlight($"\r{message1} - `#e_;WARNING: Configuration could not be validated!`");
                 Console.WriteLine();
                 return false;
             }
@@ -145,11 +145,13 @@ namespace Azure.AI.Details.Common.CLI
             ParseConfigJson(fileName, out string subscription, out string groupName, out string projectName);
 
             // TODO: Print correct stuff here... 
+            ConsoleHelpers.WriteLineWithHighlight("    AI RESOURCE: {resource-name}                                     `#e_;<== work in progress`");
+            ConsoleHelpers.WriteLineWithHighlight("    AI SEARCH RESOURCE: {search-resource-name}                       `#e_;<== work in progress`");
+            Console.WriteLine();
             ConsoleHelpers.WriteLineWithHighlight("    OPEN AI RESOURCE: {openai-resource-name}                         `#e_;<== work in progress`");
             ConsoleHelpers.WriteLineWithHighlight("    OPEN AI DEPLOYMENT (CHAT): {chat-deployment-name}                `#e_;<== work in progress`");
             ConsoleHelpers.WriteLineWithHighlight("    OPEN AI DEPLOYMENT (EMBEDDINGS): {embeddings-deployment-name}    `#e_;<== work in progress`");
             ConsoleHelpers.WriteLineWithHighlight("    OPEN AI DEPLOYMENT (EVALUATION): {evaluation-deployment-name}    `#e_;<== work in progress`");
-            ConsoleHelpers.WriteLineWithHighlight("    AI SEARCH RESOURCE: {search-resource-name}                       `#e_;<== work in progress`");
 
             Console.WriteLine();
             var label = "  Initialize";
