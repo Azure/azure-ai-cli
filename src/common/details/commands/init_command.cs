@@ -246,11 +246,8 @@ namespace Azure.AI.Details.Common.CLI
             var choiceLookup = new Dictionary<string, string>
             {
                 ["Azure OpenAI"] = "init-root-openai-create-or-select",
-                ["Azure OpenAI Deployment (Chat)"] = "init-root-openai-deployment-chat-create-or-select",
-                ["Azure OpenAI Deployment (Embedding)"] = "init-root-openai-deployment-embedding-create-or-select",
-                ["Azure OpenAI Deployment (Evaluation)"] = "init-root-openai-deployment-evaluation-create-or-select",
                 ["Azure Search"] = "init-root-search-create-or-select",
-                ["Azure Speech Service"] = "init-root-speech-create-or-select"
+                ["Azure Speech"] = "init-root-speech-create-or-select"
             };
 
             var choices = choiceLookup.Keys.ToArray();
@@ -278,10 +275,6 @@ namespace Azure.AI.Details.Common.CLI
                 {
                     "init-root-standalone-select-or-create" => DoInitStandaloneResources(interactive),
                     "init-root-openai-create-or-select" => DoInitRootOpenAi(interactive),
-                    "init-root-openai-deployment-chat-create-or-select" => DoInitRootOpenAi(interactive), // TODO: Replace with sub-flow for just the deployment
-                    "init-root-openai-deployment-embedding-create-or-select" => DoInitRootOpenAi(interactive), // TODO: Replace with sub-flow for just the deployment
-                    "init-root-openai-deployment-evaluation-create-or-select" => DoInitRootOpenAi(interactive), // TODO: Replace with sub-flow for just the deployment
-
                     "init-root-search-create-or-select" => DoInitRootSearch(interactive),
                     "init-root-speech-create-or-select" => DoInitRootSpeech(interactive),
 
@@ -349,7 +342,7 @@ namespace Azure.AI.Details.Common.CLI
             var regionFilter = _values.GetOrDefault("init.service.resource.region.name", "");
             var groupFilter = _values.GetOrDefault("init.service.resource.group.name", "");
             var resourceFilter = _values.GetOrDefault("init.service.cognitiveservices.resource.name", "");
-            var kind = _values.GetOrDefault("init.service.cognitiveservices.resource.kind", Program.CognitiveServiceResourceKind);
+            var kind = _values.GetOrDefault("init.service.cognitiveservices.resource.kind", "OpenAI");
             var sku = _values.GetOrDefault("init.service.cognitiveservices.resource.sku", Program.CognitiveServiceResourceSku);
             var yes = _values.GetOrDefault("init.service.cognitiveservices.terms.agree", false);
 
