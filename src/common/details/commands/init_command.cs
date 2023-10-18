@@ -69,6 +69,9 @@ namespace Azure.AI.Details.Common.CLI
                 case "init.project": await DoInitRootProject(interactive); break;
                 case "init.resource": await DoInitResourceCommand(); break;
 
+                // POST-IGNITE: TODO: add ability to init deployments
+                // TODO: ensure that deployments in "openai" flow can be skipped
+
                 default:
                     _values.AddThrowError("WARNING", $"Unknown command '{command}'");
                     break;
@@ -89,7 +92,7 @@ namespace Azure.AI.Details.Common.CLI
             var existing = FileHelpers.FindFileInDataPath("config.json", _values);
             if (existing != null)
             {
-                await DoInitRootVerifyConfig(existing);
+                await DoInitRootVerifyConfig(interactive, existing);
             }
             else
             {
@@ -97,9 +100,9 @@ namespace Azure.AI.Details.Common.CLI
             }
         }
 
-        private async Task DoInitRootVerifyConfig(string fileName)
+        private async Task DoInitRootVerifyConfig(bool interactive, string fileName)
         {
-            if (VerifyConfigGood(fileName))
+            if (await VerifyConfigGood(interactive, fileName))
             {
                 await DoInitRootConfirmVerifiedConfig(fileName);
             }
@@ -109,37 +112,36 @@ namespace Azure.AI.Details.Common.CLI
             }
         }
 
-        private bool VerifyConfigGood(string fileName)
+        private async Task<bool> VerifyConfigGood(bool interactive, string fileName)
         {
             ParseConfigJson(fileName, out string subscription, out string groupName, out string projectName);
 
-            var message1 = $"  PROJECT: {projectName}";
-            var message2 = "Validating configuration (config.json) ...";
-            Console.Write($"\r{message1} - {message2}");
-            
-            if (VerifyConfigGood(subscription, groupName, projectName))
+            Console.WriteLine($"  PROJECT: {projectName}");
+            var validated = await AzCliConsoleGui.ValidateSubscriptionAsync(interactive, subscription, "  SUBSCRIPTION");
+
+            ConsoleHelpers.WriteLineWithHighlight("\n  `ATTACHED SERVICES AND RESOURCES`\n");
+
+            var message = "    Validating...";
+            Console.Write(message);
+
+            if (await VerifyConfigGood(subscription, groupName, projectName))
             {
-                Console.Write($"\r{new string(' ', message1.Length + message2.Length + 3)}");
-                ConsoleHelpers.WriteLineWithHighlight($"\r  `PROJECT`: {projectName}");
-                ConsoleHelpers.WriteLineWithHighlight("\n  `ATTACHED RESOURCES`");
-                Console.WriteLine();
+                Console.Write(new string(' ', message.Length + 2) + "\r");
                 return true;
             }
             else
             {
-                Console.Write($"\r{new string(' ', message1.Length + message2.Length + 3)}");
-                ConsoleHelpers.WriteLineWithHighlight($"\r{message1} - `#e_;WARNING: Configuration could not be validated!`");
+                ConsoleHelpers.WriteLineWithHighlight($"\r{message} `#e_;WARNING: Configuration could not be validated!`");
                 Console.WriteLine();
                 return false;
             }
         }
 
-        private bool VerifyConfigGood(string subscription, string groupName, string projectName)
+        private async Task<bool> VerifyConfigGood(string subscription, string groupName, string projectName)
         {
-            // TODO: Actually verify the config.json is good
-            Thread.Sleep(1000);
-            // return true;
-            return false;
+            Thread.Sleep(4000); // TODO: Actually verify the config.json is good
+            await Task.CompletedTask;
+            return Environment.GetEnvironmentVariable("AZURE_AI_CLI_INIT_PRETEND_VALID") == "true";
         }
 
         private async Task DoInitRootConfirmVerifiedConfig(string fileName)
@@ -174,13 +176,9 @@ namespace Azure.AI.Details.Common.CLI
                 return;
             }
 
-            Console.WriteLine($"\rAttaching to Project: {projectName}");
-            await AzCliConsoleGui.PickSubscriptionAsync(false, subscription);
+            ConsoleHelpers.WriteLineWithHighlight($"\r`INIT FROM PROJECT {projectName.ToUpper()}`\n");
 
-            ConsoleHelpers.WriteLineWithHighlight("\n`INIT PROJECT FROM CONFIG`\n");
             // TODO: Setup all the local datastore configuration 
-
-
 
             _values.AddThrowError("WARNING", "NOT IMPLEMENTED YET");
         }
@@ -312,7 +310,7 @@ namespace Azure.AI.Details.Common.CLI
         private async Task DoInitRootProject(bool interactive)
         {
             var subscriptionFilter = SubscriptionToken.Data().GetOrDefault(_values, "");
-            var subscriptionId = await AzCliConsoleGui.PickSubscriptionIdAsync(interactive, subscriptionFilter);
+            var subscriptionId = await AzCliConsoleGui.PickSubscriptionIdAsync(interactive, interactive, subscriptionFilter);
             SubscriptionToken.Data().Set(_values, subscriptionId);
 
             await DoInitServiceParts(interactive, "openai", "search", "resource", "project");
@@ -323,12 +321,6 @@ namespace Azure.AI.Details.Common.CLI
             if (!interactive) ThrowInteractiveNotSupportedApplicationException(); // POST-IGNITE: TODO: Add back non-interactive mode support
 
             var subscription = SubscriptionToken.Data().GetOrDefault(_values, "");
-            if (string.IsNullOrEmpty(subscription))
-            {
-                subscription = await AzCliConsoleGui.PickSubscriptionIdAsync(interactive);
-                _values.Reset("init.service.subscription", subscription);
-            }
-
             var resourceId = _values.GetOrDefault("service.resource.id", null);
             var groupName = ResourceGroupNameToken.Data().GetOrDefault(_values);
 
@@ -346,7 +338,7 @@ namespace Azure.AI.Details.Common.CLI
         private async Task DoInitRootOpenAi(bool interactive)
         {
             var subscriptionFilter = SubscriptionToken.Data().GetOrDefault(_values, "");
-            var subscriptionId = await AzCliConsoleGui.PickSubscriptionIdAsync(interactive, subscriptionFilter);
+            var subscriptionId = await AzCliConsoleGui.PickSubscriptionIdAsync(interactive, interactive, subscriptionFilter);
             SubscriptionToken.Data().Set(_values, subscriptionId);
 
             await DoInitOpenAi(interactive);
@@ -376,7 +368,7 @@ namespace Azure.AI.Details.Common.CLI
         private async Task DoInitRootSearch(bool interactive)
         {
             var subscriptionFilter = SubscriptionToken.Data().GetOrDefault(_values, "");
-            var subscriptionId = await AzCliConsoleGui.PickSubscriptionIdAsync(interactive, subscriptionFilter);
+            var subscriptionId = await AzCliConsoleGui.PickSubscriptionIdAsync(interactive, interactive, subscriptionFilter);
             SubscriptionToken.Data().Set(_values, subscriptionId);
 
             await DoInitSearch(interactive);
@@ -402,7 +394,7 @@ namespace Azure.AI.Details.Common.CLI
         private async Task DoInitRootSpeech(bool interactive)
         {
             var subscriptionFilter = SubscriptionToken.Data().GetOrDefault(_values, "");
-            var subscriptionId = await AzCliConsoleGui.PickSubscriptionIdAsync(interactive, subscriptionFilter);
+            var subscriptionId = await AzCliConsoleGui.PickSubscriptionIdAsync(interactive, interactive, subscriptionFilter);
             SubscriptionToken.Data().Set(_values, subscriptionId);
 
             await DoInitSpeech(interactive);
@@ -421,12 +413,6 @@ namespace Azure.AI.Details.Common.CLI
             var resource = await AzCliConsoleGui.InitAndConfigSpeechResource(interactive, subscriptionId, regionFilter, groupFilter, resourceFilter, kind, sku, yes);
 
             SubscriptionToken.Data().Set(_values, subscriptionId);
-            _values.Reset("service.resource.region.name", resource.RegionLocation);
-            _values.Reset("service.openai.endpoint", resource.Endpoint);
-            _values.Reset("service.openai.key", resource.Key);
-            _values.Reset("service.openai.resource.id", resource.Id);
-            ResourceNameToken.Data().Set(_values, resource.Name);
-            ResourceGroupNameToken.Data().Set(_values, resource.Group);
         }
 
         private async Task DoInitHub(bool interactive)
@@ -436,7 +422,7 @@ namespace Azure.AI.Details.Common.CLI
             var subscription = SubscriptionToken.Data().GetOrDefault(_values, "");
             if (string.IsNullOrEmpty(subscription))
             {
-                subscription = await AzCliConsoleGui.PickSubscriptionIdAsync(interactive);
+                subscription = await AzCliConsoleGui.PickSubscriptionIdAsync(interactive, interactive);
                 _values.Reset("init.service.subscription", subscription);
             }
 

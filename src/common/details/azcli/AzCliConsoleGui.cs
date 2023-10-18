@@ -19,14 +19,19 @@ namespace Azure.AI.Details.Common.CLI
 {
     public partial class AzCliConsoleGui
     {
-        public static Task<string> PickSubscriptionIdAsync(bool interactive, string subscriptionFilter = null)
+        public static Task<string> PickSubscriptionIdAsync(bool allowInteractiveLogin, bool allowInteractivePickSubscription, string subscriptionFilter = null)
         {
-            return SubscriptionPicker.PickSubscriptionIdAsync(interactive, subscriptionFilter);
+            return SubscriptionPicker.PickSubscriptionIdAsync(allowInteractiveLogin, allowInteractivePickSubscription, subscriptionFilter);
         }
 
-        public static Task<AzCli.SubscriptionInfo> PickSubscriptionAsync(bool interactive, string subscriptionFilter = null)
+        public static Task<AzCli.SubscriptionInfo> PickSubscriptionAsync(bool allowInteractiveLogin, bool allowInteractivePickSubscription, string subscriptionFilter = null)
         {
-            return SubscriptionPicker.PickSubscriptionAsync(interactive, subscriptionFilter);
+            return SubscriptionPicker.PickSubscriptionAsync(allowInteractiveLogin, allowInteractivePickSubscription, subscriptionFilter);
+        }
+
+        public static Task<AzCli.SubscriptionInfo?> ValidateSubscriptionAsync(bool allowInteractiveLogin, string subscriptionFilter, string subscriptionLabel)
+        {
+            return SubscriptionPicker.ValidateSubscriptionAsync(allowInteractiveLogin, subscriptionFilter, subscriptionLabel);
         }
 
         public static Task<AzCli.AccountRegionLocationInfo> PickRegionLocationAsync(bool interactive, string regionFilter = null, bool allowAnyRegionOption = true)

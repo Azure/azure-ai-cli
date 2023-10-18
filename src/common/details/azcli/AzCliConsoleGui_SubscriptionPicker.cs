@@ -21,20 +21,20 @@ namespace Azure.AI.Details.Common.CLI
     {
         public class SubscriptionPicker
         {
-            public static async Task<string> PickSubscriptionIdAsync(bool interactive, string subscriptionFilter = null)
+            public static async Task<string> PickSubscriptionIdAsync(bool allowInteractiveLogin, bool allowInteractivePickSubscription, string subscriptionFilter = null)
             {
                 if (Guid.TryParse(subscriptionFilter, out var subscriptionId))
                 {
                     return subscriptionId.ToString();
                 }
                 
-                var subscription = await PickSubscriptionAsync(interactive, subscriptionFilter);
+                var subscription = await PickSubscriptionAsync(allowInteractiveLogin, allowInteractivePickSubscription, subscriptionFilter);
                 return subscription.Id;
             }
 
-            public static async Task<AzCli.SubscriptionInfo> PickSubscriptionAsync(bool interactive, string subscriptionFilter = null)
+            public static async Task<AzCli.SubscriptionInfo> PickSubscriptionAsync(bool allowInteractiveLogin, bool allowInteractivePickSubscription, string subscriptionFilter = null)
             {
-                var subscription = await FindSubscriptionAsync(interactive, subscriptionFilter);
+                var subscription = await FindSubscriptionAsync(allowInteractiveLogin,  allowInteractivePickSubscription, subscriptionFilter);
                 if (subscription == null)
                 {
                     throw new ApplicationException($"CANCELED: No subscription selected.");
@@ -45,16 +45,21 @@ namespace Azure.AI.Details.Common.CLI
                 return subscription.Value;
             }
 
-            private static async Task<AzCli.SubscriptionInfo?> FindSubscriptionAsync(bool interactive, string subscriptionFilter = null)
+            public static async Task<AzCli.SubscriptionInfo?> ValidateSubscriptionAsync(bool allowInteractiveLogin, string subscriptionFilter, string subscriptionLabel)
             {
-                Console.Write("\rSubscription: *** Loading choices ***");
+                return await FindSubscriptionAsync(allowInteractiveLogin, false, subscriptionFilter, subscriptionLabel);
+            }
+
+            private static async Task<AzCli.SubscriptionInfo?> FindSubscriptionAsync(bool allowInteractiveLogin, bool allowInteractivePickSubscription, string subscriptionFilter = null, string subscriptionLabel = "Subscription")
+            {
+                Console.Write($"\r{subscriptionLabel}: *** Loading choices ***");
                 var response = await AzCli.ListAccounts();
 
                 var noOutput = string.IsNullOrEmpty(response.Output.StdOutput);
                 var hasError = !string.IsNullOrEmpty(response.Output.StdError);
                 var hasErrorNotFound = hasError && (response.Output.StdError.Contains(" not ") || response.Output.StdError.Contains("No such file"));
 
-                Console.Write("\rSubscription: ");
+                Console.Write($"\r{subscriptionLabel}: ");
                 if (noOutput && hasError && hasErrorNotFound)
                 {
                     throw new ApplicationException("*** Please install the Azure CLI - https://aka.ms/azcli ***\n\nNOTE: If it's already installed ensure it's in the system PATH and working (try: `az account list`)");
@@ -67,9 +72,9 @@ namespace Azure.AI.Details.Common.CLI
                 var needLogin = response.Output.StdError != null && response.Output.StdError.Contains("az login");
                 if (response.Payload.Count() == 0 && needLogin)
                 {
-                    bool cancelLogin = !interactive;
+                    bool cancelLogin = !allowInteractiveLogin;
                     bool useDeviceCode = false;
-                    if (interactive)
+                    if (allowInteractiveLogin)
                     {
                         ConsoleHelpers.WriteError("*** WARNING: `az login` required ***");
                         Console.Write(" ");
@@ -89,14 +94,14 @@ namespace Azure.AI.Details.Common.CLI
 
                     if (cancelLogin)
                     {
-                        Console.Write("\rSubscription: ");
+                        Console.Write($"\r{subscriptionLabel}: ");
                         ConsoleHelpers.WriteLineError("*** Please run `az login` and try again ***");
                         return null;
                     }
 
-                    Console.Write("\rSubscription: *** Launching `az login` (interactive) ***");
+                    Console.Write($"\r{subscriptionLabel}: *** Launching `az login` (interactive) ***");
                     response = await AzCli.Login(useDeviceCode);
-                    Console.Write("\rSubscription: ");
+                    Console.Write($"\r{subscriptionLabel}: ");
                 }
 
                 var subscriptions = response.Payload
@@ -117,7 +122,7 @@ namespace Azure.AI.Details.Common.CLI
                     DisplayNameAndId(subscription);
                     return subscription;
                 }
-                else if (!interactive)
+                else if (!allowInteractivePickSubscription)
                 {
                     ConsoleHelpers.WriteLineError("*** More than 1 subscription found ***");
                     Console.WriteLine();
