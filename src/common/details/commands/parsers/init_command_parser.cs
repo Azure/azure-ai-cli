@@ -23,16 +23,13 @@ namespace Azure.AI.Details.Common.CLI
         private static readonly (string name, bool valuesRequired)[] _commands =  {
             ("init.openai", false),
             ("init.search", false),
+            ("init.speech", false),
             ("init.project", false),
             ("init.resource", false),
             ("init", false)
         };
 
         private static readonly string[] _partialCommands = {
-            "init.openai",
-            "init.search",
-            "init.project",
-            "init.resource",
             "init"
         };
 
@@ -43,6 +40,7 @@ namespace Azure.AI.Details.Common.CLI
             {
                 case "init.openai":
                 case "init.search":
+                case "init.speech":
                 case "init.project":
                 case "init.resource":
 

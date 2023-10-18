@@ -65,6 +65,7 @@ namespace Azure.AI.Details.Common.CLI
                 case "init": await DoInitRoot(); break;
                 case "init.openai": await DoInitRootOpenAi(interactive); break;
                 case "init.search": await DoInitRootSearch(interactive); break;
+                case "init.speech": await DoInitRootSpeech(interactive); break;
                 case "init.project": await DoInitRootProject(interactive); break;
                 case "init.resource": await DoInitResourceCommand(); break;
 
@@ -110,21 +111,19 @@ namespace Azure.AI.Details.Common.CLI
 
         private bool VerifyConfigGood(string fileName)
         {
-            var message = $"  Validating config.json: {fileName}... ";
+            var message = $"  Verifying project configuration: {fileName}...";
             Console.Write(message);
             
             ParseConfigJson(fileName, out string subscription, out string groupName, out string projectName);
             if (VerifyConfigGood(subscription, groupName, projectName))
             {
-                Console.WriteLine($"\r{message} Done!");
-                ConsoleHelpers.WriteLineWithHighlight("  `#e_;FYI: Didn't really check, truth be told; not implemented yet 😁...`");
+                Console.WriteLine($"\r{message} Validated!");
                 Console.WriteLine();
                 return true;
             }
             else
             {
-                Console.WriteLine($"\r{message} Done!");
-                ConsoleHelpers.WriteLineWithHighlight("  `#e_;WARNING: config.json is not valid!`");
+                ConsoleHelpers.WriteLineWithHighlight($"\r{message} `#e_;WARNING: Valid config not found!`");
                 Console.WriteLine();
                 return false;
             }
@@ -184,7 +183,8 @@ namespace Azure.AI.Details.Common.CLI
             }
             catch (Exception ex)
             {
-                _values.AddThrowError("ERROR", $"Unable to parse config.json: {ex.Message}");
+                return false;
+                // _values.AddThrowError("ERROR", $"Unable to parse config.json: {ex.Message}");
             }
 
             return !string.IsNullOrEmpty(subscription) && !string.IsNullOrEmpty(groupName) && !string.IsNullOrEmpty(projectName);
