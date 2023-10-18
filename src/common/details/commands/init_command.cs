@@ -111,19 +111,23 @@ namespace Azure.AI.Details.Common.CLI
 
         private bool VerifyConfigGood(string fileName)
         {
-            var message = $"  Verifying project configuration: {fileName}...";
-            Console.Write(message);
-            
             ParseConfigJson(fileName, out string subscription, out string groupName, out string projectName);
+
+            var message1 = $"  PROJECT: {projectName}";
+            var message2 = "Validating Connections";
+            Console.Write($"\r{message1} - {message2}");
+            
             if (VerifyConfigGood(subscription, groupName, projectName))
             {
-                Console.WriteLine($"\r{message} Validated!");
+                Console.Write($"\r{new string(' ', message1.Length + message2.Length + 3)}");
+                ConsoleHelpers.WriteLineWithHighlight($"\r{message1} - `#2_;Connections validated!`");
                 Console.WriteLine();
                 return true;
             }
             else
             {
-                ConsoleHelpers.WriteLineWithHighlight($"\r{message} `#e_;WARNING: Valid config not found!`");
+                Console.Write($"\r{new string(' ', message1.Length + message2.Length + 3)}");
+                ConsoleHelpers.WriteLineWithHighlight($"\r{message1} - `#e_;WARNING: Cconnections could not be validated!`");
                 Console.WriteLine();
                 return false;
             }
@@ -141,7 +145,6 @@ namespace Azure.AI.Details.Common.CLI
             ParseConfigJson(fileName, out string subscription, out string groupName, out string projectName);
 
             // TODO: Print correct stuff here... 
-            Console.WriteLine($"  PROJECT: {projectName}\n");
             ConsoleHelpers.WriteLineWithHighlight("    OPEN AI RESOURCE: {openai-resource-name}                         `#e_;<== work in progress`");
             ConsoleHelpers.WriteLineWithHighlight("    OPEN AI DEPLOYMENT (CHAT): {chat-deployment-name}                `#e_;<== work in progress`");
             ConsoleHelpers.WriteLineWithHighlight("    OPEN AI DEPLOYMENT (EMBEDDINGS): {embeddings-deployment-name}    `#e_;<== work in progress`");
@@ -168,7 +171,7 @@ namespace Azure.AI.Details.Common.CLI
             }
 
             Console.WriteLine($"\rProject: {projectName}");
-            await AzCliConsoleGui.PickSubscriptionAsync(true, subscription);
+            await AzCliConsoleGui.PickSubscriptionAsync(false, subscription);
 
             ConsoleHelpers.WriteLineWithHighlight("\n`INIT PROJECT FROM CONFIG`\n");
             // TODO: Setup all the local datastore configuration 
