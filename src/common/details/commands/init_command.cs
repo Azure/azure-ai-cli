@@ -62,7 +62,7 @@ namespace Azure.AI.Details.Common.CLI
             switch (command)
             {
                 // case "init": await DoInitServiceCommand(); break;
-                case "init": await DoInitRoot(); break;
+                case "init": await DoInitRootAsync(); break;
                 case "init.openai": await DoInitRootOpenAi(interactive); break;
                 case "init.search": await DoInitRootSearch(interactive); break;
                 case "init.speech": await DoInitRootSpeech(interactive); break;
@@ -82,7 +82,7 @@ namespace Azure.AI.Details.Common.CLI
             DeleteTemporaryFiles();
         }
 
-        private async Task DoInitRoot()
+        private async Task DoInitRootAsync()
         {
             var interactive = _values.GetOrDefault("init.service.interactive", true);
             if (!interactive) ThrowInteractiveNotSupportedApplicationException(); // POST-IGNITE: TODO: Add back non-interactive mode support
@@ -92,7 +92,7 @@ namespace Azure.AI.Details.Common.CLI
             var existing = FileHelpers.FindFileInDataPath("config.json", _values);
             if (existing != null)
             {
-                await DoInitRootVerifyConfig(interactive, existing);
+                await DoInitRootVerifyConfigFileAsync(interactive, existing);
             }
             else
             {
@@ -100,22 +100,23 @@ namespace Azure.AI.Details.Common.CLI
             }
         }
 
-        private async Task DoInitRootVerifyConfig(bool interactive, string fileName)
-        {
-            if (await VerifyConfigGood(interactive, fileName))
-            {
-                await DoInitRootConfirmVerifiedConfig(fileName);
-            }
-            else
-            {
-                await DoInitRootMenuPick();
-            }
-        }
-
-        private async Task<bool> VerifyConfigGood(bool interactive, string fileName)
+        private async Task DoInitRootVerifyConfigFileAsync(bool interactive, string fileName)
         {
             ParseConfigJson(fileName, out string subscription, out string groupName, out string projectName);
 
+            var (openai, search) = await VerifyProjectAsync(interactive, subscription, groupName, projectName);
+            if (openai != null && search != null)
+            {
+                await DoInitRootConfirmVerifiedProjectResources(projectName, openai.Value, search.Value);
+            }
+            else
+            {
+                await DoInitRootMenuPick();
+            }
+        }
+
+        private async Task<(AzCli.CognitiveServicesResourceInfo?, AzCli.CognitiveSearchResourceInfo?)> VerifyProjectAsync(bool interactive, string subscription, string groupName, string projectName)
+        {
             Console.WriteLine($"  PROJECT: {projectName}");
             var validated = await AzCliConsoleGui.ValidateSubscriptionAsync(interactive, subscription, "  SUBSCRIPTION");
 
@@ -124,38 +125,89 @@ namespace Azure.AI.Details.Common.CLI
             var message = "    Validating...";
             Console.Write(message);
 
-            if (await VerifyConfigGood(subscription, groupName, projectName))
+            var (openai, search) = await VerifyResourceConnections(validated, subscription, groupName, projectName);
+            if (openai != null && search != null)
             {
                 Console.Write(new string(' ', message.Length + 2) + "\r");
-                return true;
+                return (openai, search);
             }
             else
             {
                 ConsoleHelpers.WriteLineWithHighlight($"\r{message} `#e_;WARNING: Configuration could not be validated!`");
                 Console.WriteLine();
-                return false;
+                return (null, null);
             }
         }
 
-        private async Task<bool> VerifyConfigGood(string subscription, string groupName, string projectName)
+        private async Task<(AzCli.CognitiveServicesResourceInfo?, AzCli.CognitiveSearchResourceInfo?)> VerifyResourceConnections(AzCli.SubscriptionInfo? validated, string subscription, string groupName, string projectName)
         {
-            Thread.Sleep(4000); // TODO: Actually verify the config.json is good
-            await Task.CompletedTask;
-            return Environment.GetEnvironmentVariable("AZURE_AI_CLI_INIT_PRETEND_VALID") == "true";
+            try
+            {
+                var json = PythonSDKWrapper.ListConnections(_values, subscription, groupName, projectName);
+                if (string.IsNullOrEmpty(json)) return (null, null);
+
+                var connections = JObject.Parse(json)["connections"] as JArray;
+                if (connections.Count == 0) return (null, null);
+
+                var foundOpenAiResource = await FindAndVerifyOpenAiResourceConnection(subscription, connections);
+                var foundSearchResource = await FindAndVerifySearchResourceConnection(subscription, connections);
+
+                return (foundOpenAiResource, foundSearchResource);
+            }
+            catch (Exception ex)
+            {
+                FileHelpers.LogException(_values, ex);
+                return (null, null);
+            }
         }
 
-        private async Task DoInitRootConfirmVerifiedConfig(string fileName)
+        private static async Task<AzCli.CognitiveServicesResourceInfo?> FindAndVerifyOpenAiResourceConnection(string subscription, JArray connections)
         {
-            ParseConfigJson(fileName, out string subscription, out string groupName, out string projectName);
+            var openaiConnection = connections.FirstOrDefault(x => x["name"].ToString().Contains("Default_AzureOpenAI") && x["type"].ToString() == "azure_open_ai");
 
+            if (openaiConnection == null) return null;
+
+            var openaiEndpoint = openaiConnection?["target"].ToString();
+            if (string.IsNullOrEmpty(openaiEndpoint)) return null;
+
+            var responseOpenAi = await AzCli.ListCognitiveServicesResources(subscription, "OpenAI");
+            var responseOpenAiOk = !string.IsNullOrEmpty(responseOpenAi.Output.StdOutput) && string.IsNullOrEmpty(responseOpenAi.Output.StdError);
+            if (!responseOpenAiOk) return null;
+
+            var matchOpenAiEndpoint = responseOpenAi.Payload.Where(x => x.Endpoint == openaiEndpoint).ToList();
+            if (matchOpenAiEndpoint.Count() != 1) return null;
+
+            return matchOpenAiEndpoint.First();
+        }
+
+        private static async Task<AzCli.CognitiveSearchResourceInfo?> FindAndVerifySearchResourceConnection(string subscription, JArray connections)
+        {
+            var searchConnection = connections.FirstOrDefault(x => x["name"].ToString().Contains("Default_CognitiveSearch") && x["type"].ToString() == "cognitive_search");
+            if (searchConnection == null) return null;
+
+            var searchEndpoint = searchConnection?["target"].ToString();
+            if (string.IsNullOrEmpty(searchEndpoint)) return null;
+
+            var responseSearch = await AzCli.ListSearchResources(subscription, null);
+            var responseSearchOk = !string.IsNullOrEmpty(responseSearch.Output.StdOutput) && string.IsNullOrEmpty(responseSearch.Output.StdError);
+            if (!responseSearchOk) return null;
+
+            var matchSearchEndpoint = responseSearch.Payload.Where(x => x.Endpoint == searchEndpoint).ToList();
+            if (matchSearchEndpoint.Count() != 1) return null;
+
+            return matchSearchEndpoint.First();
+        }
+
+        private async Task DoInitRootConfirmVerifiedProjectResources(string projectName, AzCli.CognitiveServicesResourceInfo openaiResource, AzCli.CognitiveSearchResourceInfo searchResource)
+        {
             // TODO: Print correct stuff here... 
-            ConsoleHelpers.WriteLineWithHighlight("    AI RESOURCE: {resource-name}                                     `#e_;<== work in progress`");
-            ConsoleHelpers.WriteLineWithHighlight("    AI SEARCH RESOURCE: {search-resource-name}                       `#e_;<== work in progress`");
+            ConsoleHelpers.WriteLineWithHighlight($"    AI RESOURCE: {{resource-name}}                                     `#e_;<== work in progress`");
+            ConsoleHelpers.WriteLineWithHighlight($"    AI SEARCH RESOURCE: {searchResource.Name}");
             Console.WriteLine();
-            ConsoleHelpers.WriteLineWithHighlight("    OPEN AI RESOURCE: {openai-resource-name}                         `#e_;<== work in progress`");
-            ConsoleHelpers.WriteLineWithHighlight("    OPEN AI DEPLOYMENT (CHAT): {chat-deployment-name}                `#e_;<== work in progress`");
-            ConsoleHelpers.WriteLineWithHighlight("    OPEN AI DEPLOYMENT (EMBEDDINGS): {embeddings-deployment-name}    `#e_;<== work in progress`");
-            ConsoleHelpers.WriteLineWithHighlight("    OPEN AI DEPLOYMENT (EVALUATION): {evaluation-deployment-name}    `#e_;<== work in progress`");
+            ConsoleHelpers.WriteLineWithHighlight($"    OPEN AI RESOURCE: {openaiResource.Name}");
+            ConsoleHelpers.WriteLineWithHighlight($"    OPEN AI DEPLOYMENT (CHAT): {{chat-deployment-name}}                `#e_;<== work in progress`");
+            ConsoleHelpers.WriteLineWithHighlight($"    OPEN AI DEPLOYMENT (EMBEDDINGS): {{embeddings-deployment-name}}    `#e_;<== work in progress`");
+            ConsoleHelpers.WriteLineWithHighlight($"    OPEN AI DEPLOYMENT (EVALUATION): {{evaluation-deployment-name}}    `#e_;<== work in progress`");
 
             Console.WriteLine();
             var label = "  Initialize";
