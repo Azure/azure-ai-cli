@@ -60,6 +60,19 @@ namespace Azure.AI.Details.Common.CLI
             public string EmbeddingsDeployment;
         }
 
+        public struct CognitiveServicesSpeechResourceInfo
+        {
+            public string Id;
+            public string Group;
+            public string Name;
+            public string Kind;
+            public string RegionLocation;
+            public string Endpoint;
+
+            public string Key;
+        }
+
+
         public struct CognitiveServicesKeyInfo
         {
             public string Key1;
@@ -234,7 +247,17 @@ namespace Azure.AI.Details.Common.CLI
         {
             var cmdPart = "cognitiveservices account list";
             var subPart = subscriptionId != null ? $"--subscription {subscriptionId}" : "";
-            var condPart= kind != null ? $"? kind == 'CognitiveServices' || kind == '{kind}'" : null;
+            var condPart= kind switch
+            {
+                "OpenAI" => "? kind == 'OpenAI' || kind == 'AIServices'",
+                "ComputerVision" => "? kind == 'ComputerVision' || kind == 'CognitiveServices' || kind == 'AIServices'",
+                "SpeechServices" => "? kind == 'SpeechServices' || kind == 'CognitiveServices' || kind == 'AIServices'",
+
+                "AIServices" => $"? kind == '{kind}'",
+                "CognitiveServices" => $"? kind == '{kind}'",
+
+                _ => kind != null ? $"? kind == '{kind}' || kind == 'CognitiveServices' || kind == 'AIServices'" : null
+            };
 
             var parsed = await ProcessHelpers.ParseShellCommandJson<JArray>("az", $"{cmdPart} {subPart} --query \"[{condPart}].{{Id:id,Name:name,Location: location,Kind:kind,Group:resourceGroup,Endpoint:properties.endpoint}}\"", GetUserAgentEnv());
             var resources = parsed.Payload;
@@ -303,7 +326,7 @@ namespace Azure.AI.Details.Common.CLI
             return x;
         }
 
-        public static async Task<ParsedJsonProcessOutput<CognitiveServicesResourceInfo?>> CreateCognitiveServicesResource(string subscriptionId, string group, string regionLocation, string name, string kind = "CognitiveServices", string sku = "F0")
+        public static async Task<ParsedJsonProcessOutput<CognitiveServicesResourceInfo?>> CreateCognitiveServicesResource(string subscriptionId, string group, string regionLocation, string name, string kind = "AIServices", string sku = "F0")
         {
             var cmdPart = "cognitiveservices account create";
             var subPart = subscriptionId != null ? $"--subscription {subscriptionId}" : "";
@@ -448,6 +471,7 @@ namespace Azure.AI.Details.Common.CLI
 
         private static async Task<List<string>> ListSupportedResourceRegions()
         {
+            // TODO: What kind should we use here?
             var process2 = await ProcessHelpers.ParseShellCommandJson<JArray>("az", $"cognitiveservices account list-skus --kind {Program.CognitiveServiceResourceKind} --query \"[].{{Name:locations[0]}}\"", GetUserAgentEnv());
             var supportedRegions = new List<string>();
             foreach (var regionLocation in process2.Payload)

@@ -62,11 +62,15 @@ namespace Azure.AI.Details.Common.CLI
             switch (command)
             {
                 // case "init": await DoInitServiceCommand(); break;
-                case "init": await DoInitRoot(); break;
-                case "init.openai": await DoInitOpenAiCommand(); break;
-                case "init.search": await DoInitSearchCommand(); break;
+                case "init": await DoInitRootAsync(); break;
+                case "init.openai": await DoInitRootOpenAi(interactive); break;
+                case "init.search": await DoInitRootSearch(interactive); break;
+                case "init.speech": await DoInitRootSpeech(interactive); break;
+                case "init.project": await DoInitRootProject(interactive); break;
                 case "init.resource": await DoInitResourceCommand(); break;
-                case "init.project": await DoInitProjectCommand(); break;
+
+                // POST-IGNITE: TODO: add ability to init deployments
+                // TODO: ensure that deployments in "openai" flow can be skipped
 
                 default:
                     _values.AddThrowError("WARNING", $"Unknown command '{command}'");
@@ -78,17 +82,17 @@ namespace Azure.AI.Details.Common.CLI
             DeleteTemporaryFiles();
         }
 
-        private async Task DoInitRoot()
+        private async Task DoInitRootAsync()
         {
             var interactive = _values.GetOrDefault("init.service.interactive", true);
-            if (!interactive) ThrowInteractiveNotSupportedApplicationException(); // TODO: Add back non-interactive mode support
+            if (!interactive) ThrowInteractiveNotSupportedApplicationException(); // POST-IGNITE: TODO: Add back non-interactive mode support
 
             ConsoleHelpers.WriteLineWithHighlight("`AI INIT`\n\n  Initializes (creates, selects, or attaches to) AI Projects and services.\n");
 
             var existing = FileHelpers.FindFileInDataPath("config.json", _values);
             if (existing != null)
             {
-                await DoInitRootVerifyConfig(existing);
+                await DoInitRootVerifyConfigFileAsync(interactive, existing);
             }
             else
             {
@@ -96,11 +100,14 @@ namespace Azure.AI.Details.Common.CLI
             }
         }
 
-        private async Task DoInitRootVerifyConfig(string fileName)
+        private async Task DoInitRootVerifyConfigFileAsync(bool interactive, string fileName)
         {
-            if (VerifyConfigGood(fileName))
+            ParseConfigJson(fileName, out string subscription, out string groupName, out string projectName);
+
+            var (hubName, openai, search) = await VerifyProjectAsync(interactive, subscription, groupName, projectName);
+            if (openai != null && search != null)
             {
-                await DoInitRootConfirmVerifiedConfig(fileName);
+                await DoInitRootConfirmVerifiedProjectResources(interactive, subscription, projectName, hubName, openai.Value, search.Value);
             }
             else
             {
@@ -108,26 +115,166 @@ namespace Azure.AI.Details.Common.CLI
             }
         }
 
-        private bool VerifyConfigGood(string fileName)
+        private async Task<(string, AzCli.CognitiveServicesResourceInfo?, AzCli.CognitiveSearchResourceInfo?)> VerifyProjectAsync(bool interactive, string subscription, string groupName, string projectName)
         {
-            // TODO: Actually verify that it's a good config.json
-            return true;
+            Console.WriteLine($"  PROJECT: {projectName}");
+            var validated = await AzCliConsoleGui.ValidateSubscriptionAsync(interactive, subscription, "  SUBSCRIPTION");
+
+            ConsoleHelpers.WriteLineWithHighlight("\n  `ATTACHED SERVICES AND RESOURCES`\n");
+
+            var message = "    Validating...";
+            Console.Write(message);
+
+            var (hubName, openai, search) = await VerifyResourceConnections(validated, subscription, groupName, projectName);
+            if (openai != null && search != null)
+            {
+                Console.Write(new string(' ', message.Length + 2) + "\r");
+                return (hubName, openai, search);
+            }
+            else
+            {
+                ConsoleHelpers.WriteLineWithHighlight($"\r{message} `#e_;WARNING: Configuration could not be validated!`");
+                Console.WriteLine();
+                return (null, null, null);
+            }
         }
 
-        private async Task DoInitRootConfirmVerifiedConfig(string fileName)
+        private async Task<(string, AzCli.CognitiveServicesResourceInfo?, AzCli.CognitiveSearchResourceInfo?)> VerifyResourceConnections(AzCli.SubscriptionInfo? validated, string subscription, string groupName, string projectName)
         {
-            // TODO: Actually do the confirmation with the user
+            try
+            {
+                var projectJson = PythonSDKWrapper.ListProjects(_values, subscription);
+                var projects = JObject.Parse(projectJson)["projects"] as JArray;
+                var project = projects.FirstOrDefault(x => x["name"].ToString() == projectName);
+                if (project == null) return (null, null, null);
 
-            // ┌────────────────────────────────────────────────────────┐  
-            // │ PROJECT: Use this project: my-project (eastus)         │*default
-            // │      or: (Initialize different resources)              │  
-            // └───────────────────────────── ↑↓  <?> Find  <ESC> Close ┘
-            
-            await DoInitRootMenuPick();
+                var hub = project["workspace_hub"].ToString();
+                var hubName = hub.Split('/').Last();
+
+                var json = PythonSDKWrapper.ListConnections(_values, subscription, groupName, projectName);
+                if (string.IsNullOrEmpty(json)) return (null, null, null);
+
+                var connections = JObject.Parse(json)["connections"] as JArray;
+                if (connections.Count == 0) return (null, null, null);
+
+                var foundOpenAiResource = await FindAndVerifyOpenAiResourceConnection(subscription, connections);
+                var foundSearchResource = await FindAndVerifySearchResourceConnection(subscription, connections);
+
+                return (hubName, foundOpenAiResource, foundSearchResource);
+            }
+            catch (Exception ex)
+            {
+                FileHelpers.LogException(_values, ex);
+                return (null, null, null);
+            }
+        }
+
+        private static async Task<AzCli.CognitiveServicesResourceInfo?> FindAndVerifyOpenAiResourceConnection(string subscription, JArray connections)
+        {
+            var openaiConnection = connections.FirstOrDefault(x => x["name"].ToString().Contains("Default_AzureOpenAI") && x["type"].ToString() == "azure_open_ai");
+
+            if (openaiConnection == null) return null;
+
+            var openaiEndpoint = openaiConnection?["target"].ToString();
+            if (string.IsNullOrEmpty(openaiEndpoint)) return null;
+
+            var responseOpenAi = await AzCli.ListCognitiveServicesResources(subscription, "OpenAI");
+            var responseOpenAiOk = !string.IsNullOrEmpty(responseOpenAi.Output.StdOutput) && string.IsNullOrEmpty(responseOpenAi.Output.StdError);
+            if (!responseOpenAiOk) return null;
+
+            var matchOpenAiEndpoint = responseOpenAi.Payload.Where(x => x.Endpoint == openaiEndpoint).ToList();
+            if (matchOpenAiEndpoint.Count() != 1) return null;
+
+            return matchOpenAiEndpoint.First();
+        }
+
+        private static async Task<AzCli.CognitiveSearchResourceInfo?> FindAndVerifySearchResourceConnection(string subscription, JArray connections)
+        {
+            var searchConnection = connections.FirstOrDefault(x => x["name"].ToString().Contains("Default_CognitiveSearch") && x["type"].ToString() == "cognitive_search");
+            if (searchConnection == null) return null;
+
+            var searchEndpoint = searchConnection?["target"].ToString();
+            if (string.IsNullOrEmpty(searchEndpoint)) return null;
+
+            var responseSearch = await AzCli.ListSearchResources(subscription, null);
+            var responseSearchOk = !string.IsNullOrEmpty(responseSearch.Output.StdOutput) && string.IsNullOrEmpty(responseSearch.Output.StdError);
+            if (!responseSearchOk) return null;
+
+            var matchSearchEndpoint = responseSearch.Payload.Where(x => x.Endpoint == searchEndpoint).ToList();
+            if (matchSearchEndpoint.Count() != 1) return null;
+
+            return matchSearchEndpoint.First();
+        }
+
+        private async Task DoInitRootConfirmVerifiedProjectResources(bool interactive, string subscription, string projectName, string hubName, AzCli.CognitiveServicesResourceInfo openaiResource, AzCli.CognitiveSearchResourceInfo searchResource)
+        {
+            ConsoleHelpers.WriteLineWithHighlight($"    AI RESOURCE: {hubName}");
+            ConsoleHelpers.WriteLineWithHighlight($"    AI SEARCH RESOURCE: {searchResource.Name}");
+            // Console.WriteLine();
+            ConsoleHelpers.WriteLineWithHighlight($"    OPEN AI RESOURCE: {openaiResource.Name}");
+
+            // TODO: If there's a way to get the deployments, get them, and do this... Print correct stuff here... 
+            // ConsoleHelpers.WriteLineWithHighlight($"    OPEN AI DEPLOYMENT (CHAT): {{chat-deployment-name}}                `#e_;<== work in progress`");
+            // ConsoleHelpers.WriteLineWithHighlight($"    OPEN AI DEPLOYMENT (EMBEDDINGS): {{embeddings-deployment-name}}    `#e_;<== work in progress`");
+            // ConsoleHelpers.WriteLineWithHighlight($"    OPEN AI DEPLOYMENT (EVALUATION): {{evaluation-deployment-name}}    `#e_;<== work in progress`");
+
+            Console.WriteLine();
+            var label = "  Initialize";
+            Console.Write($"{label}: ");
+
+            var choices = new string[] { $"PROJECT: {projectName}", $"     OR: (Initialize something else)" };
+            var picked = ListBoxPicker.PickIndexOf(choices.ToArray());
+            if (picked < 0)
+            {
+                Console.WriteLine($"\r{label}: CANCELED (no selection)");
+                return;
+            }
+            else if (picked > 0)
+            {
+                Console.Write(new string(' ', label.Length + 2) + "\r");
+                Console.WriteLine("  Initializing something else...\n");
+                await DoInitRootMenuPick();
+                return;
+            }
+            else
+            {
+                Console.Write("\r" + new string(' ', label.Length + 2) + "\r");
+
+                var chatDeployment = await AzCliConsoleGui.PickOrCreateDeployment(interactive, "Chat", subscription, openaiResource.Group, openaiResource.RegionLocation, openaiResource.Name, null);
+                var embeddingsDeployment = await AzCliConsoleGui.PickOrCreateDeployment(interactive, "Embeddings", subscription, openaiResource.Group, openaiResource.RegionLocation, openaiResource.Name, null);
+                var keys = await AzCliConsoleGui.LoadCognitiveServicesResourceKeys("OPENAI RESOURCE", subscription, openaiResource);
+                ConfigSetHelpers.ConfigOpenAiResource(subscription, openaiResource.RegionLocation, openaiResource.Endpoint, chatDeployment.Name, embeddingsDeployment.Name, keys.Key1);
+
+                var searchKeys = await AzCliConsoleGui.LoadSearchResourceKeys(subscription, searchResource);
+                ConfigSetHelpers.ConfigSearchResource(searchResource.Endpoint, searchKeys.Key1);
+            }
+        }
+
+        private bool ParseConfigJson(string fileName, out string subscription, out string groupName, out string projectName)
+        {
+            subscription = groupName = projectName = null;
+
+            var json = FileHelpers.ReadAllHelpText(fileName, Encoding.UTF8);
+            try
+            {
+                var config = JObject.Parse(json);
+                subscription = config.ContainsKey("subscription_id") ? config["subscription_id"].ToString() : null;
+                groupName = config.ContainsKey("resource_group") ? config["resource_group"].ToString() : null;
+                projectName = config.ContainsKey("project_name") ? config["project_name"].ToString() : null;
+            }
+            catch (Exception ex)
+            {
+                return false;
+                // _values.AddThrowError("ERROR", $"Unable to parse config.json: {ex.Message}");
+            }
+
+            return !string.IsNullOrEmpty(subscription) && !string.IsNullOrEmpty(groupName) && !string.IsNullOrEmpty(projectName);
         }
 
         private async Task DoInitRootMenuPick()
         {
+            var interactive = true;
+
             Console.WriteLine("  Choose between initializing:");
             ConsoleHelpers.WriteLineWithHighlight("  - AI Project resource: Recommended when using `Azure AI Studio` and/or connecting to multiple AI services.");
             Console.WriteLine("  - Standalone resources: Recommended when building simple solutions connecting to a single AI service.");
@@ -137,17 +284,17 @@ namespace Azure.AI.Details.Common.CLI
             Console.Write($"{label}: ");
             var choiceToPart = new Dictionary<string, string>
             {
-                ["AI Project resource"] = "init-root-project",
-                // ["New AI Project"] = "init-root-project-new",
+                ["AI Project resource"] = "init-root-project-hack",             // TODO: Replace with new flows below | | |
+                // ["New AI Project"] = "init-root-project-new",                //                                    v v v
                 // ["Existing AI Project"] = "init-root-project-pick",
                 ["Standalone resources"] = "init-root-standalone-select-or-create",
             };
             var partToLabelDisplay = new Dictionary<string, string>()
             {
-                ["init-root-project"] = "AI Project resource",
+                ["init-root-project-hack"] = "AI Project resource",
                 // ["init-root-project-new"] = "New AI Project",
                 // ["init-root-project-pick"] = "Existing AI Project",
-                ["init-root-standalone-select-or-create"] = "Standalone service resources",
+                ["init-root-standalone-select-or-create"] = null
             };
 
             var choices = choiceToPart.Keys.ToArray();
@@ -161,25 +308,10 @@ namespace Azure.AI.Details.Common.CLI
             var part = choiceToPart[choices[picked]];
             var display = partToLabelDisplay[part];
 
-            // ConsoleHelpers.WriteLineWithHighlight($"\r{label.Trim()}: {display}");
-            ConsoleHelpers.WriteLineWithHighlight($"\r{label.Trim()}: {display}");
-
-            var interactive = true;
+            Console.Write(display == null
+                ? new string(' ', label.Length + 2) + "\r"
+                : $"\r{label.Trim()}: {display}\n");
             await DoInitServiceParts(interactive, part.Split(';').ToArray());
-
-            await Task.CompletedTask;
-        }
-
-        private async Task DoInitOpenAiCommand()
-        {
-            var interactive = _values.GetOrDefault("init.service.interactive", true);
-            await DoInitServiceParts(interactive, "openai");
-        }
-
-        private async Task DoInitSearchCommand()
-        {
-            var interactive = _values.GetOrDefault("init.service.interactive", true);
-            await DoInitServiceParts(interactive, "openai", "search");
         }
 
         private async Task DoInitResourceCommand()
@@ -188,37 +320,23 @@ namespace Azure.AI.Details.Common.CLI
             await DoInitServiceParts(interactive, "resource");
         }
 
-        private async Task DoInitProjectCommand()
+        private async Task DoInitStandaloneResources(bool interactive)
         {
-            var interactive = _values.GetOrDefault("init.service.interactive", true);
-            await DoInitServiceParts(interactive, "openai", "search", "resource", "project");
-        }
-
-        private async Task DoInitService(bool interactive)
-        {
-            if (!interactive) ThrowInteractiveNotSupportedApplicationException(); // TODO: Add back non-interactive mode support
-            await DoInitServiceInteractively();
-        }
-
-        private async Task DoInitServiceInteractively()
-        {
-            Console.Write("Initialize: ");
-
+            var label = "  Initialize";
+            Console.Write($"{label}: ");
             var choiceLookup = new Dictionary<string, string>
             {
-                ["Azure OpenAI"] = "openai",
-                ["Azure OpenAI + AI Search"] = "openai;search",
-                ["Azure AI Resource + Project"] = "resource;project",
-                ["Azure AI Resource + Project + OpenAI"] = "openai;resource;project",
-                ["Azure AI Resource + Project + OpenAI + AI Search"] = "openai;search;resource;project",
+                ["Azure OpenAI"] = "init-root-openai-create-or-select",
+                ["Azure Search"] = "init-root-search-create-or-select",
+                ["Azure Speech"] = "init-root-speech-create-or-select"
             };
 
             var choices = choiceLookup.Keys.ToArray();
 
-            var picked = ListBoxPicker.PickIndexOf(choices.ToArray(), choices.Count() - 1);
+            var picked = ListBoxPicker.PickIndexOf(choices.ToArray());
             if (picked < 0)
             {
-                Console.WriteLine("\rInitialize: (canceled)");
+                Console.WriteLine("\rInitialize: CANCELED (no selection)");
                 return;
             }
     
@@ -236,16 +354,19 @@ namespace Azure.AI.Details.Common.CLI
 
                 var task = operation switch
                 {
+                    "init-root-project-hack" => DoInitRootProject(interactive),         // TODO: Replace with new flows below  | | |
+                    "init-root-project-pick" => DoInitRootProject(interactive),         //                                     v v v
+                    "init-root-project-new" => DoInitRootProject(interactive),
+
+                    "init-root-standalone-select-or-create" => DoInitStandaloneResources(interactive),
+                    "init-root-openai-create-or-select" => DoInitRootOpenAi(interactive),
+                    "init-root-search-create-or-select" => DoInitRootSearch(interactive),
+                    "init-root-speech-create-or-select" => DoInitRootSpeech(interactive),
+
                     "openai" => DoInitOpenAi(interactive),
                     "search" => DoInitSearch(interactive),
                     "resource" => DoInitHub(interactive),
                     "project" => DoInitProject(interactive),
-
-                    "init-root-standalone-select-or-create" => DoInitServiceParts(interactive, "openai", "search"), // TODO: Replace with new flow
-
-                    "init-root-project" => DoInitProjectCommand(), // TODO: Replace with new flow
-                    "init-root-project-pick" => DoInitProjectCommand(), // TODO: Replace with new flow
-                    "init-root-project-new" => DoInitProjectCommand(), // TODO: Replace with new flow
 
                     _ => throw new ApplicationException($"WARNING: NOT YET IMPLEMENTED")
                 };
@@ -253,17 +374,53 @@ namespace Azure.AI.Details.Common.CLI
             }
         }
 
-        private async Task DoInitOpenAi(bool interactive)
+        private async Task DoInitRootProject(bool interactive)
         {
             var subscriptionFilter = SubscriptionToken.Data().GetOrDefault(_values, "");
+            var subscriptionId = await AzCliConsoleGui.PickSubscriptionIdAsync(interactive, interactive, subscriptionFilter);
+            SubscriptionToken.Data().Set(_values, subscriptionId);
+
+            await DoInitServiceParts(interactive, "openai", "search", "resource", "project");
+        }
+
+        private async Task DoInitProject(bool interactive)
+        {
+            if (!interactive) ThrowInteractiveNotSupportedApplicationException(); // POST-IGNITE: TODO: Add back non-interactive mode support
+
+            var subscription = SubscriptionToken.Data().GetOrDefault(_values, "");
+            var resourceId = _values.GetOrDefault("service.resource.id", null);
+            var groupName = ResourceGroupNameToken.Data().GetOrDefault(_values);
+
+            var openAiEndpoint = _values.GetOrDefault("service.openai.endpoint", null);
+            var openAiKey = _values.GetOrDefault("service.openai.key", null);
+            var searchEndpoint = _values.GetOrDefault("service.search.endpoint", null);
+            var searchKey = _values.GetOrDefault("service.search.key", null);
+
+            var project = AiSdkConsoleGui.InitAndConfigAiHubProject(_values, subscription, resourceId, groupName, openAiEndpoint, openAiKey, searchEndpoint, searchKey);
+
+            ProjectNameToken.Data().Set(_values, project.Name);
+            _values.Reset("service.project.id", project.Id);
+        }
+
+        private async Task DoInitRootOpenAi(bool interactive)
+        {
+            var subscriptionFilter = SubscriptionToken.Data().GetOrDefault(_values, "");
+            var subscriptionId = await AzCliConsoleGui.PickSubscriptionIdAsync(interactive, interactive, subscriptionFilter);
+            SubscriptionToken.Data().Set(_values, subscriptionId);
+
+            await DoInitOpenAi(interactive);
+        }
+
+        private async Task DoInitOpenAi(bool interactive)
+        {
+            var subscriptionId = SubscriptionToken.Data().GetOrDefault(_values, "");
             var regionFilter = _values.GetOrDefault("init.service.resource.region.name", "");
             var groupFilter = _values.GetOrDefault("init.service.resource.group.name", "");
             var resourceFilter = _values.GetOrDefault("init.service.cognitiveservices.resource.name", "");
-            var kind = _values.GetOrDefault("init.service.cognitiveservices.resource.kind", Program.CognitiveServiceResourceKind);
+            var kind = _values.GetOrDefault("init.service.cognitiveservices.resource.kind", "OpenAI");
             var sku = _values.GetOrDefault("init.service.cognitiveservices.resource.sku", Program.CognitiveServiceResourceSku);
             var yes = _values.GetOrDefault("init.service.cognitiveservices.terms.agree", false);
 
-            var subscriptionId = await AzCliConsoleGui.PickSubscriptionIdAsync(interactive, subscriptionFilter);
             var resource = await AzCliConsoleGui.InitAndConfigOpenAiResource(interactive, subscriptionId, regionFilter, groupFilter, resourceFilter, kind, sku, yes);
 
             SubscriptionToken.Data().Set(_values, subscriptionId);
@@ -275,9 +432,18 @@ namespace Azure.AI.Details.Common.CLI
             ResourceGroupNameToken.Data().Set(_values, resource.Group);
         }
 
+        private async Task DoInitRootSearch(bool interactive)
+        {
+            var subscriptionFilter = SubscriptionToken.Data().GetOrDefault(_values, "");
+            var subscriptionId = await AzCliConsoleGui.PickSubscriptionIdAsync(interactive, interactive, subscriptionFilter);
+            SubscriptionToken.Data().Set(_values, subscriptionId);
+
+            await DoInitSearch(interactive);
+        }
+
         private async Task DoInitSearch(bool interactive)
         {
-            if (!interactive) ThrowInteractiveNotSupportedApplicationException(); // TODO: Add back non-interactive mode support
+            if (!interactive) ThrowInteractiveNotSupportedApplicationException(); // POST-IGNITE: TODO: Add back non-interactive mode support
 
             var subscription = SubscriptionToken.Data().GetOrDefault(_values, "");
             var location = _values.GetOrDefault("service.resource.region.name", "");
@@ -292,43 +458,42 @@ namespace Azure.AI.Details.Common.CLI
             _values.Reset("service.search.key", resource.Key);
         }
 
+        private async Task DoInitRootSpeech(bool interactive)
+        {
+            var subscriptionFilter = SubscriptionToken.Data().GetOrDefault(_values, "");
+            var subscriptionId = await AzCliConsoleGui.PickSubscriptionIdAsync(interactive, interactive, subscriptionFilter);
+            SubscriptionToken.Data().Set(_values, subscriptionId);
+
+            await DoInitSpeech(interactive);
+        }
+
+        private async Task DoInitSpeech(bool interactive)
+        {
+            var subscriptionId = SubscriptionToken.Data().GetOrDefault(_values, "");
+            var regionFilter = _values.GetOrDefault("init.service.resource.region.name", "");
+            var groupFilter = _values.GetOrDefault("init.service.resource.group.name", "");
+            var resourceFilter = _values.GetOrDefault("init.service.cognitiveservices.resource.name", "");
+            var kind = _values.GetOrDefault("init.service.cognitiveservices.resource.kind", "SpeechServices");
+            var sku = _values.GetOrDefault("init.service.cognitiveservices.resource.sku", "S0");
+            var yes = _values.GetOrDefault("init.service.cognitiveservices.terms.agree", false);
+
+            var resource = await AzCliConsoleGui.InitAndConfigSpeechResource(interactive, subscriptionId, regionFilter, groupFilter, resourceFilter, kind, sku, yes);
+
+            SubscriptionToken.Data().Set(_values, subscriptionId);
+        }
+
         private async Task DoInitHub(bool interactive)
         {
-            if (!interactive) ThrowInteractiveNotSupportedApplicationException(); // TODO: Add back non-interactive mode support
+            if (!interactive) ThrowInteractiveNotSupportedApplicationException(); // POST-IGNITE: TODO: Add back non-interactive mode support
 
             var subscription = SubscriptionToken.Data().GetOrDefault(_values, "");
             if (string.IsNullOrEmpty(subscription))
             {
-                subscription = await AzCliConsoleGui.PickSubscriptionIdAsync(interactive);
+                subscription = await AzCliConsoleGui.PickSubscriptionIdAsync(interactive, interactive);
                 _values.Reset("init.service.subscription", subscription);
             }
 
             var aiHubResource = await AiSdkConsoleGui.PickOrCreateAiHubResource(_values, subscription);
-        }
-
-        private async Task DoInitProject(bool interactive)
-        {
-            if (!interactive) ThrowInteractiveNotSupportedApplicationException(); // TODO: Add back non-interactive mode support
-
-            var subscription = SubscriptionToken.Data().GetOrDefault(_values, "");
-            if (string.IsNullOrEmpty(subscription))
-            {
-                subscription = await AzCliConsoleGui.PickSubscriptionIdAsync(interactive);
-                _values.Reset("init.service.subscription", subscription);
-            }
-
-            var resourceId = _values.GetOrDefault("service.resource.id", null);
-            var groupName = ResourceGroupNameToken.Data().GetOrDefault(_values);
-
-            var openAiEndpoint = _values.GetOrDefault("service.openai.endpoint", null);
-            var openAiKey = _values.GetOrDefault("service.openai.key", null);
-            var searchEndpoint = _values.GetOrDefault("service.search.endpoint", null);
-            var searchKey = _values.GetOrDefault("service.search.key", null);
-
-            var project = AiSdkConsoleGui.InitAndConfigAiHubProject(_values, subscription, resourceId, groupName, openAiEndpoint, openAiKey, searchEndpoint, searchKey);
-
-            ProjectNameToken.Data().Set(_values, project.Name);
-            _values.Reset("service.project.id", project.Id);
         }
 
         private void DisplayInitServiceBanner()

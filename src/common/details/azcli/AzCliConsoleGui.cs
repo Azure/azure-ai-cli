@@ -19,14 +19,19 @@ namespace Azure.AI.Details.Common.CLI
 {
     public partial class AzCliConsoleGui
     {
-        public static Task<string> PickSubscriptionIdAsync(bool interactive, string subscriptionFilter = null)
+        public static Task<string> PickSubscriptionIdAsync(bool allowInteractiveLogin, bool allowInteractivePickSubscription, string subscriptionFilter = null)
         {
-            return SubscriptionPicker.PickSubscriptionIdAsync(interactive, subscriptionFilter);
+            return SubscriptionPicker.PickSubscriptionIdAsync(allowInteractiveLogin, allowInteractivePickSubscription, subscriptionFilter);
         }
 
-        public static Task<AzCli.SubscriptionInfo> PickSubscriptionAsync(bool interactive, string subscriptionFilter = null)
+        public static Task<AzCli.SubscriptionInfo> PickSubscriptionAsync(bool allowInteractiveLogin, bool allowInteractivePickSubscription, string subscriptionFilter = null)
         {
-            return SubscriptionPicker.PickSubscriptionAsync(interactive, subscriptionFilter);
+            return SubscriptionPicker.PickSubscriptionAsync(allowInteractiveLogin, allowInteractivePickSubscription, subscriptionFilter);
+        }
+
+        public static Task<AzCli.SubscriptionInfo?> ValidateSubscriptionAsync(bool allowInteractiveLogin, string subscriptionFilter, string subscriptionLabel)
+        {
+            return SubscriptionPicker.ValidateSubscriptionAsync(allowInteractiveLogin, subscriptionFilter, subscriptionLabel);
         }
 
         public static Task<AzCli.AccountRegionLocationInfo> PickRegionLocationAsync(bool interactive, string regionFilter = null, bool allowAnyRegionOption = true)
@@ -39,9 +44,9 @@ namespace Azure.AI.Details.Common.CLI
             return ResourceGroupPicker.PickOrCreateResourceGroup(interactive, subscriptionId, regionFilter, groupFilter);
         }
 
-        public static Task<AzCli.CognitiveServicesResourceInfo> PickOrCreateCognitiveResource(bool interactive, string subscriptionId = null, string regionFilter = null, string groupFilter = null, string resourceFilter = null, string kind = null, string sku = "F0", bool agreeTerms = false)
+        public static Task<AzCli.CognitiveServicesResourceInfo> PickOrCreateCognitiveResource(string sectionHeader, bool interactive, string subscriptionId = null, string regionFilter = null, string groupFilter = null, string resourceFilter = null, string kind = null, string sku = "F0", bool agreeTerms = false)
         {
-            return AiResourcePicker.PickOrCreateCognitiveResource(interactive, subscriptionId, regionFilter, groupFilter, resourceFilter, kind, sku, agreeTerms);
+            return AiResourcePicker.PickOrCreateCognitiveResource(sectionHeader, interactive, subscriptionId, regionFilter, groupFilter, resourceFilter, kind, sku, agreeTerms);
         }
 
         public static async Task<AzCli.CognitiveServicesDeploymentInfo> PickOrCreateDeployment(bool interactive, string deploymentExtra, string subscriptionId, string groupName, string resourceRegionLocation, string resourceName, string deploymentFilter)
@@ -49,9 +54,9 @@ namespace Azure.AI.Details.Common.CLI
             return await AzCliConsoleGui.AiResourceDeploymentPicker.PickOrCreateDeployment(interactive, deploymentExtra, subscriptionId, groupName, resourceRegionLocation, resourceName, deploymentFilter);
         }
 
-        public static Task<AzCli.CognitiveServicesKeyInfo> LoadCognitiveServicesResourceKeys(string subscriptionId, AzCli.CognitiveServicesResourceInfo resource)
+        public static Task<AzCli.CognitiveServicesKeyInfo> LoadCognitiveServicesResourceKeys(string sectionHeader, string subscriptionId, AzCli.CognitiveServicesResourceInfo resource)
         {
-            return AiResourcePicker.LoadCognitiveServicesResourceKeys(subscriptionId, resource);
+            return AiResourcePicker.LoadCognitiveServicesResourceKeys(sectionHeader, subscriptionId, resource);
         }
 
         public static async Task<AzCli.CognitiveSearchKeyInfo> LoadSearchResourceKeys(string subscriptionId, AzCli.CognitiveSearchResourceInfo resource)

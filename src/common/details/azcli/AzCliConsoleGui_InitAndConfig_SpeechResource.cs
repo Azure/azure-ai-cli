@@ -19,22 +19,19 @@ namespace Azure.AI.Details.Common.CLI
 {
     public partial class AzCliConsoleGui
     {
-        public static async Task<AzCli.CognitiveServicesOpenAiResourceInfo> InitAndConfigOpenAiResource(bool interactive, string subscriptionId, string regionFilter = null, string groupFilter = null, string resourceFilter = null, string kind = null, string sku = null, bool yes = false)
+        public static async Task<AzCli.CognitiveServicesSpeechResourceInfo> InitAndConfigSpeechResource(bool interactive, string subscriptionId, string regionFilter = null, string groupFilter = null, string resourceFilter = null, string kind = null, string sku = null, bool yes = false)
         {
-            kind ??= "OpenAI";
-            var sectionHeader = "OPEN AI RESOURCE";
+            kind ??= "SpeechServices";
+            var sectionHeader = "SPEECH RESOURCE";
 
             var regionLocation = !string.IsNullOrEmpty(regionFilter) ? await AzCliConsoleGui.PickRegionLocationAsync(interactive, regionFilter) : new AzCli.AccountRegionLocationInfo();
             var resource = await AzCliConsoleGui.PickOrCreateCognitiveResource(sectionHeader, interactive, subscriptionId, regionLocation.Name, groupFilter, resourceFilter, kind, sku, yes);
 
-            var deployment = await AzCliConsoleGui.PickOrCreateDeployment(interactive, "Chat", subscriptionId, resource.Group, resource.RegionLocation, resource.Name, null);
-            var embeddingsDeployment = await AzCliConsoleGui.PickOrCreateDeployment(interactive, "Embeddings", subscriptionId, resource.Group, resource.RegionLocation, resource.Name, null);
-
             var keys = await AzCliConsoleGui.LoadCognitiveServicesResourceKeys(sectionHeader, subscriptionId, resource);
 
-            ConfigSetHelpers.ConfigOpenAiResource(subscriptionId, resource.RegionLocation, resource.Endpoint, deployment.Name, embeddingsDeployment.Name, keys.Key1);
+            ConfigSetHelpers.ConfigSpeechResource(subscriptionId, resource.RegionLocation, resource.Endpoint, keys.Key1);
 
-            return new AzCli.CognitiveServicesOpenAiResourceInfo
+            return new AzCli.CognitiveServicesSpeechResourceInfo
             {
                 Id = resource.Id,
                 Group = resource.Group,
@@ -43,8 +40,6 @@ namespace Azure.AI.Details.Common.CLI
                 RegionLocation = resource.RegionLocation,
                 Endpoint = resource.Endpoint,
                 Key = keys.Key1,
-                ChatDeployment = deployment.Name,
-                EmbeddingsDeployment = embeddingsDeployment.Name,
             };
         }
     }
