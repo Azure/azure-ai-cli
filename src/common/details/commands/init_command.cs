@@ -104,10 +104,10 @@ namespace Azure.AI.Details.Common.CLI
         {
             ParseConfigJson(fileName, out string subscription, out string groupName, out string projectName);
 
-            var (openai, search) = await VerifyProjectAsync(interactive, subscription, groupName, projectName);
+            var (hubName, openai, search) = await VerifyProjectAsync(interactive, subscription, groupName, projectName);
             if (openai != null && search != null)
             {
-                await DoInitRootConfirmVerifiedProjectResources(projectName, openai.Value, search.Value);
+                await DoInitRootConfirmVerifiedProjectResources(interactive, subscription, projectName, hubName, openai.Value, search.Value);
             }
             else
             {
@@ -115,7 +115,7 @@ namespace Azure.AI.Details.Common.CLI
             }
         }
 
-        private async Task<(AzCli.CognitiveServicesResourceInfo?, AzCli.CognitiveSearchResourceInfo?)> VerifyProjectAsync(bool interactive, string subscription, string groupName, string projectName)
+        private async Task<(string, AzCli.CognitiveServicesResourceInfo?, AzCli.CognitiveSearchResourceInfo?)> VerifyProjectAsync(bool interactive, string subscription, string groupName, string projectName)
         {
             Console.WriteLine($"  PROJECT: {projectName}");
             var validated = await AzCliConsoleGui.ValidateSubscriptionAsync(interactive, subscription, "  SUBSCRIPTION");
@@ -125,39 +125,47 @@ namespace Azure.AI.Details.Common.CLI
             var message = "    Validating...";
             Console.Write(message);
 
-            var (openai, search) = await VerifyResourceConnections(validated, subscription, groupName, projectName);
+            var (hubName, openai, search) = await VerifyResourceConnections(validated, subscription, groupName, projectName);
             if (openai != null && search != null)
             {
                 Console.Write(new string(' ', message.Length + 2) + "\r");
-                return (openai, search);
+                return (hubName, openai, search);
             }
             else
             {
                 ConsoleHelpers.WriteLineWithHighlight($"\r{message} `#e_;WARNING: Configuration could not be validated!`");
                 Console.WriteLine();
-                return (null, null);
+                return (null, null, null);
             }
         }
 
-        private async Task<(AzCli.CognitiveServicesResourceInfo?, AzCli.CognitiveSearchResourceInfo?)> VerifyResourceConnections(AzCli.SubscriptionInfo? validated, string subscription, string groupName, string projectName)
+        private async Task<(string, AzCli.CognitiveServicesResourceInfo?, AzCli.CognitiveSearchResourceInfo?)> VerifyResourceConnections(AzCli.SubscriptionInfo? validated, string subscription, string groupName, string projectName)
         {
             try
             {
+                var projectJson = PythonSDKWrapper.ListProjects(_values, subscription);
+                var projects = JObject.Parse(projectJson)["projects"] as JArray;
+                var project = projects.FirstOrDefault(x => x["name"].ToString() == projectName);
+                if (project == null) return (null, null, null);
+
+                var hub = project["workspace_hub"].ToString();
+                var hubName = hub.Split('/').Last();
+
                 var json = PythonSDKWrapper.ListConnections(_values, subscription, groupName, projectName);
-                if (string.IsNullOrEmpty(json)) return (null, null);
+                if (string.IsNullOrEmpty(json)) return (null, null, null);
 
                 var connections = JObject.Parse(json)["connections"] as JArray;
-                if (connections.Count == 0) return (null, null);
+                if (connections.Count == 0) return (null, null, null);
 
                 var foundOpenAiResource = await FindAndVerifyOpenAiResourceConnection(subscription, connections);
                 var foundSearchResource = await FindAndVerifySearchResourceConnection(subscription, connections);
 
-                return (foundOpenAiResource, foundSearchResource);
+                return (hubName, foundOpenAiResource, foundSearchResource);
             }
             catch (Exception ex)
             {
                 FileHelpers.LogException(_values, ex);
-                return (null, null);
+                return (null, null, null);
             }
         }
 
@@ -198,16 +206,17 @@ namespace Azure.AI.Details.Common.CLI
             return matchSearchEndpoint.First();
         }
 
-        private async Task DoInitRootConfirmVerifiedProjectResources(string projectName, AzCli.CognitiveServicesResourceInfo openaiResource, AzCli.CognitiveSearchResourceInfo searchResource)
+        private async Task DoInitRootConfirmVerifiedProjectResources(bool interactive, string subscription, string projectName, string hubName, AzCli.CognitiveServicesResourceInfo openaiResource, AzCli.CognitiveSearchResourceInfo searchResource)
         {
-            // TODO: Print correct stuff here... 
-            ConsoleHelpers.WriteLineWithHighlight($"    AI RESOURCE: {{resource-name}}                                     `#e_;<== work in progress`");
+            ConsoleHelpers.WriteLineWithHighlight($"    AI RESOURCE: {hubName}");
             ConsoleHelpers.WriteLineWithHighlight($"    AI SEARCH RESOURCE: {searchResource.Name}");
-            Console.WriteLine();
+            // Console.WriteLine();
             ConsoleHelpers.WriteLineWithHighlight($"    OPEN AI RESOURCE: {openaiResource.Name}");
-            ConsoleHelpers.WriteLineWithHighlight($"    OPEN AI DEPLOYMENT (CHAT): {{chat-deployment-name}}                `#e_;<== work in progress`");
-            ConsoleHelpers.WriteLineWithHighlight($"    OPEN AI DEPLOYMENT (EMBEDDINGS): {{embeddings-deployment-name}}    `#e_;<== work in progress`");
-            ConsoleHelpers.WriteLineWithHighlight($"    OPEN AI DEPLOYMENT (EVALUATION): {{evaluation-deployment-name}}    `#e_;<== work in progress`");
+
+            // TODO: If there's a way to get the deployments, get them, and do this... Print correct stuff here... 
+            // ConsoleHelpers.WriteLineWithHighlight($"    OPEN AI DEPLOYMENT (CHAT): {{chat-deployment-name}}                `#e_;<== work in progress`");
+            // ConsoleHelpers.WriteLineWithHighlight($"    OPEN AI DEPLOYMENT (EMBEDDINGS): {{embeddings-deployment-name}}    `#e_;<== work in progress`");
+            // ConsoleHelpers.WriteLineWithHighlight($"    OPEN AI DEPLOYMENT (EVALUATION): {{evaluation-deployment-name}}    `#e_;<== work in progress`");
 
             Console.WriteLine();
             var label = "  Initialize";
@@ -227,12 +236,18 @@ namespace Azure.AI.Details.Common.CLI
                 await DoInitRootMenuPick();
                 return;
             }
+            else
+            {
+                Console.Write("\r" + new string(' ', label.Length + 2) + "\r");
 
-            ConsoleHelpers.WriteLineWithHighlight($"\r`INIT FROM PROJECT {projectName.ToUpper()}`\n");
+                var chatDeployment = await AzCliConsoleGui.PickOrCreateDeployment(interactive, "Chat", subscription, openaiResource.Group, openaiResource.RegionLocation, openaiResource.Name, null);
+                var embeddingsDeployment = await AzCliConsoleGui.PickOrCreateDeployment(interactive, "Embeddings", subscription, openaiResource.Group, openaiResource.RegionLocation, openaiResource.Name, null);
+                var keys = await AzCliConsoleGui.LoadCognitiveServicesResourceKeys("OPENAI RESOURCE", subscription, openaiResource);
+                ConfigSetHelpers.ConfigOpenAiResource(subscription, openaiResource.RegionLocation, openaiResource.Endpoint, chatDeployment.Name, embeddingsDeployment.Name, keys.Key1);
 
-            // TODO: Setup all the local datastore configuration 
-
-            _values.AddThrowError("WARNING", "NOT IMPLEMENTED YET");
+                var searchKeys = await AzCliConsoleGui.LoadSearchResourceKeys(subscription, searchResource);
+                ConfigSetHelpers.ConfigSearchResource(searchResource.Endpoint, searchKeys.Key1);
+            }
         }
 
         private bool ParseConfigJson(string fileName, out string subscription, out string groupName, out string projectName)
