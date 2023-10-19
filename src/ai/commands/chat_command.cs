@@ -163,18 +163,23 @@ namespace Azure.AI.Details.Common.CLI
 
         private async Task<Func<string, Task>> GetNormalChatTextHandler()
         {
+            var doSK = false;
+
             var kernel = CreateSemanticKernel(out var acsIndex);
-            if (kernel != null) await StoreMemoryAsync(kernel, acsIndex);
+            if (kernel != null && doSK) await StoreMemoryAsync(kernel, acsIndex);
 
             var client = CreateOpenAIClient(out var deployment);
             var options = CreateChatCompletionOptions();
 
             var handler = async (string text) =>
             {
-                var relevantMemories = await SearchMemoryAsync(kernel, acsIndex, text);
-                if (relevantMemories != null)
+                if (doSK)
                 {
-                    text = UpdateUserInputWithSearchResultInfo(text, relevantMemories);
+                    var relevantMemories = await SearchMemoryAsync(kernel, acsIndex, text);
+                    if (relevantMemories != null)
+                    {
+                        text = UpdateUserInputWithSearchResultInfo(text, relevantMemories);
+                    }
                 }
 
                 await GetChatCompletionsAsync(client, deployment, options, text);
