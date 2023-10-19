@@ -139,22 +139,28 @@ namespace Azure.AI.Details.Common.CLI
             env.Add("AZURE_AI_PROJECT_NAME", ReadConfig("project"));
             env.Add("AZURE_AI_HUB_NAME", ReadConfig("hub"));
 
-            env.Add("OPENAI_API_KEY", ReadConfig("chat.key"));
-            env.Add("OPENAI_API_VERSION", ReadConfig("chat.version"));
-            env.Add("OPENAI_API_BASE", ReadConfig("chat.base"));
-            env.Add("OPENAI_ENDPOINT", ReadConfig("chat.endpoint"));
+            env.Add("AZURE_OPENAI_CHAT_DEPLOYMENT", ReadConfig("chat.deployment"));
+            env.Add("AZURE_OPENAI_EVALUATION_DEPLOYMENT", ReadConfig("chat.evaluation.deployment") ?? ReadConfig("chat.deployment"));
+            env.Add("AZURE_OPENAI_EMBEDDING_DEPLOYMENT", ReadConfig("search.embeddings.deployment"));
 
-            env.Add("OPENAI_CHAT_DEPLOYMENT", ReadConfig("chat.deployment"));
-            env.Add("OPENAI_EVALUATION_DEPLOYMENT", ReadConfig("chat.evaluation.deployment"));
-            env.Add("OPENAI_EMBEDDING_DEPLOYMENT", ReadConfig("search.embeddings.deployment"));
+            env.Add("AZURE_OPENAI_CHAT_MODEL", ReadConfig("chat.deployment.model.name"));
+            env.Add("AZURE_OPENAI_EVALUATION_MODEL", ReadConfig("chat.evaluation.deployment.model.name") ?? ReadConfig("chat.deployment.model.name"));
+            env.Add("AZURE_OPENAI_EMBEDDING_MODEL", ReadConfig("search.embeddings.deployment.model.name"));
 
             env.Add("AZURE_AI_SEARCH_ENDPOINT", ReadConfig("search.endpoint"));
-            env.Add("AZURE_AI_SEARCH_INDEX_NAME", ReadConfig("chat.search.index"));
+            env.Add("AZURE_AI_SEARCH_INDEX_NAME", ReadConfig("search.index.name"));
             env.Add("AZURE_AI_SEARCH_KEY", ReadConfig("search.key"));
 
-            // HACK: this is a temporary hack to allow the CLI to work with the current
-            //      version of various SDKs
+            // Add "non-standard" AZURE_AI_" prefixed env variables to interop with various SDKs
 
+            // OpenAI's SDK
+            env.Add("OPENAI_ENDPOINT", ReadConfig("chat.endpoint"));
+            env.Add("OPENAI_API_BASE", ReadConfig("chat.endpoint"));
+            env.Add("OPENAI_API_KEY", ReadConfig("chat.key"));
+            env.Add("OPENAI_API_TYPE", "azure");
+            env.Add("OPENAI_API_VERSION", ChatCommand.GetOpenAIClientVersionNumber());
+
+            // Cognitive Search SDK
             env.Add("AZURE_COGNITIVE_SEARCH_TARGET", env["AZURE_AI_SEARCH_ENDPOINT"]);
             env.Add("AZURE_COGNITIVE_SEARCH_KEY", env["AZURE_AI_SEARCH_KEY"]);
 

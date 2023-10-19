@@ -88,6 +88,7 @@ namespace Azure.AI.Details.Common.CLI
                 var scanFor = deploymentExtra.ToLower() switch {
                     "chat" => "gpt",
                     "embeddings" => "embedding",
+                    "evaluation" => "gpt",
                     _ => deploymentExtra.ToLower()
                 };
 
@@ -163,7 +164,7 @@ namespace Azure.AI.Details.Common.CLI
 
             private static AzCli.CognitiveServicesDeploymentInfo? ListBoxPickDeployment(AzCli.CognitiveServicesDeploymentInfo[] deployments, string p0, int select = 0)
             {
-                var list = deployments.Select(x => $"{x.Name} ({x.ModelFormat})").ToList();
+                var list = deployments.Select(x => $"{x.Name} ({x.ModelName})").ToList();
 
                 var hasP0 = !string.IsNullOrEmpty(p0);
                 if (hasP0) list.Insert(0, p0);

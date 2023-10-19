@@ -27,12 +27,13 @@ namespace Azure.AI.Details.Common.CLI
             var regionLocation = !string.IsNullOrEmpty(regionFilter) ? await AzCliConsoleGui.PickRegionLocationAsync(interactive, regionFilter) : new AzCli.AccountRegionLocationInfo();
             var resource = await AzCliConsoleGui.PickOrCreateCognitiveResource(sectionHeader, interactive, subscriptionId, regionLocation.Name, groupFilter, resourceFilter, kind, sku, yes);
 
-            var deployment = await AzCliConsoleGui.PickOrCreateDeployment(interactive, "Chat", subscriptionId, resource.Group, resource.RegionLocation, resource.Name, null);
+            var chatDeployment = await AzCliConsoleGui.PickOrCreateDeployment(interactive, "Chat", subscriptionId, resource.Group, resource.RegionLocation, resource.Name, null);
             var embeddingsDeployment = await AzCliConsoleGui.PickOrCreateDeployment(interactive, "Embeddings", subscriptionId, resource.Group, resource.RegionLocation, resource.Name, null);
+            var evaluationDeployment = await AzCliConsoleGui.PickOrCreateDeployment(interactive, "Evaluation", subscriptionId, resource.Group, resource.RegionLocation, resource.Name, null);
 
             var keys = await AzCliConsoleGui.LoadCognitiveServicesResourceKeys(sectionHeader, subscriptionId, resource);
 
-            ConfigSetHelpers.ConfigOpenAiResource(subscriptionId, resource.RegionLocation, resource.Endpoint, deployment.Name, embeddingsDeployment.Name, keys.Key1);
+            ConfigSetHelpers.ConfigOpenAiResource(subscriptionId, resource.RegionLocation, resource.Endpoint, chatDeployment, embeddingsDeployment, evaluationDeployment, keys.Key1);
 
             return new AzCli.CognitiveServicesOpenAiResourceInfo
             {
@@ -43,8 +44,9 @@ namespace Azure.AI.Details.Common.CLI
                 RegionLocation = resource.RegionLocation,
                 Endpoint = resource.Endpoint,
                 Key = keys.Key1,
-                ChatDeployment = deployment.Name,
+                ChatDeployment = chatDeployment.Name,
                 EmbeddingsDeployment = embeddingsDeployment.Name,
+                EvaluationDeployment = evaluationDeployment.Name
             };
         }
     }
