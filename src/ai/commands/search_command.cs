@@ -70,23 +70,47 @@ namespace Azure.AI.Details.Common.CLI
         {
             var action = "Updating search index";
             var command = "search index update";
-            var searchEndpoint = DemandSearchEndpointUri(action, command);
-            var searchApiKey = DemandSearchApiKey(action, command);
-            var embeddingsEndpoint = DemandEmbeddingsEndpointUri(action, command);
-            var embeddingsDeployment = DemandEmbeddingsDeployment(action, command);
-            var embeddingsApiKey = DemandEmbeddingsApiKey(action, command);
+
             var searchIndexName = GetSearchIndexName() ?? "MyIndex";
+            var pattern = GetSearchIndexUpdateFiles() ?? GetSearchIndexUpdateFile();
 
             var message = $"{action} '{searchIndexName}'";
-
             if (!_quiet) Console.WriteLine(message);
-            DoIndexUpdateWithSK(searchEndpoint, searchApiKey, embeddingsEndpoint, embeddingsDeployment, embeddingsApiKey, searchIndexName);
+
+            var doSK = true;
+            if (doSK)
+            {
+                var searchEndpoint = DemandSearchEndpointUri(action, command);
+                var searchApiKey = DemandSearchApiKey(action, command);
+                var embeddingsEndpoint = DemandEmbeddingsEndpointUri(action, command);
+                var embeddingsDeployment = DemandEmbeddingsDeployment(action, command);
+                var embeddingsApiKey = DemandEmbeddingsApiKey(action, command);
+
+                DoIndexUpdateWithSK(searchEndpoint, searchApiKey, embeddingsEndpoint, embeddingsDeployment, embeddingsApiKey, searchIndexName, pattern);
+            }
+            else
+            {
+                var subscription = SubscriptionToken.Demand(_values, action, command);
+                var project = ProjectNameToken.Data().Demand(_values, action, command);
+                var group = ResourceGroupNameToken.Data().Demand(_values, action, command);
+                var indexName = SearchIndexNameToken.Data().Demand(_values, action, command);
+                var embeddingModelDeployment = SearchEmbeddingModelDeploymentNameToken.Data().Demand(_values, action, command);
+                var embeddingModelName = SearchEmbeddingModelNameToken.Data().Demand(_values, action, command);
+                var externalSourceUrl = "";
+
+                DoIndexUpdateWithGenAi(subscription, group, project, indexName, embeddingModelDeployment, embeddingModelName, pattern, externalSourceUrl);
+            }
+
             if (!_quiet) Console.WriteLine($"{message} Done!\n");
         }
 
-        private void DoIndexUpdateWithSK(string searchEndpoint, string searchApiKey, string embeddingsEndpoint, string embeddingsDeployment, string embeddingsApiKey, string searchIndexName)
+        private void DoIndexUpdateWithGenAi(string subscription, string groupName, string projectName, string indexName, string embeddingModelDeployment, string embeddingModelName, string dataFiles, string externalSourceUrl)
         {
-            var pattern = GetSearchIndexUpdateFiles() ?? GetSearchIndexUpdateFile();
+            PythonSDKWrapper.UpdateMLIndex(_values, subscription, groupName, projectName, indexName, embeddingModelDeployment, embeddingModelName, dataFiles, externalSourceUrl);
+        }
+
+        private void DoIndexUpdateWithSK(string searchEndpoint, string searchApiKey, string embeddingsEndpoint, string embeddingsDeployment, string embeddingsApiKey, string searchIndexName, string pattern)
+        {
             var files = FileHelpers.FindFilesInDataPath(pattern, _values)
                 .Where(x => File.Exists(x))
                 .Select(x => new FileInfo(x).FullName)
