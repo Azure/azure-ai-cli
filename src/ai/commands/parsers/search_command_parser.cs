@@ -98,6 +98,8 @@ namespace Azure.AI.Details.Common.CLI
             new CommonSearchNamedValueTokenParsers(),
             SubscriptionToken.Parser(),
             ResourceGroupNameToken.Parser(),
+            ProjectNameToken.Parser(),
+            SearchIndexNameToken.Parser(),
 
             SearchEmbeddingModelDeploymentNameToken.Parser(),
             SearchEmbeddingModelNameToken.Parser(),
@@ -105,10 +107,8 @@ namespace Azure.AI.Details.Common.CLI
             new NamedValueTokenParser(null,  "service.config.search.api.key", "00101", "1"),
             new NamedValueTokenParser(null,  "service.config.search.endpoint.uri", "00110;00101", "1"),
 
-            new NamedValueTokenParser(null, "search.embeddings.endpoint.uri", "0101;0110", "1"),
-            new NamedValueTokenParser(null, "search.embeddings.api.key", "0101", "1"),
-            new NamedValueTokenParser(null, "search.embeddings.deployment", "010;001", "1"),
-            new NamedValueTokenParser(null, "search.embeddings.index.name", "0010", "1"),
+            new NamedValueTokenParser(null, "search.embedding.endpoint.uri", "0101;0110", "1"),
+            new NamedValueTokenParser(null, "search.embedding.api.key", "0101", "1"),
 
             new NamedValueTokenParser(null, "search.index.update.file", "0001", "1"),
             new NamedValueTokenParser(null, "search.index.update.files", "0001", "1"),

@@ -336,7 +336,7 @@ namespace Azure.AI.Details.Common.CLI
 
         private void AddAzureExtensionOptions(ChatCompletionsOptions options)
         {
-            var indexName = _values["service.config.search.index.name"];
+            var indexName = SearchIndexNameToken.Data().GetOrDefault(_values);
             var indexOk = !string.IsNullOrEmpty(indexName);
             if (!indexOk) return;
 
@@ -354,7 +354,7 @@ namespace Azure.AI.Details.Common.CLI
             }
             else if (!embeddingsOk)
             {
-                _values.AddThrowError("ERROR:", $"Creating Azure AI Search extension; requires embeddings key, endpoint, and deployment.");
+                _values.AddThrowError("ERROR:", $"Creating Azure AI Search extension; requires embedding key, endpoint, and deployment.");
             }
 
             var queryType = QueryTypeFrom(_values["service.config.search.query.type"]) ?? AzureCognitiveSearchQueryType.Vector;
@@ -406,7 +406,7 @@ namespace Azure.AI.Details.Common.CLI
         private Uri GetEmbeddingsDeploymentEndpoint()
         {
             var embeddingsEndpoint = ConfigEndpointUriToken.Data().GetOrDefault(_values);
-            var embeddingsDeployment = _values["service.config.embeddings.deployment"];
+            var embeddingsDeployment = SearchEmbeddingModelDeploymentNameToken.Data().GetOrDefault(_values);
 
             var baseOk = !string.IsNullOrEmpty(embeddingsEndpoint) && !string.IsNullOrEmpty(embeddingsDeployment);
             var pathOk = embeddingsEndpoint.Contains("embeddings?") && embeddingsEndpoint.Contains("api-version=");
@@ -620,32 +620,32 @@ namespace Azure.AI.Details.Common.CLI
 
         private IKernel? CreateSemanticKernel(out string acsIndex)
         {
-           var key = _values["service.config.key"];
-           var endpoint = ConfigEndpointUriToken.Data().GetOrDefault(_values);
-           var deployment = _values["service.config.embeddings.deployment"];
+            var key = _values["service.config.key"];
+            var endpoint = ConfigEndpointUriToken.Data().GetOrDefault(_values);
+            var deployment = SearchEmbeddingModelDeploymentNameToken.Data().GetOrDefault(_values);
 
-           acsIndex = _values["service.config.embeddings.index.name"];
-           if (acsIndex == null) return null;
+            acsIndex = SearchIndexNameToken.Data().GetOrDefault(_values);
+            if (acsIndex == null) return null;
 
-           if (string.IsNullOrEmpty(key) || string.IsNullOrEmpty(endpoint) || string.IsNullOrEmpty(deployment))
-           {
-               return null;
-           }
+            if (string.IsNullOrEmpty(key) || string.IsNullOrEmpty(endpoint) || string.IsNullOrEmpty(deployment))
+            {
+                return null;
+            }
 
-           var acsKey = _values["service.config.acs.key"];
-           var acsEndpoint = _values["service.config.acs.endpoint.uri"];
-           var acsOk = !string.IsNullOrEmpty(acsKey) && !string.IsNullOrEmpty(acsEndpoint);
+            var acsKey = _values["service.config.acs.key"];
+            var acsEndpoint = _values["service.config.acs.endpoint.uri"];
+            var acsOk = !string.IsNullOrEmpty(acsKey) && !string.IsNullOrEmpty(acsEndpoint);
 
-           IMemoryStore store = acsOk
-               ? new AzureCognitiveSearchMemoryStore(acsEndpoint, acsKey)
-               : new VolatileMemoryStore();
+            IMemoryStore store = acsOk
+                ? new AzureCognitiveSearchMemoryStore(acsEndpoint, acsKey)
+                : new VolatileMemoryStore();
 
-           var kernelWithACS = Kernel.Builder
-               .WithAzureTextEmbeddingGenerationService(deployment, endpoint, key)
-               .WithMemoryStorage(store)
-               .Build();
+            var kernelWithACS = Kernel.Builder
+                .WithAzureTextEmbeddingGenerationService(deployment, endpoint, key)
+                .WithMemoryStorage(store)
+                .Build();
 
-           return kernelWithACS;
+            return kernelWithACS;
         }
 
         private static async Task StoreMemoryAsync(IKernel kernel, string index)

@@ -156,8 +156,6 @@ namespace Azure.AI.Details.Common.CLI
 
                     Console.WriteLine();
                 }
-
-                return null;
             };
             var files = getFiles();
 

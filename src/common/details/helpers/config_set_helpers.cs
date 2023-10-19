@@ -34,20 +34,20 @@ namespace Azure.AI.Details.Common.CLI
             var actions = new List<Action<int>>(new Action<int>[] {
                 ConfigSetLambda("@subscription", subscriptionId, "Subscription", subscriptionId, ref maxLabelWidth),
 
-                ConfigSetLambda("@chat.endpoint", endpoint, "Endpoint (chat)", endpoint, ref maxLabelWidth),
-                ConfigSetLambda("@chat.deployment", chatDeployment.Name, "Deployment (chat)", chatDeployment.Name, ref maxLabelWidth),
-                ConfigSetLambda("@chat.deployment.model.name", chatDeployment.ModelName, "Model Name (chat)", chatDeployment.ModelName, ref maxLabelWidth),
                 ConfigSetLambda("@chat.key", key, "Key (chat)", key.Substring(0, 4) + "****************************", ref maxLabelWidth),
+                ConfigSetLambda("@chat.endpoint", endpoint, "Endpoint (chat)", endpoint, ref maxLabelWidth),
+                ConfigSetLambda("@chat.model.deployment.name", chatDeployment.Name, "Deployment (chat)", chatDeployment.Name, ref maxLabelWidth),
+                ConfigSetLambda("@chat.model.name", chatDeployment.ModelName, "Model Name (chat)", chatDeployment.ModelName, ref maxLabelWidth),
 
-                ConfigSetLambda("@search.embeddings.endpoint", endpoint, "Endpoint (embeddings)", endpoint, ref maxLabelWidth),
-                ConfigSetLambda("@search.embeddings.deployment", embeddingsDeployment.Name, "Deployment (embeddings)", embeddingsDeployment.Name, ref maxLabelWidth),
-                ConfigSetLambda("@search.embeddings.deployment.model.name", embeddingsDeployment.ModelName, "Model Name (embeddings)", embeddingsDeployment.ModelName, ref maxLabelWidth),
-                ConfigSetLambda("@search.embeddings.key", key, "Key (embeddings)", key.Substring(0, 4) + "****************************", ref maxLabelWidth),
+                ConfigSetLambda("@search.embedding.key", key, "Key (embedding)", key.Substring(0, 4) + "****************************", ref maxLabelWidth),
+                ConfigSetLambda("@search.embedding.endpoint", endpoint, "Endpoint (embedding)", endpoint, ref maxLabelWidth),
+                ConfigSetLambda("@search.embedding.model.deployment.name", embeddingsDeployment.Name, "Deployment (embedding)", embeddingsDeployment.Name, ref maxLabelWidth),
+                ConfigSetLambda("@search.embedding.model.name", embeddingsDeployment.ModelName, "Model Name (embedding)", embeddingsDeployment.ModelName, ref maxLabelWidth),
 
-                ConfigSetLambda("@chat.evaluation.endpoint", endpoint, "Endpoint (evaluation)", endpoint, ref maxLabelWidth),
-                ConfigSetLambda("@chat.evaluation.deployment", evaluationDeployment.Name, "Deployment (evaluation)", evaluationDeployment.Name, ref maxLabelWidth),
-                ConfigSetLambda("@chat.evaluation.deployment.model.name", evaluationDeployment.ModelName, "Model Name (evaluation)", evaluationDeployment.ModelName, ref maxLabelWidth),
                 ConfigSetLambda("@chat.evaluation.key", key, "Key (evaluation)", key.Substring(0, 4) + "****************************", ref maxLabelWidth),
+                ConfigSetLambda("@chat.evaluation.endpoint", endpoint, "Endpoint (evaluation)", endpoint, ref maxLabelWidth),
+                ConfigSetLambda("@chat.evaluation.model.deployment.name", evaluationDeployment.Name, "Deployment (evaluation)", evaluationDeployment.Name, ref maxLabelWidth),
+                ConfigSetLambda("@chat.evaluation.model.name", evaluationDeployment.ModelName, "Model Name (evaluation)", evaluationDeployment.ModelName, ref maxLabelWidth),
 
                 ConfigSetLambda("@chat.region", region, "Region", region, ref maxLabelWidth),
             });

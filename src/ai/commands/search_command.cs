@@ -54,7 +54,7 @@ namespace Azure.AI.Details.Common.CLI
 
         private void DoCommand(string command)
         {
-            CheckPath();
+            StartCommand();
 
             switch (command)
             {
@@ -64,6 +64,10 @@ namespace Azure.AI.Details.Common.CLI
                     _values.AddThrowError("WARNING:", $"'{command.Replace('.', ' ')}' NOT YET IMPLEMENTED!!");
                     break;
             }
+
+            StopCommand();
+            DisposeAfterStop();
+            DeleteTemporaryFiles();
         }
 
         private void DoIndexUpdate()
@@ -77,7 +81,7 @@ namespace Azure.AI.Details.Common.CLI
             var message = $"{action} '{searchIndexName}'";
             if (!_quiet) Console.WriteLine(message);
 
-            var doSK = true;
+            var doSK = false;
             if (doSK)
             {
                 var searchEndpoint = DemandSearchEndpointUri(action, command);
@@ -188,10 +192,10 @@ namespace Azure.AI.Details.Common.CLI
             if (string.IsNullOrEmpty(endpointUri) || endpointUri.Contains("rror"))
             {
                 _values.AddThrowError(
-                    "ERROR:", $"{action}; requires embeddings endpoint uri.",
+                    "ERROR:", $"{action}; requires embedding endpoint uri.",
                             "",
-                      "TRY:", $"{Program.Name} config search --set embeddings.endpoint ENDPOINT",
-                              $"{Program.Name} {command} --embeddings-endpoint ENDPOINT",
+                      "TRY:", $"{Program.Name} config search --set embedding.endpoint ENDPOINT",
+                              $"{Program.Name} {command} --embedding-endpoint ENDPOINT",
                             "",
                       "SEE:", $"{Program.Name} help {command}");
             }
@@ -204,10 +208,10 @@ namespace Azure.AI.Details.Common.CLI
             if (string.IsNullOrEmpty(deployment) || deployment.Contains("rror"))
             {
                 _values.AddThrowError(
-                    "ERROR:", $"{action}; requires embeddings deployment.",
+                    "ERROR:", $"{action}; requires embedding deployment.",
                             "",
-                      "TRY:", $"{Program.Name} config search --set embeddings.deployment DEPLOYMENT",
-                              $"{Program.Name} {command} --embeddings-deployment DEPLOYMENT",
+                      "TRY:", $"{Program.Name} config search --set embedding.model.deployment.name DEPLOYMENT",
+                              $"{Program.Name} {command} --embedding-deployment DEPLOYMENT",
                             "",
                       "SEE:", $"{Program.Name} help {command}");
             }
@@ -220,10 +224,10 @@ namespace Azure.AI.Details.Common.CLI
             if (string.IsNullOrEmpty(embeddingsApiKey) || embeddingsApiKey.Contains("rror"))
             {
                 _values.AddThrowError(
-                    "ERROR:", $"{action}; requires embeddings api key.",
+                    "ERROR:", $"{action}; requires embedding api key.",
                             "",
-                      "TRY:", $"{Program.Name} config search --set embeddings.api.key KEY",
-                              $"{Program.Name} {command} --embeddings-api-key KEY",
+                      "TRY:", $"{Program.Name} config search --set embedding.key KEY",
+                              $"{Program.Name} {command} --embedding-key KEY",
                             "",
                       "SEE:", $"{Program.Name} help {command}");
             }
@@ -242,22 +246,22 @@ namespace Azure.AI.Details.Common.CLI
 
         private string GetEmbeddingsEndpointUri()
         {
-            return _values.Get("search.embeddings.endpoint.uri", true);
+            return _values.Get("search.embedding.endpoint.uri", true);
         }
 
         private string GetEmbeddingsApiKey()
         {
-            return _values.Get("search.embeddings.api.key", true);
+            return _values.Get("search.embedding.api.key", true);
         }
 
         private string GetEmbeddingsDeployment()
         {
-            return _values.Get("search.embeddings.deployment", true);
+            return _values.Get("search.embedding.model.deployment.name", true);
         }
 
         private string GetSearchIndexName()
         {
-            return _values.Get("search.embeddings.index.name", true);
+            return SearchIndexNameToken.Data().GetOrDefault(_values);
         }
 
         private string GetSearchIndexUpdateFile()
@@ -270,7 +274,33 @@ namespace Azure.AI.Details.Common.CLI
             return _values.Get("search.index.update.files", true);
         }
 
-        private bool _quiet = false;
-        private bool _verbose = false;
+        private void StartCommand()
+        {
+            CheckPath();
+            LogHelpers.EnsureStartLogFile(_values);
+
+            // _display = new DisplayHelper(_values);
+
+            // _output = new OutputHelper(_values);
+            // _output.StartOutput();
+
+            _lock = new SpinLock();
+            _lock.StartLock();
+        }
+
+        private void StopCommand()
+        {
+            _lock.StopLock(5000);
+
+            // LogHelpers.EnsureStopLogFile(_values);
+            // _output.CheckOutput();
+            // _output.StopOutput();
+
+            _stopEvent.Set();
+        }
+
+        private SpinLock _lock = null;
+        private readonly bool _quiet = false;
+        private readonly bool _verbose = false;
     }
 }

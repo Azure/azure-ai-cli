@@ -5,8 +5,6 @@ SEARCH INDEX UPDATE
 USAGE: ai index update [...]
 
   EMBEDDINGS
-    --embeddings-index-name NAME            (see: ai help search index embeddings name)
-    --embeddings-deployment DEPLOYMENT      (see: ai help search index embeddings deployment)
 
   ITEM
     --id ID                                 (see: ai help search index id)
@@ -24,20 +22,22 @@ USAGE: ai index update [...]
     --external-source                       (see: ai help search index external source)
 
   AZURE SEARCH
-    --search-endpoint ENDPOINT               (see: ai help search endpoint)
-    --search-api-key KEY                     (see: ai help search api key)
+    --search-api-key KEY                    (see: ai help search api key)
+    --search-endpoint ENDPOINT              (see: ai help search endpoint)
+    --search-index-name NAME                (see: ai help search index name)
+    --embedding-deployment DEPLOYMENT       (see: ai help search embedding deployment)
 
 ;  CHROMA
-;    --chroma-endpoint ENDPOINT              (see: ai help chroma endpoint)
+;    --chroma-endpoint ENDPOINT             (see: ai help chroma endpoint)
 
 ;  PINECONE
-;    --pinecone-environment ENVIRONMENT      (see: ai help pinecone environment)
-;    --pinecone-api-key KEY                  (see: ai help pinecone api key)
+;    --pinecone-environment ENVIRONMENT     (see: ai help pinecone environment)
+;    --pinecone-api-key KEY                 (see: ai help pinecone api key)
 
 ;  QDRANT
-;    --qdrant-endpoint ENDPOINT              (see: ai help qdrant endpoint)
-;    --qdrant-vector-size size               (see: ai help qdrant vector size)
+;    --qdrant-endpoint ENDPOINT             (see: ai help qdrant endpoint)
+;    --qdrant-vector-size size              (see: ai help qdrant vector size)
 
 ;  WEAVIATE
-;    --weaviate-endpoint ENDPOINT            (see: ai help weaviate endpoint)
-;    --weaviate-api-key KEY                  (see: ai help weaviate api key)
+;    --weaviate-endpoint ENDPOINT           (see: ai help weaviate endpoint)
+;    --weaviate-api-key KEY                 (see: ai help weaviate api key)

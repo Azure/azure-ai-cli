@@ -1,4 +1,2 @@
 service.config.search.api.key=@search.key
 service.config.search.endpoint.uri=@search.endpoint
-service.config.search.index.name=@search.index
-service.config.embeddings.deployment=@search.embeddings.deployment
