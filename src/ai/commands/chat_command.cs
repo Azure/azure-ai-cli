@@ -421,7 +421,7 @@ namespace Azure.AI.Details.Common.CLI
             return baseOk && pathOk ? new Uri(embeddingsEndpoint) : null;
         }
 
-        private static string GetOpenAIClientVersionNumber()
+        public static string GetOpenAIClientVersionNumber()
         {
             var latest = ((OpenAIClientOptions.ServiceVersion[])Enum.GetValues(typeof(OpenAIClientOptions.ServiceVersion))).MaxBy(i => (int)i);
             var latestVersion = latest.ToString().ToLower().Replace("_", "-").Substring(1);

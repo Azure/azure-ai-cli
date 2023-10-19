@@ -25,23 +25,30 @@ namespace Azure.AI.Details.Common.CLI
             actions.ForEach(x => x?.Invoke(maxLabelWidth));
         }
 
-        public static void ConfigOpenAiResource(string subscriptionId, string region, string endpoint, string chatDeployment, string embeddingsDeployment, string key)
+        public static void ConfigOpenAiResource(string subscriptionId, string region, string endpoint, AzCli.CognitiveServicesDeploymentInfo chatDeployment, AzCli.CognitiveServicesDeploymentInfo embeddingsDeployment, AzCli.CognitiveServicesDeploymentInfo evaluationDeployment, string key)
         {
             ConsoleHelpers.WriteLineWithHighlight($"\n`CONFIG OPEN AI RESOURCE`");
             Console.WriteLine();
 
             int maxLabelWidth = 0;
             var actions = new List<Action<int>>(new Action<int>[] {
-                Program.InitConfigsSubscription ?
-                ConfigSetLambda("@subscription", subscriptionId, "Subscription", subscriptionId, ref maxLabelWidth) : null,
-                Program.InitConfigsEndpoint ?
-                ConfigSetLambda("@chat.endpoint", endpoint, "Endpoint (chat)", endpoint, ref maxLabelWidth) : null,
-                ConfigSetLambda("@chat.deployment", chatDeployment, "Deployment (chat)", chatDeployment, ref maxLabelWidth),
+                ConfigSetLambda("@subscription", subscriptionId, "Subscription", subscriptionId, ref maxLabelWidth),
+
+                ConfigSetLambda("@chat.endpoint", endpoint, "Endpoint (chat)", endpoint, ref maxLabelWidth),
+                ConfigSetLambda("@chat.deployment", chatDeployment.Name, "Deployment (chat)", chatDeployment.Name, ref maxLabelWidth),
+                ConfigSetLambda("@chat.deployment.model.name", chatDeployment.ModelName, "Model Name (chat)", chatDeployment.ModelName, ref maxLabelWidth),
                 ConfigSetLambda("@chat.key", key, "Key (chat)", key.Substring(0, 4) + "****************************", ref maxLabelWidth),
-                Program.InitConfigsEndpoint ?
-                ConfigSetLambda("@search.embeddings.endpoint", endpoint, "Endpoint (embeddings)", endpoint, ref maxLabelWidth) : null,
-                ConfigSetLambda("@search.embeddings.deployment", embeddingsDeployment, "Deployment (embeddings)", embeddingsDeployment, ref maxLabelWidth),
+
+                ConfigSetLambda("@search.embeddings.endpoint", endpoint, "Endpoint (embeddings)", endpoint, ref maxLabelWidth),
+                ConfigSetLambda("@search.embeddings.deployment", embeddingsDeployment.Name, "Deployment (embeddings)", embeddingsDeployment.Name, ref maxLabelWidth),
+                ConfigSetLambda("@search.embeddings.deployment.model.name", embeddingsDeployment.ModelName, "Model Name (embeddings)", embeddingsDeployment.ModelName, ref maxLabelWidth),
                 ConfigSetLambda("@search.embeddings.key", key, "Key (embeddings)", key.Substring(0, 4) + "****************************", ref maxLabelWidth),
+
+                ConfigSetLambda("@chat.evaluation.endpoint", endpoint, "Endpoint (evaluation)", endpoint, ref maxLabelWidth),
+                ConfigSetLambda("@chat.evaluation.deployment", evaluationDeployment.Name, "Deployment (evaluation)", evaluationDeployment.Name, ref maxLabelWidth),
+                ConfigSetLambda("@chat.evaluation.deployment.model.name", evaluationDeployment.ModelName, "Model Name (evaluation)", evaluationDeployment.ModelName, ref maxLabelWidth),
+                ConfigSetLambda("@chat.evaluation.key", key, "Key (evaluation)", key.Substring(0, 4) + "****************************", ref maxLabelWidth),
+
                 ConfigSetLambda("@chat.region", region, "Region", region, ref maxLabelWidth),
             });
             actions.ForEach(x => x?.Invoke(maxLabelWidth));

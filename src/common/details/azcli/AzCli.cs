@@ -58,6 +58,7 @@ namespace Azure.AI.Details.Common.CLI
             public string Key;
             public string ChatDeployment;
             public string EmbeddingsDeployment;
+            public string EvaluationDeployment;
         }
 
         public struct CognitiveServicesSpeechResourceInfo
@@ -83,6 +84,7 @@ namespace Azure.AI.Details.Common.CLI
         {
             public string Name { get; set; }
             public string ModelFormat { get; set; }
+            public string ModelName { get; set; }
         }
 
         public struct CognitiveServicesModelInfo
@@ -296,6 +298,7 @@ namespace Azure.AI.Details.Common.CLI
             {
                 x.Payload[i].Name = deployment["Name"].Value<string>();
                 x.Payload[i].ModelFormat = deployment["Format"].Value<string>();
+                x.Payload[i].ModelName = deployment["Model"].Value<string>();
                 i++;
             }
 
@@ -380,6 +383,7 @@ namespace Azure.AI.Details.Common.CLI
             {
                 Name = resource?["name"]?.Value<string>(),
                 ModelFormat = resource?["kind"]?.Value<string>(),
+                ModelName = modelName
             };
 
             return x;

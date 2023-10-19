@@ -242,8 +242,9 @@ namespace Azure.AI.Details.Common.CLI
 
                 var chatDeployment = await AzCliConsoleGui.PickOrCreateDeployment(interactive, "Chat", subscription, openaiResource.Group, openaiResource.RegionLocation, openaiResource.Name, null);
                 var embeddingsDeployment = await AzCliConsoleGui.PickOrCreateDeployment(interactive, "Embeddings", subscription, openaiResource.Group, openaiResource.RegionLocation, openaiResource.Name, null);
+                var evaluateDeployment = await AzCliConsoleGui.PickOrCreateDeployment(interactive, "Evaluation", subscription, openaiResource.Group, openaiResource.RegionLocation, openaiResource.Name, null);
                 var keys = await AzCliConsoleGui.LoadCognitiveServicesResourceKeys("OPENAI RESOURCE", subscription, openaiResource);
-                ConfigSetHelpers.ConfigOpenAiResource(subscription, openaiResource.RegionLocation, openaiResource.Endpoint, chatDeployment.Name, embeddingsDeployment.Name, keys.Key1);
+                ConfigSetHelpers.ConfigOpenAiResource(subscription, openaiResource.RegionLocation, openaiResource.Endpoint, chatDeployment, embeddingsDeployment, evaluateDeployment, keys.Key1);
 
                 var searchKeys = await AzCliConsoleGui.LoadSearchResourceKeys(subscription, searchResource);
                 ConfigSetHelpers.ConfigSearchResource(searchResource.Endpoint, searchKeys.Key1);
