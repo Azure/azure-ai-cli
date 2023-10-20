@@ -58,6 +58,7 @@ namespace Azure.AI.Details.Common.CLI
 
             switch (command)
             {
+                case "search.index.create": DoIndexUpdate(); break; // POST-IGNITE: TODO: Implement create separately from update
                 case "search.index.update": DoIndexUpdate(); break;
 
                 default:

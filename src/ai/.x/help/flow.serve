@@ -5,13 +5,13 @@ FLOW SERVE
 USAGE: ai flow serve [...]
 
   FLOW
-    --flow NAME
+    --name NAME
     --port PORT
     --host HOST
 
 EXAMPLE
 
-  ai flow serve --flow my.flow --port 8080
+  ai flow serve --name my_flow --port 8080
 
 SEE ALSO
 

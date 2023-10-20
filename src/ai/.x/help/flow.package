@@ -5,12 +5,12 @@ FLOW PACKAGE
 USAGE: ai flow package [...]
 
   FLOW
-    --flow NAME
+    --name NAME
     --docker LOCATION
 
 EXAMPLE
 
-  ai flow package --flow myflow --docker /tmp/myflow
+  ai flow package --name my_flow --docker /tmp/my_flow
 
 SEE ALSO
 
