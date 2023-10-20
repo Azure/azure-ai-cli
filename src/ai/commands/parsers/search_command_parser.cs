@@ -106,6 +106,8 @@ namespace Azure.AI.Details.Common.CLI
             SearchEmbeddingModelDeploymentNameToken.Parser(),
             SearchEmbeddingModelNameToken.Parser(),
 
+            ExternalSourceToken.Parser(),
+
             new NamedValueTokenParser(null,  "service.config.search.api.key", "00101", "1"),
             new NamedValueTokenParser(null,  "service.config.search.endpoint.uri", "00110;00101", "1"),
 

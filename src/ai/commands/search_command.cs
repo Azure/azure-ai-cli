@@ -100,7 +100,7 @@ namespace Azure.AI.Details.Common.CLI
                 var indexName = SearchIndexNameToken.Data().Demand(_values, action, command);
                 var embeddingModelDeployment = SearchEmbeddingModelDeploymentNameToken.Data().Demand(_values, action, command);
                 var embeddingModelName = SearchEmbeddingModelNameToken.Data().Demand(_values, action, command);
-                var externalSourceUrl = "";
+                var externalSourceUrl = ExternalSourceToken.Data().GetOrDefault(_values);
 
                 DoIndexUpdateWithGenAi(subscription, group, project, indexName, embeddingModelDeployment, embeddingModelName, pattern, externalSourceUrl);
             }

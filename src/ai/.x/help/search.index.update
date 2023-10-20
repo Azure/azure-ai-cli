@@ -4,28 +4,32 @@ SEARCH INDEX UPDATE
 
 USAGE: ai index update [...]
 
-  EMBEDDINGS
-
-  ITEM
-    --id ID                                 (see: ai help search index id)
-    --metadata METADATA                     (see: ai help search index metadata)
-    --description DESCRIPTION               (see: ai help search index description)
-
-  DATA
-    --text TEXT                             (see: ai help search index text)
-    --file FILE                             (see: ai help search index file)
-    --files FILEs                           (see: ai help search index files)
-    --url URL                               (see: ai help search index url)
-    --urls URLs                             (see: ai help search index urls)
-
-  REFERENCE
-    --external-source                       (see: ai help search index external source)
-
   AZURE SEARCH
     --search-api-key KEY                    (see: ai help search api key)
     --search-endpoint ENDPOINT              (see: ai help search endpoint)
-    --search-index-name NAME                (see: ai help search index name)
+
+  OPENAI EMBEDDINGS
     --embedding-deployment DEPLOYMENT       (see: ai help search embedding deployment)
+    --embedding-model MODEL                 (see: ai help search embedding model)
+
+  DATA
+    --file FILE                             (see: ai help search index file)
+    --files FILEs                           (see: ai help search index files)
+    --external-source                       (see: ai help search index external source)
+
+  INDEX
+    --search-index-name NAME                (see: ai help search index name)
+
+  MLINDEX
+    --mlindex-name NAME                     (see: ai help search mlindex name)
+    --subscription SUBSCRIPTION             (see: ai help search mlindex subscription)
+    --project PROJECT                       (see: ai help search mlindex project)
+    --group group                           (see: ai help search mlindex group)
+
+;  ITEM
+;    --id ID                                 (see: ai help search index id)
+;    --metadata METADATA                     (see: ai help search index metadata)
+;    --description DESCRIPTION               (see: ai help search index description)
 
 ;  CHROMA
 ;    --chroma-endpoint ENDPOINT             (see: ai help chroma endpoint)
