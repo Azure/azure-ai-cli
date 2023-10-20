@@ -81,7 +81,7 @@ namespace Azure.AI.Details.Common.CLI
             var message = $"{action} '{searchIndexName}'";
             if (!_quiet) Console.WriteLine(message);
 
-            var doSK = false;
+            var doSK = !MLIndexNameToken.IsMLIndexCreateKind(_values);
             if (doSK)
             {
                 var searchEndpoint = DemandSearchEndpointUri(action, command);
