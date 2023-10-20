@@ -73,8 +73,18 @@ namespace Azure.AI.Details.Common.CLI
 
         static public string UpdateMLIndex(INamedValues values, string subscription, string group, string projectName, string indexName, string embeddingModelDeployment, string embeddingModelName, string dataFiles, string externalSourceUrl)
         {
-            return PythonRunner.RunEmbeddedPythonScript(values,
-                    "ml_index_update",
+            Action<string> stdErrVerbose = x => Console.Error.WriteLine(x);
+            Action<string> stdErrStandard = x => {
+                var reformatted = 
+                    x.StartsWith("Processed source: ") ? ("Processed: " + x.Substring("Processed source: ".Length))
+                    : null;
+                if (reformatted != null) Console.Error.WriteLine(reformatted);
+            };
+
+            var stdErr = Program.Debug ? stdErrVerbose : stdErrStandard;
+
+            return PythonRunner.RunEmbeddedPythonScript(values, "ml_index_update",
+                CliHelpers.BuildCliArgs(
                     "--subscription", subscription,
                     "--group", group,
                     "--project-name", projectName,
@@ -82,19 +92,20 @@ namespace Azure.AI.Details.Common.CLI
                     "--embedding-model-deployment", embeddingModelDeployment,
                     "--embedding-model-name", embeddingModelName,
                     "--data-files", dataFiles,
-                    "--external-source-url", externalSourceUrl);
+                    "--external-source-url", externalSourceUrl),
+                null, null, stdErr);
         }
 
         private static string DoCreateResourceViaPython(INamedValues values, string subscription, string group, string name, string location, string displayName, string description)
         {
-            var createResource = () => PythonRunner.RunEmbeddedPythonScript(values,
-                    "hub_create",
+            var createResource = () => PythonRunner.RunEmbeddedPythonScript(values, "hub_create",
+                CliHelpers.BuildCliArgs( 
                     "--subscription", subscription,
                     "--group", group,
                     "--name", name, 
                     "--location", location,
                     "--display-name", displayName,
-                    "--description", description);
+                    "--description", description));
 
             var output = TryCatchHelpers.TryCatchNoThrow<string>(() => createResource(), null, out var exception);
             if (!string.IsNullOrEmpty(output)) return output;
@@ -112,8 +123,8 @@ namespace Azure.AI.Details.Common.CLI
 
         private static string DoCreateProjectViaPython(INamedValues values, string subscription, string group, string resource, string name, string location, string displayName, string description, string openAiResourceId)
         {
-            return PythonRunner.RunEmbeddedPythonScript(values,
-                    "project_create",
+            return PythonRunner.RunEmbeddedPythonScript(values, "project_create",
+                CliHelpers.BuildCliArgs(
                     "--subscription", subscription,
                     "--group", group,
                     "--resource", resource,
@@ -121,75 +132,79 @@ namespace Azure.AI.Details.Common.CLI
                     "--location", location,
                     "--display-name", displayName,
                     "--description", description,
-                    "--openai-resource-id", openAiResourceId);
+                    "--openai-resource-id", openAiResourceId));
         }
 
         private static string DoListResourcesViaPython(INamedValues values, string subscription)
         {
-            return PythonRunner.RunEmbeddedPythonScript(values, "hub_list", "--subscription", subscription);
+            return PythonRunner.RunEmbeddedPythonScript(values, "hub_list", CliHelpers.BuildCliArgs( "--subscription", subscription));
         }
 
         private static string DoListProjectsViaPython(INamedValues values, string subscription)
         {
-            return PythonRunner.RunEmbeddedPythonScript(values, "project_list", "--subscription", subscription);
+            return PythonRunner.RunEmbeddedPythonScript(values, "project_list", CliHelpers.BuildCliArgs("--subscription", subscription));
         }
 
         private static string DoListConnectionsViaPython(INamedValues values, string subscription, string group, string projectName)
         {
-            return PythonRunner.RunEmbeddedPythonScript(values, "connection_list", "--subscription", subscription, "--group", group, "--project-name", projectName);
+            return PythonRunner.RunEmbeddedPythonScript(values, "connection_list", 
+                CliHelpers.BuildCliArgs(
+                    "--subscription", subscription,
+                    "--group", group,
+                    "--project-name", projectName));
         }
 
         private static string DoDeleteResourceViaPython(INamedValues values, string subscription, string group, string name, bool deleteDependentResources)
         {
-            return PythonRunner.RunEmbeddedPythonScript(values,
-                    "hub_delete",
+            return PythonRunner.RunEmbeddedPythonScript(values, "hub_delete",
+                CliHelpers.BuildCliArgs(
                     "--subscription", subscription,
                     "--group", group,
                     "--name", name, 
-                    "--delete-dependent-resources", deleteDependentResources ? "true" : "false");
+                    "--delete-dependent-resources", deleteDependentResources ? "true" : "false"));
         }
 
         private static string DoDeleteProjectViaPython(INamedValues values, string subscription, string group, string name, bool deleteDependentResources)
         {
-            return PythonRunner.RunEmbeddedPythonScript(values,
-                    "project_delete",
+            return PythonRunner.RunEmbeddedPythonScript(values, "project_delete",
+                CliHelpers.BuildCliArgs(
                     "--subscription", subscription,
                     "--group", group,
                     "--name", name, 
-                    "--delete-dependent-resources", deleteDependentResources ? "true" : "false");
+                    "--delete-dependent-resources", deleteDependentResources ? "true" : "false"));
         }
 
         private static string DoDeleteConnectionViaPython(INamedValues values, string subscription, string group, string projectName, string connectionName)
         {
-            return PythonRunner.RunEmbeddedPythonScript(values,
-                    "connection_delete",
+            return PythonRunner.RunEmbeddedPythonScript(values, "connection_delete",
+                CliHelpers.BuildCliArgs(
                     "--subscription", subscription,
                     "--group", group,
                     "--project-name", projectName, 
-                    "--connection-name", connectionName);
+                    "--connection-name", connectionName));
         }
 
         private static string DoCreateConnectionViaPython(INamedValues values, string subscription, string group, string projectName, string connectionName, string connectionType, string endpoint, string key)
         {
-            return PythonRunner.RunEmbeddedPythonScript(values,
-                    "api_key_connection_create",
+            return PythonRunner.RunEmbeddedPythonScript(values, "api_key_connection_create",
+                CliHelpers.BuildCliArgs(
                     "--subscription", subscription,
                     "--group", group,
                     "--project-name", projectName,
                     "--connection-name", connectionName,
                     "--connection-type", connectionType,
                     "--endpoint", endpoint,
-                    "--key", key);
+                    "--key", key));
         }
 
         private static string DoGetConnectionViaPython(INamedValues values, string subscription, string group, string projectName, string connectionName)
         {
-            return PythonRunner.RunEmbeddedPythonScript(values,
-                    "api_key_connection_get",
+            return PythonRunner.RunEmbeddedPythonScript(values, "api_key_connection_get",
+                CliHelpers.BuildCliArgs(
                     "--subscription", subscription,
                     "--group", group,
                     "--project-name", projectName,
-                    "--connection-name", connectionName);
+                    "--connection-name", connectionName));
         }
 
         private static void CreateResourceGroup(INamedValues values, string subscription, string location, string group)

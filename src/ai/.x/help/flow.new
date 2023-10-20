@@ -5,14 +5,14 @@ FLOW NEW
 USAGE: ai flow new [...]
 
   FLOW
-    --flow NAME
+    --name NAME
     --function MODULE:FUNCTION
     --prompt-template TEMPLATE
 
 EXAMPLES
 
-  ai flow new --name my.flow
-  ai flow new --name my.flow --function MyModule:chat_function
+  ai flow new --name my_flow
+  ai flow new --name my_flow --function MyModule:chat_function
 
 SEE ALSO
 

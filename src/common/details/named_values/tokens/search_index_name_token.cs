@@ -8,7 +8,7 @@ namespace Azure.AI.Details.Common.CLI
     public class SearchIndexNameToken
     {
         public static NamedValueTokenData Data() => new NamedValueTokenData(_optionName, _fullName, _optionExample, _requiredDisplayName);
-        public static INamedValueTokenParser Parser(bool requireSearchPart = false) => new NamedValueTokenParser(_optionName, _fullName, requireSearchPart ? "111" : "011", "1");
+        public static INamedValueTokenParser Parser(bool requireIndexPart = true) => new NamedValueTokenParser(_optionName, _fullName, requireIndexPart ? "010" : "010;001", "1");
 
         private const string _requiredDisplayName = "index name";
         private const string _optionName = "--search-index-name";

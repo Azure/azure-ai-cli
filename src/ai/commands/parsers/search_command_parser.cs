@@ -49,6 +49,7 @@ namespace Azure.AI.Details.Common.CLI
 
             switch (commandName)
             {
+                case "search.index.create": return _searchIndexUpdateParsers;
                 case "search.index.update": return _searchIndexUpdateParsers;
             }
 
@@ -100,8 +101,8 @@ namespace Azure.AI.Details.Common.CLI
             ResourceGroupNameToken.Parser(),
             ProjectNameToken.Parser(),
 
-            SearchIndexNameToken.Parser(),
-            MLIndexNameToken.Parser(),
+            SearchIndexNameToken.Parser(requireIndexPart: false),
+            MLIndexNameToken.Parser(requireIndexPart: false),
 
             SearchEmbeddingModelDeploymentNameToken.Parser(),
             SearchEmbeddingModelNameToken.Parser(),

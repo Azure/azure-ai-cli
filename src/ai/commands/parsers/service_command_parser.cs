@@ -179,7 +179,7 @@ namespace Azure.AI.Details.Common.CLI
             ResourceGroupNameToken.Parser(),
             ResourceNameToken.Parser(requireResourcePart: true),
             RegionLocationToken.Parser(),
-            ProjectNameToken.Parser(),
+            ProjectNameToken.Parser(requireProjectPart: false),
             ProjectDisplayNameToken.Parser(),
             ProjectDescriptionToken.Parser(),
 
@@ -199,7 +199,7 @@ namespace Azure.AI.Details.Common.CLI
             new CommonServiceNamedValueTokenParsers(),
           
             ResourceGroupNameToken.Parser(),
-            ProjectNameToken.Parser(),
+            ProjectNameToken.Parser(requireProjectPart: false),
             DeleteDependentResourcesToken.Parser(),
 
             new NamedValueTokenParser(null, "service.output.json", "011", "1")
@@ -210,7 +210,7 @@ namespace Azure.AI.Details.Common.CLI
             new CommonServiceNamedValueTokenParsers(),
           
             ResourceGroupNameToken.Parser(),
-            ProjectNameToken.Parser(requireProjectPart: true),
+            ProjectNameToken.Parser(),
             ProjectConnectionNameToken.Parser(),
             ProjectConnectionTypeToken.Parser(),
             ProjectConnectionEndpointToken.Parser(),
@@ -224,7 +224,7 @@ namespace Azure.AI.Details.Common.CLI
             new CommonServiceNamedValueTokenParsers(),
 
             ResourceGroupNameToken.Parser(),
-            ProjectNameToken.Parser(requireProjectPart: true),
+            ProjectNameToken.Parser(),
 
             new NamedValueTokenParser(null, "service.output.json", "011", "1")
         };
@@ -234,7 +234,7 @@ namespace Azure.AI.Details.Common.CLI
             new CommonServiceNamedValueTokenParsers(),
           
             ResourceGroupNameToken.Parser(),
-            ProjectNameToken.Parser(requireProjectPart: true),
+            ProjectNameToken.Parser(),
             ProjectConnectionNameToken.Parser(),
 
             new NamedValueTokenParser(null, "service.output.json", "011", "1")
@@ -246,7 +246,7 @@ namespace Azure.AI.Details.Common.CLI
           
             // ResourceGroupNameToken.Parser(),
             // ResourceNameToken.Parser(requireResourcePart: true),
-            // ProjectNameToken.Parser(requireProjectPart: true),
+            // ProjectNameToken.Parser(),
             // RegionLocationToken.Parser(),
             // ProjectDisplayNameToken.Parser(),
             // ProjectDescriptionToken.Parser(),

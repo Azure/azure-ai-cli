@@ -5,13 +5,13 @@ FLOW INVOKE
 USAGE: ai flow invoke [...]
 
   FLOW
-    --flow NAME
+    --name NAME
     --node NODE
     --input KEY=VALUE
 
 EXAMPLE
 
-  ai flow invoke --flow my.flow chat --input question=hello
+  ai flow invoke --name my_flow --input question=hello
 
 SEE ALSO
 
