@@ -99,11 +99,12 @@ namespace Azure.AI.Details.Common.CLI
             SubscriptionToken.Parser(),
             ResourceGroupNameToken.Parser(),
             ProjectNameToken.Parser(),
+
             SearchIndexNameToken.Parser(),
+            MLIndexNameToken.Parser(),
 
             SearchEmbeddingModelDeploymentNameToken.Parser(),
             SearchEmbeddingModelNameToken.Parser(),
-            MLIndexNameToken.Parser(),
 
             new NamedValueTokenParser(null,  "service.config.search.api.key", "00101", "1"),
             new NamedValueTokenParser(null,  "service.config.search.endpoint.uri", "00110;00101", "1"),
