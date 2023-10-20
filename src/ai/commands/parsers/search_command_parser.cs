@@ -49,6 +49,7 @@ namespace Azure.AI.Details.Common.CLI
 
             switch (commandName)
             {
+                case "search.index.create": return _searchIndexUpdateParsers;
                 case "search.index.update": return _searchIndexUpdateParsers;
             }
 

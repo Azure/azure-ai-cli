@@ -75,7 +75,7 @@ namespace Azure.AI.Details.Common.CLI
         {
             var action = "Creating AI resource";
             var command = "service resource create";
-            var subscription = SubscriptionToken.Demand(_values, action, command);
+            var subscription = SubscriptionToken.Data().Demand(_values, action, command, checkConfig: "subscription");
             var location = RegionLocationToken.Data().Demand(_values, action, command);
 
             var name = ResourceNameToken.Data().Demand(_values, action, command);
@@ -98,7 +98,7 @@ namespace Azure.AI.Details.Common.CLI
         {
             var action = "Creating AI project";
             var command = "service project create";
-            var subscription = SubscriptionToken.Demand(_values, action, command);
+            var subscription = SubscriptionToken.Data().Demand(_values, action, command, checkConfig: "subscription");
             var location = RegionLocationToken.Data().Demand(_values, action, command);
             var resource = ResourceNameToken.Data().Demand(_values, action, command);
 
@@ -122,7 +122,7 @@ namespace Azure.AI.Details.Common.CLI
         {
             var action = "Creating AI connection";
             var command = "service connection create";
-            var subscription = SubscriptionToken.Demand(_values, action, command);
+            var subscription = SubscriptionToken.Data().Demand(_values, action, command, checkConfig: "subscription");
             var project = ProjectNameToken.Data().Demand(_values, action, command);
             var group = ResourceGroupNameToken.Data().Demand(_values, action, command);
 
@@ -145,7 +145,7 @@ namespace Azure.AI.Details.Common.CLI
         {
             var action = "Listing AI resources";
             var command = "service resource list";
-            var subscription = SubscriptionToken.Demand(_values, action, command);
+            var subscription = SubscriptionToken.Data().Demand(_values, action, command, checkConfig: "subscription");
 
             var message = $"{action} for '{subscription}'";
 
@@ -161,7 +161,7 @@ namespace Azure.AI.Details.Common.CLI
         {
             var action = "Listing AI projects";
             var command = "service project list";
-            var subscription = SubscriptionToken.Demand(_values, action, command);
+            var subscription = SubscriptionToken.Data().Demand(_values, action, command, checkConfig: "subscription");
 
             var message = $"{action} for '{subscription}'";
 
@@ -177,9 +177,9 @@ namespace Azure.AI.Details.Common.CLI
         {
             var action = "Listing Project connections";
             var command = "service connection list";
-            var subscription = SubscriptionToken.Demand(_values, action, command);
-            var group = ResourceGroupNameToken.Data().Demand(_values, action, command);
-            var project = ProjectNameToken.Data().Demand(_values, action, command);
+            var subscription = SubscriptionToken.Data().Demand(_values, action, command, checkConfig: "subscription");
+            var group = ResourceGroupNameToken.Data().Demand(_values, action, command, checkConfig: "group");
+            var project = ProjectNameToken.Data().Demand(_values, action, command, checkConfig: "project");
 
             var message = $"{action} for '{project}'";
 
@@ -196,7 +196,7 @@ namespace Azure.AI.Details.Common.CLI
             var action = "Deleting AI resource";
             var command = "service resource delete";
 
-            var subscription = SubscriptionToken.Demand(_values, action, command);
+            var subscription = SubscriptionToken.Data().Demand(_values, action, command, checkConfig: "subscription");
             var resourceName = ResourceNameToken.Data().Demand(_values, action, command);
             var group = ResourceGroupNameToken.Data().Demand(_values, action, command);
 
@@ -217,7 +217,7 @@ namespace Azure.AI.Details.Common.CLI
             var action = "Deleting AI project";
             var command = "service project delete";
 
-            var subscription = SubscriptionToken.Demand(_values, action, command);
+            var subscription = SubscriptionToken.Data().Demand(_values, action, command, checkConfig: "subscription");
             var projectName = ProjectNameToken.Data().Demand(_values, action, command);
             var group = ResourceGroupNameToken.Data().Demand(_values, action, command);
 
@@ -238,7 +238,7 @@ namespace Azure.AI.Details.Common.CLI
             var action = "Deleting AI connection";
             var command = "service connection delete";
 
-            var subscription = SubscriptionToken.Demand(_values, action, command);
+            var subscription = SubscriptionToken.Data().Demand(_values, action, command, checkConfig: "subscription");
             var group = ResourceGroupNameToken.Data().Demand(_values, action, command);
             var projectName = ProjectNameToken.Data().Demand(_values, action, command);
             var connectionName = ProjectConnectionNameToken.Data().Demand(_values, action, command);

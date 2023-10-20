@@ -75,8 +75,8 @@ namespace Azure.AI.Details.Common.CLI
             var action = "Updating search index";
             var command = "search index update";
 
-            var searchIndexName = GetSearchIndexName() ?? "MyIndex";
-            var pattern = GetSearchIndexUpdateFiles() ?? GetSearchIndexUpdateFile();
+            var searchIndexName = SearchIndexNameToken.Data().Demand(_values, action, command);
+            var pattern = DemandSearchIndexUpdateFilesPattern(action, command);
 
             var message = $"{action} '{searchIndexName}' ...";
             if (!_quiet) Console.WriteLine(message);
@@ -96,15 +96,14 @@ namespace Azure.AI.Details.Common.CLI
             }
             else
             {
-                var subscription = SubscriptionToken.Demand(_values, action, command);
-                var project = ProjectNameToken.Data().Demand(_values, action, command);
-                var group = ResourceGroupNameToken.Data().Demand(_values, action, command);
-                var indexName = SearchIndexNameToken.Data().Demand(_values, action, command);
-                var embeddingModelDeployment = SearchEmbeddingModelDeploymentNameToken.Data().Demand(_values, action, command);
-                var embeddingModelName = SearchEmbeddingModelNameToken.Data().Demand(_values, action, command);
+                var subscription = SubscriptionToken.Data().Demand(_values, action, command, checkConfig: "subscription");
+                var project = ProjectNameToken.Data().Demand(_values, action, command, checkConfig: "project");
+                var group = ResourceGroupNameToken.Data().Demand(_values, action, command, checkConfig: "group");
+                var embeddingModelDeployment = SearchEmbeddingModelDeploymentNameToken.Data().Demand(_values, action, command, checkConfig: "embedding.model.deployment.name");
+                var embeddingModelName = SearchEmbeddingModelNameToken.Data().Demand(_values, action, command, checkConfig: "embedding.model.name");
                 var externalSourceUrl = ExternalSourceToken.Data().GetOrDefault(_values);
 
-                output = DoIndexUpdateWithGenAi(subscription, group, project, indexName, embeddingModelDeployment, embeddingModelName, pattern, externalSourceUrl);
+                output = DoIndexUpdateWithGenAi(subscription, group, project, searchIndexName, embeddingModelDeployment, embeddingModelName, pattern, externalSourceUrl);
             }
 
             if (!_quiet) Console.WriteLine($"{message} Done!\n");
@@ -238,6 +237,21 @@ namespace Azure.AI.Details.Common.CLI
             return embeddingsApiKey;
         }
 
+        private string DemandSearchIndexUpdateFilesPattern(string action, string command)
+        {
+            var pattern = GetSearchIndexUpdateFiles() ?? GetSearchIndexUpdateFile();
+            if (string.IsNullOrEmpty(pattern))
+            {
+                _values.AddThrowError(
+                    "ERROR:", $"{action}; requires data files.",
+                      "TRY:", $"{Program.Name} {command} --files PATTERN",
+                              $"{Program.Name} {command} --file PATTERN",
+                            "",
+                      "SEE:", $"{Program.Name} help {command}");
+            }
+            return pattern;
+        }
+
         private string GetSearchApiKey()
         {
             return _values.Get("service.config.key", true);
@@ -261,11 +275,6 @@ namespace Azure.AI.Details.Common.CLI
         private string GetEmbeddingsDeployment()
         {
             return _values.Get("search.embedding.model.deployment.name", true);
-        }
-
-        private string GetSearchIndexName()
-        {
-            return SearchIndexNameToken.Data().GetOrDefault(_values);
         }
 
         private string GetSearchIndexUpdateFile()
