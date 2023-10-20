@@ -145,8 +145,8 @@ SEARCH INDEX UPDATE
 USAGE: ai index update [...]
 
   EMBEDDINGS
-    --embeddings-index-name NAME            (see: ai help search index embeddings name)
-    --embeddings-deployment DEPLOYMENT      (see: ai help search index embeddings deployment)
+    --embedding-index-name NAME             (see: ai help search index embedding name)
+    --embedding-deployment DEPLOYMENT       (see: ai help search index embedding deployment)
 
   ITEM
     --id ID                                 (see: ai help search index id)

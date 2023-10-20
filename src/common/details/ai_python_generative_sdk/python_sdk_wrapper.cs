@@ -71,6 +71,20 @@ namespace Azure.AI.Details.Common.CLI
             return DoGetConnectionViaPython(values, subscription, group, projectName, connectionName);
         }
 
+        static public string UpdateMLIndex(INamedValues values, string subscription, string group, string projectName, string indexName, string embeddingModelDeployment, string embeddingModelName, string dataFiles, string externalSourceUrl)
+        {
+            return PythonRunner.RunEmbeddedPythonScript(values,
+                    "ml_index_update",
+                    "--subscription", subscription,
+                    "--group", group,
+                    "--project-name", projectName,
+                    "--index-name", indexName,
+                    "--embedding-model-deployment", embeddingModelDeployment,
+                    "--embedding-model-name", embeddingModelName,
+                    "--data-files", dataFiles,
+                    "--external-source-url", externalSourceUrl);
+        }
+
         private static string DoCreateResourceViaPython(INamedValues values, string subscription, string group, string name, string location, string displayName, string description)
         {
             var createResource = () => PythonRunner.RunEmbeddedPythonScript(values,
