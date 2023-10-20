@@ -149,8 +149,10 @@ namespace Azure.AI.Details.Common.CLI
 
                     Console.ForegroundColor = ConsoleColor.Gray;
 
-                    var parameters = $"{{\"question\": \"{text}\"}}";
-                    var output = PythonRunner.RunEmbeddedPythonScript(_values, "function_call", "--function", function, "--parameters", parameters);
+                    var output = PythonRunner.RunEmbeddedPythonScript(_values, "function_call",
+                        CliHelpers.BuildCliArgs(
+                            "--function", function,
+                            "--parameters", $"{{\"question\": \"{text}\"}}"));
 
                     output = output.Replace("\n", "\n           ");
                     Console.WriteLine(output);

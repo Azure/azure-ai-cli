@@ -15,7 +15,7 @@ namespace Azure.AI.Details.Common.CLI
 {
     public class PythonRunner
     {
-        public static async Task<(int, string)> RunScriptAsync(string script, string args = null)
+        public static async Task<(int, string)> RunPythonScriptAsync(string script, string args = null, Dictionary<string, string> addToEnvironment = null, Action<string> stdOutHandler = null, Action<string> stdErrHandler = null, Action<string> mergedOutputHandler = null)
         {
             EnsureFindPython();
             if (_pythonBinary == null)
@@ -33,7 +33,7 @@ namespace Azure.AI.Details.Common.CLI
                 args = args != null
                     ? $"\"{tempFile}\" {args}"
                     : $"\"{tempFile}\"";
-                var process = await ProcessHelpers.RunShellCommandAsync(_pythonBinary, args);
+                var process = await ProcessHelpers.RunShellCommandAsync(_pythonBinary, args, addToEnvironment, stdOutHandler, stdErrHandler, mergedOutputHandler);
                 return (process.ExitCode, process.MergedOutput);
             }
             finally
@@ -42,20 +42,19 @@ namespace Azure.AI.Details.Common.CLI
             }
         }
 
-        public static string RunEmbeddedPythonScript(INamedValues values, string scriptName, params string[] args)
+        public static string RunEmbeddedPythonScript(INamedValues values, string scriptName, string scriptArgs = null, Dictionary<string, string> addToEnvironment = null, Action<string> stdOutHandler = null, Action<string> stdErrHandler = null, Action<string> mergedOutputHandler = null)
         {
             var path = FileHelpers.FindFileInHelpPath($"help/include.python.script.{scriptName}.py");
             var script = FileHelpers.ReadAllHelpText(path, Encoding.UTF8);
-            var scriptArgs = CliHelpers.BuildCliArgs(args);
 
             if (Program.Debug) Console.WriteLine($"DEBUG: {scriptName}.py:\n{script}");
-            if (Program.Debug) Console.WriteLine($"DEBUG: PythonRunner.RunScriptAsync: '{scriptName}' {scriptArgs}");
+            if (Program.Debug) Console.WriteLine($"DEBUG: PythonRunner.RunPythonScriptAsync: '{scriptName}' {scriptArgs}");
 
             var dbgOut = script.Replace("\n", "\\n").Replace("\r", "");
             AI.DBG_TRACE_VERBOSE($"RunEmbeddedPythonScript: {scriptName}.py: {dbgOut}");
             AI.DBG_TRACE_VERBOSE($"RunEmbeddedPythonScript: '{scriptName}' {scriptArgs}");
 
-            (var exit, var output)= PythonRunner.RunScriptAsync(script, scriptArgs).Result;
+            (var exit, var output)= PythonRunner.RunPythonScriptAsync(script, scriptArgs, addToEnvironment, stdOutHandler, stdErrHandler, mergedOutputHandler).Result;
             if (exit != 0) AI.DBG_TRACE_WARNING($"RunEmbeddedPythonScript: exit={exit}");
 
             dbgOut = output.Replace("\n", "\\n").Replace("\r", "");

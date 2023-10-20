@@ -1,11 +1,23 @@
 import argparse
 import json
+import os
+import sys
 from azure.identity import DefaultAzureCredential
 from azure.ai.generative import AIClient
 from azure.ai.generative.operations._index_data_source import LocalSource, ACSOutputConfig
 from azure.ai.generative.functions.build_mlindex import build_mlindex
 from azure.ai.generative.entities.mlindex import MLIndex
-import os
+
+class AutoFlushingStream:
+    def __init__(self, stream):
+        self.stream = stream
+
+    def write(self, data):
+        self.stream.write(data)
+        self.stream.flush()
+
+sys.stdout = AutoFlushingStream(sys.stdout)
+sys.stderr = AutoFlushingStream(sys.stderr)
 
 class MLIndexEncoder(json.JSONEncoder):
     def default(self, obj):
