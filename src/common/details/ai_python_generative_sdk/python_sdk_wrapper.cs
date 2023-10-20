@@ -73,8 +73,12 @@ namespace Azure.AI.Details.Common.CLI
 
         static public string UpdateMLIndex(INamedValues values, string subscription, string group, string projectName, string indexName, string embeddingModelDeployment, string embeddingModelName, string dataFiles, string externalSourceUrl)
         {
-            Action<string> stdOut = x => Console.WriteLine(x);
-            Action<string> stdErr = x => Console.Error.WriteLine(x);
+            Action<string> stdErr = x => {
+                var reformatted = 
+                    x.StartsWith("Processed source: ") ? ("Processed: " + x.Substring("Processed source: ".Length))
+                    : null;
+                if (reformatted != null) Console.Error.WriteLine(reformatted);
+            };
 
             return PythonRunner.RunEmbeddedPythonScript(values, "ml_index_update",
                 CliHelpers.BuildCliArgs(
@@ -86,7 +90,7 @@ namespace Azure.AI.Details.Common.CLI
                     "--embedding-model-name", embeddingModelName,
                     "--data-files", dataFiles,
                     "--external-source-url", externalSourceUrl),
-                null, stdOut, stdErr);
+                null, null, stdErr);
         }
 
         private static string DoCreateResourceViaPython(INamedValues values, string subscription, string group, string name, string location, string displayName, string description)

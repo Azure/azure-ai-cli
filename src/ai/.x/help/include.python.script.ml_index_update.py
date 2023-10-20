@@ -16,6 +16,9 @@ class AutoFlushingStream:
         self.stream.write(data)
         self.stream.flush()
 
+    def flush(self):
+        self.stream.flush()
+
 sys.stdout = AutoFlushingStream(sys.stdout)
 sys.stderr = AutoFlushingStream(sys.stderr)
 

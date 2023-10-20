@@ -78,8 +78,10 @@ namespace Azure.AI.Details.Common.CLI
             var searchIndexName = GetSearchIndexName() ?? "MyIndex";
             var pattern = GetSearchIndexUpdateFiles() ?? GetSearchIndexUpdateFile();
 
-            var message = $"{action} '{searchIndexName}'";
+            var message = $"{action} '{searchIndexName}' ...";
             if (!_quiet) Console.WriteLine(message);
+
+            var output = string.Empty;
 
             var doSK = !MLIndexNameToken.IsMLIndexCreateKind(_values);
             if (doSK)
@@ -102,15 +104,17 @@ namespace Azure.AI.Details.Common.CLI
                 var embeddingModelName = SearchEmbeddingModelNameToken.Data().Demand(_values, action, command);
                 var externalSourceUrl = ExternalSourceToken.Data().GetOrDefault(_values);
 
-                DoIndexUpdateWithGenAi(subscription, group, project, indexName, embeddingModelDeployment, embeddingModelName, pattern, externalSourceUrl);
+                output = DoIndexUpdateWithGenAi(subscription, group, project, indexName, embeddingModelDeployment, embeddingModelName, pattern, externalSourceUrl);
             }
 
             if (!_quiet) Console.WriteLine($"{message} Done!\n");
+
+            Console.WriteLine(output);
         }
 
-        private void DoIndexUpdateWithGenAi(string subscription, string groupName, string projectName, string indexName, string embeddingModelDeployment, string embeddingModelName, string dataFiles, string externalSourceUrl)
+        private string DoIndexUpdateWithGenAi(string subscription, string groupName, string projectName, string indexName, string embeddingModelDeployment, string embeddingModelName, string dataFiles, string externalSourceUrl)
         {
-            PythonSDKWrapper.UpdateMLIndex(_values, subscription, groupName, projectName, indexName, embeddingModelDeployment, embeddingModelName, dataFiles, externalSourceUrl);
+            return PythonSDKWrapper.UpdateMLIndex(_values, subscription, groupName, projectName, indexName, embeddingModelDeployment, embeddingModelName, dataFiles, externalSourceUrl);
         }
 
         private void DoIndexUpdateWithSK(string searchEndpoint, string searchApiKey, string embeddingsEndpoint, string embeddingsDeployment, string embeddingsApiKey, string searchIndexName, string pattern)
