@@ -73,12 +73,15 @@ namespace Azure.AI.Details.Common.CLI
 
         static public string UpdateMLIndex(INamedValues values, string subscription, string group, string projectName, string indexName, string embeddingModelDeployment, string embeddingModelName, string dataFiles, string externalSourceUrl)
         {
-            Action<string> stdErr = x => {
+            Action<string> stdErrVerbose = x => Console.Error.WriteLine(x);
+            Action<string> stdErrStandard = x => {
                 var reformatted = 
                     x.StartsWith("Processed source: ") ? ("Processed: " + x.Substring("Processed source: ".Length))
                     : null;
                 if (reformatted != null) Console.Error.WriteLine(reformatted);
             };
+
+            var stdErr = Program.Debug ? stdErrVerbose : stdErrStandard;
 
             return PythonRunner.RunEmbeddedPythonScript(values, "ml_index_update",
                 CliHelpers.BuildCliArgs(
