@@ -109,7 +109,10 @@ namespace Azure.AI.Details.Common.CLI
 
             if (!_quiet) Console.WriteLine($"{message} Done!\n");
 
-            Console.WriteLine(output);
+            var fi = new FileInfo(ConfigSetHelpers.ConfigSet("search.index.name", searchIndexName));
+            if (!_quiet) Console.WriteLine($"{fi.Name} (saved at {fi.DirectoryName})\n\n  {searchIndexName}");
+
+            if (!string.IsNullOrEmpty(output)) Console.WriteLine(output);
         }
 
         private string DoIndexUpdateWithGenAi(string subscription, string groupName, string projectName, string indexName, string embeddingModelDeployment, string embeddingModelName, string dataFiles, string externalSourceUrl)
