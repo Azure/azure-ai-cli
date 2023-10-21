@@ -248,6 +248,10 @@ namespace Azure.AI.Details.Common.CLI
 
                 var searchKeys = await AzCliConsoleGui.LoadSearchResourceKeys(subscription, searchResource);
                 ConfigSetHelpers.ConfigSearchResource(searchResource.Endpoint, searchKeys.Key1);
+
+                ConfigSetHelpers.ConfigSet("@subscription", subscription);
+                ConfigSetHelpers.ConfigSet("@project", projectName);
+                ConfigSetHelpers.ConfigSet("@group", openaiResource.Group);
             }
         }
 
