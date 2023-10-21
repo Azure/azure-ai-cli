@@ -101,7 +101,7 @@ namespace Azure.AI.Details.Common.CLI
             Console.WriteLine($"\r  *** SET ***   {displayLabel}: {displayValue}");
         }
 
-        public static void ConfigSet(string atFile, string setValue)
+        public static string ConfigSet(string atFile, string setValue)
         {
             var setCommandValues = new CommandValues();
             setCommandValues.Add("x.command", "config");
@@ -110,6 +110,7 @@ namespace Azure.AI.Details.Common.CLI
             setCommandValues.Add("x.config.command.set", setValue);
             var fileName = FileHelpers.GetOutputConfigFileName(atFile, setCommandValues);
             FileHelpers.WriteAllText(fileName, setValue, Encoding.UTF8);
+            return fileName;
         }
     }
 }
