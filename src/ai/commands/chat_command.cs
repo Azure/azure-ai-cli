@@ -138,6 +138,11 @@ namespace Azure.AI.Details.Common.CLI
 
         private async Task<Func<string, Task>> GetChatFunctionTextHandler(string function)
         {
+            var messages = new List<ChatMessage>();
+
+            var systemPrompt = _values.GetOrDefault("chat.message.system.prompt", DefaultSystemPrompt);
+            messages.Add(new ChatMessage(ChatRole.System, systemPrompt.ReplaceValues(_values)));
+
             return await Task.Run(() => {
                 var handler = (string text) => {
 
@@ -149,13 +154,47 @@ namespace Azure.AI.Details.Common.CLI
 
                     Console.ForegroundColor = ConsoleColor.Gray;
 
-                    var output = PythonRunner.RunEmbeddedPythonScript(_values, "function_call",
-                        CliHelpers.BuildCliArgs(
-                            "--function", function,
-                            "--parameters", $"{{\"question\": \"{text}\"}}"));
+                    messages.Add(new ChatMessage(ChatRole.User, text));
+
+                    var chatProtocolFunc = new Func<string>(() => {
+
+                        var sb = new StringBuilder();
+                        sb.Append("[");
+                        foreach (var message in messages)
+                        {
+                            if (sb.Length > 1) sb.Append(",");
+                            sb.Append($"{{\"role\": \"{message.Role}\", \"content\": \"{message.Content}\"}}");
+                        }
+                        sb.Append("]");
+                        var theDict = $"{{ \"messages\": {sb.ToString()} }}";
+
+                        if (Program.Debug) Console.WriteLine(theDict);
+
+                        return PythonRunner.RunEmbeddedPythonScript(_values, "function_call",
+                            CliHelpers.BuildCliArgs(
+                                "--function", function,
+                                "--parameters", theDict));
+                    });
+                    var questionFunc = new Func<string>(() => {
+                         return PythonRunner.RunEmbeddedPythonScript(_values, "function_call",
+                            CliHelpers.BuildCliArgs(
+                                "--function", function,
+                                "--parameters", $"{{\"question\": \"{text}\"}}"));
+                        });
+
+                    var output = TryCatchHelpers.TryCatchNoThrow<string>(chatProtocolFunc, null, out var ex);
+                    if (output == null && ex != null)
+                    {
+                        _values.Reset("error");
+                        output = TryCatchHelpers.TryCatchNoThrow<string>(questionFunc, null, out ex);
+                        if (output == null && ex != null) throw ex;
+                    }
+
+                    messages.Add(new ChatMessage(ChatRole.Assistant, output));
 
                     output = output.Replace("\n", "\n           ");
                     Console.WriteLine(output);
+                    Console.WriteLine();
 
                     return Task.CompletedTask;
                 };
