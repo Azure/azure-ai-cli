@@ -13,10 +13,14 @@ async def ensure_and_strip_module_path(module_path) -> str:
     module_path = os.path.join(os.getcwd(), module_path)
     module_name = os.path.basename(module_path)
 
+    print("current working directory: " + os.getcwd())
+
     if os.path.exists(module_path + ".py"):
         module_dirname = os.path.dirname(module_path)
         if module_dirname not in sys.path:
             sys.path.append(module_dirname)
+        if os.getcwd() not in sys.path:
+            sys.path.append(os.getcwd())
         return module_name
 
     raise ModuleNotFoundError("Module not found: " + module_path)
@@ -109,9 +113,20 @@ async def main():
             for item in result:
                 print(item)
 
+        # if the "openai.openai_object.OpenAIObject"
+        elif (type(result).__name__ == "OpenAIObject"):
+            print("---it's an OpenAIObject---")
+            print(result.choices[0].message.content)
+
+        # if it's a dictionary that has a "choices" key
+        elif (isinstance(result, dict) and "choices" in result):
+            print("---it's a dictionary with a 'choices' key---")
+            print(result["choices"][0]["message"]["content"])
+
         else:
             print("---it's something else---")
             print(type(result))
+            print(result)
 
 if __name__ == "__main__":
     asyncio.run(main())  # Use asyncio.run() to run the asynchronous main function
