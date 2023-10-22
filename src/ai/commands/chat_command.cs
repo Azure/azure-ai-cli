@@ -138,24 +138,63 @@ namespace Azure.AI.Details.Common.CLI
 
         private async Task<Func<string, Task>> GetChatFunctionTextHandler(string function)
         {
+            var setEnv = _values.GetOrDefault("chat.set.environment", true);
+            var env = setEnv ? ConfigEnvironmentHelpers.GetEnvironment(_values) : null;
+
+            var messages = new List<ChatMessage>();
+
+            var systemPrompt = _values.GetOrDefault("chat.message.system.prompt", DefaultSystemPrompt);
+            messages.Add(new ChatMessage(ChatRole.System, systemPrompt.ReplaceValues(_values)));
+
             return await Task.Run(() => {
                 var handler = (string text) => {
 
+                    messages.Add(new ChatMessage(ChatRole.User, text));
+
                     Console.ForegroundColor = ConsoleColor.Green;
                     Console.Write("assistant");
-
                     Console.ForegroundColor = ConsoleColor.White;
                     Console.Write(": ");
-
                     Console.ForegroundColor = ConsoleColor.Gray;
 
-                    var output = PythonRunner.RunEmbeddedPythonScript(_values, "function_call",
-                        CliHelpers.BuildCliArgs(
-                            "--function", function,
-                            "--parameters", $"{{\"question\": \"{text}\"}}"));
+                    var chatProtocolFunc = new Func<string>(() =>
+                    {
+                        return PythonRunner.RunEmbeddedPythonScript(_values, "function_call",
+                            CliHelpers.BuildCliArgs(
+                                "--function", function,
+                                "--parameters", ConvertMessagesToJson(messages)),
+                            addToEnvironment: env);
+                    });
+                    var questionFunc = new Func<string>(() => {
+                         return PythonRunner.RunEmbeddedPythonScript(_values, "function_call",
+                            CliHelpers.BuildCliArgs(
+                                "--function", function,
+                                "--parameters", $"{{\"question\": \"{text}\"}}"),
+                            addToEnvironment: env);
+                    });
+
+                    var output = TryCatchHelpers.TryCatchNoThrow<string>(chatProtocolFunc, null, out var ex1);
+                    if (output == null && ex1 != null)
+                    {
+                        var error1 = _values.GetOrDefault("error", null);
+                        _values.Reset("error");
+
+                        output = TryCatchHelpers.TryCatchNoThrow<string>(questionFunc, null, out var ex2);
+
+                        if (output == null && ex2 != null)
+                        {
+                            var error2 = _values.GetOrDefault("error", null);
+                            _values.Reset("error");
+
+                            _values.AddThrowError("ERROR", $"{ex1.Message}\n\n{error1}\n\n{ex2.Message}\n\n{error2}");
+                        }
+                    }
+
+                    messages.Add(new ChatMessage(ChatRole.Assistant, output));
 
                     output = output.Replace("\n", "\n           ");
                     Console.WriteLine(output);
+                    Console.WriteLine();
 
                     return Task.CompletedTask;
                 };
@@ -317,7 +356,7 @@ namespace Azure.AI.Details.Common.CLI
             options.Messages.Add(new ChatMessage(ChatRole.System, systemPrompt.ReplaceValues(_values)));
 
             var textFile = _values["chat.message.history.text.file"];
-            if (!string.IsNullOrEmpty(textFile)) AddChatMessagesFromTextFile(options, textFile);
+            if (!string.IsNullOrEmpty(textFile)) AddChatMessagesFromTextFile(options.Messages, textFile);
 
             var maxTokens = _values["chat.options.max.tokens"];
             var temperature = _values["chat.options.temperature"];
@@ -435,67 +474,6 @@ namespace Azure.AI.Details.Common.CLI
             return latestVersion;
         }
 
-        private void AddChatMessagesFromTextFile(ChatCompletionsOptions options, string textFile)
-        {
-            var existing = FileHelpers.DemandFindFileInDataPath(textFile, _values, "chat history");
-            var text = FileHelpers.ReadAllText(existing, Encoding.Default);
-
-            var lines = text.Split(new char[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries)
-                .Where(x => !string.IsNullOrEmpty(x))
-                .Select(x => x.Trim())
-                .ToList();
-
-            var first = lines.FirstOrDefault();
-            var role = UpdateRole(ref first);
-
-            for (int i = 0; i < lines.Count; i++)
-            {
-                var line = lines[i];
-                role = UpdateRole(ref line, role);
-
-                if (role == ChatRole.System || role == ChatRole.User)
-                {
-                    line = line.ReplaceValues(_values);
-                }
-
-                if (i == 0 && role == ChatRole.System && FirstMessageIsDefaultSystemPrompt(options, role))
-                {
-                    options.Messages.First().Content = line;
-                    continue;
-                }
-
-                options.Messages.Add(new ChatMessage(role, line));
-            }
-        }
-
-        private ChatRole UpdateRole(ref string line, ChatRole? currentRole = null)
-        {
-            var lower = line.ToLower();
-            if (lower.StartsWith("system:"))
-            {
-                line = line.Substring(7).Trim();
-                return ChatRole.System;
-            }
-            else if (lower.StartsWith("user:"))
-            {
-                line = line.Substring(5).Trim();
-                return ChatRole.User;
-            }
-            else if (lower.StartsWith("assistant:"))
-            {
-                line = line.Substring(10).Trim();
-                return ChatRole.Assistant;
-            }
-            return currentRole ?? ChatRole.System;
-        }
-
-        private static bool FirstMessageIsDefaultSystemPrompt(ChatCompletionsOptions options, ChatRole role)
-        {
-            return options.Messages.Count() == 1
-                && options.Messages.First().Role == ChatRole.System
-                && options.Messages.First().Content == DefaultSystemPrompt;
-        }
-
         private OpenAIClient CreateOpenAIClient(out string deployment)
         {
             var key = _values["service.config.key"];
@@ -543,6 +521,83 @@ namespace Azure.AI.Details.Common.CLI
                 _values.AddThrowError("ERROR:", $"Creating OpenAIClient; Not-yet-implemented create from region.");
                 return null;
             }
+        }
+
+        private ChatRole UpdateRole(ref string line, ChatRole? currentRole = null)
+        {
+            var lower = line.ToLower();
+            if (lower.StartsWith("system:"))
+            {
+                line = line.Substring(7).Trim();
+                return ChatRole.System;
+            }
+            else if (lower.StartsWith("user:"))
+            {
+                line = line.Substring(5).Trim();
+                return ChatRole.User;
+            }
+            else if (lower.StartsWith("assistant:"))
+            {
+                line = line.Substring(10).Trim();
+                return ChatRole.Assistant;
+            }
+            return currentRole ?? ChatRole.System;
+        }
+
+        private void AddChatMessagesFromTextFile(IList<ChatMessage> messages, string textFile)
+        {
+            var existing = FileHelpers.DemandFindFileInDataPath(textFile, _values, "chat history");
+            var text = FileHelpers.ReadAllText(existing, Encoding.Default);
+
+            var lines = text.Split(new char[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries)
+                .Where(x => !string.IsNullOrEmpty(x))
+                .Select(x => x.Trim())
+                .ToList();
+
+            var first = lines.FirstOrDefault();
+            var role = UpdateRole(ref first);
+
+            for (int i = 0; i < lines.Count; i++)
+            {
+                var line = lines[i];
+                role = UpdateRole(ref line, role);
+
+                if (role == ChatRole.System || role == ChatRole.User)
+                {
+                    line = line.ReplaceValues(_values);
+                }
+
+                if (i == 0 && role == ChatRole.System && FirstMessageIsDefaultSystemPrompt(messages, role))
+                {
+                    messages.First().Content = line;
+                    continue;
+                }
+
+                messages.Add(new ChatMessage(role, line));
+            }
+        }
+
+        private static bool FirstMessageIsDefaultSystemPrompt(IList<ChatMessage> messages, ChatRole role)
+        {
+            return messages.Count() == 1
+                && messages.First().Role == ChatRole.System
+                && messages.First().Content == DefaultSystemPrompt;
+        }
+
+        private static string ConvertMessagesToJson(IList<ChatMessage> messages)
+        {
+            var sb = new StringBuilder();
+            sb.Append("[");
+            foreach (var message in messages)
+            {
+                if (sb.Length > 1) sb.Append(",");
+                sb.Append($"{{\"role\": \"{message.Role}\", \"content\": \"{message.Content}\"}}");
+            }
+            sb.Append("]");
+            var theDict = $"{{ \"messages\": {sb.ToString()} }}";
+
+            if (Program.Debug) Console.WriteLine(theDict);
+            return theDict;
         }
 
         private void WaitForStopOrCancel(Task task)
