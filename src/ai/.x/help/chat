@@ -15,6 +15,9 @@ USAGE: ai chat [...]
     --system PROMPT                     (see: ai help chat system prompt)
     --user MESSAGE                      (see: ai help chat user message)
 
+  CHAT WITH FUNCTION
+    --function MODULE:FUNCTION          (see: ai help chat function)
+
   CHAT WITH DATA                        (see: ai help chat with data)
     --index-name INDEX                  (see: ai help index name)
     --search-endpoint ENDPOINT          (see: ai help search endpoint)
@@ -42,9 +45,13 @@ EXAMPLES
 
   `EXAMPLE 4`: Chat w/ data using Azure Search vector index
 
-    ai config @search. --set MyIndex
-    ai search index create --name @myindex --files *.txt --interactive
-    ai chat --index-name @myindex --interactive
+    ai search index update --name contoso_product_index --files *.md
+    ai chat --index-name contoso_product_index --interactive
+    ai config --clear search.index.name
+
+  `EXAMPLE 5`: Chat w/ function a specific python function
+
+    ai chat --function copilot_aisdk:chat_completion --interactive
 
 SEE ALSO
 
