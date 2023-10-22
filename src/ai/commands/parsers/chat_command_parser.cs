@@ -57,6 +57,7 @@ namespace Azure.AI.Details.Common.CLI
 
             new NamedValueTokenParser(null,             "chat.message.system.prompt", "0010;0001", "1"),
             new NamedValueTokenParser(null,             "chat.message.user.prompt", "0010", "1"),
+            new NamedValueTokenParser(null,             "chat.message.user.question", "0001", "1", null, "chat.message.user.prompt"),
 
             new NamedValueTokenParser(null,             "chat.options.max.tokens", "0011", "1"),
             new NamedValueTokenParser(null,             "chat.options.temperature", "001", "1"),
