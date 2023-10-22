@@ -67,11 +67,11 @@ namespace Azure.AI.Details.Common.CLI
         {
             var fileName = ".env";
 
-            var env = GetEnvironment();
-            var fqn = SaveEnvironment(env, fileName);
+            var env = ConfigEnvironmentHelpers.GetEnvironment(_values);
+            var fqn = ConfigEnvironmentHelpers.SaveEnvironment(env, fileName);
 
             Console.WriteLine($"{fileName} (saved at '{fqn}')\n");
-            PrintEnvironment(env);
+            ConfigEnvironmentHelpers.PrintEnvironment(env);
         }
 
         private void DoDevShell()
@@ -83,9 +83,9 @@ namespace Azure.AI.Details.Common.CLI
 
             Console.WriteLine("Environment populated:\n");
 
-            var env = GetEnvironment();
-            PrintEnvironment(env);
-            SetEnvironment(env);
+            var env = ConfigEnvironmentHelpers.GetEnvironment(_values);
+            ConfigEnvironmentHelpers.PrintEnvironment(env);
+            ConfigEnvironmentHelpers.SetEnvironment(env);
             Console.WriteLine();
 
             var runCommand = RunCommandToken.Data().GetOrDefault(_values);
@@ -121,86 +121,6 @@ namespace Azure.AI.Details.Common.CLI
                     : $"/c \"{runCommand}\"");
 
                 Console.WriteLine($"Running command: {runCommand}\n");
-            }
-        }
-
-        private string ReadConfig(string name)
-        {
-            return FileHelpers.FileExistsInConfigPath(name, _values)
-                ? FileHelpers.ReadAllText(FileHelpers.DemandFindFileInConfigPath(name, _values, "configuration"), Encoding.UTF8)
-                : null;
-        }
-
-        private Dictionary<string, string> GetEnvironment()
-        {
-            var env = new Dictionary<string, string>();
-            env.Add("AZURE_SUBSCRIPTION_ID", ReadConfig("subscription"));
-            env.Add("AZURE_RESOURCE_GROUP", ReadConfig("group"));
-            env.Add("AZURE_AI_PROJECT_NAME", ReadConfig("project"));
-            env.Add("AZURE_AI_HUB_NAME", ReadConfig("hub"));
-
-            env.Add("AZURE_OPENAI_CHAT_DEPLOYMENT", ReadConfig("chat.deployment"));
-            env.Add("AZURE_OPENAI_EVALUATION_DEPLOYMENT", ReadConfig("chat.evaluation.model.deployment.name") ?? ReadConfig("chat.deployment"));
-            env.Add("AZURE_OPENAI_EMBEDDING_DEPLOYMENT", ReadConfig("search.embedding.model.deployment.name"));
-
-            env.Add("AZURE_OPENAI_CHAT_MODEL", ReadConfig("chat.model"));
-            env.Add("AZURE_OPENAI_EVALUATION_MODEL", ReadConfig("chat.evaluation.model.name") ?? ReadConfig("chat.model"));
-            env.Add("AZURE_OPENAI_EMBEDDING_MODEL", ReadConfig("search.embedding.model.name"));
-
-            env.Add("AZURE_AI_SEARCH_ENDPOINT", ReadConfig("search.endpoint"));
-            env.Add("AZURE_AI_SEARCH_INDEX_NAME", ReadConfig("search.index.name"));
-            env.Add("AZURE_AI_SEARCH_KEY", ReadConfig("search.key"));
-
-            // Add "non-standard" AZURE_AI_" prefixed env variables to interop with various SDKs
-
-            // OpenAI's SDK
-            env.Add("OPENAI_ENDPOINT", ReadConfig("chat.endpoint"));
-            env.Add("OPENAI_API_BASE", ReadConfig("chat.endpoint"));
-            env.Add("OPENAI_API_KEY", ReadConfig("chat.key"));
-            env.Add("OPENAI_API_TYPE", "azure");
-            env.Add("OPENAI_API_VERSION", ChatCommand.GetOpenAIClientVersionNumber());
-
-            // Cognitive Search SDK
-            env.Add("AZURE_COGNITIVE_SEARCH_TARGET", env["AZURE_AI_SEARCH_ENDPOINT"]);
-            env.Add("AZURE_COGNITIVE_SEARCH_KEY", env["AZURE_AI_SEARCH_KEY"]);
-
-            return env.Where(x => !string.IsNullOrEmpty(x.Value)).ToDictionary(x => x.Key, x => x.Value);
-        }
-
-        private static void SetEnvironment(Dictionary<string, string> env)
-        {
-            foreach (var item in env)
-            {
-                Environment.SetEnvironmentVariable(item.Key, item.Value);
-            }
-        }
-
-        private string SaveEnvironment(Dictionary<string, string> env, string fileName)
-        {
-            var items = env.ToList();
-            items.Sort((x, y) => x.Key.CompareTo(y.Key));
-
-            var sb = new StringBuilder();
-            foreach (var item in items)
-            {
-                sb.AppendLine($"{item.Key}={item.Value}");
-            }
-
-            FileHelpers.WriteAllText(fileName, sb.ToString(), Encoding.Default);
-            return new FileInfo(FileHelpers.DemandFindFileInDataPath(fileName, null, fileName)).DirectoryName;
-        }
-
-        private static void PrintEnvironment(Dictionary<string, string> env)
-        {
-            var items = env.ToList();
-            items.Sort((x, y) => x.Key.CompareTo(y.Key));
-
-            foreach (var item in items)
-            {
-                var value = item.Key.EndsWith("_KEY")
-                    ? item.Value.Substring(0, 4) + "****************************"
-                    : item.Value;
-                Console.WriteLine($"  {item.Key} = {value}");
             }
         }
 
