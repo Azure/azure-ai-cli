@@ -156,18 +156,21 @@ def bulk_run(
     results = []
     for d in dataset:
         answer = wrapper(messages_field, stream_field, session_state_field, context_field, question_field, d)
-        results.append({
-            "question": d[question_field],
-            "truth": d[truth_field],
-            "answer": answer,
-            "context": None
-        })
+        if answer is not None:
+            results.append({
+                "question": d[question_field],
+                "truth": d[truth_field],
+                "answer": answer,
+                "context": None
+            })
     return results
-
 
 def run_evaluation(subscription_id, resource_group_name, project_name, module, function, data, name):
 
+    print("Running...")
     run_results = bulk_run(module, function, data)
+    print("Running... Done!")
+    print(run_results)
 
     client = AIClient(
         credential=DefaultAzureCredential(),
@@ -177,9 +180,11 @@ def run_evaluation(subscription_id, resource_group_name, project_name, module, f
         user_agent="ai-cli 0.0.1"
     )
 
-    result = bulk_run(
+    print("Evaluating...")
+    from azure.ai.generative.evaluate import evaluate
+    result = evaluate(
         evaluation_name=name,
-        data=run_results,
+        prediction_data=run_results,
         task_type="qa",
         truth_data="truth",
         metrics_config={
@@ -193,10 +198,12 @@ def run_evaluation(subscription_id, resource_group_name, project_name, module, f
             "questions": "question",
             "contexts": "context",
             "y_pred": "answer",
-            "y_test": "answer"
+            "y_test": "truth"
         },
         tracking_uri=client.tracking_uri,
     )
+    print("Evaluating... Done!")
+    print(result)
     return result
 
 def main():
@@ -208,6 +215,7 @@ def main():
     parser.add_argument("--project-name", required=True, help="Azure AI project project name.")
     parser.add_argument("--function", required=True, help="Module and function name in the format MODULE:FUNCTION.")
     parser.add_argument("--data", required=True, help="Path to the dataset file")
+    parser.add_argument("--name", required=True, help="Name of the data evaluation")
     args = parser.parse_args()
 
     subscription_id = args.subscription
@@ -215,10 +223,11 @@ def main():
     project_name = args.project_name
     moduleAndFunction = args.function
     data = args.data
+    name = args.name
 
     module, function = moduleAndFunction.rsplit(":", 1)
 
-    result = run_evaluation(subscription_id, resource_group_name, project_name, module, function, data)
+    result = run_evaluation(subscription_id, resource_group_name, project_name, module, function, data, name)
     formatted = json.dumps(result, indent=2)
 
     print("---")
