@@ -13,27 +13,75 @@ namespace Azure.AI.Details.Common.CLI
     {
         public static bool ParseCommand(INamedValueTokens tokens, ICommandValues values)
         {
-            return ParseCommand("chat", chatCommandParsers, tokens, values);
+            return ParseCommands(_commands, _partialCommands, tokens, values, x => GetCommandParsers(x));
         }
 
         public static bool ParseCommandValues(INamedValueTokens tokens, ICommandValues values)
         {
-            return ParseCommandValues("chat", chatCommandParsers, tokens, values);
+            return ParseCommandValues("chat", GetCommandParsers(values), tokens, values);
         }
+
+        private static readonly (string name, bool valuesRequired)[] _commands =  {
+            ("chat.evaluate", true),
+            ("chat.run", true),
+            ("chat", true),
+        };
+
+        private static readonly string[] _partialCommands = {
+            "chat",
+        };
+
+        private static IEnumerable<INamedValueTokenParser> GetCommandParsers(ICommandValues values)
+        {
+            var commandName = values.GetCommand();
+
+            switch (commandName)
+            {
+                // case "chat.evaluate": return _chatEvaluateCommandParsers;
+                // case "chat.run": return _chatRunCommandParsers;
+                case "chat": return _chatCommandParsers;
+            }
+
+            foreach (var command in _commands)
+            {
+                if (commandName == command.name)
+                {
+                    return _chatPlaceHolderParsers;
+                }
+            }
+
+            return null;
+        }
+
 
         #region private data
 
-        private static INamedValueTokenParser[] chatCommandParsers = {
+        public class CommonChatNamedValueTokenParsers : NamedValueTokenParserList
+        {
+            public CommonChatNamedValueTokenParsers() : base(
 
-            new NamedValueTokenParser(null, "x.command", "11", "1", "chat"),
+                    new NamedValueTokenParser(null, "x.command", "11", "1"),
 
-            new ExpectOutputTokenParser(),
-            new DiagnosticLogTokenParser(),
-            new CommonNamedValueTokenParsers(),
+                    new ExpectOutputTokenParser(),
+                    new DiagnosticLogTokenParser(),
+                    new CommonNamedValueTokenParsers(),
 
-            new NamedValueTokenParser("--ini", "ini.file", "10", "1", "@"),
+                    new NamedValueTokenParser("--ini", "ini.file", "10", "1", "@"),
 
-            new NamedValueTokenParser(null, "x.command.expand.file.name", "11111", "1"),
+                    new NamedValueTokenParser(null, "x.command.expand.file.name", "11111", "1")
+
+                )
+            {
+            }
+        }
+
+        private static INamedValueTokenParser[] _chatPlaceHolderParsers = {
+            new CommonChatNamedValueTokenParsers()
+        };
+
+        private static INamedValueTokenParser[] _chatCommandParsers = {
+
+            new CommonChatNamedValueTokenParsers(),
 
             ConfigEndpointUriToken.Parser(),
             ConfigDeploymentToken.Parser(),
