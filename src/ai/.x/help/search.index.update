@@ -4,7 +4,14 @@ SEARCH INDEX UPDATE
 
 USAGE: ai index update [...]
 
+  AZURE AI
+    --subscription SUBSCRIPTION             (see: ai help search subscription)
+    --project PROJECT                       (see: ai help search project)
+    --group group                           (see: ai help search group)
+
   AZURE SEARCH
+    --index-name NAME                       (see: ai help search index name)
+    --index-kind KIND                       (see: ai help search index kind)
     --search-api-key KEY                    (see: ai help search api key)
     --search-endpoint ENDPOINT              (see: ai help search endpoint)
 
@@ -16,15 +23,6 @@ USAGE: ai index update [...]
     --file FILE                             (see: ai help search index file)
     --files FILEs                           (see: ai help search index files)
     --external-source                       (see: ai help search index external source)
-
-  INDEX
-    --search-index-name NAME                (see: ai help search index name)
-
-  MLINDEX
-    --mlindex-name NAME                     (see: ai help search mlindex name)
-    --subscription SUBSCRIPTION             (see: ai help search mlindex subscription)
-    --project PROJECT                       (see: ai help search mlindex project)
-    --group group                           (see: ai help search mlindex group)
 
 ;  ITEM
 ;    --id ID                                 (see: ai help search index id)

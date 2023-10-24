@@ -204,7 +204,7 @@ namespace Azure.AI.Details.Common.CLI
 
         private async Task<Func<string, Task>> GetNormalChatTextHandler()
         {
-            var doSK = false; // !MLIndexNameToken.IsMLIndexCreateKind(_values);
+            var doSK = SKIndexNameToken.IsSKIndexKind(_values);
 
             var kernel = CreateSemanticKernel(out var acsIndex);
             if (kernel != null && doSK) await StoreMemoryAsync(kernel, acsIndex);
