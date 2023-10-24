@@ -50,6 +50,7 @@ namespace Azure.AI.Details.Common.CLI
             {
                 case "chat": DoChat(); break;
                 case "chat.run": DoChatRun(); break;
+                case "chat.evaluate": DoChatEvaluate(); break;
 
                 default:
                     _values.AddThrowError("WARNING:", $"'{command.Replace('.', ' ')}' NOT YET IMPLEMENTED!!");
@@ -80,6 +81,58 @@ namespace Azure.AI.Details.Common.CLI
                 CliHelpers.BuildCliArgs(
                     "--function", function,
                     "--data", dataFile),
+                addToEnvironment: env);
+
+            if (!_quiet) Console.WriteLine($"{message} Done!\n");
+
+            if (!string.IsNullOrEmpty(output)) Console.WriteLine(output);
+        }
+
+        private void DoChatEvaluate()
+        {
+            var action = "Evaluating chats";
+            var command = "chat evaluate";
+
+            var setEnv = _values.GetOrDefault("chat.set.environment", true);
+            var env = setEnv ? ConfigEnvironmentHelpers.GetEnvironment(_values) : null;
+
+            var subscription = SubscriptionToken.Data().Demand(_values, action, command, checkConfig: "subscription");
+            var group = ResourceGroupNameToken.Data().Demand(_values, action, command, checkConfig: "group");
+            var project = ProjectNameToken.Data().Demand(_values, action, command, checkConfig: "project");
+
+            var function = FunctionToken.Data().Demand(_values, action, command);
+            var parts = function.Split(':');
+            if (parts.Length != 2)
+            {
+                _values.AddThrowError("ERROR:", $"Invalid function name '{function}'");
+            }
+            var module = FileHelpers.DemandFindFileInDataPath(parts[0] + ".py", _values, "chat module");
+            function = $"{module}:{parts[1]}";
+
+            var data = InputDataFileToken.Data().Demand(_values, action, command);
+            var dataFile = FileHelpers.DemandFindFileInDataPath(data, _values, "chat data");
+
+            var evaluationName = $"{function}-{new FileInfo(dataFile).Name}"
+                .Replace(' ', '-')
+                .Replace('.', '-')
+                .Replace('_', '-')
+                .Replace(':', '-')
+                .Replace(Path.DirectorySeparatorChar, '-')
+                .Replace(Path.AltDirectorySeparatorChar, '-')
+                .Replace("--", "-")
+                .ToLower();
+
+            var message = $"{action} w/ {function} ...";
+            if (!_quiet) Console.WriteLine(message);
+
+            var output = PythonRunner.RunEmbeddedPythonScript(_values, "function_call_evaluate",
+                CliHelpers.BuildCliArgs(
+                    "--function", function,
+                    "--data", dataFile,
+                    "--subscription", subscription,
+                    "--group", group,
+                    "--project-name", project,
+                    "--name", evaluationName),
                 addToEnvironment: env);
 
             if (!_quiet) Console.WriteLine($"{message} Done!\n");
