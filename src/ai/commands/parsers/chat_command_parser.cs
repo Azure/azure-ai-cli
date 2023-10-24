@@ -68,7 +68,21 @@ namespace Azure.AI.Details.Common.CLI
 
                     new NamedValueTokenParser("--ini", "ini.file", "10", "1", "@"),
 
-                    new NamedValueTokenParser(null, "x.command.expand.file.name", "11111", "1")
+                    new NamedValueTokenParser(null, "x.command.expand.file.name", "11111", "1"),
+
+                    ConfigEndpointUriToken.Parser(),
+                    ConfigDeploymentToken.Parser(),
+
+                    SearchIndexNameToken.Parser(),
+                    MLIndexNameToken.Parser(),
+                    SKIndexNameToken.Parser(),
+
+                    SearchEmbeddingModelDeploymentNameToken.Parser(),
+                    SearchEmbeddingModelNameToken.Parser(),
+
+                    new NamedValueTokenParser(null,             "service.config.search.api.key", "00101", "1"),
+                    new NamedValueTokenParser(null,             "service.config.search.endpoint.uri", "00110;00101", "1"),
+                    new NamedValueTokenParser(null,             "service.config.search.query.type", "00011", "1")
 
                 )
             {
@@ -82,20 +96,6 @@ namespace Azure.AI.Details.Common.CLI
         private static INamedValueTokenParser[] _chatCommandParsers = {
 
             new CommonChatNamedValueTokenParsers(),
-
-            ConfigEndpointUriToken.Parser(),
-            ConfigDeploymentToken.Parser(),
-
-            SearchIndexNameToken.Parser(),
-            MLIndexNameToken.Parser(),
-            SKIndexNameToken.Parser(),
-
-            SearchEmbeddingModelDeploymentNameToken.Parser(),
-            SearchEmbeddingModelNameToken.Parser(),
-
-            new NamedValueTokenParser(null,             "service.config.search.api.key", "00101", "1"),
-            new NamedValueTokenParser(null,             "service.config.search.endpoint.uri", "00110;00101", "1"),
-            new NamedValueTokenParser(null,             "service.config.search.query.type", "00011", "1"),
 
             new NamedValueTokenParser("--interactive",  "chat.input.interactive", "001", "1;0", "true;false", null, "true"),
 

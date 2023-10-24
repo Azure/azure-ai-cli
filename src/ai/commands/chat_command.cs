@@ -36,14 +36,30 @@ namespace Azure.AI.Details.Common.CLI
 
         internal bool RunCommand()
         {
-            Chat();
+            DoCommand(_values.GetCommand());
             return _values.GetOrDefault("passed", true);
         }
 
-        private void Chat()
+        private void DoCommand(string command)
         {
             StartCommand();
 
+            switch (command)
+            {
+                case "chat": DoChat(); break;
+
+                default:
+                    _values.AddThrowError("WARNING:", $"'{command.Replace('.', ' ')}' NOT YET IMPLEMENTED!!");
+                    break;
+            }
+
+            StopCommand();
+            DisposeAfterStop();
+            DeleteTemporaryFiles();
+        }
+
+        private void DoChat()
+        {
             var interactive = _values.GetOrDefault("chat.input.interactive", false);
             if (interactive)
             {
@@ -53,10 +69,6 @@ namespace Azure.AI.Details.Common.CLI
             {
                 ChatNonInteractively().Wait();
             }
-
-            StopCommand();
-            DisposeAfterStop();
-            DeleteTemporaryFiles();
         }
 
         private async Task ChatInteractively()
