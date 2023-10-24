@@ -49,6 +49,5 @@ EXAMPLES
 SEE ALSO
 
   ai help chat
-  ai help chat run
-  ai help chat evaluate examples
-  ai help find topics chat evaluate
+  ai help chat examples
+  ai help find topics chat

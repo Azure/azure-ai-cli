@@ -4,10 +4,7 @@ CHAT
   with an AI language model (e.g. OpenAI's GPT4).
 
 USAGE: ai chat [...]
-   OR: ai chat run [...]                (see: ai help chat run)
-   OR: ai chat evaluate [...]           (see: ai help chat evaluate)
-
-`AI CHAT OPTIONS`
+   OR: ai chat <sub-command> [...]
 
   CONNECTION                            (see: ai help connection)
     --deployment DEPLOYMENT             (see: ai help chat deployment)
@@ -33,6 +30,11 @@ USAGE: ai chat [...]
     --max-tokens MAX_TOKENS             (see: ai help chat options max-tokens)
     --top-p TOP_P                       (see: ai help chat options top-p)
     --n N                               (see: ai help chat options n)
+
+  SUB-COMMANDS
+    ai chat test [...]                  (see: ai help chat test)
+    ai chat run [...]                   (see: ai help chat run)
+    ai chat evaluate [...]              (see: ai help chat evaluate)
 
 EXAMPLES
 
@@ -60,7 +62,5 @@ EXAMPLES
 
 SEE ALSO
 
-  ai help chat setup
-  ai help chat advanced
   ai help chat examples
   ai help find topics chat
