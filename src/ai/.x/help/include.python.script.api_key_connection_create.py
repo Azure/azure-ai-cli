@@ -3,7 +3,7 @@ import json
 import time
 from datetime import datetime, timedelta
 from azure.ai.generative import AIClient
-from azure.ai.generative.entities import BaseConnection, AzureOpenAIConnection, CognitiveSearchConnection, CognitiveServiceConnection
+from azure.ai.generative.entities import BaseConnection, AzureOpenAIConnection, AzureAISearchConnection, AzureAIServiceConnection
 from azure.ai.ml.entities._credentials import ApiKeyConfiguration
 from azure.identity import DefaultAzureCredential
 
@@ -35,16 +35,16 @@ def create_api_key_connection(subscription_id, resource_group_name, project_name
             target=endpoint,
             api_version = api_version,
         )
-    elif conn_class == CognitiveSearchConnection:
+    elif conn_class == AzureAISearchConnection:
         conn = conn_class(
             name=connection_name,
             credentials=ApiKeyConfiguration(key=key),
             target=endpoint,
             api_version=api_version,
         )
-    elif conn_class == CognitiveServiceConnection:
+    elif conn_class == AzureAIServiceConnection:
         if kind is None:
-            print "--kind argument is required for Cognitive Service connection."
+            print "Error: --kind argument is required for Cognitive Service connection."
             return {}
         conn = conn_class(
             name=connection_name,
@@ -76,7 +76,7 @@ def main():
     parser.add_argument("--connection-type", required=True, help="Azure AI project connection type. Accepted types are 'azure-open-ai', 'cognitive-search', and 'cognitive-service'.")
     parser.add_argument("--endpoint", required=True, help="Azure AI Project connection endpoint.")
     parser.add_argument("--key", required=True, help="Azure AI Project connection key.")
-    parser.add_argument("--api-version", required=True, help="The expected api version of the service this connection will link to.")
+    parser.add_argument("--api-version", required=True, help="The expected api version of the service this connection will link to.", default="unset")
     parser.add_argument("--kind", required=False, help="Kind of AI Service being connected to. Required for Cognitive Service connections.", default=None)
     args = parser.parse_args()
 
