@@ -18,6 +18,7 @@ USAGE: ai chat [...]
     --interactive                       (see: ai help chat interactive)
     --system PROMPT                     (see: ai help chat system prompt)
     --user MESSAGE                      (see: ai help chat user message)
+    --chat-history FILE                 (see: ai help chat history)
 
   CHAT WITH FUNCTION
     --function MODULE:FUNCTION          (see: ai help chat function)
@@ -45,7 +46,7 @@ EXAMPLES
 
   `EXAMPLE 3`: Chat using chat message history stored in a file
 
-    ai chat --file chat-history.txt --user "Tell me a joke"
+    ai chat --chat-history chat-history.txt --user "Tell me a joke"
 
   `EXAMPLE 4`: Chat w/ data using Azure Search vector index
 

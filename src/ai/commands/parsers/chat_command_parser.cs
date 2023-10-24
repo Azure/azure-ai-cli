@@ -37,8 +37,8 @@ namespace Azure.AI.Details.Common.CLI
 
             switch (commandName)
             {
-                // case "chat.evaluate": return _chatEvaluateCommandParsers;
-                // case "chat.run": return _chatRunCommandParsers;
+                case "chat.evaluate": return _chatEvaluateCommandParsers;
+                case "chat.run": return _chatRunCommandParsers;
                 case "chat": return _chatCommandParsers;
             }
 
@@ -67,7 +67,6 @@ namespace Azure.AI.Details.Common.CLI
                     new CommonNamedValueTokenParsers(),
 
                     new NamedValueTokenParser("--ini", "ini.file", "10", "1", "@"),
-
                     new NamedValueTokenParser(null, "x.command.expand.file.name", "11111", "1"),
 
                     ConfigEndpointUriToken.Parser(),
@@ -80,17 +79,36 @@ namespace Azure.AI.Details.Common.CLI
                     SearchEmbeddingModelDeploymentNameToken.Parser(),
                     SearchEmbeddingModelNameToken.Parser(),
 
+                    FunctionToken.Parser(),
+
                     new NamedValueTokenParser(null,             "service.config.search.api.key", "00101", "1"),
                     new NamedValueTokenParser(null,             "service.config.search.endpoint.uri", "00110;00101", "1"),
-                    new NamedValueTokenParser(null,             "service.config.search.query.type", "00011", "1")
+                    new NamedValueTokenParser(null,             "service.config.search.query.type", "00011", "1"),
 
+                    new NamedValueTokenParser(null,             "chat.message.history.json.file", "10110", "1", null, null, "json.file", "chat.history.type"),
+                    new NamedValueTokenParser(null,             "chat.message.history.jsonl.file", "10110", "1", null, null, "jsonl.file", "chat.history.type"),
+                    new NamedValueTokenParser(null,             "chat.message.history.text.file", "10110", "1", null, null, "text.file", "chat.history.type"),
+                    new NamedValueTokenParser(null,             "chat.message.history.type", "1111", "1", "interactive;interactive+;json;jsonl;text;json.file;jsonl.file;text.file"),
+
+                    new NamedValueTokenParser(null,             "chat.message.system.prompt", "0010;0001", "1"),
+                    new NamedValueTokenParser(null,             "chat.message.user.prompt", "0010", "1"),
+                    new NamedValueTokenParser(null,             "chat.message.user.question", "0001", "1", null, "chat.message.user.prompt"),
+
+                    new NamedValueTokenParser(null,             "chat.options.max.tokens", "0011", "1"),
+                    new NamedValueTokenParser(null,             "chat.options.temperature", "001", "1"),
+                    new NamedValueTokenParser(null,             "chat.options.top.p", "0001", "1"),
+                    new NamedValueTokenParser(null,             "chat.options.frequency.penalty", "0011", "1"),
+                    new NamedValueTokenParser(null,             "chat.options.presence.penalty", "0011", "1"),
+                    new NamedValueTokenParser(null,             "chat.options.stop.sequence", "0010", "1"),
+
+                    new NamedValueTokenParser(null,             "chat.replace.value.*", "0011;0101", "1;0", null, null, "=")
                 )
             {
             }
         }
 
         private static INamedValueTokenParser[] _chatPlaceHolderParsers = {
-            new CommonChatNamedValueTokenParsers()
+            new CommonChatNamedValueTokenParsers(),
         };
 
         private static INamedValueTokenParser[] _chatCommandParsers = {
@@ -98,28 +116,20 @@ namespace Azure.AI.Details.Common.CLI
             new CommonChatNamedValueTokenParsers(),
 
             new NamedValueTokenParser("--interactive",  "chat.input.interactive", "001", "1;0", "true;false", null, "true"),
-
-            new NamedValueTokenParser(null,             "chat.message.history.json.file", "00011", "1", null, null, "json.file", "chat.history.type"),
-            new NamedValueTokenParser(null,             "chat.message.history.jsonl.file", "00011", "1", null, null, "jsonl.file", "chat.history.type"),
-            new NamedValueTokenParser(null,             "chat.message.history.text.file", "00011;00001", "1", null, null, "text.file", "chat.history.type"),
-            new NamedValueTokenParser(null,             "chat.message.history.type", "1111", "1", "interactive;interactive+;json;jsonl;text;json.file;jsonl.file;text.file"),
-
-            new NamedValueTokenParser(null,             "chat.message.system.prompt", "0010;0001", "1"),
-            new NamedValueTokenParser(null,             "chat.message.user.prompt", "0010", "1"),
-            new NamedValueTokenParser(null,             "chat.message.user.question", "0001", "1", null, "chat.message.user.prompt"),
-
-            new NamedValueTokenParser(null,             "chat.options.max.tokens", "0011", "1"),
-            new NamedValueTokenParser(null,             "chat.options.temperature", "001", "1"),
-            new NamedValueTokenParser(null,             "chat.options.top.p", "0001", "1"),
-            new NamedValueTokenParser(null,             "chat.options.frequency.penalty", "0011", "1"),
-            new NamedValueTokenParser(null,             "chat.options.presence.penalty", "0011", "1"),
-            new NamedValueTokenParser(null,             "chat.options.stop.sequence", "0010", "1"),
-
-            new NamedValueTokenParser(null,             "chat.replace.value.*", "0011;0101", "1;0", null, null, "="),
-
             new NamedValueTokenParser(null,             "chat.speech.input", "010", "1;0", "true;false", null, "true"),
 
-            FunctionToken.Parser(),
+        };
+
+        private static INamedValueTokenParser[] _chatRunCommandParsers = {
+
+            new CommonChatNamedValueTokenParsers(),
+            InputDataFileToken.Parser()
+        };
+
+        private static INamedValueTokenParser[] _chatEvaluateCommandParsers = {
+
+            new CommonChatNamedValueTokenParsers(),
+            InputDataFileToken.Parser()
         };
 
         #endregion

@@ -32,6 +32,8 @@ namespace Azure.AI.Details.Common.CLI
         internal ChatCommand(ICommandValues values)
         {
             _values = values.ReplaceValues();
+            _quiet = _values.GetOrDefault("x.quiet", false);
+            _verbose = _values.GetOrDefault("x.verbose", true);
         }
 
         internal bool RunCommand()
@@ -47,6 +49,7 @@ namespace Azure.AI.Details.Common.CLI
             switch (command)
             {
                 case "chat": DoChat(); break;
+                case "chat.run": DoChatRun(); break;
 
                 default:
                     _values.AddThrowError("WARNING:", $"'{command.Replace('.', ' ')}' NOT YET IMPLEMENTED!!");
@@ -56,6 +59,32 @@ namespace Azure.AI.Details.Common.CLI
             StopCommand();
             DisposeAfterStop();
             DeleteTemporaryFiles();
+        }
+
+        private void DoChatRun()
+        {
+            var action = "Running chats";
+            var command = "chat run";
+
+            var setEnv = _values.GetOrDefault("chat.set.environment", true);
+            var env = setEnv ? ConfigEnvironmentHelpers.GetEnvironment(_values) : null;
+
+            var function = FunctionToken.Data().Demand(_values, action, command);
+            var data = InputDataFileToken.Data().Demand(_values, action, command);
+            var dataFile = FileHelpers.DemandFindFileInDataPath(data, _values, "chat data");
+
+            var message = $"{action} w/ {function} ...";
+            if (!_quiet) Console.WriteLine(message);
+
+            var output = PythonRunner.RunEmbeddedPythonScript(_values, "function_call_run",
+                CliHelpers.BuildCliArgs(
+                    "--function", function,
+                    "--data", dataFile),
+                addToEnvironment: env);
+
+            if (!_quiet) Console.WriteLine($"{message} Done!\n");
+
+            if (!string.IsNullOrEmpty(output)) Console.WriteLine(output);
         }
 
         private void DoChat()
@@ -677,6 +706,9 @@ namespace Azure.AI.Details.Common.CLI
         }
 
         private SpinLock _lock = null;
+        private readonly bool _quiet = false;
+        private readonly bool _verbose = false;
+
         private AzureEventSourceListener _azureEventSourceListener;
 
         // OutputHelper _output = null;
