@@ -1,5 +1,3 @@
-# call_function.py
-
 import asyncio
 import argparse
 import importlib

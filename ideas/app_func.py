@@ -1,7 +1,7 @@
 import os
 from typing import Any, List
 
-def chat_completion(question: str) -> List[str]:
+def chat_completion(question: str) -> str:
     answers = []
 
     # Implement a switch statement for various questions
@@ -17,9 +17,8 @@ def chat_completion(question: str) -> List[str]:
         answers.append("Here are the environment variables:\n\n" + "\n".join([f"  {k}: {v}" for k, v in os.environ.items()]))
     else:
         answers.append("I don't know the answer to that question.")
-    return answers
 
-    return answers
+    return answers[0]
 
 async def async_chat_completion(messages: list[dict] = None, stream: bool = False,
     session_state: Any = None, context: dict[str, Any] = {}):
@@ -27,8 +26,6 @@ async def async_chat_completion(messages: list[dict] = None, stream: bool = Fals
     if (messages is None):
         return chat_completion(question)
     
-    print(messages)
-
     # get search documents for the last user message in the conversation
     question = messages[-1]["content"]
 
