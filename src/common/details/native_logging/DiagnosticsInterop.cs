@@ -12,6 +12,8 @@ namespace Azure.AI.Details.Common.CLI
             [CallerFilePath] string? fileName = null,
             [CallerLineNumber] int lineNumber = 0)
         {
+            if (message.Length > 1024) message = message.Substring(0, 1024);
+
             using var nativeTitle = NativeUtils.ToNativeNullTerminatedUtf8String(title);
             using var nativeMessage = NativeUtils.ToNativeNullTerminatedUtf8String(message);
             using var nativeFileName = NativeUtils.ToNativeNullTerminatedUtf8String(Path.GetFileName(fileName));

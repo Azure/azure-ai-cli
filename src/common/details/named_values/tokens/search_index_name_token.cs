@@ -11,7 +11,7 @@ namespace Azure.AI.Details.Common.CLI
         public static INamedValueTokenParser Parser(bool requireIndexPart = true) => new NamedValueTokenParser(_optionName, _fullName, requireIndexPart ? "010" : "010;001", "1");
 
         private const string _requiredDisplayName = "index name";
-        private const string _optionName = "--search-index-name";
+        private const string _optionName = "--index-name";
         private const string _optionExample = "NAME";
         private const string _fullName = "search.index.name";
     }

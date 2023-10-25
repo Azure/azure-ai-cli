@@ -4,6 +4,7 @@ CHAT
   with an AI language model (e.g. OpenAI's GPT4).
 
 USAGE: ai chat [...]
+   OR: ai chat <sub-command> [...]
 
   CONNECTION                            (see: ai help connection)
     --deployment DEPLOYMENT             (see: ai help chat deployment)
@@ -14,6 +15,7 @@ USAGE: ai chat [...]
     --interactive                       (see: ai help chat interactive)
     --system PROMPT                     (see: ai help chat system prompt)
     --user MESSAGE                      (see: ai help chat user message)
+    --chat-history FILE                 (see: ai help chat history)
 
   CHAT WITH FUNCTION
     --function MODULE:FUNCTION          (see: ai help chat function)
@@ -29,6 +31,11 @@ USAGE: ai chat [...]
     --top-p TOP_P                       (see: ai help chat options top-p)
     --n N                               (see: ai help chat options n)
 
+  SUB-COMMANDS
+    ai chat test [...]                  (see: ai help chat test)
+    ai chat run [...]                   (see: ai help chat run)
+    ai chat evaluate [...]              (see: ai help chat evaluate)
+
 EXAMPLES
 
   `EXAMPLE 1`: Chat interactively using a specific system prompt
@@ -41,11 +48,11 @@ EXAMPLES
 
   `EXAMPLE 3`: Chat using chat message history stored in a file
 
-    ai chat --file chat-history.txt --user "Tell me a joke"
+    ai chat --chat-history chat-history.txt --user "Tell me a joke"
 
   `EXAMPLE 4`: Chat w/ data using Azure Search vector index
 
-    ai search index update --name contoso_product_index --files *.md
+    ai search index update --name contoso_product_index --files "*.md"
     ai chat --index-name contoso_product_index --interactive
     ai config --clear search.index.name
 
@@ -55,7 +62,5 @@ EXAMPLES
 
 SEE ALSO
 
-  ai help chat setup
-  ai help chat advanced
   ai help chat examples
   ai help find topics chat

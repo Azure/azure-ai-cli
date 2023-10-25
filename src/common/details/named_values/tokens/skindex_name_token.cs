@@ -5,14 +5,14 @@
 
 namespace Azure.AI.Details.Common.CLI
 {
-    public class MLIndexNameToken
+    public class SKIndexNameToken
     {
-        public static bool IsMLIndexKind(ICommandValues values) => values.GetOrDefault("search.index.kind", null) == "ml";
+        public static bool IsSKIndexKind(ICommandValues values) => values.GetOrDefault("search.index.kind", null) == "sk";
         public static NamedValueTokenData Data() => SearchIndexNameToken.Data();
 
         public static INamedValueTokenParser Parser(bool requireIndexPart = true) => new NamedValueTokenParserList(
             new NamedValueTokenParser(null, "search.index.kind", requireIndexPart ? "011" : "001", "1", "ml;sk"),
-            new NamedValueTokenParser("--mlindex-name", "mlindex.name", "10", "1", null, "search.index.name", "ml", "search.index.kind")
+            new NamedValueTokenParser("--skindex-name", "skindex.name", "10", "1", null, "search.index.name", "ml", "search.index.kind")
         );
     }
 }

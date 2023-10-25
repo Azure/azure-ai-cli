@@ -32,18 +32,109 @@ namespace Azure.AI.Details.Common.CLI
         internal ChatCommand(ICommandValues values)
         {
             _values = values.ReplaceValues();
+            _quiet = _values.GetOrDefault("x.quiet", false);
+            _verbose = _values.GetOrDefault("x.verbose", true);
         }
 
         internal bool RunCommand()
         {
-            Chat();
+            DoCommand(_values.GetCommand());
             return _values.GetOrDefault("passed", true);
         }
 
-        private void Chat()
+        private void DoCommand(string command)
         {
             StartCommand();
 
+            switch (command)
+            {
+                case "chat": DoChat(); break;
+                case "chat.run": DoChatRun(); break;
+                case "chat.evaluate": DoChatEvaluate(); break;
+
+                default:
+                    _values.AddThrowError("WARNING:", $"'{command.Replace('.', ' ')}' NOT YET IMPLEMENTED!!");
+                    break;
+            }
+
+            StopCommand();
+            DisposeAfterStop();
+            DeleteTemporaryFiles();
+        }
+
+        private void DoChatRun()
+        {
+            var action = "Running chats";
+            var command = "chat run";
+
+            var setEnv = _values.GetOrDefault("chat.set.environment", true);
+            var env = setEnv ? ConfigEnvironmentHelpers.GetEnvironment(_values) : null;
+
+            var function = FunctionToken.Data().Demand(_values, action, command);
+            var data = InputDataFileToken.Data().Demand(_values, action, command);
+            var dataFile = FileHelpers.DemandFindFileInDataPath(data, _values, "chat data");
+
+            var message = $"{action} w/ {function} ...";
+            if (!_quiet) Console.WriteLine(message);
+
+            var output = PythonRunner.RunEmbeddedPythonScript(_values, "function_call_run",
+                CliHelpers.BuildCliArgs(
+                    "--function", function,
+                    "--data", dataFile),
+                addToEnvironment: env);
+
+            if (!_quiet) Console.WriteLine($"{message} Done!\n");
+
+            if (!string.IsNullOrEmpty(output)) Console.WriteLine(output);
+        }
+
+        private void DoChatEvaluate()
+        {
+            var action = "Evaluating chats";
+            var command = "chat evaluate";
+
+            var setEnv = _values.GetOrDefault("chat.set.environment", true);
+            var env = setEnv ? ConfigEnvironmentHelpers.GetEnvironment(_values) : null;
+
+            var subscription = SubscriptionToken.Data().Demand(_values, action, command, checkConfig: "subscription");
+            var group = ResourceGroupNameToken.Data().Demand(_values, action, command, checkConfig: "group");
+            var project = ProjectNameToken.Data().Demand(_values, action, command, checkConfig: "project");
+
+            var function = FunctionToken.Data().Demand(_values, action, command);
+            var data = InputDataFileToken.Data().Demand(_values, action, command);
+            var dataFile = FileHelpers.DemandFindFileInDataPath(data, _values, "chat data");
+
+            var evaluationName = $"{function}-{new FileInfo(dataFile).Name}"
+                .Replace(' ', '-')
+                .Replace('.', '-')
+                .Replace('_', '-')
+                .Replace(':', '-')
+                .Replace(Path.DirectorySeparatorChar, '-')
+                .Replace(Path.AltDirectorySeparatorChar, '-')
+                .Replace("--", "-")
+                .Trim('-')
+                .ToLower();
+
+            var message = $"{action} w/ {function} ...";
+            if (!_quiet) Console.WriteLine(message);
+
+            var output = PythonRunner.RunEmbeddedPythonScript(_values, "function_call_evaluate",
+                CliHelpers.BuildCliArgs(
+                    "--function", function,
+                    "--data", dataFile,
+                    "--subscription", subscription,
+                    "--group", group,
+                    "--project-name", project,
+                    "--name", evaluationName),
+                addToEnvironment: env);
+
+            if (!_quiet) Console.WriteLine($"{message} Done!\n");
+
+            if (!string.IsNullOrEmpty(output)) Console.WriteLine(output);
+        }
+
+        private void DoChat()
+        {
             var interactive = _values.GetOrDefault("chat.input.interactive", false);
             if (interactive)
             {
@@ -53,10 +144,6 @@ namespace Azure.AI.Details.Common.CLI
             {
                 ChatNonInteractively().Wait();
             }
-
-            StopCommand();
-            DisposeAfterStop();
-            DeleteTemporaryFiles();
         }
 
         private async Task ChatInteractively()
@@ -204,7 +291,7 @@ namespace Azure.AI.Details.Common.CLI
 
         private async Task<Func<string, Task>> GetNormalChatTextHandler()
         {
-            var doSK = false; // !MLIndexNameToken.IsMLIndexCreateKind(_values);
+            var doSK = SKIndexNameToken.IsSKIndexKind(_values);
 
             var kernel = CreateSemanticKernel(out var acsIndex);
             if (kernel != null && doSK) await StoreMemoryAsync(kernel, acsIndex);
@@ -665,6 +752,9 @@ namespace Azure.AI.Details.Common.CLI
         }
 
         private SpinLock _lock = null;
+        private readonly bool _quiet = false;
+        private readonly bool _verbose = false;
+
         private AzureEventSourceListener _azureEventSourceListener;
 
         // OutputHelper _output = null;
