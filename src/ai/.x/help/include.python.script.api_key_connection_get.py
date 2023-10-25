@@ -2,8 +2,8 @@ import argparse
 import json
 import time
 from datetime import datetime, timedelta
-from azure.ai.generative import AIClient
-from azure.ai.generative.entities import Connection
+from azure.ai.resources .clent import AIClient
+from azure.ai.resources.entities import Connection
 from azure.ai.ml.entities._credentials import ApiKeyConfiguration
 from azure.identity import DefaultAzureCredential
 

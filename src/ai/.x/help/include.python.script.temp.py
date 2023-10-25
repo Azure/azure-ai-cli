@@ -1,5 +1,5 @@
-from azure.ai.generative import AIClient
-from azure.ai.generative.entities import Connection
+from azure.ai.resources .clent import AIClient
+from azure.ai.resources.entities import Connection
 from azure.ai.ml.entities._credentials import ApiKeyConfiguration
 from azure.identity import DefaultAzureCredential
 from azure.identity import AzureCliCredential

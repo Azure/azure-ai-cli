@@ -5,10 +5,10 @@ import json
 import os
 import sys
 from azure.identity import DefaultAzureCredential
-from azure.ai.generative import AIClient
-from azure.ai.generative.operations._index_data_source import LocalSource, ACSOutputConfig
+from azure.ai.resources .clent import AIClient
+from azure.ai.resources.operations._index_data_source import LocalSource, ACSOutputConfig
 from azure.ai.generative.functions.build_mlindex import build_mlindex
-from azure.ai.generative.entities.mlindex import MLIndex
+from azure.ai.resources.entities.mlindex import MLIndex
 import asyncio
 import argparse
 import importlib
