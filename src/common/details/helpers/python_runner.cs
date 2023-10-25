@@ -68,7 +68,17 @@ namespace Azure.AI.Details.Common.CLI
 
                 var info = new List<string>();
 
-                if (output.Contains("azure.identity"))
+                if (output.Contains("az login"))
+                {
+                    values.AddThrowError(
+                        "WARNING:", "Azure CLI credential not found!",
+                                    "",
+                            "TRY:", "az login",
+                             "OR:", "az login --use-device-code",
+                                    "",
+                            "SEE:", "https://docs.microsoft.com/cli/azure/authenticate-azure-cli");
+                }
+                else if (output.Contains("azure.identity"))
                 {
                     info.Add("WARNING:");
                     info.Add("azure-identity Python wheel not found!");

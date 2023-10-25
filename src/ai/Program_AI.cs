@@ -177,7 +177,22 @@ namespace Azure.AI.Details.Common.CLI
 
         public bool DisplayKnownErrors(ICommandValues values, Exception ex)
         {
-            if (ex.Message.Contains("refresh token") && ex.Message.Contains("expired"))
+            var message = ex.Message;
+
+            if (message.Contains("az login"))
+            {
+                ErrorHelpers.WriteLineMessage(
+                       "ERROR:", $"Azure CLI credential not found.",
+                                 "",
+                         "TRY:", $"az login",
+                                 "",
+                         "SEE:", "https://docs.microsoft.com/cli/azure/authenticate-azure-cli");
+
+                values.Reset("x.verbose", "false");
+                return true;
+            }
+
+            if (message.Contains("refresh token") && message.Contains("expired"))
             {
                 ErrorHelpers.WriteLineMessage(
                        "ERROR:", $"Refresh token expired.",
