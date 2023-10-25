@@ -101,14 +101,6 @@ namespace Azure.AI.Details.Common.CLI
             var project = ProjectNameToken.Data().Demand(_values, action, command, checkConfig: "project");
 
             var function = FunctionToken.Data().Demand(_values, action, command);
-            var parts = function.Split(':');
-            if (parts.Length != 2)
-            {
-                _values.AddThrowError("ERROR:", $"Invalid function name '{function}'");
-            }
-            var module = FileHelpers.DemandFindFileInDataPath(parts[0] + ".py", _values, "chat module");
-            function = $"{module}:{parts[1]}";
-
             var data = InputDataFileToken.Data().Demand(_values, action, command);
             var dataFile = FileHelpers.DemandFindFileInDataPath(data, _values, "chat data");
 
