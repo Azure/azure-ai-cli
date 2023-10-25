@@ -112,6 +112,7 @@ namespace Azure.AI.Details.Common.CLI
                 .Replace(Path.DirectorySeparatorChar, '-')
                 .Replace(Path.AltDirectorySeparatorChar, '-')
                 .Replace("--", "-")
+                .Trim('-')
                 .ToLower();
 
             var message = $"{action} w/ {function} ...";
