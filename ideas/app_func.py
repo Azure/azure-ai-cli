@@ -18,7 +18,7 @@ def chat_completion(question: str) -> str:
     else:
         answers.append("I don't know the answer to that question.")
 
-    return answers[0]
+    return answers
 
 async def async_chat_completion(messages: list[dict] = None, stream: bool = False,
     session_state: Any = None, context: dict[str, Any] = {}):

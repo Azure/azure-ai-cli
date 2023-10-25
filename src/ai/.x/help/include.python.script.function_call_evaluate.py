@@ -155,7 +155,44 @@ def bulk_run(
 
     results = []
     for d in dataset:
-        answer = wrapper(messages_field, stream_field, session_state_field, context_field, question_field, d)
+        result = wrapper(messages_field, stream_field, session_state_field, context_field, question_field, d)
+
+        answer = None
+        if result is not None:
+            if isinstance(result, str):
+                print("===it's a string===")
+                print(result)
+                answer = result
+                
+            elif isinstance(result, list) and all(isinstance(item, str) for item in result):
+                print("===it's a list===")
+                print(result)
+                answer = "\n".join(result)
+
+            # if it's a generator
+            elif issubclass(type(result), Generator) :
+                print("===it's a generator===")
+                print(result)
+                answer = "\n".join(result)
+
+            # if the "openai.openai_object.OpenAIObject"
+            elif (type(result).__name__ == "OpenAIObject"):
+                print("===it's an OpenAIObject===")
+                print(result.choices[0].message.content)
+                answer = result.choices[0].message.content
+
+            # if it's a dictionary that has a "choices" key
+            elif (isinstance(result, dict) and "choices" in result):
+                print("===it's a dictionary with a 'choices' key===")
+                print(result["choices"][0]["message"]["content"])
+                answer = result["choices"][0]["message"]["content"]
+
+            else:
+                print("===it's something else===")
+                print(type(result))
+                print(result)
+                answer = str(result)
+
         if answer is not None:
             results.append({
                 "question": d[question_field],
