@@ -32,7 +32,6 @@ USAGE: ai chat [...]
     --n N                               (see: ai help chat options n)
 
   SUB-COMMANDS
-    ai chat test [...]                  (see: ai help chat test)
     ai chat run [...]                   (see: ai help chat run)
     ai chat evaluate [...]              (see: ai help chat evaluate)
 

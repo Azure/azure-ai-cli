@@ -295,6 +295,7 @@ namespace Azure.AI.Details.Common.CLI
                 subscription_id = subscription,
                 resource_group = groupName,
                 project_name = projectName,
+                workspace_name = projectName,
             };
 
             var configJson = JsonSerializer.Serialize(configJsonData, new JsonSerializerOptions { WriteIndented = true });

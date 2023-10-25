@@ -266,11 +266,11 @@ namespace Azure.AI.Details.Common.CLI
                 subscription = config.ContainsKey("subscription_id") ? config["subscription_id"].ToString() : null;
                 groupName = config.ContainsKey("resource_group") ? config["resource_group"].ToString() : null;
                 projectName = config.ContainsKey("project_name") ? config["project_name"].ToString() : null;
+                projectName ??= config.ContainsKey("workspace_name") ? config["workspace_name"].ToString() : null;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 return false;
-                // _values.AddThrowError("ERROR", $"Unable to parse config.json: {ex.Message}");
             }
 
             return !string.IsNullOrEmpty(subscription) && !string.IsNullOrEmpty(groupName) && !string.IsNullOrEmpty(projectName);
