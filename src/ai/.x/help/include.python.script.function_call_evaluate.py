@@ -132,9 +132,8 @@ def load_jsonl(path):
     with open(path, "r") as f:
         return [json.loads(line) for line in f.readlines()]
 
-def bulk_run(
-    module_path: str,
-    function_name: str,
+def bulk_run_part(
+    module_and_function: str,
     dataset_or_path: [str, list],
     messages_field: str = "messages",
     stream_field: str  = "stream",
@@ -145,6 +144,7 @@ def bulk_run(
     answer_field: str  = "answer",
     correct_field: str  = "correct"):
 
+    module_path, function_name = module_and_function.rsplit(":", 1)
     wrapper = create_wrapper(module_path, function_name)
 
     if isinstance(dataset_or_path, str):
@@ -153,7 +153,7 @@ def bulk_run(
     elif isinstance(dataset_or_path, list):
         dataset = dataset_or_path
 
-    results = []
+    run_results = []
     for d in dataset:
         result = wrapper(messages_field, stream_field, session_state_field, context_field, question_field, d)
 
@@ -194,21 +194,13 @@ def bulk_run(
                 answer = str(result)
 
         if answer is not None:
-            results.append({
-                "question": d[question_field],
-                "truth": d[truth_field],
-                "answer": answer,
-                "context": None
-            })
-    return results
+            result = { "question": d[question_field], "truth": d[truth_field], "answer": answer, "context": "" }
+            print(result)
+            run_results.append(result)
 
-def run_evaluation(subscription_id, resource_group_name, project_name, module, function, data, name):
+    return run_results
 
-    print("Running...")
-    run_results = bulk_run(module, function, data)
-    print("Running... Done!")
-    print(run_results)
-
+def run_evaluate_part(subscription_id, resource_group_name, project_name, run_results, name):
     client = AIClient(
         credential=DefaultAzureCredential(),
         subscription_id=subscription_id,
@@ -220,33 +212,78 @@ def run_evaluation(subscription_id, resource_group_name, project_name, module, f
     def dont_call_this_method(kwargs):
         raise Exception("This method should not be called.")
 
-    print("Evaluating...")
-    from azure.ai.generative.evaluate import evaluate
-    result = evaluate(
-        evaluation_name=name,
-        asset=dont_call_this_method,
-        data=run_results,
-        prediction_data="answer",
-        task_type="qa",
-        truth_data="truth",
-        metrics_config={
-            "openai_params": {
+    oldApi = False
+    if (oldApi):
+        from azure.ai.generative.evaluate import evaluate
+        eval_results = evaluate(
+            evaluation_name=name,
+            asset=dont_call_this_method,
+            data=run_results,
+            prediction_data="answer",
+            task_type="qa",
+            truth_data="truth",
+            metrics_config={
+                "openai_params": {
+                    "api_version": os.getenv("OPENAI_API_VERSION"),
+                    "api_base": os.getenv("OPENAI_API_BASE"),
+                    "api_type": os.getenv("OPENAI_API_TYPE"),
+                    "api_key": os.getenv("OPENAI_API_KEY"),
+                    "deployment_id": os.getenv("AZURE_OPENAI_EVALUATION_DEPLOYMENT")
+                },
+                "questions": "question",
+                "contexts": "context",
+                "y_pred": "answer",
+                "y_test": "truth"
+            },
+            tracking_uri=client.tracking_uri,
+        )
+    else:
+        from azure.ai.generative.evaluate import evaluate
+        eval_results = evaluate(
+            evaluation_name=name,
+            target=dont_call_this_method,
+            data=run_results,
+            truth_data="truth",
+            prediction_data="answer",
+            task_type="qa",
+            data_mapping={
+                "questions": "question",
+                "contexts": "context",
+                "y_pred": "answer",
+                "y_test": "truth"
+            },
+            model_config={
                 "api_version": os.getenv("OPENAI_API_VERSION"),
                 "api_base": os.getenv("OPENAI_API_BASE"),
                 "api_type": os.getenv("OPENAI_API_TYPE"),
                 "api_key": os.getenv("OPENAI_API_KEY"),
                 "deployment_id": os.getenv("AZURE_OPENAI_EVALUATION_DEPLOYMENT")
             },
-            "questions": "question",
-            "contexts": "context",
-            "y_pred": "answer",
-            "y_test": "truth"
-        },
-        tracking_uri=client.tracking_uri,
-    )
+            tracking_uri=client.tracking_uri,
+        )
+
+    return eval_results
+
+def run_and_or_evaluate(subscription_id, resource_group_name, project_name, module_and_function, dataset, name):
+
+    if isinstance(dataset, str):
+        path = pathlib.Path.cwd() / dataset
+        dataset = load_jsonl(path)
+    elif isinstance(dataset, list):
+        dataset = dataset
+
+    if module_and_function is not None:
+        print("Running...")
+        dataset = bulk_run_part(module_and_function, dataset)
+        print("Running... Done!")
+        print(dataset)
+    
+    print("Evaluating...")
+    eval_results = run_evaluate_part(subscription_id, resource_group_name, project_name, dataset, name)
     print("Evaluating... Done!")
-    print(result)
-    return result
+    print(eval_results)
+
+    return eval_results
 
 def main():
 
@@ -255,7 +292,7 @@ def main():
     parser.add_argument("--subscription", required=True, help="Azure subscription ID")
     parser.add_argument("--group", required=False, help="Azure resource group name")
     parser.add_argument("--project-name", required=True, help="Azure AI project project name.")
-    parser.add_argument("--function", required=True, help="Module and function name in the format MODULE:FUNCTION.")
+    parser.add_argument("--function", required=False, help="Module and function name in the format MODULE:FUNCTION.")
     parser.add_argument("--data", required=True, help="Path to the dataset file")
     parser.add_argument("--name", required=True, help="Name of the data evaluation")
     args = parser.parse_args()
@@ -263,13 +300,11 @@ def main():
     subscription_id = args.subscription
     resource_group_name = args.group
     project_name = args.project_name
-    moduleAndFunction = args.function
-    data = args.data
+    module_and_function = args.function
+    dataset = args.data
     name = args.name
 
-    module, function = moduleAndFunction.rsplit(":", 1)
-
-    result = run_evaluation(subscription_id, resource_group_name, project_name, module, function, data, name)
+    result = run_and_or_evaluate(subscription_id, resource_group_name, project_name, module_and_function, dataset, name)
     formatted = json.dumps(result, indent=2)
 
     print("---")

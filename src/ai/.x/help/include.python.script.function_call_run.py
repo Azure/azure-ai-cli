@@ -187,7 +187,7 @@ def bulk_run(
                 "question": d[question_field],
                 "truth": d[truth_field],
                 "answer": answer,
-                "context": None
+                "context": ""
             })
     return results
 

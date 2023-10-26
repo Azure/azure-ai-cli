@@ -162,7 +162,7 @@ namespace Azure.AI.Details.Common.CLI
             var group = ResourceGroupNameToken.Data().Demand(_values, action, command, checkConfig: "group");
             var project = ProjectNameToken.Data().Demand(_values, action, command, checkConfig: "project");
 
-            var function = FunctionToken.Data().Demand(_values, action, command);
+            var function = FunctionToken.Data().GetOrDefault(_values);
             var data = InputDataFileToken.Data().Demand(_values, action, command);
             var dataFile = FileHelpers.DemandFindFileInDataPath(data, _values, "chat data");
 
@@ -176,9 +176,13 @@ namespace Azure.AI.Details.Common.CLI
                 .Replace("--", "-")
                 .Trim('-')
                 .ToLower();
+            evaluationName = $"{evaluationName}-{DateTime.Now.ToString("yyyyMMddHHmmss")}";
 
             var message = $"{action} w/ {function} ...";
             if (!_quiet) Console.WriteLine(message);
+
+            Action<string> stdErrVerbose = x => Console.Error.WriteLine(x);
+            var stdErr = Program.Debug ? stdErrVerbose : null;
 
             var output = PythonRunner.RunEmbeddedPythonScript(_values, "function_call_evaluate",
                 CliHelpers.BuildCliArgs(
@@ -188,7 +192,7 @@ namespace Azure.AI.Details.Common.CLI
                     "--group", group,
                     "--project-name", project,
                     "--name", evaluationName),
-                addToEnvironment: env);
+                addToEnvironment: env, null, null, stdErr);
 
             if (!_quiet) Console.WriteLine($"{message} Done!\n");
 
