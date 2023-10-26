@@ -266,11 +266,11 @@ namespace Azure.AI.Details.Common.CLI
                 subscription = config.ContainsKey("subscription_id") ? config["subscription_id"].ToString() : null;
                 groupName = config.ContainsKey("resource_group") ? config["resource_group"].ToString() : null;
                 projectName = config.ContainsKey("project_name") ? config["project_name"].ToString() : null;
+                projectName ??= config.ContainsKey("workspace_name") ? config["workspace_name"].ToString() : null;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 return false;
-                // _values.AddThrowError("ERROR", $"Unable to parse config.json: {ex.Message}");
             }
 
             return !string.IsNullOrEmpty(subscription) && !string.IsNullOrEmpty(groupName) && !string.IsNullOrEmpty(projectName);
@@ -281,7 +281,7 @@ namespace Azure.AI.Details.Common.CLI
             var interactive = true;
 
             Console.WriteLine("  Choose between initializing:");
-            ConsoleHelpers.WriteLineWithHighlight("  - AI Project resource: Recommended when using `Azure AI Studio` and/or connecting to multiple AI services.");
+            ConsoleHelpers.WriteLineWithHighlight("  - AI Project: Recommended when using `Azure AI Studio` and/or connecting to multiple AI services.");
             Console.WriteLine("  - Standalone resources: Recommended when building simple solutions connecting to a single AI service.");
             Console.WriteLine();
 
@@ -289,14 +289,14 @@ namespace Azure.AI.Details.Common.CLI
             Console.Write($"{label}: ");
             var choiceToPart = new Dictionary<string, string>
             {
-                ["AI Project resource"] = "init-root-project-hack",             // TODO: Replace with new flows below | | |
+                ["AI Project"] = "init-root-project-hack",             // TODO: Replace with new flows below | | |
                 // ["New AI Project"] = "init-root-project-new",                //                                    v v v
                 // ["Existing AI Project"] = "init-root-project-pick",
                 ["Standalone resources"] = "init-root-standalone-select-or-create",
             };
             var partToLabelDisplay = new Dictionary<string, string>()
             {
-                ["init-root-project-hack"] = "AI Project resource",
+                ["init-root-project-hack"] = "AI Project",
                 // ["init-root-project-new"] = "New AI Project",
                 // ["init-root-project-pick"] = "Existing AI Project",
                 ["init-root-standalone-select-or-create"] = null

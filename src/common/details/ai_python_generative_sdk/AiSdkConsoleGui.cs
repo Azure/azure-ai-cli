@@ -289,12 +289,14 @@ namespace Azure.AI.Details.Common.CLI
         public static void CreatAiHubProjectConfigJsonFile(string subscription, string groupName, string projectName)
         {
             ConfigSetHelpers.ConfigureProject(subscription, groupName, projectName);
+            Console.WriteLine();
 
             dynamic configJsonData = new
             {
                 subscription_id = subscription,
                 resource_group = groupName,
                 project_name = projectName,
+                workspace_name = projectName,
             };
 
             var configJson = JsonSerializer.Serialize(configJsonData, new JsonSerializerOptions { WriteIndented = true });

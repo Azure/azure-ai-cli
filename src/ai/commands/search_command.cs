@@ -110,7 +110,7 @@ namespace Azure.AI.Details.Common.CLI
             if (!_quiet) Console.WriteLine($"{message} Done!\n");
 
             var fi = new FileInfo(ConfigSetHelpers.ConfigSet("search.index.name", searchIndexName));
-            if (!_quiet) Console.WriteLine($"{fi.Name} (saved at {fi.DirectoryName})\n\n  {searchIndexName}");
+            if (!_quiet) Console.WriteLine($"{fi.Name} (saved at {fi.DirectoryName})\n\n  {searchIndexName}\n");
 
             if (!string.IsNullOrEmpty(output)) Console.WriteLine(output);
         }

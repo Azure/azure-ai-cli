@@ -67,31 +67,120 @@ namespace Azure.AI.Details.Common.CLI
             var action = "Running chats";
             var command = "chat run";
 
-            var setEnv = _values.GetOrDefault("chat.set.environment", true);
-            var env = setEnv ? ConfigEnvironmentHelpers.GetEnvironment(_values) : null;
+            var function = FunctionToken.Data().GetOrDefault(_values, null);
+            var isFunction = function != null;
 
-            var function = FunctionToken.Data().Demand(_values, action, command);
-            var data = InputDataFileToken.Data().Demand(_values, action, command);
-            var dataFile = FileHelpers.DemandFindFileInDataPath(data, _values, "chat data");
-
-            var message = $"{action} w/ {function} ...";
+            var message = isFunction ? $"{action} w/ {function} ..." : $"{action} ...";
             if (!_quiet) Console.WriteLine(message);
 
-            var output = PythonRunner.RunEmbeddedPythonScript(_values, "function_call_run",
-                CliHelpers.BuildCliArgs(
-                    "--function", function,
-                    "--data", dataFile),
-                addToEnvironment: env);
+            string output = isFunction
+                ? ChatRunFunction(action, command, function)
+                : ChatRunNonFunction();
 
             if (!_quiet) Console.WriteLine($"{message} Done!\n");
 
-            if (!string.IsNullOrEmpty(output)) Console.WriteLine(output);
+            if (!string.IsNullOrEmpty(output))
+            {
+                var parsed = JArray.Parse(output);
+                foreach (var item in parsed)
+                {
+                    Console.WriteLine(item.ToString(Formatting.None));
+                }
+            }
         }
 
         private void DoChatEvaluate()
         {
             var action = "Evaluating chats";
             var command = "chat evaluate";
+
+            var function = FunctionToken.Data().GetOrDefault(_values, null);
+            var isFunction = function != null;
+
+            var message = isFunction ? $"{action} w/ {function} ..." : $"{action} ...";
+            if (!_quiet) Console.WriteLine(message);
+
+            string output = isFunction
+                ? ChatEvalFunction(action, command, function)
+                : ChatEvalNonFunction(action, command);
+
+            if (!_quiet) Console.WriteLine($"{message} Done!\n");
+
+            if (!string.IsNullOrEmpty(output)) Console.WriteLine(output);
+        }
+
+        private string ChatRunNonFunction()
+        {
+            var data = InputDataFileToken.Data().Demand(_values, "Running chats", "chat run");
+            var dataFile = FileHelpers.DemandFindFileInDataPath(data, _values, "chat data");
+            var lines = File.ReadAllLines(dataFile);
+
+            var client = CreateOpenAIClient(out var deployment);
+            var chatTextHandler = (string text) => {
+
+                var options = CreateChatCompletionOptions();
+                options.Messages.Add(new ChatMessage(ChatRole.User, text));
+
+                var response = client.GetChatCompletions(deployment, options);
+                var message = response.Value.Choices.Last().Message;
+                var answer = message.Content;
+                var context = message.AzureExtensionsContext != null && message.AzureExtensionsContext.Messages != null
+                    ? string.Join('\n', message.AzureExtensionsContext.Messages.Select(x => x.Content))
+                    : null;
+                return (answer, context);
+            };
+
+            var results = new JArray();
+            foreach (var line in lines)
+            {
+                var jsonText = line.Trim();
+                if (string.IsNullOrEmpty(jsonText)) continue;
+
+                var json = JObject.Parse(jsonText);
+                var question = json["question"].ToString();
+
+                var (answer, context) = chatTextHandler(question);
+                if (!string.IsNullOrEmpty(answer))
+                {
+                    var result = new JObject();
+                    result["question"] = question;
+                    result["answer"] = answer;
+                    if (json.ContainsKey("truth")) result["truth"] = json["truth"];
+                    if (!string.IsNullOrEmpty(context)) result["context"] = context;
+                    results.Add(result);
+                }
+            }
+
+            return results.ToString(Formatting.None);
+        }
+
+        private string ChatRunFunction(string action, string command, string function)
+        {
+            var setEnv = _values.GetOrDefault("chat.set.environment", true);
+            var env = setEnv ? ConfigEnvironmentHelpers.GetEnvironment(_values) : null;
+
+            var data = InputDataFileToken.Data().Demand(_values, action, command);
+            var dataFile = FileHelpers.DemandFindFileInDataPath(data, _values, "chat data");
+
+            var output = PythonRunner.RunEmbeddedPythonScript(_values, "function_call_run",
+                CliHelpers.BuildCliArgs(
+                    "--function", function,
+                    "--data", dataFile),
+                addToEnvironment: env);
+            return output;
+        }
+
+        private string ChatEvalNonFunction(string action, string command)
+        {
+            var data = ChatRunNonFunction();
+            var parsed = JArray.Parse(data);
+
+            var sb = new StringBuilder();
+            parsed.ToList().ForEach(x => sb.AppendLine(x.ToString(Formatting.None)));
+            data = sb.ToString();
+
+            var dataFile = Path.GetTempFileName();
+            File.WriteAllText(dataFile, data);
 
             var setEnv = _values.GetOrDefault("chat.set.environment", true);
             var env = setEnv ? ConfigEnvironmentHelpers.GetEnvironment(_values) : null;
@@ -100,7 +189,39 @@ namespace Azure.AI.Details.Common.CLI
             var group = ResourceGroupNameToken.Data().Demand(_values, action, command, checkConfig: "group");
             var project = ProjectNameToken.Data().Demand(_values, action, command, checkConfig: "project");
 
-            var function = FunctionToken.Data().Demand(_values, action, command);
+            var dataFileForEvaluationNameOnly = InputDataFileToken.Data().Demand(_values, action, command);
+            var evaluationName = $"{new FileInfo(dataFileForEvaluationNameOnly).Name}"
+                .Replace(' ', '-')
+                .Replace('.', '-')
+                .Replace('_', '-')
+                .Replace(':', '-')
+                .Replace(Path.DirectorySeparatorChar, '-')
+                .Replace(Path.AltDirectorySeparatorChar, '-')
+                .Replace("--", "-")
+                .Trim('-')
+                .ToLower();
+            evaluationName = $"{evaluationName}-{DateTime.Now.ToString("yyyyMMddHHmmss")}";
+
+            var output = PythonRunner.RunEmbeddedPythonScript(_values, "function_call_evaluate",
+                CliHelpers.BuildCliArgs(
+                    "--data", dataFile,
+                    "--subscription", subscription,
+                    "--group", group,
+                    "--project-name", project,
+                    "--name", evaluationName),
+                addToEnvironment: env);
+            return output;
+        }
+
+        private string ChatEvalFunction(string action, string command, string function)
+        {
+            var setEnv = _values.GetOrDefault("chat.set.environment", true);
+            var env = setEnv ? ConfigEnvironmentHelpers.GetEnvironment(_values) : null;
+
+            var subscription = SubscriptionToken.Data().Demand(_values, action, command, checkConfig: "subscription");
+            var group = ResourceGroupNameToken.Data().Demand(_values, action, command, checkConfig: "group");
+            var project = ProjectNameToken.Data().Demand(_values, action, command, checkConfig: "project");
+
             var data = InputDataFileToken.Data().Demand(_values, action, command);
             var dataFile = FileHelpers.DemandFindFileInDataPath(data, _values, "chat data");
 
@@ -114,9 +235,10 @@ namespace Azure.AI.Details.Common.CLI
                 .Replace("--", "-")
                 .Trim('-')
                 .ToLower();
+            evaluationName = $"{evaluationName}-{DateTime.Now.ToString("yyyyMMddHHmmss")}";
 
-            var message = $"{action} w/ {function} ...";
-            if (!_quiet) Console.WriteLine(message);
+            Action<string> stdErrVerbose = x => Console.Error.WriteLine(x);
+            var stdErr = Program.Debug ? stdErrVerbose : null;
 
             var output = PythonRunner.RunEmbeddedPythonScript(_values, "function_call_evaluate",
                 CliHelpers.BuildCliArgs(
@@ -126,11 +248,8 @@ namespace Azure.AI.Details.Common.CLI
                     "--group", group,
                     "--project-name", project,
                     "--name", evaluationName),
-                addToEnvironment: env);
-
-            if (!_quiet) Console.WriteLine($"{message} Done!\n");
-
-            if (!string.IsNullOrEmpty(output)) Console.WriteLine(output);
+                addToEnvironment: env, null, stdErr, null);
+            return output;
         }
 
         private void DoChat()
@@ -223,7 +342,7 @@ namespace Azure.AI.Details.Common.CLI
                 : await GetNormalChatTextHandler();
         }
 
-        private async Task<Func<string, Task>> GetChatFunctionTextHandler(string function)
+        private async Task<Func<string, Task<string>>> GetChatFunctionTextHandler(string function)
         {
             var setEnv = _values.GetOrDefault("chat.set.environment", true);
             var env = setEnv ? ConfigEnvironmentHelpers.GetEnvironment(_values) : null;
@@ -234,7 +353,7 @@ namespace Azure.AI.Details.Common.CLI
             messages.Add(new ChatMessage(ChatRole.System, systemPrompt.ReplaceValues(_values)));
 
             return await Task.Run(() => {
-                var handler = (string text) => {
+                Func<string, Task<string>> handler = (string text) => {
 
                     messages.Add(new ChatMessage(ChatRole.User, text));
 
@@ -283,7 +402,10 @@ namespace Azure.AI.Details.Common.CLI
                     Console.WriteLine(output);
                     Console.WriteLine();
 
-                    return Task.CompletedTask;
+                    output = messages.Last().Content;
+
+                    // return output as a Task<string>
+                    return Task.FromResult(output);
                 };
                 return handler;
             });
