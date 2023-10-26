@@ -88,6 +88,16 @@ namespace Azure.AI.Details.Common.CLI
             var dataFile = FileHelpers.DemandFindFileInDataPath(data, _values, "chat data");
             var lines = File.ReadAllLines(dataFile);
 
+            var client = CreateOpenAIClient(out var deployment);
+            var chatTextHandler = (string text) => {
+
+                var options = CreateChatCompletionOptions();
+                options.Messages.Add(new ChatMessage(ChatRole.User, text));
+
+                var response = client.GetChatCompletions(deployment, options);
+                return response.Value.Choices.Last().Message.Content;
+            };
+
             var results = new JArray();
             foreach (var line in lines)
             {
@@ -97,14 +107,8 @@ namespace Azure.AI.Details.Common.CLI
                 var json = JObject.Parse(jsonText);
                 var question = json["question"].ToString();
 
-                var chatTextHandler = GetChatTextHandler().Result;
-                var task = chatTextHandler(question);
-                WaitForStopOrCancel(task);
-
-                if (_canceledEvent.WaitOne(0)) break;
-
-                var answer = ""; // task.Result;
-                if (string.IsNullOrEmpty(answer))
+                var answer = chatTextHandler(question);
+                if (!string.IsNullOrEmpty(answer))
                 {
                     var result = new JObject();
                     result["answer"] = answer;
