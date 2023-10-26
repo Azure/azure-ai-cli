@@ -67,25 +67,70 @@ namespace Azure.AI.Details.Common.CLI
             var action = "Running chats";
             var command = "chat run";
 
+            var function = FunctionToken.Data().GetOrDefault(_values, null);
+            var isFunction = function != null;
+
+            var message = isFunction ? $"{action} w/ {function} ..." : $"{action} ...";
+            if (!_quiet) Console.WriteLine(message);
+
+            string output = isFunction
+                ? ChatRunFunction(action, command, function)
+                : ChatRunNonFunction();
+
+            if (!_quiet) Console.WriteLine($"{message} Done!\n");
+
+            if (!string.IsNullOrEmpty(output)) Console.WriteLine(output);
+        }
+
+        private string ChatRunNonFunction()
+        {
+            var data = InputDataFileToken.Data().Demand(_values, "Running chats", "chat run");
+            var dataFile = FileHelpers.DemandFindFileInDataPath(data, _values, "chat data");
+            var lines = File.ReadAllLines(dataFile);
+
+            var results = new JArray();
+            foreach (var line in lines)
+            {
+                var jsonText = line.Trim();
+                if (string.IsNullOrEmpty(jsonText)) continue;
+
+                var json = JObject.Parse(jsonText);
+                var question = json["question"].ToString();
+
+                var chatTextHandler = GetChatTextHandler().Result;
+                var task = chatTextHandler(question);
+                WaitForStopOrCancel(task);
+
+                if (_canceledEvent.WaitOne(0)) break;
+
+                var answer = ""; // task.Result;
+                if (string.IsNullOrEmpty(answer))
+                {
+                    var result = new JObject();
+                    result["answer"] = answer;
+                    result["question"] = question;
+                    result["truth"] = json["truth"];
+                    results.Add(result);
+                }
+            }
+
+            return results.ToString(Formatting.Indented);
+        }
+
+        private string ChatRunFunction(string action, string command, string function)
+        {
             var setEnv = _values.GetOrDefault("chat.set.environment", true);
             var env = setEnv ? ConfigEnvironmentHelpers.GetEnvironment(_values) : null;
 
-            var function = FunctionToken.Data().Demand(_values, action, command);
             var data = InputDataFileToken.Data().Demand(_values, action, command);
             var dataFile = FileHelpers.DemandFindFileInDataPath(data, _values, "chat data");
-
-            var message = $"{action} w/ {function} ...";
-            if (!_quiet) Console.WriteLine(message);
 
             var output = PythonRunner.RunEmbeddedPythonScript(_values, "function_call_run",
                 CliHelpers.BuildCliArgs(
                     "--function", function,
                     "--data", dataFile),
                 addToEnvironment: env);
-
-            if (!_quiet) Console.WriteLine($"{message} Done!\n");
-
-            if (!string.IsNullOrEmpty(output)) Console.WriteLine(output);
+            return output;
         }
 
         private void DoChatEvaluate()
@@ -223,7 +268,7 @@ namespace Azure.AI.Details.Common.CLI
                 : await GetNormalChatTextHandler();
         }
 
-        private async Task<Func<string, Task>> GetChatFunctionTextHandler(string function)
+        private async Task<Func<string, Task<string>>> GetChatFunctionTextHandler(string function)
         {
             var setEnv = _values.GetOrDefault("chat.set.environment", true);
             var env = setEnv ? ConfigEnvironmentHelpers.GetEnvironment(_values) : null;
@@ -234,7 +279,7 @@ namespace Azure.AI.Details.Common.CLI
             messages.Add(new ChatMessage(ChatRole.System, systemPrompt.ReplaceValues(_values)));
 
             return await Task.Run(() => {
-                var handler = (string text) => {
+                Func<string, Task<string>> handler = (string text) => {
 
                     messages.Add(new ChatMessage(ChatRole.User, text));
 
@@ -283,7 +328,10 @@ namespace Azure.AI.Details.Common.CLI
                     Console.WriteLine(output);
                     Console.WriteLine();
 
-                    return Task.CompletedTask;
+                    output = messages.Last().Content;
+
+                    // return output as a Task<string>
+                    return Task.FromResult(output);
                 };
                 return handler;
             });
