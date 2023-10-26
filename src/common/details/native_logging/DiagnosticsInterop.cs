@@ -1,5 +1,6 @@
 ﻿using System.IO;
 using System.Runtime.CompilerServices;
+using System.Text.RegularExpressions;
 
 namespace Azure.AI.Details.Common.CLI
 {
@@ -12,6 +13,15 @@ namespace Azure.AI.Details.Common.CLI
             [CallerFilePath] string? fileName = null,
             [CallerLineNumber] int lineNumber = 0)
         {
+            if (message.Contains("\"key\""))
+            {
+                message = Regex.Replace(message, "\"key\"\\s*:\\s*\"[^\"]*\"", "\"key\":\"REDACTED\"");
+            }
+            if (message.Contains("\"embeddingKey\""))
+            {
+                message = Regex.Replace(message, "\"embeddingKey\"\\s*:\\s*\"[^\"]*\"", "\"embeddingKey\":\"REDACTED\"");
+            }
+
             if (message.Length > 1024) message = message.Substring(0, 1024);
 
             using var nativeTitle = NativeUtils.ToNativeNullTerminatedUtf8String(title);
