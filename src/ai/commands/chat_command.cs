@@ -79,7 +79,14 @@ namespace Azure.AI.Details.Common.CLI
 
             if (!_quiet) Console.WriteLine($"{message} Done!\n");
 
-            if (!string.IsNullOrEmpty(output)) Console.WriteLine(output);
+            if (!string.IsNullOrEmpty(output))
+            {
+                var parsed = JArray.Parse(output);
+                foreach (var item in parsed)
+                {
+                    Console.WriteLine(item.ToString(Formatting.None));
+                }
+            }
         }
 
         private string ChatRunNonFunction()
@@ -95,7 +102,12 @@ namespace Azure.AI.Details.Common.CLI
                 options.Messages.Add(new ChatMessage(ChatRole.User, text));
 
                 var response = client.GetChatCompletions(deployment, options);
-                return response.Value.Choices.Last().Message.Content;
+                var message = response.Value.Choices.Last().Message;
+                var answer = message.Content;
+                var context = message.AzureExtensionsContext != null && message.AzureExtensionsContext.Messages != null
+                    ? string.Join('\n', message.AzureExtensionsContext.Messages.Select(x => x.Content))
+                    : null;
+                return (answer, context);
             };
 
             var results = new JArray();
@@ -107,18 +119,19 @@ namespace Azure.AI.Details.Common.CLI
                 var json = JObject.Parse(jsonText);
                 var question = json["question"].ToString();
 
-                var answer = chatTextHandler(question);
+                var (answer, context) = chatTextHandler(question);
                 if (!string.IsNullOrEmpty(answer))
                 {
                     var result = new JObject();
-                    result["answer"] = answer;
                     result["question"] = question;
-                    result["truth"] = json["truth"];
+                    result["answer"] = answer;
+                    if (json.ContainsKey("truth")) result["truth"] = json["truth"];
+                    if (!string.IsNullOrEmpty(context)) result["context"] = context;
                     results.Add(result);
                 }
             }
 
-            return results.ToString(Formatting.Indented);
+            return results.ToString(Formatting.None);
         }
 
         private string ChatRunFunction(string action, string command, string function)
