@@ -259,9 +259,20 @@ namespace Azure.AI.Details.Common.CLI
                     ? PythonSDKWrapper.CreateConnection(values, subscription, groupName, projectName, connectionName, connectionType, openAiEndpoint, openAiKey)
                     : PythonSDKWrapper.GetConnection(values, subscription, groupName, projectName, connectionName);
 
-                Console.WriteLine(createOpenAiConnection
-                    ? "\r*** CREATED ***  "
-                    : "\r*** CHECKED ***  ");
+                var message = createSearchConnection ? "\r*** CREATED ***  " : null;
+                if (checkForExistingOpenAiConnection)
+                {
+                    var parsed = !string.IsNullOrEmpty(connectionJson) ? JToken.Parse(connectionJson) : null;
+                    var connection = parsed?.Type == JTokenType.Object ? parsed?["connection"] : null;
+                    var target = connection?.Type == JTokenType.Object ? connection?["target"]?.ToString() : null;
+                    message = target == null
+                        ? $"\r*** WARNING: {connectionName} not connection found ***  "
+                        : target != openAiEndpoint
+                            ? $"\r*** WARNING: {connectionName} found but target is {target} ***  "
+                            : $"\r*** MATCHED: {connectionName} ***  ";
+                }
+
+                Console.WriteLine(message);
                 connectionCount++;
             }
 
@@ -279,9 +290,20 @@ namespace Azure.AI.Details.Common.CLI
                     ? PythonSDKWrapper.CreateConnection(values, subscription, groupName, projectName, connectionName, connectionType, searchEndpoint, searchKey)
                     : PythonSDKWrapper.GetConnection(values, subscription, groupName, projectName, connectionName);
 
-                Console.WriteLine(createSearchConnection
-                    ? "\r*** CREATED ***  "
-                    : "\r*** CHECKED ***  ");
+                var message = createSearchConnection ? "\r*** CREATED ***  " : null;
+                if (checkForExistingSearchConnection)
+                {
+                    var parsed = !string.IsNullOrEmpty(connectionJson) ? JToken.Parse(connectionJson) : null;
+                    var connection = parsed?.Type == JTokenType.Object ? parsed?["connection"] : null;
+                    var target = connection?.Type == JTokenType.Object ? connection?["target"]?.ToString() : null;
+                    message = target == null
+                        ? $"\r*** WARNING: {connectionName} not connection found ***  "
+                        : target != searchEndpoint
+                            ? $"\r*** WARNING: {connectionName} found but target is {target} ***  "
+                            : $"\r*** MATCHED: {connectionName} ***  ";
+                }
+
+                Console.WriteLine(message);
                 connectionCount++;
             }
         }
