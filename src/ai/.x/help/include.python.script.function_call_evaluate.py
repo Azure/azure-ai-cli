@@ -247,7 +247,10 @@ def run_and_or_evaluate(subscription_id, resource_group_name, project_name, modu
     print("Evaluating... Done!")
     print(eval_results)
 
-    return eval_results
+    return {
+        "metrics_summary": eval_results.metrics_summary,
+        "artifacts": eval_results.artifacts
+    }
 
 def main():
 
