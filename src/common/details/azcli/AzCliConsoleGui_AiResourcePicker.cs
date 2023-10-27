@@ -215,8 +215,6 @@ namespace Azure.AI.Details.Common.CLI
                 var checkAttestation = kind.ToLower() switch
                 {
                     "face" => true,
-                    "cognitiveservices" => true,
-                    "openai" => true,
                     _ => false
                 };
 
