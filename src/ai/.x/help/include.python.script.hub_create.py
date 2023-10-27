@@ -1,20 +1,21 @@
 import argparse
 import json
-from azure.ai.ml import MLClient
-from azure.ai.ml.entities import WorkspaceHub, ManagedNetwork, WorkspaceHubConfig
+from azure.ai.resources.client import AIClient
+from azure.ai.resources.entities import AIResource
+from azure.ai.ml.entities import ManagedNetwork
 from azure.identity import DefaultAzureCredential
 
-def create_hub(subscription_id, resource_group_name, resource_name, location, display_name, description):
-    """Create Azure ML hub."""
-    ml_client = MLClient(
+def create_hub(subscription_id, resource_group_name, ai_resource_name, location, display_name, description):
+    """Create Azure AI hub."""
+    ai_client = AIClient(
         credential=DefaultAzureCredential(),
         subscription_id=subscription_id,
         resource_group_name=resource_group_name,
         user_agent="ai-cli 0.0.1"
     )
 
-    wshub = WorkspaceHub(
-        name=resource_name,
+    resource = AIResource(
+        name=ai_resource_name,
         location=location,
         display_name=display_name,
         description=description,
@@ -24,12 +25,13 @@ def create_hub(subscription_id, resource_group_name, resource_name, location, di
         )
     )
 
-    result = ml_client.workspace_hubs.begin_create(workspace_hub=wshub).result()
-    return result._to_dict()
+    # TODO allow setting of optional bool update_dependent_resources?
+    result = ai_client.ai_resources.begin_create(ai_resource=resource).result()
+    return result._workspace_hub._to_dict()
 
 def main():
     """Parse command line arguments and print created hub."""
-    parser = argparse.ArgumentParser(description="Create Azure ML hub")
+    parser = argparse.ArgumentParser(description="Create Azure AI hub")
     parser.add_argument("--subscription", required=True, help="Azure subscription ID")
     parser.add_argument("--group", required=True, help="Azure resource group name")
     parser.add_argument("--name", required=True, help="Azure AI resource display name. This is non-unique within the resource group.")
@@ -40,12 +42,12 @@ def main():
 
     subscription_id = args.subscription
     resource_group_name = args.group
-    resource_name = args.name
+    ai_resource_name = args.name
     location = args.location
     display_name = args.display_name
     description = args.description
 
-    hub = create_hub(subscription_id, resource_group_name, resource_name, location, display_name, description)
+    hub = create_hub(subscription_id, resource_group_name, ai_resource_name, location, display_name, description)
     formatted = json.dumps({"hub": hub}, indent=2)
 
     print("---")
