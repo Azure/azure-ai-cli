@@ -212,55 +212,29 @@ def run_evaluate_part(subscription_id, resource_group_name, project_name, run_re
     def dont_call_this_method(kwargs):
         raise Exception("This method should not be called.")
 
-    oldApi = False
-    if (oldApi):
-        from azure.ai.generative.evaluate import evaluate
-        eval_results = evaluate(
-            evaluation_name=name,
-            asset=dont_call_this_method,
-            data=run_results,
-            prediction_data="answer",
-            task_type="qa",
-            truth_data="truth",
-            metrics_config={
-                "openai_params": {
-                    "api_version": os.getenv("OPENAI_API_VERSION"),
-                    "api_base": os.getenv("OPENAI_API_BASE"),
-                    "api_type": os.getenv("OPENAI_API_TYPE"),
-                    "api_key": os.getenv("OPENAI_API_KEY"),
-                    "deployment_id": os.getenv("AZURE_OPENAI_EVALUATION_DEPLOYMENT")
-                },
-                "questions": "question",
-                "contexts": "context",
-                "y_pred": "answer",
-                "y_test": "truth"
-            },
-            tracking_uri=client.tracking_uri,
-        )
-    else:
-        from azure.ai.generative.evaluate import evaluate
-        eval_results = evaluate(
-            evaluation_name=name,
-            target=dont_call_this_method,
-            data=run_results,
-            truth_data="truth",
-            prediction_data="answer",
-            task_type="qa",
-            data_mapping={
-                "questions": "question",
-                "contexts": "context",
-                "y_pred": "answer",
-                "y_test": "truth"
-            },
-            model_config={
-                "api_version": os.getenv("OPENAI_API_VERSION"),
-                "api_base": os.getenv("OPENAI_API_BASE"),
-                "api_type": os.getenv("OPENAI_API_TYPE"),
-                "api_key": os.getenv("OPENAI_API_KEY"),
-                "deployment_id": os.getenv("AZURE_OPENAI_EVALUATION_DEPLOYMENT")
-            },
-            tracking_uri=client.tracking_uri,
-        )
+    from azure.ai.generative.evaluate import evaluate
+    eval_results = evaluate(
+        evaluation_name=name,
+        target=dont_call_this_method,
+        data=run_results,
+        truth_data="truth",
+        prediction_data="answer",
+        task_type="qa",
+        data_mapping={
+            "questions": "question",
+            "contexts": "context",
+            "y_pred": "answer",
+            "y_test": "truth"
+        },
+        model_config={
+            "api_version": os.getenv("OPENAI_API_VERSION"),
+            "api_base": os.getenv("OPENAI_API_BASE"),
+            "api_type": os.getenv("OPENAI_API_TYPE"),
+            "api_key": os.getenv("OPENAI_API_KEY"),
+            "deployment_id": os.getenv("AZURE_OPENAI_EVALUATION_DEPLOYMENT")
+        },
+        tracking_uri=client.tracking_uri,
+    )
 
     return eval_results
 

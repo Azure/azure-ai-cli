@@ -13,7 +13,7 @@ namespace Azure.AI.Details.Common.CLI
     {
         public static void ConfigureProject(string subscriptionId, string groupName, string projectName)
         {
-            ConsoleHelpers.WriteLineWithHighlight($"\n`AZURE AI PROJECT CONFIG`\n");
+            ConsoleHelpers.WriteLineWithHighlight($"\n`AZURE AI PROJECT CONFIG`");
             Console.WriteLine();
 
             int maxLabelWidth = 0;
