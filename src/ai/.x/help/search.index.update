@@ -15,6 +15,12 @@ USAGE: ai index update [...]
     --search-api-key KEY                    (see: ai help search api key)
     --search-endpoint ENDPOINT              (see: ai help search endpoint)
 
+  AZURE SEARCH DATA SOURCE
+    --data-source-connection NAME           (see: ai help search data source connection)
+    --data-source-connection-string STRING  (see: ai help search data source connection string)
+    --data-source-container-name NAME       (see: ai help search data source container name)
+    --vector-field NAME                     (see: ai help search vector field name)
+
   OPENAI EMBEDDINGS
     --embedding-deployment DEPLOYMENT       (see: ai help search embedding deployment)
     --embedding-model MODEL                 (see: ai help search embedding model)
