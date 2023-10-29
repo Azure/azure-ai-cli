@@ -1,8 +1,6 @@
 import argparse
 import json
-from azure.ai.generative import AIClient
-from azure.ai.generative.entities import Connection
-from azure.ai.ml.entities._credentials import ApiKeyConfiguration
+from azure.ai.resources.client import AIClient
 from azure.identity import DefaultAzureCredential
 
 def list_connections(subscription_id, resource_group_name, project_name):

@@ -34,6 +34,10 @@ namespace Azure.AI.Details.Common.CLI
             env.Add("AZURE_AI_SEARCH_INDEX_NAME", ReadConfig(values, "search.index.name"));
             env.Add("AZURE_AI_SEARCH_KEY", ReadConfig(values, "search.key"));
 
+            env.Add("AZURE_AI_SPEECH_ENDPOINT", ReadConfig(values, "speech.endpoint"));
+            env.Add("AZURE_AI_SPEECH_KEY", ReadConfig(values, "speech.key"));
+            env.Add("AZURE_AI_SPEECH_REGION", ReadConfig(values, "speech.region"));
+
             // Add "non-standard" AZURE_AI_" prefixed env variables to interop with various SDKs
 
             // OpenAI's SDK
