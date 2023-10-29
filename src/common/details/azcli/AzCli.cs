@@ -46,6 +46,21 @@ namespace Azure.AI.Details.Common.CLI
             public string Endpoint;
         }
 
+        public struct CognitiveServicesAiServicesResourceInfo
+        {
+            public string Id;
+            public string Group;
+            public string Name;
+            public string Kind;
+            public string RegionLocation;
+            public string Endpoint;
+
+            public string Key;
+            public string ChatDeployment;
+            public string EmbeddingsDeployment;
+            public string EvaluationDeployment;
+        }
+
         public struct CognitiveServicesOpenAiResourceInfo
         {
             public string Id;
