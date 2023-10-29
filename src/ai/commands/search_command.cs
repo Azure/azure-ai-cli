@@ -164,39 +164,29 @@ namespace Azure.AI.Details.Common.CLI
             SearchIndexClient indexClient = new(endpoint, credential);
             await indexClient.DeleteIndexAsync(datasourceIndex.Name);
 
-
             await indexClient.CreateIndexAsync(datasourceIndex);
-            indexerClient.CreateOrUpdateDataSourceConnection(dataSource);
-            indexerClient.CreateSkillset(skillset);
-            indexerClient.CreateIndexer(indexer);
+            await indexerClient.CreateOrUpdateDataSourceConnectionAsync(dataSource);
+            await indexerClient.CreateSkillsetAsync(skillset);
+            await indexerClient.CreateIndexerAsync(indexer);
 
-            await Task.Delay(10000); //wait for some doc to index
+            await indexerClient.RunIndexerAsync(indexer.Name);
 
-            //SearchClient client = new SearchClient(endpoint, datasourceIndex.Name, credential);
+            var output = string.Empty;
+            for (;;)
+            {
+                var statusResponse = await indexerClient.GetIndexerStatusAsync(indexer.Name);
+                var lastResult = statusResponse.Value.LastResult;
+                if (lastResult != null && lastResult.Status != IndexerExecutionStatus.InProgress)
+                {
+                    output = JsonSerializer.Serialize(statusResponse.Value, new JsonSerializerOptions { WriteIndented = true });
+                    break;
+                }
 
-            //SearchResults<JFK> response = await client.SearchAsync<JFK>(null,
-            //    new SearchOptions
-            //    {
-            //        VectorQueries = { new VectorizableTextQuery() {
-            //        Text = "What happened in Cuba",
-            //        KNearestNeighborsCount = 3,
-            //        Fields = { vectorFieldName } } },
-            //    });
+                Console.Write('.');
+                Thread.Sleep(1000);
+            }
 
-
-            //int count = 0;
-            //Console.WriteLine($"Single Vector Search Results:");
-            //await foreach (SearchResult<JFK> result in response.GetResultsAsync())
-            //{
-            //    count++;
-            //    JFK doc = result.Document;
-            //    Console.WriteLine($"{doc.ChunkKey}: {doc.ParentKey} \n {doc.page} \n {doc.vector}");
-            //}
-            //Console.WriteLine($"Total number of search results:{count}");
-
-            //Console.WriteLine("Bye, World!");
-
-            return null;
+            return output;
         }
 
         private static SearchIndex PrepGetSearchIndex(string embeddingsEndpoint, string embeddingsDeployment, string embeddingsApiKey, string searchIndexName, string vectorFieldName)
@@ -257,98 +247,89 @@ namespace Azure.AI.Details.Common.CLI
 
         private static SearchIndexerSkillset PrepGetSkillset(string embeddingsEndpoint, string embeddingsDeployment, string embeddingsApiKey, string vectorFieldName, SearchIndex datasourceIndex)
         {
-            var skillset =
-                new SearchIndexerSkillset(
-                    "datasourceskillset",
-                    new List<SearchIndexerSkill>
-                    {
-                        new OcrSkill(
-                            new List<InputFieldMappingEntry>
-                            {
-                                new InputFieldMappingEntry("image") { Source = "/document/normalized_images/*" }
-                            },
-                            new List<OutputFieldMappingEntry>
-                            {
-                                new OutputFieldMappingEntry("text") { TargetName = "text"}
-                            }
-                        )
-                        {
-                            Context = "/document/normalized_images/*",
-                            ShouldDetectOrientation = true
-                        },
-                        new MergeSkill(
-                            new List<InputFieldMappingEntry>
-                            {
-                                new InputFieldMappingEntry("text") { Source = "/document/content" },
-                                new InputFieldMappingEntry("itemsToInsert") { Source = "/document/normalized_images/*/text" },
-                                new InputFieldMappingEntry("offsets") { Source = "/document/normalized_images/*/contentOffset" }
-                            },
-                            new List<OutputFieldMappingEntry>
-                            {
-                                new OutputFieldMappingEntry("mergedText") { TargetName = "mergedText"}
-                            }
-                        )
-                        {
-                            Context = "/document",
-                            InsertPreTag = " ",
-                            InsertPostTag = " "
-                        },
-                        new SplitSkill(
-                            new List<InputFieldMappingEntry>
-                            {
-                                new InputFieldMappingEntry("text") { Source = "/document/mergedText" }
-                            },
-                            new List<OutputFieldMappingEntry>
-                            {
-                                new OutputFieldMappingEntry("textItems") { TargetName = "pages"}
-                            }
-                        )
-                        {
-                            TextSplitMode = TextSplitMode.Pages,
-                            MaximumPageLength = 500,
-                            PageOverlapLength = 100,
-                            Context = "/document"
-                        },
-                        new AzureOpenAIEmbeddingSkill(
-                            new List<InputFieldMappingEntry>
-                            {
-                                new InputFieldMappingEntry("text") { Source = "/document/pages/*" }
-                            },
-                            new List<OutputFieldMappingEntry>
-                            {
-                                new OutputFieldMappingEntry("embedding") { TargetName = vectorFieldName}
-                            }
-                        )
-                        {
-                            Context = "/document/pages/*",
-                            ResourceUri = new Uri(embeddingsEndpoint),
-                            ApiKey = embeddingsApiKey,
-                            DeploymentId = embeddingsDeployment,
-                            //AuthIdentity = new SearchIndexerDataUserAssignedIdentity("randomuser")
-                        }
-                    }
-                )
-                {
-                    // CognitiveServicesAccount = new CognitiveServicesAccountKey(cognitivekey),
-                    IndexProjections = new SearchIndexerIndexProjections(
-                        new List<SearchIndexerIndexProjectionSelector>
-                        {
-                            new SearchIndexerIndexProjectionSelector(
-                                datasourceIndex.Name,
-                                "ParentKey",
-                                "/document/pages/*",
-                                new List<InputFieldMappingEntry>
-                                    {
-                                        new InputFieldMappingEntry("page") { Source = "/document/pages/*" },
-                                        new InputFieldMappingEntry(vectorFieldName) { Source = "/document/pages/*/vector" }
-                                    }
-                                )
-                        }
-                        )
-                    {
-                        Parameters = new SearchIndexerIndexProjectionsParameters() { ProjectionMode = IndexProjectionMode.SkipIndexingParentDocuments }
-                    }
+            var useOcr = true;
+
+            var ocrSkill = new OcrSkill(
+                new List<InputFieldMappingEntry> {
+                    new InputFieldMappingEntry("image") { Source = "/document/normalized_images/*" }
+                },
+                new List<OutputFieldMappingEntry> {
+                    new OutputFieldMappingEntry("text") { TargetName = "text"}
+                }) {
+                    Context = "/document/normalized_images/*",
+                    ShouldDetectOrientation = true
                 };
+
+            var ocrMergeSkill = new MergeSkill(
+                new List<InputFieldMappingEntry> {
+                    new InputFieldMappingEntry("text") { Source = "/document/content" },
+                    new InputFieldMappingEntry("itemsToInsert") { Source = "/document/normalized_images/*/text" },
+                    new InputFieldMappingEntry("offsets") { Source = "/document/normalized_images/*/contentOffset" }
+                },
+                new List<OutputFieldMappingEntry> {
+                    new OutputFieldMappingEntry("mergedText") { TargetName = "mergedText"}
+                }) {
+                    Context = "/document",
+                    InsertPreTag = " ",
+                    InsertPostTag = " "
+                };
+
+
+            var splitSkill = new SplitSkill(
+                new List<InputFieldMappingEntry> {
+                    new InputFieldMappingEntry("text") { Source = useOcr ? "/document/mergedText" : "/document/content" },
+                    new InputFieldMappingEntry("languageCode") { Source = "/document/language" }
+                },
+                new List<OutputFieldMappingEntry> {
+                    new OutputFieldMappingEntry("textItems") { TargetName = "pages"}
+                }) {
+                    DefaultLanguageCode = SplitSkillLanguage.En,
+                    TextSplitMode = TextSplitMode.Pages,
+                    MaximumPageLength = 1000,
+                    PageOverlapLength = 100,
+                    Context = "/document"
+                };
+
+            var azureOpenAIEmbeddingSkill = new AzureOpenAIEmbeddingSkill(
+                new List<InputFieldMappingEntry> {
+                    new InputFieldMappingEntry("text") { Source = "/document/pages/*" }
+                },
+                new List<OutputFieldMappingEntry> {
+                    new OutputFieldMappingEntry("embedding") { TargetName = vectorFieldName}
+                }) {
+                    Context = "/document/pages/*",
+                    ResourceUri = new Uri(embeddingsEndpoint),
+                    ApiKey = embeddingsApiKey,
+                    DeploymentId = embeddingsDeployment,
+                    //AuthIdentity = new SearchIndexerDataUserAssignedIdentity("randomuser")
+                };
+
+            var skills = useOcr
+                ? new List<SearchIndexerSkill> { ocrSkill, ocrMergeSkill, splitSkill, azureOpenAIEmbeddingSkill }
+                : new List<SearchIndexerSkill> { splitSkill, azureOpenAIEmbeddingSkill };
+
+            var skillset = new SearchIndexerSkillset("datasourceskillset", skills) {
+                // CognitiveServicesAccount = new CognitiveServicesAccountKey(cognitivekey),
+                IndexProjections = new SearchIndexerIndexProjections(
+                    new List<SearchIndexerIndexProjectionSelector>
+                    {
+                        new SearchIndexerIndexProjectionSelector(
+                            datasourceIndex.Name,
+                            "ParentKey",
+                            "/document/pages/*",
+                            new List<InputFieldMappingEntry>
+                                {
+                                    new InputFieldMappingEntry("page") { Source = "/document/pages/*" },
+                                    new InputFieldMappingEntry(vectorFieldName) { Source = "/document/pages/*/vector" }
+                                }
+                            )
+                    }
+                    )
+                {
+                    Parameters = new SearchIndexerIndexProjectionsParameters() { ProjectionMode = IndexProjectionMode.SkipIndexingParentDocuments }
+                }
+            };
+
             return skillset;
         }
 
