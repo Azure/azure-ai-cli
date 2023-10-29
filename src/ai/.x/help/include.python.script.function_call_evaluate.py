@@ -1,21 +1,11 @@
 import asyncio
-import pathlib
-import platform
+import importlib
 import json
 import os
+import pathlib
 import sys
 from azure.identity import DefaultAzureCredential
-from azure.ai.generative import AIClient
-from azure.ai.generative.operations._index_data_source import LocalSource, ACSOutputConfig
-from azure.ai.generative.functions.build_mlindex import build_mlindex
-from azure.ai.generative.entities.mlindex import MLIndex
-import asyncio
-import argparse
-import importlib
-import inspect
-import json
-import os
-import sys
+from azure.ai.resources.client import AIClient
 from typing import Any, List, Dict, Generator
 
 class AutoFlushingStream:
@@ -257,7 +247,10 @@ def run_and_or_evaluate(subscription_id, resource_group_name, project_name, modu
     print("Evaluating... Done!")
     print(eval_results)
 
-    return eval_results
+    return {
+        "metrics_summary": eval_results.metrics_summary,
+        "artifacts": eval_results.artifacts
+    }
 
 def main():
 

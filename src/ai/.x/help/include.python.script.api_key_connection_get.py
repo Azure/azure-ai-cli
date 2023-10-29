@@ -2,9 +2,7 @@ import argparse
 import json
 import time
 from datetime import datetime, timedelta
-from azure.ai.generative import AIClient
-from azure.ai.generative.entities import Connection
-from azure.ai.ml.entities._credentials import ApiKeyConfiguration
+from azure.ai.resources.client import AIClient
 from azure.identity import DefaultAzureCredential
 
 def get_api_key_connection(subscription_id, resource_group_name, project_name, connection_name):

@@ -3,10 +3,10 @@ import json
 import os
 import sys
 from azure.identity import DefaultAzureCredential
-from azure.ai.generative import AIClient
-from azure.ai.generative.operations._index_data_source import LocalSource, ACSOutputConfig
-from azure.ai.generative.functions.build_mlindex import build_mlindex
-from azure.ai.generative.entities.mlindex import MLIndex
+from azure.ai.resources.client import AIClient
+from azure.ai.resources.operations._index_data_source import LocalSource, ACSOutputConfig
+from azure.ai.generative.index import build_index
+from azure.ai.resources.entities import Index
 
 class AutoFlushingStream:
     def __init__(self, stream):
@@ -22,9 +22,9 @@ class AutoFlushingStream:
 sys.stdout = AutoFlushingStream(sys.stdout)
 sys.stderr = AutoFlushingStream(sys.stderr)
 
-class MLIndexEncoder(json.JSONEncoder):
+class IndexEncoder(json.JSONEncoder):
     def default(self, obj):
-        if isinstance(obj, MLIndex):
+        if isinstance(obj, Index):
             return {
                 "name": obj.name,
                 "path": obj.path,
@@ -80,7 +80,7 @@ def search_index_update(
     print(f"Data files path: {data_files_path}")
     print(f"Data files glob pattern: {data_files_glob_pattern}")
 
-    index = build_mlindex(
+    index = build_index(
         output_index_name=index_name,
         vector_store="azure_cognitive_search",
         embeddings_model = f"azure_open_ai://deployment/{embedding_model_deployment}/model/{embedding_model_name}",
@@ -92,7 +92,7 @@ def search_index_update(
         ),
     )
 
-    return client.mlindexes.create_or_update(index)
+    return client.indexes.create_or_update(index)
 
 def main():
     """Parse command line arguments and build MLIndex."""
@@ -118,7 +118,7 @@ def main():
     external_source_url = args.external_source_url
     
     index = search_index_update(subscription_id, resource_group_name, project_name, index_name, embedding_model_deployment, embedding_model_name, data_files, external_source_url)
-    formatted = json.dumps({"index": index}, indent=2, cls=MLIndexEncoder)
+    formatted = json.dumps({"index": index}, indent=2, cls=IndexEncoder)
 
     print("---")
     print(formatted)

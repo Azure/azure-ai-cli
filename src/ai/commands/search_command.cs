@@ -105,6 +105,13 @@ namespace Azure.AI.Details.Common.CLI
                 var externalSourceUrl = ExternalSourceToken.Data().GetOrDefault(_values);
 
                 output = DoIndexUpdateWithGenAi(subscription, group, project, searchIndexName, embeddingModelDeployment, embeddingModelName, pattern, externalSourceUrl);
+
+                var parsed = !string.IsNullOrEmpty(output) ? JToken.Parse(output) : null;
+                var index = parsed?.Type == JTokenType.Object ? parsed["index"] : null;
+                if (index == null)
+                {
+                    _values.AddThrowError("ERROR:", $"Failed to update search index '{searchIndexName}'");
+                }
             }
 
             if (!_quiet) Console.WriteLine($"{message} Done!\n");
