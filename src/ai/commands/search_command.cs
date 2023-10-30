@@ -94,6 +94,7 @@ namespace Azure.AI.Details.Common.CLI
 
             if (useIndexer)
             {
+                var aiServicesApiKey = AiServicesApiKeyToken.Data().Demand(_values, action, command, checkConfig: "services.key");
                 var searchEndpoint = DemandSearchEndpointUri(action, command);
                 var searchApiKey = DemandSearchApiKey(action, command);
                 var embeddingsEndpoint = DemandEmbeddingsEndpointUri(action, command);
@@ -103,7 +104,7 @@ namespace Azure.AI.Details.Common.CLI
                 var dataSourceContainerName = SearchIndexerDataSourceContainerNameToken.Data().Demand(_values, action, command);
                 var vectorFieldName = VectorFieldNameToken.Data().GetOrDefault(_values, "Embedding");
 
-                output = DoIndexUpdateWithAISearch(searchEndpoint, searchApiKey, embeddingsEndpoint, embeddingModelDeployment, embeddingsApiKey, searchIndexName, dataSourceConnectionName, dataSourceConnectionString, dataSourceContainerName, vectorFieldName).Result;
+                output = DoIndexUpdateWithAISearch(aiServicesApiKey, searchEndpoint, searchApiKey, embeddingsEndpoint, embeddingModelDeployment, embeddingsApiKey, searchIndexName, dataSourceConnectionName, dataSourceConnectionString, dataSourceContainerName, vectorFieldName).Result;
             }
             else if (useSK)
             {
@@ -153,11 +154,11 @@ namespace Azure.AI.Details.Common.CLI
             return PythonSDKWrapper.UpdateMLIndex(_values, subscription, groupName, projectName, indexName, embeddingModelDeployment, embeddingModelName, dataFiles, externalSourceUrl);
         }
 
-        private async Task<string> DoIndexUpdateWithAISearch(string searchEndpoint, string searchApiKey, string embeddingsEndpoint, string embeddingsDeployment, string embeddingsApiKey, string searchIndexName, string dataSourceConnectionName, string dataSourceConnectionString, string dataSourceContainerName, string vectorFieldName)
+        private async Task<string> DoIndexUpdateWithAISearch(string aiServicesApiKey, string searchEndpoint, string searchApiKey, string embeddingsEndpoint, string embeddingsDeployment, string embeddingsApiKey, string searchIndexName, string dataSourceConnectionName, string dataSourceConnectionString, string dataSourceContainerName, string vectorFieldName)
         {
             var datasourceIndex = PrepGetSearchIndex(embeddingsEndpoint, embeddingsDeployment, embeddingsApiKey, searchIndexName, vectorFieldName);
             var dataSource = PrepGetDataSourceConnection(dataSourceConnectionName, dataSourceConnectionString, dataSourceContainerName);
-            var skillset = PrepGetSkillset(embeddingsEndpoint, embeddingsDeployment, embeddingsApiKey, vectorFieldName, datasourceIndex);
+            var skillset = PrepGetSkillset(aiServicesApiKey, embeddingsEndpoint, embeddingsDeployment, embeddingsApiKey, vectorFieldName, datasourceIndex);
             var indexer = PrepGetIndexer(datasourceIndex, dataSource, skillset);
 
             Uri endpoint = new Uri(searchEndpoint);
@@ -252,7 +253,7 @@ namespace Azure.AI.Details.Common.CLI
                     new SearchIndexerDataContainer(dataSourceContainerName));
         }
 
-        private static SearchIndexerSkillset PrepGetSkillset(string embeddingsEndpoint, string embeddingsDeployment, string embeddingsApiKey, string vectorFieldName, SearchIndex datasourceIndex)
+        private static SearchIndexerSkillset PrepGetSkillset(string aiServicesApiKey, string embeddingsEndpoint, string embeddingsDeployment, string embeddingsApiKey, string vectorFieldName, SearchIndex datasourceIndex)
         {
             var useOcr = true;
 
@@ -315,27 +316,27 @@ namespace Azure.AI.Details.Common.CLI
                 ? new List<SearchIndexerSkill> { ocrSkill, ocrMergeSkill, splitSkill, azureOpenAIEmbeddingSkill }
                 : new List<SearchIndexerSkill> { splitSkill, azureOpenAIEmbeddingSkill };
 
-            var skillset = new SearchIndexerSkillset("datasourceskillset", skills) {
-                // CognitiveServicesAccount = new CognitiveServicesAccountKey(cognitivekey),
-                IndexProjections = new SearchIndexerIndexProjections(
-                    new List<SearchIndexerIndexProjectionSelector>
-                    {
-                        new SearchIndexerIndexProjectionSelector(
-                            datasourceIndex.Name,
-                            "ParentKey",
-                            "/document/pages/*",
-                            new List<InputFieldMappingEntry>
-                                {
-                                    new InputFieldMappingEntry("page") { Source = "/document/pages/*" },
-                                    new InputFieldMappingEntry(vectorFieldName) { Source = "/document/pages/*/vector" }
-                                }
-                            )
-                    }
-                    )
-                {
+            var indexProjections = new SearchIndexerIndexProjections(
+                new List<SearchIndexerIndexProjectionSelector> {
+                    new SearchIndexerIndexProjectionSelector(
+                        datasourceIndex.Name,
+                        "ParentKey",
+                        "/document/pages/*",
+                        new List<InputFieldMappingEntry> {
+                            new InputFieldMappingEntry("page") { Source = "/document/pages/*" },
+                            new InputFieldMappingEntry(vectorFieldName) { Source = "/document/pages/*/vector" }
+                })}) {
                     Parameters = new SearchIndexerIndexProjectionsParameters() { ProjectionMode = IndexProjectionMode.SkipIndexingParentDocuments }
+                };
+
+            var skillset = !string.IsNullOrEmpty(aiServicesApiKey)
+                ? new SearchIndexerSkillset("datasourceskillset", skills) {
+                    CognitiveServicesAccount = new CognitiveServicesAccountKey(aiServicesApiKey),
+                    IndexProjections = indexProjections
                 }
-            };
+                : new SearchIndexerSkillset("datasourceskillset", skills) {
+                    IndexProjections = indexProjections
+                };
 
             return skillset;
         }

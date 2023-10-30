@@ -34,9 +34,9 @@ namespace Azure.AI.Details.Common.CLI
             var actions = new List<Action<int>>(new Action<int>[] {
                 ConfigSetLambda("@subscription", subscriptionId, "Subscription", subscriptionId, ref maxLabelWidth),
 
-                ConfigSetLambda("@aiservices.endpoint", endpoint, "Endpoint (aiservices)", endpoint, ref maxLabelWidth),
-                ConfigSetLambda("@aiservices.key", key, "Key (aiservices)", key.Substring(0, 4) + "****************************", ref maxLabelWidth),
-                ConfigSetLambda("@aiservices.region", region, "Region (aiservices)", region, ref maxLabelWidth),
+                ConfigSetLambda("@services.endpoint", endpoint, "Endpoint (AIServices)", endpoint, ref maxLabelWidth),
+                ConfigSetLambda("@services.key", key, "Key (AIServices)", key.Substring(0, 4) + "****************************", ref maxLabelWidth),
+                ConfigSetLambda("@services.region", region, "Region (AIServices)", region, ref maxLabelWidth),
 
                 ConfigSetLambda("@chat.key", key, "Key (chat)", key.Substring(0, 4) + "****************************", ref maxLabelWidth),
                 ConfigSetLambda("@chat.endpoint", endpoint, "Endpoint (chat)", endpoint, ref maxLabelWidth),
