@@ -25,7 +25,7 @@ namespace Azure.AI.Details.Common.CLI
             actions.ForEach(x => x?.Invoke(maxLabelWidth));
         }
 
-        public static void ConfigAiServicesResource(string subscriptionId, string region, string endpoint, AzCli.CognitiveServicesDeploymentInfo chatDeployment, AzCli.CognitiveServicesDeploymentInfo embeddingsDeployment, AzCli.CognitiveServicesDeploymentInfo evaluationDeployment, string key)
+        public static void ConfigCognitiveServicesAIServicesKindResource(string subscriptionId, string region, string endpoint, AzCli.CognitiveServicesDeploymentInfo chatDeployment, AzCli.CognitiveServicesDeploymentInfo embeddingsDeployment, AzCli.CognitiveServicesDeploymentInfo evaluationDeployment, string key)
         {
             ConsoleHelpers.WriteLineWithHighlight($"\n`CONFIG AI SERVICES`");
             Console.WriteLine();
@@ -39,6 +39,7 @@ namespace Azure.AI.Details.Common.CLI
                 ConfigSetLambda("@services.region", region, "Region (AIServices)", region, ref maxLabelWidth),
 
                 ConfigSetLambda("@chat.key", key, "Key (chat)", key.Substring(0, 4) + "****************************", ref maxLabelWidth),
+                ConfigSetLambda("@chat.region", region, "Region (chat)", region, ref maxLabelWidth),
                 ConfigSetLambda("@chat.endpoint", endpoint, "Endpoint (chat)", endpoint, ref maxLabelWidth),
                 ConfigSetLambda("@chat.deployment", chatDeployment.Name, "Deployment (chat)", chatDeployment.Name, ref maxLabelWidth),
                 ConfigSetLambda("@chat.model", chatDeployment.ModelName, "Model Name (chat)", chatDeployment.ModelName, ref maxLabelWidth),
@@ -53,7 +54,25 @@ namespace Azure.AI.Details.Common.CLI
                 ConfigSetLambda("@chat.evaluation.model.deployment.name", evaluationDeployment.Name, "Deployment (evaluation)", evaluationDeployment.Name, ref maxLabelWidth),
                 ConfigSetLambda("@chat.evaluation.model.name", evaluationDeployment.ModelName, "Model Name (evaluation)", evaluationDeployment.ModelName, ref maxLabelWidth),
 
-                ConfigSetLambda("@chat.region", region, "Region", region, ref maxLabelWidth),
+                ConfigSetLambda("@speech.endpoint", endpoint, "Endpoint (speech)", endpoint, ref maxLabelWidth),
+                ConfigSetLambda("@speech.key", key, "Key (speech)", key.Substring(0, 4) + "****************************", ref maxLabelWidth),
+                ConfigSetLambda("@speech.region", region, "Region (speech)", region, ref maxLabelWidth),
+            });
+            actions.ForEach(x => x?.Invoke(maxLabelWidth));
+        }
+
+        public static void ConfigCognitiveServicesCognitiveServicesKindResource(string subscriptionId, string region, string endpoint, string key)
+        {
+            ConsoleHelpers.WriteLineWithHighlight($"\n`CONFIG AI SERVICES (v1)`");
+            Console.WriteLine();
+
+            int maxLabelWidth = 0;
+            var actions = new List<Action<int>>(new Action<int>[] {
+                ConfigSetLambda("@subscription", subscriptionId, "Subscription", subscriptionId, ref maxLabelWidth),
+
+                ConfigSetLambda("@services.endpoint", endpoint, "Endpoint (AIServices)", endpoint, ref maxLabelWidth),
+                ConfigSetLambda("@services.key", key, "Key (AIServices)", key.Substring(0, 4) + "****************************", ref maxLabelWidth),
+                ConfigSetLambda("@services.region", region, "Region (AIServices)", region, ref maxLabelWidth),
 
                 ConfigSetLambda("@speech.endpoint", endpoint, "Endpoint (speech)", endpoint, ref maxLabelWidth),
                 ConfigSetLambda("@speech.key", key, "Key (speech)", key.Substring(0, 4) + "****************************", ref maxLabelWidth),
