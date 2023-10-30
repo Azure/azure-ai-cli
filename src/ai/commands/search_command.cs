@@ -24,6 +24,13 @@ using Azure.Search.Documents;
 using Azure.Search.Documents.Indexes;
 using Azure.Search.Documents.Indexes.Models;
 using Azure.Search.Documents.Models;
+using Azure.Storage.Blobs;
+using Azure.Storage.Sas;
+using Azure.Storage;
+using Azure.Identity;
+using Azure.Storage.Blobs.Models;
+using System.Diagnostics.Tracing;
+using Azure.Core.Diagnostics;
 
 namespace Azure.AI.Details.Common.CLI
 {
@@ -81,15 +88,16 @@ namespace Azure.AI.Details.Common.CLI
             var action = "Updating search index";
             var command = "search index update";
 
+            var pattern = DemandSearchIndexUpdateFilesPattern(action, command);
             var searchIndexName = SearchIndexNameToken.Data().Demand(_values, action, command);
-            var dataSourceConnectionString = SearchIndexerDataSourceConnectionStringToken.Data().GetOrDefault(_values);
+            var blobContainer = BlobContainerToken.Data().GetOrDefault(_values);
 
             var message = $"{action} '{searchIndexName}' ...";
             if (!_quiet) Console.WriteLine(message);
 
             var output = string.Empty;
 
-            var useIndexer = !string.IsNullOrEmpty(dataSourceConnectionString);
+            var useIndexer = !string.IsNullOrEmpty(blobContainer);
             var useSK = !useIndexer && SKIndexNameToken.IsSKIndexKind(_values);
 
             if (useIndexer)
@@ -101,14 +109,12 @@ namespace Azure.AI.Details.Common.CLI
                 var embeddingsApiKey = DemandEmbeddingsApiKey(action, command);
                 var embeddingModelDeployment = SearchEmbeddingModelDeploymentNameToken.Data().Demand(_values, action, command, checkConfig: "embedding.model.deployment.name");
                 var dataSourceConnectionName = SearchIndexerDataSourceConnectionNameToken.Data().GetOrDefault(_values, "datasource");
-                var dataSourceContainerName = SearchIndexerDataSourceContainerNameToken.Data().Demand(_values, action, command);
                 var vectorFieldName = VectorFieldNameToken.Data().GetOrDefault(_values, "Embedding");
 
-                output = DoIndexUpdateWithAISearch(aiServicesApiKey, searchEndpoint, searchApiKey, embeddingsEndpoint, embeddingModelDeployment, embeddingsApiKey, searchIndexName, dataSourceConnectionName, dataSourceConnectionString, dataSourceContainerName, vectorFieldName).Result;
+                output = DoIndexUpdateWithAISearch(aiServicesApiKey, searchEndpoint, searchApiKey, embeddingsEndpoint, embeddingModelDeployment, embeddingsApiKey, searchIndexName, dataSourceConnectionName, blobContainer, pattern, vectorFieldName).Result;
             }
             else if (useSK)
             {
-                var pattern = DemandSearchIndexUpdateFilesPattern(action, command);
                 var searchEndpoint = DemandSearchEndpointUri(action, command);
                 var searchApiKey = DemandSearchApiKey(action, command);
                 var embeddingsEndpoint = DemandEmbeddingsEndpointUri(action, command);
@@ -128,7 +134,6 @@ namespace Azure.AI.Details.Common.CLI
                 var embeddingsApiKey = DemandEmbeddingsApiKey(action, command);
                 var embeddingModelDeployment = SearchEmbeddingModelDeploymentNameToken.Data().Demand(_values, action, command, checkConfig: "embedding.model.deployment.name");
                 var embeddingModelName = SearchEmbeddingModelNameToken.Data().Demand(_values, action, command, checkConfig: "embedding.model.name");
-                var pattern = DemandSearchIndexUpdateFilesPattern(action, command);
                 var externalSourceUrl = ExternalSourceToken.Data().GetOrDefault(_values);
 
                 output = DoIndexUpdateWithGenAi(subscription, group, project, searchIndexName, embeddingModelDeployment, embeddingModelName, pattern, externalSourceUrl);
@@ -154,10 +159,13 @@ namespace Azure.AI.Details.Common.CLI
             return PythonSDKWrapper.UpdateMLIndex(_values, subscription, groupName, projectName, indexName, embeddingModelDeployment, embeddingModelName, dataFiles, externalSourceUrl);
         }
 
-        private async Task<string> DoIndexUpdateWithAISearch(string aiServicesApiKey, string searchEndpoint, string searchApiKey, string embeddingsEndpoint, string embeddingsDeployment, string embeddingsApiKey, string searchIndexName, string dataSourceConnectionName, string dataSourceConnectionString, string dataSourceContainerName, string vectorFieldName)
+        private async Task<string> DoIndexUpdateWithAISearch(string aiServicesApiKey, string searchEndpoint, string searchApiKey, string embeddingsEndpoint, string embeddingsDeployment, string embeddingsApiKey, string searchIndexName, string dataSourceConnectionName, string blobContainer, string pattern, string vectorFieldName)
         {
+            var (connectionString, containerName) = await UploadFilesToBlobContainer(blobContainer, pattern);
+
+            Console.WriteLine("Connecting to Search ...");
             var datasourceIndex = PrepGetSearchIndex(embeddingsEndpoint, embeddingsDeployment, embeddingsApiKey, searchIndexName, vectorFieldName);
-            var dataSource = PrepGetDataSourceConnection(dataSourceConnectionName, dataSourceConnectionString, dataSourceContainerName);
+            var dataSource = PrepGetDataSourceConnection(dataSourceConnectionName, connectionString, containerName);
             var skillset = PrepGetSkillset(aiServicesApiKey, embeddingsEndpoint, embeddingsDeployment, embeddingsApiKey, vectorFieldName, datasourceIndex);
             var indexer = PrepGetIndexer(datasourceIndex, dataSource, skillset);
 
@@ -172,11 +180,13 @@ namespace Azure.AI.Details.Common.CLI
             SearchIndexClient indexClient = new(endpoint, credential);
             await indexClient.DeleteIndexAsync(datasourceIndex.Name);
 
+            Console.WriteLine("Creating Search index ...");
             await indexClient.CreateIndexAsync(datasourceIndex);
             await indexerClient.CreateOrUpdateDataSourceConnectionAsync(dataSource);
             await indexerClient.CreateSkillsetAsync(skillset);
             await indexerClient.CreateIndexerAsync(indexer);
 
+            Console.Write("Running indexer ...");
             await indexerClient.RunIndexerAsync(indexer.Name);
 
             var output = string.Empty;
@@ -195,6 +205,93 @@ namespace Azure.AI.Details.Common.CLI
             }
 
             return output;
+        }
+
+        private async Task<(string connectionString, string containerName)> UploadFilesToBlobContainer(string blobUrlWithContainerName, string pattern)
+        {
+            int thirdSlash = blobUrlWithContainerName.IndexOf('/', blobUrlWithContainerName.IndexOf('/', blobUrlWithContainerName.IndexOf('/') + 1) + 1);
+            var endpoint = blobUrlWithContainerName.Substring(0, thirdSlash);
+            var containerName = blobUrlWithContainerName.Substring(thirdSlash + 1);
+
+            Console.WriteLine();
+            Console.WriteLine($"Connecting to blob container ...");
+
+            var azureEventSourceListener = new AzureEventSourceListener((e, message) => EventSourceAiLoggerLog(e, message), System.Diagnostics.Tracing.EventLevel.Verbose);
+            var options = new BlobClientOptions() { Diagnostics = { IsLoggingEnabled = true, IsLoggingContentEnabled = true } };
+
+            var serviceClient = new BlobServiceClient(new Uri(endpoint), new DefaultAzureCredential(), options);
+            var containerClient = serviceClient.GetBlobContainerClient(containerName);
+
+            if (!containerClient.Exists())
+            {
+                Console.WriteLine($"\nCreating blob container ...");
+                containerClient = serviceClient.CreateBlobContainer(containerName);
+                Console.WriteLine($"Creating blob container ... Done!\n");
+            }
+            Console.WriteLine($"Connecting to blob container ... Done!\n");
+
+            Console.WriteLine("Uploading files to blob container ...");
+            await UploadFilesToBlobContainer(containerClient, pattern);
+            Console.WriteLine("Uploading files to blob container ... Done!\n");
+
+            var connectionString = BuildConnectionString(serviceClient, endpoint, containerName);
+
+            return (connectionString, containerName);
+        }
+
+        private async Task UploadFilesToBlobContainer(BlobContainerClient containerClient, string pattern)
+        {
+            var files = FileHelpers.FindFilesInDataPath(pattern, _values)
+                .Where(x => File.Exists(x))
+                .Select(x => new FileInfo(x).FullName)
+                .Distinct();
+
+            Console.WriteLine();
+
+            var tasks = files.Select(x => UploadFileToBlobContainer(containerClient, x));
+            await Task.WhenAll(tasks);
+
+            Console.WriteLine();
+        }
+
+        private Task<Response<BlobContentInfo>> UploadFileToBlobContainer(BlobContainerClient containerClient, string fileName)
+        {
+            var blobName = Path.GetFileName(fileName);
+            var blobClient = containerClient.GetBlobClient(blobName);
+            var uploaded = blobClient.UploadAsync(fileName, true);
+
+            return uploaded.ContinueWith<Response<BlobContentInfo>>(x => {
+                if (x.Exception != null)
+                {
+                    throw x.Exception;
+                }
+
+                var response = x.Result;
+                var info = response.Value;
+                Console.WriteLine($"  {blobName} ({new FileInfo(fileName).Length} byte(s))");
+                return response;
+            });
+        }
+
+        private static string BuildConnectionString(BlobServiceClient serviceClient, string endpoint, string containerName)
+        {
+            var accountName = endpoint.Substring(8, endpoint.IndexOf('.') - 8);
+
+            Console.WriteLine("Generating SAS token ...");
+            Console.WriteLine();
+            Console.WriteLine("  Signing method: User delegation");
+            Console.WriteLine("  Expires: " + DateTime.Now.AddYears(5).ToString("yyyy-MM-dd HH:mm:ss"));
+
+            var expiresOn = DateTimeOffset.UtcNow.AddYears(5);
+            var userKey = serviceClient.GetUserDelegationKey(null, expiresOn);
+            Console.WriteLine("  Key: " + userKey.Value);
+
+            var sasBuilder = new BlobSasBuilder(BlobContainerSasPermissions.All, expiresOn) { BlobContainerName = containerName, Resource = "c", };
+            var sasToken = sasBuilder.ToSasQueryParameters(userKey, accountName);
+
+            Console.WriteLine($"  Blob SAS token: {sasToken}");
+
+            return $"BlobEndpoint={endpoint};SharedAccessSignature={sasToken}";
         }
 
         private static SearchIndex PrepGetSearchIndex(string embeddingsEndpoint, string embeddingsDeployment, string embeddingsApiKey, string searchIndexName, string vectorFieldName)
@@ -561,6 +658,28 @@ namespace Azure.AI.Details.Common.CLI
             _stopEvent.Set();
         }
 
+        private void EventSourceAiLoggerLog(EventWrittenEventArgs e, string message)
+        {
+            message = message.Replace("\r", "\\r").Replace("\n", "\\n");
+            switch (e.Level)
+            {
+                case EventLevel.Error:
+                    AI.DBG_TRACE_ERROR(message, 0, e.EventSource.Name, e.EventName);
+                    break;
+
+                case EventLevel.Warning:
+                    AI.DBG_TRACE_WARNING(message, 0, e.EventSource.Name, e.EventName);
+                    break;
+
+                case EventLevel.Informational:
+                    AI.DBG_TRACE_INFO(message, 0, e.EventSource.Name, e.EventName);
+                    break;
+
+                default:
+                case EventLevel.Verbose:
+                    AI.DBG_TRACE_VERBOSE(message, 0, e.EventSource.Name, e.EventName); break;
+            }
+        }
         private SpinLock _lock = null;
         private readonly bool _quiet = false;
         private readonly bool _verbose = false;

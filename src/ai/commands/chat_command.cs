@@ -20,8 +20,6 @@ using Microsoft.SemanticKernel;
 using Microsoft.SemanticKernel.Connectors.Memory.AzureCognitiveSearch;
 using Microsoft.SemanticKernel.Memory;
 using Azure.Core.Diagnostics;
-using Azure.Core.Pipeline;
-using Azure.Core;
 using System.Diagnostics.Tracing;
 using Microsoft.CognitiveServices.Speech;
 

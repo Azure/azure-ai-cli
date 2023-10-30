@@ -17,8 +17,7 @@ USAGE: ai index update [...]
 
   AZURE SEARCH DATA SOURCE
     --data-source-connection NAME           (see: ai help search data source connection)
-    --data-source-connection-string STRING  (see: ai help search data source connection string)
-    --data-source-container-name NAME       (see: ai help search data source container name)
+    --blob-container ENDPOINT/NAME          (see: ai help search data source blob container)
     --vector-field NAME                     (see: ai help search vector field name)
 
   OPENAI EMBEDDINGS
