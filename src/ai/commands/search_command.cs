@@ -216,10 +216,10 @@ namespace Azure.AI.Details.Common.CLI
             Console.WriteLine();
             Console.WriteLine($"Connecting to blob container ...");
 
-            var azureEventSourceListener = new AzureEventSourceListener((e, message) => EventSourceAiLoggerLog(e, message), System.Diagnostics.Tracing.EventLevel.Verbose);
             var options = new BlobClientOptions() { Diagnostics = { IsLoggingEnabled = true, IsLoggingContentEnabled = true } };
-
             var serviceClient = new BlobServiceClient(new Uri(endpoint), new DefaultAzureCredential(), options);
+            var connectionString = BuildConnectionString(serviceClient, endpoint, containerName);
+
             var containerClient = serviceClient.GetBlobContainerClient(containerName);
 
             if (!containerClient.Exists())
@@ -233,8 +233,6 @@ namespace Azure.AI.Details.Common.CLI
             Console.WriteLine("Uploading files to blob container ...");
             await UploadFilesToBlobContainer(containerClient, pattern);
             Console.WriteLine("Uploading files to blob container ... Done!\n");
-
-            var connectionString = BuildConnectionString(serviceClient, endpoint, containerName);
 
             return (connectionString, containerName);
         }
@@ -282,7 +280,7 @@ namespace Azure.AI.Details.Common.CLI
             Console.WriteLine("  Signing method: User delegation");
             Console.WriteLine("  Expires: " + DateTime.Now.AddYears(5).ToString("yyyy-MM-dd HH:mm:ss"));
 
-            var expiresOn = DateTimeOffset.UtcNow.AddYears(5);
+            var expiresOn = DateTimeOffset.UtcNow.AddDays(1);
             var userKey = serviceClient.GetUserDelegationKey(null, expiresOn);
             Console.WriteLine("  Key: " + userKey.Value);
 
@@ -656,29 +654,6 @@ namespace Azure.AI.Details.Common.CLI
             // _output.StopOutput();
 
             _stopEvent.Set();
-        }
-
-        private void EventSourceAiLoggerLog(EventWrittenEventArgs e, string message)
-        {
-            message = message.Replace("\r", "\\r").Replace("\n", "\\n");
-            switch (e.Level)
-            {
-                case EventLevel.Error:
-                    AI.DBG_TRACE_ERROR(message, 0, e.EventSource.Name, e.EventName);
-                    break;
-
-                case EventLevel.Warning:
-                    AI.DBG_TRACE_WARNING(message, 0, e.EventSource.Name, e.EventName);
-                    break;
-
-                case EventLevel.Informational:
-                    AI.DBG_TRACE_INFO(message, 0, e.EventSource.Name, e.EventName);
-                    break;
-
-                default:
-                case EventLevel.Verbose:
-                    AI.DBG_TRACE_VERBOSE(message, 0, e.EventSource.Name, e.EventName); break;
-            }
         }
         private SpinLock _lock = null;
         private readonly bool _quiet = false;
