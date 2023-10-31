@@ -8,6 +8,7 @@ from azure.ai.ml.entities._credentials import ApiKeyConfiguration
 from azure.identity import DefaultAzureCredential
 
 def create_api_key_connection(subscription_id, resource_group_name, project_name, connection_name, connection_type, endpoint, key, api_version, kind):
+
     client = AIClient(
         credential=DefaultAzureCredential(),
         subscription_id=subscription_id,
@@ -17,7 +18,6 @@ def create_api_key_connection(subscription_id, resource_group_name, project_name
     )
 
     conn_class = BaseConnection._get_ai_connection_class_from_type(connection_type)
-
     if conn_class == BaseConnection:
         # TODO print warning, users shouldn't run into this unless dealing with odd legacy stuff.
         conn = conn_class(
@@ -51,7 +51,7 @@ def create_api_key_connection(subscription_id, resource_group_name, project_name
             api_version=api_version,
             kind=kind,
         )
-        
+
     conn = client.connections.create_or_update(conn)
     conn2 = client.connections.get(conn.name)
 
@@ -61,7 +61,6 @@ def create_api_key_connection(subscription_id, resource_group_name, project_name
         "target": conn2.target,
         "credentials": conn2.credentials.values()
     }
-
     print(result);
     return result
 
@@ -97,7 +96,7 @@ def main():
 
     while datetime.now() - start_time < timeout:
         try:
-            connection = create_api_key_connection(subscription_id, resource_group_name, project_name, connection_name, connection_type, endpoint, key, api_version, kind))
+            connection = create_api_key_connection(subscription_id, resource_group_name, project_name, connection_name, connection_type, endpoint, key, api_version, kind)
             if connection is not None:
                 success = True
                 break
