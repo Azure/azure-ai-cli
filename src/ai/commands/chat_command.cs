@@ -20,8 +20,6 @@ using Microsoft.SemanticKernel;
 using Microsoft.SemanticKernel.Connectors.Memory.AzureCognitiveSearch;
 using Microsoft.SemanticKernel.Memory;
 using Azure.Core.Diagnostics;
-using Azure.Core.Pipeline;
-using Azure.Core;
 using System.Diagnostics.Tracing;
 using Microsoft.CognitiveServices.Speech;
 
@@ -612,7 +610,7 @@ namespace Azure.AI.Details.Common.CLI
                 _values.AddThrowError("ERROR:", $"Creating Azure AI Search extension; requires embedding key, endpoint, and deployment.");
             }
 
-            var queryType = QueryTypeFrom(_values["service.config.search.query.type"]) ?? AzureCognitiveSearchQueryType.Vector;
+            var queryType = QueryTypeFrom(_values["service.config.search.query.type"]) ?? AzureCognitiveSearchQueryType.VectorSimpleHybrid;
 
             options.AzureExtensionsOptions = new()
             {

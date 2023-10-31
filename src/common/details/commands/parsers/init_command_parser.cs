@@ -21,6 +21,8 @@ namespace Azure.AI.Details.Common.CLI
         }
 
         private static readonly (string name, bool valuesRequired)[] _commands =  {
+            ("init.aiservices", false),
+            ("init.cognitiveservices", false),
             ("init.openai", false),
             ("init.search", false),
             ("init.speech", false),
@@ -38,6 +40,8 @@ namespace Azure.AI.Details.Common.CLI
             var commandName = values.GetCommand();
             switch (commandName)
             {
+                case "init.aiservices":
+                case "init.cognitiveservices":
                 case "init.openai":
                 case "init.search":
                 case "init.speech":

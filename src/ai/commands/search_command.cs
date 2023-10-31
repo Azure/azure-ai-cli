@@ -20,6 +20,18 @@ using Microsoft.SemanticKernel;
 using Microsoft.SemanticKernel.Memory;
 using Microsoft.SemanticKernel.Connectors.Memory.AzureCognitiveSearch;
 
+using Azure.Search.Documents;
+using Azure.Search.Documents.Indexes;
+using Azure.Search.Documents.Indexes.Models;
+using Azure.Search.Documents.Models;
+using Azure.Storage.Blobs;
+using Azure.Storage.Sas;
+using Azure.Storage;
+using Azure.Identity;
+using Azure.Storage.Blobs.Models;
+using System.Diagnostics.Tracing;
+using Azure.Core.Diagnostics;
+
 namespace Azure.AI.Details.Common.CLI
 {
     public class SearchCommand : Command
@@ -76,16 +88,32 @@ namespace Azure.AI.Details.Common.CLI
             var action = "Updating search index";
             var command = "search index update";
 
-            var searchIndexName = SearchIndexNameToken.Data().Demand(_values, action, command);
             var pattern = DemandSearchIndexUpdateFilesPattern(action, command);
+            var searchIndexName = SearchIndexNameToken.Data().Demand(_values, action, command);
+            var blobContainer = BlobContainerToken.Data().GetOrDefault(_values);
 
             var message = $"{action} '{searchIndexName}' ...";
             if (!_quiet) Console.WriteLine(message);
 
             var output = string.Empty;
 
-            var doSK = SKIndexNameToken.IsSKIndexKind(_values);
-            if (doSK)
+            var useIndexer = !string.IsNullOrEmpty(blobContainer);
+            var useSK = !useIndexer && SKIndexNameToken.IsSKIndexKind(_values);
+
+            if (useIndexer)
+            {
+                var aiServicesApiKey = AiServicesApiKeyToken.Data().Demand(_values, action, command, checkConfig: "services.key");
+                var searchEndpoint = DemandSearchEndpointUri(action, command);
+                var searchApiKey = DemandSearchApiKey(action, command);
+                var embeddingsEndpoint = DemandEmbeddingsEndpointUri(action, command);
+                var embeddingsApiKey = DemandEmbeddingsApiKey(action, command);
+                var embeddingModelDeployment = SearchEmbeddingModelDeploymentNameToken.Data().Demand(_values, action, command, checkConfig: "embedding.model.deployment.name");
+                var dataSourceConnectionName = SearchIndexerDataSourceConnectionNameToken.Data().GetOrDefault(_values, "datasource");
+                var vectorFieldName = VectorFieldNameToken.Data().GetOrDefault(_values, "Embedding");
+
+                output = DoIndexUpdateWithAISearch(aiServicesApiKey, searchEndpoint, searchApiKey, embeddingsEndpoint, embeddingModelDeployment, embeddingsApiKey, searchIndexName, dataSourceConnectionName, blobContainer, pattern, vectorFieldName).Result;
+            }
+            else if (useSK)
             {
                 var searchEndpoint = DemandSearchEndpointUri(action, command);
                 var searchApiKey = DemandSearchApiKey(action, command);
@@ -95,11 +123,15 @@ namespace Azure.AI.Details.Common.CLI
 
                 DoIndexUpdateWithSK(searchEndpoint, searchApiKey, embeddingsEndpoint, embeddingsDeployment, embeddingsApiKey, searchIndexName, pattern);
             }
-            else
+            else // use GenAi
             {
                 var subscription = SubscriptionToken.Data().Demand(_values, action, command, checkConfig: "subscription");
                 var project = ProjectNameToken.Data().Demand(_values, action, command, checkConfig: "project");
                 var group = ResourceGroupNameToken.Data().Demand(_values, action, command, checkConfig: "group");
+                var searchEndpoint = DemandSearchEndpointUri(action, command);
+                var searchApiKey = DemandSearchApiKey(action, command);
+                var embeddingsEndpoint = DemandEmbeddingsEndpointUri(action, command);
+                var embeddingsApiKey = DemandEmbeddingsApiKey(action, command);
                 var embeddingModelDeployment = SearchEmbeddingModelDeploymentNameToken.Data().Demand(_values, action, command, checkConfig: "embedding.model.deployment.name");
                 var embeddingModelName = SearchEmbeddingModelNameToken.Data().Demand(_values, action, command, checkConfig: "embedding.model.name");
                 var externalSourceUrl = ExternalSourceToken.Data().GetOrDefault(_values);
@@ -125,6 +157,307 @@ namespace Azure.AI.Details.Common.CLI
         private string DoIndexUpdateWithGenAi(string subscription, string groupName, string projectName, string indexName, string embeddingModelDeployment, string embeddingModelName, string dataFiles, string externalSourceUrl)
         {
             return PythonSDKWrapper.UpdateMLIndex(_values, subscription, groupName, projectName, indexName, embeddingModelDeployment, embeddingModelName, dataFiles, externalSourceUrl);
+        }
+
+        private async Task<string> DoIndexUpdateWithAISearch(string aiServicesApiKey, string searchEndpoint, string searchApiKey, string embeddingsEndpoint, string embeddingsDeployment, string embeddingsApiKey, string searchIndexName, string dataSourceConnectionName, string blobContainer, string pattern, string vectorFieldName)
+        {
+            var (connectionString, containerName) = await UploadFilesToBlobContainer(blobContainer, pattern);
+
+            Console.WriteLine("Connecting to Search ...");
+            var datasourceIndex = PrepGetSearchIndex(embeddingsEndpoint, embeddingsDeployment, embeddingsApiKey, searchIndexName, vectorFieldName);
+            var dataSource = PrepGetDataSourceConnection(dataSourceConnectionName, connectionString, containerName);
+            var skillset = PrepGetSkillset(aiServicesApiKey, embeddingsEndpoint, embeddingsDeployment, embeddingsApiKey, vectorFieldName, datasourceIndex);
+            var indexer = PrepGetIndexer(datasourceIndex, dataSource, skillset);
+
+            Uri endpoint = new Uri(searchEndpoint);
+            AzureKeyCredential credential = new AzureKeyCredential(searchApiKey);
+
+            SearchIndexerClient indexerClient = new SearchIndexerClient(endpoint, credential);
+            indexerClient.DeleteDataSourceConnection(datasourceIndex.Name);
+            indexerClient.DeleteSkillset(skillset.Name);
+            indexerClient.DeleteIndexer(indexer.Name);
+
+            SearchIndexClient indexClient = new(endpoint, credential);
+            await indexClient.DeleteIndexAsync(datasourceIndex.Name);
+
+            Console.WriteLine("Creating Search index ...");
+            await indexClient.CreateIndexAsync(datasourceIndex);
+            await indexerClient.CreateOrUpdateDataSourceConnectionAsync(dataSource);
+            await indexerClient.CreateSkillsetAsync(skillset);
+            await indexerClient.CreateIndexerAsync(indexer);
+
+            Console.Write("Running indexer ...");
+            await indexerClient.RunIndexerAsync(indexer.Name);
+
+            var output = string.Empty;
+            for (;;)
+            {
+                var statusResponse = await indexerClient.GetIndexerStatusAsync(indexer.Name);
+                var lastResult = statusResponse.Value.LastResult;
+                if (lastResult != null && lastResult.Status != IndexerExecutionStatus.InProgress)
+                {
+                    output = JsonSerializer.Serialize(statusResponse.Value, new JsonSerializerOptions { WriteIndented = true });
+                    break;
+                }
+
+                Console.Write('.');
+                Thread.Sleep(1000);
+            }
+
+            return output;
+        }
+
+        private async Task<(string connectionString, string containerName)> UploadFilesToBlobContainer(string blobUrlWithContainerName, string pattern)
+        {
+            int thirdSlash = blobUrlWithContainerName.IndexOf('/', blobUrlWithContainerName.IndexOf('/', blobUrlWithContainerName.IndexOf('/') + 1) + 1);
+            var endpoint = blobUrlWithContainerName.Substring(0, thirdSlash);
+            var containerName = blobUrlWithContainerName.Substring(thirdSlash + 1);
+
+            Console.WriteLine();
+            Console.WriteLine($"Connecting to blob container ...");
+
+            var options = new BlobClientOptions() { Diagnostics = { IsLoggingEnabled = true, IsLoggingContentEnabled = true } };
+            var serviceClient = new BlobServiceClient(new Uri(endpoint), new DefaultAzureCredential(), options);
+            var connectionString = BuildConnectionString(serviceClient, endpoint, containerName);
+
+            var containerClient = serviceClient.GetBlobContainerClient(containerName);
+
+            if (!containerClient.Exists())
+            {
+                Console.WriteLine($"\nCreating blob container ...");
+                containerClient = serviceClient.CreateBlobContainer(containerName);
+                Console.WriteLine($"Creating blob container ... Done!\n");
+            }
+            Console.WriteLine($"Connecting to blob container ... Done!\n");
+
+            Console.WriteLine("Uploading files to blob container ...");
+            await UploadFilesToBlobContainer(containerClient, pattern);
+            Console.WriteLine("Uploading files to blob container ... Done!\n");
+
+            return (connectionString, containerName);
+        }
+
+        private async Task UploadFilesToBlobContainer(BlobContainerClient containerClient, string pattern)
+        {
+            var files = FileHelpers.FindFilesInDataPath(pattern, _values)
+                .Where(x => File.Exists(x))
+                .Select(x => new FileInfo(x).FullName)
+                .Distinct();
+
+            Console.WriteLine();
+
+            var tasks = files.Select(x => UploadFileToBlobContainer(containerClient, x));
+            await Task.WhenAll(tasks);
+
+            Console.WriteLine();
+        }
+
+        private Task<Response<BlobContentInfo>> UploadFileToBlobContainer(BlobContainerClient containerClient, string fileName)
+        {
+            var blobName = Path.GetFileName(fileName);
+            var blobClient = containerClient.GetBlobClient(blobName);
+            var uploaded = blobClient.UploadAsync(fileName, true);
+
+            return uploaded.ContinueWith<Response<BlobContentInfo>>(x => {
+                if (x.Exception != null)
+                {
+                    throw x.Exception;
+                }
+
+                var response = x.Result;
+                var info = response.Value;
+                Console.WriteLine($"  {blobName} ({new FileInfo(fileName).Length} byte(s))");
+                return response;
+            });
+        }
+
+        private static string BuildConnectionString(BlobServiceClient serviceClient, string endpoint, string containerName)
+        {
+            var accountName = endpoint.Substring(8, endpoint.IndexOf('.') - 8);
+
+            Console.WriteLine("Generating SAS token ...");
+            Console.WriteLine();
+            Console.WriteLine("  Signing method: User delegation");
+            Console.WriteLine("  Expires: " + DateTime.Now.AddYears(5).ToString("yyyy-MM-dd HH:mm:ss"));
+
+            var expiresOn = DateTimeOffset.UtcNow.AddDays(1);
+            var userKey = serviceClient.GetUserDelegationKey(null, expiresOn);
+            Console.WriteLine("  Key: " + userKey.Value);
+
+            var sasBuilder = new BlobSasBuilder(BlobContainerSasPermissions.All, expiresOn) { BlobContainerName = containerName, Resource = "c", };
+            var sasToken = sasBuilder.ToSasQueryParameters(userKey, accountName);
+
+            Console.WriteLine($"  Blob SAS token: {sasToken}");
+
+            return $"BlobEndpoint={endpoint};SharedAccessSignature={sasToken}";
+        }
+
+        private static SearchIndex PrepGetSearchIndex(string embeddingsEndpoint, string embeddingsDeployment, string embeddingsApiKey, string searchIndexName, string vectorFieldName)
+        {
+            SearchIndex datasourceIndex = new(searchIndexName)
+            {
+                Fields =
+                    {
+                        new SearchableField("ChunkKey") { IsKey = true, AnalyzerName = LexicalAnalyzerName.Keyword },
+                        new SearchableField("ParentKey") { IsFilterable = true},
+                        new SearchableField("page"),
+                        new SearchField(vectorFieldName, SearchFieldDataType.Collection(SearchFieldDataType.Single))
+                        {
+                            IsSearchable = true,
+                            VectorSearchDimensions = 1536,
+                            VectorSearchProfile = "vectorsearchprofile"
+                        }
+                    },
+                VectorSearch = new()
+                {
+                    Profiles =
+                    {
+                        new VectorSearchProfile("vectorsearchprofile", "algoconfig")
+                        {
+                            Vectorizer = "myvectorizer"
+                        }
+                    },
+                    Algorithms =
+                    {
+                        new HnswVectorSearchAlgorithmConfiguration("algoconfig")
+                    },
+                    Vectorizers =
+                    {
+                        new AzureOpenAIVectorizer("myvectorizer")
+                        {
+                            AzureOpenAIParameters = new AzureOpenAIParameters()
+                            {
+                                DeploymentId = embeddingsDeployment,
+                                ResourceUri = new Uri(embeddingsEndpoint),
+                                ApiKey = embeddingsApiKey
+                                //AuthIdentity = new SearchIndexerDataUserAssignedIdentity("randomuser"),
+                            }
+                        }
+                    }
+                },
+            };
+            return datasourceIndex;
+        }
+
+        private static SearchIndexerDataSourceConnection PrepGetDataSourceConnection(string dataSourceConnectionName, string dataSourceConnectionString, string dataSourceContainerName)
+        {
+            return new SearchIndexerDataSourceConnection(
+                    dataSourceConnectionName,
+                    SearchIndexerDataSourceType.AzureBlob,
+                    dataSourceConnectionString,
+                    new SearchIndexerDataContainer(dataSourceContainerName));
+        }
+
+        private static SearchIndexerSkillset PrepGetSkillset(string aiServicesApiKey, string embeddingsEndpoint, string embeddingsDeployment, string embeddingsApiKey, string vectorFieldName, SearchIndex datasourceIndex)
+        {
+            var useOcr = true;
+
+            var ocrSkill = new OcrSkill(
+                new List<InputFieldMappingEntry> {
+                    new InputFieldMappingEntry("image") { Source = "/document/normalized_images/*" }
+                },
+                new List<OutputFieldMappingEntry> {
+                    new OutputFieldMappingEntry("text") { TargetName = "text"}
+                }) {
+                    Context = "/document/normalized_images/*",
+                    ShouldDetectOrientation = true
+                };
+
+            var ocrMergeSkill = new MergeSkill(
+                new List<InputFieldMappingEntry> {
+                    new InputFieldMappingEntry("text") { Source = "/document/content" },
+                    new InputFieldMappingEntry("itemsToInsert") { Source = "/document/normalized_images/*/text" },
+                    new InputFieldMappingEntry("offsets") { Source = "/document/normalized_images/*/contentOffset" }
+                },
+                new List<OutputFieldMappingEntry> {
+                    new OutputFieldMappingEntry("mergedText") { TargetName = "mergedText"}
+                }) {
+                    Context = "/document",
+                    InsertPreTag = " ",
+                    InsertPostTag = " "
+                };
+
+
+            var splitSkill = new SplitSkill(
+                new List<InputFieldMappingEntry> {
+                    new InputFieldMappingEntry("text") { Source = useOcr ? "/document/mergedText" : "/document/content" },
+                    new InputFieldMappingEntry("languageCode") { Source = "/document/language" }
+                },
+                new List<OutputFieldMappingEntry> {
+                    new OutputFieldMappingEntry("textItems") { TargetName = "pages"}
+                }) {
+                    DefaultLanguageCode = SplitSkillLanguage.En,
+                    TextSplitMode = TextSplitMode.Pages,
+                    MaximumPageLength = 1000,
+                    PageOverlapLength = 100,
+                    Context = "/document"
+                };
+
+            var azureOpenAIEmbeddingSkill = new AzureOpenAIEmbeddingSkill(
+                new List<InputFieldMappingEntry> {
+                    new InputFieldMappingEntry("text") { Source = "/document/pages/*" }
+                },
+                new List<OutputFieldMappingEntry> {
+                    new OutputFieldMappingEntry("embedding") { TargetName = vectorFieldName}
+                }) {
+                    Context = "/document/pages/*",
+                    ResourceUri = new Uri(embeddingsEndpoint),
+                    ApiKey = embeddingsApiKey,
+                    DeploymentId = embeddingsDeployment,
+                    //AuthIdentity = new SearchIndexerDataUserAssignedIdentity("randomuser")
+                };
+
+            var skills = useOcr
+                ? new List<SearchIndexerSkill> { ocrSkill, ocrMergeSkill, splitSkill, azureOpenAIEmbeddingSkill }
+                : new List<SearchIndexerSkill> { splitSkill, azureOpenAIEmbeddingSkill };
+
+            var indexProjections = new SearchIndexerIndexProjections(
+                new List<SearchIndexerIndexProjectionSelector> {
+                    new SearchIndexerIndexProjectionSelector(
+                        datasourceIndex.Name,
+                        "ParentKey",
+                        "/document/pages/*",
+                        new List<InputFieldMappingEntry> {
+                            new InputFieldMappingEntry("page") { Source = "/document/pages/*" },
+                            new InputFieldMappingEntry(vectorFieldName) { Source = "/document/pages/*/vector" }
+                })}) {
+                    Parameters = new SearchIndexerIndexProjectionsParameters() { ProjectionMode = IndexProjectionMode.SkipIndexingParentDocuments }
+                };
+
+            var skillset = !string.IsNullOrEmpty(aiServicesApiKey)
+                ? new SearchIndexerSkillset("datasourceskillset", skills) {
+                    CognitiveServicesAccount = new CognitiveServicesAccountKey(aiServicesApiKey),
+                    IndexProjections = indexProjections
+                }
+                : new SearchIndexerSkillset("datasourceskillset", skills) {
+                    IndexProjections = indexProjections
+                };
+
+            return skillset;
+        }
+
+        private static SearchIndexer PrepGetIndexer(SearchIndex datasourceIndex, SearchIndexerDataSourceConnection dataSource, SearchIndexerSkillset skillset)
+        {
+            return new SearchIndexer("datasourceindexer", dataSource.Name, datasourceIndex.Name)
+            {
+                Description = "Data indexer",
+                Schedule = new IndexingSchedule(TimeSpan.FromDays(1))
+                {
+                    StartTime = DateTimeOffset.Now
+                },
+                Parameters = new IndexingParameters()
+                {
+                    BatchSize = 10,
+                    MaxFailedItems = 0,
+                    MaxFailedItemsPerBatch = 0,
+                    IndexingParametersConfiguration = new IndexingParametersConfiguration()
+                    {
+                        DataToExtract = BlobIndexerDataToExtract.ContentAndMetadata,
+                        ImageAction = BlobIndexerImageAction.GenerateNormalizedImages
+                    }
+                },
+                SkillsetName = skillset.Name
+            };
         }
 
         private void DoIndexUpdateWithSK(string searchEndpoint, string searchApiKey, string embeddingsEndpoint, string embeddingsDeployment, string embeddingsApiKey, string searchIndexName, string pattern)
@@ -163,7 +496,7 @@ namespace Azure.AI.Details.Common.CLI
                     text: entry.Value,
                     id: entry.Key);
 
-                 Console.WriteLine($"{entry.Key}: {entry.Value.Length} bytes");
+                Console.WriteLine($"{entry.Key}: {entry.Value.Length} bytes");
             }
             Console.WriteLine();
         }
@@ -322,7 +655,6 @@ namespace Azure.AI.Details.Common.CLI
 
             _stopEvent.Set();
         }
-
         private SpinLock _lock = null;
         private readonly bool _quiet = false;
         private readonly bool _verbose = false;

@@ -19,19 +19,19 @@ namespace Azure.AI.Details.Common.CLI
 {
     public partial class AzCliConsoleGui
     {
-        public static async Task<AzCli.CognitiveServicesSpeechResourceInfo> InitAndConfigSpeechResource(bool interactive, string subscriptionId, string regionFilter = null, string groupFilter = null, string resourceFilter = null, string kind = null, string sku = null, bool yes = false)
+        public static async Task<AzCli.CognitiveServicesResourceInfoEx> InitAndConfigCognitiveServicesCognitiveServicesKindResource(bool interactive, string subscriptionId, string regionFilter = null, string groupFilter = null, string resourceFilter = null, string kind = null, string sku = null, bool yes = false)
         {
-            kind ??= "SpeechServices";
-            var sectionHeader = "SPEECH RESOURCE";
+            kind ??= "CognitiveServices";
+            var sectionHeader = "AI SERVICES (v1)";
 
             var regionLocation = !string.IsNullOrEmpty(regionFilter) ? await AzCliConsoleGui.PickRegionLocationAsync(interactive, regionFilter) : new AzCli.AccountRegionLocationInfo();
             var resource = await AzCliConsoleGui.PickOrCreateCognitiveResource(sectionHeader, interactive, subscriptionId, regionLocation.Name, groupFilter, resourceFilter, kind, sku, yes);
 
             var keys = await AzCliConsoleGui.LoadCognitiveServicesResourceKeys(sectionHeader, subscriptionId, resource);
 
-            ConfigSetHelpers.ConfigSpeechResource(subscriptionId, resource.RegionLocation, resource.Endpoint, keys.Key1);
+            ConfigSetHelpers.ConfigCognitiveServicesCognitiveServicesKindResource(subscriptionId, resource.RegionLocation, resource.Endpoint, keys.Key1);
 
-            return new AzCli.CognitiveServicesSpeechResourceInfo
+            return new AzCli.CognitiveServicesResourceInfoEx
             {
                 Id = resource.Id,
                 Group = resource.Group,

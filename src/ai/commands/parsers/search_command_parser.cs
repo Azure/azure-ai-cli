@@ -101,12 +101,18 @@ namespace Azure.AI.Details.Common.CLI
             ResourceGroupNameToken.Parser(),
             ProjectNameToken.Parser(),
 
+            BlobContainerToken.Parser(),
+            SearchIndexerDataSourceConnectionNameToken.Parser(),
+            VectorFieldNameToken.Parser(),
+
             SearchIndexNameToken.Parser(requireIndexPart: false),
             MLIndexNameToken.Parser(requireIndexPart: false),
             SKIndexNameToken.Parser(),
 
             SearchEmbeddingModelDeploymentNameToken.Parser(),
             SearchEmbeddingModelNameToken.Parser(),
+
+            AiServicesApiKeyToken.Parser(),
 
             ExternalSourceToken.Parser(),
 

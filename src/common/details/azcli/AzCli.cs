@@ -46,7 +46,7 @@ namespace Azure.AI.Details.Common.CLI
             public string Endpoint;
         }
 
-        public struct CognitiveServicesOpenAiResourceInfo
+        public struct CognitiveServicesResourceInfoEx
         {
             public string Id;
             public string Group;

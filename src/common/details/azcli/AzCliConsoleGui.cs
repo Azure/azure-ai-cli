@@ -46,17 +46,17 @@ namespace Azure.AI.Details.Common.CLI
 
         public static Task<AzCli.CognitiveServicesResourceInfo> PickOrCreateCognitiveResource(string sectionHeader, bool interactive, string subscriptionId = null, string regionFilter = null, string groupFilter = null, string resourceFilter = null, string kind = null, string sku = "F0", bool agreeTerms = false)
         {
-            return AiResourcePicker.PickOrCreateCognitiveResource(sectionHeader, interactive, subscriptionId, regionFilter, groupFilter, resourceFilter, kind, sku, agreeTerms);
+            return CognitiveServicesResourcePicker.PickOrCreateCognitiveResource(sectionHeader, interactive, subscriptionId, regionFilter, groupFilter, resourceFilter, kind, sku, agreeTerms);
         }
 
-        public static async Task<AzCli.CognitiveServicesDeploymentInfo> PickOrCreateDeployment(bool interactive, string deploymentExtra, string subscriptionId, string groupName, string resourceRegionLocation, string resourceName, string deploymentFilter)
+        public static async Task<AzCli.CognitiveServicesDeploymentInfo> PickOrCreateCognitiveServicesResourceDeployment(bool interactive, string deploymentExtra, string subscriptionId, string groupName, string resourceRegionLocation, string resourceName, string deploymentFilter)
         {
-            return await AzCliConsoleGui.AiResourceDeploymentPicker.PickOrCreateDeployment(interactive, deploymentExtra, subscriptionId, groupName, resourceRegionLocation, resourceName, deploymentFilter);
+            return await AzCliConsoleGui.CognitiveServicesResourceDeploymentPicker.PickOrCreateCognitiveServicesResourceDeployment(interactive, deploymentExtra, subscriptionId, groupName, resourceRegionLocation, resourceName, deploymentFilter);
         }
 
         public static Task<AzCli.CognitiveServicesKeyInfo> LoadCognitiveServicesResourceKeys(string sectionHeader, string subscriptionId, AzCli.CognitiveServicesResourceInfo resource)
         {
-            return AiResourcePicker.LoadCognitiveServicesResourceKeys(sectionHeader, subscriptionId, resource);
+            return CognitiveServicesResourcePicker.LoadCognitiveServicesResourceKeys(sectionHeader, subscriptionId, resource);
         }
 
         public static async Task<AzCli.CognitiveSearchKeyInfo> LoadSearchResourceKeys(string subscriptionId, AzCli.CognitiveSearchResourceInfo resource)
