@@ -21,7 +21,7 @@ namespace Azure.AI.Details.Common.CLI
     {
         public class CognitiveServicesResourcePicker
         {
-            public static async Task<AzCli.CognitiveServicesResourceInfo> PickOrCreateCognitiveResource(string sectionHeader, bool interactive, string subscriptionId = null, string regionFilter = null, string groupFilter = null, string resourceFilter = null, string kind = null, string sku = "F0", bool agreeTerms = false)
+            public static async Task<AzCli.CognitiveServicesResourceInfo> PickOrCreateCognitiveResource(string sectionHeader, bool interactive, string subscriptionId = null, string regionFilter = null, string groupFilter = null, string resourceFilter = null, string kinds = null, string sku = "F0", bool agreeTerms = false)
             {
                 ConsoleHelpers.WriteLineWithHighlight($"\n`{sectionHeader}`");
 
@@ -29,10 +29,10 @@ namespace Azure.AI.Details.Common.CLI
                     ? $"(Create `{resourceFilter}`)"
                     : interactive ? "(Create new)" : null;
 
-                var resource = await FindCognitiveServicesResource(interactive, subscriptionId, regionFilter, groupFilter, resourceFilter, kind, createNewItem);
+                var resource = await FindCognitiveServicesResource(interactive, subscriptionId, regionFilter, groupFilter, resourceFilter, kinds, createNewItem);
                 if (resource != null && resource.Value.Name == null)
                 {
-                    resource = await TryCreateCognitiveServicesResource(sectionHeader, interactive, subscriptionId, regionFilter, groupFilter, resourceFilter, kind, sku, agreeTerms);
+                    resource = await TryCreateCognitiveServicesResource(sectionHeader, interactive, subscriptionId, regionFilter, groupFilter, resourceFilter, kinds, sku, agreeTerms);
                 }
 
                 if (resource == null)
@@ -56,12 +56,12 @@ namespace Azure.AI.Details.Common.CLI
                 return keys.Payload;
             }
 
-            public static async Task<AzCli.CognitiveServicesResourceInfo?> FindCognitiveServicesResource(bool interactive, string subscriptionId = null, string regionLocationFilter = null, string groupFilter = null, string resourceFilter = null, string kind = null, string allowCreateResourceOption = null)
+            public static async Task<AzCli.CognitiveServicesResourceInfo?> FindCognitiveServicesResource(bool interactive, string subscriptionId = null, string regionLocationFilter = null, string groupFilter = null, string resourceFilter = null, string kinds = null, string allowCreateResourceOption = null)
             {
                 var allowCreateResource = !string.IsNullOrEmpty(allowCreateResourceOption);
 
                 Console.Write("\rName: *** Loading choices ***");
-                var response = await AzCli.ListCognitiveServicesResources(subscriptionId, kind);
+                var response = await AzCli.ListCognitiveServicesResources(subscriptionId, kinds);
 
                 Console.Write("\rName: ");
                 if (string.IsNullOrEmpty(response.Output.StdOutput) && !string.IsNullOrEmpty(response.Output.StdError))
@@ -109,7 +109,7 @@ namespace Azure.AI.Details.Common.CLI
                     : null;
             }
 
-            public static async Task<AzCli.CognitiveServicesResourceInfo?> TryCreateCognitiveServicesResource(string sectionHeader, bool interactive, string subscriptionId = null, string regionLocationFilter = null, string groupFilter = null, string resourceFilter = null, string kind = null, string sku = "F0", bool agreeTerms = false)
+            public static async Task<AzCli.CognitiveServicesResourceInfo?> TryCreateCognitiveServicesResource(string sectionHeader, bool interactive, string subscriptionId = null, string regionLocationFilter = null, string groupFilter = null, string resourceFilter = null, string kinds = null, string sku = "F0", bool agreeTerms = false)
             {
                 ConsoleHelpers.WriteLineWithHighlight("\n`RESOURCE GROUP`");
 
@@ -117,23 +117,25 @@ namespace Azure.AI.Details.Common.CLI
                 if (regionLocation == null) return null;
 
                 var group = await ResourceGroupPicker.PickOrCreateResourceGroup(interactive, subscriptionId, regionLocation?.Name, groupFilter);
+                var createKind = kinds.Split(';').Last();
 
                 ConsoleHelpers.WriteLineWithHighlight($"\n`CREATE {sectionHeader}`");
                 Console.WriteLine($"Region: {group.RegionLocation}");
                 Console.WriteLine($"Group: {group.Name}");
+                Console.WriteLine($"Kind: {createKind}");
 
                 var smartName = group.Name;
                 var smartNameKind = "rg";
 
                 var name = string.IsNullOrEmpty(resourceFilter)
-                    ? NamePickerHelper.DemandPickOrEnterName("Name: ", kind.ToLower() ?? "cs", smartName, smartNameKind)
+                    ? NamePickerHelper.DemandPickOrEnterName("Name: ", createKind.ToLower() ?? "cs", smartName, smartNameKind)
                     : AskPromptHelper.AskPrompt("Name: ", resourceFilter);
                 if (string.IsNullOrEmpty(name)) return null;
 
-                if (!agreeTerms && !CheckAgreeTerms(kind)) return null;
+                if (!agreeTerms && !CheckAgreeTerms(createKind)) return null;
 
                 Console.Write("*** CREATING ***");
-                var response = await AzCli.CreateCognitiveServicesResource(subscriptionId, group.Name, group.RegionLocation, name, kind, sku);
+                var response = await AzCli.CreateCognitiveServicesResource(subscriptionId, group.Name, group.RegionLocation, name, createKind, sku);
 
                 Console.Write("\r");
                 if (string.IsNullOrEmpty(response.Output.StdOutput) && !string.IsNullOrEmpty(response.Output.StdError))
@@ -210,9 +212,9 @@ namespace Azure.AI.Details.Common.CLI
                 Console.WriteLine(new string(' ', 20));
             }
 
-            private static bool CheckAgreeTerms(string kind)
+            private static bool CheckAgreeTerms(string createKind)
             {
-                var checkAttestation = kind.ToLower() switch
+                var checkAttestation = createKind.ToLower() switch
                 {
                     "cognitiveservices" => true,
                     "face" => true,

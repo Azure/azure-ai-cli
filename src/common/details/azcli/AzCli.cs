@@ -245,20 +245,22 @@ namespace Azure.AI.Details.Common.CLI
             return x;
         }
 
-        public static async Task<ParsedJsonProcessOutput<CognitiveServicesResourceInfo[]>> ListCognitiveServicesResources(string subscriptionId = null, string kind = null)
+        public static async Task<ParsedJsonProcessOutput<CognitiveServicesResourceInfo[]>> ListCognitiveServicesResources(string subscriptionId = null, string kinds = null)
         {
             var cmdPart = "cognitiveservices account list";
             var subPart = subscriptionId != null ? $"--subscription {subscriptionId}" : "";
-            var condPart= kind switch
+            
+            var lookForKind = kinds.Split(';').First();
+            var condPart= lookForKind switch
             {
                 "OpenAI" => "? kind == 'OpenAI' || kind == 'AIServices'",
                 "ComputerVision" => "? kind == 'ComputerVision' || kind == 'CognitiveServices' || kind == 'AIServices'",
                 "SpeechServices" => "? kind == 'SpeechServices' || kind == 'CognitiveServices' || kind == 'AIServices'",
 
-                "AIServices" => $"? kind == '{kind}'",
-                "CognitiveServices" => $"? kind == '{kind}'",
+                "AIServices" => $"? kind == '{lookForKind}'",
+                "CognitiveServices" => $"? kind == '{lookForKind}'",
 
-                _ => kind != null ? $"? kind == '{kind}' || kind == 'CognitiveServices' || kind == 'AIServices'" : null
+                _ => kinds != null ? $"? kind == '{lookForKind}' || kind == 'CognitiveServices' || kind == 'AIServices'" : null
             };
 
             var parsed = await ProcessHelpers.ParseShellCommandJson<JArray>("az", $"{cmdPart} {subPart} --query \"[{condPart}].{{Id:id,Name:name,Location: location,Kind:kind,Group:resourceGroup,Endpoint:properties.endpoint}}\"", GetUserAgentEnv());
@@ -329,12 +331,13 @@ namespace Azure.AI.Details.Common.CLI
             return x;
         }
 
-        public static async Task<ParsedJsonProcessOutput<CognitiveServicesResourceInfo?>> CreateCognitiveServicesResource(string subscriptionId, string group, string regionLocation, string name, string kind = "AIServices", string sku = "F0")
+        public static async Task<ParsedJsonProcessOutput<CognitiveServicesResourceInfo?>> CreateCognitiveServicesResource(string subscriptionId, string group, string regionLocation, string name, string kinds = "AIServices", string sku = "F0")
         {
             var cmdPart = "cognitiveservices account create";
             var subPart = subscriptionId != null ? $"--subscription {subscriptionId}" : "";
 
-            var parsed = await ProcessHelpers.ParseShellCommandJson<JObject>("az", $"{cmdPart} {subPart} --kind {kind} --location {regionLocation} --sku {sku} -g {group} -n {name} --custom-domain {name}", GetUserAgentEnv());
+            var createKind = kinds.Split(';').Last();
+            var parsed = await ProcessHelpers.ParseShellCommandJson<JObject>("az", $"{cmdPart} {subPart} --kind {createKind} --location {regionLocation} --sku {sku} -g {group} -n {name} --custom-domain {name}", GetUserAgentEnv());
             var resource = parsed.Payload;
 
             var x = new ParsedJsonProcessOutput<CognitiveServicesResourceInfo?>(parsed.Output);
