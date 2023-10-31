@@ -44,9 +44,9 @@ namespace Azure.AI.Details.Common.CLI
             return ResourceGroupPicker.PickOrCreateResourceGroup(interactive, subscriptionId, regionFilter, groupFilter);
         }
 
-        public static Task<AzCli.CognitiveServicesResourceInfo> PickOrCreateCognitiveResource(string sectionHeader, bool interactive, string subscriptionId = null, string regionFilter = null, string groupFilter = null, string resourceFilter = null, string kind = null, string sku = "F0", bool agreeTerms = false)
+        public static Task<AzCli.CognitiveServicesResourceInfo> PickOrCreateCognitiveResource(string sectionHeader, bool interactive, string subscriptionId = null, string regionFilter = null, string groupFilter = null, string resourceFilter = null, string kinds = null, string sku = "F0", bool agreeTerms = false)
         {
-            return CognitiveServicesResourcePicker.PickOrCreateCognitiveResource(sectionHeader, interactive, subscriptionId, regionFilter, groupFilter, resourceFilter, kind, sku, agreeTerms);
+            return CognitiveServicesResourcePicker.PickOrCreateCognitiveResource(sectionHeader, interactive, subscriptionId, regionFilter, groupFilter, resourceFilter, kinds, sku, agreeTerms);
         }
 
         public static async Task<AzCli.CognitiveServicesDeploymentInfo> PickOrCreateCognitiveServicesResourceDeployment(bool interactive, string deploymentExtra, string subscriptionId, string groupName, string resourceRegionLocation, string resourceName, string deploymentFilter)

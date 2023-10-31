@@ -278,7 +278,7 @@ namespace Azure.AI.Details.Common.CLI
             Console.WriteLine("Generating SAS token ...");
             Console.WriteLine();
             Console.WriteLine("  Signing method: User delegation");
-            Console.WriteLine("  Expires: " + DateTime.Now.AddYears(5).ToString("yyyy-MM-dd HH:mm:ss"));
+            Console.WriteLine("  Expires: " + DateTime.Now.AddDays(1).ToString("yyyy-MM-dd HH:mm:ss"));
 
             var expiresOn = DateTimeOffset.UtcNow.AddDays(1);
             var userKey = serviceClient.GetUserDelegationKey(null, expiresOn);
