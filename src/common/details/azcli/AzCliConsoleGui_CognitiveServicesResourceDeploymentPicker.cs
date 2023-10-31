@@ -109,9 +109,13 @@ namespace Azure.AI.Details.Common.CLI
 
                 Console.Write("\rModel: *** Loading choices ***");
                 var models = await AzCli.ListCognitiveServicesModels(subscriptionId, resourceRegionLocation);
+                var usage = await AzCli.ListCognitiveServicesUsage(subscriptionId, resourceRegionLocation);
+                var deployableModels = FilterModelsByUsage(models.Payload, usage.Payload);
 
                 Console.Write("\rModel: ");
-                var choices = models.Payload.Select(x => x.Name + " (version " + x.Version + ")").ToArray();
+                var choices = Program.Debug
+                    ? deployableModels.Select(x => x.Name + " (version " + x.Version + ")" + $"{x.DefaultCapacity} capacity").ToArray()
+                    : deployableModels.Select(x => x.Name + " (version " + x.Version + ")").ToArray();
 
                 var scanFor = deploymentExtra.ToLower() switch {
                     "chat" => "gpt",
@@ -123,12 +127,12 @@ namespace Azure.AI.Details.Common.CLI
                 var index = ListBoxPicker.PickIndexOf(choices, select);
                 if (index < 0) return null;
 
-                var modelName = models.Payload[index].Name;
+                var modelName = deployableModels[index].Name;
                 Console.WriteLine($"\rModel: {modelName}");
 
                 var modelFormat = "OpenAI";
-                var modelVersion = models.Payload[index].Version;
-                var scaleCapacity = models.Payload[index].DefaultCapacity;
+                var modelVersion = deployableModels[index].Version;
+                var scaleCapacity = deployableModels[index].DefaultCapacity;
 
                 // HACK: There's a bug in the RP or region specific or something that sometimes 120 doesn't work, and we need to use 119
                 if (scaleCapacity == "120") scaleCapacity = "119";
@@ -160,6 +164,40 @@ namespace Azure.AI.Details.Common.CLI
 
                 Console.WriteLine("\r*** CREATED ***  ");
                 return response.Payload;
+            }
+
+            private static AzCli.CognitiveServicesModelInfo[] FilterModelsByUsage(AzCli.CognitiveServicesModelInfo[] models, AzCli.CognitiveServicesUsageInfo[] usage)
+            {
+                var filtered = new List<AzCli.CognitiveServicesModelInfo>();
+                foreach (var model in models)
+                {
+                    if (!double.TryParse(model.DefaultCapacity, out var defaultCapacityValue)) continue;
+
+                    var checkUsage = usage.Where(x => x.Name.EndsWith(model.Name));
+                    var current = checkUsage.Sum(x => double.TryParse(x.Current, out var value) ? value : 0);
+                    var limit = checkUsage.Sum(x => double.TryParse(x.Limit, out var value) ? value : 0);
+
+                    var available = limit - current;
+                    if (available <= 0) continue;
+
+                    if (defaultCapacityValue <= available)
+                    {
+                        filtered.Add(model);
+                        continue;
+                    }
+
+                    var newDefault = available - 1;
+                    if (newDefault < 1) newDefault = 1;
+
+                    filtered.Add(new AzCli.CognitiveServicesModelInfo()
+                    {
+                        Name = model.Name,
+                        Version = model.Version,
+                        DefaultCapacity = newDefault.ToString()
+                    });
+                }
+
+                return filtered.ToArray();
             }
 
             private static AzCli.CognitiveServicesDeploymentInfo? ListBoxPickDeployment(AzCli.CognitiveServicesDeploymentInfo[] deployments, string p0, int select = 0)

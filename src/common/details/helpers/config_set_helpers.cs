@@ -32,8 +32,6 @@ namespace Azure.AI.Details.Common.CLI
 
             int maxLabelWidth = 0;
             var actions = new List<Action<int>>(new Action<int>[] {
-                ConfigSetLambda("@subscription", subscriptionId, "Subscription", subscriptionId, ref maxLabelWidth),
-
                 ConfigSetLambda("@services.endpoint", endpoint, "Endpoint (AIServices)", endpoint, ref maxLabelWidth),
                 ConfigSetLambda("@services.key", key, "Key (AIServices)", key.Substring(0, 4) + "****************************", ref maxLabelWidth),
                 ConfigSetLambda("@services.region", region, "Region (AIServices)", region, ref maxLabelWidth),
@@ -68,8 +66,6 @@ namespace Azure.AI.Details.Common.CLI
 
             int maxLabelWidth = 0;
             var actions = new List<Action<int>>(new Action<int>[] {
-                ConfigSetLambda("@subscription", subscriptionId, "Subscription", subscriptionId, ref maxLabelWidth),
-
                 ConfigSetLambda("@services.endpoint", endpoint, "Endpoint (AIServices)", endpoint, ref maxLabelWidth),
                 ConfigSetLambda("@services.key", key, "Key (AIServices)", key.Substring(0, 4) + "****************************", ref maxLabelWidth),
                 ConfigSetLambda("@services.region", region, "Region (AIServices)", region, ref maxLabelWidth),
@@ -88,8 +84,6 @@ namespace Azure.AI.Details.Common.CLI
 
             int maxLabelWidth = 0;
             var actions = new List<Action<int>>(new Action<int>[] {
-                ConfigSetLambda("@subscription", subscriptionId, "Subscription", subscriptionId, ref maxLabelWidth),
-
                 ConfigSetLambda("@chat.key", key, "Key (chat)", key.Substring(0, 4) + "****************************", ref maxLabelWidth),
                 ConfigSetLambda("@chat.endpoint", endpoint, "Endpoint (chat)", endpoint, ref maxLabelWidth),
                 ConfigSetLambda("@chat.deployment", chatDeployment.Name, "Deployment (chat)", chatDeployment.Name, ref maxLabelWidth),
