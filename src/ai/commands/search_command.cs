@@ -234,6 +234,20 @@ namespace Azure.AI.Details.Common.CLI
             await UploadFilesToBlobContainer(containerClient, pattern);
             Console.WriteLine("Uploading files to blob container ... Done!\n");
 
+            if (Program.Debug)
+            {
+                var blobServiceClient = new BlobServiceClient(connectionString);
+                var blobContainerClient = blobServiceClient.GetBlobContainerClient(containerName);
+                var blobs = blobContainerClient.GetBlobsAsync();
+
+                Console.WriteLine($"Files in container '{containerName}'");
+                await foreach (var blob in blobs)
+                {
+                    Console.WriteLine($"  {blob.Name} ({blob.Properties.ContentLength} byte(s))");
+                }
+                Console.WriteLine($"Found: {blobs.CountAsync().Result} file(s)");
+            }
+
             return (connectionString, containerName);
         }
 
