@@ -1,12 +1,14 @@
 import argparse
 import json
-from azure.ai.resources.client import AIClient
-from azure.ai.resources.entities import AIResource
-from azure.ai.ml.entities import ManagedNetwork
-from azure.identity import DefaultAzureCredential
 
 def create_hub(subscription_id, resource_group_name, ai_resource_name, location, display_name, description):
     """Create Azure AI hub."""
+
+    from azure.identity import DefaultAzureCredential
+    from azure.ai.resources.client import AIClient
+    from azure.ai.resources.entities import AIResource
+    from azure.ai.ml.entities import ManagedNetwork
+
     ai_client = AIClient(
         credential=DefaultAzureCredential(),
         subscription_id=subscription_id,
@@ -54,4 +56,13 @@ def main():
     print(formatted)
 
 if __name__ == "__main__":
-    main()
+    try:
+        main()
+    except Exception as e:
+        import sys
+        import traceback
+        print("MESSAGE: " + str(sys.exc_info()[1]), file=sys.stderr)
+        print("EXCEPTION: " + str(sys.exc_info()[0]), file=sys.stderr)
+        print("TRACEBACK: " + "".join(traceback.format_tb(sys.exc_info()[2])), file=sys.stderr)
+        sys.exit(1)
+

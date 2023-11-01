@@ -1,11 +1,13 @@
 import argparse
 import json
-from azure.ai.resources.client import AIClient
-from azure.ai.resources.entities import Project
-from azure.identity import DefaultAzureCredential
 
 def create_project(subscription_id, resource_id, resource_group_name, project_name, location, display_name, description, openai_resource_id):
     """Create Azure AI project."""
+
+    from azure.identity import DefaultAzureCredential
+    from azure.ai.resources.client import AIClient
+    from azure.ai.resources.entities import Project
+
     ai_client = AIClient(
         credential=DefaultAzureCredential(),
         subscription_id=subscription_id,
@@ -53,4 +55,13 @@ def main():
     print(formatted)
 
 if __name__ == "__main__":
-    main()
+    try:
+        main()
+    except Exception as e:
+        import sys
+        import traceback
+        print("MESSAGE: " + str(sys.exc_info()[1]), file=sys.stderr)
+        print("EXCEPTION: " + str(sys.exc_info()[0]), file=sys.stderr)
+        print("TRACEBACK: " + "".join(traceback.format_tb(sys.exc_info()[2])), file=sys.stderr)
+        sys.exit(1)
+

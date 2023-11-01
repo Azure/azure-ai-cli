@@ -4,7 +4,6 @@ import json
 import os
 import pathlib
 import sys
-from azure.identity import DefaultAzureCredential
 from typing import Any, List, Dict, Generator
 
 class AutoFlushingStream:
@@ -211,4 +210,12 @@ def main():
     print(formatted)
 
 if __name__ == "__main__":
-    main()
+    try:
+        main()
+    except Exception as e:
+        import sys
+        import traceback
+        print("MESSAGE: " + str(sys.exc_info()[1]), file=sys.stderr)
+        print("EXCEPTION: " + str(sys.exc_info()[0]), file=sys.stderr)
+        print("TRACEBACK: " + "".join(traceback.format_tb(sys.exc_info()[2])), file=sys.stderr)
+        sys.exit(1)

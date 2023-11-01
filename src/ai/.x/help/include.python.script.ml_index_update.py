@@ -2,11 +2,6 @@ import argparse
 import json
 import os
 import sys
-from azure.identity import DefaultAzureCredential
-from azure.ai.resources.client import AIClient
-from azure.ai.resources.operations._index_data_source import LocalSource, ACSOutputConfig
-from azure.ai.generative.index import build_index
-from azure.ai.resources.entities import Index
 
 class AutoFlushingStream:
     def __init__(self, stream):
@@ -24,6 +19,7 @@ sys.stderr = AutoFlushingStream(sys.stderr)
 
 class IndexEncoder(json.JSONEncoder):
     def default(self, obj):
+        from azure.ai.resources.entities import Index
         if isinstance(obj, Index):
             return {
                 "name": obj.name,
@@ -44,6 +40,9 @@ def search_index_update(
     embedding_model_name : str, 
     data_files : str, 
     external_source_url : str):
+
+    from azure.identity import DefaultAzureCredential
+    from azure.ai.resources.client import AIClient
 
     client = AIClient(
         credential=DefaultAzureCredential(),
@@ -79,6 +78,9 @@ def search_index_update(
         data_files_path = data_files_path + "/"
     print(f"Data files path: {data_files_path}")
     print(f"Data files glob pattern: {data_files_glob_pattern}")
+
+    from azure.ai.resources.operations._index_data_source import LocalSource, ACSOutputConfig
+    from azure.ai.generative.index import build_index
 
     index = build_index(
         output_index_name=index_name,
@@ -124,4 +126,13 @@ def main():
     print(formatted)
 
 if __name__ == "__main__":
-    main()
+    try:
+        main()
+    except Exception as e:
+        import sys
+        import traceback
+        print("MESSAGE: " + str(sys.exc_info()[1]), file=sys.stderr)
+        print("EXCEPTION: " + str(sys.exc_info()[0]), file=sys.stderr)
+        print("TRACEBACK: " + "".join(traceback.format_tb(sys.exc_info()[2])), file=sys.stderr)
+        sys.exit(1)
+
