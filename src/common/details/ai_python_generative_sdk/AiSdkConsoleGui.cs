@@ -234,7 +234,7 @@ namespace Azure.AI.Details.Common.CLI
 
         public static void GetOrCreateAiHubProjectConnections(ICommandValues values, bool create, string subscription, string groupName, string projectName, string openAiEndpoint, string openAiKey, string searchEndpoint, string searchKey)
         {
-            var checkForExistingOpenAiConnection = !create;
+            var checkForExistingOpenAiConnection = true;
             var createOpenAiConnection = !string.IsNullOrEmpty(openAiEndpoint) && !string.IsNullOrEmpty(openAiKey) && !checkForExistingOpenAiConnection;
 
             var checkForExistingSearchConnection = !create;
@@ -317,7 +317,7 @@ namespace Azure.AI.Details.Common.CLI
             {
                 subscription_id = subscription,
                 resource_group = groupName,
-                project_name = projectName,
+                // project_name = projectName,
                 workspace_name = projectName,
             };
 
