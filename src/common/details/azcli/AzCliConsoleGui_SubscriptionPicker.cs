@@ -106,7 +106,7 @@ namespace Azure.AI.Details.Common.CLI
 
                 var subscriptions = response.Payload
                     .Where(x => MatchSubscriptionFilter(x, subscriptionFilter))
-                    .OrderBy(x => (x.IsDefault ? "0" : "1") + x.Name)
+                    .OrderBy(x => x.Name)
                     .ToArray();
 
                 if (subscriptions.Count() == 0)
@@ -136,7 +136,9 @@ namespace Azure.AI.Details.Common.CLI
             private static AzCli.SubscriptionInfo? ListBoxPickSubscription(AzCli.SubscriptionInfo[] subscriptions)
             {
                 var list = subscriptions.Select(x => x.Name).ToArray();
-                var picked = ListBoxPicker.PickIndexOf(list);
+                var defaultIndex = subscriptions.Select((x, i) => new { x, i }).Where(x => x.x.IsDefault).Select(x => x.i).FirstOrDefault();
+
+                var picked = ListBoxPicker.PickIndexOf(list, defaultIndex);
                 if (picked < 0)
                 {
                     return null;
