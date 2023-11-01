@@ -33,6 +33,7 @@ namespace Azure.AI.Details.Common.CLI
         {
             var cmdPart = "flow test";
             var argsPart = CliHelpers.BuildCliArgs(
+                "--config", "connection.provider=azureml",
                 "--flow", flowPath,
                 "--inputs", inputs,
                 "--node", node,
@@ -62,6 +63,7 @@ namespace Azure.AI.Details.Common.CLI
         {
             var cmdPart = "flow serve";
             var argsPart = CliHelpers.BuildCliArgs(
+                "--config", "connection.provider=azureml",
                 "--source", flowPath,
                 "--port", port,
                 "--host", host,
