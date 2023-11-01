@@ -208,9 +208,9 @@ namespace Azure.AI.Details.Common.CLI
             return matchSearchEndpoint.First();
         }
 
-        private async Task DoInitRootConfirmVerifiedProjectResources(bool interactive, string subscription, string projectName, string hubName, AzCli.CognitiveServicesResourceInfo openaiResource, AzCli.CognitiveSearchResourceInfo searchResource)
+        private async Task DoInitRootConfirmVerifiedProjectResources(bool interactive, string subscription, string projectName, string resourceName, AzCli.CognitiveServicesResourceInfo openaiResource, AzCli.CognitiveSearchResourceInfo searchResource)
         {
-            ConsoleHelpers.WriteLineWithHighlight($"    AI RESOURCE: {hubName}");
+            ConsoleHelpers.WriteLineWithHighlight($"    AI RESOURCE: {resourceName}");
             ConsoleHelpers.WriteLineWithHighlight($"    AI SEARCH RESOURCE: {searchResource.Name}");
             // Console.WriteLine();
             ConsoleHelpers.WriteLineWithHighlight($"    OPEN AI RESOURCE: {openaiResource.Name}");

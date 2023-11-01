@@ -20,7 +20,7 @@ namespace Azure.AI.Details.Common.CLI
             env.Add("AZURE_SUBSCRIPTION_ID", ReadConfig(values, "subscription"));
             env.Add("AZURE_RESOURCE_GROUP", ReadConfig(values, "group"));
             env.Add("AZURE_AI_PROJECT_NAME", ReadConfig(values, "project"));
-            env.Add("AZURE_AI_HUB_NAME", ReadConfig(values, "hub"));
+            env.Add("AZURE_AI_RESOURCE_NAME", ReadConfig(values, "resource"));
 
             env.Add("AZURE_OPENAI_CHAT_DEPLOYMENT", ReadConfig(values, "chat.deployment"));
             env.Add("AZURE_OPENAI_EVALUATION_DEPLOYMENT", ReadConfig(values, "chat.evaluation.model.deployment.name") ?? ReadConfig(values, "chat.deployment"));

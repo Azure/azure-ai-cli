@@ -2,7 +2,7 @@ import argparse
 import json
 
 def list_hubs(subscription_id, resource_group_name):
-    """List Azure AI hubs."""
+    """List Azure AI resources."""
 
     from azure.identity import DefaultAzureCredential
     from azure.ai.resources.client import AIClient
@@ -24,8 +24,8 @@ def list_hubs(subscription_id, resource_group_name):
     return results
 
 def main():
-    """Parse command line arguments and print hubs."""
-    parser = argparse.ArgumentParser(description="List Azure AI hubs")
+    """Parse command line arguments and print AI resources."""
+    parser = argparse.ArgumentParser(description="List Azure AI resources")
     parser.add_argument("--subscription", required=True, help="Azure subscription ID")
     parser.add_argument("--group", required=False, help="Azure resource group name")
     args = parser.parse_args()

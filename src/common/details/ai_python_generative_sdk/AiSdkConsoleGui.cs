@@ -116,7 +116,7 @@ namespace Azure.AI.Details.Common.CLI
                 smartNameKind = "rg";
             }
 
-            var name = NamePickerHelper.DemandPickOrEnterName("Name: ", "aihub", smartName, smartNameKind); // TODO: What will this really be called?
+            var name = NamePickerHelper.DemandPickOrEnterName("Name: ", "ai", smartName, smartNameKind); // TODO: What will this really be called?
             displayName ??= name;
             description ??= name;
 
@@ -126,7 +126,7 @@ namespace Azure.AI.Details.Common.CLI
             Console.WriteLine("\r*** CREATED ***  ");
 
             var parsed = !string.IsNullOrEmpty(json) ? JToken.Parse(json) : null;
-            return parsed["hub"];
+            return parsed["resource"];
         }
 
         public static AiHubProjectInfo InitAndConfigAiHubProject(ICommandValues values, string subscription, string resourceId, string groupName, string openAiEndpoint, string openAiKey, string searchEndpoint, string searchKey)
