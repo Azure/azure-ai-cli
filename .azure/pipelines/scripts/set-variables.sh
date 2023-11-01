@@ -27,3 +27,7 @@ define_variable "AICLIVersion" "$VERSION"
 
 # Set the AICLINuPkgFileName variable in the pipeline.
 define_variable "AICLINuPkgFileName" "Azure.AI.CLI.$VERSION.nupkg"
+
+# At this point, the $VERSION may have a pre-release tag. We need to remove it to get the version that will be used for SemVer.
+SEMVER_VERSION=$(echo $VERSION | sed -r 's/-.*//')
+define_variable "AICLISemVerVersion" "$SEMVER_VERSION"
