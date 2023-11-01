@@ -112,6 +112,12 @@ namespace Azure.AI.Details.Common.CLI
                 var usage = await AzCli.ListCognitiveServicesUsage(subscriptionId, resourceRegionLocation);
                 var deployableModels = FilterModelsByUsage(models.Payload, usage.Payload);
 
+                if (deployableModels.Count() != 0)
+                {
+                    Console.Write("\n\n  ");
+                    throw new ApplicationException($"ERROR: No models available for deployment in region {resourceRegionLocation}; check usage limits and capacity.");
+                }
+
                 Console.Write("\rModel: ");
                 var choices = Program.Debug
                     ? deployableModels.Select(x => x.Name + " (version " + x.Version + ")" + $"{x.DefaultCapacity} capacity").ToArray()
