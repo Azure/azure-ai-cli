@@ -4,8 +4,6 @@ import json
 import os
 import pathlib
 import sys
-from azure.identity import DefaultAzureCredential
-from azure.ai.resources.client import AIClient
 from typing import Any, List, Dict, Generator
 
 class AutoFlushingStream:
@@ -191,6 +189,8 @@ def bulk_run_part(
     return run_results
 
 def run_evaluate_part(subscription_id, resource_group_name, project_name, run_results, name):
+    from azure.identity import DefaultAzureCredential
+    from azure.ai.resources.client import AIClient
     client = AIClient(
         credential=DefaultAzureCredential(),
         subscription_id=subscription_id,

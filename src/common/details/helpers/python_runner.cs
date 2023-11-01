@@ -66,64 +66,67 @@ namespace Azure.AI.Details.Common.CLI
 
                 var info = new List<string>();
 
-                if (output.Contains("az login"))
+                if (output.Contains("MESSAGE:") && output.Contains("EXCEPTION:") && output.Contains("TRACEBACK:"))
                 {
-                    values.AddThrowError(
-                        "WARNING:", "Azure CLI credential not found!",
-                                    "",
-                            "TRY:", "az login",
-                             "OR:", "az login --use-device-code",
-                                    "",
-                            "SEE:", "https://docs.microsoft.com/cli/azure/authenticate-azure-cli");
-                }
-                else if (output.Contains("azure.identity"))
-                {
-                    info.Add("WARNING:");
-                    info.Add("azure-identity Python wheel not found!");
-                    info.Add("");
-                    info.Add("TRY:");
-                    info.Add("pip install azure-identity");
-                    info.Add("SEE:");
-                    info.Add("https://pypi.org/project/azure-identity/");
-                    info.Add("");
-                }
-                else if (output.Contains("azure.mgmt.resource"))
-                {
-                    info.Add("WARNING:");
-                    info.Add("azure-mgmt-resource Python wheel not found!");
-                    info.Add("");
-                    info.Add("TRY:");
-                    info.Add("pip install azure-mgmt-resource");
-                    info.Add("SEE:");
-                    info.Add("https://pypi.org/project/azure-mgmt-resource/");
-                    info.Add("");
-                }
-                else if (output.Contains("azure.ai.ml"))
-                {
-                    info.Add("WARNING:");
-                    info.Add("azure-ai-ml Python wheel not found!");
-                    info.Add("");
-                    info.Add("TRY:");
-                    info.Add("pip install azure-ai-ml");
-                    info.Add("SEE:");
-                    info.Add("https://pypi.org/project/azure-ai-ml/");
-                    info.Add("");
-                }
-                else if (output.Contains("ModuleNotFoundError"))
-                {
-                    info.Add("WARNING:");
-                    info.Add("Python wheel not found!");
-                    info.Add("");
-                }
-                else if (output.Contains("MESSAGE:") && output.Contains("EXCEPTION:") && output.Contains("TRACEBACK:"))
-                {
-                    info.Add("WARNING:");
-                    info.Add("Unhandled exception in Python script!");
-                    info.Add("");
-
                     var messageLine = process.StdError.Split(new[] { '\r', '\n' }).FirstOrDefault(x => x.StartsWith("MESSAGE:"));
                     var message = messageLine.Substring("MESSAGE:".Length).Trim();
                     FileHelpers.LogException(values, new PythonScriptException(output, exit));
+
+                    if (output.Contains("az login"))
+                    {
+                        values.AddThrowError(
+                            "WARNING:", "Azure CLI credential not found!",
+                                        "",
+                                "TRY:", "az login",
+                                "OR:", "az login --use-device-code",
+                                        "",
+                                "SEE:", "https://docs.microsoft.com/cli/azure/authenticate-azure-cli");
+                    }
+                    else if (output.Contains("azure.identity"))
+                    {
+                        info.Add("WARNING:");
+                        info.Add("azure-identity Python wheel not found!");
+                        info.Add("");
+                        info.Add("TRY:");
+                        info.Add("pip install azure-identity");
+                        info.Add("SEE:");
+                        info.Add("https://pypi.org/project/azure-identity/");
+                        info.Add("");
+                    }
+                    else if (output.Contains("azure.mgmt.resource"))
+                    {
+                        info.Add("WARNING:");
+                        info.Add("azure-mgmt-resource Python wheel not found!");
+                        info.Add("");
+                        info.Add("TRY:");
+                        info.Add("pip install azure-mgmt-resource");
+                        info.Add("SEE:");
+                        info.Add("https://pypi.org/project/azure-mgmt-resource/");
+                        info.Add("");
+                    }
+                    else if (output.Contains("azure.ai.ml"))
+                    {
+                        info.Add("WARNING:");
+                        info.Add("azure-ai-ml Python wheel not found!");
+                        info.Add("");
+                        info.Add("TRY:");
+                        info.Add("pip install azure-ai-ml");
+                        info.Add("SEE:");
+                        info.Add("https://pypi.org/project/azure-ai-ml/");
+                        info.Add("");
+                    }
+                    else if (output.Contains("ModuleNotFoundError"))
+                    {
+                        info.Add("WARNING:");
+                        info.Add("Python wheel not found!");
+                        info.Add("");
+                    }
+                    else
+                    {
+                        info.Add("WARNING:");
+                        info.Add("Unhandled exception in Python script!");
+                        info.Add("");
+                    }
 
                     output = message;
                 }

@@ -1,9 +1,10 @@
 import argparse
 import json
-from azure.ai.resources.client import AIClient
-from azure.identity import DefaultAzureCredential
 
 def list_connections(subscription_id, resource_group_name, project_name):
+
+    from azure.identity import DefaultAzureCredential
+    from azure.ai.resources.client import AIClient
 
     client = AIClient(
         credential=DefaultAzureCredential(),

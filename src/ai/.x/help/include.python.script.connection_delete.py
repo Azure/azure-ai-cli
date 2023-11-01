@@ -1,9 +1,10 @@
 import argparse
 import json
-from azure.ai.resources.client import AIClient
-from azure.identity import DefaultAzureCredential
 
 def delete_connection(subscription_id, resource_group_name, project_name, connection_name):
+
+    from azure.identity import DefaultAzureCredential
+    from azure.ai.resources.client import AIClient
 
     client = AIClient(
         credential=DefaultAzureCredential(),

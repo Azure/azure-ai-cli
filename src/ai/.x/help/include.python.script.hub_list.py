@@ -1,11 +1,13 @@
 import argparse
 import json
-from azure.ai.resources.client import AIClient
-from azure.identity import DefaultAzureCredential
-from azure.ai.ml.constants._common import Scope
 
 def list_hubs(subscription_id, resource_group_name):
     """List Azure AI hubs."""
+
+    from azure.identity import DefaultAzureCredential
+    from azure.ai.resources.client import AIClient
+    from azure.ai.ml.constants._common import Scope
+
     ai_client = AIClient(
         credential=DefaultAzureCredential(),
         subscription_id=subscription_id,

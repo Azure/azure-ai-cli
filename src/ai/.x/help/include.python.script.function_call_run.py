@@ -4,7 +4,6 @@ import json
 import os
 import pathlib
 import sys
-from azure.identity import DefaultAzureCredential
 from typing import Any, List, Dict, Generator
 
 class AutoFlushingStream:

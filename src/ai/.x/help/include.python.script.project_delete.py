@@ -1,10 +1,12 @@
 import argparse
 import json
-from azure.ai.resources.client import AIClient
-from azure.identity import DefaultAzureCredential
 
 def delete_project(subscription_id, resource_group_name, project_name, delete_dependent_resources):
     """Delete Azure AI projects."""
+
+    from azure.ai.resources.client import AIClient
+    from azure.identity import DefaultAzureCredential
+
     ai_client = AIClient(
         credential=DefaultAzureCredential(),
         subscription_id=subscription_id,

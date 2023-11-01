@@ -1,12 +1,14 @@
 import argparse
 import json
-from azure.ai.resources.client import AIClient
-from azure.ai.resources.entities import AIResource
-from azure.ai.ml.entities import ManagedNetwork
-from azure.identity import DefaultAzureCredential
 
 def create_hub(subscription_id, resource_group_name, ai_resource_name, location, display_name, description):
     """Create Azure AI hub."""
+
+    from azure.identity import DefaultAzureCredential
+    from azure.ai.resources.client import AIClient
+    from azure.ai.resources.entities import AIResource
+    from azure.ai.ml.entities import ManagedNetwork
+
     ai_client = AIClient(
         credential=DefaultAzureCredential(),
         subscription_id=subscription_id,

@@ -1,10 +1,12 @@
 import argparse
 import json
-from azure.ai.resources.client import AIClient
-from azure.identity import DefaultAzureCredential
 
 def delete_hub(subscription_id, resource_group_name, ai_resource_name, delete_dependent_resources):
     """Delete Azure AI hubs."""
+
+    from azure.identity import DefaultAzureCredential
+    from azure.ai.resources.client import AIClient
+
     ai_client = AIClient(
         credential=DefaultAzureCredential(),
         subscription_id=subscription_id,

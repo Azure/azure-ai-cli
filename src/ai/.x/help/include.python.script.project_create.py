@@ -1,11 +1,13 @@
 import argparse
 import json
-from azure.ai.resources.client import AIClient
-from azure.ai.resources.entities import Project
-from azure.identity import DefaultAzureCredential
 
 def create_project(subscription_id, resource_id, resource_group_name, project_name, location, display_name, description, openai_resource_id):
     """Create Azure AI project."""
+
+    from azure.identity import DefaultAzureCredential
+    from azure.ai.resources.client import AIClient
+    from azure.ai.resources.entities import Project
+
     ai_client = AIClient(
         credential=DefaultAzureCredential(),
         subscription_id=subscription_id,
