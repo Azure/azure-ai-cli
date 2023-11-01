@@ -82,6 +82,28 @@ namespace Azure.AI.Details.Common.CLI
                                         "",
                                 "SEE:", "https://docs.microsoft.com/cli/azure/authenticate-azure-cli");
                     }
+                    else if (output.Contains("azure.ai.resources"))
+                    {
+                        info.Add("WARNING:");
+                        info.Add("azure-ai-resources Python wheel not found!");
+                        info.Add("");
+                        info.Add("TRY:");
+                        info.Add("pip install azure-ai-resources");
+                        info.Add("SEE:");
+                        info.Add("https://pypi.org/project/azure-ai-resources/");
+                        info.Add("");
+                    }
+                    else if (output.Contains("azure.ai.generative"))
+                    {
+                        info.Add("WARNING:");
+                        info.Add("azure-ai-resources Python wheel not found!");
+                        info.Add("");
+                        info.Add("TRY:");
+                        info.Add("pip install azure-ai-generative");
+                        info.Add("SEE:");
+                        info.Add("https://pypi.org/project/azure-ai-generative/");
+                        info.Add("");
+                    }
                     else if (output.Contains("azure.identity"))
                     {
                         info.Add("WARNING:");
