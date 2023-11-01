@@ -95,6 +95,13 @@ namespace Azure.AI.Details.Common.CLI
             public string DefaultCapacity { get; set; }
         }
 
+        public struct CognitiveServicesUsageInfo
+        {
+            public string Name { get; set; }
+            public string Current { get; set; }
+            public string Limit { get; set; }
+        }
+
         public struct CognitiveSearchResourceInfo
         {
             public string Id;
@@ -325,6 +332,29 @@ namespace Azure.AI.Details.Common.CLI
                 x.Payload[i].Format = model["Format"].Value<string>();
                 x.Payload[i].Version = model["Version"].Value<string>();
                 x.Payload[i].DefaultCapacity = model["DefaultCapacity"].Value<string>();
+                i++;
+            }
+
+            return x;
+        }
+
+        public static async Task<ParsedJsonProcessOutput<CognitiveServicesUsageInfo[]>> ListCognitiveServicesUsage(string subscriptionId = null, string regionLocation = null)
+        {
+            var cmdPart = "cognitiveservices usage list";
+            var subPart = subscriptionId != null ? $"--subscription {subscriptionId}" : "";
+
+            var parsed = await ProcessHelpers.ParseShellCommandJson<JArray>("az", $"{cmdPart} {subPart} -l {regionLocation} --query \"[].{{Name:name.value,Current:currentValue,Limit:limit}}\"", GetUserAgentEnv());
+            var models = parsed.Payload;
+
+            var x = new ParsedJsonProcessOutput<CognitiveServicesUsageInfo[]>(parsed.Output);
+            x.Payload = new CognitiveServicesUsageInfo[models.Count];
+
+            var i = 0;
+            foreach (var model in models)
+            {
+                x.Payload[i].Name = model["Name"].Value<string>();
+                x.Payload[i].Current = model["Current"].Value<string>();
+                x.Payload[i].Limit = model["Limit"].Value<string>();
                 i++;
             }
 
