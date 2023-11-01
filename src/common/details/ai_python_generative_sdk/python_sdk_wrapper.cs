@@ -21,57 +21,57 @@ namespace Azure.AI.Details.Common.CLI
 {
     public class PythonSDKWrapper
     {
-        static public string CreateResource(INamedValues values, string subscription, string group, string name, string location, string displayName, string description)
+        static public string CreateResource(ICommandValues values, string subscription, string group, string name, string location, string displayName, string description)
         {
             return DoCreateResourceViaPython(values, subscription, group, name, location, displayName, description);
         }
 
-        static public string CreateProject(INamedValues values, string subscription, string group, string resource, string name, string location, string displayName = null, string description = null, string openAiResourceId = null)
+        static public string CreateProject(ICommandValues values, string subscription, string group, string resource, string name, string location, string displayName = null, string description = null, string openAiResourceId = null)
         {
             return DoCreateProjectViaPython(values, subscription, group, resource, name, location, displayName, description, openAiResourceId);
         }
 
-        static public string ListResources(INamedValues values, string subscription)
+        static public string ListResources(ICommandValues values, string subscription)
         {
             return CheckIgnorePythonSdkErrors(() => DoListResourcesViaPython(values, subscription), "[]");
         }
 
-        static public string ListProjects(INamedValues values, string subscription)
+        static public string ListProjects(ICommandValues values, string subscription)
         {
             return CheckIgnorePythonSdkErrors(() => DoListProjectsViaPython(values, subscription), "[]");
         }
 
-        static public string ListConnections(INamedValues values, string subscription, string group, string projectName)
+        static public string ListConnections(ICommandValues values, string subscription, string group, string projectName)
         {
             return CheckIgnorePythonSdkErrors(() => DoListConnectionsViaPython(values, subscription, group, projectName), "[]");
         }
 
-        static public string DeleteResource(INamedValues values, string subscription, string group, string name, bool deleteDependentResources)
+        static public string DeleteResource(ICommandValues values, string subscription, string group, string name, bool deleteDependentResources)
         {
             return DoDeleteResourceViaPython(values, subscription, group, name, deleteDependentResources);
         }
 
-        static public string DeleteProject(INamedValues values, string subscription, string group, string name, bool deleteDependentResources)
+        static public string DeleteProject(ICommandValues values, string subscription, string group, string name, bool deleteDependentResources)
         {
             return DoDeleteProjectViaPython(values, subscription, group, name, deleteDependentResources);
         }
 
-        static public string DeleteConnection(INamedValues values, string subscription, string group, string projectName, string connectionName)
+        static public string DeleteConnection(ICommandValues values, string subscription, string group, string projectName, string connectionName)
         {
             return DoDeleteConnectionViaPython(values, subscription, group, projectName, connectionName);
         }
 
-        static public string CreateConnection(INamedValues values, string subscription, string group, string projectName, string connectionName, string connectionType, string endpoint, string key)
+        static public string CreateConnection(ICommandValues values, string subscription, string group, string projectName, string connectionName, string connectionType, string endpoint, string key)
         {
             return DoCreateConnectionViaPython(values, subscription, group, projectName, connectionName, connectionType, endpoint, key);
         }
 
-        static public string GetConnection(INamedValues values, string subscription, string group, string projectName, string connectionName)
+        static public string GetConnection(ICommandValues values, string subscription, string group, string projectName, string connectionName)
         {
             return DoGetConnectionViaPython(values, subscription, group, projectName, connectionName);
         }
 
-        static public string UpdateMLIndex(INamedValues values, string subscription, string group, string projectName, string indexName, string embeddingModelDeployment, string embeddingModelName, string dataFiles, string externalSourceUrl)
+        static public string UpdateMLIndex(ICommandValues values, string subscription, string group, string projectName, string indexName, string embeddingModelDeployment, string embeddingModelName, string dataFiles, string externalSourceUrl)
         {
             Action<string> stdErrVerbose = x => Console.Error.WriteLine(x);
             Action<string> stdErrStandard = x => {
@@ -96,7 +96,7 @@ namespace Azure.AI.Details.Common.CLI
                 null, null, stdErr);
         }
 
-        private static string DoCreateResourceViaPython(INamedValues values, string subscription, string group, string name, string location, string displayName, string description)
+        private static string DoCreateResourceViaPython(ICommandValues values, string subscription, string group, string name, string location, string displayName, string description)
         {
             var createResource = () => PythonRunner.RunEmbeddedPythonScript(values, "hub_create",
                 CliHelpers.BuildCliArgs( 
@@ -121,7 +121,7 @@ namespace Azure.AI.Details.Common.CLI
             throw exception;
         }
 
-        private static string DoCreateProjectViaPython(INamedValues values, string subscription, string group, string resource, string name, string location, string displayName, string description, string openAiResourceId)
+        private static string DoCreateProjectViaPython(ICommandValues values, string subscription, string group, string resource, string name, string location, string displayName, string description, string openAiResourceId)
         {
             return PythonRunner.RunEmbeddedPythonScript(values, "project_create",
                 CliHelpers.BuildCliArgs(
@@ -135,17 +135,17 @@ namespace Azure.AI.Details.Common.CLI
                     "--openai-resource-id", openAiResourceId));
         }
 
-        private static string DoListResourcesViaPython(INamedValues values, string subscription)
+        private static string DoListResourcesViaPython(ICommandValues values, string subscription)
         {
             return PythonRunner.RunEmbeddedPythonScript(values, "hub_list", CliHelpers.BuildCliArgs( "--subscription", subscription));
         }
 
-        private static string DoListProjectsViaPython(INamedValues values, string subscription)
+        private static string DoListProjectsViaPython(ICommandValues values, string subscription)
         {
             return PythonRunner.RunEmbeddedPythonScript(values, "project_list", CliHelpers.BuildCliArgs("--subscription", subscription));
         }
 
-        private static string DoListConnectionsViaPython(INamedValues values, string subscription, string group, string projectName)
+        private static string DoListConnectionsViaPython(ICommandValues values, string subscription, string group, string projectName)
         {
             return PythonRunner.RunEmbeddedPythonScript(values, "connection_list", 
                 CliHelpers.BuildCliArgs(
@@ -154,7 +154,7 @@ namespace Azure.AI.Details.Common.CLI
                     "--project-name", projectName));
         }
 
-        private static string DoDeleteResourceViaPython(INamedValues values, string subscription, string group, string name, bool deleteDependentResources)
+        private static string DoDeleteResourceViaPython(ICommandValues values, string subscription, string group, string name, bool deleteDependentResources)
         {
             return PythonRunner.RunEmbeddedPythonScript(values, "hub_delete",
                 CliHelpers.BuildCliArgs(
@@ -164,7 +164,7 @@ namespace Azure.AI.Details.Common.CLI
                     "--delete-dependent-resources", deleteDependentResources ? "true" : "false"));
         }
 
-        private static string DoDeleteProjectViaPython(INamedValues values, string subscription, string group, string name, bool deleteDependentResources)
+        private static string DoDeleteProjectViaPython(ICommandValues values, string subscription, string group, string name, bool deleteDependentResources)
         {
             return PythonRunner.RunEmbeddedPythonScript(values, "project_delete",
                 CliHelpers.BuildCliArgs(
@@ -174,7 +174,7 @@ namespace Azure.AI.Details.Common.CLI
                     "--delete-dependent-resources", deleteDependentResources ? "true" : "false"));
         }
 
-        private static string DoDeleteConnectionViaPython(INamedValues values, string subscription, string group, string projectName, string connectionName)
+        private static string DoDeleteConnectionViaPython(ICommandValues values, string subscription, string group, string projectName, string connectionName)
         {
             return PythonRunner.RunEmbeddedPythonScript(values, "connection_delete",
                 CliHelpers.BuildCliArgs(
@@ -184,7 +184,7 @@ namespace Azure.AI.Details.Common.CLI
                     "--connection-name", connectionName));
         }
 
-        private static string DoCreateConnectionViaPython(INamedValues values, string subscription, string group, string projectName, string connectionName, string connectionType, string endpoint, string key)
+        private static string DoCreateConnectionViaPython(ICommandValues values, string subscription, string group, string projectName, string connectionName, string connectionType, string endpoint, string key)
         {
             return PythonRunner.RunEmbeddedPythonScript(values, "api_key_connection_create",
                 CliHelpers.BuildCliArgs(
@@ -197,7 +197,7 @@ namespace Azure.AI.Details.Common.CLI
                     "--key", key));
         }
 
-        private static string DoGetConnectionViaPython(INamedValues values, string subscription, string group, string projectName, string connectionName)
+        private static string DoGetConnectionViaPython(ICommandValues values, string subscription, string group, string projectName, string connectionName)
         {
             return PythonRunner.RunEmbeddedPythonScript(values, "api_key_connection_get",
                 CliHelpers.BuildCliArgs(
@@ -207,7 +207,7 @@ namespace Azure.AI.Details.Common.CLI
                     "--connection-name", connectionName));
         }
 
-        private static void CreateResourceGroup(INamedValues values, string subscription, string location, string group)
+        private static void CreateResourceGroup(ICommandValues values, string subscription, string location, string group)
         {
             var quiet = values.GetOrDefault("x.quiet", false);
 

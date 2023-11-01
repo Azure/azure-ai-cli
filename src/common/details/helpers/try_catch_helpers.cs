@@ -37,7 +37,7 @@ namespace Azure.AI.Details.Common.CLI
                 }
                 catch (ExceptionType ex)
                 {
-                    if (retry++ > retryTimes) return ex;
+                    if (retry++ >= retryTimes) return ex;
                     if (retryIf != null && !retryIf(ex)) return ex;
                     Thread.Sleep(retry * 22);
                 }
