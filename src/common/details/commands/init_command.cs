@@ -303,14 +303,14 @@ namespace Azure.AI.Details.Common.CLI
             Console.Write($"{label}: ");
             var choiceToPart = new Dictionary<string, string>
             {
-                ["AI Project"] = "init-root-project-select-or-create",
+                // ["AI Project"] = "init-root-project-select-or-create",
                 ["New AI Project"] = "init-root-project-create",
                 ["Existing AI Project"] = "init-root-project-select",
                 ["Standalone resources"] = "init-root-standalone-select-or-create",
             };
             var partToLabelDisplay = new Dictionary<string, string>()
             {
-                ["init-root-project-select-or-create"] = "AI Project",
+                // ["init-root-project-select-or-create"] = "AI Project",
                 ["init-root-project-create"] = "New AI Project",
                 ["init-root-project-select"] = "Existing AI Project",
                 ["init-root-standalone-select-or-create"] = null
@@ -398,6 +398,11 @@ namespace Azure.AI.Details.Common.CLI
                     "init-root-project-select" => DoInitRootProject(interactive, false, true),
                     "init-root-project-create" => DoInitRootProject(interactive, true, false),
 
+                    "project-select-or-create" => DoInitProject(interactive, true, true),
+                    "project-select" => DoInitProject(interactive, false, true),
+                    "project-create" => DoInitProject(interactive, true, false),
+
+
                     "init-root-standalone-select-or-create" => DoInitStandaloneResources(interactive),
                     "init-root-cognitiveservices-ai-services-kind-create-or-select" => DoInitRootCognitiveServicesAIServicesKind(interactive),
                     "init-root-cognitiveservices-cognitiveservices-kind-create-or-select" => DoInitRootCognitiveServicesCognitiveServicesKind(interactive),
@@ -411,7 +416,6 @@ namespace Azure.AI.Details.Common.CLI
                     "openai" => DoInitOpenAi(interactive),
                     "search" => DoInitSearch(interactive),
                     "resource" => DoInitHub(interactive),
-                    "project" => DoInitProject(interactive),
 
                     _ => throw new ApplicationException($"WARNING: NOT YET IMPLEMENTED")
                 };
