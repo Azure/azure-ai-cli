@@ -401,6 +401,7 @@ namespace Azure.AI.Details.Common.CLI
                     "init-root-search-create-or-select" => DoInitRootSearch(interactive),
                     "init-root-speech-create-or-select" => DoInitRootSpeech(interactive),
 
+                    "subscription" => DoInitSubscriptionId(interactive),
                     "cognitiveservices-ai-services-kind" => DoInitCognitiveServicesAIServicesKind(interactive),
                     "cognitiveservices-cognitiveservices-kind" => DoInitCognitiveServicesCognitiveServicesKind(interactive),
                     "openai" => DoInitOpenAi(interactive),
@@ -414,13 +415,16 @@ namespace Azure.AI.Details.Common.CLI
             }
         }
 
-        private async Task DoInitRootProject(bool interactive)
+        private async Task DoInitSubscriptionId(bool interactive)
         {
             var subscriptionFilter = SubscriptionToken.Data().GetOrDefault(_values, "");
             var subscriptionId = await AzCliConsoleGui.PickSubscriptionIdAsync(interactive, interactive, subscriptionFilter);
             SubscriptionToken.Data().Set(_values, subscriptionId);
+        }
 
-            await DoInitServiceParts(interactive, "openai", "search", "resource", "project");
+        private async Task DoInitRootProject(bool interactive)
+        {
+            await DoInitServiceParts(interactive, "subscription", "openai", "search", "resource", "project");
         }
 
         private async Task DoInitProject(bool interactive)
@@ -442,10 +446,7 @@ namespace Azure.AI.Details.Common.CLI
 
         private async Task DoInitRootOpenAi(bool interactive)
         {
-            var subscriptionFilter = SubscriptionToken.Data().GetOrDefault(_values, "");
-            var subscriptionId = await AzCliConsoleGui.PickSubscriptionIdAsync(interactive, interactive, subscriptionFilter);
-            SubscriptionToken.Data().Set(_values, subscriptionId);
-
+            await DoInitSubscriptionId(interactive);
             await DoInitOpenAi(interactive);
         }
 
@@ -472,10 +473,7 @@ namespace Azure.AI.Details.Common.CLI
 
         private async Task DoInitRootCognitiveServicesAIServicesKind(bool interactive)
         {
-            var subscriptionFilter = SubscriptionToken.Data().GetOrDefault(_values, "");
-            var subscriptionId = await AzCliConsoleGui.PickSubscriptionIdAsync(interactive, interactive, subscriptionFilter);
-            SubscriptionToken.Data().Set(_values, subscriptionId);
-
+            await DoInitSubscriptionId(interactive);
             await DoInitCognitiveServicesAIServicesKind(interactive);
         }
 
@@ -502,10 +500,7 @@ namespace Azure.AI.Details.Common.CLI
 
         private async Task DoInitRootCognitiveServicesCognitiveServicesKind(bool interactive)
         {
-            var subscriptionFilter = SubscriptionToken.Data().GetOrDefault(_values, "");
-            var subscriptionId = await AzCliConsoleGui.PickSubscriptionIdAsync(interactive, interactive, subscriptionFilter);
-            SubscriptionToken.Data().Set(_values, subscriptionId);
-
+            await DoInitSubscriptionId(interactive);
             await DoInitCognitiveServicesCognitiveServicesKind(interactive);
         }
 
@@ -531,10 +526,7 @@ namespace Azure.AI.Details.Common.CLI
 
         private async Task DoInitRootSearch(bool interactive)
         {
-            var subscriptionFilter = SubscriptionToken.Data().GetOrDefault(_values, "");
-            var subscriptionId = await AzCliConsoleGui.PickSubscriptionIdAsync(interactive, interactive, subscriptionFilter);
-            SubscriptionToken.Data().Set(_values, subscriptionId);
-
+            await DoInitSubscriptionId(interactive);
             await DoInitSearch(interactive);
         }
 
@@ -555,10 +547,7 @@ namespace Azure.AI.Details.Common.CLI
 
         private async Task DoInitRootSpeech(bool interactive)
         {
-            var subscriptionFilter = SubscriptionToken.Data().GetOrDefault(_values, "");
-            var subscriptionId = await AzCliConsoleGui.PickSubscriptionIdAsync(interactive, interactive, subscriptionFilter);
-            SubscriptionToken.Data().Set(_values, subscriptionId);
-
+            await DoInitSubscriptionId(interactive);
             await DoInitSpeech(interactive);
         }
 
