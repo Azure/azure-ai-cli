@@ -2,7 +2,7 @@ import argparse
 import json
 
 def delete_hub(subscription_id, resource_group_name, ai_resource_name, delete_dependent_resources):
-    """Delete Azure AI hubs."""
+    """Delete Azure AI resources."""
 
     from azure.identity import DefaultAzureCredential
     from azure.ai.resources.client import AIClient
@@ -18,12 +18,12 @@ def delete_hub(subscription_id, resource_group_name, ai_resource_name, delete_de
     return result
 
 def main():
-    """Parse command line arguments and delete's the hub."""
-    parser = argparse.ArgumentParser(description="Delete Azure AI hub")
+    """Parse command line arguments and delete's the resource."""
+    parser = argparse.ArgumentParser(description="Delete Azure AI resource")
     parser.add_argument("--subscription", required=True, help="Azure subscription ID")
     parser.add_argument("--group", required=True, help="Azure resource group name")
-    parser.add_argument("--name", required=True, help="Azure resource hub name")
-    parser.add_argument("--delete-dependent-resources", required=True, help="Delete resources associated with the hub")
+    parser.add_argument("--name", required=True, help="Azure AI resource name")
+    parser.add_argument("--delete-dependent-resources", required=True, help="Delete resources associated with the resource")
     args = parser.parse_args()
 
     subscription_id = args.subscription

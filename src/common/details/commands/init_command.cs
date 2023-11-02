@@ -59,16 +59,22 @@ namespace Azure.AI.Details.Common.CLI
             CheckPath();
 
             var interactive = _values.GetOrDefault("init.service.interactive", true);
+            if (!interactive) ThrowInteractiveNotSupportedApplicationException(); // POST-IGNITE: TODO: Add back non-interactive mode support
+
             switch (command)
             {
                 // case "init": await DoInitServiceCommand(); break;
                 case "init": await DoInitRootAsync(); break;
+
+                case "init.project": await DoInitRootProject(interactive, true, true); break;
+                case "init.project.new": await DoInitRootProject(interactive, true, false); break;
+                case "init.project.select": await DoInitRootProject(interactive, false, true); break;
+
                 case "init.aiservices": await DoInitRootCognitiveServicesAIServicesKind(interactive); break;
                 case "init.cognitiveservices": await DoInitRootCognitiveServicesCognitiveServicesKind(interactive); break;
                 case "init.openai": await DoInitRootOpenAi(interactive); break;
                 case "init.search": await DoInitRootSearch(interactive); break;
                 case "init.speech": await DoInitRootSpeech(interactive); break;
-                case "init.project": await DoInitRootProject(interactive); break;
                 case "init.resource": await DoInitResourceCommand(); break;
 
                 // POST-IGNITE: TODO: add ability to init deployments
@@ -87,7 +93,6 @@ namespace Azure.AI.Details.Common.CLI
         private async Task DoInitRootAsync()
         {
             var interactive = _values.GetOrDefault("init.service.interactive", true);
-            if (!interactive) ThrowInteractiveNotSupportedApplicationException(); // POST-IGNITE: TODO: Add back non-interactive mode support
 
             ConsoleHelpers.WriteLineWithHighlight("`AI INIT`\n\n  Initializes (creates, selects, or attaches to) AI Projects and services.\n");
 
@@ -127,7 +132,7 @@ namespace Azure.AI.Details.Common.CLI
             var message = "    Validating...";
             Console.Write(message);
 
-            var (hubName, openai, search) = await VerifyResourceConnections(validated, subscription, groupName, projectName);
+            var (hubName, openai, search) = await AiSdkConsoleGui.VerifyResourceConnections(_values, validated?.Id, groupName, projectName);
             if (openai != null && search != null)
             {
                 Console.Write(new string(' ', message.Length + 2) + "\r");
@@ -141,84 +146,17 @@ namespace Azure.AI.Details.Common.CLI
             }
         }
 
-        private async Task<(string, AzCli.CognitiveServicesResourceInfo?, AzCli.CognitiveSearchResourceInfo?)> VerifyResourceConnections(AzCli.SubscriptionInfo? validated, string subscription, string groupName, string projectName)
+        private async Task DoInitRootConfirmVerifiedProjectResources(bool interactive, string subscription, string projectName, string resourceName, AzCli.CognitiveServicesResourceInfo openaiResource, AzCli.CognitiveSearchResourceInfo searchResource)
         {
-            try
-            {
-                var projectJson = PythonSDKWrapper.ListProjects(_values, subscription);
-                var projects = JObject.Parse(projectJson)["projects"] as JArray;
-                var project = projects.FirstOrDefault(x => x["name"].ToString() == projectName);
-                if (project == null) return (null, null, null);
-
-                var hub = project["workspace_hub"].ToString();
-                var hubName = hub.Split('/').Last();
-
-                var json = PythonSDKWrapper.ListConnections(_values, subscription, groupName, projectName);
-                if (string.IsNullOrEmpty(json)) return (null, null, null);
-
-                var connections = JObject.Parse(json)["connections"] as JArray;
-                if (connections.Count == 0) return (null, null, null);
-
-                var foundOpenAiResource = await FindAndVerifyOpenAiResourceConnection(subscription, connections);
-                var foundSearchResource = await FindAndVerifySearchResourceConnection(subscription, connections);
-
-                return (hubName, foundOpenAiResource, foundSearchResource);
-            }
-            catch (Exception ex)
-            {
-                FileHelpers.LogException(_values, ex);
-                return (null, null, null);
-            }
-        }
-
-        private static async Task<AzCli.CognitiveServicesResourceInfo?> FindAndVerifyOpenAiResourceConnection(string subscription, JArray connections)
-        {
-            var openaiConnection = connections.FirstOrDefault(x => x["name"].ToString().Contains("Default_AzureOpenAI") && x["type"].ToString() == "azure_open_ai");
-
-            if (openaiConnection == null) return null;
-
-            var openaiEndpoint = openaiConnection?["target"].ToString();
-            if (string.IsNullOrEmpty(openaiEndpoint)) return null;
-
-            var responseOpenAi = await AzCli.ListCognitiveServicesResources(subscription, "OpenAI");
-            var responseOpenAiOk = !string.IsNullOrEmpty(responseOpenAi.Output.StdOutput) && string.IsNullOrEmpty(responseOpenAi.Output.StdError);
-            if (!responseOpenAiOk) return null;
-
-            var matchOpenAiEndpoint = responseOpenAi.Payload.Where(x => x.Endpoint == openaiEndpoint).ToList();
-            if (matchOpenAiEndpoint.Count() != 1) return null;
-
-            return matchOpenAiEndpoint.First();
-        }
-
-        private static async Task<AzCli.CognitiveSearchResourceInfo?> FindAndVerifySearchResourceConnection(string subscription, JArray connections)
-        {
-            var searchConnection = connections.FirstOrDefault(x => x["name"].ToString().Contains("Default_CognitiveSearch") && x["type"].ToString() == "cognitive_search");
-            if (searchConnection == null) return null;
-
-            var searchEndpoint = searchConnection?["target"].ToString();
-            if (string.IsNullOrEmpty(searchEndpoint)) return null;
-
-            var responseSearch = await AzCli.ListSearchResources(subscription, null);
-            var responseSearchOk = !string.IsNullOrEmpty(responseSearch.Output.StdOutput) && string.IsNullOrEmpty(responseSearch.Output.StdError);
-            if (!responseSearchOk) return null;
-
-            var matchSearchEndpoint = responseSearch.Payload.Where(x => x.Endpoint == searchEndpoint).ToList();
-            if (matchSearchEndpoint.Count() != 1) return null;
-
-            return matchSearchEndpoint.First();
-        }
-
-        private async Task DoInitRootConfirmVerifiedProjectResources(bool interactive, string subscription, string projectName, string hubName, AzCli.CognitiveServicesResourceInfo openaiResource, AzCli.CognitiveSearchResourceInfo searchResource)
-        {
-            ConsoleHelpers.WriteLineWithHighlight($"    AI RESOURCE: {hubName}");
+            ConsoleHelpers.WriteLineWithHighlight($"    AI RESOURCE: {resourceName}");
             ConsoleHelpers.WriteLineWithHighlight($"    AI SEARCH RESOURCE: {searchResource.Name}");
             // Console.WriteLine();
-            ConsoleHelpers.WriteLineWithHighlight($"    OPEN AI RESOURCE: {openaiResource.Name}");
+            ConsoleHelpers.WriteLineWithHighlight($"    AZURE OPENAI RESOURCE: {openaiResource.Name}");
 
             // TODO: If there's a way to get the deployments, get them, and do this... Print correct stuff here... 
-            // ConsoleHelpers.WriteLineWithHighlight($"    OPEN AI DEPLOYMENT (CHAT): {{chat-deployment-name}}                `#e_;<== work in progress`");
-            // ConsoleHelpers.WriteLineWithHighlight($"    OPEN AI DEPLOYMENT (EMBEDDING): {{embedding-deployment-name}}    `#e_;<== work in progress`");
-            // ConsoleHelpers.WriteLineWithHighlight($"    OPEN AI DEPLOYMENT (EVALUATION): {{evaluation-deployment-name}}    `#e_;<== work in progress`");
+            // ConsoleHelpers.WriteLineWithHighlight($"    AZURE OPENAI DEPLOYMENT (CHAT): {{chat-deployment-name}}                `#e_;<== work in progress`");
+            // ConsoleHelpers.WriteLineWithHighlight($"    AZURE OPENAI DEPLOYMENT (EMBEDDING): {{embedding-deployment-name}}    `#e_;<== work in progress`");
+            // ConsoleHelpers.WriteLineWithHighlight($"    AZURE OPENAI DEPLOYMENT (EVALUATION): {{evaluation-deployment-name}}    `#e_;<== work in progress`");
 
             Console.WriteLine();
             var label = "  Initialize";
@@ -242,18 +180,7 @@ namespace Azure.AI.Details.Common.CLI
             {
                 Console.Write("\r" + new string(' ', label.Length + 2) + "\r");
 
-                var chatDeployment = await AzCliConsoleGui.PickOrCreateCognitiveServicesResourceDeployment(interactive, "Chat", subscription, openaiResource.Group, openaiResource.RegionLocation, openaiResource.Name, null);
-                var embeddingsDeployment = await AzCliConsoleGui.PickOrCreateCognitiveServicesResourceDeployment(interactive, "Embeddings", subscription, openaiResource.Group, openaiResource.RegionLocation, openaiResource.Name, null);
-                var evaluateDeployment = await AzCliConsoleGui.PickOrCreateCognitiveServicesResourceDeployment(interactive, "Evaluation", subscription, openaiResource.Group, openaiResource.RegionLocation, openaiResource.Name, null);
-                var keys = await AzCliConsoleGui.LoadCognitiveServicesResourceKeys("OPENAI RESOURCE", subscription, openaiResource);
-                if (openaiResource.Kind == "AIServices")
-                {
-                    ConfigSetHelpers.ConfigCognitiveServicesAIServicesKindResource(subscription, openaiResource.RegionLocation, openaiResource.Endpoint, chatDeployment, embeddingsDeployment, evaluateDeployment, keys.Key1);
-                }
-                else
-                {
-                    ConfigSetHelpers.ConfigOpenAiResource(subscription, openaiResource.RegionLocation, openaiResource.Endpoint, chatDeployment, embeddingsDeployment, evaluateDeployment, keys.Key1);
-                }
+                var (chatDeployment, embeddingsDeployment, evaluationDeployment, keys) = await AzCliConsoleGui.PickOrCreateAndConfigCognitiveServicesOpenAiKindResourceDeployments("AZURE OPENAI RESOURCE", interactive, subscription, openaiResource);
 
                 var searchKeys = await AzCliConsoleGui.LoadSearchResourceKeys(subscription, searchResource);
                 ConfigSetHelpers.ConfigSearchResource(searchResource.Endpoint, searchKeys.Key1);
@@ -298,16 +225,16 @@ namespace Azure.AI.Details.Common.CLI
             Console.Write($"{label}: ");
             var choiceToPart = new Dictionary<string, string>
             {
-                ["AI Project"] = "init-root-project-hack",             // TODO: Replace with new flows below | | |
-                // ["New AI Project"] = "init-root-project-new",                //                                    v v v
-                // ["Existing AI Project"] = "init-root-project-pick",
+                // ["AI Project"] = "init-root-project-select-or-create",
+                ["New AI Project"] = "init-root-project-create",
+                ["Existing AI Project"] = "init-root-project-select",
                 ["Standalone resources"] = "init-root-standalone-select-or-create",
             };
             var partToLabelDisplay = new Dictionary<string, string>()
             {
-                ["init-root-project-hack"] = "AI Project",
-                // ["init-root-project-new"] = "New AI Project",
-                // ["init-root-project-pick"] = "Existing AI Project",
+                // ["init-root-project-select-or-create"] = "AI Project",
+                ["init-root-project-create"] = "New AI Project",
+                ["init-root-project-select"] = "Existing AI Project",
                 ["init-root-standalone-select-or-create"] = null
             };
 
@@ -389,9 +316,13 @@ namespace Azure.AI.Details.Common.CLI
 
                 var task = operation switch
                 {
-                    "init-root-project-hack" => DoInitRootProject(interactive),         // TODO: Replace with new flows below  | | |
-                    "init-root-project-pick" => DoInitRootProject(interactive),         //                                     v v v
-                    "init-root-project-new" => DoInitRootProject(interactive),
+                    "init-root-project-select-or-create" => DoInitRootProject(interactive, true, true),
+                    "init-root-project-select" => DoInitRootProject(interactive, false, true),
+                    "init-root-project-create" => DoInitRootProject(interactive, true, false),
+
+                    "project-select-or-create" => DoInitProject(interactive, true, true),
+                    "project-select" => DoInitProject(interactive, false, true),
+                    "project-create" => DoInitProject(interactive, true, false),
 
                     "init-root-standalone-select-or-create" => DoInitStandaloneResources(interactive),
                     "init-root-cognitiveservices-ai-services-kind-create-or-select" => DoInitRootCognitiveServicesAIServicesKind(interactive),
@@ -400,12 +331,12 @@ namespace Azure.AI.Details.Common.CLI
                     "init-root-search-create-or-select" => DoInitRootSearch(interactive),
                     "init-root-speech-create-or-select" => DoInitRootSpeech(interactive),
 
+                    "subscription" => DoInitSubscriptionId(interactive),
                     "cognitiveservices-ai-services-kind" => DoInitCognitiveServicesAIServicesKind(interactive),
                     "cognitiveservices-cognitiveservices-kind" => DoInitCognitiveServicesCognitiveServicesKind(interactive),
                     "openai" => DoInitOpenAi(interactive),
                     "search" => DoInitSearch(interactive),
                     "resource" => DoInitHub(interactive),
-                    "project" => DoInitProject(interactive),
 
                     _ => throw new ApplicationException($"WARNING: NOT YET IMPLEMENTED")
                 };
@@ -413,18 +344,27 @@ namespace Azure.AI.Details.Common.CLI
             }
         }
 
-        private async Task DoInitRootProject(bool interactive)
+        private async Task DoInitSubscriptionId(bool interactive)
         {
             var subscriptionFilter = SubscriptionToken.Data().GetOrDefault(_values, "");
             var subscriptionId = await AzCliConsoleGui.PickSubscriptionIdAsync(interactive, interactive, subscriptionFilter);
             SubscriptionToken.Data().Set(_values, subscriptionId);
-
-            await DoInitServiceParts(interactive, "openai", "search", "resource", "project");
         }
 
-        private async Task DoInitProject(bool interactive)
+        private async Task DoInitRootProject(bool interactive, bool allowCreate = true, bool allowPick = true)
         {
-            if (!interactive) ThrowInteractiveNotSupportedApplicationException(); // POST-IGNITE: TODO: Add back non-interactive mode support
+            await DoInitSubscriptionId(interactive);
+            await DoInitProject(interactive, allowCreate, allowPick);
+        }
+
+        private async Task DoInitProject(bool interactive, bool allowCreate = true, bool allowPick = true)
+        {
+            if (allowCreate)
+            {
+                await DoInitOpenAi(interactive);
+                await DoInitSearch(interactive);
+                await DoInitHub(interactive);
+            }
 
             var subscription = SubscriptionToken.Data().GetOrDefault(_values, "");
             var resourceId = _values.GetOrDefault("service.resource.id", null);
@@ -435,7 +375,7 @@ namespace Azure.AI.Details.Common.CLI
             var searchEndpoint = _values.GetOrDefault("service.search.endpoint", null);
             var searchKey = _values.GetOrDefault("service.search.key", null);
 
-            var project = AiSdkConsoleGui.InitAndConfigAiHubProject(_values, subscription, resourceId, groupName, openAiEndpoint, openAiKey, searchEndpoint, searchKey);
+            var project = await AiSdkConsoleGui.PickOrCreateAndConfigAiHubProject(allowCreate, allowPick, _values, subscription, resourceId, groupName, openAiEndpoint, openAiKey, searchEndpoint, searchKey);
 
             ProjectNameToken.Data().Set(_values, project.Name);
             _values.Reset("service.project.id", project.Id);
@@ -443,10 +383,7 @@ namespace Azure.AI.Details.Common.CLI
 
         private async Task DoInitRootOpenAi(bool interactive)
         {
-            var subscriptionFilter = SubscriptionToken.Data().GetOrDefault(_values, "");
-            var subscriptionId = await AzCliConsoleGui.PickSubscriptionIdAsync(interactive, interactive, subscriptionFilter);
-            SubscriptionToken.Data().Set(_values, subscriptionId);
-
+            await DoInitSubscriptionId(interactive);
             await DoInitOpenAi(interactive);
         }
 
@@ -460,7 +397,7 @@ namespace Azure.AI.Details.Common.CLI
             var sku = _values.GetOrDefault("init.service.cognitiveservices.resource.sku", Program.CognitiveServiceResourceSku);
             var yes = _values.GetOrDefault("init.service.cognitiveservices.terms.agree", false);
 
-            var resource = await AzCliConsoleGui.InitAndConfigCognitiveServicesOpenAiKindResource(interactive, subscriptionId, regionFilter, groupFilter, resourceFilter, kind, sku, yes);
+            var resource = await AzCliConsoleGui.PickOrCreateAndConfigCognitiveServicesOpenAiKindResource(interactive, subscriptionId, regionFilter, groupFilter, resourceFilter, kind, sku, yes);
 
             SubscriptionToken.Data().Set(_values, subscriptionId);
             _values.Reset("service.resource.region.name", resource.RegionLocation);
@@ -473,10 +410,7 @@ namespace Azure.AI.Details.Common.CLI
 
         private async Task DoInitRootCognitiveServicesAIServicesKind(bool interactive)
         {
-            var subscriptionFilter = SubscriptionToken.Data().GetOrDefault(_values, "");
-            var subscriptionId = await AzCliConsoleGui.PickSubscriptionIdAsync(interactive, interactive, subscriptionFilter);
-            SubscriptionToken.Data().Set(_values, subscriptionId);
-
+            await DoInitSubscriptionId(interactive);
             await DoInitCognitiveServicesAIServicesKind(interactive);
         }
 
@@ -490,7 +424,7 @@ namespace Azure.AI.Details.Common.CLI
             var sku = _values.GetOrDefault("init.service.cognitiveservices.resource.sku", Program.CognitiveServiceResourceSku);
             var yes = _values.GetOrDefault("init.service.cognitiveservices.terms.agree", false);
 
-            var resource = await AzCliConsoleGui.InitAndConfigCognitiveServicesAiServicesKindResource(interactive, subscriptionId, regionFilter, groupFilter, resourceFilter, kind, sku, yes);
+            var resource = await AzCliConsoleGui.PickOrCreateAndConfigCognitiveServicesAiServicesKindResource(interactive, subscriptionId, regionFilter, groupFilter, resourceFilter, kind, sku, yes);
 
             SubscriptionToken.Data().Set(_values, subscriptionId);
             _values.Reset("service.resource.region.name", resource.RegionLocation);
@@ -503,10 +437,7 @@ namespace Azure.AI.Details.Common.CLI
 
         private async Task DoInitRootCognitiveServicesCognitiveServicesKind(bool interactive)
         {
-            var subscriptionFilter = SubscriptionToken.Data().GetOrDefault(_values, "");
-            var subscriptionId = await AzCliConsoleGui.PickSubscriptionIdAsync(interactive, interactive, subscriptionFilter);
-            SubscriptionToken.Data().Set(_values, subscriptionId);
-
+            await DoInitSubscriptionId(interactive);
             await DoInitCognitiveServicesCognitiveServicesKind(interactive);
         }
 
@@ -520,7 +451,7 @@ namespace Azure.AI.Details.Common.CLI
             var sku = _values.GetOrDefault("init.service.cognitiveservices.resource.sku", Program.CognitiveServiceResourceSku);
             var yes = _values.GetOrDefault("init.service.cognitiveservices.terms.agree", false);
 
-            var resource = await AzCliConsoleGui.InitAndConfigCognitiveServicesCognitiveServicesKindResource(interactive, subscriptionId, regionFilter, groupFilter, resourceFilter, kind, sku, yes);
+            var resource = await AzCliConsoleGui.PickOrCreateAndConfigCognitiveServicesCognitiveServicesKindResource(interactive, subscriptionId, regionFilter, groupFilter, resourceFilter, kind, sku, yes);
 
             SubscriptionToken.Data().Set(_values, subscriptionId);
             _values.Reset("services.region", resource.RegionLocation);
@@ -532,17 +463,12 @@ namespace Azure.AI.Details.Common.CLI
 
         private async Task DoInitRootSearch(bool interactive)
         {
-            var subscriptionFilter = SubscriptionToken.Data().GetOrDefault(_values, "");
-            var subscriptionId = await AzCliConsoleGui.PickSubscriptionIdAsync(interactive, interactive, subscriptionFilter);
-            SubscriptionToken.Data().Set(_values, subscriptionId);
-
+            await DoInitSubscriptionId(interactive);
             await DoInitSearch(interactive);
         }
 
         private async Task DoInitSearch(bool interactive)
         {
-            if (!interactive) ThrowInteractiveNotSupportedApplicationException(); // POST-IGNITE: TODO: Add back non-interactive mode support
-
             var subscription = SubscriptionToken.Data().GetOrDefault(_values, "");
             var location = _values.GetOrDefault("service.resource.region.name", "");
             var groupName = ResourceGroupNameToken.Data().GetOrDefault(_values, "");
@@ -550,7 +476,7 @@ namespace Azure.AI.Details.Common.CLI
             var smartName = ResourceNameToken.Data().GetOrDefault(_values);
             var smartNameKind = smartName != null && smartName.Contains("openai") ? "openai" : "oai";
 
-            var resource = await AzCliConsoleGui.InitAndConfigCogSearchResource(subscription, location, groupName, smartName, smartNameKind);
+            var resource = await AzCliConsoleGui.PickOrCreateAndConfigCogSearchResource(subscription, location, groupName, smartName, smartNameKind);
 
             _values.Reset("service.search.endpoint", resource.Endpoint);
             _values.Reset("service.search.key", resource.Key);
@@ -558,10 +484,7 @@ namespace Azure.AI.Details.Common.CLI
 
         private async Task DoInitRootSpeech(bool interactive)
         {
-            var subscriptionFilter = SubscriptionToken.Data().GetOrDefault(_values, "");
-            var subscriptionId = await AzCliConsoleGui.PickSubscriptionIdAsync(interactive, interactive, subscriptionFilter);
-            SubscriptionToken.Data().Set(_values, subscriptionId);
-
+            await DoInitSubscriptionId(interactive);
             await DoInitSpeech(interactive);
         }
 
@@ -575,15 +498,13 @@ namespace Azure.AI.Details.Common.CLI
             var sku = _values.GetOrDefault("init.service.cognitiveservices.resource.sku", "S0");
             var yes = _values.GetOrDefault("init.service.cognitiveservices.terms.agree", false);
 
-            var resource = await AzCliConsoleGui.InitAndConfigCognitiveServicesSpeechServicesKindResource(interactive, subscriptionId, regionFilter, groupFilter, resourceFilter, kind, sku, yes);
+            var resource = await AzCliConsoleGui.PickOrCreateAndConfigCognitiveServicesSpeechServicesKindResource(interactive, subscriptionId, regionFilter, groupFilter, resourceFilter, kind, sku, yes);
 
             SubscriptionToken.Data().Set(_values, subscriptionId);
         }
 
         private async Task DoInitHub(bool interactive)
         {
-            if (!interactive) ThrowInteractiveNotSupportedApplicationException(); // POST-IGNITE: TODO: Add back non-interactive mode support
-
             var subscription = SubscriptionToken.Data().GetOrDefault(_values, "");
             if (string.IsNullOrEmpty(subscription))
             {

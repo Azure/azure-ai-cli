@@ -2,7 +2,7 @@ import argparse
 import json
 
 def create_hub(subscription_id, resource_group_name, ai_resource_name, location, display_name, description):
-    """Create Azure AI hub."""
+    """Create Azure AI resource."""
 
     from azure.identity import DefaultAzureCredential
     from azure.ai.resources.client import AIClient
@@ -32,8 +32,8 @@ def create_hub(subscription_id, resource_group_name, ai_resource_name, location,
     return result._workspace_hub._to_dict()
 
 def main():
-    """Parse command line arguments and print created hub."""
-    parser = argparse.ArgumentParser(description="Create Azure AI hub")
+    """Parse command line arguments and print created AI resource."""
+    parser = argparse.ArgumentParser(description="Create Azure AI resource")
     parser.add_argument("--subscription", required=True, help="Azure subscription ID")
     parser.add_argument("--group", required=True, help="Azure resource group name")
     parser.add_argument("--name", required=True, help="Azure AI resource display name. This is non-unique within the resource group.")
@@ -50,7 +50,7 @@ def main():
     description = args.description
 
     hub = create_hub(subscription_id, resource_group_name, ai_resource_name, location, display_name, description)
-    formatted = json.dumps({"hub": hub}, indent=2)
+    formatted = json.dumps({"resource": hub}, indent=2)
 
     print("---")
     print(formatted)

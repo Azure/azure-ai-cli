@@ -26,6 +26,8 @@ namespace Azure.AI.Details.Common.CLI
             ("init.openai", false),
             ("init.search", false),
             ("init.speech", false),
+            ("init.project.new", false),
+            ("init.project.select", false),
             ("init.project", false),
             ("init.resource", false),
             ("init", false)
@@ -46,6 +48,8 @@ namespace Azure.AI.Details.Common.CLI
                 case "init.search":
                 case "init.speech":
                 case "init.project":
+                case "init.project.new":
+                case "init.project.select":
                 case "init.resource":
 
                 case "init":
