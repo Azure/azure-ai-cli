@@ -79,7 +79,7 @@ namespace Azure.AI.Details.Common.CLI
 
         public static void ConfigOpenAiResource(string subscriptionId, string region, string endpoint, AzCli.CognitiveServicesDeploymentInfo chatDeployment, AzCli.CognitiveServicesDeploymentInfo embeddingsDeployment, AzCli.CognitiveServicesDeploymentInfo evaluationDeployment, string key)
         {
-            ConsoleHelpers.WriteLineWithHighlight($"\n`CONFIG OPEN AI RESOURCE`");
+            ConsoleHelpers.WriteLineWithHighlight($"\n`CONFIG AZURE OPENAI RESOURCE`");
             Console.WriteLine();
 
             int maxLabelWidth = 0;

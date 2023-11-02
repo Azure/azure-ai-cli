@@ -15,7 +15,7 @@ namespace Azure.AI.Details.Common.CLI
     {
         public static async Task<AzCli.CognitiveServicesDeploymentInfo> PickOrCreateCognitiveServicesResourceDeployment(bool interactive, string deploymentExtra, string subscriptionId, string groupName, string resourceRegionLocation, string resourceName, string deploymentFilter)
         {
-            ConsoleHelpers.WriteLineWithHighlight($"\n`OPEN AI DEPLOYMENT ({deploymentExtra.ToUpper()})`");
+            ConsoleHelpers.WriteLineWithHighlight($"\n`AZURE OPENAI DEPLOYMENT ({deploymentExtra.ToUpper()})`");
 
             var createNewItem = !string.IsNullOrEmpty(deploymentFilter)
                 ? $"(Create `{deploymentFilter}`)"

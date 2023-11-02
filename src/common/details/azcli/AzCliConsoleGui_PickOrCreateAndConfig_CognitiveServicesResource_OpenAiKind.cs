@@ -22,25 +22,12 @@ namespace Azure.AI.Details.Common.CLI
         public static async Task<AzCli.CognitiveServicesResourceInfoEx> PickOrCreateAndConfigCognitiveServicesOpenAiKindResource(bool interactive, string subscriptionId, string regionFilter = null, string groupFilter = null, string resourceFilter = null, string kinds = null, string sku = null, bool yes = false)
         {
             kinds ??= "OpenAI;AIServices";
-            var sectionHeader = "OPEN AI RESOURCE";
+            var sectionHeader = "AZURE OPENAI RESOURCE";
 
             var regionLocation = !string.IsNullOrEmpty(regionFilter) ? await AzCliConsoleGui.PickRegionLocationAsync(interactive, regionFilter) : new AzCli.AccountRegionLocationInfo();
             var resource = await AzCliConsoleGui.PickOrCreateCognitiveResource(sectionHeader, interactive, subscriptionId, regionLocation.Name, groupFilter, resourceFilter, kinds, sku, yes);
 
-            var chatDeployment = await AzCliConsoleGui.PickOrCreateCognitiveServicesResourceDeployment(interactive, "Chat", subscriptionId, resource.Group, resource.RegionLocation, resource.Name, null);
-            var embeddingsDeployment = await AzCliConsoleGui.PickOrCreateCognitiveServicesResourceDeployment(interactive, "Embeddings", subscriptionId, resource.Group, resource.RegionLocation, resource.Name, null);
-            var evaluationDeployment = await AzCliConsoleGui.PickOrCreateCognitiveServicesResourceDeployment(interactive, "Evaluation", subscriptionId, resource.Group, resource.RegionLocation, resource.Name, null);
-
-            var keys = await AzCliConsoleGui.LoadCognitiveServicesResourceKeys(sectionHeader, subscriptionId, resource);
-
-            if (resource.Kind == "AIServices")
-            {
-                ConfigSetHelpers.ConfigCognitiveServicesAIServicesKindResource(subscriptionId, resource.RegionLocation, resource.Endpoint, chatDeployment, embeddingsDeployment, evaluationDeployment, keys.Key1);
-            }
-            else
-            {
-                ConfigSetHelpers.ConfigOpenAiResource(subscriptionId, resource.RegionLocation, resource.Endpoint, chatDeployment, embeddingsDeployment, evaluationDeployment, keys.Key1);
-            }
+            var (chatDeployment, embeddingsDeployment, evaluationDeployment, keys) = await PickOrCreateAndConfigCognitiveServicesOpenAiKindResourceDeployments(sectionHeader, interactive, subscriptionId, resource);
 
             return new AzCli.CognitiveServicesResourceInfoEx
             {
@@ -55,6 +42,25 @@ namespace Azure.AI.Details.Common.CLI
                 EmbeddingsDeployment = embeddingsDeployment.Name,
                 EvaluationDeployment = evaluationDeployment.Name
             };
+        }
+
+        public static async Task<(AzCli.CognitiveServicesDeploymentInfo, AzCli.CognitiveServicesDeploymentInfo, AzCli.CognitiveServicesDeploymentInfo, AzCli.CognitiveServicesKeyInfo)> PickOrCreateAndConfigCognitiveServicesOpenAiKindResourceDeployments(string sectionHeader, bool interactive, string subscriptionId, AzCli.CognitiveServicesResourceInfo resource)
+        {
+            var chatDeployment = await AzCliConsoleGui.PickOrCreateCognitiveServicesResourceDeployment(interactive, "Chat", subscriptionId, resource.Group, resource.RegionLocation, resource.Name, null);
+            var embeddingsDeployment = await AzCliConsoleGui.PickOrCreateCognitiveServicesResourceDeployment(interactive, "Embeddings", subscriptionId, resource.Group, resource.RegionLocation, resource.Name, null);
+            var evaluationDeployment = await AzCliConsoleGui.PickOrCreateCognitiveServicesResourceDeployment(interactive, "Evaluation", subscriptionId, resource.Group, resource.RegionLocation, resource.Name, null);
+            var keys = await AzCliConsoleGui.LoadCognitiveServicesResourceKeys(sectionHeader, subscriptionId, resource);
+         
+            if (resource.Kind == "AIServices")
+            {
+                ConfigSetHelpers.ConfigCognitiveServicesAIServicesKindResource(subscriptionId, resource.RegionLocation, resource.Endpoint, chatDeployment, embeddingsDeployment, evaluationDeployment, keys.Key1);
+            }
+            else
+            {
+                ConfigSetHelpers.ConfigOpenAiResource(subscriptionId, resource.RegionLocation, resource.Endpoint, chatDeployment, embeddingsDeployment, evaluationDeployment, keys.Key1);
+            }
+         
+            return (chatDeployment, embeddingsDeployment, evaluationDeployment, keys);
         }
     }
 }

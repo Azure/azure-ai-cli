@@ -132,7 +132,7 @@ namespace Azure.AI.Details.Common.CLI
             var message = "    Validating...";
             Console.Write(message);
 
-            var (hubName, openai, search) = await VerifyResourceConnections(validated, subscription, groupName, projectName);
+            var (hubName, openai, search) = await AiSdkConsoleGui.VerifyResourceConnections(_values, validated?.Id, groupName, projectName);
             if (openai != null && search != null)
             {
                 Console.Write(new string(' ', message.Length + 2) + "\r");
@@ -146,84 +146,17 @@ namespace Azure.AI.Details.Common.CLI
             }
         }
 
-        private async Task<(string, AzCli.CognitiveServicesResourceInfo?, AzCli.CognitiveSearchResourceInfo?)> VerifyResourceConnections(AzCli.SubscriptionInfo? validated, string subscription, string groupName, string projectName)
-        {
-            try
-            {
-                var projectJson = PythonSDKWrapper.ListProjects(_values, subscription);
-                var projects = JObject.Parse(projectJson)["projects"] as JArray;
-                var project = projects.FirstOrDefault(x => x["name"].ToString() == projectName);
-                if (project == null) return (null, null, null);
-
-                var hub = project["workspace_hub"].ToString();
-                var hubName = hub.Split('/').Last();
-
-                var json = PythonSDKWrapper.ListConnections(_values, subscription, groupName, projectName);
-                if (string.IsNullOrEmpty(json)) return (null, null, null);
-
-                var connections = JObject.Parse(json)["connections"] as JArray;
-                if (connections.Count == 0) return (null, null, null);
-
-                var foundOpenAiResource = await FindAndVerifyOpenAiResourceConnection(subscription, connections);
-                var foundSearchResource = await FindAndVerifySearchResourceConnection(subscription, connections);
-
-                return (hubName, foundOpenAiResource, foundSearchResource);
-            }
-            catch (Exception ex)
-            {
-                FileHelpers.LogException(_values, ex);
-                return (null, null, null);
-            }
-        }
-
-        private static async Task<AzCli.CognitiveServicesResourceInfo?> FindAndVerifyOpenAiResourceConnection(string subscription, JArray connections)
-        {
-            var openaiConnection = connections.FirstOrDefault(x => x["name"].ToString().Contains("Default_AzureOpenAI") && x["type"].ToString() == "azure_open_ai");
-
-            if (openaiConnection == null) return null;
-
-            var openaiEndpoint = openaiConnection?["target"].ToString();
-            if (string.IsNullOrEmpty(openaiEndpoint)) return null;
-
-            var responseOpenAi = await AzCli.ListCognitiveServicesResources(subscription, "OpenAI");
-            var responseOpenAiOk = !string.IsNullOrEmpty(responseOpenAi.Output.StdOutput) && string.IsNullOrEmpty(responseOpenAi.Output.StdError);
-            if (!responseOpenAiOk) return null;
-
-            var matchOpenAiEndpoint = responseOpenAi.Payload.Where(x => x.Endpoint == openaiEndpoint).ToList();
-            if (matchOpenAiEndpoint.Count() != 1) return null;
-
-            return matchOpenAiEndpoint.First();
-        }
-
-        private static async Task<AzCli.CognitiveSearchResourceInfo?> FindAndVerifySearchResourceConnection(string subscription, JArray connections)
-        {
-            var searchConnection = connections.FirstOrDefault(x => x["name"].ToString().Contains("Default_CognitiveSearch") && x["type"].ToString() == "cognitive_search");
-            if (searchConnection == null) return null;
-
-            var searchEndpoint = searchConnection?["target"].ToString();
-            if (string.IsNullOrEmpty(searchEndpoint)) return null;
-
-            var responseSearch = await AzCli.ListSearchResources(subscription, null);
-            var responseSearchOk = !string.IsNullOrEmpty(responseSearch.Output.StdOutput) && string.IsNullOrEmpty(responseSearch.Output.StdError);
-            if (!responseSearchOk) return null;
-
-            var matchSearchEndpoint = responseSearch.Payload.Where(x => x.Endpoint == searchEndpoint).ToList();
-            if (matchSearchEndpoint.Count() != 1) return null;
-
-            return matchSearchEndpoint.First();
-        }
-
         private async Task DoInitRootConfirmVerifiedProjectResources(bool interactive, string subscription, string projectName, string resourceName, AzCli.CognitiveServicesResourceInfo openaiResource, AzCli.CognitiveSearchResourceInfo searchResource)
         {
             ConsoleHelpers.WriteLineWithHighlight($"    AI RESOURCE: {resourceName}");
             ConsoleHelpers.WriteLineWithHighlight($"    AI SEARCH RESOURCE: {searchResource.Name}");
             // Console.WriteLine();
-            ConsoleHelpers.WriteLineWithHighlight($"    OPEN AI RESOURCE: {openaiResource.Name}");
+            ConsoleHelpers.WriteLineWithHighlight($"    AZURE OPENAI RESOURCE: {openaiResource.Name}");
 
             // TODO: If there's a way to get the deployments, get them, and do this... Print correct stuff here... 
-            // ConsoleHelpers.WriteLineWithHighlight($"    OPEN AI DEPLOYMENT (CHAT): {{chat-deployment-name}}                `#e_;<== work in progress`");
-            // ConsoleHelpers.WriteLineWithHighlight($"    OPEN AI DEPLOYMENT (EMBEDDING): {{embedding-deployment-name}}    `#e_;<== work in progress`");
-            // ConsoleHelpers.WriteLineWithHighlight($"    OPEN AI DEPLOYMENT (EVALUATION): {{evaluation-deployment-name}}    `#e_;<== work in progress`");
+            // ConsoleHelpers.WriteLineWithHighlight($"    AZURE OPENAI DEPLOYMENT (CHAT): {{chat-deployment-name}}                `#e_;<== work in progress`");
+            // ConsoleHelpers.WriteLineWithHighlight($"    AZURE OPENAI DEPLOYMENT (EMBEDDING): {{embedding-deployment-name}}    `#e_;<== work in progress`");
+            // ConsoleHelpers.WriteLineWithHighlight($"    AZURE OPENAI DEPLOYMENT (EVALUATION): {{evaluation-deployment-name}}    `#e_;<== work in progress`");
 
             Console.WriteLine();
             var label = "  Initialize";
@@ -247,18 +180,7 @@ namespace Azure.AI.Details.Common.CLI
             {
                 Console.Write("\r" + new string(' ', label.Length + 2) + "\r");
 
-                var chatDeployment = await AzCliConsoleGui.PickOrCreateCognitiveServicesResourceDeployment(interactive, "Chat", subscription, openaiResource.Group, openaiResource.RegionLocation, openaiResource.Name, null);
-                var embeddingsDeployment = await AzCliConsoleGui.PickOrCreateCognitiveServicesResourceDeployment(interactive, "Embeddings", subscription, openaiResource.Group, openaiResource.RegionLocation, openaiResource.Name, null);
-                var evaluateDeployment = await AzCliConsoleGui.PickOrCreateCognitiveServicesResourceDeployment(interactive, "Evaluation", subscription, openaiResource.Group, openaiResource.RegionLocation, openaiResource.Name, null);
-                var keys = await AzCliConsoleGui.LoadCognitiveServicesResourceKeys("OPENAI RESOURCE", subscription, openaiResource);
-                if (openaiResource.Kind == "AIServices")
-                {
-                    ConfigSetHelpers.ConfigCognitiveServicesAIServicesKindResource(subscription, openaiResource.RegionLocation, openaiResource.Endpoint, chatDeployment, embeddingsDeployment, evaluateDeployment, keys.Key1);
-                }
-                else
-                {
-                    ConfigSetHelpers.ConfigOpenAiResource(subscription, openaiResource.RegionLocation, openaiResource.Endpoint, chatDeployment, embeddingsDeployment, evaluateDeployment, keys.Key1);
-                }
+                var (chatDeployment, embeddingsDeployment, evaluationDeployment, keys) = await AzCliConsoleGui.PickOrCreateAndConfigCognitiveServicesOpenAiKindResourceDeployments("AZURE OPENAI RESOURCE", interactive, subscription, openaiResource);
 
                 var searchKeys = await AzCliConsoleGui.LoadSearchResourceKeys(subscription, searchResource);
                 ConfigSetHelpers.ConfigSearchResource(searchResource.Endpoint, searchKeys.Key1);
@@ -453,7 +375,7 @@ namespace Azure.AI.Details.Common.CLI
             var searchEndpoint = _values.GetOrDefault("service.search.endpoint", null);
             var searchKey = _values.GetOrDefault("service.search.key", null);
 
-            var project = AiSdkConsoleGui.PickOrCreateAndConfigAiHubProject(allowCreate, allowPick, _values, subscription, resourceId, groupName, openAiEndpoint, openAiKey, searchEndpoint, searchKey);
+            var project = await AiSdkConsoleGui.PickOrCreateAndConfigAiHubProject(allowCreate, allowPick, _values, subscription, resourceId, groupName, openAiEndpoint, openAiKey, searchEndpoint, searchKey);
 
             ProjectNameToken.Data().Set(_values, project.Name);
             _values.Reset("service.project.id", project.Id);

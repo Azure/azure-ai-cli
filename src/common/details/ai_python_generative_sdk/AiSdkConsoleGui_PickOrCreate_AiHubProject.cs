@@ -16,7 +16,7 @@ namespace Azure.AI.Details.Common.CLI
 {
     public partial class AiSdkConsoleGui
     {
-        public static AiHubProjectInfo PickOrCreateAndConfigAiHubProject(bool allowCreate, bool allowPick, ICommandValues values, string subscription, string resourceId, string groupName, string openAiEndpoint, string openAiKey, string searchEndpoint, string searchKey)
+        public static async Task<AiHubProjectInfo> PickOrCreateAndConfigAiHubProject(bool allowCreate, bool allowPick, ICommandValues values, string subscription, string resourceId, string groupName, string openAiEndpoint, string openAiKey, string searchEndpoint, string searchKey)
         {
             var createdProject = false;
             var project = allowCreate && allowPick
@@ -27,8 +27,26 @@ namespace Azure.AI.Details.Common.CLI
                         ? PickAiHubProject(values, subscription, resourceId)
                         : throw new ApplicationException($"CANCELED: No project selected");
 
-            GetOrCreateAiHubProjectConnections(values, createdProject, subscription, groupName, project.Name, openAiEndpoint, openAiKey, searchEndpoint, searchKey);
-            CreateAiHubProjectConfigJsonFile(subscription, groupName, project.Name);
+            if (!createdProject)
+            {
+                var (hubName, openai, search) = await AiSdkConsoleGui.VerifyResourceConnections(values, subscription, project.Group, project.Name);
+
+                if (!string.IsNullOrEmpty(openai?.Name))
+                {
+                    var (chatDeployment, embeddingsDeployment, evaluationDeployment, keys) = await AzCliConsoleGui.PickOrCreateAndConfigCognitiveServicesOpenAiKindResourceDeployments("AZURE OPENAI RESOURCE", true, subscription, openai.Value);
+                    openAiEndpoint = openai.Value.Endpoint;
+                    openAiKey = keys.Key1;
+                }
+                else
+                {
+                    var openAiResource = await AzCliConsoleGui.PickOrCreateAndConfigCognitiveServicesOpenAiKindResource(true, subscription);
+                    openAiEndpoint = openAiResource.Endpoint;
+                    openAiKey = openAiResource.Key;
+                }
+            }
+
+            GetOrCreateAiHubProjectConnections(values, createdProject, subscription, project.Group, project.Name, openAiEndpoint, openAiKey, searchEndpoint, searchKey);
+            CreateAiHubProjectConfigJsonFile(subscription, project.Group, project.Name);
 
             return project;
         }
@@ -66,7 +84,7 @@ namespace Azure.AI.Details.Common.CLI
             {
                 var hub = item["workspace_hub"]?.Value<string>();
 
-                var hubOk = !string.IsNullOrEmpty(hub) && hub == resourceId;
+                var hubOk = string.IsNullOrEmpty(resourceId) || hub == resourceId;
                 if (!hubOk) continue;
 
                 itemJTokens.Add(item);
@@ -130,6 +148,7 @@ namespace Azure.AI.Details.Common.CLI
                 Name = project["name"].Value<string>(),
                 DisplayName = project["display_name"].Value<string>(),
                 RegionLocation = project["location"].Value<string>(),
+                HubId = project["workspace_hub"].Value<string>(),
             };
 
             return aiHubProject;
@@ -191,11 +210,13 @@ namespace Azure.AI.Details.Common.CLI
                     var parsed = !string.IsNullOrEmpty(connectionJson) ? JToken.Parse(connectionJson) : null;
                     var connection = parsed?.Type == JTokenType.Object ? parsed?["connection"] : null;
                     var target = connection?.Type == JTokenType.Object ? connection?["target"]?.ToString() : null;
-                    message = target == null
+                    message = string.IsNullOrEmpty(target)
                         ? $"\r*** WARNING: {connectionName} not connection found ***  "
-                        : target != openAiEndpoint
-                            ? $"\r*** WARNING: {connectionName} found but target is {target} ***  "
-                            : $"\r*** MATCHED: {connectionName} ***  ";
+                        : string.IsNullOrEmpty(openAiEndpoint)
+                            ? $"\r*** FOUND: {connectionName} found ***  "
+                            : target != openAiEndpoint
+                                ? $"\r*** WARNING: {connectionName} found but target is {target} ***  "
+                                : $"\r*** MATCHED: {connectionName} ***  ";
                 }
 
                 Console.WriteLine(message);
@@ -222,11 +243,13 @@ namespace Azure.AI.Details.Common.CLI
                     var parsed = !string.IsNullOrEmpty(connectionJson) ? JToken.Parse(connectionJson) : null;
                     var connection = parsed?.Type == JTokenType.Object ? parsed?["connection"] : null;
                     var target = connection?.Type == JTokenType.Object ? connection?["target"]?.ToString() : null;
-                    message = target == null
+                    message = string.IsNullOrEmpty(target)
                         ? $"\r*** WARNING: {connectionName} not connection found ***  "
-                        : target != searchEndpoint
-                            ? $"\r*** WARNING: {connectionName} found but target is {target} ***  "
-                            : $"\r*** MATCHED: {connectionName} ***  ";
+                        : string.IsNullOrEmpty(searchEndpoint)
+                            ? $"\r*** FOUND: {connectionName} found ***  "
+                            : target != searchEndpoint
+                                ? $"\r*** WARNING: {connectionName} found but target is {target} ***  "
+                                : $"\r*** MATCHED: {connectionName} ***  ";
                 }
 
                 Console.WriteLine(message);
