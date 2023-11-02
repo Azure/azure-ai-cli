@@ -136,9 +136,9 @@ fi
 # Add the .NET tools directory to the PATH
 echo ""
 echo "Adding $DOTNET_TOOLS_PATH to PATH..."
-export PATH="$DOTNET_TOOLS_PATH:$PATH"                               # For current shell
-echo "export PATH=\"$DOTNET_TOOLS_PATH:\$PATH\"" >> "$HOME/.bashrc"  # For bash
-echo "export PATH=\"$DOTNET_TOOLS_PATH:\$PATH\"" >> "$HOME/.zshrc"   # For zsh (if using)
+export PATH="$DOTNET_TOOLS_PATH:$PATH"                                           # For current shell
+echo "export PATH=\"$DOTNET_TOOLS_PATH:\$PATH\"" >> "$HOME/.bashrc"              # For bash
+echo "export PATH=\"$DOTNET_TOOLS_PATH:\$PATH\"" >> "${ZDOTDIR:-$HOME}/.zshrc"   # For zsh (if using)
 echo ""
 echo "Don't forget to source your shell's rc file, for example:"
 echo ""
