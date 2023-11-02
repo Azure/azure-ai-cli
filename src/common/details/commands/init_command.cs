@@ -59,6 +59,8 @@ namespace Azure.AI.Details.Common.CLI
             CheckPath();
 
             var interactive = _values.GetOrDefault("init.service.interactive", true);
+            if (!interactive) ThrowInteractiveNotSupportedApplicationException(); // POST-IGNITE: TODO: Add back non-interactive mode support
+
             switch (command)
             {
                 // case "init": await DoInitServiceCommand(); break;
@@ -87,7 +89,6 @@ namespace Azure.AI.Details.Common.CLI
         private async Task DoInitRootAsync()
         {
             var interactive = _values.GetOrDefault("init.service.interactive", true);
-            if (!interactive) ThrowInteractiveNotSupportedApplicationException(); // POST-IGNITE: TODO: Add back non-interactive mode support
 
             ConsoleHelpers.WriteLineWithHighlight("`AI INIT`\n\n  Initializes (creates, selects, or attaches to) AI Projects and services.\n");
 
@@ -424,8 +425,6 @@ namespace Azure.AI.Details.Common.CLI
 
         private async Task DoInitProject(bool interactive)
         {
-            if (!interactive) ThrowInteractiveNotSupportedApplicationException(); // POST-IGNITE: TODO: Add back non-interactive mode support
-
             var subscription = SubscriptionToken.Data().GetOrDefault(_values, "");
             var resourceId = _values.GetOrDefault("service.resource.id", null);
             var groupName = ResourceGroupNameToken.Data().GetOrDefault(_values);
@@ -541,8 +540,6 @@ namespace Azure.AI.Details.Common.CLI
 
         private async Task DoInitSearch(bool interactive)
         {
-            if (!interactive) ThrowInteractiveNotSupportedApplicationException(); // POST-IGNITE: TODO: Add back non-interactive mode support
-
             var subscription = SubscriptionToken.Data().GetOrDefault(_values, "");
             var location = _values.GetOrDefault("service.resource.region.name", "");
             var groupName = ResourceGroupNameToken.Data().GetOrDefault(_values, "");
@@ -582,8 +579,6 @@ namespace Azure.AI.Details.Common.CLI
 
         private async Task DoInitHub(bool interactive)
         {
-            if (!interactive) ThrowInteractiveNotSupportedApplicationException(); // POST-IGNITE: TODO: Add back non-interactive mode support
-
             var subscription = SubscriptionToken.Data().GetOrDefault(_values, "");
             if (string.IsNullOrEmpty(subscription))
             {
