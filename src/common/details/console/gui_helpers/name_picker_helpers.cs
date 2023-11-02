@@ -13,15 +13,34 @@ namespace Azure.AI.Details.Common.CLI
 {
     public class NameGenHelper
     {
-        public static string GenerateName()
+        public static string GenerateName(int maxCch = 24)
         {
             EnsureLoaded();
 
-            var adjective = GetRandomElement(_adjectives);
-            var color = GetRandomElement(_colors);
-            var animal = GetRandomElement(_animals);
+            var approaches = 3;
+            var maxTriesPerApproach = 100;
 
-            return $"{adjective}-{color}-{animal}";
+            for (int approach = 0; approach < approaches; approach++)
+            {
+                for (int i = 0; i < maxTriesPerApproach; i++)
+                {
+                    var animal = GetRandomElement(_animals);
+                    var color = GetRandomElement(_colors);
+                    var adjective = GetRandomElement(_adjectives);
+
+                    var name = approach switch
+                    {
+                        0 => $"{adjective}-{color}-{animal}",
+                        1 => $"{color}-{animal}",
+                        2 => $"{animal}",
+                        _ => throw new ApplicationException($"Unexpected approach '{approach}'."),
+                    };
+
+                    if (name.Length < maxCch) return name;
+                }
+            }
+
+            return Guid.NewGuid().ToString().Substring(0, maxCch);
         }
 
         private static void EnsureLoaded()
@@ -69,9 +88,9 @@ namespace Azure.AI.Details.Common.CLI
 
     public class NamePickerHelper
     {
-        public static string DemandPickOrEnterName(string namePrompt, string nameOutKind, string nameIn = null, string nameInKind = null)
+        public static string DemandPickOrEnterName(string namePrompt, string nameOutKind, string nameIn = null, string nameInKind = null, int maxCch = 32)
         {
-            var choices = GetNameChoices(nameIn, nameInKind, nameOutKind);
+            var choices = GetNameChoices(nameIn, nameInKind, nameOutKind, maxCch);
             var usePicker = choices != null && choices.Count() > 1;
 
             if (usePicker)
@@ -93,7 +112,7 @@ namespace Azure.AI.Details.Common.CLI
             return DemandAskPrompt(namePrompt);
         }
 
-        private static string[] GetNameChoices(string nameIn, string nameInKind, string nameOutKind)
+        private static string[] GetNameChoices(string nameIn, string nameInKind, string nameOutKind, int maxCch = 32)
         {
             var choices = new List<string>();
 
@@ -122,9 +141,11 @@ namespace Azure.AI.Details.Common.CLI
                 choices.Add($"{nameOutKind}-{nameIn}");
             }
 
-            if (!nameInOk)
+            choices = choices.Where(x => x.Length <= maxCch).ToList();
+
+            if (!nameInOk || choices.Count() == 0)
             {
-                var name = NameGenHelper.GenerateName();
+                var name = NameGenHelper.GenerateName(maxCch - 1 - nameOutKind.Length);
                 choices.Add($"{nameOutKind}-{name}");
                 choices.Add($"{name}-{nameOutKind}");
             }
