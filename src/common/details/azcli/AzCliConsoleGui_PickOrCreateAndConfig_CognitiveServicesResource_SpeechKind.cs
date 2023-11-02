@@ -19,7 +19,7 @@ namespace Azure.AI.Details.Common.CLI
 {
     public partial class AzCliConsoleGui
     {
-        public static async Task<AzCli.CognitiveServicesSpeechResourceInfo> InitAndConfigCognitiveServicesSpeechServicesKindResource(bool interactive, string subscriptionId, string regionFilter = null, string groupFilter = null, string resourceFilter = null, string kinds = null, string sku = null, bool yes = false)
+        public static async Task<AzCli.CognitiveServicesSpeechResourceInfo> PickOrCreateAndConfigCognitiveServicesSpeechServicesKindResource(bool interactive, string subscriptionId, string regionFilter = null, string groupFilter = null, string resourceFilter = null, string kinds = null, string sku = null, bool yes = false)
         {
             kinds ??= "SpeechServices";
             var sectionHeader = "SPEECH RESOURCE";

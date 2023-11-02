@@ -74,11 +74,11 @@
 ## init-root-menu-pick
 
 ▤ ↕ ⎆
-- "a new AI Project" => [init-root-project-new](#init-root-project-new)
-- "an existing AI Project" => [init-root-project-pick](#init-root-project-pick)
+- "a new AI Project" => [init-root-project-create](#init-root-project-create)
+- "an existing AI Project" => [init-root-project-select](#init-root-project-select)
 - "standalone resources" => [init-root-standalone-select-or-create](#init-root-standalone-select-or-create)
 
-## init-root-project-new
+## init-root-project-create
 
 1. [project-name-new-get](#project-name-new-get)
 1. [subscription-select](#subscription-select)
@@ -89,7 +89,7 @@
 1. [project-create](#project-create)
 1. init-root-finish-print-verified-config 🛑
 
-## init-root-project-pick
+## init-root-project-select
 
 1. [subscription-select](#subscription-select)
 1. [hub-select](#hub-select)

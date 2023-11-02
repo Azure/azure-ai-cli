@@ -168,9 +168,16 @@ namespace Azure.AI.Details.Common.CLI
 
         #region Project Picker
 
-        public static AiHubProjectInfo InitAndConfigAiHubProject(ICommandValues values, string subscription, string resourceId, string groupName, string openAiEndpoint, string openAiKey, string searchEndpoint, string searchKey)
+        public static AiHubProjectInfo PickOrCreateAndConfigAiHubProject(bool allowCreate, bool allowPick, ICommandValues values, string subscription, string resourceId, string groupName, string openAiEndpoint, string openAiKey, string searchEndpoint, string searchKey)
         {
-            var project = AiSdkConsoleGui.PickOrCreateAiHubProject(values, subscription, resourceId, out var createdProject);
+            var createdProject = false;
+            var project = allowCreate && allowPick
+                ? PickOrCreateAiHubProject(values, subscription, resourceId, out createdProject)
+                : allowCreate
+                    ? CreateAiHubProject(values, subscription, resourceId)
+                    : allowPick
+                        ? PickAiHubProject(values, subscription, resourceId)
+                        : throw new ApplicationException($"CANCELED: No project selected");
 
             GetOrCreateAiHubProjectConnections(values, createdProject, subscription, groupName, project.Name, openAiEndpoint, openAiKey, searchEndpoint, searchKey);
             CreateAiHubProjectConfigJsonFile(subscription, groupName, project.Name);
@@ -265,7 +272,6 @@ namespace Azure.AI.Details.Common.CLI
 
             return TryCreateAiHubProjectInteractive(values, subscription, resourceId, group, location, ref displayName, ref description, openAiResourceId, smartName, smartNameKind);
         }
-
 
         private static AiHubProjectInfo FinishPickOrCreateAiHubProject(ICommandValues values, JToken project)
         {

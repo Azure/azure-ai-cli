@@ -19,46 +19,6 @@ namespace Azure.AI.Details.Common.CLI
 {
     public partial class AzCliConsoleGui
     {
-        public static Task<string> PickSubscriptionIdAsync(bool allowInteractiveLogin, bool allowInteractivePickSubscription, string subscriptionFilter = null)
-        {
-            return SubscriptionPicker.PickSubscriptionIdAsync(allowInteractiveLogin, allowInteractivePickSubscription, subscriptionFilter);
-        }
-
-        public static Task<AzCli.SubscriptionInfo> PickSubscriptionAsync(bool allowInteractiveLogin, bool allowInteractivePickSubscription, string subscriptionFilter = null)
-        {
-            return SubscriptionPicker.PickSubscriptionAsync(allowInteractiveLogin, allowInteractivePickSubscription, subscriptionFilter);
-        }
-
-        public static Task<AzCli.SubscriptionInfo?> ValidateSubscriptionAsync(bool allowInteractiveLogin, string subscriptionFilter, string subscriptionLabel)
-        {
-            return SubscriptionPicker.ValidateSubscriptionAsync(allowInteractiveLogin, subscriptionFilter, subscriptionLabel);
-        }
-
-        public static Task<AzCli.AccountRegionLocationInfo> PickRegionLocationAsync(bool interactive, string regionFilter = null, bool allowAnyRegionOption = true)
-        {
-            return RegionLocationPicker.PickRegionLocationAsync(interactive, regionFilter, allowAnyRegionOption);
-        }
-
-        public static Task<AzCli.ResourceGroupInfo> PickOrCreateResourceGroup(bool interactive, string subscriptionId = null, string regionFilter = null, string groupFilter = null)
-        {
-            return ResourceGroupPicker.PickOrCreateResourceGroup(interactive, subscriptionId, regionFilter, groupFilter);
-        }
-
-        public static Task<AzCli.CognitiveServicesResourceInfo> PickOrCreateCognitiveResource(string sectionHeader, bool interactive, string subscriptionId = null, string regionFilter = null, string groupFilter = null, string resourceFilter = null, string kinds = null, string sku = "F0", bool agreeTerms = false)
-        {
-            return CognitiveServicesResourcePicker.PickOrCreateCognitiveResource(sectionHeader, interactive, subscriptionId, regionFilter, groupFilter, resourceFilter, kinds, sku, agreeTerms);
-        }
-
-        public static async Task<AzCli.CognitiveServicesDeploymentInfo> PickOrCreateCognitiveServicesResourceDeployment(bool interactive, string deploymentExtra, string subscriptionId, string groupName, string resourceRegionLocation, string resourceName, string deploymentFilter)
-        {
-            return await AzCliConsoleGui.CognitiveServicesResourceDeploymentPicker.PickOrCreateCognitiveServicesResourceDeployment(interactive, deploymentExtra, subscriptionId, groupName, resourceRegionLocation, resourceName, deploymentFilter);
-        }
-
-        public static Task<AzCli.CognitiveServicesKeyInfo> LoadCognitiveServicesResourceKeys(string sectionHeader, string subscriptionId, AzCli.CognitiveServicesResourceInfo resource)
-        {
-            return CognitiveServicesResourcePicker.LoadCognitiveServicesResourceKeys(sectionHeader, subscriptionId, resource);
-        }
-
         public static async Task<AzCli.CognitiveSearchKeyInfo> LoadSearchResourceKeys(string subscriptionId, AzCli.CognitiveSearchResourceInfo resource)
         {
             ConsoleHelpers.WriteLineWithHighlight($"\n`AI SEARCH RESOURCE KEYS`");
