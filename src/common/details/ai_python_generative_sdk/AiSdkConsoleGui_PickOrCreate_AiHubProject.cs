@@ -46,7 +46,7 @@ namespace Azure.AI.Details.Common.CLI
         public static AiHubProjectInfo CreateAiHubProject(ICommandValues values, string subscription, string resourceId)
         {
             var project = TryCreateAiHubProjectInteractive(values, subscription, resourceId);
-            return FinishPickOrCreateAiHubProject(values, project);
+            return AiHubProjectInfoFromToken(values, project);
         }
 
         private static AiHubProjectInfo PickOrCreateAiHubProject(bool allowCreate, ICommandValues values, string subscription, string resourceId, out bool createNew)
@@ -103,7 +103,7 @@ namespace Azure.AI.Details.Common.CLI
                 project = TryCreateAiHubProjectInteractive(values, subscription, resourceId);
             }
 
-            return FinishPickOrCreateAiHubProject(values, project);
+            return AiHubProjectInfoFromToken(values, project);
         }
 
         private static JToken TryCreateAiHubProjectInteractive(ICommandValues values, string subscription, string resourceId)
@@ -121,7 +121,7 @@ namespace Azure.AI.Details.Common.CLI
             return TryCreateAiHubProjectInteractive(values, subscription, resourceId, group, location, ref displayName, ref description, openAiResourceId, smartName, smartNameKind);
         }
 
-        private static AiHubProjectInfo FinishPickOrCreateAiHubProject(ICommandValues values, JToken project)
+        private static AiHubProjectInfo AiHubProjectInfoFromToken(ICommandValues values, JToken project)
         {
             var aiHubProject = new AiHubProjectInfo
             {

@@ -402,7 +402,6 @@ namespace Azure.AI.Details.Common.CLI
                     "project-select" => DoInitProject(interactive, false, true),
                     "project-create" => DoInitProject(interactive, true, false),
 
-
                     "init-root-standalone-select-or-create" => DoInitStandaloneResources(interactive),
                     "init-root-cognitiveservices-ai-services-kind-create-or-select" => DoInitRootCognitiveServicesAIServicesKind(interactive),
                     "init-root-cognitiveservices-cognitiveservices-kind-create-or-select" => DoInitRootCognitiveServicesCognitiveServicesKind(interactive),
@@ -433,14 +432,18 @@ namespace Azure.AI.Details.Common.CLI
         private async Task DoInitRootProject(bool interactive, bool allowCreate = true, bool allowPick = true)
         {
             await DoInitSubscriptionId(interactive);
-            await DoInitOpenAi(interactive);
-            await DoInitSearch(interactive);
-            await DoInitHub(interactive);
             await DoInitProject(interactive, allowCreate, allowPick);
         }
 
         private async Task DoInitProject(bool interactive, bool allowCreate = true, bool allowPick = true)
         {
+            if (allowCreate)
+            {
+                await DoInitOpenAi(interactive);
+                await DoInitSearch(interactive);
+                await DoInitHub(interactive);
+            }
+
             var subscription = SubscriptionToken.Data().GetOrDefault(_values, "");
             var resourceId = _values.GetOrDefault("service.resource.id", null);
             var groupName = ResourceGroupNameToken.Data().GetOrDefault(_values);
