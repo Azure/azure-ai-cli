@@ -180,7 +180,7 @@ namespace Azure.AI.Details.Common.CLI
             {
                 Console.Write("\r" + new string(' ', label.Length + 2) + "\r");
 
-                var (chatDeployment, embeddingsDeployment, evaluationDeployment, keys) = await AzCliConsoleGui.PickOrCreateAndConfigCognitiveServicesOpenAiKindResourceDeployments("AZURE OPENAI RESOURCE", interactive, subscription, openaiResource);
+                var (chatDeployment, embeddingsDeployment, evaluationDeployment, keys) = await AzCliConsoleGui.PickOrCreateAndConfigCognitiveServicesOpenAiKindResourceDeployments("AZURE OPENAI RESOURCE", interactive, true, subscription, openaiResource);
 
                 var searchKeys = await AzCliConsoleGui.LoadSearchResourceKeys(subscription, searchResource);
                 ConfigSetHelpers.ConfigSearchResource(searchResource.Endpoint, searchKeys.Key1);
@@ -357,11 +357,11 @@ namespace Azure.AI.Details.Common.CLI
             await DoInitProject(interactive, allowCreate, allowPick);
         }
 
-        private async Task DoInitProject(bool interactive, bool allowCreate = true, bool allowPick = true)
+        private async Task DoInitProject(bool interactive, bool allowCreate = true, bool allowPick = true, bool allowSkipDeployments = true)
         {
             if (allowCreate)
             {
-                await DoInitOpenAi(interactive);
+                await DoInitOpenAi(interactive, allowSkipDeployments);
                 await DoInitSearch(interactive);
                 await DoInitHub(interactive);
             }
@@ -375,7 +375,7 @@ namespace Azure.AI.Details.Common.CLI
             var searchEndpoint = _values.GetOrDefault("service.search.endpoint", null);
             var searchKey = _values.GetOrDefault("service.search.key", null);
 
-            var project = await AiSdkConsoleGui.PickOrCreateAndConfigAiHubProject(allowCreate, allowPick, _values, subscription, resourceId, groupName, openAiEndpoint, openAiKey, searchEndpoint, searchKey);
+            var project = await AiSdkConsoleGui.PickOrCreateAndConfigAiHubProject(allowCreate, allowPick, allowSkipDeployments, _values, subscription, resourceId, groupName, openAiEndpoint, openAiKey, searchEndpoint, searchKey);
 
             ProjectNameToken.Data().Set(_values, project.Name);
             _values.Reset("service.project.id", project.Id);
@@ -387,7 +387,7 @@ namespace Azure.AI.Details.Common.CLI
             await DoInitOpenAi(interactive);
         }
 
-        private async Task DoInitOpenAi(bool interactive)
+        private async Task DoInitOpenAi(bool interactive, bool allowSkipDeployments = true)
         {
             var subscriptionId = SubscriptionToken.Data().GetOrDefault(_values, "");
             var regionFilter = _values.GetOrDefault("init.service.resource.region.name", "");
@@ -397,7 +397,7 @@ namespace Azure.AI.Details.Common.CLI
             var sku = _values.GetOrDefault("init.service.cognitiveservices.resource.sku", Program.CognitiveServiceResourceSku);
             var yes = _values.GetOrDefault("init.service.cognitiveservices.terms.agree", false);
 
-            var resource = await AzCliConsoleGui.PickOrCreateAndConfigCognitiveServicesOpenAiKindResource(interactive, subscriptionId, regionFilter, groupFilter, resourceFilter, kind, sku, yes);
+            var resource = await AzCliConsoleGui.PickOrCreateAndConfigCognitiveServicesOpenAiKindResource(interactive, allowSkipDeployments, subscriptionId, regionFilter, groupFilter, resourceFilter, kind, sku, yes);
 
             SubscriptionToken.Data().Set(_values, subscriptionId);
             _values.Reset("service.resource.region.name", resource.RegionLocation);
@@ -414,7 +414,7 @@ namespace Azure.AI.Details.Common.CLI
             await DoInitCognitiveServicesAIServicesKind(interactive);
         }
 
-        private async Task DoInitCognitiveServicesAIServicesKind(bool interactive)
+        private async Task DoInitCognitiveServicesAIServicesKind(bool interactive, bool allowSkipDeployments = true)
         {
             var subscriptionId = SubscriptionToken.Data().GetOrDefault(_values, "");
             var regionFilter = _values.GetOrDefault("init.service.resource.region.name", "");
@@ -424,7 +424,7 @@ namespace Azure.AI.Details.Common.CLI
             var sku = _values.GetOrDefault("init.service.cognitiveservices.resource.sku", Program.CognitiveServiceResourceSku);
             var yes = _values.GetOrDefault("init.service.cognitiveservices.terms.agree", false);
 
-            var resource = await AzCliConsoleGui.PickOrCreateAndConfigCognitiveServicesAiServicesKindResource(interactive, subscriptionId, regionFilter, groupFilter, resourceFilter, kind, sku, yes);
+            var resource = await AzCliConsoleGui.PickOrCreateAndConfigCognitiveServicesAiServicesKindResource(interactive, allowSkipDeployments, subscriptionId, regionFilter, groupFilter, resourceFilter, kind, sku, yes);
 
             SubscriptionToken.Data().Set(_values, subscriptionId);
             _values.Reset("service.resource.region.name", resource.RegionLocation);

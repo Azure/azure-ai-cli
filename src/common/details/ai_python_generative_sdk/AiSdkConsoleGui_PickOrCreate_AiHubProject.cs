@@ -16,7 +16,7 @@ namespace Azure.AI.Details.Common.CLI
 {
     public partial class AiSdkConsoleGui
     {
-        public static async Task<AiHubProjectInfo> PickOrCreateAndConfigAiHubProject(bool allowCreate, bool allowPick, ICommandValues values, string subscription, string resourceId, string groupName, string openAiEndpoint, string openAiKey, string searchEndpoint, string searchKey)
+        public static async Task<AiHubProjectInfo> PickOrCreateAndConfigAiHubProject(bool allowCreate, bool allowPick, bool allowSkipDeployments, ICommandValues values, string subscription, string resourceId, string groupName, string openAiEndpoint, string openAiKey, string searchEndpoint, string searchKey)
         {
             var createdProject = false;
             var project = allowCreate && allowPick
@@ -34,13 +34,13 @@ namespace Azure.AI.Details.Common.CLI
 
                 if (!string.IsNullOrEmpty(openai?.Name))
                 {
-                    var (chatDeployment, embeddingsDeployment, evaluationDeployment, keys) = await AzCliConsoleGui.PickOrCreateAndConfigCognitiveServicesOpenAiKindResourceDeployments("AZURE OPENAI RESOURCE", true, subscription, openai.Value);
+                    var (chatDeployment, embeddingsDeployment, evaluationDeployment, keys) = await AzCliConsoleGui.PickOrCreateAndConfigCognitiveServicesOpenAiKindResourceDeployments("AZURE OPENAI RESOURCE", true, allowSkipDeployments, subscription, openai.Value);
                     openAiEndpoint = openai.Value.Endpoint;
                     openAiKey = keys.Key1;
                 }
                 else
                 {
-                    var openAiResource = await AzCliConsoleGui.PickOrCreateAndConfigCognitiveServicesOpenAiKindResource(true, subscription);
+                    var openAiResource = await AzCliConsoleGui.PickOrCreateAndConfigCognitiveServicesOpenAiKindResource(true, allowSkipDeployments, subscription);
                     openAiEndpoint = openAiResource.Endpoint;
                     openAiKey = openAiResource.Key;
                 }

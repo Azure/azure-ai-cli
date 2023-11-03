@@ -19,7 +19,7 @@ namespace Azure.AI.Details.Common.CLI
 {
     public partial class AzCliConsoleGui
     {
-        public static async Task<AzCli.CognitiveServicesResourceInfoEx> PickOrCreateAndConfigCognitiveServicesAiServicesKindResource(bool interactive, string subscriptionId, string regionFilter = null, string groupFilter = null, string resourceFilter = null, string kinds = null, string sku = null, bool yes = false)
+        public static async Task<AzCli.CognitiveServicesResourceInfoEx> PickOrCreateAndConfigCognitiveServicesAiServicesKindResource(bool interactive, bool allowSkipDeployments, string subscriptionId, string regionFilter = null, string groupFilter = null, string resourceFilter = null, string kinds = null, string sku = null, bool yes = false)
         {
             kinds ??= "AIServices";
             var sectionHeader = "AI SERVICES";
@@ -27,7 +27,7 @@ namespace Azure.AI.Details.Common.CLI
             var regionLocation = !string.IsNullOrEmpty(regionFilter) ? await AzCliConsoleGui.PickRegionLocationAsync(interactive, regionFilter) : new AzCli.AccountRegionLocationInfo();
             var resource = await AzCliConsoleGui.PickOrCreateCognitiveResource(sectionHeader, interactive, subscriptionId, regionLocation.Name, groupFilter, resourceFilter, kinds, sku, yes);
 
-            var (chatDeployment, embeddingsDeployment, evaluationDeployment, keys) = await PickOrCreateAndConfigCognitiveServicesOpenAiKindResourceDeployments(sectionHeader, interactive, subscriptionId, resource);
+            var (chatDeployment, embeddingsDeployment, evaluationDeployment, keys) = await PickOrCreateAndConfigCognitiveServicesOpenAiKindResourceDeployments(sectionHeader, interactive, allowSkipDeployments, subscriptionId, resource);
 
             return new AzCli.CognitiveServicesResourceInfoEx
             {
@@ -38,9 +38,9 @@ namespace Azure.AI.Details.Common.CLI
                 RegionLocation = resource.RegionLocation,
                 Endpoint = resource.Endpoint,
                 Key = keys.Key1,
-                ChatDeployment = chatDeployment.Name,
-                EmbeddingsDeployment = embeddingsDeployment.Name,
-                EvaluationDeployment = evaluationDeployment.Name
+                ChatDeployment = chatDeployment.HasValue ? chatDeployment.Value.Name : null,
+                EmbeddingsDeployment = embeddingsDeployment.HasValue ? embeddingsDeployment.Value.Name : null,
+                EvaluationDeployment = evaluationDeployment.HasValue ? evaluationDeployment.Value.Name : null
             };
         }
     }
