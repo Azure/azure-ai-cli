@@ -357,7 +357,7 @@ namespace Azure.AI.Details.Common.CLI
             await DoInitProject(interactive, allowCreate, allowPick);
         }
 
-        private async Task DoInitProject(bool interactive, bool allowCreate = true, bool allowPick = true, bool allowSkipDeployments = true)
+        private async Task DoInitProject(bool interactive, bool allowCreate = true, bool allowPick = true, bool allowSkipDeployments = true, bool allowSkipSearch = true)
         {
             if (allowCreate)
             {
@@ -375,7 +375,7 @@ namespace Azure.AI.Details.Common.CLI
             var searchEndpoint = _values.GetOrDefault("service.search.endpoint", null);
             var searchKey = _values.GetOrDefault("service.search.key", null);
 
-            var project = await AiSdkConsoleGui.PickOrCreateAndConfigAiHubProject(allowCreate, allowPick, allowSkipDeployments, _values, subscription, resourceId, groupName, openAiEndpoint, openAiKey, searchEndpoint, searchKey);
+            var project = await AiSdkConsoleGui.PickOrCreateAndConfigAiHubProject(allowCreate, allowPick, allowSkipDeployments, allowSkipSearch, _values, subscription, resourceId, groupName, openAiEndpoint, openAiKey, searchEndpoint, searchKey);
 
             ProjectNameToken.Data().Set(_values, project.Name);
             _values.Reset("service.project.id", project.Id);
@@ -464,10 +464,10 @@ namespace Azure.AI.Details.Common.CLI
         private async Task DoInitRootSearch(bool interactive)
         {
             await DoInitSubscriptionId(interactive);
-            await DoInitSearch(interactive);
+            await DoInitSearch(interactive, false);
         }
 
-        private async Task DoInitSearch(bool interactive)
+        private async Task DoInitSearch(bool interactive, bool allowSkipSearch = true)
         {
             var subscription = SubscriptionToken.Data().GetOrDefault(_values, "");
             var location = _values.GetOrDefault("service.resource.region.name", "");
@@ -476,10 +476,10 @@ namespace Azure.AI.Details.Common.CLI
             var smartName = ResourceNameToken.Data().GetOrDefault(_values);
             var smartNameKind = smartName != null && smartName.Contains("openai") ? "openai" : "oai";
 
-            var resource = await AzCliConsoleGui.PickOrCreateAndConfigCogSearchResource(subscription, location, groupName, smartName, smartNameKind);
+            var resource = await AzCliConsoleGui.PickOrCreateAndConfigCogSearchResource(allowSkipSearch, subscription, location, groupName, smartName, smartNameKind);
 
-            _values.Reset("service.search.endpoint", resource.Endpoint);
-            _values.Reset("service.search.key", resource.Key);
+            _values.Reset("service.search.endpoint", resource?.Endpoint);
+            _values.Reset("service.search.key", resource?.Key);
         }
 
         private async Task DoInitRootSpeech(bool interactive)

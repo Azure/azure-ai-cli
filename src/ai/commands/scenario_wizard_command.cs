@@ -117,7 +117,7 @@ namespace Azure.AI.Details.Common.CLI
 
             var subscription = await AzCliConsoleGui.PickSubscriptionAsync(true, true);
             var openAiResource = await AzCliConsoleGui.PickOrCreateAndConfigCognitiveServicesOpenAiKindResource(true, false, subscription.Id);
-            var cogSearchResource = await AzCliConsoleGui.PickOrCreateAndConfigCogSearchResource(subscription.Id, openAiResource.RegionLocation, openAiResource.Group);
+            var cogSearchResource = await AzCliConsoleGui.PickOrCreateAndConfigCogSearchResource(false, subscription.Id, openAiResource.RegionLocation, openAiResource.Group);
             // var aiHubResource = await AiSdkConsoleGui.PickOrCreateAiHubResource(_values, subscription.Id);
             // var aiHubProject = AiSdkConsoleGui.PickOrCreateAndConfigAiHubProject(true, true, _values, subscription.Id, aiHubResource.Id, openAiResource.Group, openAiResource.Endpoint, openAiResource.Key, cogSearchResource.Endpoint, cogSearchResource.Key);
 
@@ -166,7 +166,7 @@ namespace Azure.AI.Details.Common.CLI
 
             Console.WriteLine("*** UPDATING ***");
 
-            var kernel = CreateSemanticKernel(cogSearchResource.Endpoint, cogSearchResource.Key, openAiResource.Endpoint, openAiResource.EmbeddingsDeployment, openAiResource.Key);
+            var kernel = CreateSemanticKernel(cogSearchResource.Value.Endpoint, cogSearchResource.Value.Key, openAiResource.Endpoint, openAiResource.EmbeddingsDeployment, openAiResource.Key);
             await StoreMemoryAsync(kernel, indexName, files.Select(x => new KeyValuePair<string, string>(x, FileHelpers.ReadAllHelpText(x, Encoding.UTF8))));
 
             Console.Write("\r*** UPDATED ***  ");
