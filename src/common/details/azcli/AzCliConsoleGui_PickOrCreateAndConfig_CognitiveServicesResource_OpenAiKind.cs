@@ -19,7 +19,7 @@ namespace Azure.AI.Details.Common.CLI
 {
     public partial class AzCliConsoleGui
     {
-        public static async Task<AzCli.CognitiveServicesResourceInfoEx> PickOrCreateAndConfigCognitiveServicesOpenAiKindResource(bool interactive, string subscriptionId, string regionFilter = null, string groupFilter = null, string resourceFilter = null, string kinds = null, string sku = null, bool yes = false)
+        public static async Task<AzCli.CognitiveServicesResourceInfoEx> PickOrCreateAndConfigCognitiveServicesOpenAiKindResource(bool interactive, bool allowSkipDeployments, string subscriptionId, string regionFilter = null, string groupFilter = null, string resourceFilter = null, string kinds = null, string sku = null, bool yes = false)
         {
             kinds ??= "OpenAI;AIServices";
             var sectionHeader = "AZURE OPENAI RESOURCE";
@@ -27,7 +27,7 @@ namespace Azure.AI.Details.Common.CLI
             var regionLocation = !string.IsNullOrEmpty(regionFilter) ? await AzCliConsoleGui.PickRegionLocationAsync(interactive, regionFilter) : new AzCli.AccountRegionLocationInfo();
             var resource = await AzCliConsoleGui.PickOrCreateCognitiveResource(sectionHeader, interactive, subscriptionId, regionLocation.Name, groupFilter, resourceFilter, kinds, sku, yes);
 
-            var (chatDeployment, embeddingsDeployment, evaluationDeployment, keys) = await PickOrCreateAndConfigCognitiveServicesOpenAiKindResourceDeployments(sectionHeader, interactive, subscriptionId, resource);
+            var (chatDeployment, embeddingsDeployment, evaluationDeployment, keys) = await PickOrCreateAndConfigCognitiveServicesOpenAiKindResourceDeployments(sectionHeader, interactive, allowSkipDeployments, subscriptionId, resource);
 
             return new AzCli.CognitiveServicesResourceInfoEx
             {
@@ -38,17 +38,17 @@ namespace Azure.AI.Details.Common.CLI
                 RegionLocation = resource.RegionLocation,
                 Endpoint = resource.Endpoint,
                 Key = keys.Key1,
-                ChatDeployment = chatDeployment.Name,
-                EmbeddingsDeployment = embeddingsDeployment.Name,
-                EvaluationDeployment = evaluationDeployment.Name
+                ChatDeployment = chatDeployment.HasValue ? chatDeployment.Value.Name : null,
+                EmbeddingsDeployment = embeddingsDeployment.HasValue ? embeddingsDeployment.Value.Name : null,
+                EvaluationDeployment = evaluationDeployment.HasValue ? evaluationDeployment.Value.Name : null
             };
         }
 
-        public static async Task<(AzCli.CognitiveServicesDeploymentInfo, AzCli.CognitiveServicesDeploymentInfo, AzCli.CognitiveServicesDeploymentInfo, AzCli.CognitiveServicesKeyInfo)> PickOrCreateAndConfigCognitiveServicesOpenAiKindResourceDeployments(string sectionHeader, bool interactive, string subscriptionId, AzCli.CognitiveServicesResourceInfo resource)
+        public static async Task<(AzCli.CognitiveServicesDeploymentInfo?, AzCli.CognitiveServicesDeploymentInfo?, AzCli.CognitiveServicesDeploymentInfo?, AzCli.CognitiveServicesKeyInfo)> PickOrCreateAndConfigCognitiveServicesOpenAiKindResourceDeployments(string sectionHeader, bool interactive, bool allowSkipDeployments, string subscriptionId, AzCli.CognitiveServicesResourceInfo resource)
         {
-            var chatDeployment = await AzCliConsoleGui.PickOrCreateCognitiveServicesResourceDeployment(interactive, "Chat", subscriptionId, resource.Group, resource.RegionLocation, resource.Name, null);
-            var embeddingsDeployment = await AzCliConsoleGui.PickOrCreateCognitiveServicesResourceDeployment(interactive, "Embeddings", subscriptionId, resource.Group, resource.RegionLocation, resource.Name, null);
-            var evaluationDeployment = await AzCliConsoleGui.PickOrCreateCognitiveServicesResourceDeployment(interactive, "Evaluation", subscriptionId, resource.Group, resource.RegionLocation, resource.Name, null);
+            var chatDeployment = await AzCliConsoleGui.PickOrCreateCognitiveServicesResourceDeployment(interactive, allowSkipDeployments, "Chat", subscriptionId, resource.Group, resource.RegionLocation, resource.Name, null);
+            var embeddingsDeployment = await AzCliConsoleGui.PickOrCreateCognitiveServicesResourceDeployment(interactive, allowSkipDeployments, "Embeddings", subscriptionId, resource.Group, resource.RegionLocation, resource.Name, null);
+            var evaluationDeployment = await AzCliConsoleGui.PickOrCreateCognitiveServicesResourceDeployment(interactive, allowSkipDeployments, "Evaluation", subscriptionId, resource.Group, resource.RegionLocation, resource.Name, null);
             var keys = await AzCliConsoleGui.LoadCognitiveServicesResourceKeys(sectionHeader, subscriptionId, resource);
          
             if (resource.Kind == "AIServices")

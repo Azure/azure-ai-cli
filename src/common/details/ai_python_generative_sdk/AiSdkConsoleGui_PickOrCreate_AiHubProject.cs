@@ -16,7 +16,7 @@ namespace Azure.AI.Details.Common.CLI
 {
     public partial class AiSdkConsoleGui
     {
-        public static async Task<AiHubProjectInfo> PickOrCreateAndConfigAiHubProject(bool allowCreate, bool allowPick, ICommandValues values, string subscription, string resourceId, string groupName, string openAiEndpoint, string openAiKey, string searchEndpoint, string searchKey)
+        public static async Task<AiHubProjectInfo> PickOrCreateAndConfigAiHubProject(bool allowCreate, bool allowPick, bool allowSkipDeployments, bool allowSkipSearch, ICommandValues values, string subscription, string resourceId, string groupName, string openAiEndpoint, string openAiKey, string searchEndpoint, string searchKey)
         {
             var createdProject = false;
             var project = allowCreate && allowPick
@@ -27,20 +27,20 @@ namespace Azure.AI.Details.Common.CLI
                         ? PickAiHubProject(values, subscription, resourceId)
                         : throw new ApplicationException($"CANCELED: No project selected");
 
-            var createdSearch = false;
+            var createdOrPickedSearch = false;
             if (!createdProject)
             {
                 var (hubName, openai, search) = await AiSdkConsoleGui.VerifyResourceConnections(values, subscription, project.Group, project.Name);
 
                 if (!string.IsNullOrEmpty(openai?.Name))
                 {
-                    var (chatDeployment, embeddingsDeployment, evaluationDeployment, keys) = await AzCliConsoleGui.PickOrCreateAndConfigCognitiveServicesOpenAiKindResourceDeployments("AZURE OPENAI RESOURCE", true, subscription, openai.Value);
+                    var (chatDeployment, embeddingsDeployment, evaluationDeployment, keys) = await AzCliConsoleGui.PickOrCreateAndConfigCognitiveServicesOpenAiKindResourceDeployments("AZURE OPENAI RESOURCE", true, allowSkipDeployments, subscription, openai.Value);
                     openAiEndpoint = openai.Value.Endpoint;
                     openAiKey = keys.Key1;
                 }
                 else
                 {
-                    var openAiResource = await AzCliConsoleGui.PickOrCreateAndConfigCognitiveServicesOpenAiKindResource(true, subscription);
+                    var openAiResource = await AzCliConsoleGui.PickOrCreateAndConfigCognitiveServicesOpenAiKindResource(true, allowSkipDeployments, subscription);
                     openAiEndpoint = openAiResource.Endpoint;
                     openAiKey = openAiResource.Key;
                 }
@@ -54,14 +54,17 @@ namespace Azure.AI.Details.Common.CLI
                 }
                 else
                 {
-                    var pickedOrCreated = await AzCliConsoleGui.PickOrCreateAndConfigCogSearchResource(subscription, null, null, project.Name, "aiproj");
-                    searchEndpoint = pickedOrCreated.Endpoint;
-                    searchKey = pickedOrCreated.Key;
-                    createdSearch = true;
+                    var pickedOrCreated = await AzCliConsoleGui.PickOrCreateAndConfigCogSearchResource(allowSkipSearch, subscription, null, null, project.Name, "aiproj");
+                    createdOrPickedSearch = pickedOrCreated != null;
+                    if (createdOrPickedSearch)
+                    {
+                        searchEndpoint = pickedOrCreated.Value.Endpoint;
+                        searchKey = pickedOrCreated.Value.Key;
+                    }
                 }
             }
 
-            GetOrCreateAiHubProjectConnections(values, createdProject || createdSearch, subscription, project.Group, project.Name, openAiEndpoint, openAiKey, searchEndpoint, searchKey);
+            GetOrCreateAiHubProjectConnections(values, createdProject || createdOrPickedSearch, subscription, project.Group, project.Name, openAiEndpoint, openAiKey, searchEndpoint, searchKey);
             CreateAiHubProjectConfigJsonFile(subscription, project.Group, project.Name);
 
             return project;

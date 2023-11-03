@@ -13,7 +13,7 @@ namespace Azure.AI.Details.Common.CLI
 {
     public partial class AzCliConsoleGui
     {
-        public static async Task<AzCli.CognitiveServicesDeploymentInfo> PickOrCreateCognitiveServicesResourceDeployment(bool interactive, string deploymentExtra, string subscriptionId, string groupName, string resourceRegionLocation, string resourceName, string deploymentFilter)
+        public static async Task<AzCli.CognitiveServicesDeploymentInfo?> PickOrCreateCognitiveServicesResourceDeployment(bool interactive, bool allowSkipDeployment, string deploymentExtra, string subscriptionId, string groupName, string resourceRegionLocation, string resourceName, string deploymentFilter)
         {
             ConsoleHelpers.WriteLineWithHighlight($"\n`AZURE OPENAI DEPLOYMENT ({deploymentExtra.ToUpper()})`");
 
@@ -21,7 +21,9 @@ namespace Azure.AI.Details.Common.CLI
                 ? $"(Create `{deploymentFilter}`)"
                 : interactive ? "(Create new)" : null;
 
-            var deployment = await FindCognitiveServicesResourceDeployment(interactive, deploymentExtra, subscriptionId, groupName, resourceName, deploymentFilter, createNewItem);
+            var deployment = await FindCognitiveServicesResourceDeployment(interactive, allowSkipDeployment, deploymentExtra, subscriptionId, groupName, resourceName, deploymentFilter, createNewItem);
+            if (deployment == null && allowSkipDeployment) return null;
+            
             if (deployment != null && deployment.Value.Name == null)
             {
                 deployment = await TryCreateCognitiveServicesResourceDeployment(interactive, deploymentExtra, subscriptionId, groupName, resourceRegionLocation, resourceName, deploymentFilter);
@@ -35,7 +37,7 @@ namespace Azure.AI.Details.Common.CLI
             return deployment.Value;
         }
 
-        public static async Task<AzCli.CognitiveServicesDeploymentInfo?> FindCognitiveServicesResourceDeployment(bool interactive, string deploymentExtra, string subscriptionId, string groupName, string resourceName, string deploymentFilter, string allowCreateDeploymentOption)
+        public static async Task<AzCli.CognitiveServicesDeploymentInfo?> FindCognitiveServicesResourceDeployment(bool interactive, bool allowSkipDeployment, string deploymentExtra, string subscriptionId, string groupName, string resourceName, string deploymentFilter, string allowCreateDeploymentOption)
         {
             var allowCreateDeployment = !string.IsNullOrEmpty(allowCreateDeploymentOption);
 
@@ -97,7 +99,7 @@ namespace Azure.AI.Details.Common.CLI
             select = Math.Max(0, select);
 
             return interactive
-                ? ListBoxPickDeployment(choices, allowCreateDeploymentOption, select)
+                ? ListBoxPickDeployment(choices, allowCreateDeploymentOption, allowSkipDeployment, select)
                 : null;
         }
 
@@ -198,12 +200,17 @@ namespace Azure.AI.Details.Common.CLI
             return filtered.ToArray();
         }
 
-        private static AzCli.CognitiveServicesDeploymentInfo? ListBoxPickDeployment(AzCli.CognitiveServicesDeploymentInfo[] deployments, string p0, int select = 0)
+        private static AzCli.CognitiveServicesDeploymentInfo? ListBoxPickDeployment(AzCli.CognitiveServicesDeploymentInfo[] deployments, string p0, bool allowSkipDeployment = false, int select = 0)
         {
             var list = deployments.Select(x => $"{x.Name} ({x.ModelName})").ToList();
-
+         
             var hasP0 = !string.IsNullOrEmpty(p0);
             if (hasP0) list.Insert(0, p0);
+
+            if (allowSkipDeployment)
+            {
+                list.Add("(Skip)");
+            }
 
             var picked = ListBoxPicker.PickIndexOf(list.ToArray(), select);
             if (picked < 0)
@@ -215,6 +222,12 @@ namespace Azure.AI.Details.Common.CLI
             {
                 Console.WriteLine(p0);
                 return new AzCli.CognitiveServicesDeploymentInfo();
+            }
+
+            if (allowSkipDeployment && picked == list.Count - 1)
+            {
+                Console.WriteLine("(Skip)");
+                return null;
             }
 
             if (hasP0) picked--;

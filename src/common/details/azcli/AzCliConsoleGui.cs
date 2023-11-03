@@ -32,7 +32,7 @@ namespace Azure.AI.Details.Common.CLI
             return keys.Payload;
         }
 
-        public static async Task<AzCli.CognitiveSearchResourceInfo> PickOrCreateCognitiveSearchResource(string subscription, string location, string groupName, string smartName = null, string smartNameKind = null)
+        public static async Task<AzCli.CognitiveSearchResourceInfo?> PickOrCreateCognitiveSearchResource(bool allowSkip, string subscription, string location, string groupName, string smartName = null, string smartNameKind = null)
         {
             ConsoleHelpers.WriteLineWithHighlight($"\n`AI SEARCH RESOURCE`");
             Console.Write("\rName: *** Loading choices ***");
@@ -48,12 +48,23 @@ namespace Azure.AI.Details.Common.CLI
             var choices = resources.Select(x => $"{x.Name} ({x.RegionLocation})").ToList();
             choices.Insert(0, "(Create new)");
 
+            if (allowSkip)
+            {
+                choices.Add("(Skip)");
+            }
+
             Console.Write("\rName: ");
 
             var picked = ListBoxPicker.PickIndexOf(choices.ToArray());
             if (picked < 0)
             {
                 throw new ApplicationException($"CANCELED: No resource selected");
+            }
+
+            if (allowSkip && picked == choices.Count - 1)
+            {
+                Console.WriteLine($"\rName: (Skipped)");
+                return null;
             }
 
             Console.WriteLine($"\rName: {choices[picked]}");

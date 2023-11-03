@@ -19,20 +19,22 @@ namespace Azure.AI.Details.Common.CLI
 {
     public partial class AzCliConsoleGui
     {
-        public static async Task<AzCli.CognitiveSearchResourceInfoEx> PickOrCreateAndConfigCogSearchResource(string subscription, string location, string groupName, string smartName = null, string smartNameKind = null)
+        public static async Task<AzCli.CognitiveSearchResourceInfoEx?> PickOrCreateAndConfigCogSearchResource(bool allowSkip, string subscription, string location, string groupName, string smartName = null, string smartNameKind = null)
         {
-            var resource = await AzCliConsoleGui.PickOrCreateCognitiveSearchResource(subscription, location, groupName, smartName, smartNameKind);
-            var keys = await AzCliConsoleGui.LoadSearchResourceKeys(subscription, resource);
+            var resource = await AzCliConsoleGui.PickOrCreateCognitiveSearchResource(allowSkip, subscription, location, groupName, smartName, smartNameKind);
+            if (resource == null) return null;
 
-            ConfigSetHelpers.ConfigSearchResource(resource.Endpoint, keys.Key1);
+            var keys = await AzCliConsoleGui.LoadSearchResourceKeys(subscription, resource.Value);
+
+            ConfigSetHelpers.ConfigSearchResource(resource.Value.Endpoint, keys.Key1);
 
             return new AzCli.CognitiveSearchResourceInfoEx
             {
-                Id = resource.Id,
-                Group = resource.Group,
-                Name = resource.Name,
-                RegionLocation = resource.RegionLocation,
-                Endpoint = resource.Endpoint,
+                Id = resource.Value.Id,
+                Group = resource.Value.Group,
+                Name = resource.Value.Name,
+                RegionLocation = resource.Value.RegionLocation,
+                Endpoint = resource.Value.Endpoint,
                 Key = keys.Key1,
             };
         }
