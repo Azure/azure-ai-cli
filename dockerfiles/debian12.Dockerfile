@@ -20,7 +20,7 @@ COPY ./scripts/InstallAzureAICLIDeb.sh /_scratch/
 COPY ./scripts/InstallAzureAICLIDeb-UpdateVersion.sh /_scratch/
 
 # Feature flags/arguments
-ARG AZURE_CLI_VERSION=1.0.0-alpha1027.1
+ARG AZURE_CLI_VERSION=1.0.0-alpha1102.4
 ARG DOWNLOAD_SCRIPT=false
 
 # If we're downloading the script, do so
