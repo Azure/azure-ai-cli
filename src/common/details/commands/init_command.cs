@@ -367,8 +367,6 @@ namespace Azure.AI.Details.Common.CLI
         {
             if (allowCreate)
             {
-                await DoInitOpenAi(interactive, allowSkipDeployments);
-                await DoInitSearch(interactive);
                 await DoInitHubResource(interactive);
             }
 
