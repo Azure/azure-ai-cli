@@ -27,6 +27,7 @@ namespace Azure.AI.Details.Common.CLI
                         ? PickAiHubProject(values, subscription, resourceId)
                         : throw new ApplicationException($"CANCELED: No project selected");
 
+            var createdSearch = false;
             if (!createdProject)
             {
                 var (hubName, openai, search) = await AiSdkConsoleGui.VerifyResourceConnections(values, subscription, project.Group, project.Name);
@@ -43,9 +44,24 @@ namespace Azure.AI.Details.Common.CLI
                     openAiEndpoint = openAiResource.Endpoint;
                     openAiKey = openAiResource.Key;
                 }
+
+                if (!string.IsNullOrEmpty(search?.Name))
+                {
+                    var keys = await AzCliConsoleGui.LoadSearchResourceKeys(subscription, search.Value);
+                    ConfigSetHelpers.ConfigSearchResource(search.Value.Endpoint, keys.Key1);
+                    searchEndpoint = search.Value.Endpoint;
+                    searchKey = keys.Key1;
+                }
+                else
+                {
+                    var pickedOrCreated = await AzCliConsoleGui.PickOrCreateAndConfigCogSearchResource(subscription, null, null, project.Name, "aiproj");
+                    searchEndpoint = pickedOrCreated.Endpoint;
+                    searchKey = pickedOrCreated.Key;
+                    createdSearch = true;
+                }
             }
 
-            GetOrCreateAiHubProjectConnections(values, createdProject, subscription, project.Group, project.Name, openAiEndpoint, openAiKey, searchEndpoint, searchKey);
+            GetOrCreateAiHubProjectConnections(values, createdProject || createdSearch, subscription, project.Group, project.Name, openAiEndpoint, openAiKey, searchEndpoint, searchKey);
             CreateAiHubProjectConfigJsonFile(subscription, project.Group, project.Name);
 
             return project;
@@ -227,7 +243,7 @@ namespace Azure.AI.Details.Common.CLI
             {
                 if (connectionCount > 0) Console.WriteLine();
 
-                var connectionName = "Default_CognitiveSearch";
+                var connectionName = "Default_AzureAISearch";
                 Console.WriteLine($"Connection: {connectionName}");
 
                 Console.Write(createSearchConnection ? "*** CREATING ***" : "*** CHECKING ***");
