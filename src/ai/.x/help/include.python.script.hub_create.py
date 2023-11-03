@@ -1,7 +1,7 @@
 import argparse
 import json
 
-def create_hub(subscription_id, resource_group_name, ai_resource_name, location, display_name, description):
+def create_hub(subscription_id, resource_group_name, ai_resource_name, location, display_name, description, openai_resource_id):
     """Create Azure AI resource."""
 
     from azure.identity import DefaultAzureCredential
@@ -28,7 +28,7 @@ def create_hub(subscription_id, resource_group_name, ai_resource_name, location,
     )
 
     # TODO allow setting of optional bool update_dependent_resources?
-    result = ai_client.ai_resources.begin_create(ai_resource=resource).result()
+    result = ai_client.ai_resources.begin_create(ai_resource=resource, endpoint_resource_id=openai_resource_id).result()
     return result._workspace_hub._to_dict()
 
 def main():
@@ -40,6 +40,7 @@ def main():
     parser.add_argument("--location", required=True, help="The location in which to create the AI resource.")
     parser.add_argument("--display-name", required=False, help="Display name for the AI resource. This is non-unique within the resource group.")
     parser.add_argument("--description", required=False, help="Description of the AI resource.")
+    parser.add_argument("--openai-resource-id", required=False, help="OpenAI resource id to use.")
     args = parser.parse_args()
 
     subscription_id = args.subscription
@@ -48,8 +49,9 @@ def main():
     location = args.location
     display_name = args.display_name
     description = args.description
+    openai_resource_id = args.openai_resource_id
 
-    hub = create_hub(subscription_id, resource_group_name, ai_resource_name, location, display_name, description)
+    hub = create_hub(subscription_id, resource_group_name, ai_resource_name, location, display_name, description, openai_resource_id)
     formatted = json.dumps({"resource": hub}, indent=2)
 
     print("---")

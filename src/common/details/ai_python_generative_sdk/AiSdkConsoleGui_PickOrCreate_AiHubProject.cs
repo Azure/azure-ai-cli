@@ -119,12 +119,10 @@ namespace Azure.AI.Details.Common.CLI
             var displayName = ProjectDisplayNameToken.Data().GetOrDefault(values);
             var description = ProjectDescriptionToken.Data().GetOrDefault(values);
 
-            var openAiResourceId = values.GetOrDefault("service.openai.resource.id", "");
-
             var smartName = ResourceNameToken.Data().GetOrDefault(values);
             var smartNameKind = smartName != null && smartName.Contains("openai") ? "openai" : "oai";
 
-            return TryCreateAiHubProjectInteractive(values, subscription, resourceId, group, location, ref displayName, ref description, openAiResourceId, smartName, smartNameKind);
+            return TryCreateAiHubProjectInteractive(values, subscription, resourceId, group, location, ref displayName, ref description, smartName, smartNameKind);
         }
 
         private static AiHubProjectInfo AiHubProjectInfoFromToken(ICommandValues values, JToken project)
@@ -142,7 +140,7 @@ namespace Azure.AI.Details.Common.CLI
             return aiHubProject;
         }
 
-        private static JToken TryCreateAiHubProjectInteractive(ICommandValues values, string subscription, string resourceId, string group, string location, ref string displayName, ref string description, string openAiResourceId, string smartName = null, string smartNameKind = null)
+        private static JToken TryCreateAiHubProjectInteractive(ICommandValues values, string subscription, string resourceId, string group, string location, ref string displayName, ref string description, string smartName = null, string smartNameKind = null)
         {
             ConsoleHelpers.WriteLineWithHighlight($"\n`CREATE AZURE AI PROJECT`");
 
@@ -157,7 +155,7 @@ namespace Azure.AI.Details.Common.CLI
             description ??= name;
 
             Console.Write("*** CREATING ***");
-            var json = PythonSDKWrapper.CreateProject(values, subscription, group, resourceId, name, location, displayName, description, openAiResourceId);
+            var json = PythonSDKWrapper.CreateProject(values, subscription, group, resourceId, name, location, displayName, description);
 
             Console.WriteLine("\r*** CREATED ***  ");
 

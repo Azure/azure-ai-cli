@@ -21,14 +21,14 @@ namespace Azure.AI.Details.Common.CLI
 {
     public class PythonSDKWrapper
     {
-        static public string CreateResource(ICommandValues values, string subscription, string group, string name, string location, string displayName, string description)
+        static public string CreateResource(ICommandValues values, string subscription, string group, string name, string location, string displayName, string description, string openAiResourceId = null)
         {
-            return DoCreateResourceViaPython(values, subscription, group, name, location, displayName, description);
+            return DoCreateResourceViaPython(values, subscription, group, name, location, displayName, description, openAiResourceId);
         }
 
-        static public string CreateProject(ICommandValues values, string subscription, string group, string resource, string name, string location, string displayName = null, string description = null, string openAiResourceId = null)
+        static public string CreateProject(ICommandValues values, string subscription, string group, string resource, string name, string location, string displayName = null, string description = null)
         {
-            return DoCreateProjectViaPython(values, subscription, group, resource, name, location, displayName, description, openAiResourceId);
+            return DoCreateProjectViaPython(values, subscription, group, resource, name, location, displayName, description);
         }
 
         static public string ListResources(ICommandValues values, string subscription)
@@ -96,7 +96,7 @@ namespace Azure.AI.Details.Common.CLI
                 null, null, stdErr);
         }
 
-        private static string DoCreateResourceViaPython(ICommandValues values, string subscription, string group, string name, string location, string displayName, string description)
+        private static string DoCreateResourceViaPython(ICommandValues values, string subscription, string group, string name, string location, string displayName, string description, string openAiResourceId)
         {
             var createResource = () => PythonRunner.RunEmbeddedPythonScript(values, "hub_create",
                 CliHelpers.BuildCliArgs( 
@@ -105,7 +105,8 @@ namespace Azure.AI.Details.Common.CLI
                     "--name", name, 
                     "--location", location,
                     "--display-name", displayName,
-                    "--description", description));
+                    "--description", description,
+                    "--openai-resource-id", openAiResourceId));
 
             var output = TryCatchHelpers.TryCatchNoThrow<string>(() => createResource(), null, out var exception);
             if (!string.IsNullOrEmpty(output)) return output;
@@ -121,7 +122,7 @@ namespace Azure.AI.Details.Common.CLI
             throw exception;
         }
 
-        private static string DoCreateProjectViaPython(ICommandValues values, string subscription, string group, string resource, string name, string location, string displayName, string description, string openAiResourceId)
+        private static string DoCreateProjectViaPython(ICommandValues values, string subscription, string group, string resource, string name, string location, string displayName, string description)
         {
             return PythonRunner.RunEmbeddedPythonScript(values, "project_create",
                 CliHelpers.BuildCliArgs(
@@ -131,8 +132,7 @@ namespace Azure.AI.Details.Common.CLI
                     "--name", name, 
                     "--location", location,
                     "--display-name", displayName,
-                    "--description", description,
-                    "--openai-resource-id", openAiResourceId));
+                    "--description", description));
         }
 
         private static string DoListResourcesViaPython(ICommandValues values, string subscription)

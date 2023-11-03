@@ -88,10 +88,12 @@ namespace Azure.AI.Details.Common.CLI
             var displayName = ResourceDisplayNameToken.Data().GetOrDefault(values);
             var description = ResourceDescriptionToken.Data().GetOrDefault(values);
 
+            var openAiResourceId = values.GetOrDefault("service.openai.resource.id", "");
+
             var smartName = ResourceNameToken.Data().GetOrDefault(values);
             var smartNameKind = smartName != null && smartName.Contains("openai") ? "openai" : "oai";
 
-            return await TryCreateAiHubResourceInteractive(values, subscription, locationName, groupName, displayName, description, smartName, smartNameKind);
+            return await TryCreateAiHubResourceInteractive(values, subscription, locationName, groupName, displayName, description, openAiResourceId, smartName, smartNameKind);
         }
 
         private static AiHubResourceInfo FinishPickOrCreateAiHubResource(ICommandValues values, JToken resource)
@@ -104,7 +106,7 @@ namespace Azure.AI.Details.Common.CLI
                 RegionLocation = resource["location"].Value<string>(),
             };
 
-            values.Reset("service.resource.id", aiHubResource.Id);
+            ResourceIdToken.Data().Set(values, aiHubResource.Id);
             ResourceNameToken.Data().Set(values, aiHubResource.Name);
             ResourceGroupNameToken.Data().Set(values, aiHubResource.Group);
             RegionLocationToken.Data().Set(values, aiHubResource.RegionLocation);
@@ -112,7 +114,7 @@ namespace Azure.AI.Details.Common.CLI
             return aiHubResource;
         }
 
-        private static async Task<JToken> TryCreateAiHubResourceInteractive(ICommandValues values, string subscription, string locationName, string groupName, string displayName, string description, string smartName = null, string smartNameKind = null)
+        private static async Task<JToken> TryCreateAiHubResourceInteractive(ICommandValues values, string subscription, string locationName, string groupName, string displayName, string description, string openAiResourceId, string smartName = null, string smartNameKind = null)
         {
             ConsoleHelpers.WriteLineWithHighlight($"\n`CREATE AZURE AI RESOURCE`");
 
@@ -137,7 +139,7 @@ namespace Azure.AI.Details.Common.CLI
             description ??= name;
 
             Console.Write("*** CREATING ***");
-            var json = PythonSDKWrapper.CreateResource(values, subscription, groupName, name, locationName, displayName, description);
+            var json = PythonSDKWrapper.CreateResource(values, subscription, groupName, name, locationName, displayName, description, openAiResourceId);
 
             Console.WriteLine("\r*** CREATED ***  ");
 
