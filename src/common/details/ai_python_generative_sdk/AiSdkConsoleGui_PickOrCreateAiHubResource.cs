@@ -89,11 +89,12 @@ namespace Azure.AI.Details.Common.CLI
             var description = ResourceDescriptionToken.Data().GetOrDefault(values);
 
             var openAiResourceId = values.GetOrDefault("service.openai.resource.id", "");
+            var openAiResourceKind = values.GetOrDefault("service.openai.resource.kind", "");
 
             var smartName = ResourceNameToken.Data().GetOrDefault(values);
             var smartNameKind = smartName != null && smartName.Contains("openai") ? "openai" : "oai";
 
-            return await TryCreateAiHubResourceInteractive(values, subscription, locationName, groupName, displayName, description, openAiResourceId, smartName, smartNameKind);
+            return await TryCreateAiHubResourceInteractive(values, subscription, locationName, groupName, displayName, description, openAiResourceId, openAiResourceKind, smartName, smartNameKind);
         }
 
         private static AiHubResourceInfo FinishPickOrCreateAiHubResource(ICommandValues values, JToken resource)
@@ -114,7 +115,7 @@ namespace Azure.AI.Details.Common.CLI
             return aiHubResource;
         }
 
-        private static async Task<JToken> TryCreateAiHubResourceInteractive(ICommandValues values, string subscription, string locationName, string groupName, string displayName, string description, string openAiResourceId, string smartName = null, string smartNameKind = null)
+        private static async Task<JToken> TryCreateAiHubResourceInteractive(ICommandValues values, string subscription, string locationName, string groupName, string displayName, string description, string openAiResourceId, string openAiResourceKind, string smartName = null, string smartNameKind = null)
         {
             ConsoleHelpers.WriteLineWithHighlight($"\n`CREATE AZURE AI RESOURCE`");
 
@@ -139,7 +140,7 @@ namespace Azure.AI.Details.Common.CLI
             description ??= name;
 
             Console.Write("*** CREATING ***");
-            var json = PythonSDKWrapper.CreateResource(values, subscription, groupName, name, locationName, displayName, description, openAiResourceId);
+            var json = PythonSDKWrapper.CreateResource(values, subscription, groupName, name, locationName, displayName, description, openAiResourceId, openAiResourceKind);
 
             Console.WriteLine("\r*** CREATED ***  ");
 

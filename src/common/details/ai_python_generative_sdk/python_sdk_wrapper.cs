@@ -21,9 +21,9 @@ namespace Azure.AI.Details.Common.CLI
 {
     public class PythonSDKWrapper
     {
-        static public string CreateResource(ICommandValues values, string subscription, string group, string name, string location, string displayName, string description, string openAiResourceId = null)
+        static public string CreateResource(ICommandValues values, string subscription, string group, string name, string location, string displayName, string description, string openAiResourceId = null, string openAiResourceKind = null)
         {
-            return DoCreateResourceViaPython(values, subscription, group, name, location, displayName, description, openAiResourceId);
+            return DoCreateResourceViaPython(values, subscription, group, name, location, displayName, description, openAiResourceId, openAiResourceKind);
         }
 
         static public string CreateProject(ICommandValues values, string subscription, string group, string resource, string name, string location, string displayName = null, string description = null)
@@ -96,7 +96,7 @@ namespace Azure.AI.Details.Common.CLI
                 null, null, stdErr);
         }
 
-        private static string DoCreateResourceViaPython(ICommandValues values, string subscription, string group, string name, string location, string displayName, string description, string openAiResourceId)
+        private static string DoCreateResourceViaPython(ICommandValues values, string subscription, string group, string name, string location, string displayName, string description, string openAiResourceId, string openAiResourceKind)
         {
             var createResource = () => PythonRunner.RunEmbeddedPythonScript(values, "hub_create",
                 CliHelpers.BuildCliArgs( 
@@ -106,7 +106,8 @@ namespace Azure.AI.Details.Common.CLI
                     "--location", location,
                     "--display-name", displayName,
                     "--description", description,
-                    "--openai-resource-id", openAiResourceId));
+                    "--openai-resource-id", openAiResourceId,
+                    "--openai-resource-kind", openAiResourceKind));
 
             var output = TryCatchHelpers.TryCatchNoThrow<string>(() => createResource(), null, out var exception);
             if (!string.IsNullOrEmpty(output)) return output;

@@ -1,7 +1,7 @@
 import argparse
 import json
 
-def create_hub(subscription_id, resource_group_name, ai_resource_name, location, display_name, description, openai_resource_id):
+def create_hub(subscription_id, resource_group_name, ai_resource_name, location, display_name, description, openai_resource_id, openai_resource_kind):
     """Create Azure AI resource."""
 
     from azure.identity import DefaultAzureCredential
@@ -28,7 +28,7 @@ def create_hub(subscription_id, resource_group_name, ai_resource_name, location,
     )
 
     # TODO allow setting of optional bool update_dependent_resources?
-    result = ai_client.ai_resources.begin_create(ai_resource=resource, endpoint_resource_id=openai_resource_id).result()
+    result = ai_client.ai_resources.begin_create(ai_resource=resource, endpoint_resource_id=openai_resource_id, endpoint_kind=openai_resource_kind).result()
     return result._workspace_hub._to_dict()
 
 def main():
@@ -41,6 +41,7 @@ def main():
     parser.add_argument("--display-name", required=False, help="Display name for the AI resource. This is non-unique within the resource group.")
     parser.add_argument("--description", required=False, help="Description of the AI resource.")
     parser.add_argument("--openai-resource-id", required=False, help="OpenAI resource id to use.")
+    parser.add_argument("--openai-resource-kind", required=False, help="OpenAI resource kind to use.")
     args = parser.parse_args()
 
     subscription_id = args.subscription
@@ -50,8 +51,9 @@ def main():
     display_name = args.display_name
     description = args.description
     openai_resource_id = args.openai_resource_id
+    openai_resource_kind = args.openai_resource_kind
 
-    hub = create_hub(subscription_id, resource_group_name, ai_resource_name, location, display_name, description, openai_resource_id)
+    hub = create_hub(subscription_id, resource_group_name, ai_resource_name, location, display_name, description, openai_resource_id, openai_resource_kind)
     formatted = json.dumps({"resource": hub}, indent=2)
 
     print("---")

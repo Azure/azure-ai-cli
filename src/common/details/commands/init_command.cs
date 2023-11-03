@@ -410,6 +410,7 @@ namespace Azure.AI.Details.Common.CLI
             _values.Reset("service.openai.endpoint", resource.Endpoint);
             _values.Reset("service.openai.key", resource.Key);
             _values.Reset("service.openai.resource.id", resource.Id);
+            _values.Reset("service.openai.resource.kind", resource.Kind);
             ResourceNameToken.Data().Set(_values, resource.Name);
             ResourceGroupNameToken.Data().Set(_values, resource.Group);
         }
@@ -437,6 +438,7 @@ namespace Azure.AI.Details.Common.CLI
             _values.Reset("service.openai.endpoint", resource.Endpoint);
             _values.Reset("service.openai.key", resource.Key);
             _values.Reset("service.openai.resource.id", resource.Id);
+            _values.Reset("service.openai.resource.kind", resource.Kind);
             ResourceNameToken.Data().Set(_values, resource.Name);
             ResourceGroupNameToken.Data().Set(_values, resource.Group);
         }
