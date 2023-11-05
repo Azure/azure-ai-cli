@@ -46,8 +46,19 @@ namespace Azure.AI.Details.Common.CLI
             var path = FileHelpers.FindFileInHelpPath($"help/include.python.script.{scriptName}.py");
             var script = FileHelpers.ReadAllHelpText(path, Encoding.UTF8);
 
-            if (Program.Debug) Console.WriteLine($"DEBUG: {scriptName}.py:\n{script}");
-            if (Program.Debug) Console.WriteLine($"DEBUG: PythonRunner.RunEmbeddedPythonScript: '{scriptName}' {scriptArgs}");
+            if (Program.Debug)
+            {
+                Console.WriteLine($"DEBUG: {scriptName}.py:\n{script}");
+                Console.WriteLine($"DEBUG: PythonRunner.RunEmbeddedPythonScript: '{scriptName}' {scriptArgs}");
+
+                var verbose = values.GetOrDefault("x.verbose", "false") != "false";
+                if (verbose)
+                {
+                    var file = $"{scriptName}.py";
+                    FileHelpers.WriteAllText(file, script, Encoding.UTF8);
+                    ConsoleHelpers.WriteLineWithHighlight($"DEBUG: `{file} {scriptArgs}`");
+                }
+            }
 
             var dbgOut = script.Replace("\n", "\\n").Replace("\r", "");
             AI.DBG_TRACE_VERBOSE($"RunEmbeddedPythonScript: {scriptName}.py: {dbgOut}");
