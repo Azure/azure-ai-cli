@@ -1,4 +1,4 @@
-| new | `--question`          | `--replace`|  runs | uses | must exist |
+|     | `--question`          | `--replace`|  runs | uses | must exist |
 |--|--|--|--|--|--|
 |     | `"... {lang1} ..."`   | `--replace lang1 "C#"`  | 1 time | item
 | new | `"... {lang2} ..."`   | `--replace-foreach lang2 in "Python;C#;JavaScript"`  | 3 times | items between `';'`

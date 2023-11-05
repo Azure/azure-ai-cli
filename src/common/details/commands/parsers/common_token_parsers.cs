@@ -34,6 +34,7 @@ namespace Azure.AI.Details.Common.CLI
 
             new NamedValueTokenParser(null,                 "check.result.jmes", "110", "1"),
             new ParallelCommandsTokenParser(),
+            new ReplaceForEachTokenParser(),
             new ForEachTokenParser()
         )
         {
