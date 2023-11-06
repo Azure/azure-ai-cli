@@ -107,9 +107,19 @@ namespace Azure.AI.Details.Common.CLI
                 var path = !hasPath ? currentDir : item.Substring(0, pathLen);
                 var pattern = !hasPath ? item : item.Substring(pathLen + 1);
 
+                EnumerationOptions recursiveOptions = null;
+                if (path.EndsWith("**"))
+                {
+                    path = path.Substring(0, path.Length - 3);
+                    recursiveOptions = new EnumerationOptions() { RecurseSubdirectories = true };
+                }
+
                 if (!Directory.Exists(path)) continue;
 
-                foreach (var file in Directory.EnumerateFiles(path, pattern))
+                var files = recursiveOptions != null 
+                    ? Directory.EnumerateFiles(path, pattern, recursiveOptions)
+                    : Directory.EnumerateFiles(path, pattern);
+                foreach (var file in files)
                 {
                     yield return file;
                 }

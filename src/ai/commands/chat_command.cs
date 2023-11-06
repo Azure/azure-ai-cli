@@ -269,7 +269,6 @@ namespace Azure.AI.Details.Common.CLI
 
             var speechInput = _values.GetOrDefault("chat.speech.input", false);
             var userPrompt = _values["chat.message.user.prompt"];
-            userPrompt = userPrompt.ReplaceValues(_values);
 
             Console.WriteLine("Press ENTER for more options.\n");
 
@@ -318,7 +317,6 @@ namespace Azure.AI.Details.Common.CLI
                                 "",
                         "SEE:", $"{Program.Name} help chat");
             }
-            userPrompt = userPrompt.ReplaceValues(_values);
 
             DisplayUserChatPrompt();
             var text = userPrompt;
@@ -348,7 +346,7 @@ namespace Azure.AI.Details.Common.CLI
             var messages = new List<ChatMessage>();
 
             var systemPrompt = _values.GetOrDefault("chat.message.system.prompt", DefaultSystemPrompt);
-            messages.Add(new ChatMessage(ChatRole.System, systemPrompt.ReplaceValues(_values)));
+            messages.Add(new ChatMessage(ChatRole.System, systemPrompt));
 
             return await Task.Run(() => {
                 Func<string, Task<string>> handler = (string text) => {
@@ -560,7 +558,7 @@ namespace Azure.AI.Details.Common.CLI
             var options = new ChatCompletionsOptions();
 
             var systemPrompt = _values.GetOrDefault("chat.message.system.prompt", DefaultSystemPrompt);
-            options.Messages.Add(new ChatMessage(ChatRole.System, systemPrompt.ReplaceValues(_values)));
+            options.Messages.Add(new ChatMessage(ChatRole.System, systemPrompt));
 
             var textFile = _values["chat.message.history.text.file"];
             if (!string.IsNullOrEmpty(textFile)) AddChatMessagesFromTextFile(options.Messages, textFile);

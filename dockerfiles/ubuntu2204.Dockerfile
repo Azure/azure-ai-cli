@@ -13,6 +13,7 @@ RUN apt install fuse -y
 RUN apt install dos2unix -y
 RUN apt-get install python3.10 -y --no-install-recommends
 RUN apt install python3-pip -y
+RUN pip install --upgrade pip setuptools
 COPY requirements.txt .
 RUN pip install -r requirements.txt
 
