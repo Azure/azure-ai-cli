@@ -30,38 +30,7 @@ namespace Azure.AI.Details.Common.CLI
             var createdOrPickedSearch = false;
             if (!createdProject)
             {
-                var (hubName, openai, search) = await AiSdkConsoleGui.VerifyResourceConnections(values, subscription, project.Group, project.Name);
-
-                if (!string.IsNullOrEmpty(openai?.Name))
-                {
-                    var (chatDeployment, embeddingsDeployment, evaluationDeployment, keys) = await AzCliConsoleGui.PickOrCreateAndConfigCognitiveServicesOpenAiKindResourceDeployments("AZURE OPENAI RESOURCE", true, allowSkipDeployments, subscription, openai.Value);
-                    openAiEndpoint = openai.Value.Endpoint;
-                    openAiKey = keys.Key1;
-                }
-                else
-                {
-                    var openAiResource = await AzCliConsoleGui.PickOrCreateAndConfigCognitiveServicesOpenAiKindResource(true, allowSkipDeployments, subscription);
-                    openAiEndpoint = openAiResource.Endpoint;
-                    openAiKey = openAiResource.Key;
-                }
-
-                if (!string.IsNullOrEmpty(search?.Name))
-                {
-                    var keys = await AzCliConsoleGui.LoadSearchResourceKeys(subscription, search.Value);
-                    ConfigSetHelpers.ConfigSearchResource(search.Value.Endpoint, keys.Key1);
-                    searchEndpoint = search.Value.Endpoint;
-                    searchKey = keys.Key1;
-                }
-                else
-                {
-                    var pickedOrCreated = await AzCliConsoleGui.PickOrCreateAndConfigCogSearchResource(allowSkipSearch, subscription, null, null, project.Name, "aiproj");
-                    createdOrPickedSearch = pickedOrCreated != null;
-                    if (createdOrPickedSearch)
-                    {
-                        searchEndpoint = pickedOrCreated.Value.Endpoint;
-                        searchKey = pickedOrCreated.Value.Key;
-                    }
-                }
+                (openAiEndpoint, openAiKey, searchEndpoint, searchKey, createdOrPickedSearch) = await EnsureResourceConnections(allowSkipDeployments, allowSkipSearch, values, subscription, project.Name, project.Group);
             }
 
             GetOrCreateAiHubProjectConnections(values, createdProject || createdOrPickedSearch, subscription, project.Group, project.Name, openAiEndpoint, openAiKey, searchEndpoint, searchKey);
@@ -150,12 +119,10 @@ namespace Azure.AI.Details.Common.CLI
             var displayName = ProjectDisplayNameToken.Data().GetOrDefault(values);
             var description = ProjectDescriptionToken.Data().GetOrDefault(values);
 
-            var openAiResourceId = values.GetOrDefault("service.openai.resource.id", "");
-
             var smartName = ResourceNameToken.Data().GetOrDefault(values);
             var smartNameKind = smartName != null && smartName.Contains("openai") ? "openai" : "oai";
 
-            return TryCreateAiHubProjectInteractive(values, subscription, resourceId, group, location, ref displayName, ref description, openAiResourceId, smartName, smartNameKind);
+            return TryCreateAiHubProjectInteractive(values, subscription, resourceId, group, location, ref displayName, ref description, smartName, smartNameKind);
         }
 
         private static AiHubProjectInfo AiHubProjectInfoFromToken(ICommandValues values, JToken project)
@@ -173,7 +140,7 @@ namespace Azure.AI.Details.Common.CLI
             return aiHubProject;
         }
 
-        private static JToken TryCreateAiHubProjectInteractive(ICommandValues values, string subscription, string resourceId, string group, string location, ref string displayName, ref string description, string openAiResourceId, string smartName = null, string smartNameKind = null)
+        private static JToken TryCreateAiHubProjectInteractive(ICommandValues values, string subscription, string resourceId, string group, string location, ref string displayName, ref string description, string smartName = null, string smartNameKind = null)
         {
             ConsoleHelpers.WriteLineWithHighlight($"\n`CREATE AZURE AI PROJECT`");
 
@@ -188,7 +155,7 @@ namespace Azure.AI.Details.Common.CLI
             description ??= name;
 
             Console.Write("*** CREATING ***");
-            var json = PythonSDKWrapper.CreateProject(values, subscription, group, resourceId, name, location, displayName, description, openAiResourceId);
+            var json = PythonSDKWrapper.CreateProject(values, subscription, group, resourceId, name, location, displayName, description);
 
             Console.WriteLine("\r*** CREATED ***  ");
 

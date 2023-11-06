@@ -1,7 +1,7 @@
 import argparse
 import json
 
-def create_project(subscription_id, resource_id, resource_group_name, project_name, location, display_name, description, openai_resource_id):
+def create_project(subscription_id, resource_id, resource_group_name, project_name, location, display_name, description):
     """Create Azure AI project."""
 
     from azure.identity import DefaultAzureCredential
@@ -23,7 +23,7 @@ def create_project(subscription_id, resource_id, resource_group_name, project_na
         ai_resource=resource_id,
     )
 
-    result = ai_client.projects.begin_create(project=project, byo_open_ai_resource_id=openai_resource_id).result()
+    result = ai_client.projects.begin_create(project=project).result()
     return result._workspace._to_dict()
 
 def main():
@@ -36,7 +36,6 @@ def main():
     parser.add_argument("--location", required=True, help="The location in which to create the AI project.")
     parser.add_argument("--display-name", required=False, help="Display name for the AI project. This is non-unique within the resource group.")
     parser.add_argument("--description", required=False, help="Description of the AI project.")
-    parser.add_argument("--openai-resource-id", required=False, help="OpenAI resource id to use.")
     args = parser.parse_args()
 
     subscription_id = args.subscription
@@ -46,9 +45,8 @@ def main():
     location = args.location
     display_name = args.display_name
     description = args.description
-    openai_resource_id = args.openai_resource_id
 
-    project = create_project(subscription_id, resource_id, resource_group_name, project_name, location, display_name, description, openai_resource_id)
+    project = create_project(subscription_id, resource_id, resource_group_name, project_name, location, display_name, description)
     formatted = json.dumps({"project": project}, indent=2)
 
     print("---")

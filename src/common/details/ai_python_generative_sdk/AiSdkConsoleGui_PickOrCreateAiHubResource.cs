@@ -57,7 +57,8 @@ namespace Azure.AI.Details.Common.CLI
 
             if (allowCreate)
             {
-                choices.Insert(0, "(Create new)");
+                choices.Insert(0, "(Create w/ integrated Open AI + AI Services)");
+                choices.Insert(1, "(Create w/ standalone Open AI resource)");
             }
 
             Console.Write("\rName: ");
@@ -69,11 +70,32 @@ namespace Azure.AI.Details.Common.CLI
 
             Console.WriteLine($"\rName: {choices[picked]}");
             var resource = allowCreate
-                ? (picked > 0 ? items.ToArray()[picked - 1] : null)
+                ? (picked >= 2 ? items.ToArray()[picked - 2] : null)
                 : items.ToArray()[picked];
 
-            var createNew = allowCreate && picked == 0;
-            if (createNew)
+            var byoServices = allowCreate && picked == 1;
+            if (byoServices)
+            {
+                var regionFilter = values.GetOrDefault("init.service.resource.region.name", "");
+                var groupFilter = values.GetOrDefault("init.service.resource.group.name", "");
+                var resourceFilter = values.GetOrDefault("init.service.cognitiveservices.resource.name", "");
+                var kind = values.GetOrDefault("init.service.cognitiveservices.resource.kind", "OpenAI;AIServices");
+                var sku = values.GetOrDefault("init.service.cognitiveservices.resource.sku", Program.CognitiveServiceResourceSku);
+                var yes = values.GetOrDefault("init.service.cognitiveservices.terms.agree", false);
+
+                var openAiResource = await AzCliConsoleGui.PickOrCreateAndConfigCognitiveServicesOpenAiKindResource(true, true, subscription, regionFilter, groupFilter, resourceFilter, kind, sku, yes);
+
+                ResourceGroupNameToken.Data().Set(values, openAiResource.Group);
+                values.Reset("service.resource.region.name", openAiResource.RegionLocation);
+
+                values.Reset("service.openai.endpoint", openAiResource.Endpoint);
+                values.Reset("service.openai.key", openAiResource.Key);
+                values.Reset("service.openai.resource.id", openAiResource.Id);
+                values.Reset("service.openai.resource.kind", openAiResource.Kind);
+            }
+
+            var createNewHub = allowCreate && (picked == 0 || picked == 1);
+            if (createNewHub)
             {
                 resource = await TryCreateAiHubResourceInteractive(values, subscription);
             }
@@ -88,10 +110,13 @@ namespace Azure.AI.Details.Common.CLI
             var displayName = ResourceDisplayNameToken.Data().GetOrDefault(values);
             var description = ResourceDescriptionToken.Data().GetOrDefault(values);
 
+            var openAiResourceId = values.GetOrDefault("service.openai.resource.id", "");
+            var openAiResourceKind = values.GetOrDefault("service.openai.resource.kind", "");
+
             var smartName = ResourceNameToken.Data().GetOrDefault(values);
             var smartNameKind = smartName != null && smartName.Contains("openai") ? "openai" : "oai";
 
-            return await TryCreateAiHubResourceInteractive(values, subscription, locationName, groupName, displayName, description, smartName, smartNameKind);
+            return await TryCreateAiHubResourceInteractive(values, subscription, locationName, groupName, displayName, description, openAiResourceId, openAiResourceKind, smartName, smartNameKind);
         }
 
         private static AiHubResourceInfo FinishPickOrCreateAiHubResource(ICommandValues values, JToken resource)
@@ -104,7 +129,7 @@ namespace Azure.AI.Details.Common.CLI
                 RegionLocation = resource["location"].Value<string>(),
             };
 
-            values.Reset("service.resource.id", aiHubResource.Id);
+            ResourceIdToken.Data().Set(values, aiHubResource.Id);
             ResourceNameToken.Data().Set(values, aiHubResource.Name);
             ResourceGroupNameToken.Data().Set(values, aiHubResource.Group);
             RegionLocationToken.Data().Set(values, aiHubResource.RegionLocation);
@@ -112,7 +137,7 @@ namespace Azure.AI.Details.Common.CLI
             return aiHubResource;
         }
 
-        private static async Task<JToken> TryCreateAiHubResourceInteractive(ICommandValues values, string subscription, string locationName, string groupName, string displayName, string description, string smartName = null, string smartNameKind = null)
+        private static async Task<JToken> TryCreateAiHubResourceInteractive(ICommandValues values, string subscription, string locationName, string groupName, string displayName, string description, string openAiResourceId, string openAiResourceKind, string smartName = null, string smartNameKind = null)
         {
             ConsoleHelpers.WriteLineWithHighlight($"\n`CREATE AZURE AI RESOURCE`");
 
@@ -137,7 +162,7 @@ namespace Azure.AI.Details.Common.CLI
             description ??= name;
 
             Console.Write("*** CREATING ***");
-            var json = PythonSDKWrapper.CreateResource(values, subscription, groupName, name, locationName, displayName, description);
+            var json = PythonSDKWrapper.CreateResource(values, subscription, groupName, name, locationName, displayName, description, openAiResourceId, openAiResourceKind);
 
             Console.WriteLine("\r*** CREATED ***  ");
 

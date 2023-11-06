@@ -66,6 +66,8 @@ namespace Azure.AI.Details.Common.CLI
                 // case "init": await DoInitServiceCommand(); break;
                 case "init": await DoInitRootAsync(); break;
 
+                case "init.resource": await DoInitRootHubResource(interactive); break;
+
                 case "init.project": await DoInitRootProject(interactive, true, true); break;
                 case "init.project.new": await DoInitRootProject(interactive, true, false); break;
                 case "init.project.select": await DoInitRootProject(interactive, false, true); break;
@@ -75,7 +77,6 @@ namespace Azure.AI.Details.Common.CLI
                 case "init.openai": await DoInitRootOpenAi(interactive); break;
                 case "init.search": await DoInitRootSearch(interactive); break;
                 case "init.speech": await DoInitRootSpeech(interactive); break;
-                case "init.resource": await DoInitResourceCommand(); break;
 
                 // POST-IGNITE: TODO: add ability to init deployments
                 // TODO: ensure that deployments in "openai" flow can be skipped
@@ -255,12 +256,6 @@ namespace Azure.AI.Details.Common.CLI
             await DoInitServiceParts(interactive, part.Split(';').ToArray());
         }
 
-        private async Task DoInitResourceCommand()
-        {
-            var interactive = _values.GetOrDefault("init.service.interactive", true);
-            await DoInitServiceParts(interactive, "resource");
-        }
-
         private async Task DoInitStandaloneResources(bool interactive)
         {
             Console.WriteLine("  Standalone resources:");
@@ -336,7 +331,6 @@ namespace Azure.AI.Details.Common.CLI
                     "cognitiveservices-cognitiveservices-kind" => DoInitCognitiveServicesCognitiveServicesKind(interactive),
                     "openai" => DoInitOpenAi(interactive),
                     "search" => DoInitSearch(interactive),
-                    "resource" => DoInitHub(interactive),
 
                     _ => throw new ApplicationException($"WARNING: NOT YET IMPLEMENTED")
                 };
@@ -351,6 +345,18 @@ namespace Azure.AI.Details.Common.CLI
             SubscriptionToken.Data().Set(_values, subscriptionId);
         }
 
+        private async Task DoInitRootHubResource(bool interactive)
+        {
+            await DoInitSubscriptionId(interactive);
+            await DoInitHubResource(interactive);
+        }
+
+        private async Task DoInitHubResource(bool interactive)
+        {
+            var subscription = SubscriptionToken.Data().GetOrDefault(_values, "");
+            var aiHubResource = await AiSdkConsoleGui.PickOrCreateAiHubResource(_values, subscription);
+        }
+
         private async Task DoInitRootProject(bool interactive, bool allowCreate = true, bool allowPick = true)
         {
             await DoInitSubscriptionId(interactive);
@@ -361,13 +367,11 @@ namespace Azure.AI.Details.Common.CLI
         {
             if (allowCreate)
             {
-                await DoInitOpenAi(interactive, allowSkipDeployments);
-                await DoInitSearch(interactive);
-                await DoInitHub(interactive);
+                await DoInitHubResource(interactive);
             }
 
             var subscription = SubscriptionToken.Data().GetOrDefault(_values, "");
-            var resourceId = _values.GetOrDefault("service.resource.id", null);
+            var resourceId = ResourceIdToken.Data().GetOrDefault(_values, null);
             var groupName = ResourceGroupNameToken.Data().GetOrDefault(_values);
 
             var openAiEndpoint = _values.GetOrDefault("service.openai.endpoint", null);
@@ -404,6 +408,7 @@ namespace Azure.AI.Details.Common.CLI
             _values.Reset("service.openai.endpoint", resource.Endpoint);
             _values.Reset("service.openai.key", resource.Key);
             _values.Reset("service.openai.resource.id", resource.Id);
+            _values.Reset("service.openai.resource.kind", resource.Kind);
             ResourceNameToken.Data().Set(_values, resource.Name);
             ResourceGroupNameToken.Data().Set(_values, resource.Group);
         }
@@ -431,6 +436,7 @@ namespace Azure.AI.Details.Common.CLI
             _values.Reset("service.openai.endpoint", resource.Endpoint);
             _values.Reset("service.openai.key", resource.Key);
             _values.Reset("service.openai.resource.id", resource.Id);
+            _values.Reset("service.openai.resource.kind", resource.Kind);
             ResourceNameToken.Data().Set(_values, resource.Name);
             ResourceGroupNameToken.Data().Set(_values, resource.Group);
         }
@@ -501,18 +507,6 @@ namespace Azure.AI.Details.Common.CLI
             var resource = await AzCliConsoleGui.PickOrCreateAndConfigCognitiveServicesSpeechServicesKindResource(interactive, subscriptionId, regionFilter, groupFilter, resourceFilter, kind, sku, yes);
 
             SubscriptionToken.Data().Set(_values, subscriptionId);
-        }
-
-        private async Task DoInitHub(bool interactive)
-        {
-            var subscription = SubscriptionToken.Data().GetOrDefault(_values, "");
-            if (string.IsNullOrEmpty(subscription))
-            {
-                subscription = await AzCliConsoleGui.PickSubscriptionIdAsync(interactive, interactive);
-                _values.Reset("init.service.subscription", subscription);
-            }
-
-            var aiHubResource = await AiSdkConsoleGui.PickOrCreateAiHubResource(_values, subscription);
         }
 
         private void DisplayInitServiceBanner()
