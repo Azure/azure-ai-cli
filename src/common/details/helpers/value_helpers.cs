@@ -82,7 +82,7 @@ namespace Azure.AI.Details.Common.CLI
             // if that's not it, check the chat replacements
             if (str == null)
             {
-                var check = $"chat.replace.value.{name}";
+                var check = $"replace.var.{name}";
                 if (values.Contains(check))
                 {
                     str = values[check];

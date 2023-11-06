@@ -9,17 +9,19 @@ namespace Azure.AI.Details.Common.CLI
     {
         public override bool Parse(INamedValueTokens tokens, INamedValues values)
         {
+            if (_parser1.Parse(tokens, values)) return true;
+
             var prefix = tokens.NamePrefixRequired();
             if (string.IsNullOrEmpty(prefix)) return false;
 
             var skip = 0;
             var token0 = tokens.PeekNextToken(skip++);
-            if (token0 == prefix + "replace")
+            if (token0 == prefix + "foreach")
             {
                 var token1 = tokens.PeekNextToken(skip++);
-                if (token1 != "foreach") return false;
+                if (token1 != "var") return false;
             }
-            else if (token0 != prefix + "replace.foreach")
+            else if (token0 != prefix + "foreach.var")
             {
                 return false;
             }
@@ -50,23 +52,25 @@ namespace Azure.AI.Details.Common.CLI
         private IEnumerable<string> ParseReplaceForEachInFiles(INamedValueTokens tokens, INamedValues values, string name, int skip)
         {
             yield return "--foreach";
-            yield return $"replace.{name}";
+            yield return $"replace.var.{name}";
             yield return "in";
 
             var pattern = tokens.PeekNextToken(skip);
             var found = FileHelpers.FindFiles(pattern, values).ToList();
 
-            yield return string.Join(";", found);
+            var str = string.Join(";", found);
+            yield return str.Contains(';') ? str : $"{str};";
         }
 
         private IEnumerable<string> ParseReplaceForEachInSemiListOrAtFile(INamedValueTokens tokens, INamedValues values, string name, int v)
         {
             yield return "--foreach";
-            yield return $"replace.{name}";
+            yield return $"replace.var.{name}";
             yield return "in";
             yield return tokens.PeekNextToken(v);
         }
 
+        private NamedValueTokenParser _parser1 = new NamedValueTokenParser(null, "replace.var.*", "011;101", "1;0", null, null, "=");
         private ForEachTokenParser _forEachTokenParser = new();
     }
 }
