@@ -48,6 +48,9 @@ namespace Azure.AI.Details.Common.CLI
             if (text[i] != '{') throw new InvalidOperationException($"Interpolate() '{{' not found; pos={i}");
             i += 1; // skipping '{'
 
+            var expandAtFile = text[i] == '@';
+            if (expandAtFile) i++;
+
             var sb = new StringBuilder();
 
             while (i < text.Length && text[i] != '}')
@@ -73,19 +76,44 @@ namespace Azure.AI.Details.Common.CLI
 
             var name = sb.ToString();
 
+            // check if name is a well known escape sequence, like \n, \t, etc.
+            if (name.Length == 2 && name[0] == '\\' && name[1] == 't') return "\t";
+            if (name.Length == 2 && name[0] == '\\' && name[1] == 'r') return "\r";
+            if (name.Length == 2 && name[0] == '\\' && name[1] == 'n') return "\n";
+
+            // next, try to get it from the values
             var str = values[name];
-            if (str != null) return str;
 
-            var check = $"chat.replace.value.{name}";
-            if (values.Contains(check)) return values[check];
-
-            if (values.Names.Any(x => x.StartsWith($"{check}=")))
+            // if that's not it, check the chat replacements
+            if (str == null)
             {
-                str = values.Names.Where(x => x.StartsWith($"{check}=")).First();
-                return str.Substring(check.Length + 1);
+                var check = $"replace.var.{name}";
+                if (values.Contains(check))
+                {
+                    str = values[check];
+                }
+                else if (values.Names.Any(x => x.StartsWith($"{check}=")))
+                {
+                    str = values.Names.Where(x => x.StartsWith($"{check}=")).First();
+                    str = str.Substring(check.Length + 1);
+                }
+            }
+          
+            if (str == null && !expandAtFile)
+            {
+                return deleteUnresolved ? string.Empty : $"{{{name}}}";
+            }
+            else if (str == null && expandAtFile)
+            {
+                str = name;
             }
 
-            return deleteUnresolved ? string.Empty : $"{{{name}}}";
+            if (Program.Debug)
+            {
+                Console.WriteLine($"*** REPLACED: '{name}' => {str}");
+            }
+
+            return expandAtFile ? FileHelpers.ExpandAtFileValue($"@{str}", values) : str;
         }
     }
 }

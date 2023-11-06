@@ -59,6 +59,7 @@ namespace Azure.AI.Details.Common.CLI
         public static string ReplaceValues(this string s, INamedValues values)
         {
             if (s == null || !s.Contains("{") || !s.Contains("}")) return s;
+            if (values is ICommandValues) return s.ReplaceValues(values as ICommandValues);
 
             StringBuilder sb = new StringBuilder();
             for (int i = 0; i < s.Length; i++)
