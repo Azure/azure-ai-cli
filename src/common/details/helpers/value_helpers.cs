@@ -103,6 +103,11 @@ namespace Azure.AI.Details.Common.CLI
                 str = name;
             }
 
+            if (Program.Debug)
+            {
+                Console.WriteLine($"*** REPLACED: '{name}' => {str}");
+            }
+
             return expandAtFile ? FileHelpers.ExpandAtFileValue($"@{str}", values) : str;
         }
     }
