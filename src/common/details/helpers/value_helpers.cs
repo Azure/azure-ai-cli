@@ -76,7 +76,12 @@ namespace Azure.AI.Details.Common.CLI
 
             var name = sb.ToString();
 
-            // first try to get it from the values
+            // check if name is a well known escape sequence, like \n, \t, etc.
+            if (name.Length == 2 && name[0] == '\\' && name[1] == 't') return "\t";
+            if (name.Length == 2 && name[0] == '\\' && name[1] == 'r') return "\r";
+            if (name.Length == 2 && name[0] == '\\' && name[1] == 'n') return "\n";
+
+            // next, try to get it from the values
             var str = values[name];
 
             // if that's not it, check the chat replacements
