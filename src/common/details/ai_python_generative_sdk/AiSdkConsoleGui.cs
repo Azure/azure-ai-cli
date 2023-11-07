@@ -127,7 +127,13 @@ namespace Azure.AI.Details.Common.CLI
             var responseOpenAiOk = !string.IsNullOrEmpty(responseOpenAi.Output.StdOutput) && string.IsNullOrEmpty(responseOpenAi.Output.StdError);
             if (!responseOpenAiOk) return null;
 
-            var matchOpenAiEndpoint = responseOpenAi.Payload.Where(x => x.Endpoint == openaiEndpoint).ToList();
+            Func<string, string, bool> match = (a, b) => {
+                return a == b ||
+                    a.Replace(".openai.azure.com/", ".cognitiveservices.azure.com/") == b ||
+                    b.Replace(".openai.azure.com/", ".cognitiveservices.azure.com/") == a;
+            };
+
+            var matchOpenAiEndpoint = responseOpenAi.Payload.Where(x => match(x.Endpoint, openaiEndpoint)).ToList();
             if (matchOpenAiEndpoint.Count() != 1) return null;
 
             return matchOpenAiEndpoint.First();
