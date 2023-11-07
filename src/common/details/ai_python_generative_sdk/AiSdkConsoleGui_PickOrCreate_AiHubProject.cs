@@ -213,7 +213,7 @@ namespace Azure.AI.Details.Common.CLI
             {
                 if (connectionCount > 0) Console.WriteLine();
 
-                var connectionName = "Default_AzureAISearch";
+                var connectionName = "AzureAISearch";
                 Console.WriteLine($"Connection: {connectionName}");
 
                 Console.Write(createSearchConnection ? "*** CREATING ***" : "*** CHECKING ***");
