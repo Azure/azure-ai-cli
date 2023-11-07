@@ -31,26 +31,6 @@ USAGE: ai index update [...]
     --files FILEs                           (see: ai help search index files)
     --external-source                       (see: ai help search index external source)
 
-;  ITEM
-;    --id ID                                 (see: ai help search index id)
-;    --metadata METADATA                     (see: ai help search index metadata)
-;    --description DESCRIPTION               (see: ai help search index description)
-
-;  CHROMA
-;    --chroma-endpoint ENDPOINT             (see: ai help chroma endpoint)
-
-;  PINECONE
-;    --pinecone-environment ENVIRONMENT     (see: ai help pinecone environment)
-;    --pinecone-api-key KEY                 (see: ai help pinecone api key)
-
-;  QDRANT
-;    --qdrant-endpoint ENDPOINT             (see: ai help qdrant endpoint)
-;    --qdrant-vector-size size              (see: ai help qdrant vector size)
-
-;  WEAVIATE
-;    --weaviate-endpoint ENDPOINT           (see: ai help weaviate endpoint)
-;    --weaviate-api-key KEY                 (see: ai help weaviate api key)
-
 EXAMPLE
 
   ai search index update --index-name product-info --files "*.md" --blob-container https://crbn.blob.core.windows.net/product-info
