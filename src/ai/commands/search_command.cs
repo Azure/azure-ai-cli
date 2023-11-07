@@ -109,9 +109,12 @@ namespace Azure.AI.Details.Common.CLI
                 var embeddingsApiKey = DemandEmbeddingsApiKey(action, command);
                 var embeddingModelDeployment = SearchEmbeddingModelDeploymentNameToken.Data().Demand(_values, action, command, checkConfig: "embedding.model.deployment.name");
                 var dataSourceConnectionName = SearchIndexerDataSourceConnectionNameToken.Data().GetOrDefault(_values, "datasource");
-                var vectorFieldName = VectorFieldNameToken.Data().GetOrDefault(_values, "contentVector");
 
-                output = DoIndexUpdateWithAISearch(aiServicesApiKey, searchEndpoint, searchApiKey, embeddingsEndpoint, embeddingModelDeployment, embeddingsApiKey, searchIndexName, dataSourceConnectionName, blobContainer, pattern, vectorFieldName).Result;
+                var idFieldName = IndexIdFieldNameToken.Data().GetOrDefault(_values, "id");
+                var contentFieldName = IndexContentFieldNameToken.Data().GetOrDefault(_values, "content");
+                var vectorFieldName = IndexVectorFieldNameToken.Data().GetOrDefault(_values, "contentVector");
+
+                output = DoIndexUpdateWithAISearch(aiServicesApiKey, searchEndpoint, searchApiKey, embeddingsEndpoint, embeddingModelDeployment, embeddingsApiKey, searchIndexName, dataSourceConnectionName, blobContainer, pattern, idFieldName, contentFieldName, vectorFieldName).Result;
             }
             else if (useSK)
             {
@@ -159,14 +162,14 @@ namespace Azure.AI.Details.Common.CLI
             return PythonSDKWrapper.UpdateMLIndex(_values, subscription, groupName, projectName, indexName, embeddingModelDeployment, embeddingModelName, dataFiles, externalSourceUrl);
         }
 
-        private async Task<string> DoIndexUpdateWithAISearch(string aiServicesApiKey, string searchEndpoint, string searchApiKey, string embeddingsEndpoint, string embeddingsDeployment, string embeddingsApiKey, string searchIndexName, string dataSourceConnectionName, string blobContainer, string pattern, string vectorFieldName)
+        private async Task<string> DoIndexUpdateWithAISearch(string aiServicesApiKey, string searchEndpoint, string searchApiKey, string embeddingsEndpoint, string embeddingsDeployment, string embeddingsApiKey, string searchIndexName, string dataSourceConnectionName, string blobContainer, string pattern, string idFieldName, string contentFieldName, string vectorFieldName)
         {
             var (connectionString, containerName) = await UploadFilesToBlobContainer(blobContainer, pattern);
 
             Console.WriteLine("Connecting to Search ...");
-            var datasourceIndex = PrepGetSearchIndex(embeddingsEndpoint, embeddingsDeployment, embeddingsApiKey, searchIndexName, vectorFieldName);
+            var datasourceIndex = PrepGetSearchIndex(embeddingsEndpoint, embeddingsDeployment, embeddingsApiKey, searchIndexName, idFieldName, contentFieldName, vectorFieldName);
             var dataSource = PrepGetDataSourceConnection(dataSourceConnectionName, connectionString, containerName);
-            var skillset = PrepGetSkillset(aiServicesApiKey, embeddingsEndpoint, embeddingsDeployment, embeddingsApiKey, vectorFieldName, datasourceIndex);
+            var skillset = PrepGetSkillset(aiServicesApiKey, embeddingsEndpoint, embeddingsDeployment, embeddingsApiKey, idFieldName, contentFieldName, vectorFieldName, datasourceIndex);
             var indexer = PrepGetIndexer(datasourceIndex, dataSource, skillset);
 
             Uri endpoint = new Uri(searchEndpoint);
@@ -306,15 +309,15 @@ namespace Azure.AI.Details.Common.CLI
             return $"BlobEndpoint={endpoint};SharedAccessSignature={sasToken}";
         }
 
-        private static SearchIndex PrepGetSearchIndex(string embeddingsEndpoint, string embeddingsDeployment, string embeddingsApiKey, string searchIndexName, string vectorFieldName)
+        private static SearchIndex PrepGetSearchIndex(string embeddingsEndpoint, string embeddingsDeployment, string embeddingsApiKey, string searchIndexName, string idFieldName, string contentFieldName, string vectorFieldName)
         {
             SearchIndex datasourceIndex = new(searchIndexName)
             {
                 Fields =
                     {
                         new SearchableField("ChunkKey") { IsKey = true, AnalyzerName = LexicalAnalyzerName.Keyword },
-                        new SearchableField("ParentKey") { IsFilterable = true},
-                        new SearchableField("page"),
+                        new SearchableField(idFieldName) { IsFilterable = true},
+                        new SearchableField(contentFieldName),
                         new SearchField(vectorFieldName, SearchFieldDataType.Collection(SearchFieldDataType.Single))
                         {
                             IsSearchable = true,
@@ -362,7 +365,7 @@ namespace Azure.AI.Details.Common.CLI
                     new SearchIndexerDataContainer(dataSourceContainerName));
         }
 
-        private static SearchIndexerSkillset PrepGetSkillset(string aiServicesApiKey, string embeddingsEndpoint, string embeddingsDeployment, string embeddingsApiKey, string vectorFieldName, SearchIndex datasourceIndex)
+        private static SearchIndexerSkillset PrepGetSkillset(string aiServicesApiKey, string embeddingsEndpoint, string embeddingsDeployment, string embeddingsApiKey, string idFieldName, string contentFieldName, string vectorFieldName, SearchIndex datasourceIndex)
         {
             var useOcr = true;
 
@@ -429,10 +432,10 @@ namespace Azure.AI.Details.Common.CLI
                 new List<SearchIndexerIndexProjectionSelector> {
                     new SearchIndexerIndexProjectionSelector(
                         datasourceIndex.Name,
-                        "ParentKey",
+                        idFieldName,
                         "/document/pages/*",
                         new List<InputFieldMappingEntry> {
-                            new InputFieldMappingEntry("page") { Source = "/document/pages/*" },
+                            new InputFieldMappingEntry(contentFieldName) { Source = "/document/pages/*" },
                             new InputFieldMappingEntry(vectorFieldName) { Source = "/document/pages/*/vector" }
                 })}) {
                     Parameters = new SearchIndexerIndexProjectionsParameters() { ProjectionMode = IndexProjectionMode.SkipIndexingParentDocuments }
