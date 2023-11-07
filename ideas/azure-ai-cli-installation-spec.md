@@ -42,7 +42,7 @@ Customer Requirements:
 - Support Debian 10, 11, and 12, and Ubunutu 20.04 and 22.04
 - Uses VS Code base images (e.g. `mcr.microsoft.com/devcontainers/base:bookworm`)
 - Tagged similarly to VS Code base images (e.g. `${REGISTRY}/azure-ai-cli:bookworm`)
-- Tagged with versions as well (e.g. `${REGISTRY}/azure-ai-cli:bookworm-1.0.0-alpha1102.4`)
+- Tagged with versions as well (e.g. `${REGISTRY}/azure-ai-cli:bookworm-1.0.0-alpha1107.1`)
 - `${REGISTRY}` is currently `acrbn.azurecr.io`
 - `${REGISTRY}` likely (???) should be `mcr.microsoft.com`
 - `latest` tag points to `${REGISTRY}/azure-ai-cli:bookworm`
