@@ -23,6 +23,7 @@ namespace Azure.AI.Details.Common.CLI
             ("flow.new", true),
             ("flow.invoke", true),
             ("flow.serve", true),
+            ("flow.upload", true),
             ("flow.package", true),
             ("flow.deploy", true),
         };
@@ -40,6 +41,7 @@ namespace Azure.AI.Details.Common.CLI
                 case "flow.new": return _flowNewParsers;
                 case "flow.invoke": return _flowInvokeParsers;
                 case "flow.deploy": return _flowDeployParsers;
+                case "flow.upload": return _flowUploadParsers;
                 case "flow.package": return _flowPackageParsers;
                 case "flow.serve": return _flowServeParsers;
             }
@@ -98,6 +100,15 @@ namespace Azure.AI.Details.Common.CLI
             new CommonFlowNamedValueTokenParsers(),
             FlowNameToken.Parser()
         };
+
+        private static INamedValueTokenParser[] _flowUploadParsers = {
+            new CommonFlowNamedValueTokenParsers(),
+            SubscriptionToken.Parser(),
+            ResourceGroupNameToken.Parser(),
+            ProjectNameToken.Parser(),
+            FlowNameToken.Parser(),
+        };
+
 
         private static INamedValueTokenParser[] _flowPackageParsers = {
             new CommonFlowNamedValueTokenParsers(),
