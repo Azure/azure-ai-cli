@@ -54,7 +54,7 @@ def search_index_update(
 
     openaiConnection = client.get_default_aoai_connection()
     openaiConnection.set_current_environment()
-    searchConnection = client.connections.get("Default_AzureAISearch")
+    searchConnection = client.connections.get("AzureAISearch")
     searchConnection.set_current_environment()
 
     # data_files is a string that specifies one of the following three things:

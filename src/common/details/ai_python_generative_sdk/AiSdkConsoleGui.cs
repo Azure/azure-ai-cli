@@ -135,7 +135,7 @@ namespace Azure.AI.Details.Common.CLI
 
         private static async Task<AzCli.CognitiveSearchResourceInfo?> FindAndVerifySearchResourceConnection(string subscription, JArray connections)
         {
-            var searchConnection = connections.FirstOrDefault(x => x["name"].ToString().Contains("Default_AzureAISearch") && x["type"].ToString() == "cognitive_search");
+            var searchConnection = connections.FirstOrDefault(x => x["name"].ToString().Contains("AzureAISearch") && x["type"].ToString() == "cognitive_search");
             if (searchConnection == null) return null;
 
             var searchEndpoint = searchConnection?["target"].ToString();
