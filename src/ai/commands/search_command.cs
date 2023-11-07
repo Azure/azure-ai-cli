@@ -109,7 +109,7 @@ namespace Azure.AI.Details.Common.CLI
                 var embeddingsApiKey = DemandEmbeddingsApiKey(action, command);
                 var embeddingModelDeployment = SearchEmbeddingModelDeploymentNameToken.Data().Demand(_values, action, command, checkConfig: "embedding.model.deployment.name");
                 var dataSourceConnectionName = SearchIndexerDataSourceConnectionNameToken.Data().GetOrDefault(_values, "datasource");
-                var vectorFieldName = VectorFieldNameToken.Data().GetOrDefault(_values, "Embedding");
+                var vectorFieldName = VectorFieldNameToken.Data().GetOrDefault(_values, "contentVector");
 
                 output = DoIndexUpdateWithAISearch(aiServicesApiKey, searchEndpoint, searchApiKey, embeddingsEndpoint, embeddingModelDeployment, embeddingsApiKey, searchIndexName, dataSourceConnectionName, blobContainer, pattern, vectorFieldName).Result;
             }
