@@ -45,13 +45,14 @@ namespace Azure.AI.Details.Common.CLI
 
         private async Task DoCommand(string command)
         {
-            CheckPath();
+            StartCommand();
 
             switch (command)
             {
                 case "flow.new": await DoNewFlow(); break;
                 case "flow.invoke": await DoInvokeFlow(); break;
                 case "flow.serve": await DoServeFlow(); break;
+                case "flow.upload": await DoUploadFlow(); break;
                 case "flow.package": await DoPackageFlow(); break;
                 // case "flow.deploy": await DoDeployFlow(); break;
 
@@ -59,6 +60,10 @@ namespace Azure.AI.Details.Common.CLI
                     _values.AddThrowError("WARNING:", $"'{command.Replace('.', ' ')}' NOT YET IMPLEMENTED!!");
                     break;
             }
+
+            StopCommand();
+            DisposeAfterStop();
+            DeleteTemporaryFiles();
         }
 
         private async Task DoNewFlow()
@@ -66,18 +71,12 @@ namespace Azure.AI.Details.Common.CLI
             var action = "Creating flow";
             var command = "flow new";
 
-            StartCommand();
-
             var flow = FlowNameToken.Data().Demand(_values, action, command);
             var prompt = SystemPromptTemplateToken.Data().GetOrDefault(_values);
             var function = FunctionToken.Data().GetOrDefault(_values, "");
             SplitFunctionReference(function, out var module, out function);
 
             await DoFlowInitConsoleGui(flow, prompt, function, module);
-
-            StopCommand();
-            DisposeAfterStop();
-            DeleteTemporaryFiles();
         }
 
         private async Task DoInvokeFlow()
@@ -85,18 +84,12 @@ namespace Azure.AI.Details.Common.CLI
             var action = "Invoking flow";
             var command = "flow invoke";
 
-            StartCommand();
-
             var flowName = FlowNameToken.Data().Demand(_values, action, command);
             var nodeName = FlowNodeToken.Data().GetOrDefault(_values);
             var inputs = string.Join(" ", InputWildcardToken.GetNames(_values)
                 .Select(name => $"{name}={InputWildcardToken.Data(name).GetOrDefault(_values)}"));
 
             await DoFlowTestConsoleGui(flowName, inputs, nodeName);
-            
-            StopCommand();
-            DisposeAfterStop();
-            DeleteTemporaryFiles();
         }
 
         private async Task DoServeFlow()
@@ -104,18 +97,25 @@ namespace Azure.AI.Details.Common.CLI
             var action = "Serving flow";
             var command = "flow serve";
 
-            StartCommand();
-
             var flowName = FlowNameToken.Data().Demand(_values, action, command);
             var port = PortToken.Data().GetOrDefault(_values);
             var host = HostToken.Data().GetOrDefault(_values);
             var env = EnvironmentVariablesToken.Data().GetOrDefault(_values);
 
             await DoFlowServeConsoleGui(flowName, port, host, env);
+        }
 
-            StopCommand();
-            DisposeAfterStop();
-            DeleteTemporaryFiles();
+        private async Task DoUploadFlow()
+        {
+            var action = "Uploading flow";
+            var command = "flow upload";
+
+            var flowName = FlowNameToken.Data().Demand(_values, action, command);
+            var subscription = SubscriptionToken.Data().Demand(_values, action, command, "subscription");
+            var resourceGroup = ResourceGroupNameToken.Data().Demand(_values, action, command, "group");
+            var projectName = ProjectNameToken.Data().Demand(_values, action, command, "project");
+
+            await DoFlowUpload(subscription, resourceGroup, projectName, flowName);
         }
 
         private async Task DoPackageFlow()
@@ -123,16 +123,10 @@ namespace Azure.AI.Details.Common.CLI
             var action = "Packaging flow";
             var command = "flow package";
 
-            StartCommand();
-
             var flowName = FlowNameToken.Data().Demand(_values, action, command);
             var dockerBuildContext = DockerBuildContextToken.Data().Demand(_values, action, command);
 
             await DoFlowBuild(flowName, dockerBuildContext, "docker");
-
-            StopCommand();
-            DisposeAfterStop();
-            DeleteTemporaryFiles();
         }
 
         private async Task DoFlowInitConsoleGui(string flow, string prompt, string function, string module)
@@ -160,6 +154,11 @@ namespace Azure.AI.Details.Common.CLI
             {
                 _values.AddThrowError("ERROR:", response.StdError);
             }
+        }
+
+        private Task DoFlowUpload(string subscription, string resourceGroup, string projectName, string flowName)
+        {
+            return PfCli.FlowUpload(subscription, resourceGroup, projectName, flowName);
         }
 
         private async Task DoFlowBuild(string flowName, string dockerBuildContext, string format)

@@ -45,6 +45,18 @@ namespace Azure.AI.Details.Common.CLI
             return await ProcessHelpers.RunShellCommandAsync("pf", $"{cmdPart} {argsPart}", null, StdOutputHandler(), StandardErrorHandler());
         }
 
+        public static Task FlowUpload(string subscription, string resourceGroup, string projectName, string flowName)
+        {
+            var cmdPart = "flow create";
+            var argsPart = CliHelpers.BuildCliArgs(
+                "--subscription", subscription,
+                "--resource-group", resourceGroup,
+                "--workspace-name", projectName,
+                "--flow", flowName);
+
+            return ProcessHelpers.RunShellCommandAsync("pfazure", $"{cmdPart} {argsPart}", null, StdOutputHandler(), StandardErrorHandler());
+        }
+
         public static async Task<ProcessOutput> FlowBuild(string flowPath, string output, string format, string variant = null, bool verbose = false, bool debug = false)
         {
             var cmdPart = "flow build";
