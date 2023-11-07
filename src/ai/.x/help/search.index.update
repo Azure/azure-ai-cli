@@ -18,6 +18,8 @@ USAGE: ai index update [...]
   AZURE SEARCH DATA SOURCE
     --data-source-connection NAME           (see: ai help search data source connection)
     --blob-container ENDPOINT/NAME          (see: ai help search data source blob container)
+    --id-field NAME                         (see: ai help search id field name)
+    --content-field NAME                    (see: ai help search content field name)
     --vector-field NAME                     (see: ai help search vector field name)
 
   OPENAI EMBEDDINGS
@@ -48,3 +50,12 @@ USAGE: ai index update [...]
 ;  WEAVIATE
 ;    --weaviate-endpoint ENDPOINT           (see: ai help weaviate endpoint)
 ;    --weaviate-api-key KEY                 (see: ai help weaviate api key)
+
+EXAMPLE
+
+  ai search index update --index-name product-info --files "*.md" --blob-container https://crbn.blob.core.windows.net/product-info
+
+SEE ALSO
+
+  ai help search index examples
+  ai help find topics search index
