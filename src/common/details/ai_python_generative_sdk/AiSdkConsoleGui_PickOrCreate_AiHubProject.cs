@@ -196,13 +196,20 @@ namespace Azure.AI.Details.Common.CLI
                     var parsed = !string.IsNullOrEmpty(connectionJson) ? JToken.Parse(connectionJson) : null;
                     var connection = parsed?.Type == JTokenType.Object ? parsed?["connection"] : null;
                     var target = connection?.Type == JTokenType.Object ? connection?["target"]?.ToString() : null;
-                    message = string.IsNullOrEmpty(target)
-                        ? $"\r*** WARNING: {connectionName} not connection found ***  "
-                        : string.IsNullOrEmpty(openAiEndpoint)
-                            ? $"\r*** FOUND: {connectionName} found ***  "
-                            : target != openAiEndpoint
-                                ? $"\r*** WARNING: {connectionName} found but target is {target} ***  "
-                                : $"\r*** MATCHED: {connectionName} ***  ";
+
+                    var endpointOk = !string.IsNullOrEmpty(openAiEndpoint);
+                    var targetOk = !string.IsNullOrEmpty(target);
+                    var targetMatch = targetOk && endpointOk &&
+                        (target == openAiEndpoint ||
+                         target.Replace(".openai.azure.com/", ".cognitiveservices.azure.com/") == openAiEndpoint);
+
+                    message = !targetOk ?
+                        $"\r*** WARNING: {connectionName} not connection found ***  "
+                        : !endpointOk 
+                        ? $"\r*** FOUND: {connectionName} found ***  "
+                        : !targetMatch
+                            ? $"\r*** WARNING: {connectionName} found but target is {target} ***  "
+                            : $"\r*** MATCHED: {connectionName} ***  ";
                 }
 
                 Console.WriteLine(message);
@@ -229,11 +236,16 @@ namespace Azure.AI.Details.Common.CLI
                     var parsed = !string.IsNullOrEmpty(connectionJson) ? JToken.Parse(connectionJson) : null;
                     var connection = parsed?.Type == JTokenType.Object ? parsed?["connection"] : null;
                     var target = connection?.Type == JTokenType.Object ? connection?["target"]?.ToString() : null;
-                    message = string.IsNullOrEmpty(target)
+
+                    var targetOk = !string.IsNullOrEmpty(target);
+                    var endpointOk = !string.IsNullOrEmpty(searchEndpoint);
+                    var targetMatch = targetOk && endpointOk && target == searchEndpoint;
+
+                    message = !targetOk
                         ? $"\r*** WARNING: {connectionName} not connection found ***  "
-                        : string.IsNullOrEmpty(searchEndpoint)
+                        : !endpointOk
                             ? $"\r*** FOUND: {connectionName} found ***  "
-                            : target != searchEndpoint
+                            : !targetMatch
                                 ? $"\r*** WARNING: {connectionName} found but target is {target} ***  "
                                 : $"\r*** MATCHED: {connectionName} ***  ";
                 }
