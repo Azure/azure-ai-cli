@@ -47,7 +47,12 @@ namespace Azure.AI.Details.Common.CLI.ConsoleGui
         {
             if (_speedSearchBox == null)
             {
-                _speedSearchBox = new EditBoxControl(this, new Rect(0, -1, Width - 2, 1), ColorHelpers.GetHighlightColors(Colors.Foreground, Colors.Background), "", Width, null, null);
+                var tooSmall = this.Height < 3;
+                var rect = tooSmall
+                    ? new Rect(0, 0, Width - 2, 0)
+                    : new Rect(0, -1, Width - 2, 1);
+
+                _speedSearchBox = new EditBoxControl(this, rect, ColorHelpers.GetHighlightColors(Colors.Foreground, Colors.Background), "", Width, null, null);
                 _speedSearchBox.Open();
 
                 DisplaySpeedSearchToolTip();
@@ -86,7 +91,7 @@ namespace Azure.AI.Details.Common.CLI.ConsoleGui
         protected void DisplaySpeedSearchToolTip()
         {
             var tooltip = GetSpeedSearchTooltip();
-            if (tooltip.Length > ClientRect.Width) return;
+            if (tooltip.Length > ClientRect.Width || Height < 3) return;
 
             WriteText(ColorHelpers.GetHighlightColors(), ColumnOffset + ClientRect.Width - tooltip.Length + 1, RowOffset + ClientRect.Height + 1, tooltip);
         }
