@@ -17,6 +17,11 @@ namespace Azure.AI.Details.Common.CLI.ConsoleGui
 
         public Screen()
         {
+            var env = Environment.GetEnvironmentVariable("AI_MAX_LINES");
+            if (!string.IsNullOrEmpty(env) && int.TryParse(env, out var maxLines))
+            {
+                _initialHeight = maxLines;
+            }
         }
 
         #region cursor and colors
