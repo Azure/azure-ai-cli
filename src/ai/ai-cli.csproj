@@ -90,17 +90,12 @@
     <PackageReference Include="Microsoft.SemanticKernel.Connectors.Memory.AzureCognitiveSearch" Version="0.18.230725.3-preview" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
     <PackageReference Include="System.Interactive.Async" Version="6.0.1" />
+    <PackageReference Include="Azure.AI.OpenAI" Version="1.0.0-beta.7" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\common\common.csproj" />
   </ItemGroup>
-
-  <!-- <ItemGroup>
-    <ProjectReference Include="..\..\..\..\..\semantic-kernel\dotnet\src\Connectors\Connectors.AI.OpenAI\Connectors.AI.OpenAI.csproj" />
-    <ProjectReference Include="..\..\..\..\..\semantic-kernel\dotnet\src\Connectors\Connectors.Memory.AzureCognitiveSearch\Connectors.Memory.AzureCognitiveSearch.csproj" />
-    <ProjectReference Include="..\..\..\..\..\semantic-kernel\dotnet\src\SemanticKernel\SemanticKernel.csproj" />
-  </ItemGroup> -->
 
   <Import Project="BuildCommon.targets" />
 
