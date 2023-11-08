@@ -13,5 +13,9 @@ namespace Azure.AI.Details.Common.CLI
             return Environment.GetEnvironmentVariable("ANDROID_ROOT") != null &&
                 Environment.GetEnvironmentVariable("ANDROID_DATA") != null;
         }
+        public static bool IsCodeSpaces()
+        {
+            return Environment.GetEnvironmentVariable("CODESPACES") == "true";
+        }
     }
 }
