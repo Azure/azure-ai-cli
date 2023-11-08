@@ -77,17 +77,22 @@ namespace Azure.AI.Details.Common.CLI
                     ConsoleHelpers.WriteError("*** WARNING: `az login` required ***");
                     Console.Write(" ");
 
-                    var choices = new string[] {
-                        "LAUNCH: `az login` (interactive browser)",
+                    var selection = 0;
+                    var choices = new List<string>() {
                         "LAUNCH: `az login` (interactive device code)",
                         "CANCEL: `az login ...` (non-interactive)",
                     };
 
-                    var selection = OS.IsLinux() ? 1 : 0;
-                    var picked = ListBoxPicker.PickIndexOf(choices, selection);
+                    if (!OS.IsCodeSpaces())
+                    {
+                        choices.Insert(0, "LAUNCH: `az login` (interactive browser)");
+                        selection = OS.IsWindows() ? 0 : 1;
+                    }
 
-                    cancelLogin = (picked < 0 || picked == 2);
-                    useDeviceCode = (picked == 1);
+                    var picked = ListBoxPicker.PickIndexOf(choices.ToArray(), selection);
+
+                    cancelLogin = picked < 0 || picked == choices.Count() - 1;
+                    useDeviceCode = picked == choices.Count() - 2;
                 }
 
                 if (cancelLogin)
