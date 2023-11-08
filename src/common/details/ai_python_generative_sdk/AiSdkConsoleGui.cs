@@ -34,56 +34,6 @@ namespace Azure.AI.Details.Common.CLI
 
     public partial class AiSdkConsoleGui
     {
-        public static async Task<(string openAiEndpoint, string openAiKey, string searchEndpoint, string searchKey, bool createdOrPickedSearch)> EnsureResourceConnections(
-            bool allowSkipDeployments,
-            bool allowSkipSearch,
-            ICommandValues values,
-            string subscription,
-            string projectName,
-            string projectGroup)
-        {
-            var openAiEndpoint = string.Empty;
-            var openAiKey = string.Empty;
-            var searchEndpoint = string.Empty;
-            var searchKey = string.Empty;
-            var createdOrPickedSearch = false;
-
-            var (hubName, openai, search) = await VerifyResourceConnections(values, subscription, projectGroup, projectName);
-
-            if (!string.IsNullOrEmpty(openai?.Name))
-            {
-                var (chatDeployment, embeddingsDeployment, evaluationDeployment, keys) = await AzCliConsoleGui.PickOrCreateAndConfigCognitiveServicesOpenAiKindResourceDeployments("AZURE OPENAI RESOURCE", true, allowSkipDeployments, subscription, openai.Value);
-                openAiEndpoint = openai.Value.Endpoint;
-                openAiKey = keys.Key1;
-            }
-            else
-            {
-                var openAiResource = await AzCliConsoleGui.PickOrCreateAndConfigCognitiveServicesOpenAiKindResource(true, allowSkipDeployments, subscription);
-                openAiEndpoint = openAiResource.Endpoint;
-                openAiKey = openAiResource.Key;
-            }
-
-            if (!string.IsNullOrEmpty(search?.Name))
-            {
-                var keys = await AzCliConsoleGui.LoadSearchResourceKeys(subscription, search.Value);
-                ConfigSetHelpers.ConfigSearchResource(search.Value.Endpoint, keys.Key1);
-                searchEndpoint = search.Value.Endpoint;
-                searchKey = keys.Key1;
-            }
-            else
-            {
-                var pickedOrCreated = await AzCliConsoleGui.PickOrCreateAndConfigCogSearchResource(allowSkipSearch, subscription, null, null, projectName, "aiproj");
-                createdOrPickedSearch = pickedOrCreated != null;
-                if (createdOrPickedSearch)
-                {
-                    searchEndpoint = pickedOrCreated.Value.Endpoint;
-                    searchKey = pickedOrCreated.Value.Key;
-                }
-            }
-
-            return (openAiEndpoint, openAiKey, searchEndpoint, searchKey, createdOrPickedSearch);
-        }
-
         public static async Task<(string, AzCli.CognitiveServicesResourceInfo?, AzCli.CognitiveSearchResourceInfo?)> VerifyResourceConnections(ICommandValues values, string subscription, string groupName, string projectName)
         {
             try
