@@ -84,6 +84,7 @@ namespace Azure.AI.Details.Common.CLI
                 var yes = values.GetOrDefault("init.service.cognitiveservices.terms.agree", false);
 
                 var openAiResource = await AzCliConsoleGui.PickOrCreateAndConfigCognitiveServicesOpenAiKindResource(true, true, subscription, regionFilter, groupFilter, resourceFilter, kind, sku, yes);
+                values.Reset("service.openai.deployments.picked", "true");
 
                 ResourceGroupNameToken.Data().Set(values, openAiResource.Group);
                 values.Reset("service.resource.region.name", openAiResource.RegionLocation);
