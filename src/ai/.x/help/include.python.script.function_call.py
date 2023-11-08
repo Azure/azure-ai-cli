@@ -8,17 +8,31 @@ import sys
 from typing import Any, List, Dict, Generator
 
 async def ensure_and_strip_module_path(module_path) -> str:
-    module_path = os.path.join(os.getcwd(), module_path)
+    cwd = os.getcwd()
+    module_path = os.path.join(cwd, module_path)
     module_name = os.path.basename(module_path)
 
     print("current working directory: " + os.getcwd())
 
     if os.path.exists(module_path + ".py"):
         module_dirname = os.path.dirname(module_path)
+
+        # Add the module_dirname to sys.path
         if module_dirname not in sys.path:
             sys.path.append(module_dirname)
+
+        # Add all directories between cwd and module_dirname to sys.path
+        common_path = os.path.commonpath([cwd, module_dirname])
+        subdirectories = os.path.relpath(module_dirname, common_path).split(os.path.sep)
+        for subdir in subdirectories:
+            common_path = os.path.join(common_path, subdir)
+            if common_path not in sys.path:
+                sys.path.append(common_path)
+
+        # Also, add cwd to sys.path if it's not already there
         if os.getcwd() not in sys.path:
             sys.path.append(os.getcwd())
+
         return module_name
 
     raise ModuleNotFoundError("Module not found: " + module_path)
