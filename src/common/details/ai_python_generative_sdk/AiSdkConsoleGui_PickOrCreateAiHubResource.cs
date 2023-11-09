@@ -61,6 +61,11 @@ namespace Azure.AI.Details.Common.CLI
                 choices.Insert(1, "(Create w/ standalone Open AI resource)");
             }
 
+            if (choices.Count == 0)
+            {
+                throw new ApplicationException($"CANCELED: No resources found");
+            }
+
             Console.Write("\rName: ");
             var picked = ListBoxPicker.PickIndexOf(choices.ToArray());
             if (picked < 0)
