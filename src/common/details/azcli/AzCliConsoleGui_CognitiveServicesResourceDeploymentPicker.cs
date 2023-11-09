@@ -50,8 +50,13 @@ namespace Azure.AI.Details.Common.CLI
                 throw new ApplicationException($"ERROR: Loading deployments:\n{response.Output.StdError}");
             }
 
+            var lookForChatCompletionCapable = deploymentExtra.ToLower() == "chat" || deploymentExtra.ToLower() == "evaluation";
+            var lookForEmbeddingCapable = deploymentExtra.ToLower() == "embeddings";
+
             var deployments = response.Payload
                 .Where(x => MatchDeploymentFilter(x, deploymentFilter))
+                .Where(x => !lookForChatCompletionCapable || x.ChatCompletionCapable)
+                .Where(x => !lookForEmbeddingCapable || x.EmbeddingsCapable)
                 .OrderBy(x => x.Name)
                 .ToList();
 
@@ -110,7 +115,15 @@ namespace Azure.AI.Details.Common.CLI
             Console.Write("\rModel: *** Loading choices ***");
             var models = await AzCli.ListCognitiveServicesModels(subscriptionId, resourceRegionLocation);
             var usage = await AzCli.ListCognitiveServicesUsage(subscriptionId, resourceRegionLocation);
-            var deployableModels = FilterModelsByUsage(models.Payload, usage.Payload);
+
+            var lookForChatCompletionCapable = deploymentExtra.ToLower() == "chat" || deploymentExtra.ToLower() == "evaluation";
+            var lookForEmbeddingCapable = deploymentExtra.ToLower() == "embeddings";
+            var capableModels = models.Payload
+                .Where(x => !lookForChatCompletionCapable || x.ChatCompletionCapable)
+                .Where(x => !lookForEmbeddingCapable || x.EmbeddingsCapable)
+                .ToArray();
+
+            var deployableModels = FilterModelsByUsage(capableModels, usage.Payload);
 
             Console.Write("\rModel: ");
             var choices = Program.Debug
