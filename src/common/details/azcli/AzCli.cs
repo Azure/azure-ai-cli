@@ -85,6 +85,8 @@ namespace Azure.AI.Details.Common.CLI
             public string Name { get; set; }
             public string ModelFormat { get; set; }
             public string ModelName { get; set; }
+            public bool ChatCompletionCapable { get; set; }
+            public bool EmbeddingsCapable { get; set; }
         }
 
         public struct CognitiveServicesModelInfo
@@ -93,6 +95,8 @@ namespace Azure.AI.Details.Common.CLI
             public string Format { get; set; }
             public string Version { get; set; }
             public string DefaultCapacity { get; set; }
+            public bool ChatCompletionCapable { get; set; }
+            public bool EmbeddingsCapable { get; set; }
         }
 
         public struct CognitiveServicesUsageInfo
@@ -296,7 +300,7 @@ namespace Azure.AI.Details.Common.CLI
             var cmdPart = "cognitiveservices account deployment list";
             var subPart = subscriptionId != null ? $"--subscription {subscriptionId}" : "";
 
-            var parsed = await ProcessHelpers.ParseShellCommandJson<JArray>("az", $"{cmdPart} --output json {subPart}  -g {group} -n {resourceName} --query \"[].{{Name:name,Location: location,Group:resourceGroup,Endpoint:properties.endpoint,Model:properties.model.name,Format:properties.model.format}}\"", GetUserAgentEnv());
+            var parsed = await ProcessHelpers.ParseShellCommandJson<JArray>("az", $"{cmdPart} --output json {subPart}  -g {group} -n {resourceName} --query \"[].{{Name:name,Location: location,Group:resourceGroup,Endpoint:properties.endpoint,Model:properties.model.name,Format:properties.model.format,ChatCompletionCapable:properties.capabilities.chatCompletion,EmbeddingsCapable:properties.capabilities.embeddings}}\"", GetUserAgentEnv());
             var deployments = parsed.Payload;
 
             var x = new ParsedJsonProcessOutput<CognitiveServicesDeploymentInfo[]>(parsed.Output);
@@ -308,6 +312,8 @@ namespace Azure.AI.Details.Common.CLI
                 x.Payload[i].Name = deployment["Name"].Value<string>();
                 x.Payload[i].ModelFormat = deployment["Format"].Value<string>();
                 x.Payload[i].ModelName = deployment["Model"].Value<string>();
+                x.Payload[i].ChatCompletionCapable = deployment["ChatCompletionCapable"].Value<string>() == "true";
+                x.Payload[i].EmbeddingsCapable = deployment["EmbeddingsCapable"].Value<string>() == "true";
                 i++;
             }
 
@@ -319,7 +325,7 @@ namespace Azure.AI.Details.Common.CLI
             var cmdPart = "cognitiveservices model list";
             var subPart = subscriptionId != null ? $"--subscription {subscriptionId}" : "";
 
-            var parsed = await ProcessHelpers.ParseShellCommandJson<JArray>("az", $"{cmdPart} --output json {subPart} -l {regionLocation} --query \"[].{{Name:model.name,Format:model.format,Version:model.version,DefaultCapacity:model.skus[0].capacity.default}}\"", GetUserAgentEnv());
+            var parsed = await ProcessHelpers.ParseShellCommandJson<JArray>("az", $"{cmdPart} --output json {subPart} -l {regionLocation} --query \"[].{{Name:model.name,Format:model.format,Version:model.version,DefaultCapacity:model.skus[0].capacity.default,ChatCompletionCapable:model.capabilities.chatCompletion,EmbeddingsCapable:model.capabilities.embeddings}}\"", GetUserAgentEnv());
             var models = parsed.Payload;
 
             var x = new ParsedJsonProcessOutput<CognitiveServicesModelInfo[]>(parsed.Output);
@@ -332,6 +338,8 @@ namespace Azure.AI.Details.Common.CLI
                 x.Payload[i].Format = model["Format"].Value<string>();
                 x.Payload[i].Version = model["Version"].Value<string>();
                 x.Payload[i].DefaultCapacity = model["DefaultCapacity"].Value<string>();
+                x.Payload[i].ChatCompletionCapable = model["ChatCompletionCapable"].Value<string>() == "true";
+                x.Payload[i].EmbeddingsCapable = model["EmbeddingsCapable"].Value<string>() == "true";
                 i++;
             }
 
@@ -416,7 +424,9 @@ namespace Azure.AI.Details.Common.CLI
             {
                 Name = resource?["name"]?.Value<string>(),
                 ModelFormat = resource?["kind"]?.Value<string>(),
-                ModelName = modelName
+                ModelName = modelName,
+                ChatCompletionCapable = resource?["properties"]?["capabilities"]?["chatCompletion"]?.Value<bool>() ?? false,
+                EmbeddingsCapable = resource?["properties"]?["capabilities"]?["embeddings"]?.Value<bool>() ?? false
             };
 
             return x;

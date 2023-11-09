@@ -134,6 +134,11 @@ namespace Azure.AI.Details.Common.CLI
                 choices.Insert(0, "(Create new)");
             }
 
+            if (choices.Count == 0)
+            {
+                throw new ApplicationException($"CANCELED: No projects found");
+            }
+
             Console.Write("\rName: ");
             var picked = ListBoxPicker.PickIndexOf(choices.ToArray());
             if (picked < 0)

@@ -50,8 +50,13 @@ namespace Azure.AI.Details.Common.CLI
                 throw new ApplicationException($"ERROR: Loading deployments:\n{response.Output.StdError}");
             }
 
+            var lookForChatCompletionCapable = deploymentExtra.ToLower() == "chat" || deploymentExtra.ToLower() == "evaluation";
+            var lookForEmbeddingCapable = deploymentExtra.ToLower() == "embeddings";
+
             var deployments = response.Payload
                 .Where(x => MatchDeploymentFilter(x, deploymentFilter))
+                .Where(x => !lookForChatCompletionCapable || x.ChatCompletionCapable)
+                .Where(x => !lookForEmbeddingCapable || x.EmbeddingsCapable)
                 .OrderBy(x => x.Name)
                 .ToList();
 
@@ -110,12 +115,28 @@ namespace Azure.AI.Details.Common.CLI
             Console.Write("\rModel: *** Loading choices ***");
             var models = await AzCli.ListCognitiveServicesModels(subscriptionId, resourceRegionLocation);
             var usage = await AzCli.ListCognitiveServicesUsage(subscriptionId, resourceRegionLocation);
-            var deployableModels = FilterModelsByUsage(models.Payload, usage.Payload);
+
+            var lookForChatCompletionCapable = deploymentExtra.ToLower() == "chat" || deploymentExtra.ToLower() == "evaluation";
+            var lookForEmbeddingCapable = deploymentExtra.ToLower() == "embeddings";
+            var capableModels = models.Payload
+                .Where(x => !lookForChatCompletionCapable || x.ChatCompletionCapable)
+                .Where(x => !lookForEmbeddingCapable || x.EmbeddingsCapable)
+                .ToArray();
+
+            var deployableModels = FilterModelsByUsage(capableModels, usage.Payload);
 
             Console.Write("\rModel: ");
             var choices = Program.Debug
                 ? deployableModels.Select(x => x.Name + " (version " + x.Version + ")" + $"{x.DefaultCapacity} capacity").ToArray()
                 : deployableModels.Select(x => x.Name + " (version " + x.Version + ")").ToArray();
+
+            if (choices.Count() == 0)
+            {
+                ConsoleHelpers.WriteLineError(models.Payload.Count() > 0
+                    ? $"*** No {deploymentExtra} capable models with capacity found ***"
+                    : "*** No deployable models found ***");
+                return null;
+            }
 
             var scanFor = deploymentExtra.ToLower() switch {
                 "chat" => "gpt",
@@ -133,9 +154,6 @@ namespace Azure.AI.Details.Common.CLI
             var modelFormat = "OpenAI";
             var modelVersion = deployableModels[index].Version;
             var scaleCapacity = deployableModels[index].DefaultCapacity;
-
-            // HACK: There's a bug in the RP or region specific or something that sometimes 120 doesn't work, and we need to use 119
-            if (scaleCapacity == "120") scaleCapacity = "119";
 
             Console.Write("\rName: ");
             choices = new string[] {
