@@ -114,7 +114,7 @@ namespace Azure.AI.Details.Common.CLI
             var regionLocation = await FindRegionAsync(interactive, regionLocationFilter, true);
             if (regionLocation == null) return null;
 
-            var group = await PickOrCreateResourceGroup(interactive, subscriptionId, regionLocation?.Name, groupFilter);
+            var (group, createdNew) = await PickOrCreateResourceGroup(interactive, subscriptionId, regionLocation?.Name, groupFilter);
             var createKind = kinds.Split(';').Last();
 
             ConsoleHelpers.WriteLineWithHighlight($"\n`CREATE {sectionHeader}`");

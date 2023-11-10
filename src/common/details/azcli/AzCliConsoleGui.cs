@@ -79,7 +79,8 @@ namespace Azure.AI.Details.Common.CLI
 
         private static async Task<AzCli.CognitiveSearchResourceInfo> TryCreateSearchInteractive(string subscription, string locationName, string groupName, string smartName = null, string smartNameKind = null)
         {
-            ConsoleHelpers.WriteLineWithHighlight($"\n`CREATE AI SEARCH RESOURCE`");
+            var sectionHeader = "\n`CREATE SEARCH RESOURCE`";
+            ConsoleHelpers.WriteLineWithHighlight(sectionHeader);
 
             var groupOk = !string.IsNullOrEmpty(groupName);
             if (!groupOk)
@@ -88,13 +89,18 @@ namespace Azure.AI.Details.Common.CLI
                 locationName = location.Name;
             }
             
-            var group = await AzCliConsoleGui.PickOrCreateResourceGroup(true, subscription, groupOk ? null : locationName, groupName);
+            var (group, createdNew) = await AzCliConsoleGui.PickOrCreateResourceGroup(true, subscription, groupOk ? null : locationName, groupName);
             groupName = group.Name;
 
             if (string.IsNullOrEmpty(smartName))
             {
                 smartName = group.Name;
                 smartNameKind = "rg";
+            }
+
+            if (createdNew)
+            {
+                ConsoleHelpers.WriteLineWithHighlight(sectionHeader);
             }
 
             var name = NamePickerHelper.DemandPickOrEnterName("Name: ", "search", smartName, smartNameKind);
