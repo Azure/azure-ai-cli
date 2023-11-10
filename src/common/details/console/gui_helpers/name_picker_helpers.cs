@@ -13,11 +13,17 @@ namespace Azure.AI.Details.Common.CLI
 {
     public class NameGenHelper
     {
-        public static string GenerateName(int maxCch = 24)
+        public static string GenerateName(string userName = null, int maxCch = 24)
         {
             EnsureLoaded();
 
-            var approaches = 3;
+            if (userName != null)
+            {
+                userName = userName.Trim().Replace("_", "-");
+                userName = userName.Split(new[] { '@' }, StringSplitOptions.RemoveEmptyEntries).FirstOrDefault();
+            }
+
+            var approaches = 6;
             var maxTriesPerApproach = 100;
 
             for (int approach = 0; approach < approaches; approach++)
@@ -30,9 +36,13 @@ namespace Azure.AI.Details.Common.CLI
 
                     var name = approach switch
                     {
-                        0 => $"{adjective}-{color}-{animal}",
-                        1 => $"{color}-{animal}",
-                        2 => $"{animal}",
+                        0 => $"{userName}-{adjective}-{color}-{animal}",
+                        1 => $"{userName}-{color}-{animal}",
+                        2 => $"{userName}-{animal}",
+                        3 => $"{adjective}-{color}-{animal}",
+                        4 => $"{color}-{animal}",
+                        5 => $"{animal}",
+
                         _ => throw new ApplicationException($"Unexpected approach '{approach}'."),
                     };
 
@@ -88,12 +98,12 @@ namespace Azure.AI.Details.Common.CLI
 
     public class NamePickerHelper
     {
-        public static string DemandPickOrEnterName(string namePrompt, string nameOutKind, string nameIn = null, string nameInKind = null, int maxCch = 32)
+        public static string DemandPickOrEnterName(string namePrompt, string nameOutKind, string nameIn = null, string nameInKind = null, string userName = null, int maxCch = 32)
         {
-            var choices = GetNameChoices(nameIn, nameInKind, nameOutKind, maxCch);
+            var choices = GetNameChoices(nameIn, nameInKind, nameOutKind, userName, maxCch, out var hasRegenChoice);
             var usePicker = choices != null && choices.Count() > 1;
 
-            if (usePicker)
+            while (usePicker)
             {
                 Console.Write(namePrompt);
                 var pick = ListBoxPicker.PickIndexOf(choices);
@@ -101,22 +111,36 @@ namespace Azure.AI.Details.Common.CLI
 
                 Console.Write("\r");
 
+                if (hasRegenChoice && pick == 0)
+                {
+                    choices = GetNameChoices(nameIn, nameInKind, nameOutKind, userName, maxCch, out hasRegenChoice);
+                    continue;
+                }
+
                 var pickedUseCustomName = pick == choices.Length - 1;
                 if (!pickedUseCustomName)
                 {
                     Console.WriteLine($"{namePrompt}{choices[pick]}");
                     return choices[pick];
                 }
+
+                break;
             }
 
             return DemandAskPrompt(namePrompt);
         }
 
-        private static string[] GetNameChoices(string nameIn, string nameInKind, string nameOutKind, int maxCch = 32)
+        private static string[] GetNameChoices(string nameIn, string nameInKind, string nameOutKind, string userName, int maxCch, out bool hasRegenChoice)
         {
             var choices = new List<string>();
+            hasRegenChoice = false;
 
             var nameInOk = !string.IsNullOrEmpty(nameIn) && !string.IsNullOrEmpty(nameInKind);
+            if (nameInOk)
+            {
+                nameIn = nameIn.Trim().Replace("_", "-");
+            }
+
             if (nameInOk && nameIn.StartsWith($"{nameInKind}-"))
             {
                 var nameBase = nameIn.Substring(nameInKind.Length + 1);
@@ -145,13 +169,19 @@ namespace Azure.AI.Details.Common.CLI
 
             if (!nameInOk || choices.Count() == 0)
             {
-                var name = NameGenHelper.GenerateName(maxCch - 1 - nameOutKind.Length);
+                var name = NameGenHelper.GenerateName(userName, maxCch - 1 - nameOutKind.Length);
                 choices.Add($"{nameOutKind}-{name}");
                 choices.Add($"{name}-{nameOutKind}");
+                hasRegenChoice = true;
             }
 
             choices.Sort();
             choices.Add("(Enter custom name)");
+
+            if (hasRegenChoice)
+            {
+                choices.Insert(0, "(Regenerate choices)");
+            }
 
             return choices.ToArray();
         }

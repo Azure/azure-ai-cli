@@ -19,6 +19,16 @@ namespace Azure.AI.Details.Common.CLI
 {
     public partial class AzCliConsoleGui
     {
+        public static string GetSubscriptionUserName(string subscriptionId)
+        {
+            if (_subscriptionIdToUsreName.TryGetValue(subscriptionId, out var userName))
+            {
+                return userName;
+            }
+
+            return null;
+        }
+
         public static async Task<string> PickSubscriptionIdAsync(bool allowInteractiveLogin, bool allowInteractivePickSubscription, string subscriptionFilter = null)
         {
             if (Guid.TryParse(subscriptionFilter, out var subscriptionId))
@@ -123,6 +133,7 @@ namespace Azure.AI.Details.Common.CLI
             {
                 var subscription = subscriptions[0];
                 DisplayNameAndId(subscription);
+                CacheSubscriptionUserName(subscription);
                 return subscription;
             }
             else if (!allowInteractivePickSubscription)
@@ -149,6 +160,7 @@ namespace Azure.AI.Details.Common.CLI
 
             var subscription = subscriptions[picked];
             DisplayNameAndId(subscription);
+            CacheSubscriptionUserName(subscription);
             return subscription;
         }
 
@@ -169,6 +181,7 @@ namespace Azure.AI.Details.Common.CLI
             {
                 Console.Write(prefix);
                 DisplayNameAndId(subscription);
+                CacheSubscriptionUserName(subscription);
             }
         }
 
@@ -177,5 +190,12 @@ namespace Azure.AI.Details.Common.CLI
             Console.Write($"{subscription.Name} ({subscription.Id})");
             Console.WriteLine(new string(' ', 20));
         }
+
+        private static void CacheSubscriptionUserName(AzCli.SubscriptionInfo subscription)
+        {
+            _subscriptionIdToUsreName[subscription.Id] = subscription.UserName;
+        }
+
+        private static Dictionary<string, string> _subscriptionIdToUsreName = new Dictionary<string, string>();
     }
 }

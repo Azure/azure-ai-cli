@@ -126,7 +126,7 @@ namespace Azure.AI.Details.Common.CLI
             var smartNameKind = "rg";
 
             var name = string.IsNullOrEmpty(resourceFilter)
-                ? NamePickerHelper.DemandPickOrEnterName("Name: ", createKind.ToLower() ?? "cs", smartName, smartNameKind)
+                ? NamePickerHelper.DemandPickOrEnterName("Name: ", createKind.ToLower() ?? "cs", smartName, smartNameKind, AzCliConsoleGui.GetSubscriptionUserName(subscriptionId))
                 : AskPromptHelper.AskPrompt("Name: ", resourceFilter);
             if (string.IsNullOrEmpty(name)) return null;
 
