@@ -102,24 +102,26 @@ namespace Azure.AI.Details.Common.CLI
     {
         public static string DemandPickOrEnterName(string namePrompt, string nameOutKind, string nameIn = null, string nameInKind = null, string userName = null, int maxCch = 32)
         {
-            var choices = GetNameChoices(nameIn, nameInKind, nameOutKind, userName, maxCch, out var hasRegenChoice);
+            var choices = GetNameChoices(nameIn, nameInKind, nameOutKind, userName, maxCch);
             var usePicker = choices != null && choices.Count() > 1;
 
             while (usePicker)
             {
+                choices.Insert(0, "(Regenerate choices)");
+
                 Console.Write(namePrompt);
-                var pick = ListBoxPicker.PickIndexOf(choices);
+                var pick = ListBoxPicker.PickIndexOf(choices.ToArray());
                 if (pick < 0) ThrowPromptNotAnsweredApplicationException();
 
                 Console.Write("\r");
 
-                if (hasRegenChoice && pick == 0)
+                if (pick == 0)
                 {
-                    choices = GetNameChoices(nameIn, nameInKind, nameOutKind, userName, maxCch, out hasRegenChoice);
+                    choices = GetNameChoices(null, null, nameOutKind, userName, maxCch);
                     continue;
                 }
 
-                var pickedUseCustomName = pick == choices.Length - 1;
+                var pickedUseCustomName = pick == choices.Count() - 1;
                 if (!pickedUseCustomName)
                 {
                     Console.WriteLine($"{namePrompt}{choices[pick]}");
@@ -129,13 +131,28 @@ namespace Azure.AI.Details.Common.CLI
                 break;
             }
 
-            return DemandAskPrompt(namePrompt);
+            while (true)
+            {
+                var name = DemandAskPrompt(namePrompt);
+                if (name.Length > maxCch)
+                {
+                    Console.WriteLine($"*** WARNING: Name is too long. Max length is {maxCch}.\n");
+                    continue;
+                }
+
+                if (name.Count(x => !char.IsLetterOrDigit(x) && x != '-') > 0)
+                {
+                    Console.WriteLine($"*** WARNING: Name contains invalid characters. Only letters, digits, and dashes are allowed.\n");
+                    continue;
+                }
+
+                return name;
+            }
         }
 
-        private static string[] GetNameChoices(string nameIn, string nameInKind, string nameOutKind, string userName, int maxCch, out bool hasRegenChoice)
+        private static List<string> GetNameChoices(string nameIn, string nameInKind, string nameOutKind, string userName, int maxCch)
         {
             var choices = new List<string>();
-            hasRegenChoice = false;
 
             var nameInOk = !string.IsNullOrEmpty(nameIn) && !string.IsNullOrEmpty(nameInKind);
             if (nameInOk)
@@ -174,18 +191,12 @@ namespace Azure.AI.Details.Common.CLI
                 var name = NameGenHelper.GenerateName(userName, maxCch - 1 - nameOutKind.Length);
                 choices.Add($"{nameOutKind}-{name}");
                 choices.Add($"{name}-{nameOutKind}");
-                hasRegenChoice = true;
             }
 
             choices.Sort();
             choices.Add("(Enter custom name)");
 
-            if (hasRegenChoice)
-            {
-                choices.Insert(0, "(Regenerate choices)");
-            }
-
-            return choices.ToArray();
+            return choices;
         }
 
         private static string DemandAskPrompt(string prompt, string value = null, bool useEditBox = false)
@@ -195,6 +206,7 @@ namespace Azure.AI.Details.Common.CLI
             {
                 ThrowPromptNotAnsweredApplicationException();
             }
+
             return answer;
         }
 

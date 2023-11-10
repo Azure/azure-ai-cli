@@ -111,7 +111,7 @@ namespace Azure.AI.Details.Common.CLI
         {
             ConsoleHelpers.WriteLineWithHighlight("\n`RESOURCE GROUP`");
 
-            var regionLocation = await FindRegionAsync(interactive, regionLocationFilter, true);
+            var regionLocation = !string.IsNullOrEmpty(regionLocationFilter) ? await FindRegionAsync(interactive, regionLocationFilter, true) : new AzCli.AccountRegionLocationInfo();
             if (regionLocation == null) return null;
 
             var group = await PickOrCreateResourceGroup(interactive, subscriptionId, regionLocation?.Name, groupFilter);
