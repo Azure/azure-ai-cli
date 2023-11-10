@@ -236,12 +236,15 @@ namespace Azure.AI.Details.Common.CLI
                 }
                 excluded.Sort();
 
-                Console.WriteLine($"\rModel: (excluded {excluded.Count()} models with zero remaining quota)\n");
-                foreach (var model in excluded)
+                if (excluded.Count() > 0)
                 {
-                    ConsoleHelpers.WriteLineWithHighlight($"  `#e_;*** WARNING: Excluded {model}) ***`");
+                    Console.WriteLine($"\rModel: (excluded {excluded.Count()} models with zero remaining quota)\n");
+                    foreach (var model in excluded)
+                    {
+                        ConsoleHelpers.WriteLineWithHighlight($"  `#e_;*** WARNING: Excluded {model}) ***`");
+                    }
+                    Console.WriteLine();
                 }
-                Console.WriteLine();
             }
 
             if (Program.Debug)
