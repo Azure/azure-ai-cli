@@ -198,7 +198,7 @@ namespace Azure.AI.Details.Common.CLI
                 smartNameKind = "rg";
             }
 
-            var name = NamePickerHelper.DemandPickOrEnterName("Name: ", "aiproj", smartName, smartNameKind); // TODO: What will this really be called?
+            var name = NamePickerHelper.DemandPickOrEnterName("Name: ", "aiproj", smartName, smartNameKind, AzCliConsoleGui.GetSubscriptionUserName(subscription));
             displayName ??= name;
             description ??= name;
 

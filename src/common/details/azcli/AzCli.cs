@@ -19,6 +19,7 @@ namespace Azure.AI.Details.Common.CLI
         {
             public string Id;
             public string Name;
+            public string UserName;
             public bool IsDefault;
         }
 
@@ -153,7 +154,7 @@ namespace Azure.AI.Details.Common.CLI
 
             var stdErrHandler = useDeviceCode ? showDeviceCodeMessage : null;
             var deviceCodePart = useDeviceCode ? "--use-device-code" : "";
-            var queryPart = $"--query \"[].{{Name:name,Id:id,IsDefault:isDefault}}\"";
+            var queryPart = $"--query \"[].{{Name:name,Id:id,IsDefault:isDefault,UserName:user.name}}\"";
 
             var parsed = await ProcessHelpers.ParseShellCommandJson<JArray>("az", $"login --output json {queryPart} {deviceCodePart}", GetUserAgentEnv(), null, stdErrHandler);
             var accounts = parsed.Payload;
@@ -167,6 +168,7 @@ namespace Azure.AI.Details.Common.CLI
                 x.Payload[i].Id = account["Id"].Value<string>();
                 x.Payload[i].Name = account["Name"].Value<string>();
                 x.Payload[i].IsDefault = account["IsDefault"].Value<bool>();
+                x.Payload[i].UserName = account["UserName"].Value<string>();
                 i++;
             }
 
@@ -175,7 +177,7 @@ namespace Azure.AI.Details.Common.CLI
 
         public static async Task<ParsedJsonProcessOutput<SubscriptionInfo[]>> ListAccounts()
         {
-            var parsed = await ProcessHelpers.ParseShellCommandJson<JArray>("az", "account list --output json --query \"[].{Name:name,Id:id,IsDefault:isDefault}\"", GetUserAgentEnv());
+            var parsed = await ProcessHelpers.ParseShellCommandJson<JArray>("az", "account list --output json --query \"[].{Name:name,Id:id,IsDefault:isDefault,UserName:user.name}\"", GetUserAgentEnv());
             var accounts = parsed.Payload;
 
             var x = new ParsedJsonProcessOutput<SubscriptionInfo[]>(parsed.Output);
@@ -187,6 +189,7 @@ namespace Azure.AI.Details.Common.CLI
                 x.Payload[i].Id = account["Id"].Value<string>();
                 x.Payload[i].Name = account["Name"].Value<string>();
                 x.Payload[i].IsDefault = account["IsDefault"].Value<bool>();
+                x.Payload[i].UserName = account["UserName"].Value<string>();
                 i++;
             }
 

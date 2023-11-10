@@ -111,7 +111,7 @@ namespace Azure.AI.Details.Common.CLI
         {
             ConsoleHelpers.WriteLineWithHighlight("\n`RESOURCE GROUP`");
 
-            var regionLocation = await FindRegionAsync(interactive, regionLocationFilter, true);
+            var regionLocation = !string.IsNullOrEmpty(regionLocationFilter) ? await FindRegionAsync(interactive, regionLocationFilter, true) : new AzCli.AccountRegionLocationInfo();
             if (regionLocation == null) return null;
 
             var group = await PickOrCreateResourceGroup(interactive, subscriptionId, regionLocation?.Name, groupFilter);
@@ -124,9 +124,15 @@ namespace Azure.AI.Details.Common.CLI
 
             var smartName = group.Name;
             var smartNameKind = "rg";
+            var nameOutKind = createKind?.ToLower() switch
+            {
+                "aiservices" => "ais",
+                "cognitiveservices" => "cs",
+                _ => createKind.ToLower()
+            };
 
             var name = string.IsNullOrEmpty(resourceFilter)
-                ? NamePickerHelper.DemandPickOrEnterName("Name: ", createKind.ToLower() ?? "cs", smartName, smartNameKind)
+                ? NamePickerHelper.DemandPickOrEnterName("Name: ", nameOutKind, smartName, smartNameKind, AzCliConsoleGui.GetSubscriptionUserName(subscriptionId))
                 : AskPromptHelper.AskPrompt("Name: ", resourceFilter);
             if (string.IsNullOrEmpty(name)) return null;
 

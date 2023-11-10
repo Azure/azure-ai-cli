@@ -233,6 +233,7 @@ namespace Azure.AI.Details.Common.CLI
             var picked = ListBoxPicker.PickIndexOf(list.ToArray(), select);
             if (picked < 0)
             {
+                Console.WriteLine();
                 return null;
             }
 
