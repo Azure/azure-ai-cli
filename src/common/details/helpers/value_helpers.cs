@@ -21,65 +21,79 @@ namespace Azure.AI.Details.Common.CLI
             if (string.IsNullOrEmpty(text) || !text.Contains('{')) return text;
 
             var i = 0;
-            var resolved = new StringBuilder();
-            while (i < text.Length)
+            var sb = new StringBuilder(text);
+            while (i < sb.Length)
             {
-                if (text[i] == '{')
+                if (sb[i] == '{')
                 {
-                    resolved.Append(Interpolate(text, ref i, values, deleteUnresolved));
+                    i += Interpolate(1, sb, i, values, deleteUnresolved);
                 }
-                else if (text[i] == '$' && i + 1 < text.Length && text[i + 1] == '{')
+                else if (sb[i] == '$' && i + 1 < sb.Length && sb[i + 1] == '{')
                 {
-                    i++;
-                    resolved.Append(Interpolate(text, ref i, values, deleteUnresolved));
+                    i += Interpolate(2, sb, i, values, deleteUnresolved);
                 }
                 else
                 {
-                    resolved.Append(text[i]);
                     i++;
                 }
             }
 
-            return resolved.ToString();
+            return sb.ToString();
         }
 
-        private static string Interpolate(string text, ref int i, ICommandValues values, bool deleteUnresolved)
+        private static int Interpolate(int cchPrefix, StringBuilder sb, int start, ICommandValues values, bool deleteUnresolved, int level = 0)
         {
-            if (text[i] != '{') throw new InvalidOperationException($"Interpolate() '{{' not found; pos={i}");
-            i += 1; // skipping '{'
+            if (sb[start] != '{') throw new InvalidOperationException($"Interpolate() '{{' not found; pos={start}");
 
-            var expandAtFile = text[i] == '@';
-            if (expandAtFile) i++;
+            var i = cchPrefix;
 
-            var sb = new StringBuilder();
-
-            while (i < text.Length && text[i] != '}')
+            while (start + i < sb.Length && sb[start + i] != '}')
             {
-                if (text[i] == '{')
+                if (sb[start + i] == '{')
                 {
-                    sb.Append(Interpolate(text, ref i, values, deleteUnresolved));
+                    i += Interpolate(1, sb, start + i, values, deleteUnresolved, level + 1);
                 }
-                else if (text[i] == '$' && i + 1 < text.Length && text[i + 1] == '{')
+                else if (sb[start + i] == '$' && start + i + 1 < sb.Length && sb[start + i + 1] == '{')
                 {
-                    i++;
-                    sb.Append(Interpolate(text, ref i, values, deleteUnresolved));
+                    i += Interpolate(2, sb, start + i, values, deleteUnresolved, level + 1);
                 }
                 else
                 {
-                    sb.Append(text[i]);
                     i++;
                 }
             }
 
-            if (text[i] != '}') throw new InvalidOperationException($"Interpolate() '}}' not found; pos={i}");
+            if (sb[start + i] != '}') throw new InvalidOperationException($"Interpolate() '}}' not found; pos={start + i}");
             i += 1; // skipping '}'
 
-            var name = sb.ToString();
+            var nameStartsAt = start + cchPrefix;
+            var name = sb.ToString().Substring(nameStartsAt, start + i - nameStartsAt - 1);
 
             // check if name is a well known escape sequence, like \n, \t, etc.
-            if (name.Length == 2 && name[0] == '\\' && name[1] == 't') return "\t";
-            if (name.Length == 2 && name[0] == '\\' && name[1] == 'r') return "\r";
-            if (name.Length == 2 && name[0] == '\\' && name[1] == 'n') return "\n";
+            if (name.Length == 2 && name[0] == '\\' && name[1] == 't')
+            {
+                sb.Remove(start, name.Length + cchPrefix + 1);
+                sb.Insert(start, "\t");
+                return 1;
+            }
+            else if (name.Length == 2 && name[0] == '\\' && name[1] == 'n')
+            {
+                sb.Remove(start, name.Length + cchPrefix + 1);
+                sb.Insert(start, "\n");
+                return 1;
+            }
+            else if (name.Length == 2 && name[0] == '\\' && name[1] == 'r')
+            {
+                sb.Remove(start, name.Length + cchPrefix + 1);
+                sb.Insert(start, "\r");
+                return 1;
+            }
+
+            var expandAtFile = name.StartsWith('@');
+            if (expandAtFile)
+            {
+                name = name.Substring(1);
+            }
 
             // next, try to get it from the values
             var str = values[name];
@@ -101,19 +115,21 @@ namespace Azure.AI.Details.Common.CLI
           
             if (str == null && !expandAtFile)
             {
-                return deleteUnresolved ? string.Empty : $"{{{name}}}";
+                str = deleteUnresolved ? string.Empty : $"{{{name}}}";
+                sb.Remove(start, name.Length + cchPrefix + 1);
+                sb.Insert(start, str);
+                return str.Length;
             }
-            else if (str == null && expandAtFile)
+
+            if (str == null && expandAtFile)
             {
                 str = name;
             }
 
-            if (Program.Debug)
-            {
-                Console.WriteLine($"*** REPLACED: '{name}' => {str}");
-            }
-
-            return expandAtFile ? FileHelpers.ExpandAtFileValue($"@{str}", values) : str;
+            str = expandAtFile ? FileHelpers.ExpandAtFileValue($"@{str}", values) : str;
+            sb.Remove(start, name.Length + cchPrefix + 1 + (expandAtFile ? 1 : 0));
+            sb.Insert(start, str);
+            return 0;
         }
     }
 }
