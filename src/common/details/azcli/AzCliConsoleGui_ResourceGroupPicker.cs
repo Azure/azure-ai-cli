@@ -19,8 +19,9 @@ namespace Azure.AI.Details.Common.CLI
 {
     public partial class AzCliConsoleGui
     {
-        public static async Task<AzCli.ResourceGroupInfo> PickOrCreateResourceGroup(bool interactive, string subscriptionId = null, string regionFilter = null, string groupFilter = null)
+        public static async Task<(AzCli.ResourceGroupInfo, bool createdNew)> PickOrCreateResourceGroup(bool interactive, string subscriptionId = null, string regionFilter = null, string groupFilter = null)
         {
+            var createdNew = false;
             var createNewItem = !string.IsNullOrEmpty(groupFilter)
                 ? $"(Create `{groupFilter}`)"
                 : interactive ? "(Create new)" : null;
@@ -29,6 +30,7 @@ namespace Azure.AI.Details.Common.CLI
             if ((group != null && group.Value.Name == null) || (group == null && groupFilter == null))
             {
                 group = await TryCreateResourceGroup(interactive, subscriptionId, regionFilter, groupFilter);
+                createdNew = true;
             }
 
             if (group == null)
@@ -36,7 +38,7 @@ namespace Azure.AI.Details.Common.CLI
                 throw new ApplicationException($"CANCELED: No resource selected");
             }
 
-            return group.Value;
+            return (group.Value, createdNew);
         }
 
         public static async Task<AzCli.ResourceGroupInfo?> FindGroupAsync(bool interactive, string subscription = null, string regionLocation = null, string groupFilter = null, string allowCreateGroupOption = null)
