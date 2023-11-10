@@ -236,7 +236,7 @@ namespace Azure.AI.Details.Common.CLI
                 var connectionType = "azure_open_ai";
                 var connectionJson = createOpenAiConnection
                     ? PythonSDKWrapper.CreateConnection(values, subscription, groupName, projectName, connectionName, connectionType, openAiEndpoint, openAiKey)
-                    : PythonSDKWrapper.GetConnection(values, subscription, groupName, projectName, connectionName);
+                    : GetConnection(values, subscription, groupName, projectName, connectionName);
 
                 var message = createSearchConnection ? "\r*** CREATED ***  " : null;
                 if (checkForExistingOpenAiConnection)
@@ -252,8 +252,8 @@ namespace Azure.AI.Details.Common.CLI
                          target.Replace(".openai.azure.com/", ".cognitiveservices.azure.com/") == openAiEndpoint);
 
                     message = !targetOk ?
-                        $"\r*** WARNING: {connectionName} not connection found ***  "
-                        : !endpointOk 
+                        $"\r*** WARNING: {connectionName} no connection found ***  "
+                        : !endpointOk
                         ? $"\r*** FOUND: {connectionName} found ***  "
                         : !targetMatch
                             ? $"\r*** WARNING: {connectionName} found but target is {target} ***  "
@@ -276,7 +276,7 @@ namespace Azure.AI.Details.Common.CLI
                 var connectionType = "cognitive_search";
                 var connectionJson = createSearchConnection
                     ? PythonSDKWrapper.CreateConnection(values, subscription, groupName, projectName, connectionName, connectionType, searchEndpoint, searchKey)
-                    : PythonSDKWrapper.GetConnection(values, subscription, groupName, projectName, connectionName);
+                    : GetConnection(values, subscription, groupName, projectName, connectionName);
 
                 var message = createSearchConnection ? "\r*** CREATED ***  " : null;
                 if (checkForExistingSearchConnection)
@@ -290,7 +290,7 @@ namespace Azure.AI.Details.Common.CLI
                     var targetMatch = targetOk && endpointOk && target == searchEndpoint;
 
                     message = !targetOk
-                        ? $"\r*** WARNING: {connectionName} not connection found ***  "
+                        ? $"\r*** WARNING: {connectionName} no connection found ***  "
                         : !endpointOk
                             ? $"\r*** FOUND: {connectionName} found ***  "
                             : !targetMatch
@@ -300,6 +300,19 @@ namespace Azure.AI.Details.Common.CLI
 
                 Console.WriteLine(message);
                 connectionCount++;
+            }
+        }
+
+        private static string GetConnection(ICommandValues values, string subscription, string groupName, string projectName, string connectionName)
+        {
+            try
+            {
+                return PythonSDKWrapper.GetConnection(values, subscription, groupName, projectName, connectionName);
+            }
+            catch (Exception)
+            {
+                values.Reset("error");
+                return null;
             }
         }
 
