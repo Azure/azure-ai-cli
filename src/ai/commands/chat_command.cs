@@ -114,13 +114,16 @@ namespace Azure.AI.Details.Common.CLI
             var lines = File.ReadAllLines(dataFile);
 
             var client = CreateOpenAIClient(out var deployment);
-            var chatTextHandler = (string text) => {
+            var chatTextHandler = (string text) =>
+            {
 
                 var options = CreateChatCompletionOptions();
                 options.Messages.Add(new ChatMessage(ChatRole.User, text));
 
                 var response = client.GetChatCompletions(deployment, options);
-                var message = response.Value.Choices.Last().Message;
+
+                var choice = CheckChoiceFinishReason(response.Value.Choices.Last());
+                var message = choice.Message;
                 var answer = message.Content;
                 var context = message.AzureExtensionsContext != null && message.AzureExtensionsContext.Messages != null
                     ? string.Join('\n', message.AzureExtensionsContext.Messages.Select(x => x.Content))
@@ -544,6 +547,7 @@ namespace Azure.AI.Details.Common.CLI
                     str = str.Replace("\n", "\n           ");
                     Console.Write(str);
                 }
+                CheckChoiceFinishReason(choice);
                 Console.WriteLine();
             }
 
@@ -726,6 +730,36 @@ namespace Azure.AI.Details.Common.CLI
                 _values.AddThrowError("ERROR:", $"Creating OpenAIClient; Not-yet-implemented create from region.");
                 return null;
             }
+        }
+
+        private ChatChoice CheckChoiceFinishReason(ChatChoice choice)
+        {
+            if (choice.FinishReason == CompletionsFinishReason.ContentFiltered)
+            {
+                ConsoleHelpers.WriteLineWithHighlight("#e_;WARNING: Content filtered!");
+            }
+            if (choice.FinishReason == CompletionsFinishReason.TokenLimitReached)
+            {
+                Console.WriteLine("Reason:" + choice.FinishReason.ToString());
+                _values.AddThrowError("ERROR:", $"exceeded token limit!",
+                                         "TRY:", $"{Program.Name} chat --max-tokens TOKENS");
+            }
+            return choice;
+        }
+
+        private StreamingChatChoice CheckChoiceFinishReason(StreamingChatChoice choice)
+        {
+            if (choice.FinishReason == CompletionsFinishReason.ContentFiltered)
+            {
+                ConsoleHelpers.WriteLineWithHighlight("#e_;WARNING: Content filtered!");
+            }
+            if (choice.FinishReason == CompletionsFinishReason.TokenLimitReached)
+            {
+                Console.WriteLine("Reason:" + choice.FinishReason.ToString());
+                _values.AddThrowError("ERROR:", $"exceeded token limit!",
+                                         "TRY:", $"{Program.Name} chat --max-tokens TOKENS");
+            }
+            return choice;
         }
 
         private ChatRole UpdateRole(ref string line, ChatRole? currentRole = null)

@@ -102,7 +102,7 @@ namespace Azure.AI.Details.Common.CLI
             if (regionLocation == null) return null;
 
             var name = string.IsNullOrEmpty(groupName)
-                ? NamePickerHelper.DemandPickOrEnterName("Name: ", "rg")
+                ? NamePickerHelper.DemandPickOrEnterName("Name: ", "rg", null, null, AzCliConsoleGui.GetSubscriptionUserName(subscriptionId), 26)
                 : AskPromptHelper.AskPrompt("Name: ", groupName);
             if (string.IsNullOrEmpty(name)) return null;
 

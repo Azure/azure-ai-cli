@@ -169,7 +169,7 @@ namespace Azure.AI.Details.Common.CLI
                 ConsoleHelpers.WriteLineWithHighlight(sectionHeader);
             }
 
-            var name = NamePickerHelper.DemandPickOrEnterName("Name: ", "ai", smartName, smartNameKind); // TODO: What will this really be called?
+            var name = NamePickerHelper.DemandPickOrEnterName("Name: ", "ai", smartName, smartNameKind, AzCliConsoleGui.GetSubscriptionUserName(subscription));
             displayName ??= name;
             description ??= name;
 
