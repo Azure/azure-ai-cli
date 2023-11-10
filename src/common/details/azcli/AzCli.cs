@@ -263,7 +263,7 @@ namespace Azure.AI.Details.Common.CLI
         {
             var cmdPart = "cognitiveservices account list";
             var subPart = subscriptionId != null ? $"--subscription {subscriptionId}" : "";
-            var groupPart = "--group \"\"";
+            var groupPart = "--resource-group \"\"";
             
             var lookForKind = kinds.Split(';').First();
             var condPart= lookForKind switch
