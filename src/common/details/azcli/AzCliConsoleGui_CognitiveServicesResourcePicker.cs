@@ -124,9 +124,15 @@ namespace Azure.AI.Details.Common.CLI
 
             var smartName = group.Name;
             var smartNameKind = "rg";
+            var nameOutKind = createKind?.ToLower() switch
+            {
+                "aiservices" => "ais",
+                "cognitiveservices" => "cs",
+                _ => createKind.ToLower()
+            };
 
             var name = string.IsNullOrEmpty(resourceFilter)
-                ? NamePickerHelper.DemandPickOrEnterName("Name: ", createKind.ToLower() ?? "cs", smartName, smartNameKind, AzCliConsoleGui.GetSubscriptionUserName(subscriptionId))
+                ? NamePickerHelper.DemandPickOrEnterName("Name: ", nameOutKind, smartName, smartNameKind, AzCliConsoleGui.GetSubscriptionUserName(subscriptionId))
                 : AskPromptHelper.AskPrompt("Name: ", resourceFilter);
             if (string.IsNullOrEmpty(name)) return null;
 

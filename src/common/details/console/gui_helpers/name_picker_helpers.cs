@@ -17,18 +17,18 @@ namespace Azure.AI.Details.Common.CLI
         {
             EnsureLoaded();
 
-            if (userName != null)
-            {
-                userName = userName.Trim().Replace("_", "-");
-                userName = userName.Split(new[] { '@' }, StringSplitOptions.RemoveEmptyEntries).FirstOrDefault();
-            }
+            userName = userName ?? Environment.UserName;
+            userName = userName?.Trim().Replace("_", "-");
+            userName = userName?.Split(new[] { '@' }, StringSplitOptions.RemoveEmptyEntries).FirstOrDefault();
 
-            var approaches = 6;
-            var maxTriesPerApproach = 100;
+            var approaches = 8;
+            var maxTries = 1000;
 
             for (int approach = 0; approach < approaches; approach++)
             {
-                for (int i = 0; i < maxTriesPerApproach; i++)
+                if (approach < approaches / 2 && string.IsNullOrEmpty(userName)) continue;
+
+                for (int i = 0; i < maxTries; i++)
                 {
                     var animal = GetRandomElement(_animals);
                     var color = GetRandomElement(_colors);
@@ -37,16 +37,18 @@ namespace Azure.AI.Details.Common.CLI
                     var name = approach switch
                     {
                         0 => $"{userName}-{adjective}-{color}-{animal}",
-                        1 => $"{userName}-{color}-{animal}",
-                        2 => $"{userName}-{animal}",
-                        3 => $"{adjective}-{color}-{animal}",
-                        4 => $"{color}-{animal}",
-                        5 => $"{animal}",
+                        1 => $"{userName}-{adjective}-{animal}",
+                        2 => $"{userName}-{color}-{animal}",
+                        3 => $"{userName}-{animal}",
+                        4 => $"{adjective}-{color}-{animal}",
+                        5 => $"{adjective}-{animal}",
+                        6 => $"{color}-{animal}",
+                        7 => $"{animal}",
 
                         _ => throw new ApplicationException($"Unexpected approach '{approach}'."),
                     };
 
-                    if (name.Length < maxCch) return name;
+                    if (name.Length <= maxCch) return name;
                 }
             }
 
