@@ -186,6 +186,16 @@ namespace Azure.AI.Details.Common.CLI
 
         private static AzCli.CognitiveServicesModelInfo[] FilterModelsByUsage(AzCli.CognitiveServicesModelInfo[] models, AzCli.CognitiveServicesUsageInfo[] usage)
         {
+            models = models.GroupBy(x => x.Name).Select(x => x.First()).ToArray();
+            
+            if (Program.Debug)
+            {
+                foreach (var model in models)
+                {
+                    Console.WriteLine($"{model.Name} (version {model.Version}) capacity={model.DefaultCapacity}");
+                }
+            }
+
             var filtered = new List<AzCli.CognitiveServicesModelInfo>();
             foreach (var model in models)
             {
@@ -213,6 +223,24 @@ namespace Azure.AI.Details.Common.CLI
                     Version = model.Version,
                     DefaultCapacity = newDefault.ToString()
                 });
+            }
+
+            if (filtered.Count() <= models.Count())
+            {
+                var excluded = new List<string>();
+                foreach (var model in models)
+                {
+                    if (filtered.Any(x => x.Name == model.Name && x.Version == model.Version)) continue;
+                    excluded.Add($"{model.Name} (version {model.Version})");
+                }
+                excluded.Sort();
+
+                Console.WriteLine($"\rModel: (excluded {excluded.Count()} models with zero remaining quota)\n");
+                foreach (var model in excluded)
+                {
+                    ConsoleHelpers.WriteLineWithHighlight($"  `#e_;*** WARNING: Excluded {model}) ***`");
+                }
+                Console.WriteLine();
             }
 
             return filtered.ToArray();
