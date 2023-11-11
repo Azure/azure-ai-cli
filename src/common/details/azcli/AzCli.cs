@@ -263,6 +263,7 @@ namespace Azure.AI.Details.Common.CLI
         {
             var cmdPart = "cognitiveservices account list";
             var subPart = subscriptionId != null ? $"--subscription {subscriptionId}" : "";
+            var groupPart = "--resource-group \"\"";
             
             var lookForKind = kinds.Split(';').First();
             var condPart= lookForKind switch
@@ -277,7 +278,7 @@ namespace Azure.AI.Details.Common.CLI
                 _ => kinds != null ? $"? kind == '{lookForKind}' || kind == 'CognitiveServices' || kind == 'AIServices'" : null
             };
 
-            var parsed = await ProcessHelpers.ParseShellCommandJson<JArray>("az", $"{cmdPart} --output json {subPart} --query \"[{condPart}].{{Id:id,Name:name,Location: location,Kind:kind,Group:resourceGroup,Endpoint:properties.endpoint}}\"", GetUserAgentEnv());
+            var parsed = await ProcessHelpers.ParseShellCommandJson<JArray>("az", $"{cmdPart} --output json {subPart} {groupPart} --query \"[{condPart}].{{Id:id,Name:name,Location: location,Kind:kind,Group:resourceGroup,Endpoint:properties.endpoint}}\"", GetUserAgentEnv());
             var resources = parsed.Payload;
 
             var x = new ParsedJsonProcessOutput<CognitiveServicesResourceInfo[]>(parsed.Output);
@@ -496,10 +497,12 @@ namespace Azure.AI.Details.Common.CLI
         {
             var cmdPart = "resource list";
             var subPart = subscriptionId != null ? $"--subscription {subscriptionId}" : "";
+            var groupPart = "--resource-group \"\"";
+
             var queryPart1 = string.IsNullOrEmpty(regionLocation) ? "" : $"--location {regionLocation}";
             var queryPart2 = "--query \"[].{Name:name,Id:id,Group:resourceGroup,Location:location}\"";
 
-            var parsed = await ProcessHelpers.ParseShellCommandJson<JArray>("az", $"{cmdPart} --output json {subPart} {queryPart1} {queryPart2} --resource-type Microsoft.Search/searchServices", GetUserAgentEnv());
+            var parsed = await ProcessHelpers.ParseShellCommandJson<JArray>("az", $"{cmdPart} --output json {subPart} {groupPart} {queryPart1} {queryPart2} --resource-type Microsoft.Search/searchServices", GetUserAgentEnv());
             var groups = parsed.Payload;
 
             var x = new ParsedJsonProcessOutput<CognitiveSearchResourceInfo[]>(parsed.Output);
