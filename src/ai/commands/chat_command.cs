@@ -239,7 +239,7 @@ namespace Azure.AI.Details.Common.CLI
             evaluationName = $"{evaluationName}-{DateTime.Now.ToString("yyyyMMddHHmmss")}";
 
             Action<string> stdErrVerbose = x => Console.Error.WriteLine(x);
-            var stdErr = Program.Debug ? stdErrVerbose : null;
+            var stdErr = (Program.Debug || _verbose) ? stdErrVerbose : null;
 
             var output = PythonRunner.RunEmbeddedPythonScript(_values, "function_call_evaluate",
                 CliHelpers.BuildCliArgs(
@@ -273,11 +273,11 @@ namespace Azure.AI.Details.Common.CLI
             var speechInput = _values.GetOrDefault("chat.speech.input", false);
             var userPrompt = _values["chat.message.user.prompt"];
 
-            Console.WriteLine("Press ENTER for more options.\n");
+            if (!_quiet) Console.WriteLine("Press ENTER for more options.\n");
 
             while (true)
             {
-                DisplayUserChatPrompt();
+                DisplayUserChatPromptLabel();
 
                 var text = ReadLineOrSimulateInput(ref userPrompt);
                 if (text.ToLower() == "")
@@ -289,13 +289,12 @@ namespace Azure.AI.Details.Common.CLI
                         text = await GetSpeechInputAsync();
                     }
 
-                    Console.ForegroundColor = ConsoleColor.Yellow;
-                    Console.WriteLine(text);
+                    DisplayUserChatPromptText(text);
                 }
 
                 if (text.ToLower() == "stop") break;
                 if (text.ToLower() == "quit") break;
-                if (text.ToLower() == "exit") break;
+                if (text.ToLower().Trim('.') == "exit") break;
 
                 var task = chatTextHandler(text);
                 WaitForStopOrCancel(task);
@@ -321,11 +320,9 @@ namespace Azure.AI.Details.Common.CLI
                         "SEE:", $"{Program.Name} help chat");
             }
 
-            DisplayUserChatPrompt();
+            DisplayUserChatPromptLabel();
             var text = userPrompt;
-
-            Console.ForegroundColor = ConsoleColor.Yellow;
-            Console.WriteLine(text);
+            DisplayUserChatPromptText(text);
 
             var task = chatTextHandler(text);
             WaitForStopOrCancel(task);
@@ -356,10 +353,7 @@ namespace Azure.AI.Details.Common.CLI
 
                     messages.Add(new ChatMessage(ChatRole.User, text));
 
-                    Console.ForegroundColor = ConsoleColor.Green;
-                    Console.Write("assistant");
-                    Console.ForegroundColor = ConsoleColor.White;
-                    Console.Write(": ");
+                    DisplayAssistantPromptLabel();
                     Console.ForegroundColor = ConsoleColor.Gray;
 
                     var chatProtocolFunc = new Func<string>(() =>
@@ -395,15 +389,11 @@ namespace Azure.AI.Details.Common.CLI
                         }
                     }
 
+                    DisplayAssistantPromptTextStreaming(output);
+                    DisplayAssistantPromptTextStreamingDone();
+
                     messages.Add(new ChatMessage(ChatRole.Assistant, output));
 
-                    output = output.Replace("\n", "\n           ");
-                    Console.WriteLine(output);
-                    Console.WriteLine();
-
-                    output = messages.Last().Content;
-
-                    // return output as a Task<string>
                     return Task.FromResult(output);
                 };
                 return handler;
@@ -461,7 +451,7 @@ namespace Azure.AI.Details.Common.CLI
         private async Task<string> GetSpeechInputAsync()
         {
             Console.Write("\r");
-            DisplayUserChatPrompt();
+            DisplayUserChatPromptLabel();
             Console.ForegroundColor = ConsoleColor.DarkGray;
 
             var text = "(listening)";
@@ -473,7 +463,7 @@ namespace Azure.AI.Details.Common.CLI
             recognizer.Recognizing += (s, e) =>
             {
                 Console.Write("\r");
-                DisplayUserChatPrompt();
+                DisplayUserChatPromptLabel();
                 Console.ForegroundColor = ConsoleColor.DarkGray;
 
                 Console.Write($"{e.Result.Text} ...");
@@ -484,20 +474,21 @@ namespace Azure.AI.Details.Common.CLI
             var result = await recognizer.RecognizeOnceAsync();
 
             Console.Write("\r");
-            DisplayUserChatPrompt();
+            DisplayUserChatPromptLabel();
             Console.Write(new string(' ', result.Text.Length + 4));
 
             Console.Write("\r");
-            DisplayUserChatPrompt();
+            DisplayUserChatPromptLabel();
 
             return result.Text;
         }
 
-        private static string PickInteractiveContextMenu(bool allowSpeechInput)
+        private string PickInteractiveContextMenu(bool allowSpeechInput)
         {
             if (Console.CursorTop > 0)
             {
-                Console.SetCursorPosition(11, Console.CursorTop - 1);
+                var x = _quiet ? 0 : 11;
+                Console.SetCursorPosition(x, Console.CursorTop - 1);
             }
 
             var choices = allowSpeechInput
@@ -507,29 +498,65 @@ namespace Azure.AI.Details.Common.CLI
             return ListBoxPicker.PickString(choices, 20, choices.Length + 2, new Colors(ConsoleColor.White, ConsoleColor.Blue), new Colors(ConsoleColor.White, ConsoleColor.Red), select);
         }
 
-        private static void DisplayUserChatPrompt()
+        private void DisplayUserChatPromptLabel()
         {
-            Console.SetCursorPosition(0, Console.CursorTop);
-            Console.ForegroundColor = ConsoleColor.Green;
-            Console.Write("user");
-            Console.ForegroundColor = ConsoleColor.White;
-            Console.Write("@");
-            Console.ForegroundColor = ConsoleColor.Blue;
-            Console.Write("CHAT");
+            if (!_quiet)
+            {
+                Console.SetCursorPosition(0, Console.CursorTop);
+                Console.ForegroundColor = ConsoleColor.Green;
+                Console.Write("user");
+                Console.ForegroundColor = ConsoleColor.White;
+                Console.Write("@");
+                Console.ForegroundColor = ConsoleColor.Blue;
+                Console.Write("CHAT");
+                Console.ForegroundColor = ConsoleColor.Yellow;
+                Console.Write(": ");
+            }
+            else
+            {
+                Console.ForegroundColor = ConsoleColor.Yellow;
+            }
+        }
+
+        private static void DisplayUserChatPromptText(string text)
+        {
             Console.ForegroundColor = ConsoleColor.Yellow;
-            Console.Write(": ");
+            Console.WriteLine(text);
+        }
+
+        private void DisplayAssistantPromptLabel()
+        {
+            if (!_quiet)
+            {
+                Console.ForegroundColor = ConsoleColor.Green;
+                Console.Write("assistant");
+                Console.ForegroundColor = ConsoleColor.White;
+                Console.Write(": ");
+            }
+            else
+            {
+                Console.ForegroundColor = ConsoleColor.White;
+            }
+        }
+
+        private void DisplayAssistantPromptTextStreaming(string text)
+        {
+            // do "tab" indentation when not quiet
+            Console.Write(!_quiet
+                ? text.Replace("\n", "\n           ")
+                : text);
+        }
+
+        private void DisplayAssistantPromptTextStreamingDone()
+        {
+            Console.WriteLine("\n");
         }
 
         private async Task<Response<StreamingChatCompletions>> GetChatCompletionsAsync(OpenAIClient client, string deployment, ChatCompletionsOptions options, string text)
         {
             options.Messages.Add(new ChatMessage(ChatRole.User, text));
 
-            Console.ForegroundColor = ConsoleColor.Green;
-            Console.Write("assistant");
-
-            Console.ForegroundColor = ConsoleColor.White;
-            Console.Write(": ");
-
+            DisplayAssistantPromptLabel();
             Console.ForegroundColor = ConsoleColor.Gray;
 
             var response = await client.GetChatCompletionsStreamingAsync(deployment, options);
@@ -542,17 +569,14 @@ namespace Azure.AI.Details.Common.CLI
                     var str = message.Content;
                     if (string.IsNullOrEmpty(str)) continue;
 
+                    DisplayAssistantPromptTextStreaming(str);
                     completeResponse = completeResponse + str;
-
-                    str = str.Replace("\n", "\n           ");
-                    Console.Write(str);
                 }
                 CheckChoiceFinishReason(choice);
-                Console.WriteLine();
+                DisplayAssistantPromptTextStreamingDone();
             }
 
             options.Messages.Add(new ChatMessage(ChatRole.Assistant, completeResponse));
-            Console.WriteLine();
 
             return response;
         }
@@ -736,11 +760,10 @@ namespace Azure.AI.Details.Common.CLI
         {
             if (choice.FinishReason == CompletionsFinishReason.ContentFiltered)
             {
-                ConsoleHelpers.WriteLineWithHighlight("#e_;WARNING: Content filtered!");
+                if (!_quiet) ConsoleHelpers.WriteLineWithHighlight("#e_;WARNING: Content filtered!");
             }
             if (choice.FinishReason == CompletionsFinishReason.TokenLimitReached)
             {
-                Console.WriteLine("Reason:" + choice.FinishReason.ToString());
                 _values.AddThrowError("ERROR:", $"exceeded token limit!",
                                          "TRY:", $"{Program.Name} chat --max-tokens TOKENS");
             }
@@ -751,11 +774,10 @@ namespace Azure.AI.Details.Common.CLI
         {
             if (choice.FinishReason == CompletionsFinishReason.ContentFiltered)
             {
-                ConsoleHelpers.WriteLineWithHighlight("#e_;WARNING: Content filtered!");
+                if (!_quiet) ConsoleHelpers.WriteLineWithHighlight("#e_;WARNING: Content filtered!");
             }
             if (choice.FinishReason == CompletionsFinishReason.TokenLimitReached)
             {
-                Console.WriteLine("Reason:" + choice.FinishReason.ToString());
                 _values.AddThrowError("ERROR:", $"exceeded token limit!",
                                          "TRY:", $"{Program.Name} chat --max-tokens TOKENS");
             }
@@ -952,9 +974,9 @@ namespace Azure.AI.Details.Common.CLI
             return kernelWithACS;
         }
 
-        private static async Task StoreMemoryAsync(IKernel kernel, string index)
+        private async Task StoreMemoryAsync(IKernel kernel, string index)
         {
-           Console.Write("Storing files in semantic memory...");
+           if (!_quiet) Console.Write("Storing files in semantic memory...");
            var githubFiles = SampleData();
            foreach (var entry in githubFiles)
            {
@@ -965,10 +987,10 @@ namespace Azure.AI.Details.Common.CLI
                    description: entry.Value,
                    text: entry.Value);
 
-               Console.Write(".");
+               if (!_quiet) Console.Write(".");
            }
 
-           Console.WriteLine(". Done!\n");
+           if (!_quiet) Console.WriteLine(". Done!\n");
         }
 
         private static async Task<string?> SearchMemoryAsync(IKernel? kernel, string collection, string text)
