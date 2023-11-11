@@ -154,7 +154,7 @@ namespace Azure.AI.Details.Common.CLI
 
             var stdErrHandler = useDeviceCode ? showDeviceCodeMessage : null;
             var deviceCodePart = useDeviceCode ? "--use-device-code" : "";
-            var queryPart = $"--query \"[].{{Name:name,Id:id,IsDefault:isDefault,UserName:user.name}}\"";
+            var queryPart = $"--query \"[?state=='Enabled'].{{Name:name,Id:id,IsDefault:isDefault,UserName:user.name}}\"";
 
             var parsed = await ProcessHelpers.ParseShellCommandJson<JArray>("az", $"login --output json {queryPart} {deviceCodePart}", GetUserAgentEnv(), null, stdErrHandler);
             var accounts = parsed.Payload;
@@ -177,7 +177,7 @@ namespace Azure.AI.Details.Common.CLI
 
         public static async Task<ParsedJsonProcessOutput<SubscriptionInfo[]>> ListAccounts()
         {
-            var parsed = await ProcessHelpers.ParseShellCommandJson<JArray>("az", "account list --output json --query \"[].{Name:name,Id:id,IsDefault:isDefault,UserName:user.name}\"", GetUserAgentEnv());
+            var parsed = await ProcessHelpers.ParseShellCommandJson<JArray>("az", "account list --output json --query \"[?state=='Enabled'].{Name:name,Id:id,IsDefault:isDefault,UserName:user.name}\"", GetUserAgentEnv());
             var accounts = parsed.Payload;
 
             var x = new ParsedJsonProcessOutput<SubscriptionInfo[]>(parsed.Output);
