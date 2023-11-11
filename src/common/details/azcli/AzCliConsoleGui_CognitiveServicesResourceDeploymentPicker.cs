@@ -186,36 +186,89 @@ namespace Azure.AI.Details.Common.CLI
 
         private static AzCli.CognitiveServicesModelInfo[] FilterModelsByUsage(AzCli.CognitiveServicesModelInfo[] models, AzCli.CognitiveServicesUsageInfo[] usage)
         {
-            var filtered = new List<AzCli.CognitiveServicesModelInfo>();
+            models = models.GroupBy(x => x.Name + x.Version + x.Format).Select(x => x.First()).ToArray();
+            
+            if (Program.Debug)
+            {
+                Console.WriteLine($"\rModel: (found {models.Count()} models)\n");
+                foreach (var model in models)
+                {
+                    Console.WriteLine($"{model.Name} (version {model.Version}) capacity={model.DefaultCapacity}");
+                }
+                Console.WriteLine();
+            }
+
+            var filteredKeep = new List<AzCli.CognitiveServicesModelInfo>();
             foreach (var model in models)
             {
-                if (!double.TryParse(model.DefaultCapacity, out var defaultCapacityValue)) continue;
+                if (!double.TryParse(model.DefaultCapacity, out var defaultCapacityValue))
+                {
+                    defaultCapacityValue = 1;
+                }
 
                 var checkUsage = usage.Where(x => x.Name.EndsWith(model.Name));
-                var current = checkUsage.Sum(x => double.TryParse(x.Current, out var value) ? value : 0);
-                var limit = checkUsage.Sum(x => double.TryParse(x.Limit, out var value) ? value : 0);
+                var current = checkUsage.Count() > 0
+                    ? checkUsage.Sum(x => double.TryParse(x.Current, out var value) ? value : 0)
+                    : 0;
+                var limit = checkUsage.Count() > 0
+                    ? checkUsage.Sum(x => double.TryParse(x.Limit, out var value) ? value : 0)
+                    : 1;
 
                 var available = limit - current;
                 if (available <= 0) continue;
 
                 if (defaultCapacityValue <= available)
                 {
-                    filtered.Add(model);
+                    filteredKeep.Add(model);
                     continue;
                 }
 
                 var newDefault = available - 1;
                 if (newDefault < 1) newDefault = 1;
 
-                filtered.Add(new AzCli.CognitiveServicesModelInfo()
+                filteredKeep.Add(new AzCli.CognitiveServicesModelInfo()
                 {
                     Name = model.Name,
                     Version = model.Version,
-                    DefaultCapacity = newDefault.ToString()
+                    Format = model.Format,
+                    DefaultCapacity = newDefault.ToString(),
+                    ChatCompletionCapable = model.ChatCompletionCapable,
+                    EmbeddingsCapable = model.EmbeddingsCapable
                 });
             }
 
-            return filtered.ToArray();
+            if (filteredKeep.Count() <= models.Count())
+            {
+                var filteredDidntKeep = new List<string>();
+                foreach (var model in models)
+                {
+                    if (filteredKeep.Any(x => x.Name == model.Name && x.Version == model.Version && x.Format == model.Format)) continue;
+                    filteredDidntKeep.Add($"{model.Name} (version {model.Version})");
+                }
+                filteredDidntKeep.Sort();
+
+                if (filteredDidntKeep.Count() > 0)
+                {
+                    Console.WriteLine($"\rModel: (excluded {filteredDidntKeep.Count()} models with zero remaining quota)\n");
+                    foreach (var model in filteredDidntKeep)
+                    {
+                        ConsoleHelpers.WriteLineWithHighlight($"  `#e_;*** EXCLUDED: {model} ***`");
+                    }
+                    Console.WriteLine();
+                }
+            }
+
+            if (Program.Debug)
+            {
+                Console.WriteLine($"\rModel: ({filteredKeep.Count()} models with remaining quota)\n");
+                foreach (var model in filteredKeep)
+                {
+                    Console.WriteLine($"{model.Name} (version {model.Version}) capacity={model.DefaultCapacity}");
+                }
+                Console.WriteLine();
+            }
+
+            return filteredKeep.ToArray();
         }
 
         private static AzCli.CognitiveServicesDeploymentInfo? ListBoxPickDeployment(AzCli.CognitiveServicesDeploymentInfo[] deployments, string p0, bool allowSkipDeployment = false, int select = 0)
