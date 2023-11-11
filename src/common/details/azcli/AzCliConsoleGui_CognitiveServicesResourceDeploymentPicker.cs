@@ -195,9 +195,10 @@ namespace Azure.AI.Details.Common.CLI
                 {
                     Console.WriteLine($"{model.Name} (version {model.Version}) capacity={model.DefaultCapacity}");
                 }
+                Console.WriteLine();
             }
 
-            var filtered = new List<AzCli.CognitiveServicesModelInfo>();
+            var filteredKeep = new List<AzCli.CognitiveServicesModelInfo>();
             foreach (var model in models)
             {
                 if (!double.TryParse(model.DefaultCapacity, out var defaultCapacityValue)) continue;
@@ -211,35 +212,38 @@ namespace Azure.AI.Details.Common.CLI
 
                 if (defaultCapacityValue <= available)
                 {
-                    filtered.Add(model);
+                    filteredKeep.Add(model);
                     continue;
                 }
 
                 var newDefault = available - 1;
                 if (newDefault < 1) newDefault = 1;
 
-                filtered.Add(new AzCli.CognitiveServicesModelInfo()
+                filteredKeep.Add(new AzCli.CognitiveServicesModelInfo()
                 {
                     Name = model.Name,
                     Version = model.Version,
-                    DefaultCapacity = newDefault.ToString()
+                    Format = model.Format,
+                    DefaultCapacity = newDefault.ToString(),
+                    ChatCompletionCapable = model.ChatCompletionCapable,
+                    EmbeddingsCapable = model.EmbeddingsCapable
                 });
             }
 
-            if (filtered.Count() <= models.Count())
+            if (filteredKeep.Count() <= models.Count())
             {
-                var excluded = new List<string>();
+                var filteredDidntKeep = new List<string>();
                 foreach (var model in models)
                 {
-                    if (filtered.Any(x => x.Name == model.Name && x.Version == model.Version)) continue;
-                    excluded.Add($"{model.Name} (version {model.Version})");
+                    if (filteredKeep.Any(x => x.Name == model.Name && x.Version == model.Version && x.Format == model.Format)) continue;
+                    filteredDidntKeep.Add($"{model.Name} (version {model.Version})");
                 }
-                excluded.Sort();
+                filteredDidntKeep.Sort();
 
-                if (excluded.Count() > 0)
+                if (filteredDidntKeep.Count() > 0)
                 {
-                    Console.WriteLine($"\rModel: (excluded {excluded.Count()} models with zero remaining quota)\n");
-                    foreach (var model in excluded)
+                    Console.WriteLine($"\rModel: (excluded {filteredDidntKeep.Count()} models with zero remaining quota)\n");
+                    foreach (var model in filteredDidntKeep)
                     {
                         ConsoleHelpers.WriteLineWithHighlight($"  `#e_;*** WARNING: Excluded {model}) ***`");
                     }
@@ -249,14 +253,15 @@ namespace Azure.AI.Details.Common.CLI
 
             if (Program.Debug)
             {
-                Console.WriteLine($"\rModel: ({filtered.Count()} models with remaining quota)\n");
-                foreach (var model in filtered)
+                Console.WriteLine($"\rModel: ({filteredKeep.Count()} models with remaining quota)\n");
+                foreach (var model in filteredKeep)
                 {
                     Console.WriteLine($"{model.Name} (version {model.Version}) capacity={model.DefaultCapacity}");
                 }
+                Console.WriteLine();
             }
 
-            return filtered.ToArray();
+            return filteredKeep.ToArray();
         }
 
         private static AzCli.CognitiveServicesDeploymentInfo? ListBoxPickDeployment(AzCli.CognitiveServicesDeploymentInfo[] deployments, string p0, bool allowSkipDeployment = false, int select = 0)
