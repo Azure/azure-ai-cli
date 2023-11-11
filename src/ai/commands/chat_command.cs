@@ -284,12 +284,15 @@ namespace Azure.AI.Details.Common.CLI
                 {
                     text = PickInteractiveContextMenu(speechInput);
                     if (text == null) continue;
+
+                    var fromSpeech = false;
                     if (text == "speech")
                     {
                         text = await GetSpeechInputAsync();
+                        fromSpeech = true;
                     }
 
-                    DisplayUserChatPromptText(text);
+                    DisplayUserChatPromptText(text, fromSpeech);
                 }
 
                 if (text.ToLower() == "stop") break;
@@ -518,8 +521,9 @@ namespace Azure.AI.Details.Common.CLI
             }
         }
 
-        private static void DisplayUserChatPromptText(string text)
+        private void DisplayUserChatPromptText(string text, bool fromSpeech = false)
         {
+            if (_quiet && !fromSpeech) return;
             Console.ForegroundColor = ConsoleColor.Yellow;
             Console.WriteLine(text);
         }
