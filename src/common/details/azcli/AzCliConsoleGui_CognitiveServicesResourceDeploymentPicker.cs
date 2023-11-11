@@ -201,11 +201,18 @@ namespace Azure.AI.Details.Common.CLI
             var filteredKeep = new List<AzCli.CognitiveServicesModelInfo>();
             foreach (var model in models)
             {
-                if (!double.TryParse(model.DefaultCapacity, out var defaultCapacityValue)) continue;
+                if (!double.TryParse(model.DefaultCapacity, out var defaultCapacityValue))
+                {
+                    defaultCapacityValue = 1;
+                }
 
                 var checkUsage = usage.Where(x => x.Name.EndsWith(model.Name));
-                var current = checkUsage.Sum(x => double.TryParse(x.Current, out var value) ? value : 0);
-                var limit = checkUsage.Sum(x => double.TryParse(x.Limit, out var value) ? value : 0);
+                var current = checkUsage.Count() > 0
+                    ? checkUsage.Sum(x => double.TryParse(x.Current, out var value) ? value : 0)
+                    : 0;
+                var limit = checkUsage.Count() > 0
+                    ? checkUsage.Sum(x => double.TryParse(x.Limit, out var value) ? value : 0)
+                    : 1;
 
                 var available = limit - current;
                 if (available <= 0) continue;
@@ -245,7 +252,7 @@ namespace Azure.AI.Details.Common.CLI
                     Console.WriteLine($"\rModel: (excluded {filteredDidntKeep.Count()} models with zero remaining quota)\n");
                     foreach (var model in filteredDidntKeep)
                     {
-                        ConsoleHelpers.WriteLineWithHighlight($"  `#e_;*** WARNING: Excluded {model}) ***`");
+                        ConsoleHelpers.WriteLineWithHighlight($"  `#e_;*** EXCLUDED: {model} ***`");
                     }
                     Console.WriteLine();
                 }
