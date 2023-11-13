@@ -6,9 +6,26 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+using Newtonsoft.Json;
 
 namespace Azure.AI.Details.Common.CLI
 {
+    public class TrueFalseNamedValueTokenParser : NamedValueTokenParser
+    {
+        public TrueFalseNamedValueTokenParser(string fullName, string requiredParts, bool defaultValue = true) :
+            base(null, fullName, requiredParts, "1;0", "true;false", null, defaultValue ? "true" : "false")
+        {
+        }
+    }
+
+    public class TrueFalseRequiredPrefixNamedValueTokenParser : TrueFalseNamedValueTokenParser
+    {
+        public TrueFalseRequiredPrefixNamedValueTokenParser(string prefix, string fullName, string requiredParts, bool defaultValue = true) :
+            base($"{prefix}.{fullName}", $"{Required(prefix)}.{requiredParts}", defaultValue)
+        {
+        }
+    }
+
     public class CommonNamedValueTokenParsers : NamedValueTokenParserList
     {
         public CommonNamedValueTokenParsers(bool includeKeyAndRegion = true) : base(

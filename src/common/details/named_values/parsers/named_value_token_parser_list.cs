@@ -54,17 +54,9 @@ namespace Azure.AI.Details.Common.CLI
             _parsers.RemoveAll(match);
         }
 
-        static protected string NotRequired(string dottedTokenParts)
-        {
-            var count = dottedTokenParts.Count(x => x == '.');
-            return new string('0', count + 1);
-        }
+        static protected string NotRequired(string dottedTokenParts) => NamedValueTokenParser.NotRequired(dottedTokenParts);
 
-        static protected string Required(string dottedTokenParts)
-        {
-            var count = dottedTokenParts.Count(x => x == '.');
-            return new string('1', count + 1);
-        }
+        static protected string Required(string dottedTokenParts) => NamedValueTokenParser.Required(dottedTokenParts);
 
         private readonly List<INamedValueTokenParser> _parsers;
     }

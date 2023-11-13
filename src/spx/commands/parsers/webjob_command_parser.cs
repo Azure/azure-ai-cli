@@ -176,7 +176,7 @@ namespace Azure.AI.Details.Common.CLI
                 Allow.OutputUrl |
                 Allow.Wait),
             new NamedValueTokenParser(null, "webjob.upload.job.file", "0001", "1"),
-            new NamedValueTokenParser(null, "webjob.run.job", "010", "1;0", "true;false", null, "true"),
+            new TrueFalseNamedValueTokenParser("webjob.run.job", "010"),
         };
 
         private static readonly INamedValueTokenParser[] runCommandParsers = {

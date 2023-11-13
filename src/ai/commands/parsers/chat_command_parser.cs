@@ -113,8 +113,8 @@ namespace Azure.AI.Details.Common.CLI
 
             new CommonChatNamedValueTokenParsers(),
 
-            new NamedValueTokenParser("--interactive",  "chat.input.interactive", "001", "1;0", "true;false", null, "true"),
-            new NamedValueTokenParser(null,             "chat.speech.input", "010", "1;0", "true;false", null, "true"),
+            new TrueFalseNamedValueTokenParser("chat.input.interactive", "001"),
+            new TrueFalseNamedValueTokenParser("chat.speech.input", "010"),
 
         };
 
