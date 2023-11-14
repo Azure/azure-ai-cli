@@ -18,6 +18,8 @@ USAGE: ai index update [...]
   AZURE SEARCH DATA SOURCE
     --data-source-connection NAME           (see: ai help search data source connection)
     --blob-container ENDPOINT/NAME          (see: ai help search data source blob container)
+    --indexer-name NAME                     (see: ai help search indexer name)
+    --skillset-name NAME                    (see: ai help search skillset name)
     --id-field NAME                         (see: ai help search id field name)
     --content-field NAME                    (see: ai help search content field name)
     --vector-field NAME                     (see: ai help search vector field name)
