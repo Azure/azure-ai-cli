@@ -397,8 +397,7 @@ namespace Azure.AI.Details.Common.CLI
 
             var splitSkill = new SplitSkill(
                 new List<InputFieldMappingEntry> {
-                    new InputFieldMappingEntry("text") { Source = useOcr ? "/document/mergedText" : "/document/content" },
-                    new InputFieldMappingEntry("languageCode") { Source = "/document/language" }
+                    new InputFieldMappingEntry("text") { Source = useOcr ? "/document/mergedText" : "/document/content" }
                 },
                 new List<OutputFieldMappingEntry> {
                     new OutputFieldMappingEntry("textItems") { TargetName = "pages"}
@@ -415,7 +414,7 @@ namespace Azure.AI.Details.Common.CLI
                     new InputFieldMappingEntry("text") { Source = "/document/pages/*" }
                 },
                 new List<OutputFieldMappingEntry> {
-                    new OutputFieldMappingEntry("embedding") { TargetName = vectorFieldName}
+                    new OutputFieldMappingEntry("embedding") { TargetName = "vector" }
                 }) {
                     Context = "/document/pages/*",
                     ResourceUri = new Uri(embeddingsEndpoint),
