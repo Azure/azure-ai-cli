@@ -13,7 +13,7 @@ In the future, you'll even be able to use the `AI` CLI to dynamically create cod
 
 You can install the Azure `AI` CLI locally on Linux, Mac, or Windows computers, or use it thru an internet browser or Docker container. 
 
-During this private preview, we recommend using the Azure `AI` CLI thru GitHub Codespaces. This will allow you to quickly get started without having to install anything locally.
+During this public preview, we recommend using the Azure `AI` CLI thru GitHub Codespaces. This will allow you to quickly get started without having to install anything locally.
 
 ### OPTION 1: GitHub Codespaces
 
@@ -120,8 +120,8 @@ ai search index update --files "../../data/3-product-info/*.md" --index-name "pr
 AI - Azure AI CLI, Version 1.0.0
 Copyright (c) 2023 Microsoft Corporation. All Rights Reserved.
 
-This PRIVATE PREVIEW version may change at any time.
-See: https://aka.ms/azure-ai-cli-private-preview
+This PUBLIC PREVIEW version may change at any time.
+See: https://aka.ms/azure-ai-cli-public-preview
 
 SEARCH INDEX UPDATE
 
