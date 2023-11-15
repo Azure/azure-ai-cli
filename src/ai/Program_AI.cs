@@ -28,7 +28,7 @@ namespace Azure.AI.Details.Common.CLI
         #region name data
         public string Name => "ai";
         public string DisplayName => "Azure AI CLI";
-        public string WarningBanner => "`#e_;This PRIVATE PREVIEW version may change at any time.\nSee: https://aka.ms/azure-ai-cli-public-preview";
+        public string WarningBanner => "`#e_;This PUBLIC PREVIEW version may change at any time.\nSee: https://aka.ms/azure-ai-cli-public-preview";
         public string TelemetryUserAgent => "ai-cli 0.0.1";
         #endregion
 
