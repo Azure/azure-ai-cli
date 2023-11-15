@@ -19,6 +19,7 @@
     <PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
     <Authors>Microsoft</Authors>
+    <Title>Azuure.AI.CLI</Title>
     <Description>Azure AI CLI (AI) is a command line tool for using the Azure AI service without writing any code. See https://docs.microsoft.com/azure/ai for more information.</Description>
     <Copyright>© Microsoft Corporation. All rights reserved.</Copyright>
     <PackageProjectUrl>https://docs.microsoft.com/azure/ai</PackageProjectUrl>
