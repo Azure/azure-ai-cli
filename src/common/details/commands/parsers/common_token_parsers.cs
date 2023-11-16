@@ -10,6 +10,38 @@ using Newtonsoft.Json;
 
 namespace Azure.AI.Details.Common.CLI
 {
+    public class OutputFileNamedValueTokenParser : NamedValueTokenParser
+    {
+        public OutputFileNamedValueTokenParser(string fullName, string requiredParts, string defaultValue = "-") :
+            base(null, $"output.{fullName}.file", $"1{requiredParts}0", "1;0", "@@", null, defaultValue)
+        {
+        }
+    }
+
+    public class OutputFileOptionalPrefixNamedValueTokenParser : OutputFileNamedValueTokenParser
+    {
+        public OutputFileOptionalPrefixNamedValueTokenParser(string optionalPrefix, string fullName, string fullNameRequiredParts, string defaultValue = "-") :
+            base($"{optionalPrefix}.{fullName}", $"{NotRequired(optionalPrefix)}{fullNameRequiredParts}",  defaultValue)
+        {
+        }
+    }
+
+    public class OutputFileRequiredPrefixNamedValueTokenParser : OutputFileNamedValueTokenParser
+    {
+        public OutputFileRequiredPrefixNamedValueTokenParser(string requiredPrefix, string fullName, string fullNameRequiredParts, string defaultValue = "-") :
+            base($"{requiredPrefix}.{fullName}.output.file", $"{Required(requiredPrefix)}{fullNameRequiredParts}", defaultValue)
+        {
+        }
+    }
+
+    public class OutputFileOptionalAndRequiredPrefixNamedValueTokenParser : OutputFileNamedValueTokenParser
+    {
+        public OutputFileOptionalAndRequiredPrefixNamedValueTokenParser(string optionalPrefix, string requiredPrefix, string fullName, string fullNameRequiredParts, string defaultValue = "-") :
+            base($"{optionalPrefix}.{requiredPrefix}.{fullName}", $"{NotRequired(optionalPrefix)}{Required(requiredPrefix)}{fullNameRequiredParts}",  defaultValue)
+        {
+        }
+    }
+
     public class TrueFalseNamedValueTokenParser : NamedValueTokenParser
     {
         public TrueFalseNamedValueTokenParser(string fullName, string requiredParts, bool defaultValue = true) :
@@ -21,8 +53,9 @@ namespace Azure.AI.Details.Common.CLI
     public class TrueFalseRequiredPrefixNamedValueTokenParser : TrueFalseNamedValueTokenParser
     {
         public TrueFalseRequiredPrefixNamedValueTokenParser(string prefix, string fullName, string requiredParts, bool defaultValue = true) :
-            base($"{prefix}.{fullName}", $"{Required(prefix)}.{requiredParts}", defaultValue)
+            base($"{prefix}.{fullName}", $"{Required(prefix)}{requiredParts}", defaultValue)
         {
+            Console.WriteLine($"{FullName}, {RequiredParts}");
         }
     }
 

@@ -110,7 +110,8 @@ namespace Azure.AI.Details.Common.CLI
                 EnumerationOptions recursiveOptions = null;
                 if (path.EndsWith("**"))
                 {
-                    path = path.Substring(0, path.Length - 3);
+                    path = path.Substring(0, path.Length - 2).TrimEnd('/', '\\');
+                    if (string.IsNullOrEmpty(path)) path = ".";
                     recursiveOptions = new EnumerationOptions() { RecurseSubdirectories = true };
                 }
 

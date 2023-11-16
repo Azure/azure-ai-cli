@@ -394,6 +394,7 @@ namespace Azure.AI.Details.Common.CLI
 
                     DisplayAssistantPromptTextStreaming(output);
                     DisplayAssistantPromptTextStreamingDone();
+                    CheckWriteChatAnswerOutputFile(output);
 
                     messages.Add(new ChatMessage(ChatRole.Assistant, output));
 
@@ -556,6 +557,16 @@ namespace Azure.AI.Details.Common.CLI
             Console.WriteLine("\n");
         }
 
+        private void CheckWriteChatAnswerOutputFile(string completeResponse)
+        {
+            var outputAnswerFile = OutputChatAnswerFileToken.Data().GetOrDefault(_values);
+            if (!string.IsNullOrEmpty(outputAnswerFile))
+            {
+                var fileName = FileHelpers.GetOutputDataFileName(outputAnswerFile, _values);
+                FileHelpers.WriteAllText(fileName, completeResponse, Encoding.UTF8);
+            }
+        }
+
         private async Task<Response<StreamingChatCompletions>> GetChatCompletionsAsync(OpenAIClient client, string deployment, ChatCompletionsOptions options, string text)
         {
             options.Messages.Add(new ChatMessage(ChatRole.User, text));
@@ -578,6 +589,7 @@ namespace Azure.AI.Details.Common.CLI
                 }
                 CheckChoiceFinishReason(choice);
                 DisplayAssistantPromptTextStreamingDone();
+                CheckWriteChatAnswerOutputFile(completeResponse);
             }
 
             options.Messages.Add(new ChatMessage(ChatRole.Assistant, completeResponse));
