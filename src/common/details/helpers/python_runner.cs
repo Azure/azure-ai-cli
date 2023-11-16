@@ -200,20 +200,16 @@ namespace Azure.AI.Details.Common.CLI
             if (_pythonBinary == null)
             {
                 _pythonBinary = FindPython();
+                AI.DBG_TRACE_VERBOSE($"Python found: {_pythonBinary}");
             }
+
             return _pythonBinary;
         }
 
         private static string FindPython()
         {
-            var process = ProcessHelpers.RunShellCommandAsync("python3", "--version").Result;
-            if (process.ExitCode == 0 && process.MergedOutput.Contains("Python 3.")) return "python3";
-
-            process = ProcessHelpers.RunShellCommandAsync("python", "--version").Result;
-            if (process.ExitCode == 0 && process.MergedOutput.Contains("Python 3.")) return "python";
-
             var lastTry = FindPythonBinaryInOsPath();
-            process = ProcessHelpers.RunShellCommandAsync("python", "--version").Result;
+            var process = ProcessHelpers.RunShellCommandAsync(lastTry, "--version").Result;
             if (process.ExitCode == 0 && process.MergedOutput.Contains("Python 3.")) return lastTry;
 
             return null;

@@ -54,7 +54,7 @@ namespace Azure.AI.Details.Common.CLI
                 "--workspace-name", projectName,
                 "--flow", flowName);
 
-            return ProcessHelpers.RunShellCommandAsync("pfazure", $"{cmdPart} {argsPart}", null, StdOutputHandler(), StandardErrorHandler());
+            return ProcessHelpers.RunShellCommandAsync("pfazure", $"{cmdPart} {argsPart} --set name={flowName} type=chat", null, StdOutputHandler(), StandardErrorHandler());
         }
 
         public static async Task<ProcessOutput> FlowBuild(string flowPath, string output, string format, string variant = null, bool verbose = false, bool debug = false)

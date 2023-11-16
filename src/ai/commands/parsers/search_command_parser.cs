@@ -103,6 +103,7 @@ namespace Azure.AI.Details.Common.CLI
 
             BlobContainerToken.Parser(),
             SearchIndexerDataSourceConnectionNameToken.Parser(),
+            SearchIndexerSkillsetNameToken.Parser(),
             IndexIdFieldNameToken.Parser(),
             IndexContentFieldNameToken.Parser(),
             IndexVectorFieldNameToken.Parser(),
