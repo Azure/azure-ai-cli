@@ -12,6 +12,7 @@ using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
+using Azure.AI.Details.Common.CLI.ConsoleGui;
 
 namespace Azure.AI.Details.Common.CLI
 {
@@ -22,6 +23,14 @@ namespace Azure.AI.Details.Common.CLI
         public static int Main(IProgramData data, string[] mainArgs)
         {
             _data = data;
+
+            if (mainArgs.Length == 1 && mainArgs[0] == "edit")
+            {
+                var normal = new Colors(Console.ForegroundColor, Console.BackgroundColor);
+                var text = ConsoleReadMultiLineTextBox.ReadLine(Console.BufferWidth, 1, normal);
+                Console.WriteLine(text);
+                return 0;
+            }
 
             Console.OutputEncoding = Encoding.UTF8;
             Console.CancelKeyPress += (s, e) =>

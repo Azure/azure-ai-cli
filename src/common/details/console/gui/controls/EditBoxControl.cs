@@ -43,6 +43,7 @@ namespace Azure.AI.Details.Common.CLI.ConsoleGui
             if (base.Open())
             {
                 DisplayText();
+                DisplayCursor();
                 return true;
             }
 
