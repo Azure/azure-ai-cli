@@ -576,6 +576,7 @@ namespace Azure.AI.Details.Common.CLI
             Console.ForegroundColor = ConsoleColor.Gray;
 
             var functions = AzureOpenAIFunctionDefinitionHelper.GetFunctionDefinitions(typeof(Calculator));
+            functions.Clear();
             functions.ToList().ForEach(x => options.Functions.Add(x.Value));
 
             string contentComplete = string.Empty;
