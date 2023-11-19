@@ -575,6 +575,8 @@ namespace Azure.AI.Details.Common.CLI
             DisplayAssistantPromptLabel();
             Console.ForegroundColor = ConsoleColor.Gray;
 
+            // AzureOpenAIFunctionDefinitionHelper.GetFunctionDefinitions(typeof(Calculator)).ForEach(x => options.Functions.Add(x));
+
             options.DeploymentName = deployment;
             var response = await client.GetChatCompletionsStreamingAsync(options);
 
