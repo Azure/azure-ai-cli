@@ -116,7 +116,6 @@ namespace Azure.AI.Details.Common.CLI
             var client = CreateOpenAIClient(out var deployment);
             var chatTextHandler = (string text) =>
             {
-
                 var options = CreateChatCompletionOptions();
                 options.Messages.Add(new ChatMessage(ChatRole.User, text));
 
@@ -571,53 +570,64 @@ namespace Azure.AI.Details.Common.CLI
         private async Task<StreamingResponse<StreamingChatCompletionsUpdate>> GetChatCompletionsAsync(OpenAIClient client, string deployment, ChatCompletionsOptions options, string text)
         {
             options.Messages.Add(new ChatMessage(ChatRole.User, text));
+            options.DeploymentName = deployment;
 
             DisplayAssistantPromptLabel();
             Console.ForegroundColor = ConsoleColor.Gray;
 
-            // AzureOpenAIFunctionDefinitionHelper.GetFunctionDefinitions(typeof(Calculator)).ForEach(x => options.Functions.Add(x));
+            var functions = AzureOpenAIFunctionDefinitionHelper.GetFunctionDefinitions(typeof(Calculator));
+            functions.ToList().ForEach(x => options.Functions.Add(x.Value));
 
-            options.DeploymentName = deployment;
-            var response = await client.GetChatCompletionsStreamingAsync(options);
-
-            string functionName = null;
-            string argumentsComplete = string.Empty;
             string contentComplete = string.Empty;
 
-            var updates = response.EnumerateValues();
-            await foreach (var update in updates)
+            while (true)
             {
-                if (!string.IsNullOrEmpty(update.FunctionName))
+                string functionName = null;
+                string argumentsComplete = string.Empty;
+
+                var response = await client.GetChatCompletionsStreamingAsync(options);
+                await foreach (var update in response.EnumerateValues())
                 {
-                    functionName = update.FunctionName;
-                }
-                
-                var arguments = update.FunctionArgumentsUpdate;
-                if (arguments != null)
-                {
-                    argumentsComplete += arguments;
+                    if (!string.IsNullOrEmpty(update.FunctionName))
+                    {
+                        functionName = update.FunctionName;
+                    }
+                    
+                    var arguments = update.FunctionArgumentsUpdate;
+                    if (arguments != null)
+                    {
+                        argumentsComplete += arguments;
+                    }
+
+                    var content = update.ContentUpdate;
+                    if (content != null)
+                    {
+                        contentComplete += content;
+                        DisplayAssistantPromptTextStreaming(content);
+                    }
+
+                    CheckChoiceFinishReason(update.FinishReason);
                 }
 
-                if (update.FinishReason == CompletionsFinishReason.FunctionCall)
+                if (functionName != null && !string.IsNullOrEmpty(argumentsComplete))
                 {
+                    var function = functions.FirstOrDefault(x => x.Value.Name == functionName);
+                    if (function.Key != null)
+                    {
+                        var result = AzureOpenAIFunctionDefinitionHelper.CallFunction(function.Key, function.Value, argumentsComplete);
+                        options.Messages.Add(new ChatMessage() { Role = ChatRole.Assistant, FunctionCall = new FunctionCall(functionName, argumentsComplete) });
+                        options.Messages.Add(new ChatMessage(ChatRole.Function, result) { Name = functionName });
+                        continue;
+                    }
                 }
 
-                var content = update.ContentUpdate;
-                if (content != null)
-                {
-                    contentComplete += content;
-                    DisplayAssistantPromptTextStreaming(content);
-                }
+                DisplayAssistantPromptTextStreamingDone();
+                CheckWriteChatAnswerOutputFile(contentComplete);
 
-                CheckChoiceFinishReason(update.FinishReason);
+                options.Messages.Add(new ChatMessage(ChatRole.Assistant, contentComplete));
+
+                return response;
             }
-
-            DisplayAssistantPromptTextStreamingDone();
-            CheckWriteChatAnswerOutputFile(contentComplete);
-
-            options.Messages.Add(new ChatMessage(ChatRole.Assistant, contentComplete));
-
-            return response;
         }
 
         private ChatCompletionsOptions CreateChatCompletionOptions()

@@ -17,6 +17,18 @@ namespace Azure.AI.Details.Common.CLI
 
     public static class Calculator
     {
+        [FunctionDefinition(Description = "Returns the age of a person")]
+        public static int GetPersonAge(string personName)
+        {
+            return personName switch
+            {
+                "Beckett" => 17,
+                "Jac" => 19,
+                "Rob" => 54,
+                _ => 0,
+            };
+        }
+
         [FunctionDefinition(Description = "Adds two numbers")]
         public static int Add(int a, int b)
         {
@@ -44,9 +56,9 @@ namespace Azure.AI.Details.Common.CLI
 
     public class AzureOpenAIFunctionDefinitionHelper
     {
-        public static List<FunctionDefinition> GetFunctionDefinitions(Type type)
+        public static Dictionary<MethodInfo, FunctionDefinition> GetFunctionDefinitions(Type type)
         {
-            var functions = new List<FunctionDefinition>();
+            var functions = new Dictionary<MethodInfo, FunctionDefinition>();
 
             var methods = type.GetMethods(BindingFlags.Static | BindingFlags.Public);
             foreach (var method in methods)
@@ -87,34 +99,79 @@ namespace Azure.AI.Details.Common.CLI
                     var json = parameters.ToString(Formatting.None);
                     functionDefinition.Parameters = new BinaryData(json);
 
-                    functions.Add(functionDefinition);
+                    functions.Add(method, functionDefinition);
                 }
             }
 
-
             return functions;
         }
 
-        public static List<FunctionDefinition> GetFunctionDefinitions(IEnumerable<Type> types)
+        public static Dictionary<MethodInfo, FunctionDefinition> GetFunctionDefinitions(IEnumerable<Type> types)
         {
-            var functions = new List<FunctionDefinition>();
+            var functions = new Dictionary<MethodInfo, FunctionDefinition>();
             foreach (var type in types)
             {
-                functions.AddRange(GetFunctionDefinitions(type));
+                var typeFunctions = GetFunctionDefinitions(type);
+                foreach (var typeFunction in typeFunctions)
+                {
+                    functions.Add(typeFunction.Key, typeFunction.Value);
+                }
             }
             return functions;
         }
 
-        public static List<FunctionDefinition> GetFunctionDefinitions(Type type1, params Type[] types)
+        public static Dictionary<MethodInfo, FunctionDefinition> GetFunctionDefinitions(Type type1, params Type[] types)
         {
             var functions = GetFunctionDefinitions(type1);
-            functions.AddRange(GetFunctionDefinitions(types));
+            foreach (var type in types)
+            {
+                var typeFunctions = GetFunctionDefinitions(type);
+                foreach (var typeFunction in typeFunctions)
+                {
+                    functions.Add(typeFunction.Key, typeFunction.Value);
+                }
+            }
             return functions;
         }
 
-        public static List<FunctionDefinition> GetFunctionDefinitions(Assembly assembly)
+        public static Dictionary<MethodInfo, FunctionDefinition> GetFunctionDefinitions(Assembly assembly)
         {
             return GetFunctionDefinitions(assembly.GetTypes());
+        }
+
+        public static string CallFunction(MethodInfo methodInfo, FunctionDefinition functionDefinition, string argumentsAsJson)
+        {
+            var jObject = JObject.Parse(argumentsAsJson);
+            var arguments = new List<object>();
+
+            var schema = functionDefinition.Parameters.ToString();
+            var schemaObject = JObject.Parse(schema);
+
+            var parameters = methodInfo.GetParameters();
+            foreach (var parameter in parameters)
+            {
+                var parameterName = parameter.Name;
+                var parameterType = parameter.ParameterType.Name;
+
+                var parameterValue = jObject[parameterName].ToString();
+
+                if (parameterType == "String")
+                {
+                    arguments.Add(parameterValue);
+                }
+                else if (parameterType == "Int32")
+                {
+                    arguments.Add(int.Parse(parameterValue));
+                }
+                else
+                {
+                    var isRequired = schemaObject["required"].Values<string>().Contains(parameterName);
+                    if (isRequired) throw new Exception($"Unknown parameter type: {parameterType}");
+                }
+            }
+
+            var result = methodInfo.Invoke(null, arguments.ToArray());
+            return result.ToString();
         }
     }
 }
