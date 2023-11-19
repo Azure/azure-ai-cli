@@ -506,7 +506,7 @@ namespace Azure.AI.Details.Common.CLI
         {
             if (!_quiet)
             {
-                Console.SetCursorPosition(0, Console.CursorTop);
+                Console.Write('\r');
                 Console.ForegroundColor = ConsoleColor.Green;
                 Console.Write("user");
                 Console.ForegroundColor = ConsoleColor.White;
