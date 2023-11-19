@@ -120,7 +120,8 @@ namespace Azure.AI.Details.Common.CLI
                 var options = CreateChatCompletionOptions();
                 options.Messages.Add(new ChatMessage(ChatRole.User, text));
 
-                var response = client.GetChatCompletions(deployment, options);
+                options.DeploymentName = deployment;
+                var response = client.GetChatCompletions(options);
 
                 var choice = CheckChoiceFinishReason(response.Value.Choices.Last());
                 var message = choice.Message;
@@ -567,32 +568,52 @@ namespace Azure.AI.Details.Common.CLI
             }
         }
 
-        private async Task<Response<StreamingChatCompletions>> GetChatCompletionsAsync(OpenAIClient client, string deployment, ChatCompletionsOptions options, string text)
+        private async Task<StreamingResponse<StreamingChatCompletionsUpdate>> GetChatCompletionsAsync(OpenAIClient client, string deployment, ChatCompletionsOptions options, string text)
         {
             options.Messages.Add(new ChatMessage(ChatRole.User, text));
 
             DisplayAssistantPromptLabel();
             Console.ForegroundColor = ConsoleColor.Gray;
 
-            var response = await client.GetChatCompletionsStreamingAsync(deployment, options);
+            options.DeploymentName = deployment;
+            var response = await client.GetChatCompletionsStreamingAsync(options);
 
-            var completeResponse = string.Empty;
-            await foreach (var choice in response.Value.GetChoicesStreaming())
+            string functionName = null;
+            string argumentsComplete = string.Empty;
+            string contentComplete = string.Empty;
+
+            var updates = response.EnumerateValues();
+            await foreach (var update in updates)
             {
-                await foreach (var message in choice.GetMessageStreaming())
+                if (!string.IsNullOrEmpty(update.FunctionName))
                 {
-                    var str = message.Content;
-                    if (string.IsNullOrEmpty(str)) continue;
-
-                    DisplayAssistantPromptTextStreaming(str);
-                    completeResponse = completeResponse + str;
+                    functionName = update.FunctionName;
                 }
-                CheckChoiceFinishReason(choice);
-                DisplayAssistantPromptTextStreamingDone();
-                CheckWriteChatAnswerOutputFile(completeResponse);
+                
+                var arguments = update.FunctionArgumentsUpdate;
+                if (arguments != null)
+                {
+                    argumentsComplete += arguments;
+                }
+
+                if (update.FinishReason == CompletionsFinishReason.FunctionCall)
+                {
+                }
+
+                var content = update.ContentUpdate;
+                if (content != null)
+                {
+                    contentComplete += content;
+                    DisplayAssistantPromptTextStreaming(content);
+                }
+
+                CheckChoiceFinishReason(update.FinishReason);
             }
 
-            options.Messages.Add(new ChatMessage(ChatRole.Assistant, completeResponse));
+            DisplayAssistantPromptTextStreamingDone();
+            CheckWriteChatAnswerOutputFile(contentComplete);
+
+            options.Messages.Add(new ChatMessage(ChatRole.Assistant, contentComplete));
 
             return response;
         }
@@ -654,23 +675,19 @@ namespace Azure.AI.Details.Common.CLI
 
             var queryType = QueryTypeFrom(_values["service.config.search.query.type"]) ?? AzureCognitiveSearchQueryType.VectorSimpleHybrid;
 
-            options.AzureExtensionsOptions = new()
-            {
-                Extensions =
-                {
-                    new AzureCognitiveSearchChatExtensionConfiguration(
+            var search = new AzureCognitiveSearchChatExtensionConfiguration(
                             AzureChatExtensionType.AzureCognitiveSearch,
                             new Uri(searchEndpoint),
-                            new AzureKeyCredential(searchKey),
                             indexName)
-                    {
-                        QueryType = queryType,
-                        EmbeddingEndpoint = embeddingEndpoint,
-                        EmbeddingKey = new AzureKeyCredential(embeddingsKey),
-                        DocumentCount = 16,
-                    }
-                }
+            {
+                QueryType = queryType,
+                DocumentCount = 16,
+                EmbeddingEndpoint = embeddingEndpoint,
             };
+            search.SetEmbeddingKey(embeddingsKey);
+            search.SetSearchKey(searchKey);
+
+            options.AzureExtensionsOptions = new() { Extensions = { search } };
         }
 
         private static AzureCognitiveSearchQueryType? QueryTypeFrom(string queryType)
@@ -786,18 +803,17 @@ namespace Azure.AI.Details.Common.CLI
             return choice;
         }
 
-        private StreamingChatChoice CheckChoiceFinishReason(StreamingChatChoice choice)
+        private void CheckChoiceFinishReason(CompletionsFinishReason? finishReason)
         {
-            if (choice.FinishReason == CompletionsFinishReason.ContentFiltered)
+            if (finishReason == CompletionsFinishReason.ContentFiltered)
             {
                 if (!_quiet) ConsoleHelpers.WriteLineWithHighlight("#e_;WARNING: Content filtered!");
             }
-            if (choice.FinishReason == CompletionsFinishReason.TokenLimitReached)
+            if (finishReason == CompletionsFinishReason.TokenLimitReached)
             {
                 _values.AddThrowError("ERROR:", $"exceeded token limit!",
                                          "TRY:", $"{Program.Name} chat --max-tokens TOKENS");
             }
-            return choice;
         }
 
         private ChatRole UpdateRole(ref string line, ChatRole? currentRole = null)
