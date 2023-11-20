@@ -64,9 +64,11 @@ namespace Azure.AI.Details.Common.CLI.Extensions.FunctionCallingModel
             var attributes = method.GetCustomAttributes(typeof(FunctionDescriptionAttribute), false);
             if (attributes.Length > 0)
             {
+                var funcDescriptionAttrib = attributes[0] as FunctionDescriptionAttribute;
+
                 var functionDefinition = new FunctionDefinition();
                 functionDefinition.Name = method.Name;
-                functionDefinition.Description = ((FunctionDescriptionAttribute)attributes[0]).Description;
+                functionDefinition.Description = funcDescriptionAttrib!.Description;
 
                 var required = new JArray();
                 var parameters = new JObject();
@@ -80,8 +82,6 @@ namespace Azure.AI.Details.Common.CLI.Extensions.FunctionCallingModel
                     var parameterName = parameter.Name;
                     if (parameterName == null) continue;
 
-                    required.Add(parameterName);
-
                     var parameterType = parameter.ParameterType.Name switch
                     {
                         "String" => "string",
@@ -89,11 +89,19 @@ namespace Azure.AI.Details.Common.CLI.Extensions.FunctionCallingModel
                         _ => parameter.ParameterType.Name,
                     };
 
+                    attributes = parameter.GetCustomAttributes(typeof(ParameterDescriptionAttribute), false);
+                    var paramDescriptionAttrib = attributes.Length > 0 ? (attributes[0] as ParameterDescriptionAttribute) : null;
+                    var paramDescription = paramDescriptionAttrib?.Description ?? $"The {parameterName} parameter";
+
                     var parameterJson = new JObject();
                     parameterJson["type"] = parameterType;
-                    parameterJson["description"] = $"The {parameterName} parameter";
-
+                    parameterJson["description"] = paramDescription;
                     properties[parameterName] = parameterJson;
+
+                    if (!parameter.IsOptional)
+                    {
+                        required.Add(parameterName);
+                    }
                 }
 
                 parameters["required"] = required;
