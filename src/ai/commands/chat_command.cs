@@ -580,11 +580,11 @@ namespace Azure.AI.Details.Common.CLI
 
                     CheckChoiceFinishReason(update.FinishReason);
 
-                    var str = update.ContentUpdate;
-                    if (str == null) continue;
+                    var content = update.ContentUpdate;
+                    if (content == null) continue;
 
-                    contentComplete += str;
-                    DisplayAssistantPromptTextStreaming(str);
+                    contentComplete += content;
+                    DisplayAssistantPromptTextStreaming(content);
                 }
 
                 if (options.TryCallFunction(funcFactory, funcContext))
