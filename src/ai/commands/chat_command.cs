@@ -575,30 +575,17 @@ namespace Azure.AI.Details.Common.CLI
             DisplayAssistantPromptLabel();
             Console.ForegroundColor = ConsoleColor.Gray;
 
-            var functions = AzureOpenAIFunctionDefinitionHelper.GetFunctionDefinitions(typeof(Calculator));
-            functions.Clear();
-            functions.ToList().ForEach(x => options.Functions.Add(x.Value));
+            var funcFactory = new FunctionFactory(); // new FunctionFactory(typeof(Calculator));
+            var funcContext = options.AddFunctions(funcFactory);
 
             string contentComplete = string.Empty;
 
             while (true)
             {
-                string functionName = null;
-                string argumentsComplete = string.Empty;
-
                 var response = await client.GetChatCompletionsStreamingAsync(options);
                 await foreach (var update in response.EnumerateValues())
                 {
-                    if (!string.IsNullOrEmpty(update.FunctionName))
-                    {
-                        functionName = update.FunctionName;
-                    }
-                    
-                    var arguments = update.FunctionArgumentsUpdate;
-                    if (arguments != null)
-                    {
-                        argumentsComplete += arguments;
-                    }
+                    funcContext.CheckForUpdate(update);
 
                     var content = update.ContentUpdate;
                     if (content != null)
@@ -610,16 +597,10 @@ namespace Azure.AI.Details.Common.CLI
                     CheckChoiceFinishReason(update.FinishReason);
                 }
 
-                if (functionName != null && !string.IsNullOrEmpty(argumentsComplete))
+                if (options.TryCallFunction(funcFactory, funcContext))
                 {
-                    var function = functions.FirstOrDefault(x => x.Value.Name == functionName);
-                    if (function.Key != null)
-                    {
-                        var result = AzureOpenAIFunctionDefinitionHelper.CallFunction(function.Key, function.Value, argumentsComplete);
-                        options.Messages.Add(new ChatMessage() { Role = ChatRole.Assistant, FunctionCall = new FunctionCall(functionName, argumentsComplete) });
-                        options.Messages.Add(new ChatMessage(ChatRole.Function, result) { Name = functionName });
-                        continue;
-                    }
+                    funcContext.Reset();
+                    continue;
                 }
 
                 DisplayAssistantPromptTextStreamingDone();
