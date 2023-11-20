@@ -65,66 +65,20 @@ namespace Azure.AI.Details.Common.CLI.Extensions.FunctionCallingModel
             if (attributes.Length > 0)
             {
                 var funcDescriptionAttrib = attributes[0] as FunctionDescriptionAttribute;
+                var funcDescription = funcDescriptionAttrib!.Description;
 
-                var functionDefinition = new FunctionDefinition();
-                functionDefinition.Name = method.Name;
-                functionDefinition.Description = funcDescriptionAttrib!.Description;
-
-                var required = new JArray();
-                var parameters = new JObject();
-                parameters["type"] = "object";
-
-                var properties = new JObject();
-                parameters["properties"] = properties;
-
-                foreach (var parameter in method.GetParameters())
+                string json = GetMethodParametersJsonSchema(method, ref attributes);
+                _functions.Add(method, new FunctionDefinition(method.Name)
                 {
-                    var parameterName = parameter.Name;
-                    if (parameterName == null) continue;
-
-                    var parameterType = parameter.ParameterType.Name switch
-                    {
-                        "String" => "string",
-                        "Int32" => "integer",
-                        _ => parameter.ParameterType.Name,
-                    };
-
-                    attributes = parameter.GetCustomAttributes(typeof(ParameterDescriptionAttribute), false);
-                    var paramDescriptionAttrib = attributes.Length > 0 ? (attributes[0] as ParameterDescriptionAttribute) : null;
-                    var paramDescription = paramDescriptionAttrib?.Description ?? $"The {parameterName} parameter";
-
-                    var parameterJson = new JObject();
-                    parameterJson["type"] = parameterType;
-                    parameterJson["description"] = paramDescription;
-                    properties[parameterName] = parameterJson;
-
-                    if (!parameter.IsOptional)
-                    {
-                        required.Add(parameterName);
-                    }
-                }
-
-                parameters["required"] = required;
-
-                var json = parameters.ToString(Formatting.None);
-                functionDefinition.Parameters = new BinaryData(json);
-
-                _functions.Add(method, functionDefinition);
+                    Description = funcDescription,
+                    Parameters = new BinaryData(json)
+                });
             }
-        }
-
-        public void AddTo(ChatCompletionsOptions options)
-        {
         }
 
         public IEnumerable<FunctionDefinition> GetFunctionDefinitions()
         {
             return _functions.Values;
-        }
-
-        public static implicit operator List<FunctionDefinition>(FunctionFactory functionFactory)
-        {
-            return functionFactory._functions.Values.ToList();
         }
 
         public bool TryCallFunction(ChatCompletionsOptions options, FunctionCallContext context)
@@ -158,7 +112,6 @@ namespace Azure.AI.Details.Common.CLI.Extensions.FunctionCallingModel
                 if (parameterName == null) continue;
 
                 var parameterType = parameter.ParameterType.Name;
-
                 var parameterValue = jObject[parameterName]?.ToString();
 
                 if (parameterType == "String" && parameterValue != null)
@@ -178,6 +131,48 @@ namespace Azure.AI.Details.Common.CLI.Extensions.FunctionCallingModel
 
             var result = methodInfo.Invoke(null, arguments.ToArray());
             return result?.ToString();
+        }
+
+        private static string GetMethodParametersJsonSchema(MethodInfo method, ref object[] attributes)
+        {
+            var required = new JArray();
+            var parameters = new JObject();
+            parameters["type"] = "object";
+
+            var properties = new JObject();
+            parameters["properties"] = properties;
+
+            foreach (var parameter in method.GetParameters())
+            {
+                var parameterName = parameter.Name;
+                if (parameterName == null) continue;
+
+                var parameterType = parameter.ParameterType.Name switch
+                {
+                    "String" => "string",
+                    "Int32" => "integer",
+                    _ => parameter.ParameterType.Name,
+                };
+
+                attributes = parameter.GetCustomAttributes(typeof(ParameterDescriptionAttribute), false);
+                var paramDescriptionAttrib = attributes.Length > 0 ? (attributes[0] as ParameterDescriptionAttribute) : null;
+                var paramDescription = paramDescriptionAttrib?.Description ?? $"The {parameterName} parameter";
+
+                var parameterJson = new JObject();
+                parameterJson["type"] = parameterType;
+                parameterJson["description"] = paramDescription;
+                properties[parameterName] = parameterJson;
+
+                if (!parameter.IsOptional)
+                {
+                    required.Add(parameterName);
+                }
+            }
+
+            parameters["required"] = required;
+
+            var json = parameters.ToString(Formatting.None);
+            return json;
         }
 
         private Dictionary<MethodInfo, FunctionDefinition> _functions = new();
