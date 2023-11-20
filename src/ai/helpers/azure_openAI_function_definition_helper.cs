@@ -55,127 +55,6 @@ namespace Azure.AI.Details.Common.CLI
         }
     }
 
-    public class AzureOpenAIFunctionDefinitionHelper
-    {
-        public static Dictionary<MethodInfo, FunctionDefinition> GetFunctionDefinitions(Type type)
-        {
-            var functions = new Dictionary<MethodInfo, FunctionDefinition>();
-
-            var methods = type.GetMethods(BindingFlags.Static | BindingFlags.Public);
-            foreach (var method in methods)
-            {
-                var attributes = method.GetCustomAttributes(typeof(FunctionDefinitionAttribute), false);
-                if (attributes.Length > 0)
-                {
-                    var functionDefinition = new FunctionDefinition();
-                    functionDefinition.Name = method.Name;
-                    functionDefinition.Description = ((FunctionDefinitionAttribute)attributes[0]).Description;
-
-                    var required = new JArray();
-                    var parameters = new JObject();
-                    parameters["type"] = "object";
-                    parameters["properties"] = new JObject();
-
-                    foreach (var parameter in method.GetParameters())
-                    {
-                        var parameterName = parameter.Name;
-                        required.Add(parameterName);
-
-                        var parameterType = parameter.ParameterType.Name switch
-                        {
-                            "String" => "string",
-                            "Int32" => "integer",
-                            _ => parameter.ParameterType.Name,
-                        };
-
-                        var parameterJson = new JObject();
-                        parameterJson["type"] = parameterType;
-                        parameterJson["description"] = $"The {parameterName} parameter";
-
-                        parameters["properties"][parameterName] = parameterJson;
-                    }
-
-                    parameters["required"] = required;
-
-                    var json = parameters.ToString(Formatting.None);
-                    functionDefinition.Parameters = new BinaryData(json);
-
-                    functions.Add(method, functionDefinition);
-                }
-            }
-
-            return functions;
-        }
-
-        public static Dictionary<MethodInfo, FunctionDefinition> GetFunctionDefinitions(IEnumerable<Type> types)
-        {
-            var functions = new Dictionary<MethodInfo, FunctionDefinition>();
-            foreach (var type in types)
-            {
-                var typeFunctions = GetFunctionDefinitions(type);
-                foreach (var typeFunction in typeFunctions)
-                {
-                    functions.Add(typeFunction.Key, typeFunction.Value);
-                }
-            }
-            return functions;
-        }
-
-        public static Dictionary<MethodInfo, FunctionDefinition> GetFunctionDefinitions(Type type1, params Type[] types)
-        {
-            var functions = GetFunctionDefinitions(type1);
-            foreach (var type in types)
-            {
-                var typeFunctions = GetFunctionDefinitions(type);
-                foreach (var typeFunction in typeFunctions)
-                {
-                    functions.Add(typeFunction.Key, typeFunction.Value);
-                }
-            }
-            return functions;
-        }
-
-        public static Dictionary<MethodInfo, FunctionDefinition> GetFunctionDefinitions(Assembly assembly)
-        {
-            return GetFunctionDefinitions(assembly.GetTypes());
-        }
-
-        public static string CallFunction(MethodInfo methodInfo, FunctionDefinition functionDefinition, string argumentsAsJson)
-        {
-            var jObject = JObject.Parse(argumentsAsJson);
-            var arguments = new List<object>();
-
-            var schema = functionDefinition.Parameters.ToString();
-            var schemaObject = JObject.Parse(schema);
-
-            var parameters = methodInfo.GetParameters();
-            foreach (var parameter in parameters)
-            {
-                var parameterName = parameter.Name;
-                var parameterType = parameter.ParameterType.Name;
-
-                var parameterValue = jObject[parameterName].ToString();
-
-                if (parameterType == "String")
-                {
-                    arguments.Add(parameterValue);
-                }
-                else if (parameterType == "Int32")
-                {
-                    arguments.Add(int.Parse(parameterValue));
-                }
-                else
-                {
-                    var isRequired = schemaObject["required"].Values<string>().Contains(parameterName);
-                    if (isRequired) throw new Exception($"Unknown parameter type: {parameterType}");
-                }
-            }
-
-            var result = methodInfo.Invoke(null, arguments.ToArray());
-            return result.ToString();
-        }
-    }
-
     public class FunctionFactory
     {
         public FunctionFactory()
@@ -293,13 +172,48 @@ namespace Azure.AI.Details.Common.CLI
                 var function = _functions.FirstOrDefault(x => x.Value.Name == context.FunctionName);
                 if (function.Key != null)
                 {
-                    var result = AzureOpenAIFunctionDefinitionHelper.CallFunction(function.Key, function.Value, context.Arguments);
+                    var result = CallFunction(function.Key, function.Value, context.Arguments);
                     options.Messages.Add(new ChatMessage() { Role = ChatRole.Assistant, FunctionCall = new FunctionCall(context.FunctionName, context.Arguments) });
                     options.Messages.Add(new ChatMessage(ChatRole.Function, result) { Name = context.FunctionName });
                     return true;
                 }
             }
             return false;
+        }
+
+        private static string CallFunction(MethodInfo methodInfo, FunctionDefinition functionDefinition, string argumentsAsJson)
+        {
+            var jObject = JObject.Parse(argumentsAsJson);
+            var arguments = new List<object>();
+
+            var schema = functionDefinition.Parameters.ToString();
+            var schemaObject = JObject.Parse(schema);
+
+            var parameters = methodInfo.GetParameters();
+            foreach (var parameter in parameters)
+            {
+                var parameterName = parameter.Name;
+                var parameterType = parameter.ParameterType.Name;
+
+                var parameterValue = jObject[parameterName].ToString();
+
+                if (parameterType == "String")
+                {
+                    arguments.Add(parameterValue);
+                }
+                else if (parameterType == "Int32")
+                {
+                    arguments.Add(int.Parse(parameterValue));
+                }
+                else
+                {
+                    var isRequired = schemaObject["required"].Values<string>().Contains(parameterName);
+                    if (isRequired) throw new Exception($"Unknown parameter type: {parameterType}");
+                }
+            }
+
+            var result = methodInfo.Invoke(null, arguments.ToArray());
+            return result.ToString();
         }
 
         private Dictionary<MethodInfo, FunctionDefinition> _functions = new();
@@ -352,11 +266,6 @@ namespace Azure.AI.Details.Common.CLI
             }
 
             return new StreamingFunctionCallContext();
-        }
-
-        public static void CheckUpdate(this StreamingChatCompletionsUpdate update, StreamingFunctionCallContext context)
-        {
-            context.CheckForUpdate(update);
         }
 
         public static bool TryCallFunction(this ChatCompletionsOptions options, FunctionFactory funcFactory, StreamingFunctionCallContext context)
