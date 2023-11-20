@@ -1,60 +1,10 @@
-using System;
-using System.Collections.Generic;
-using System.Reflection;
-using System.Runtime.Serialization;
+﻿using System.Reflection;
 using Newtonsoft.Json;
 using Azure.AI.OpenAI;
 using Newtonsoft.Json.Linq;
-using DevLab.JmesPath.Utils;
-using System.Linq;
 
-namespace Azure.AI.Details.Common.CLI
+namespace Azure.AI.Details.Common.CLI.Extensions.FunctionCallingModel
 {
-    public class FunctionDefinitionAttribute : Attribute
-    {
-        public string Description { get; set; }
-    }
-
-    public static class Calculator
-    {
-        [FunctionDefinition(Description = "Returns the age of a person")]
-        public static int GetPersonAge(string personName)
-        {
-            return personName switch
-            {
-                "Beckett" => 17,
-                "Jac" => 19,
-                "Kris" => 53,
-                "Rob" => 54,
-                _ => 0,
-            };
-        }
-
-        [FunctionDefinition(Description = "Adds two numbers")]
-        public static int Add(int a, int b)
-        {
-            return a + b;
-        }
-
-        [FunctionDefinition(Description = "Subtracts two numbers")]
-        public static int Subtract(int a, int b)
-        {
-            return a - b;
-        }
-
-        [FunctionDefinition(Description = "Multiplies two numbers")]
-        public static int Multiply(int a, int b)
-        {
-            return a * b;
-        }
-
-        [FunctionDefinition(Description = "Divides two numbers")]
-        public static int Divide(int a, int b)
-        {
-            return a / b;
-        }
-    }
-
     public class FunctionFactory
     {
         public FunctionFactory()
@@ -111,21 +61,25 @@ namespace Azure.AI.Details.Common.CLI
 
         public void AddFunction(MethodInfo method)
         {
-            var attributes = method.GetCustomAttributes(typeof(FunctionDefinitionAttribute), false);
+            var attributes = method.GetCustomAttributes(typeof(FunctionDescriptionAttribute), false);
             if (attributes.Length > 0)
             {
                 var functionDefinition = new FunctionDefinition();
                 functionDefinition.Name = method.Name;
-                functionDefinition.Description = ((FunctionDefinitionAttribute)attributes[0]).Description;
+                functionDefinition.Description = ((FunctionDescriptionAttribute)attributes[0]).Description;
 
                 var required = new JArray();
                 var parameters = new JObject();
                 parameters["type"] = "object";
-                parameters["properties"] = new JObject();
+
+                var properties = new JObject();
+                parameters["properties"] = properties;
 
                 foreach (var parameter in method.GetParameters())
                 {
                     var parameterName = parameter.Name;
+                    if (parameterName == null) continue;
+
                     required.Add(parameterName);
 
                     var parameterType = parameter.ParameterType.Name switch
@@ -139,7 +93,7 @@ namespace Azure.AI.Details.Common.CLI
                     parameterJson["type"] = parameterType;
                     parameterJson["description"] = $"The {parameterName} parameter";
 
-                    parameters["properties"][parameterName] = parameterJson;
+                    properties[parameterName] = parameterJson;
                 }
 
                 parameters["required"] = required;
@@ -165,9 +119,9 @@ namespace Azure.AI.Details.Common.CLI
             return functionFactory._functions.Values.ToList();
         }
 
-        public bool TryCallFunction(ChatCompletionsOptions options, StreamingFunctionCallContext context)
+        public bool TryCallFunction(ChatCompletionsOptions options, FunctionCallContext context)
         {
-            if (context.FunctionName != null && !string.IsNullOrEmpty(context.Arguments))
+            if (!string.IsNullOrEmpty(context.FunctionName) && !string.IsNullOrEmpty(context.Arguments))
             {
                 var function = _functions.FirstOrDefault(x => x.Value.Name == context.FunctionName);
                 if (function.Key != null)
@@ -181,7 +135,7 @@ namespace Azure.AI.Details.Common.CLI
             return false;
         }
 
-        private static string CallFunction(MethodInfo methodInfo, FunctionDefinition functionDefinition, string argumentsAsJson)
+        private static string? CallFunction(MethodInfo methodInfo, FunctionDefinition functionDefinition, string argumentsAsJson)
         {
             var jObject = JObject.Parse(argumentsAsJson);
             var arguments = new List<object>();
@@ -193,84 +147,31 @@ namespace Azure.AI.Details.Common.CLI
             foreach (var parameter in parameters)
             {
                 var parameterName = parameter.Name;
+                if (parameterName == null) continue;
+
                 var parameterType = parameter.ParameterType.Name;
 
-                var parameterValue = jObject[parameterName].ToString();
+                var parameterValue = jObject[parameterName]?.ToString();
 
-                if (parameterType == "String")
+                if (parameterType == "String" && parameterValue != null)
                 {
                     arguments.Add(parameterValue);
                 }
-                else if (parameterType == "Int32")
+                else if (parameterType == "Int32" && parameterValue != null)
                 {
                     arguments.Add(int.Parse(parameterValue));
                 }
                 else
                 {
-                    var isRequired = schemaObject["required"].Values<string>().Contains(parameterName);
+                    var isRequired = schemaObject["required"]?.Values<string>().Contains(parameterName) ?? false;
                     if (isRequired) throw new Exception($"Unknown parameter type: {parameterType}");
                 }
             }
 
             var result = methodInfo.Invoke(null, arguments.ToArray());
-            return result.ToString();
+            return result?.ToString();
         }
 
         private Dictionary<MethodInfo, FunctionDefinition> _functions = new();
-    }
-
-    public class StreamingFunctionCallContext
-    {
-        public bool CheckForUpdate(StreamingChatCompletionsUpdate update)
-        {
-            var updated = false;
-
-            if (!string.IsNullOrEmpty(update.FunctionName))
-            {
-                _functionName = update.FunctionName;
-                updated = true;
-            }
-            
-            var arguments = update.FunctionArgumentsUpdate;
-            if (arguments != null)
-            {
-                _arguments += arguments;
-                updated = true;
-            }
-
-            return updated;
-        }
-
-        public void Reset()
-        {
-            _functionName = null;
-            _arguments = string.Empty;
-        }
-
-        public string FunctionName => _functionName;
-
-        public string Arguments => _arguments;
-
-        private string _functionName = null;
-        private string _arguments = string.Empty;
-    }
-
-    public static class FunctionFactoryExtensions
-    {
-        // extension method to ChatCompletionsOptions
-        public static StreamingFunctionCallContext AddFunctions(this ChatCompletionsOptions options, FunctionFactory functionFactory)
-        {
-            foreach (var function in functionFactory.GetFunctionDefinitions())
-            {
-                options.Functions.Add(function);
-            }
-
-            return new StreamingFunctionCallContext();
-        }
-
-        public static bool TryCallFunction(this ChatCompletionsOptions options, FunctionFactory funcFactory, StreamingFunctionCallContext context)
-        {
-            return funcFactory.TryCallFunction(options, context);
-        }
     }
 }

@@ -96,6 +96,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\common\common.csproj" />
+    <ProjectReference Include="..\extensions\function-calling-model\function-calling-model.csproj" />
   </ItemGroup>
 
   <Import Project="BuildCommon.targets" />

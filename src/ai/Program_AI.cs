@@ -63,6 +63,7 @@ namespace Azure.AI.Details.Common.CLI
             "Azure.Core.dll",
             "Azure.Identity.dll",
             "Azure.AI.CLI.Common.dll",
+            "Azure.AI.CLI.Extensions.FunctionCallingModel.dll",
             "Azure.AI.OpenAI.dll",
             "Azure.Core.dll",
             "Azure.Search.Documents.dll",
