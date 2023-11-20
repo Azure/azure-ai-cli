@@ -558,16 +558,6 @@ namespace Azure.AI.Details.Common.CLI
             Console.WriteLine("\n");
         }
 
-        private void CheckWriteChatAnswerOutputFile(string completeResponse)
-        {
-            var outputAnswerFile = OutputChatAnswerFileToken.Data().GetOrDefault(_values);
-            if (!string.IsNullOrEmpty(outputAnswerFile))
-            {
-                var fileName = FileHelpers.GetOutputDataFileName(outputAnswerFile, _values);
-                FileHelpers.WriteAllText(fileName, completeResponse, Encoding.UTF8);
-            }
-        }
-
         private async Task<StreamingResponse<StreamingChatCompletionsUpdate>> GetChatCompletionsAsync(OpenAIClient client, string deployment, ChatCompletionsOptions options, string text)
         {
             options.Messages.Add(new ChatMessage(ChatRole.User, text));
@@ -588,14 +578,13 @@ namespace Azure.AI.Details.Common.CLI
                 {
                     funcContext.CheckForUpdate(update);
 
-                    var content = update.ContentUpdate;
-                    if (content != null)
-                    {
-                        contentComplete += content;
-                        DisplayAssistantPromptTextStreaming(content);
-                    }
-
                     CheckChoiceFinishReason(update.FinishReason);
+
+                    var str = update.ContentUpdate;
+                    if (str == null) continue;
+
+                    contentComplete += str;
+                    DisplayAssistantPromptTextStreaming(str);
                 }
 
                 if (options.TryCallFunction(funcFactory, funcContext))
@@ -610,6 +599,16 @@ namespace Azure.AI.Details.Common.CLI
                 options.Messages.Add(new ChatMessage(ChatRole.Assistant, contentComplete));
 
                 return response;
+            }
+        }
+
+        private void CheckWriteChatAnswerOutputFile(string completeResponse)
+        {
+            var outputAnswerFile = OutputChatAnswerFileToken.Data().GetOrDefault(_values);
+            if (!string.IsNullOrEmpty(outputAnswerFile))
+            {
+                var fileName = FileHelpers.GetOutputDataFileName(outputAnswerFile, _values);
+                FileHelpers.WriteAllText(fileName, completeResponse, Encoding.UTF8);
             }
         }
 
