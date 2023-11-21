@@ -85,6 +85,7 @@ namespace Azure.AI.Details.Common.CLI.Extensions.FunctionCallingModel
         {
             if (!string.IsNullOrEmpty(context.FunctionName) && !string.IsNullOrEmpty(context.Arguments))
             {
+                Console.WriteLine($"Trying to call function {context.FunctionName} with arguments {context.Arguments}...");
                 var function = _functions.FirstOrDefault(x => x.Value.Name == context.FunctionName);
                 if (function.Key != null)
                 {

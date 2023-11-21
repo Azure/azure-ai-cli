@@ -567,6 +567,7 @@ namespace Azure.AI.Details.Common.CLI
             Console.ForegroundColor = ConsoleColor.Gray;
 
             var funcFactory = new FunctionFactory(); // new FunctionFactory(typeof(Calculator));
+            // funcFactory.AddFunctions(typeof(FileReaderWriter));
             var funcContext = options.AddFunctions(funcFactory);
 
             string contentComplete = string.Empty;
