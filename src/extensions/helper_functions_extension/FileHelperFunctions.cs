@@ -67,7 +67,6 @@ namespace Azure.AI.Details.Common.CLI.Extensions.HelperFunctions
                 var content = FileHelpers.ReadAllText(file, Encoding.UTF8);
                 if (content.Contains(text))
                 {
-                    Console.WriteLine($"  Found {file}");
                     result.Add(file);
                 }
             }
