@@ -1,12 +1,12 @@
 ﻿namespace Azure.AI.Details.Common.CLI.Extensions.HelperFunctions
 {
-    public class FunctionDescriptionAttribute : Attribute
+    public class HelperFunctionDescriptionAttribute : Attribute
     {
-        public FunctionDescriptionAttribute()
+        public HelperFunctionDescriptionAttribute()
         {
         }
 
-        public FunctionDescriptionAttribute(string description)
+        public HelperFunctionDescriptionAttribute(string description)
         {
             Description = description;
         }

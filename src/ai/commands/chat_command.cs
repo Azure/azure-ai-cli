@@ -559,7 +559,7 @@ namespace Azure.AI.Details.Common.CLI
             Console.WriteLine("\n");
         }
 
-        private void DisplayAssistantFunctionCall(FunctionCallContext context, string result)
+        private void DisplayAssistantFunctionCall(HelperFunctionCallContext context, string result)
         {
             if (!_quiet && _verbose)
             {
@@ -574,7 +574,7 @@ namespace Azure.AI.Details.Common.CLI
             }
         }
 
-        private async Task<StreamingResponse<StreamingChatCompletionsUpdate>> GetChatCompletionsAsync(OpenAIClient client, ChatCompletionsOptions options, FunctionCallContext funcContext, string text)
+        private async Task<StreamingResponse<StreamingChatCompletionsUpdate>> GetChatCompletionsAsync(OpenAIClient client, ChatCompletionsOptions options, HelperFunctionCallContext funcContext, string text)
         {
             options.Messages.Add(new ChatMessage(ChatRole.User, text));
 
@@ -797,7 +797,7 @@ namespace Azure.AI.Details.Common.CLI
             }
         }
 
-        private FunctionCallContext CreateFunctionFactoryAndCallContext(ChatCompletionsOptions options)
+        private HelperFunctionCallContext CreateFunctionFactoryAndCallContext(ChatCompletionsOptions options)
         {
             var customFunctions = _values.GetOrDefault("chat.custom.helper.functions", null);
             var useCustomFunctions = !string.IsNullOrEmpty(customFunctions);
@@ -814,9 +814,9 @@ namespace Azure.AI.Details.Common.CLI
             return options.AddFunctions(factory);
         }
 
-        private FunctionFactory CreateFunctionFactoryForCustomFunctions(string customFunctions)
+        private HelperFunctionFactory CreateFunctionFactoryForCustomFunctions(string customFunctions)
         {
-            var factory = new FunctionFactory();
+            var factory = new HelperFunctionFactory();
 
             var patterns = customFunctions.Split(new char[] { ';', '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
             foreach (var pattern in patterns)
@@ -838,14 +838,14 @@ namespace Azure.AI.Details.Common.CLI
             return factory;
         }
 
-        private FunctionFactory CreateFunctionFactoryWithBuiltinFunctions()
+        private HelperFunctionFactory CreateFunctionFactoryWithBuiltinFunctions()
         {
-            return new FunctionFactory(typeof(Calculator), typeof(FileReaderWriter));
+            return new HelperFunctionFactory(typeof(CalculatorHelperFunctions), typeof(FileHelperFunctions));
         }
 
-        private FunctionFactory CreateFunctionFactoryWithNoFunctions()
+        private HelperFunctionFactory CreateFunctionFactoryWithNoFunctions()
         {
-            return new FunctionFactory();
+            return new HelperFunctionFactory();
         }
 
         private ChatChoice CheckChoiceFinishReason(ChatChoice choice)

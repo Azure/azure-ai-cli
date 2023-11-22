@@ -2,9 +2,9 @@
 
 namespace Azure.AI.Details.Common.CLI.Extensions.HelperFunctions
 {
-    public class FunctionCallContext
+    public class HelperFunctionCallContext
     {
-        public FunctionCallContext(FunctionFactory factory)
+        public HelperFunctionCallContext(HelperFunctionFactory factory)
         {
             _factory = factory;
         }
@@ -46,6 +46,6 @@ namespace Azure.AI.Details.Common.CLI.Extensions.HelperFunctions
 
         private string _functionName = string.Empty;
         private string _arguments = string.Empty;
-        private readonly FunctionFactory _factory;
+        private readonly HelperFunctionFactory _factory;
     }
 }

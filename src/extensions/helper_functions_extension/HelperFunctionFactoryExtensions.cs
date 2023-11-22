@@ -7,20 +7,20 @@ using System.Linq;
 
 namespace Azure.AI.Details.Common.CLI.Extensions.HelperFunctions
 {
-    public static class FunctionFactoryExtensions
+    public static class HelperFunctionFactoryExtensions
     {
         // extension method to ChatCompletionsOptions
-        public static FunctionCallContext AddFunctions(this ChatCompletionsOptions options, FunctionFactory functionFactory)
+        public static HelperFunctionCallContext AddFunctions(this ChatCompletionsOptions options, HelperFunctionFactory functionFactory)
         {
             foreach (var function in functionFactory.GetFunctionDefinitions())
             {
                 options.Functions.Add(function);
             }
 
-            return new FunctionCallContext(functionFactory);
+            return new HelperFunctionCallContext(functionFactory);
         }
 
-        public static bool TryCallFunction(this ChatCompletionsOptions options, FunctionCallContext context, out string? result)
+        public static bool TryCallFunction(this ChatCompletionsOptions options, HelperFunctionCallContext context, out string? result)
         {
             return context.TryCallFunction(options, out result);
         }

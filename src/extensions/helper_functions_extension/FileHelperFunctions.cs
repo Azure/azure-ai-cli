@@ -3,16 +3,16 @@ using Azure.AI.OpenAI;
 
 namespace Azure.AI.Details.Common.CLI.Extensions.HelperFunctions
 {
-    public static class FileReaderWriter
+    public static class FileHelperFunctions
     {
-        [FunctionDescription("Checks if file exists")]
+        [HelperFunctionDescription("Checks if file exists")]
         public static bool FileExists(string fileName)
         {
             var exists = FileHelpers.FileExists(fileName);
             return exists;
         }
 
-        [FunctionDescription("Reads text from a file; returns empty string if file does not exist")]
+        [HelperFunctionDescription("Reads text from a file; returns empty string if file does not exist")]
         public static string ReadTextFromFile(string fileName)
         {
             var content = FileHelpers.FileExists(fileName)
@@ -21,14 +21,14 @@ namespace Azure.AI.Details.Common.CLI.Extensions.HelperFunctions
             return content;
         }
 
-        [FunctionDescription("Writes text into a file; if the file exists, it is overwritten")]
+        [HelperFunctionDescription("Writes text into a file; if the file exists, it is overwritten")]
         public static bool CreateFileAndSaveText(string fileName, string text)
         {
             FileHelpers.WriteAllText(fileName, text, Encoding.UTF8);
             return true;
         }
 
-        [FunctionDescription("Creates a directory if it doesn't already exist")]
+        [HelperFunctionDescription("Creates a directory if it doesn't already exist")]
         public static bool DirectoryCreate(string directoryName)
         {
             FileHelpers.EnsureDirectoryForFileExists($"{directoryName}/.");
@@ -36,29 +36,29 @@ namespace Azure.AI.Details.Common.CLI.Extensions.HelperFunctions
         }
 
 
-        [FunctionDescription("List files; lists all files regardless of name")]
+        [HelperFunctionDescription("List files; lists all files regardless of name")]
         public static string FindAllFiles()
         {
             return FindFilesMatchingPattern("**/*");
         }
 
-        [FunctionDescription("List files; lists files matching pattern")]
-        public static string FindFilesMatchingPattern([ParameterDescription("The pattern to search for; use '**/*.ext' to search sub-directories")] string pattern)
+        [HelperFunctionDescription("List files; lists files matching pattern")]
+        public static string FindFilesMatchingPattern([HelperFunctionParameterDescription("The pattern to search for; use '**/*.ext' to search sub-directories")] string pattern)
         {
             var files = FileHelpers.FindFiles(".", pattern);
             return string.Join("\n", files);
         }
 
-        [FunctionDescription("Find files containing text; searches all files")]
-        public static string FindTextInAllFiles([ParameterDescription("The text to find")] string text)
+        [HelperFunctionDescription("Find files containing text; searches all files")]
+        public static string FindTextInAllFiles([HelperFunctionParameterDescription("The text to find")] string text)
         {
             return FindTextInFilesMatchingPattern(text, "**/*");
         }
 
-        [FunctionDescription("Find files containing text; searches files matching a pattern")]
+        [HelperFunctionDescription("Find files containing text; searches files matching a pattern")]
         public static string FindTextInFilesMatchingPattern(
-            [ParameterDescription("The text to find")] string text,
-            [ParameterDescription("The pattern to search for; use '**/*.ext' to search sub-directories")] string pattern)
+            [HelperFunctionParameterDescription("The text to find")] string text,
+            [HelperFunctionParameterDescription("The pattern to search for; use '**/*.ext' to search sub-directories")] string pattern)
         {
             var files = FileHelpers.FindFiles(".", pattern);
             var result = new List<string>();

@@ -2,27 +2,27 @@
 
 namespace Azure.AI.Details.Common.CLI.Extensions.HelperFunctions
 {
-    public static class Calculator
+    public static class CalculatorHelperFunctions
     {
-        [FunctionDescription("Adds two numbers")]
+        [HelperFunctionDescription("Adds two numbers")]
         public static int Add(int a, int b)
         {
             return a + b;
         }
 
-        [FunctionDescription("Subtracts two numbers")]
+        [HelperFunctionDescription("Subtracts two numbers")]
         public static int Subtract(int a, int b)
         {
             return a - b;
         }
 
-        [FunctionDescription("Multiplies two numbers")]
+        [HelperFunctionDescription("Multiplies two numbers")]
         public static int Multiply(int a, int b)
         {
             return a * b;
         }
 
-        [FunctionDescription("Divides two numbers")]
+        [HelperFunctionDescription("Divides two numbers")]
         public static int Divide(int a, int b)
         {
             return a / b;

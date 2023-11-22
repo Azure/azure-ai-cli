@@ -3,10 +3,10 @@ using Azure.AI.Details.Common.CLI.Extensions.HelperFunctions;
 
 namespace Azure.AI.Details.Common.CLI.Extensions.HelperFunctions.Test
 {
-    public static class TestExtension
+    public static class PersonAgeFunctionHelperTest
     {
-        [FunctionDescription("Returns the age of a person")]
-        public static int GetPersonAge([ParameterDescription("The name of the person whose age to return")] string personName)
+        [HelperFunctionDescription("Returns the age of a person")]
+        public static int GetPersonAge([HelperFunctionParameterDescription("The name of the person whose age to return; Names must be capitalized correctly")] string personName)
         {
             return personName switch
             {

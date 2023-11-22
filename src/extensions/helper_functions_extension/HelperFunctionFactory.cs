@@ -5,28 +5,28 @@ using Newtonsoft.Json.Linq;
 
 namespace Azure.AI.Details.Common.CLI.Extensions.HelperFunctions
 {
-    public class FunctionFactory
+    public class HelperFunctionFactory
     {
-        public FunctionFactory()
+        public HelperFunctionFactory()
         {
         }
 
-        public FunctionFactory(Assembly assembly)
+        public HelperFunctionFactory(Assembly assembly)
         {
             AddFunctions(assembly);
         }
 
-        public FunctionFactory(Type type1, params Type[] types)
+        public HelperFunctionFactory(Type type1, params Type[] types)
         {
             AddFunctions(type1, types);
         }
 
-        public FunctionFactory(IEnumerable<Type> types)
+        public HelperFunctionFactory(IEnumerable<Type> types)
         {
             AddFunctions(types);
         }
 
-        public FunctionFactory(Type type)
+        public HelperFunctionFactory(Type type)
         {
             AddFunctions(type);
         }
@@ -61,10 +61,10 @@ namespace Azure.AI.Details.Common.CLI.Extensions.HelperFunctions
 
         public void AddFunction(MethodInfo method)
         {
-            var attributes = method.GetCustomAttributes(typeof(FunctionDescriptionAttribute), false);
+            var attributes = method.GetCustomAttributes(typeof(HelperFunctionDescriptionAttribute), false);
             if (attributes.Length > 0)
             {
-                var funcDescriptionAttrib = attributes[0] as FunctionDescriptionAttribute;
+                var funcDescriptionAttrib = attributes[0] as HelperFunctionDescriptionAttribute;
                 var funcDescription = funcDescriptionAttrib!.Description;
 
                 string json = GetMethodParametersJsonSchema(method, ref attributes);
@@ -81,7 +81,7 @@ namespace Azure.AI.Details.Common.CLI.Extensions.HelperFunctions
             return _functions.Values;
         }
 
-        public bool TryCallFunction(ChatCompletionsOptions options, FunctionCallContext context, out string? result)
+        public bool TryCallFunction(ChatCompletionsOptions options, HelperFunctionCallContext context, out string? result)
         {
             result = null;
             if (!string.IsNullOrEmpty(context.FunctionName) && !string.IsNullOrEmpty(context.Arguments))
@@ -99,9 +99,9 @@ namespace Azure.AI.Details.Common.CLI.Extensions.HelperFunctions
         }
 
         // operator to add to FunctionFactories together
-        public static FunctionFactory operator +(FunctionFactory a, FunctionFactory b)
+        public static HelperFunctionFactory operator +(HelperFunctionFactory a, HelperFunctionFactory b)
         {
-            var newFactory = new FunctionFactory();
+            var newFactory = new HelperFunctionFactory();
             a._functions.ToList().ForEach(x => newFactory._functions.Add(x.Key, x.Value));
             b._functions.ToList().ForEach(x => newFactory._functions.Add(x.Key, x.Value));
             return newFactory;
@@ -164,8 +164,8 @@ namespace Azure.AI.Details.Common.CLI.Extensions.HelperFunctions
                     _ => parameter.ParameterType.Name,
                 };
 
-                attributes = parameter.GetCustomAttributes(typeof(ParameterDescriptionAttribute), false);
-                var paramDescriptionAttrib = attributes.Length > 0 ? (attributes[0] as ParameterDescriptionAttribute) : null;
+                attributes = parameter.GetCustomAttributes(typeof(HelperFunctionParameterDescriptionAttribute), false);
+                var paramDescriptionAttrib = attributes.Length > 0 ? (attributes[0] as HelperFunctionParameterDescriptionAttribute) : null;
                 var paramDescription = paramDescriptionAttrib?.Description ?? $"The {parameterName} parameter";
 
                 var parameterJson = new JObject();
