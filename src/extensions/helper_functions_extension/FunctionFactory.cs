@@ -98,6 +98,15 @@ namespace Azure.AI.Details.Common.CLI.Extensions.HelperFunctions
             return false;
         }
 
+        // operator to add to FunctionFactories together
+        public static FunctionFactory operator +(FunctionFactory a, FunctionFactory b)
+        {
+            var newFactory = new FunctionFactory();
+            a._functions.ToList().ForEach(x => newFactory._functions.Add(x.Key, x.Value));
+            b._functions.ToList().ForEach(x => newFactory._functions.Add(x.Key, x.Value));
+            return newFactory;
+        }
+
         private static string? CallFunction(MethodInfo methodInfo, FunctionDefinition functionDefinition, string argumentsAsJson)
         {
             var jObject = JObject.Parse(argumentsAsJson);

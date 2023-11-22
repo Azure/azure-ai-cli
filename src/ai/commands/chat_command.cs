@@ -23,6 +23,7 @@ using Azure.Core.Diagnostics;
 using System.Diagnostics.Tracing;
 using Microsoft.CognitiveServices.Speech;
 using Azure.AI.Details.Common.CLI.Extensions.HelperFunctions;
+using System.Reflection;
 
 namespace Azure.AI.Details.Common.CLI
 {
@@ -782,21 +783,51 @@ namespace Azure.AI.Details.Common.CLI
 
         private FunctionCallContext CreateFunctionFactoryAndCallContext(ChatCompletionsOptions options)
         {
-            var builtinFunctions = _values.GetOrDefault("chat.built.in.functions", false);
-            var funcFactory = builtinFunctions
-                ? CreateFunctionFactoryWithBuiltinFunctions(options)
-                : CreateFunctionFactoryWithNoFunctions(options);
-            return options.AddFunctions(funcFactory);
+            var customFunctions = _values.GetOrDefault("chat.custom.functions", null);
+            var useCustomFunctions = !string.IsNullOrEmpty(customFunctions);
+            var useBuiltInFunctions = _values.GetOrDefault("chat.built.in.functions", false);
+
+            var factory = useCustomFunctions && useBuiltInFunctions
+                ? CreateFunctionFactoryForCustomFunctions(customFunctions) + CreateFunctionFactoryWithBuiltinFunctions()
+                : useCustomFunctions
+                    ? CreateFunctionFactoryForCustomFunctions(customFunctions)
+                    : useBuiltInFunctions
+                        ? CreateFunctionFactoryWithBuiltinFunctions()
+                        : CreateFunctionFactoryWithNoFunctions();
+
+            return options.AddFunctions(factory);
         }
 
-        private FunctionFactory CreateFunctionFactoryWithBuiltinFunctions(ChatCompletionsOptions options)
+        private FunctionFactory CreateFunctionFactoryForCustomFunctions(string customFunctions)
         {
-            var funcFactory = new FunctionFactory(typeof(Calculator));
-            funcFactory.AddFunctions(typeof(FileReaderWriter));
-            return funcFactory;
+            var factory = new FunctionFactory();
+
+            var patterns = customFunctions.Split(new char[] { ';', '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
+            foreach (var pattern in patterns)
+            {
+                var files = FileHelpers.FindFiles(pattern, _values);
+                if (files.Count() == 0)
+                {
+                    files = FileHelpers.FindFilesInOsPath(pattern);
+                }
+
+                foreach (var file in files)
+                {
+                    if (Program.Debug) Console.WriteLine($"Trying to load custom functions from: {file}");
+                    var assembly = TryCatchHelpers.TryCatchNoThrow<Assembly>(() => Assembly.LoadFrom(file), null, out var ex);
+                    if (assembly != null) factory.AddFunctions(assembly);
+                }
+            }
+
+            return factory;
         }
 
-        private FunctionFactory CreateFunctionFactoryWithNoFunctions(ChatCompletionsOptions options)
+        private FunctionFactory CreateFunctionFactoryWithBuiltinFunctions()
+        {
+            return new FunctionFactory(typeof(Calculator), typeof(FileReaderWriter));
+        }
+
+        private FunctionFactory CreateFunctionFactoryWithNoFunctions()
         {
             return new FunctionFactory();
         }

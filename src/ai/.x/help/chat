@@ -17,8 +17,9 @@ USAGE: ai chat [...]
     --user MESSAGE                      (see: ai help chat user message)
     --chat-history FILE                 (see: ai help chat history)
 
-  FUNCTIONS
-    --built-in-functions TRUE           (see: ai help chat built-in functions)
+  HELPER FUNCTIONS
+    --built-in-functions TRUE           (see: ai help chat helper functions built-in)
+    --custom-functions PATTERN          (see: ai help chat helper functions custom) 
   
   CHAT WITH DATA                        (see: ai help chat with data)
     --index-name INDEX                  (see: ai help index name)

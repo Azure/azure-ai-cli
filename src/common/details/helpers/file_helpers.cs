@@ -411,6 +411,11 @@ namespace Azure.AI.Details.Common.CLI
 
         public static string FindFileInOsPath(string fileName)
         {
+            return FindFilesInOsPath(fileName).FirstOrDefault();
+        }
+
+        public static IEnumerable<string> FindFilesInOsPath(string fileName)
+        {
             var lookIn = Environment.GetEnvironmentVariable("PATH")!.Split(System.IO.Path.PathSeparator);
             var found = lookIn.SelectMany(x =>
             {
@@ -423,7 +428,7 @@ namespace Azure.AI.Details.Common.CLI
                     return Enumerable.Empty<string>();
                 }
             });
-            return found.FirstOrDefault();
+            return found;
         }
 
         private static string FindFileInPath(string fileName, INamedValues values, string searchPaths)

@@ -116,6 +116,7 @@ namespace Azure.AI.Details.Common.CLI
             new TrueFalseNamedValueTokenParser("chat.input.interactive", "001"),
             new TrueFalseNamedValueTokenParser("chat.speech.input", "010"),
             new TrueFalseNamedValueTokenParser("chat.built.in.functions", "0111"),
+            new NamedValueTokenParser(null, "chat.custom.functions", "011", "1"),
 
             OutputChatAnswerFileToken.Parser(),
             // new TrueFalseRequiredPrefixNamedValueTokenParser("output", "all.answer", "01"),
