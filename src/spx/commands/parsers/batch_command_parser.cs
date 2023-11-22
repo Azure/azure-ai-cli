@@ -90,7 +90,7 @@ namespace Azure.AI.Details.Common.CLI
             new NamedValueTokenParser(null,                 "batch.list.transcription.languages", "0001", "0", null, null, "transcription", "batch.list.languages.kind"),
             new NamedValueTokenParser(null,                 "batch.list.languages.kind", "001", "1"),
 
-            new NamedValueTokenParser(null,                 "batch.list.transcription.files", "0001", "1;0", "true;false", null, "true"),
+            new TrueFalseNamedValueTokenParser("batch.list.transcription.files", "0001"),
             new NamedValueTokenParser(null,                 "batch.transcription.id", "001;010", "1"),
 
             new NamedValueTokenParser(null,                 "batch.top", "01", "1"),
@@ -140,7 +140,7 @@ namespace Azure.AI.Details.Common.CLI
             // new NamedValueTokenParser("--diarization",      "service.output.config.diarization", "0001", "1;0", "true;false", null, "true"),
             // new NamedValueTokenParser("--profanity",        "service.output.config.profanity.option", "00010", "1", "none;removed;tags;masked"),
             // new NamedValueTokenParser("--punctuation",      "service.output.config.punctuation.mode", "00010", "1;0", "none;dictated;automatic;dictatedandautomatic", null, "DictatedAndAutomatic"),
-            new NamedValueTokenParser(null,                 "service.output.config.word.level.timing", "000101", "1;0", "true;false", null, "true"),
+            new TrueFalseNamedValueTokenParser("service.output.config.word.level.timing", "000101"),
 
             new NamedValueTokenParser(null,                 "batch.api.version", "011", "1"),
             new NamedValueTokenParser(null,                 "batch.api.endpoint", "011", "1"),

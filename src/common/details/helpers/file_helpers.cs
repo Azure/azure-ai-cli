@@ -110,7 +110,8 @@ namespace Azure.AI.Details.Common.CLI
                 EnumerationOptions recursiveOptions = null;
                 if (path.EndsWith("**"))
                 {
-                    path = path.Substring(0, path.Length - 3);
+                    path = path.Substring(0, path.Length - 2).TrimEnd('/', '\\');
+                    if (string.IsNullOrEmpty(path)) path = ".";
                     recursiveOptions = new EnumerationOptions() { RecurseSubdirectories = true };
                 }
 
@@ -410,6 +411,11 @@ namespace Azure.AI.Details.Common.CLI
 
         public static string FindFileInOsPath(string fileName)
         {
+            return FindFilesInOsPath(fileName).FirstOrDefault();
+        }
+
+        public static IEnumerable<string> FindFilesInOsPath(string fileName)
+        {
             var lookIn = Environment.GetEnvironmentVariable("PATH")!.Split(System.IO.Path.PathSeparator);
             var found = lookIn.SelectMany(x =>
             {
@@ -422,7 +428,7 @@ namespace Azure.AI.Details.Common.CLI
                     return Enumerable.Empty<string>();
                 }
             });
-            return found.FirstOrDefault();
+            return found;
         }
 
         private static string FindFileInPath(string fileName, INamedValues values, string searchPaths)

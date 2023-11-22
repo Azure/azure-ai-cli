@@ -1,0 +1,21 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <AssemblyName>Azure.AI.CLI.Extensions.HelperFunctions</AssemblyName>
+    <TargetFramework>net7.0</TargetFramework>
+    <RootNamespace>Azure.AI.Details.Common.CLI.Extensions.HelperFunctions</RootNamespace>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Azure.AI.OpenAI" Version="1.0.0-beta.9" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\common\common.csproj" />
+  </ItemGroup>
+
+  <Import Project="BuildCommon.targets" />
+
+</Project>

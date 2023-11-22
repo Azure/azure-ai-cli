@@ -60,7 +60,7 @@ namespace Azure.AI.Details.Common.CLI
             new NamedValueTokenParser(null,           "x.command.expand.file.name", "11111", "1"),
 
             new SpeechConfigServiceConnectionTokenParser(),
-            new NamedValueTokenParser(null,           "service.config.content.logging.enabled", "00011;00110", "1;0", "true;false", null, "true"),
+            new TrueFalseNamedValueTokenParser("service.config.content.logging.enabled", "00011;00110"),
 
             new NamedValueTokenParser("--embedded",   "embedded.config.embedded", "001", "1;0", "true;false", null, "true"),
 
@@ -70,7 +70,7 @@ namespace Azure.AI.Details.Common.CLI
             // new NamedValueTokenParser("--target",     "target.language.config", "100", "1"),
             new NamedValueTokenParser("--languages",  "source.language.config", "100;010", "1"),
             new NamedValueTokenParser("--profanity",  "service.output.config.profanity.option", "00010", "1", "masked;raw;removed"),
-            new NamedValueTokenParser(null,           "service.output.config.word.level.timing", "000101", "1;0", "true;false", null, "true"),
+            new TrueFalseNamedValueTokenParser("service.output.config.word.level.timing", "000101"),
 
             new NamedValueTokenParser("--property",   "config.string.property", "001", "2;1"),
             new NamedValueTokenParser("--properties", "config.string.properties", "001", "1", "@;"),
@@ -151,8 +151,8 @@ namespace Azure.AI.Details.Common.CLI
             new NamedValueTokenParser(null, "check.sr.transcript.lexical.text.not.contains", "1001011", "1", null, "check.sr.transcript.lexical.text.not.contains", "true", "output.all.recognizer.recognized.result.lexical.text"),
             new NamedValueTokenParser(null, "check.sr.transcript.lexical.text", "10010", "2;1", null, "check.sr.transcript.lexical.text", "true", "output.all.recognizer.recognized.result.lexical.text"),
 
-            new NamedValueTokenParser(null, "output.overwrite", "11", "1;0", "true;false", null, "true"),
-            new NamedValueTokenParser(null, "output.audio.input.id", "1101;1011", "1;0", "true;false", null, "true"),
+            new TrueFalseNamedValueTokenParser("output.overwrite", "11"),
+            new TrueFalseNamedValueTokenParser("output.audio.input.id", "1101;1011"),
 
             new OutputBatchRecognizerTokenParser(),
             new OutputSrtVttRecognizerTokenParser(),
@@ -173,7 +173,7 @@ namespace Azure.AI.Details.Common.CLI
             new NamedValueTokenParser(null,           "x.command.expand.file.name", "11111", "1"),
 
             new SpeechConfigServiceConnectionTokenParser(),
-            new NamedValueTokenParser(null,           "service.config.content.logging.enabled", "00011;00110", "1;0", "true;false", null, "true"),
+            new TrueFalseNamedValueTokenParser("service.config.content.logging.enabled", "00011;00110"),
 
             new NamedValueTokenParser("--embedded",   "embedded.config.embedded", "001", "1;0", "true;false", null, "true"),
 
@@ -183,7 +183,7 @@ namespace Azure.AI.Details.Common.CLI
             // new NamedValueTokenParser("--target",     "target.language.config", "100", "1"),
             new NamedValueTokenParser("--languages",  "source.language.config", "100;010", "1"),
             new NamedValueTokenParser("--profanity",  "service.output.config.profanity.option", "00010", "1", "masked;raw;removed"),
-            new NamedValueTokenParser(null,           "service.output.config.word.level.timing", "000101", "1;0", "true;false", null, "true"),
+            new TrueFalseNamedValueTokenParser("service.output.config.word.level.timing", "000101"),
 
             new NamedValueTokenParser("--property",   "config.string.property", "01", "2;1"),
             new NamedValueTokenParser("--properties", "config.string.properties", "01", "@;"),
@@ -266,8 +266,8 @@ namespace Azure.AI.Details.Common.CLI
 
             new NamedValueTokenParser(null, "check.jmes", "10", "1"),
 
-            new NamedValueTokenParser(null, "output.overwrite", "11", "1;0", "true;false", null, "true"),
-            new NamedValueTokenParser(null, "output.audio.input.id", "1101;1011", "1;0", "true;false", null, "true"),
+            new TrueFalseNamedValueTokenParser("output.overwrite", "11"),
+            new TrueFalseNamedValueTokenParser("output.audio.input.id", "1101;1011"),
 
             new OutputBatchRecognizerTokenParser(),
             new OutputSrtVttRecognizerTokenParser(),

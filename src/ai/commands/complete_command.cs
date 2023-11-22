@@ -83,7 +83,8 @@ namespace Azure.AI.Details.Common.CLI
         {
             options.Prompts.Clear();
             options.Prompts.Add(text);
-            var response = await client.GetCompletionsAsync(deployment, options);
+            options.DeploymentName = deployment;
+            var response = await client.GetCompletionsAsync(options);
 
             Console.WriteLine();
             Console.WriteLine(response.Value.Choices[0].Text);
