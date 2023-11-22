@@ -99,7 +99,10 @@ namespace Azure.AI.Details.Common.CLI
                     new NamedValueTokenParser(null,             "chat.options.top.p", "0001", "1"),
                     new NamedValueTokenParser(null,             "chat.options.frequency.penalty", "0011", "1"),
                     new NamedValueTokenParser(null,             "chat.options.presence.penalty", "0011", "1"),
-                    new NamedValueTokenParser(null,             "chat.options.stop.sequence", "0010", "1")
+                    new NamedValueTokenParser(null,             "chat.options.stop.sequence", "0010", "1"),
+
+                    new TrueFalseNamedValueTokenParser("chat.built.in.helper.functions", "01101"),
+                    new NamedValueTokenParser(null, "chat.custom.helper.functions", "0101;0011", "1")
                 )
             {
             }
@@ -115,8 +118,6 @@ namespace Azure.AI.Details.Common.CLI
 
             new TrueFalseNamedValueTokenParser("chat.input.interactive", "001"),
             new TrueFalseNamedValueTokenParser("chat.speech.input", "010"),
-            new TrueFalseNamedValueTokenParser("chat.built.in.helper.functions", "01101"),
-            new NamedValueTokenParser(null, "chat.custom.helper.functions", "0101;0011", "1"),
 
             OutputChatAnswerFileToken.Parser(),
             // new TrueFalseRequiredPrefixNamedValueTokenParser("output", "all.answer", "01"),

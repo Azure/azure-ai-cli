@@ -9,6 +9,25 @@ namespace Azure.AI.Details.Common.CLI.Extensions.HelperFunctions
             _factory = factory;
         }
 
+        public bool CheckForFunction(ChatMessage message)
+        {
+            var updated = false;
+
+            if (!string.IsNullOrEmpty(message.FunctionCall?.Name))
+            {
+                _functionName = message.FunctionCall.Name;
+                updated = true;
+            }
+
+            if (!string.IsNullOrEmpty(message.FunctionCall?.Arguments))
+            {
+                _arguments = message.FunctionCall.Arguments;
+                updated = true;
+            }
+
+            return updated;
+        }
+
         public bool CheckForUpdate(StreamingChatCompletionsUpdate update)
         {
             var updated = false;

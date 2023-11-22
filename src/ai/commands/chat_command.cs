@@ -116,15 +116,18 @@ namespace Azure.AI.Details.Common.CLI
             var lines = File.ReadAllLines(dataFile);
 
             var client = CreateOpenAIClient(out var deployment);
+            var options = CreateChatCompletionOptions(deployment);
+            var funcContext = CreateFunctionFactoryAndCallContext(options);
+
             var chatTextHandler = (string text) =>
             {
-                var options = CreateChatCompletionOptions(deployment);
+                var systemMessage = options.Messages.First();
+                options.Messages.Clear();
+
+                options.Messages.Add(systemMessage);
                 options.Messages.Add(new ChatMessage(ChatRole.User, text));
 
-                var response = client.GetChatCompletions(options);
-
-                var choice = CheckChoiceFinishReason(response.Value.Choices.Last());
-                var message = choice.Message;
+                var message = GetChatCompletion(client, options, funcContext);
                 var answer = message.Content;
                 var context = message.AzureExtensionsContext != null && message.AzureExtensionsContext.Messages != null
                     ? string.Join('\n', message.AzureExtensionsContext.Messages.Select(x => x.Content))
@@ -154,6 +157,26 @@ namespace Azure.AI.Details.Common.CLI
             }
 
             return results.ToString(Formatting.None);
+        }
+
+        private ChatMessage GetChatCompletion(OpenAIClient client, ChatCompletionsOptions options, HelperFunctionCallContext funcContext)
+        {
+            while (true)
+            {
+                var response = client.GetChatCompletions(options);
+                var message = CheckChoiceFinishReason(response.Value.Choices.Last()).Message;
+
+                if (funcContext.CheckForFunction(message))
+                {
+                    if (options.TryCallFunction(funcContext, out var result))
+                    {
+                        funcContext.Reset();
+                        continue;
+                    }
+                }
+
+                return message;
+            }
         }
 
         private string ChatRunFunction(string action, string command, string function)
