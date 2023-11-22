@@ -17,12 +17,17 @@ namespace Azure.AI.Details.Common.CLI.Extensions.FunctionCallingModel
                 options.Functions.Add(function);
             }
 
-            return new FunctionCallContext();
+            return new FunctionCallContext(functionFactory);
         }
 
-        public static bool TryCallFunction(this ChatCompletionsOptions options, FunctionFactory funcFactory, FunctionCallContext context)
+        public static bool TryCallFunction(this ChatCompletionsOptions options, FunctionCallContext context)
         {
-            return funcFactory.TryCallFunction(options, context);
+            var result = context.TryCallFunction(options);
+            if (result)
+            {
+                context.Reset();
+            }
+            return result;
         }
     }
 }

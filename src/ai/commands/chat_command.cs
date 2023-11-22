@@ -117,10 +117,9 @@ namespace Azure.AI.Details.Common.CLI
             var client = CreateOpenAIClient(out var deployment);
             var chatTextHandler = (string text) =>
             {
-                var options = CreateChatCompletionOptions();
+                var options = CreateChatCompletionOptions(deployment);
                 options.Messages.Add(new ChatMessage(ChatRole.User, text));
 
-                options.DeploymentName = deployment;
                 var response = client.GetChatCompletions(options);
 
                 var choice = CheckChoiceFinishReason(response.Value.Choices.Last());
@@ -413,7 +412,8 @@ namespace Azure.AI.Details.Common.CLI
             if (kernel != null && doSK) await StoreMemoryAsync(kernel, acsIndex);
 
             var client = CreateOpenAIClient(out var deployment);
-            var options = CreateChatCompletionOptions();
+            var options = CreateChatCompletionOptions(deployment);
+            var funcContext = CreateFunctionFactoryAndCallContext(options);
 
             var handler = async (string text) =>
             {
@@ -426,7 +426,7 @@ namespace Azure.AI.Details.Common.CLI
                     }
                 }
 
-                await GetChatCompletionsAsync(client, deployment, options, text);
+                await GetChatCompletionsAsync(client, options, funcContext, text);
             };
             return handler;
         }
@@ -558,17 +558,12 @@ namespace Azure.AI.Details.Common.CLI
             Console.WriteLine("\n");
         }
 
-        private async Task<StreamingResponse<StreamingChatCompletionsUpdate>> GetChatCompletionsAsync(OpenAIClient client, string deployment, ChatCompletionsOptions options, string text)
+        private async Task<StreamingResponse<StreamingChatCompletionsUpdate>> GetChatCompletionsAsync(OpenAIClient client, ChatCompletionsOptions options, FunctionCallContext funcContext, string text)
         {
             options.Messages.Add(new ChatMessage(ChatRole.User, text));
-            options.DeploymentName = deployment;
 
             DisplayAssistantPromptLabel();
             Console.ForegroundColor = ConsoleColor.Gray;
-
-            var funcFactory = new FunctionFactory(); // new FunctionFactory(typeof(Calculator));
-            // funcFactory.AddFunctions(typeof(FileReaderWriter));
-            var funcContext = options.AddFunctions(funcFactory);
 
             string contentComplete = string.Empty;
 
@@ -588,7 +583,7 @@ namespace Azure.AI.Details.Common.CLI
                     DisplayAssistantPromptTextStreaming(content);
                 }
 
-                if (options.TryCallFunction(funcFactory, funcContext))
+                if (options.TryCallFunction(funcContext))
                 {
                     funcContext.Reset();
                     continue;
@@ -613,9 +608,10 @@ namespace Azure.AI.Details.Common.CLI
             }
         }
 
-        private ChatCompletionsOptions CreateChatCompletionOptions()
+        private ChatCompletionsOptions CreateChatCompletionOptions(string deployment)
         {
             var options = new ChatCompletionsOptions();
+            options.DeploymentName = deployment;
 
             var systemPrompt = _values.GetOrDefault("chat.message.system.prompt", DefaultSystemPrompt);
             options.Messages.Add(new ChatMessage(ChatRole.System, systemPrompt));
@@ -782,6 +778,27 @@ namespace Azure.AI.Details.Common.CLI
                 _values.AddThrowError("ERROR:", $"Creating OpenAIClient; Not-yet-implemented create from region.");
                 return null;
             }
+        }
+
+        private FunctionCallContext CreateFunctionFactoryAndCallContext(ChatCompletionsOptions options)
+        {
+            var builtinFunctions = _values.GetOrDefault("chat.built.in.functions", false);
+            var funcFactory = builtinFunctions
+                ? CreateFunctionFactoryWithBuiltinFunctions(options)
+                : CreateFunctionFactoryWithNoFunctions(options);
+            return options.AddFunctions(funcFactory);
+        }
+
+        private FunctionFactory CreateFunctionFactoryWithBuiltinFunctions(ChatCompletionsOptions options)
+        {
+            var funcFactory = new FunctionFactory(typeof(Calculator));
+            funcFactory.AddFunctions(typeof(FileReaderWriter));
+            return funcFactory;
+        }
+
+        private FunctionFactory CreateFunctionFactoryWithNoFunctions(ChatCompletionsOptions options)
+        {
+            return new FunctionFactory();
         }
 
         private ChatChoice CheckChoiceFinishReason(ChatChoice choice)

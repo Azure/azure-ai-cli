@@ -4,6 +4,11 @@ namespace Azure.AI.Details.Common.CLI.Extensions.FunctionCallingModel
 {
     public class FunctionCallContext
     {
+        public FunctionCallContext(FunctionFactory factory)
+        {
+            _factory = factory;
+        }
+
         public bool CheckForUpdate(StreamingChatCompletionsUpdate update)
         {
             var updated = false;
@@ -24,6 +29,11 @@ namespace Azure.AI.Details.Common.CLI.Extensions.FunctionCallingModel
             return updated;
         }
 
+        public bool TryCallFunction(ChatCompletionsOptions options)
+        {
+            return _factory.TryCallFunction(options, this);
+        }
+
         public void Reset()
         {
             _functionName = string.Empty;
@@ -36,5 +46,6 @@ namespace Azure.AI.Details.Common.CLI.Extensions.FunctionCallingModel
 
         private string _functionName = string.Empty;
         private string _arguments = string.Empty;
+        private readonly FunctionFactory _factory;
     }
 }
