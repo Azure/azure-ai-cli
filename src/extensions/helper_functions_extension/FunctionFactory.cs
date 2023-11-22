@@ -81,15 +81,15 @@ namespace Azure.AI.Details.Common.CLI.Extensions.HelperFunctions
             return _functions.Values;
         }
 
-        public bool TryCallFunction(ChatCompletionsOptions options, FunctionCallContext context)
+        public bool TryCallFunction(ChatCompletionsOptions options, FunctionCallContext context, out string? result)
         {
+            result = null;
             if (!string.IsNullOrEmpty(context.FunctionName) && !string.IsNullOrEmpty(context.Arguments))
             {
-                Console.WriteLine($"Trying to call function {context.FunctionName} with arguments {context.Arguments}...");
                 var function = _functions.FirstOrDefault(x => x.Value.Name == context.FunctionName);
                 if (function.Key != null)
                 {
-                    var result = CallFunction(function.Key, function.Value, context.Arguments);
+                    result = CallFunction(function.Key, function.Value, context.Arguments);
                     options.Messages.Add(new ChatMessage() { Role = ChatRole.Assistant, FunctionCall = new FunctionCall(context.FunctionName, context.Arguments) });
                     options.Messages.Add(new ChatMessage(ChatRole.Function, result) { Name = context.FunctionName });
                     return true;

@@ -20,14 +20,9 @@ namespace Azure.AI.Details.Common.CLI.Extensions.HelperFunctions
             return new FunctionCallContext(functionFactory);
         }
 
-        public static bool TryCallFunction(this ChatCompletionsOptions options, FunctionCallContext context)
+        public static bool TryCallFunction(this ChatCompletionsOptions options, FunctionCallContext context, out string? result)
         {
-            var result = context.TryCallFunction(options);
-            if (result)
-            {
-                context.Reset();
-            }
-            return result;
+            return context.TryCallFunction(options, out result);
         }
     }
 }

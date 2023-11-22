@@ -29,9 +29,9 @@ namespace Azure.AI.Details.Common.CLI.Extensions.HelperFunctions
             return updated;
         }
 
-        public bool TryCallFunction(ChatCompletionsOptions options)
+        public bool TryCallFunction(ChatCompletionsOptions options, out string? result)
         {
-            return _factory.TryCallFunction(options, this);
+            return _factory.TryCallFunction(options, this, out result);
         }
 
         public void Reset()

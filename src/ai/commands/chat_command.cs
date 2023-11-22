@@ -559,6 +559,21 @@ namespace Azure.AI.Details.Common.CLI
             Console.WriteLine("\n");
         }
 
+        private void DisplayAssistantFunctionCall(FunctionCallContext context, string result)
+        {
+            if (!_quiet && _verbose)
+            {
+                Console.ForegroundColor = ConsoleColor.Green;
+                Console.Write("\rassistant-function");
+                Console.ForegroundColor = ConsoleColor.White;
+                Console.Write(": ");
+                Console.ForegroundColor = ConsoleColor.DarkGray;
+                Console.WriteLine($"{context.FunctionName}({context.Arguments}) = {result}");
+
+                DisplayAssistantPromptLabel();
+            }
+        }
+
         private async Task<StreamingResponse<StreamingChatCompletionsUpdate>> GetChatCompletionsAsync(OpenAIClient client, ChatCompletionsOptions options, FunctionCallContext funcContext, string text)
         {
             options.Messages.Add(new ChatMessage(ChatRole.User, text));
@@ -584,8 +599,9 @@ namespace Azure.AI.Details.Common.CLI
                     DisplayAssistantPromptTextStreaming(content);
                 }
 
-                if (options.TryCallFunction(funcContext))
+                if (options.TryCallFunction(funcContext, out var result))
                 {
+                    DisplayAssistantFunctionCall(funcContext, result);
                     funcContext.Reset();
                     continue;
                 }
@@ -783,9 +799,9 @@ namespace Azure.AI.Details.Common.CLI
 
         private FunctionCallContext CreateFunctionFactoryAndCallContext(ChatCompletionsOptions options)
         {
-            var customFunctions = _values.GetOrDefault("chat.custom.functions", null);
+            var customFunctions = _values.GetOrDefault("chat.custom.helper.functions", null);
             var useCustomFunctions = !string.IsNullOrEmpty(customFunctions);
-            var useBuiltInFunctions = _values.GetOrDefault("chat.built.in.functions", false);
+            var useBuiltInFunctions = _values.GetOrDefault("chat.built.in.helper.functions", false);
 
             var factory = useCustomFunctions && useBuiltInFunctions
                 ? CreateFunctionFactoryForCustomFunctions(customFunctions) + CreateFunctionFactoryWithBuiltinFunctions()
