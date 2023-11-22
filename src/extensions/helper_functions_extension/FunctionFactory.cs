@@ -3,7 +3,7 @@ using Newtonsoft.Json;
 using Azure.AI.OpenAI;
 using Newtonsoft.Json.Linq;
 
-namespace Azure.AI.Details.Common.CLI.Extensions.FunctionCallingModel
+namespace Azure.AI.Details.Common.CLI.Extensions.HelperFunctions
 {
     public class FunctionFactory
     {

@@ -1,7 +1,7 @@
 ﻿using System.Text;
 using Azure.AI.OpenAI;
 
-namespace Azure.AI.Details.Common.CLI.Extensions.FunctionCallingModel
+namespace Azure.AI.Details.Common.CLI.Extensions.HelperFunctions
 {
     public static class FileReaderWriter
     {

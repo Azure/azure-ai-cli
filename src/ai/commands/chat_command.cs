@@ -22,7 +22,7 @@ using Microsoft.SemanticKernel.Memory;
 using Azure.Core.Diagnostics;
 using System.Diagnostics.Tracing;
 using Microsoft.CognitiveServices.Speech;
-using Azure.AI.Details.Common.CLI.Extensions.FunctionCallingModel;
+using Azure.AI.Details.Common.CLI.Extensions.HelperFunctions;
 
 namespace Azure.AI.Details.Common.CLI
 {

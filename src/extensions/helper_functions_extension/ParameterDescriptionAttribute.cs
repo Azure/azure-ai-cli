@@ -1,4 +1,4 @@
-﻿namespace Azure.AI.Details.Common.CLI.Extensions.FunctionCallingModel
+﻿namespace Azure.AI.Details.Common.CLI.Extensions.HelperFunctions
 {
     public class ParameterDescriptionAttribute : Attribute
     {

@@ -1,6 +1,6 @@
 ﻿using Azure.AI.OpenAI;
 
-namespace Azure.AI.Details.Common.CLI.Extensions.FunctionCallingModel
+namespace Azure.AI.Details.Common.CLI.Extensions.HelperFunctions
 {
     public class FunctionCallContext
     {

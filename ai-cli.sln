@@ -7,7 +7,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ai-cli", "src\ai\ai-cli.csp
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "common", "src\common\common.csproj", "{7639F510-D2CD-491A-BB25-C9D89F3A576A}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "function-calling-model", "src\extensions\function-calling-model\function-calling-model.csproj", "{272E0B1B-6C05-428E-BF64-E30B1E5F603A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "helper_functions_extension", "src\extensions\helper_functions_extension\helper_functions_extension.csproj", "{272E0B1B-6C05-428E-BF64-E30B1E5F603A}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Extensions", "Extensions", "{644B75F1-C768-4DB3-BAF2-C69A1F36DD28}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -30,6 +32,9 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{272E0B1B-6C05-428E-BF64-E30B1E5F603A} = {644B75F1-C768-4DB3-BAF2-C69A1F36DD28}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {002655B1-E1E1-4F2A-8D53-C9CD55136AE2}

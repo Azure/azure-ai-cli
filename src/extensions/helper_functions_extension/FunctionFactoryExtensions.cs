@@ -5,7 +5,7 @@ using Azure.AI.OpenAI;
 using DevLab.JmesPath.Utils;
 using System.Linq;
 
-namespace Azure.AI.Details.Common.CLI.Extensions.FunctionCallingModel
+namespace Azure.AI.Details.Common.CLI.Extensions.HelperFunctions
 {
     public static class FunctionFactoryExtensions
     {
