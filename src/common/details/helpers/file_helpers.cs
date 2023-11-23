@@ -925,6 +925,12 @@ namespace Azure.AI.Details.Common.CLI
                 name = name.Replace("." + dotDirectory.Replace("/", ".") + "help", "");
             }
 
+            if (name.StartsWith($"..{Program.Name}.templates"))
+            {
+                subDir = "templates/";
+                name = name.Replace("." + dotDirectory.Replace("/", ".") + "templates", "");
+            }
+
             name = name.Replace("." + dotDirectory.Replace("/", "."), "");
             name = name.Trim('.', '/');
 
