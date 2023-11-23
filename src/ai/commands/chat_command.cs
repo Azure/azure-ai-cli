@@ -594,6 +594,7 @@ namespace Azure.AI.Details.Common.CLI
                 Console.WriteLine($"{context.FunctionName}({context.Arguments}) = {result}");
 
                 DisplayAssistantPromptLabel();
+                Console.ForegroundColor = ConsoleColor.Gray;
             }
         }
 

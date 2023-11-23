@@ -4,6 +4,7 @@
 //
 
 using Mono.TextTemplating;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -35,23 +36,37 @@ namespace Azure.AI.Details.Common.CLI
 
             if (mainArgs.Length > 0 && mainArgs[0] == "t")
             {
-                var files = FileHelpers.FindFilesInTemplatePath("HelperFunctionsProject/*", null);
+                var thing = "HelperFunctionsProject";
+                var files = FileHelpers.FindFilesInTemplatePath($"{thing}/*", null);
+
+                var generator = new TemplateGenerator();
+
+                var jsonFile = files.Where(x => x.EndsWith("_.json")).FirstOrDefault();
+                if (jsonFile != null)
+                {
+                    files = files.Where(x => x != jsonFile);
+                    var json = FileHelpers.ReadAllText(jsonFile, Encoding.UTF8);
+                    foreach (var item in JObject.Parse(json))
+                    {
+                        generator.AddParameter(string.Empty, string.Empty, item.Key, item.Value.ToString());
+                    }
+                }
+
                 foreach (var file in files)
                 {
                     var text = FileHelpers.ReadAllText(file, Encoding.UTF8);
                     Console.WriteLine($"```{file}\n{text}\n```");
 
-                    var outputFile = "2-" + file;
+                    var i = file.IndexOf(thing);
+                    var outputFile = file.Substring(i + thing.Length + 1);
 
-                    var generator = new TemplateGenerator();
                     ParsedTemplate parsed = generator.ParseTemplate(file, text);
-                    generator.TryAddParameter("Fred=Hello");
                     TemplateSettings settings = TemplatingEngine.GetSettings(generator, parsed);
 
                     settings.CompilerOptions = "-nullable:enable";
 
                     (string generatedFilename, string generatedContent) = generator.ProcessTemplateAsync(parsed, file, text, outputFile, settings).Result;
-                    Console.WriteLine($"```{outputFile}\n{generatedContent}\n```");
+                    Console.WriteLine($"```{generatedFilename}\n{generatedContent}\n```");
                     //File.WriteAllText (generatedFilename, generatedContent);
                 }
                 return 0;
