@@ -3,6 +3,7 @@
 // Licensed under the MIT license. See LICENSE.md file in the project root for full license information.
 //
 
+using Mono.TextTemplating;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -31,6 +32,30 @@ namespace Azure.AI.Details.Common.CLI
                 Console.WriteLine("<ctrl-c> received... terminating ... ");
                 Process.GetCurrentProcess().Kill();
             };
+
+            if (mainArgs.Length > 0 && mainArgs[0] == "t")
+            {
+                var files = FileHelpers.FindFilesInTemplatePath("HelperFunctionsProject/*", null);
+                foreach (var file in files)
+                {
+                    var text = FileHelpers.ReadAllText(file, Encoding.UTF8);
+                    Console.WriteLine($"```{file}\n{text}\n```");
+
+                    var outputFile = "2-" + file;
+
+                    var generator = new TemplateGenerator();
+                    ParsedTemplate parsed = generator.ParseTemplate(file, text);
+                    generator.TryAddParameter("Fred=Hello");
+                    TemplateSettings settings = TemplatingEngine.GetSettings(generator, parsed);
+
+                    settings.CompilerOptions = "-nullable:enable";
+
+                    (string generatedFilename, string generatedContent) = generator.ProcessTemplateAsync(parsed, file, text, outputFile, settings).Result;
+                    Console.WriteLine($"```{outputFile}\n{generatedContent}\n```");
+                    //File.WriteAllText (generatedFilename, generatedContent);
+                }
+                return 0;
+            }
 
             ICommandValues values = new CommandValues();
             INamedValueTokens tokens = new CmdLineTokenSource(mainArgs, values);

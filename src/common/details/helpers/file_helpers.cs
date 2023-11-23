@@ -145,11 +145,11 @@ namespace Azure.AI.Details.Common.CLI
             find = find.Replace(" ", ".");
 
             List<string> files = new List<string>();
-            files.AddRange(FileHelpers.FindFilesInHelpPath($"{find}", values));
-            files.AddRange(FileHelpers.FindFilesInHelpPath($"*.{find}", values));
-            files.AddRange(FileHelpers.FindFilesInHelpPath($"{find}.*", values));
-            files.AddRange(FileHelpers.FindFilesInHelpPath($"*{find}*", values));
-
+            files.AddRange(FileHelpers.FindFilesInHelpPath($"help/{find}", values));
+            files.AddRange(FileHelpers.FindFilesInHelpPath($"help/*.{find}", values));
+            files.AddRange(FileHelpers.FindFilesInHelpPath($"help/{find}.*", values));
+            files.AddRange(FileHelpers.FindFilesInHelpPath($"help/*{find}*", values));
+            
             var found = files.Where(x => !x.Contains("/include.") && !x.Contains(".include."))
                 .Select(x => File.Exists(x)
                     ? new FileInfo(x).FullName
@@ -1315,7 +1315,7 @@ namespace Azure.AI.Details.Common.CLI
 
         private static string GetHelpPath()
         {
-            return GetAppResourceConfigDotDir() + "help/";
+            return GetAppResourceConfigDotDir();
         }
 
         private static string GetAssemblyDir()
