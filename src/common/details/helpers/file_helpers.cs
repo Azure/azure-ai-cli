@@ -145,10 +145,10 @@ namespace Azure.AI.Details.Common.CLI
             find = find.Replace(" ", ".");
 
             List<string> files = new List<string>();
-            files.AddRange(FileHelpers.FindFilesInHelpPath($"help/{find}", values));
-            files.AddRange(FileHelpers.FindFilesInHelpPath($"help/*.{find}", values));
-            files.AddRange(FileHelpers.FindFilesInHelpPath($"help/{find}.*", values));
-            files.AddRange(FileHelpers.FindFilesInHelpPath($"help/*{find}*", values));
+            files.AddRange(FileHelpers.FindFilesInHelpPath($"{find}", values));
+            files.AddRange(FileHelpers.FindFilesInHelpPath($"*.{find}", values));
+            files.AddRange(FileHelpers.FindFilesInHelpPath($"{find}.*", values));
+            files.AddRange(FileHelpers.FindFilesInHelpPath($"*{find}*", values));
 
             var found = files.Where(x => !x.Contains("/include.") && !x.Contains(".include."))
                 .Select(x => File.Exists(x)
@@ -211,6 +211,17 @@ namespace Azure.AI.Details.Common.CLI
             if (Program.Debug) Console.WriteLine($"DEBUG: Searching for DATA '{fileNames}'\n");
 
             var found = FindFilesInPath(fileNames, values, GetDataPath(values));
+
+            if (Program.Debug) Console.WriteLine();
+
+            return found;
+        }
+
+        public static IEnumerable<string> FindFilesInTemplatePath(string fileNames, INamedValues values)
+        {
+            if (Program.Debug) Console.WriteLine($"DEBUG: Searching for TEMPLATE '{fileNames}'\n");
+
+            var found = FindFilesInPath(fileNames, values, GetTemplatePath());
 
             if (Program.Debug) Console.WriteLine();
 
@@ -398,6 +409,17 @@ namespace Azure.AI.Details.Common.CLI
             return found;
         }
 
+        public static string FindFileInTemplatePath(string fileName, INamedValues values)
+        {
+            if (Program.Debug) Console.WriteLine($"DEBUG: TEMPLATE '{fileName}' EXIST?\n");
+
+            var found = FindFileInPath(fileName, values, GetTemplatePath());
+
+            if (Program.Debug) Console.WriteLine();
+
+            return found;
+        }
+
         public static string FindFileInHelpPath(string fileName)
         {
             if (Program.Debug) Console.WriteLine($"DEBUG: HELP '{fileName}' EXIST?\n");
@@ -461,6 +483,11 @@ namespace Azure.AI.Details.Common.CLI
         public static bool FileExistsInDataPath(string fileName, INamedValues values)
         {
             return FileExistsInPath(fileName, values, GetDataPath(values));
+        }
+
+        public static bool FileExistsInTemplatePath(string fileName, INamedValues values)
+        {
+            return FileExistsInPath(fileName, values, GetTemplatePath());
         }
 
         public static bool FileExistsInHelpPath(string fileName, INamedValues values)
@@ -1281,9 +1308,14 @@ namespace Azure.AI.Details.Common.CLI
             return _dataPath;
         }
 
+        private static string GetTemplatePath()
+        {
+            return GetAppResourceConfigDotDir() + "templates/";
+        }
+
         private static string GetHelpPath()
         {
-            return GetAppResourceConfigDotDir();
+            return GetAppResourceConfigDotDir() + "help/";
         }
 
         private static string GetAssemblyDir()
