@@ -7,12 +7,13 @@
     <TargetFramework>net7.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    <EnableDefaultCompileItems>true</EnableDefaultCompileItems>
     <AICLIExtensionReferencePath Condition="'$(AICLIExtensionReferencePath)' == ''"><#= AICLIExtensionReferencePath #></AICLIExtensionReferencePath>
   </PropertyGroup>
 
   <ItemGroup>
     <Reference Include="Azure.AI.CLI.Extensions.HelperFunctions">
-      <HintPath>$(AICLIExtensionReferencePath)Azure.AI.CLI.Extensions.HelperFunctions.dll</HintPath>
+      <HintPath>$(AICLIExtensionReferencePath)\Azure.AI.CLI.Extensions.HelperFunctions.dll</HintPath>
     </Reference>
   </ItemGroup>
 

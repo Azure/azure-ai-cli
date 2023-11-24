@@ -124,19 +124,29 @@ namespace Azure.AI.Details.Common.CLI.Extensions.HelperFunctions
                 var parameterType = parameter.ParameterType.Name;
                 var parameterValue = jObject[parameterName]?.ToString();
 
-                if (parameterType == "String" && parameterValue != null)
+                if (parameterType == null) continue;
+                switch (parameterType)
                 {
-                    arguments.Add(parameterValue);
-                }
-                else if (parameterType == "Int32" && parameterValue != null)
-                {
-                    arguments.Add(int.Parse(parameterValue));
-                }
-                else
-                {
-                    var isRequired = schemaObject["required"]?.Values<string>().Contains(parameterName) ?? false;
-                    if (isRequired) throw new Exception($"Unknown parameter type: {parameterType}");
-                }
+                    case "Boolean": arguments.Add(bool.Parse(parameterValue!)); break;
+                    case "byte": arguments.Add(byte.Parse(parameterValue!)); break;
+                    case "decimal": arguments.Add(decimal.Parse(parameterValue!)); break;
+                    case "double": arguments.Add(double.Parse(parameterValue!)); break;
+                    case "float": arguments.Add(float.Parse(parameterValue!)); break;
+                    case "Single": arguments.Add(Single.Parse(parameterValue!)); break;
+                    case "Int16": arguments.Add(Int16.Parse(parameterValue!)); break;
+                    case "Int32": arguments.Add(Int32.Parse(parameterValue!)); break;
+                    case "Int64": arguments.Add(Int64.Parse(parameterValue!)); break;
+                    case "long": arguments.Add(long.Parse(parameterValue!)); break;
+                    case "sbyte": arguments.Add(sbyte.Parse(parameterValue!)); break;
+                    case "short": arguments.Add(short.Parse(parameterValue!)); break;
+                    case "String": arguments.Add(parameterValue!); break;
+                    case "UInt16": arguments.Add(UInt16.Parse(parameterValue!)); break;
+                    case "UInt32": arguments.Add(UInt32.Parse(parameterValue!)); break;
+                    case "UInt64": arguments.Add(UInt64.Parse(parameterValue!)); break;
+                    case "ulong": arguments.Add(ulong.Parse(parameterValue!)); break;
+                    case "ushort": arguments.Add(ushort.Parse(parameterValue!)); break;
+                    default: arguments.Add(parameterValue!); break;
+                };
             }
 
             var result = methodInfo.Invoke(null, arguments.ToArray());
@@ -159,9 +169,23 @@ namespace Azure.AI.Details.Common.CLI.Extensions.HelperFunctions
 
                 var parameterType = parameter.ParameterType.Name switch
                 {
-                    "String" => "string",
+                    "Boolean" => "boolean",
+                    "byte" => "integer",
+                    "decimal" => "number",
+                    "double" => "number",
+                    "float" => "number",
                     "Int32" => "integer",
-                    _ => parameter.ParameterType.Name,
+                    "Int64" => "integer",
+                    "long" => "integer",
+                    "sbyte" => "integer",
+                    "short" => "integer",
+                    "String" => "string",
+                    "UInt16" => "integer",
+                    "UInt32" => "integer",
+                    "UInt64" => "integer",
+                    "ulong" => "integer",
+                    "ushort" => "integer",
+                    _ => "string"
                 };
 
                 attributes = parameter.GetCustomAttributes(typeof(HelperFunctionParameterDescriptionAttribute), false);
