@@ -9,6 +9,7 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Text;
+using Azure.AI.Details.Common.CLI.Extensions.Templates;
 
 namespace Azure.AI.Details.Common.CLI
 {
@@ -48,6 +49,7 @@ namespace Azure.AI.Details.Common.CLI
 
             switch (command)
             {
+                case "dev.new.template": DoNewTemplate(); break;
                 case "dev.new.env": DoNewEnv(); break;
                 case "dev.new": DoNew(); break;
                 case "dev.shell": DoDevShell(); break;
@@ -72,6 +74,11 @@ namespace Azure.AI.Details.Common.CLI
 
             Console.WriteLine($"{fileName} (saved at '{fqn}')\n");
             ConfigEnvironmentHelpers.PrintEnvironment(env);
+        }
+
+        private void DoNewTemplate()
+        {
+            TemplateFactory.GenerateTemplateFiles("HelperFunctionsProject");
         }
 
         private void DoDevShell()

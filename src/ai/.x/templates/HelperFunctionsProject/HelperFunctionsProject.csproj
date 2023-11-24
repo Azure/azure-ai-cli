@@ -1,18 +1,18 @@
 <#@ template hostspecific="true" #>
 <#@ output extension=".csproj" encoding="utf-8" #>
-<#@ parameter name="HelperFunctionsAssemblyPath" type="System.String" #>
+<#@ parameter name="AICLIExtensionReferencePath" type="System.String" #>
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net7.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
-    <HelperFunctionsAssemblyPath Condition="'$(HelperFunctionsAssemblyPath)' == ''"><#= HelperFunctionsAssemblyPath #></HelperFunctionsAssemblyPath>
+    <AICLIExtensionReferencePath Condition="'$(AICLIExtensionReferencePath)' == ''"><#= AICLIExtensionReferencePath #></AICLIExtensionReferencePath>
   </PropertyGroup>
 
   <ItemGroup>
     <Reference Include="Azure.AI.CLI.Extensions.HelperFunctions">
-      <HintPath>$(HelperFunctionsAssemblyPath)/Azure.AI.CLI.Extensions.HelperFunctions.dll</HintPath>
+      <HintPath>$(AICLIExtensionReferencePath)Azure.AI.CLI.Extensions.HelperFunctions.dll</HintPath>
     </Reference>
   </ItemGroup>
 

@@ -9,7 +9,6 @@
   <ItemGroup>
     <PackageReference Include="JmesPath.Net" Version="1.0.308" />
     <PackageReference Include="Microsoft.CognitiveServices.Speech" Version="1.32.1" />
-    <PackageReference Include="Mono.TextTemplating" Version="3.0.0-preview-0027-g2711105671" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
     <PackageReference Include="System.Interactive.Async" Version="6.0.1" />
   </ItemGroup>

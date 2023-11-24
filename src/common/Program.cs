@@ -3,8 +3,6 @@
 // Licensed under the MIT license. See LICENSE.md file in the project root for full license information.
 //
 
-using Mono.TextTemplating;
-using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -33,62 +31,6 @@ namespace Azure.AI.Details.Common.CLI
                 Console.WriteLine("<ctrl-c> received... terminating ... ");
                 Process.GetCurrentProcess().Kill();
             };
-
-            if (mainArgs.Length > 0 && mainArgs[0] == "t")
-            {
-                var thing = "HelperFunctionsProject";
-                var files = FileHelpers.FindFilesInTemplatePath($"{thing}/*", null);
-
-                var generator = new TemplateGenerator();
-
-                // var assembly = typeof(CLI.Extensions.HelperFunctions.HelperFunctionDescriptionAttribute).Assembly;
-                // var helperFunctionsAssemblyPath = Path.GetDirectoryName(assembly.Location);
-                var helperFunctionsAssemblyPath = "d:\\src\\ai-cli\\src\\ai\\bin\\Debug\\net7.0\\";
-                var parameters = new Dictionary<string, string>();
-                parameters.Add("HelperFunctionsAssemblyPath", helperFunctionsAssemblyPath);
-
-                var jsonFile = files.Where(x => x.EndsWith("_.json")).FirstOrDefault();
-                if (jsonFile != null)
-                {
-                    files = files.Where(x => x != jsonFile);
-                    var json = FileHelpers.ReadAllText(jsonFile, Encoding.UTF8);
-                    foreach (var item in JObject.Parse(json))
-                    {
-                        var name = item.Key;
-                        var value = parameters.Keys.Contains(name)
-                            ? parameters[name]
-                            : item.Value.ToString();
-
-                        generator.AddParameter(string.Empty, string.Empty, name, value);
-                    }
-                }
-                else
-                {
-                    foreach (var item in parameters)
-                    {
-                        generator.AddParameter(string.Empty, string.Empty, item.Key, item.Value);
-                    }
-                }
-
-                foreach (var file in files)
-                {
-                    var text = FileHelpers.ReadAllText(file, Encoding.UTF8);
-                    Console.WriteLine($"```{file}\n{text}\n```");
-
-                    var i = file.IndexOf(thing);
-                    var outputFile = file.Substring(i + thing.Length + 1);
-
-                    ParsedTemplate parsed = generator.ParseTemplate(file, text);
-                    TemplateSettings settings = TemplatingEngine.GetSettings(generator, parsed);
-
-                    settings.CompilerOptions = "-nullable:enable";
-
-                    (string generatedFilename, string generatedContent) = generator.ProcessTemplateAsync(parsed, file, text, outputFile, settings).Result;
-                    Console.WriteLine($"```{generatedFilename}\n{generatedContent}\n```");
-                    //File.WriteAllText (generatedFilename, generatedContent);
-                }
-                return 0;
-            }
 
             ICommandValues values = new CommandValues();
             INamedValueTokens tokens = new CmdLineTokenSource(mainArgs, values);
