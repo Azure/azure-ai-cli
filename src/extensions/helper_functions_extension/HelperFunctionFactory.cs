@@ -109,6 +109,8 @@ namespace Azure.AI.Details.Common.CLI.Extensions.HelperFunctions
 
         private static string? CallFunction(MethodInfo methodInfo, FunctionDefinition functionDefinition, string argumentsAsJson)
         {
+            // update later from here: https://chat.openai.com/share/99019aec-c51c-49f9-a1ab-3f5b1be13c43
+            
             var jObject = JObject.Parse(argumentsAsJson);
             var arguments = new List<object>();
 
