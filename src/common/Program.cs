@@ -41,6 +41,12 @@ namespace Azure.AI.Details.Common.CLI
 
                 var generator = new TemplateGenerator();
 
+                // var assembly = typeof(CLI.Extensions.HelperFunctions.HelperFunctionDescriptionAttribute).Assembly;
+                // var helperFunctionsAssemblyPath = Path.GetDirectoryName(assembly.Location);
+                var helperFunctionsAssemblyPath = "d:\\src\\ai-cli\\src\\ai\\bin\\Debug\\net7.0\\";
+                var parameters = new Dictionary<string, string>();
+                parameters.Add("HelperFunctionsAssemblyPath", helperFunctionsAssemblyPath);
+
                 var jsonFile = files.Where(x => x.EndsWith("_.json")).FirstOrDefault();
                 if (jsonFile != null)
                 {
@@ -48,7 +54,19 @@ namespace Azure.AI.Details.Common.CLI
                     var json = FileHelpers.ReadAllText(jsonFile, Encoding.UTF8);
                     foreach (var item in JObject.Parse(json))
                     {
-                        generator.AddParameter(string.Empty, string.Empty, item.Key, item.Value.ToString());
+                        var name = item.Key;
+                        var value = parameters.Keys.Contains(name)
+                            ? parameters[name]
+                            : item.Value.ToString();
+
+                        generator.AddParameter(string.Empty, string.Empty, name, value);
+                    }
+                }
+                else
+                {
+                    foreach (var item in parameters)
+                    {
+                        generator.AddParameter(string.Empty, string.Empty, item.Key, item.Value);
                     }
                 }
 

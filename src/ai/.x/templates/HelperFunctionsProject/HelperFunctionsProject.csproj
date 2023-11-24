@@ -1,17 +1,18 @@
 <#@ template hostspecific="true" #>
 <#@ output extension=".csproj" encoding="utf-8" #>
+<#@ parameter name="HelperFunctionsAssemblyPath" type="System.String" #>
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net7.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
-    <HelperFunctionsDir Condition="'$(HelperFunctionsDir)' == ''">$(MSBuildThisFileDirectory)</HelperFunctionsDir>
+    <HelperFunctionsAssemblyPath Condition="'$(HelperFunctionsAssemblyPath)' == ''"><#= HelperFunctionsAssemblyPath #></HelperFunctionsAssemblyPath>
   </PropertyGroup>
 
   <ItemGroup>
     <Reference Include="Azure.AI.CLI.Extensions.HelperFunctions">
-      <HintPath>C:\src\ai-cli\src\ai\bin\Debug\net7.0\Azure.AI.CLI.Extensions.HelperFunctions.dll</HintPath>
+      <HintPath>$(HelperFunctionsAssemblyPath)/Azure.AI.CLI.Extensions.HelperFunctions.dll</HintPath>
     </Reference>
   </ItemGroup>
 

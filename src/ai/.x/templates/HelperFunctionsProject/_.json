@@ -1,3 +1,4 @@
 {
-    "Name": "HelperFunctionClass1"
+    "Name": "HelperFunctionClass1",
+    "HelperFunctionsAssemblyPath": "."
 }
