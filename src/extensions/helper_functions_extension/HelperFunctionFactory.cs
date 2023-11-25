@@ -67,7 +67,7 @@ namespace Azure.AI.Details.Common.CLI.Extensions.HelperFunctions
                 var funcDescriptionAttrib = attributes[0] as HelperFunctionDescriptionAttribute;
                 var funcDescription = funcDescriptionAttrib!.Description;
 
-                string json = GetMethodParametersJsonSchema(method, ref attributes);
+                string json = GetMethodParametersJsonSchema(method);
                 if (Program.Debug)
                 {
                     System.Console.WriteLine($"Function: {method.Name}");
@@ -161,7 +161,7 @@ namespace Azure.AI.Details.Common.CLI.Extensions.HelperFunctions
             return result?.ToString();
         }
 
-        private static string GetMethodParametersJsonSchema(MethodInfo method, ref object[] attributes)
+        private static string GetMethodParametersJsonSchema(MethodInfo method)
         {
             var required = new JArray();
             var parameters = new JObject();
@@ -172,32 +172,16 @@ namespace Azure.AI.Details.Common.CLI.Extensions.HelperFunctions
 
             foreach (var parameter in method.GetParameters())
             {
-                var parameterName = parameter.Name;
-                if (parameterName == null) continue;
-
-                var parameterTypeCode = Type.GetTypeCode(parameter.ParameterType);
-                var parameterType = parameterTypeCode switch
-                {
-                    TypeCode.Boolean => "boolean",
-                    TypeCode.Byte or TypeCode.SByte or TypeCode.Int16 or TypeCode.Int32 or TypeCode.Int64 or
-                    TypeCode.UInt16 or TypeCode.UInt32 or TypeCode.UInt64 => "integer",
-                    TypeCode.Decimal or TypeCode.Double or TypeCode.Single => "number",
-                    TypeCode.String => "string",
-                    _ => "string"
-                };
-
-                attributes = parameter.GetCustomAttributes(typeof(HelperFunctionParameterDescriptionAttribute), false);
-                var paramDescriptionAttrib = attributes.Length > 0 ? (attributes[0] as HelperFunctionParameterDescriptionAttribute) : null;
-                var paramDescription = paramDescriptionAttrib?.Description ?? $"The {parameterName} parameter";
+                if (parameter.Name == null) continue;
 
                 var parameterJson = new JObject();
-                parameterJson["type"] = parameterType;
-                parameterJson["description"] = paramDescription;
-                properties[parameterName] = parameterJson;
+                parameterJson["type"] = GetParameterJsonType(parameter);
+                parameterJson["description"] = GetParameterDescription(parameter);
+                properties[parameter.Name] = parameterJson;
 
                 if (!parameter.IsOptional)
                 {
-                    required.Add(parameterName);
+                    required.Add(parameter.Name);
                 }
             }
 
@@ -205,6 +189,28 @@ namespace Azure.AI.Details.Common.CLI.Extensions.HelperFunctions
 
             var json = parameters.ToString(Formatting.None);
             return json;
+        }
+
+        private static string GetParameterJsonType(ParameterInfo parameter)
+        {
+            var parameterTypeCode = Type.GetTypeCode(parameter.ParameterType);
+            var parameterType = parameterTypeCode switch
+            {
+                TypeCode.Boolean => "boolean",
+                TypeCode.Byte or TypeCode.SByte or TypeCode.Int16 or TypeCode.Int32 or TypeCode.Int64 or
+                TypeCode.UInt16 or TypeCode.UInt32 or TypeCode.UInt64 => "integer",
+                TypeCode.Decimal or TypeCode.Double or TypeCode.Single => "number",
+                TypeCode.String => "string",
+                _ => "string"
+            };
+            return parameterType;
+        }
+
+        private static string GetParameterDescription(ParameterInfo parameter)
+        {
+            var attributes = parameter.GetCustomAttributes(typeof(HelperFunctionParameterDescriptionAttribute), false);
+            var paramDescriptionAttrib = attributes.Length > 0 ? (attributes[0] as HelperFunctionParameterDescriptionAttribute) : null;
+            return  paramDescriptionAttrib?.Description ?? $"The {parameter.Name} parameter";
         }
 
         private Dictionary<MethodInfo, FunctionDefinition> _functions = new();
