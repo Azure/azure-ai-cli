@@ -51,5 +51,11 @@ namespace Azure.AI.Details.Common.CLI.Extensions.HelperFunctions
         {
             return a / b;
         }
+
+        [HelperFunctionDescription("Calculate the mean of a list of floats")]
+        public static float MeanFloats(List<float> floats)
+        {
+            return floats.Average();
+        }
     }
 }

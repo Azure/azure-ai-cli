@@ -174,11 +174,7 @@ namespace Azure.AI.Details.Common.CLI.Extensions.HelperFunctions
             {
                 if (parameter.Name == null) continue;
 
-                var parameterJson = new JObject();
-                parameterJson["type"] = GetParameterJsonType(parameter);
-                parameterJson["description"] = GetParameterDescription(parameter);
-                properties[parameter.Name] = parameterJson;
-
+                properties[parameter.Name] = GetParameterJsonSchema(parameter);
                 if (!parameter.IsOptional)
                 {
                     required.Add(parameter.Name);
@@ -187,14 +183,46 @@ namespace Azure.AI.Details.Common.CLI.Extensions.HelperFunctions
 
             parameters["required"] = required;
 
-            var json = parameters.ToString(Formatting.None);
-            return json;
+            return parameters.ToString(Formatting.None);
         }
 
-        private static string GetParameterJsonType(ParameterInfo parameter)
+        private static JToken GetParameterJsonSchema(ParameterInfo parameter)
         {
-            var parameterTypeCode = Type.GetTypeCode(parameter.ParameterType);
-            var parameterType = parameterTypeCode switch
+            return IsArrayParameter(parameter)
+                ? GetArrayJsonSchema(parameter)
+                : GetJsonSchemaForPrimative(parameter);
+        }
+
+        private static bool IsArrayParameter(ParameterInfo parameter)
+        {
+            return parameter.ParameterType.IsGenericType && parameter.ParameterType.GetGenericTypeDefinition() == typeof(List<>);
+        }
+
+        private static JToken GetArrayJsonSchema(ParameterInfo parameter)
+        {
+            var parameterJson = new JObject();
+            parameterJson["type"] = "array";
+            parameterJson["items"] = new JObject() { ["type"] = GetJsonTypeForGenericArgument(parameter, 0) };
+            parameterJson["description"] = GetParameterDescription(parameter);
+            return parameterJson;
+        }
+
+        private static string GetJsonTypeForGenericArgument(ParameterInfo parameter, int argumentIndex)
+        {
+            return GetJsonTypeFromPrimitive(parameter.ParameterType.GetGenericArguments()[argumentIndex]);
+        }
+
+        private static JToken GetJsonSchemaForPrimative(ParameterInfo parameter)
+        {
+            var parameterJson = new JObject();
+            parameterJson["description"] = GetParameterDescription(parameter);
+            parameterJson["type"] = GetJsonTypeFromPrimitive(parameter.ParameterType);
+            return parameterJson;
+        }
+
+        private static string GetJsonTypeFromPrimitive(Type t)
+        {
+            return Type.GetTypeCode(t) switch
             {
                 TypeCode.Boolean => "boolean",
                 TypeCode.Byte or TypeCode.SByte or TypeCode.Int16 or TypeCode.Int32 or TypeCode.Int64 or
@@ -203,7 +231,6 @@ namespace Azure.AI.Details.Common.CLI.Extensions.HelperFunctions
                 TypeCode.String => "string",
                 _ => "string"
             };
-            return parameterType;
         }
 
         private static string GetParameterDescription(ParameterInfo parameter)
