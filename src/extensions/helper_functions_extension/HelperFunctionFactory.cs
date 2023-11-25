@@ -2,6 +2,7 @@
 using Newtonsoft.Json;
 using Azure.AI.OpenAI;
 using Newtonsoft.Json.Linq;
+using System.Collections;
 
 namespace Azure.AI.Details.Common.CLI.Extensions.HelperFunctions
 {
@@ -70,7 +71,7 @@ namespace Azure.AI.Details.Common.CLI.Extensions.HelperFunctions
                 string json = GetMethodParametersJsonSchema(method);
                 if (Program.Debug)
                 {
-                    System.Console.WriteLine($"Function: {method.Name}");
+                    System.Console.WriteLine($"\nFunction: {method.Name}");
                     System.Console.WriteLine($"Description: {funcDescription}");
                     System.Console.WriteLine($"Parameters: {json}");
                 }
@@ -115,13 +116,8 @@ namespace Azure.AI.Details.Common.CLI.Extensions.HelperFunctions
 
         private static string? CallFunction(MethodInfo methodInfo, FunctionDefinition functionDefinition, string argumentsAsJson)
         {
-            // update later from here: https://chat.openai.com/share/99019aec-c51c-49f9-a1ab-3f5b1be13c43
-
             var jObject = JObject.Parse(argumentsAsJson);
             var arguments = new List<object>();
-
-            var schema = functionDefinition.Parameters.ToString();
-            var schemaObject = JObject.Parse(schema);
 
             var parameters = methodInfo.GetParameters();
             foreach (var parameter in parameters)
@@ -129,36 +125,63 @@ namespace Azure.AI.Details.Common.CLI.Extensions.HelperFunctions
                 var parameterName = parameter.Name;
                 if (parameterName == null) continue;
 
-                var parameterType = parameter.ParameterType.Name;
                 var parameterValue = jObject[parameterName]?.ToString();
+                if (string.IsNullOrEmpty(parameterValue)) continue;
 
-                if (parameterType == null) continue;
-                switch (parameterType)
-                {
-                    case "Boolean": arguments.Add(bool.Parse(parameterValue!)); break;
-                    case "byte": arguments.Add(byte.Parse(parameterValue!)); break;
-                    case "decimal": arguments.Add(decimal.Parse(parameterValue!)); break;
-                    case "double": arguments.Add(double.Parse(parameterValue!)); break;
-                    case "float": arguments.Add(float.Parse(parameterValue!)); break;
-                    case "Single": arguments.Add(Single.Parse(parameterValue!)); break;
-                    case "Int16": arguments.Add(Int16.Parse(parameterValue!)); break;
-                    case "Int32": arguments.Add(Int32.Parse(parameterValue!)); break;
-                    case "Int64": arguments.Add(Int64.Parse(parameterValue!)); break;
-                    case "long": arguments.Add(long.Parse(parameterValue!)); break;
-                    case "sbyte": arguments.Add(sbyte.Parse(parameterValue!)); break;
-                    case "short": arguments.Add(short.Parse(parameterValue!)); break;
-                    case "String": arguments.Add(parameterValue!); break;
-                    case "UInt16": arguments.Add(UInt16.Parse(parameterValue!)); break;
-                    case "UInt32": arguments.Add(UInt32.Parse(parameterValue!)); break;
-                    case "UInt64": arguments.Add(UInt64.Parse(parameterValue!)); break;
-                    case "ulong": arguments.Add(ulong.Parse(parameterValue!)); break;
-                    case "ushort": arguments.Add(ushort.Parse(parameterValue!)); break;
-                    default: arguments.Add(parameterValue!); break;
-                };
+                var parsed = ParseParameterValue(parameterValue, parameter.ParameterType);
+                arguments.Add(parsed);
             }
 
-            var result = methodInfo.Invoke(null, arguments.ToArray());
+            var args = arguments.ToArray();
+            var result = methodInfo.Invoke(null, args);
             return result?.ToString();
+        }
+
+        private static object ParseParameterValue(string parameterValue, Type parameterType)
+        {
+            // Check if the parameterType is List<T>
+            if (parameterType.IsGenericType && parameterType.GetGenericTypeDefinition() == typeof(List<>))
+            {
+                Type elementType = parameterType.GetGenericArguments()[0];
+                return CreateGenericCollectionFromJsonArray(parameterValue, typeof(List<>), elementType);
+            }
+
+            switch (Type.GetTypeCode(parameterType))
+            {
+                case TypeCode.Boolean: return bool.Parse(parameterValue!);
+                case TypeCode.Byte: return byte.Parse(parameterValue!);
+                case TypeCode.Decimal: return decimal.Parse(parameterValue!);
+                case TypeCode.Double: return double.Parse(parameterValue!);
+                case TypeCode.Single: return float.Parse(parameterValue!);
+                case TypeCode.Int16: return short.Parse(parameterValue!);
+                case TypeCode.Int32: return int.Parse(parameterValue!);
+                case TypeCode.Int64: return long.Parse(parameterValue!);
+                case TypeCode.SByte: return sbyte.Parse(parameterValue!);
+                case TypeCode.UInt16: return ushort.Parse(parameterValue!);
+                case TypeCode.UInt32: return uint.Parse(parameterValue!);
+                case TypeCode.UInt64: return ulong.Parse(parameterValue!);
+                case TypeCode.String: return parameterValue!;
+                default: return Convert.ChangeType(parameterValue!, parameterType);
+            }
+        }
+
+        private static object CreateGenericCollectionFromJsonArray(string parameterValue, Type collectionType, Type elementType)
+        {
+            var array = JArray.Parse(parameterValue);
+
+            if (collectionType == typeof(List<>))
+            {
+                var collection = Activator.CreateInstance(collectionType.MakeGenericType(elementType));
+                var list = collection as IList;
+                foreach (var item in array)
+                {
+                    var parsed = ParseParameterValue(item.ToString(), elementType);
+                    if (parsed != null) list!.Add(parsed);
+                }
+                return collection!;
+            }
+
+            return array;
         }
 
         private static string GetMethodParametersJsonSchema(MethodInfo method)
@@ -188,12 +211,12 @@ namespace Azure.AI.Details.Common.CLI.Extensions.HelperFunctions
 
         private static JToken GetParameterJsonSchema(ParameterInfo parameter)
         {
-            return IsArrayParameter(parameter)
+            return IsArrayLikeParameter(parameter)
                 ? GetArrayJsonSchema(parameter)
                 : GetJsonSchemaForPrimative(parameter);
         }
 
-        private static bool IsArrayParameter(ParameterInfo parameter)
+        private static bool IsArrayLikeParameter(ParameterInfo parameter)
         {
             return parameter.ParameterType.IsGenericType && parameter.ParameterType.GetGenericTypeDefinition() == typeof(List<>);
         }
