@@ -68,6 +68,12 @@ namespace Azure.AI.Details.Common.CLI.Extensions.HelperFunctions
                 var funcDescription = funcDescriptionAttrib!.Description;
 
                 string json = GetMethodParametersJsonSchema(method, ref attributes);
+                if (Program.Debug)
+                {
+                    System.Console.WriteLine($"Function: {method.Name}");
+                    System.Console.WriteLine($"Description: {funcDescription}");
+                    System.Console.WriteLine($"Parameters: {json}");
+                }
                 _functions.Add(method, new FunctionDefinition(method.Name)
                 {
                     Description = funcDescription,
@@ -110,7 +116,7 @@ namespace Azure.AI.Details.Common.CLI.Extensions.HelperFunctions
         private static string? CallFunction(MethodInfo methodInfo, FunctionDefinition functionDefinition, string argumentsAsJson)
         {
             // update later from here: https://chat.openai.com/share/99019aec-c51c-49f9-a1ab-3f5b1be13c43
-            
+
             var jObject = JObject.Parse(argumentsAsJson);
             var arguments = new List<object>();
 
@@ -169,24 +175,14 @@ namespace Azure.AI.Details.Common.CLI.Extensions.HelperFunctions
                 var parameterName = parameter.Name;
                 if (parameterName == null) continue;
 
-                var parameterType = parameter.ParameterType.Name switch
+                var parameterTypeCode = Type.GetTypeCode(parameter.ParameterType);
+                var parameterType = parameterTypeCode switch
                 {
-                    "Boolean" => "boolean",
-                    "byte" => "integer",
-                    "decimal" => "number",
-                    "double" => "number",
-                    "float" => "number",
-                    "Int32" => "integer",
-                    "Int64" => "integer",
-                    "long" => "integer",
-                    "sbyte" => "integer",
-                    "short" => "integer",
-                    "String" => "string",
-                    "UInt16" => "integer",
-                    "UInt32" => "integer",
-                    "UInt64" => "integer",
-                    "ulong" => "integer",
-                    "ushort" => "integer",
+                    TypeCode.Boolean => "boolean",
+                    TypeCode.Byte or TypeCode.SByte or TypeCode.Int16 or TypeCode.Int32 or TypeCode.Int64 or
+                    TypeCode.UInt16 or TypeCode.UInt32 or TypeCode.UInt64 => "integer",
+                    TypeCode.Decimal or TypeCode.Double or TypeCode.Single => "number",
+                    TypeCode.String => "string",
                     _ => "string"
                 };
 
