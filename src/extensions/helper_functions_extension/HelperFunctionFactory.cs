@@ -139,8 +139,13 @@ namespace Azure.AI.Details.Common.CLI.Extensions.HelperFunctions
 
         private static object ParseParameterValue(string parameterValue, Type parameterType)
         {
-            // Check if the parameterType is List<T>
-            if (parameterType.IsGenericType && parameterType.GetGenericTypeDefinition() == typeof(List<>))
+            if (parameterType.IsArray)
+            {
+                Type elementType = parameterType.GetElementType()!;
+                return CreateGenericCollectionFromJsonArray(parameterValue, typeof(Array), elementType);
+            }
+
+            if (IsGenericListOrEquivalent(parameterType))
             {
                 Type elementType = parameterType.GetGenericArguments()[0];
                 return CreateGenericCollectionFromJsonArray(parameterValue, typeof(List<>), elementType);
@@ -169,7 +174,17 @@ namespace Azure.AI.Details.Common.CLI.Extensions.HelperFunctions
         {
             var array = JArray.Parse(parameterValue);
 
-            if (collectionType == typeof(List<>))
+            if (collectionType == typeof(Array))
+            {
+                var collection = Array.CreateInstance(elementType, array.Count);
+                for (int i = 0; i < array.Count; i++)
+                {
+                    var parsed = ParseParameterValue(array[i].ToString(), elementType);
+                    if (parsed != null) collection.SetValue(parsed, i);
+                }
+                return collection;
+            }
+            else if (collectionType == typeof(List<>))
             {
                 var collection = Activator.CreateInstance(collectionType.MakeGenericType(elementType));
                 var list = collection as IList;
@@ -211,28 +226,39 @@ namespace Azure.AI.Details.Common.CLI.Extensions.HelperFunctions
 
         private static JToken GetParameterJsonSchema(ParameterInfo parameter)
         {
-            return IsArrayLikeParameter(parameter)
-                ? GetArrayJsonSchema(parameter)
+            return IsGenericListOrEquivalent(parameter.ParameterType) || parameter.ParameterType.IsArray
+                ? GetArrayOrGenericListEquivalentJsonSchema(parameter)
                 : GetJsonSchemaForPrimative(parameter);
         }
 
-        private static bool IsArrayLikeParameter(ParameterInfo parameter)
+        private static bool IsGenericListOrEquivalent(Type t)
         {
-            return parameter.ParameterType.IsGenericType && parameter.ParameterType.GetGenericTypeDefinition() == typeof(List<>);
+            return t.IsGenericType &&
+               (t.GetGenericTypeDefinition() == typeof(List<>) ||
+                t.GetGenericTypeDefinition() == typeof(ICollection<>) ||
+                t.GetGenericTypeDefinition() == typeof(IEnumerable<>) ||
+                t.GetGenericTypeDefinition() == typeof(IList<>) ||
+                t.GetGenericTypeDefinition() == typeof(IReadOnlyCollection<>) ||
+                t.GetGenericTypeDefinition() == typeof(IReadOnlyList<>));
         }
 
-        private static JToken GetArrayJsonSchema(ParameterInfo parameter)
+        private static JToken GetArrayOrGenericListEquivalentJsonSchema(ParameterInfo parameter)
         {
             var parameterJson = new JObject();
             parameterJson["type"] = "array";
-            parameterJson["items"] = new JObject() { ["type"] = GetJsonTypeForGenericArgument(parameter, 0) };
+
+            var itemType = GetJsonTypeForArrayOrGenericListEquivalent(parameter);
+            parameterJson["items"] = new JObject() { ["type"] = itemType };
+
             parameterJson["description"] = GetParameterDescription(parameter);
             return parameterJson;
         }
 
-        private static string GetJsonTypeForGenericArgument(ParameterInfo parameter, int argumentIndex)
+        private static string GetJsonTypeForArrayOrGenericListEquivalent(ParameterInfo parameter)
         {
-            return GetJsonTypeFromPrimitive(parameter.ParameterType.GetGenericArguments()[argumentIndex]);
+            return parameter.ParameterType.IsArray
+                ? GetJsonTypeFromPrimitive(parameter.ParameterType.GetElementType()!)
+                : GetJsonTypeFromPrimitive(parameter.ParameterType.GetGenericArguments()[0]);
         }
 
         private static JToken GetJsonSchemaForPrimative(ParameterInfo parameter)

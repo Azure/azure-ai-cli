@@ -52,10 +52,22 @@ namespace Azure.AI.Details.Common.CLI.Extensions.HelperFunctions
             return a / b;
         }
 
-        [HelperFunctionDescription("Calculate the mean of a list of floats")]
-        public static float MeanFloats(List<float> floats)
+        [HelperFunctionDescription("Calculates the average of a list of numbers")]
+        public static double Average(IEnumerable<double> numbers)
         {
-            return floats.Average();
+            var count = numbers.Count();
+            return count == 0 ? 0 : numbers.Sum() / count;
+        }
+
+        [HelperFunctionDescription("Calculates the standard deviation of a list of numbers")]
+        public static double StandardDeviation(double[] numbers)
+        {
+            var count = numbers.Count();
+            if (count == 0) return 0;
+
+            double average = Average(numbers);
+            double sumOfSquaresOfDifferences = numbers.Select(val => (val - average) * (val - average)).Sum();
+            return Math.Sqrt(sumOfSquaresOfDifferences / count);
         }
     }
 }
