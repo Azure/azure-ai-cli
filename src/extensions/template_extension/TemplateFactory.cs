@@ -14,10 +14,55 @@ namespace Azure.AI.Details.Common.CLI.Extensions.Templates
 {
     public class TemplateFactory
     {
-        public static void GenerateTemplateFiles(string templateName)
+        public static bool ListTemplates()
         {
+            var root = FileHelpers.FileNameFromResourceName("templates") + "/";
+
+            var templateShortNames = FileHelpers.FindFilesInTemplatePath("*", null)
+                .Select(x => x.Replace(root, string.Empty))
+                .Select(x => x.Split('.').FirstOrDefault())
+                .Where(x => x != null)
+                .Select(x => x!)
+                .Distinct()
+                .ToList();
+
+            var templateLongNames = templateShortNames.Select(x => GetParameters(x)["_Name"]).ToList();
+
+            templateShortNames.Insert(0, ".env");
+            templateLongNames.Insert(0, "Environment Variables");
+
+            var widths = new int[2];
+            widths[0] = templateLongNames.Max(x => x.Length);
+            widths[1] = templateShortNames.Max(x => x.Length);
+
+            Console.WriteLine($"{"Name".PadRight(widths[0])}    {"Short Name".PadRight(widths[1])}");
+            Console.WriteLine($"{"-".PadRight(widths[0], '-')}    {"-".PadRight(widths[1], '-')}");
+
+            for (int i = 0; i < templateShortNames.Count; i++)
+            {
+                var longName = templateLongNames[i];
+                var shortName = templateShortNames[i].Replace('_', '-');
+                Console.WriteLine($"{longName.PadRight(widths[0])}    {shortName.PadRight(widths[1])}");
+            }
+
+            return true;
+        }
+
+        public static bool GenerateTemplateFiles(string templateName)
+        {
+            templateName = templateName.Replace('-', '_');
             var generator = new TemplateGenerator();
+            
             var files = GetTemplateFileNames(templateName, generator);
+            if (files.Count() == 0)
+            {
+                templateName = templateName.Replace(" ", "_");
+                files = GetTemplateFileNames(templateName, generator);
+                if (files.Count() == 0)
+                {
+                    return false;
+                }
+            }
 
             var processed = ProcessTemplates(templateName, generator, files);
             foreach (var item in processed)
@@ -26,11 +71,15 @@ namespace Azure.AI.Details.Common.CLI.Extensions.Templates
                 var text = item.Value;
                 Console.WriteLine($"```{file}\n{text}\n```");
             }
+
+            return true;
         }
 
         private static IEnumerable<string> GetTemplateFileNames(string templateName, TemplateGenerator generator)
         {
             var files = FileHelpers.FindFilesInTemplatePath($"{templateName}/*", null).ToList();
+            if (files.Count() == 0) return files;
+            
             var parameters = new Dictionary<string, string>();
 
             var assembly = typeof(TemplateFactory).Assembly;
@@ -53,16 +102,37 @@ namespace Azure.AI.Details.Common.CLI.Extensions.Templates
             if (jsonFile != null)
             {
                 files.Remove(jsonFile);
-                var json = FileHelpers.ReadAllText(jsonFile, Encoding.UTF8);
-                foreach (var item in JObject.Parse(json))
-                {
-                    var name = item.Key;
-                    var value = parameters.Keys.Contains(name)
-                        ? parameters[name]
-                        : item.Value?.ToString();
-                    parameters[name] = value!;
-                }
+                UpdateParameters(jsonFile, parameters);
             }
+            return parameters;
+        }
+
+        private static void UpdateParameters(string? jsonFile, Dictionary<string, string> parameters)
+        {
+            var json = FileHelpers.ReadAllText(jsonFile, Encoding.UTF8);
+            foreach (var item in JObject.Parse(json))
+            {
+                var name = item.Key;
+                var value = parameters.Keys.Contains(name)
+                    ? parameters[name]
+                    : item.Value?.ToString();
+                parameters[name] = value!;
+            }
+        }
+
+        private static Dictionary<string, string> GetParameters(string templateName)
+        {
+            var parameters = new Dictionary<string, string>();
+
+            var files = FileHelpers.FindFilesInTemplatePath($"{templateName}/_.json", null).ToList();
+            if (files.Count() == 0) return parameters;
+
+            var jsonFile = files.FirstOrDefault();
+            if (jsonFile != null)
+            {
+                UpdateParameters(jsonFile, parameters);
+            }
+
             return parameters;
         }
 

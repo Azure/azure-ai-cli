@@ -20,8 +20,8 @@ namespace Azure.AI.Details.Common.CLI
         }
 
         private static readonly (string name, bool valuesRequired)[] _commands =  {
-            ("dev.new.template", false),
-            ("dev.new.env", false),
+            ("dev.new.list", false),
+            ("dev.new", true),
             ("dev.shell", false),
         };
 
@@ -36,8 +36,7 @@ namespace Azure.AI.Details.Common.CLI
 
             switch (commandName)
             {
-                case "dev.new.template": return _devNewParsers;
-                case "dev.new.env": return _devNewParsers;
+                case "dev.new.list": return _devNewParsers;
                 case "dev.new": return _devNewParsers;
                 case "dev.shell": return _devShellParsers;
             }
@@ -77,7 +76,8 @@ namespace Azure.AI.Details.Common.CLI
         };
 
         private static INamedValueTokenParser[] _devNewParsers = {
-            new CommonDevNamedValueTokenParsers()
+            new CommonDevNamedValueTokenParsers(),
+            ArgXToken.Parser(),
         };
 
         private static INamedValueTokenParser[] _devShellParsers = {

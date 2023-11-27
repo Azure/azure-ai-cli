@@ -49,9 +49,8 @@ namespace Azure.AI.Details.Common.CLI
 
             switch (command)
             {
-                case "dev.new.template": DoNewTemplate(); break;
-                case "dev.new.env": DoNewEnv(); break;
                 case "dev.new": DoNew(); break;
+                case "dev.new.list": DoNewList(); break;
                 case "dev.shell": DoDevShell(); break;
 
                 default:
@@ -62,7 +61,12 @@ namespace Azure.AI.Details.Common.CLI
 
         private void DoNew()
         {
-            _values.AddThrowError("WARNING:", $"''ai dev new' NOT YET IMPLEMENTED!!");
+            var newWhat = string.Join(" ", ArgXToken.GetArgs(_values));
+            switch (newWhat)
+            {
+                case ".env": DoNewEnv(); break;
+                default: DoNewTemplate(newWhat); break;
+            }
         }
 
         private void DoNewEnv()
@@ -76,9 +80,18 @@ namespace Azure.AI.Details.Common.CLI
             ConfigEnvironmentHelpers.PrintEnvironment(env);
         }
 
-        private void DoNewTemplate()
+        private void DoNewTemplate(string templateName)
         {
-            TemplateFactory.GenerateTemplateFiles("HelperFunctionsProject");
+            if (!TemplateFactory.GenerateTemplateFiles(templateName))
+            {
+                _values.AddThrowError("ERROR:", $"Template '{templateName}' not found");
+                return;
+            }
+        }
+
+        private void DoNewList()
+        {
+            TemplateFactory.ListTemplates();
         }
 
         private void DoDevShell()
