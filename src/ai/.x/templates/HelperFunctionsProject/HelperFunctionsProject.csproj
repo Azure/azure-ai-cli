@@ -12,6 +12,13 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Azure.Core" Version="1.36.0" />
+    <PackageReference Include="Azure.Identity" Version="1.10.4" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+    <PackageReference Include="Azure.AI.OpenAI" Version="1.0.0-beta.9" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Reference Include="Azure.AI.CLI.Extensions.HelperFunctions">
       <HintPath>$(AICLIExtensionReferencePath)\Azure.AI.CLI.Extensions.HelperFunctions.dll</HintPath>
     </Reference>

@@ -126,14 +126,58 @@ namespace Azure.AI.Details.Common.CLI.Extensions.HelperFunctions
                 if (parameterName == null) continue;
 
                 var parameterValue = jObject[parameterName]?.ToString();
-                if (string.IsNullOrEmpty(parameterValue)) continue;
+                if (parameterValue == null) continue;
 
                 var parsed = ParseParameterValue(parameterValue, parameter.ParameterType);
                 arguments.Add(parsed);
             }
 
             var args = arguments.ToArray();
-            var result = methodInfo.Invoke(null, args);
+            var result = CallFunction(methodInfo, args);
+            return ConvertFunctionResultToString(result);
+        }
+
+        private static object? CallFunction(MethodInfo methodInfo, object[] args)
+        {
+            var t = methodInfo.ReturnType;
+            return t == typeof(Task)
+                ? CallVoidAsyncFunction(methodInfo, args)
+                : t.IsGenericType && t.GetGenericTypeDefinition() == typeof(Task<>)
+                    ? CallAsyncFunction(methodInfo, args)
+                    : CallSyncFunction(methodInfo, args);
+        }
+
+        private static object? CallVoidAsyncFunction(MethodInfo methodInfo, object[] args)
+        {
+            var task = methodInfo.Invoke(null, args) as Task;
+            task!.Wait();
+            return true;
+        }
+
+        private static object? CallAsyncFunction(MethodInfo methodInfo, object[] args)
+        {
+            var task = methodInfo.Invoke(null, args) as Task;
+            task!.Wait();
+            return task.GetType().GetProperty("Result")?.GetValue(task);
+        }
+
+        private static object? CallSyncFunction(MethodInfo methodInfo, object[] args)
+        {
+            return methodInfo.Invoke(null, args);
+        }
+
+        private static string? ConvertFunctionResultToString(object? result)
+        {
+            if (result is IEnumerable enumerable)
+            {
+                var array = new JArray();
+                foreach (var item in enumerable)
+                {
+                    var str = item.ToString();
+                    array.Add(str);
+                }
+                return array.ToString();
+            }
             return result?.ToString();
         }
 
