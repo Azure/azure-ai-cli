@@ -189,6 +189,12 @@ namespace Azure.AI.Details.Common.CLI.Extensions.HelperFunctions
                 return CreateGenericCollectionFromJsonArray(parameterValue, typeof(Array), elementType);
             }
 
+            if (IsTuppleType(parameterType))
+            {
+                Type elementType = parameterType.GetGenericArguments()[0];
+                return CreateTuppleTypeFromJsonArray(parameterValue, elementType);
+            }
+
             if (IsGenericListOrEquivalent(parameterType))
             {
                 Type elementType = parameterType.GetGenericArguments()[0];
@@ -243,6 +249,31 @@ namespace Azure.AI.Details.Common.CLI.Extensions.HelperFunctions
             return array;
         }
 
+        private static object CreateTuppleTypeFromJsonArray(string parameterValue, Type elementType)
+        {
+            var list = new List<object>();
+
+            var array = JArray.Parse(parameterValue);
+            foreach (var item in array)
+            {
+                var parsed = ParseParameterValue(item.ToString(), elementType);
+                if (parsed != null) list!.Add(parsed);
+            }
+
+            var collection = list.Count() switch
+            {
+                1 => Activator.CreateInstance(typeof(Tuple<>).MakeGenericType(elementType), list[0]),
+                2 => Activator.CreateInstance(typeof(Tuple<,>).MakeGenericType(elementType, elementType), list[0], list[1]),
+                3 => Activator.CreateInstance(typeof(Tuple<,,>).MakeGenericType(elementType, elementType, elementType), list[0], list[1], list[2]),
+                4 => Activator.CreateInstance(typeof(Tuple<,,,>).MakeGenericType(elementType, elementType, elementType, elementType), list[0], list[1], list[2], list[3]),
+                5 => Activator.CreateInstance(typeof(Tuple<,,,,>).MakeGenericType(elementType, elementType, elementType, elementType, elementType), list[0], list[1], list[2], list[3], list[4]),
+                6 => Activator.CreateInstance(typeof(Tuple<,,,,,>).MakeGenericType(elementType, elementType, elementType, elementType, elementType, elementType), list[0], list[1], list[2], list[3], list[4], list[5]),
+                7 => Activator.CreateInstance(typeof(Tuple<,,,,,,>).MakeGenericType(elementType, elementType, elementType, elementType, elementType, elementType, elementType), list[0], list[1], list[2], list[3], list[4], list[5], list[6]),
+                _ => throw new Exception("Tuples with more than 7 elements are not supported")
+            };
+            return collection!;
+        }
+
         private static string GetMethodParametersJsonSchema(MethodInfo method)
         {
             var required = new JArray();
@@ -270,9 +301,14 @@ namespace Azure.AI.Details.Common.CLI.Extensions.HelperFunctions
 
         private static JToken GetParameterJsonSchema(ParameterInfo parameter)
         {
-            return IsGenericListOrEquivalent(parameter.ParameterType) || parameter.ParameterType.IsArray
-                ? GetArrayOrGenericListEquivalentJsonSchema(parameter)
+            return IsGenericListOrEquivalent(parameter.ParameterType) || parameter.ParameterType.IsArray || IsTuppleType(parameter.ParameterType)
+                ? GetArrayOrTuppleOrGenericListEquivalentJsonSchema(parameter)
                 : GetJsonSchemaForPrimative(parameter);
+        }
+
+        private static bool IsTuppleType(Type parameterType)
+        {
+            return parameterType.IsGenericType && parameterType.GetGenericTypeDefinition().Name.StartsWith("Tuple");
         }
 
         private static bool IsGenericListOrEquivalent(Type t)
@@ -286,19 +322,19 @@ namespace Azure.AI.Details.Common.CLI.Extensions.HelperFunctions
                 t.GetGenericTypeDefinition() == typeof(IReadOnlyList<>));
         }
 
-        private static JToken GetArrayOrGenericListEquivalentJsonSchema(ParameterInfo parameter)
+        private static JToken GetArrayOrTuppleOrGenericListEquivalentJsonSchema(ParameterInfo parameter)
         {
             var parameterJson = new JObject();
             parameterJson["type"] = "array";
 
-            var itemType = GetJsonTypeForArrayOrGenericListEquivalent(parameter);
+            var itemType = GetJsonTypeForArrayOrTuppleOrGenericListEquivalent(parameter);
             parameterJson["items"] = new JObject() { ["type"] = itemType };
 
             parameterJson["description"] = GetParameterDescription(parameter);
             return parameterJson;
         }
 
-        private static string GetJsonTypeForArrayOrGenericListEquivalent(ParameterInfo parameter)
+        private static string GetJsonTypeForArrayOrTuppleOrGenericListEquivalent(ParameterInfo parameter)
         {
             return parameter.ParameterType.IsArray
                 ? GetJsonTypeFromPrimitive(parameter.ParameterType.GetElementType()!)
