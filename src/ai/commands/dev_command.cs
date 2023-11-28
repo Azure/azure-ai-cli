@@ -84,8 +84,9 @@ namespace Azure.AI.Details.Common.CLI
         {
             if (!TemplateFactory.GenerateTemplateFiles(templateName))
             {
-                _values.AddThrowError("ERROR:", $"Template '{templateName}' not found");
-                return;
+                _values.AddThrowError("WARNING:", $"Template '{templateName}' not found",
+                                                   "",
+                                          "TRY:", $"{Program.Name} dev new list");
             }
         }
 
