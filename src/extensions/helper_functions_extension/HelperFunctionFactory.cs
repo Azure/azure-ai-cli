@@ -185,7 +185,7 @@ namespace Azure.AI.Details.Common.CLI.Extensions.HelperFunctions
 
         private static object ParseParameterValue(string parameterValue, Type parameterType)
         {
-            if (parameterType.IsArray)
+            if (IsArrayType(parameterType))
             {
                 Type elementType = parameterType.GetElementType()!;
                 return CreateGenericCollectionFromJsonArray(parameterValue, typeof(Array), elementType);
@@ -197,7 +197,7 @@ namespace Azure.AI.Details.Common.CLI.Extensions.HelperFunctions
                 return CreateTuppleTypeFromJsonArray(parameterValue, elementType);
             }
 
-            if (IsGenericListOrEquivalent(parameterType))
+            if (IsGenericListOrEquivalentType(parameterType))
             {
                 Type elementType = parameterType.GetGenericArguments()[0];
                 return CreateGenericCollectionFromJsonArray(parameterValue, typeof(List<>), elementType);
@@ -278,82 +278,76 @@ namespace Azure.AI.Details.Common.CLI.Extensions.HelperFunctions
 
         private static string GetMethodParametersJsonSchema(MethodInfo method)
         {
-            var required = new JArray();
-            var parameters = new JObject();
-            parameters["type"] = "object";
+            var schema = new JObject();
+            schema["type"] = "object";
 
             var properties = new JObject();
-            parameters["properties"] = properties;
+            schema["properties"] = properties;
 
+            var required = new JArray();
             foreach (var parameter in method.GetParameters())
             {
                 if (parameter.Name == null) continue;
 
-                properties[parameter.Name] = GetParameterJsonSchema(parameter);
+                properties[parameter.Name] = GetJsonSchemaForParameterWithDescription(parameter);
                 if (!parameter.IsOptional)
                 {
                     required.Add(parameter.Name);
                 }
             }
 
-            parameters["required"] = required;
+            schema["required"] = required;
 
-            return parameters.ToString(Formatting.None);
+            return schema.ToString(Formatting.None);
         }
 
-        private static JToken GetParameterJsonSchema(ParameterInfo parameter)
+        private static JToken GetJsonSchemaForParameterWithDescription(ParameterInfo parameter)
         {
-            return IsGenericListOrEquivalent(parameter.ParameterType) || parameter.ParameterType.IsArray || IsTuppleType(parameter.ParameterType)
-                ? GetArrayOrTuppleOrGenericListEquivalentJsonSchema(parameter)
-                : GetJsonSchemaForPrimative(parameter);
+            var schema = GetJsonSchemaForType(parameter.ParameterType);
+            schema["description"] = GetParameterDescription(parameter);
+            return schema;
         }
 
-        private static bool IsTuppleType(Type parameterType)
+        private static string GetParameterDescription(ParameterInfo parameter)
         {
-            return parameterType.IsGenericType && parameterType.GetGenericTypeDefinition().Name.StartsWith("Tuple");
+            var attributes = parameter.GetCustomAttributes(typeof(HelperFunctionParameterDescriptionAttribute), false);
+            var paramDescriptionAttrib = attributes.Length > 0 ? (attributes[0] as HelperFunctionParameterDescriptionAttribute) : null;
+            return  paramDescriptionAttrib?.Description ?? $"The {parameter.Name} parameter";
         }
 
-        private static bool IsGenericListOrEquivalent(Type t)
+        private static JObject GetJsonSchemaForType(Type t)
         {
-            return t.IsGenericType &&
-               (t.GetGenericTypeDefinition() == typeof(List<>) ||
-                t.GetGenericTypeDefinition() == typeof(ICollection<>) ||
-                t.GetGenericTypeDefinition() == typeof(IEnumerable<>) ||
-                t.GetGenericTypeDefinition() == typeof(IList<>) ||
-                t.GetGenericTypeDefinition() == typeof(IReadOnlyCollection<>) ||
-                t.GetGenericTypeDefinition() == typeof(IReadOnlyList<>));
+            return IsJsonArrayEquivalentType(t)
+                ? GetJsonArraySchemaFromType(t)
+                : GetJsonPrimativeSchemaFromType(t);
         }
 
-        private static JToken GetArrayOrTuppleOrGenericListEquivalentJsonSchema(ParameterInfo parameter)
+        private static JObject GetJsonArraySchemaFromType(Type containerType)
         {
-            var parameterJson = new JObject();
-            parameterJson["type"] = "array";
-
-            var itemType = GetJsonTypeForArrayOrTuppleOrGenericListEquivalent(parameter);
-            parameterJson["items"] = new JObject() { ["type"] = itemType };
-
-            parameterJson["description"] = GetParameterDescription(parameter);
-            return parameterJson;
+            var schema = new JObject();
+            schema["type"] = "array";
+            schema["items"] = GetJsonArrayItemSchemaFromType(containerType);
+            return schema;
         }
 
-        private static string GetJsonTypeForArrayOrTuppleOrGenericListEquivalent(ParameterInfo parameter)
+        private static JObject GetJsonArrayItemSchemaFromType(Type containerType)
         {
-            return parameter.ParameterType.IsArray
-                ? GetJsonTypeFromPrimitive(parameter.ParameterType.GetElementType()!)
-                : GetJsonTypeFromPrimitive(parameter.ParameterType.GetGenericArguments()[0]);
+            var itemType = containerType.IsArray
+                ? containerType.GetElementType()!
+                : containerType.GetGenericArguments()[0];
+            return GetJsonSchemaForType(itemType);
         }
 
-        private static JToken GetJsonSchemaForPrimative(ParameterInfo parameter)
+        private static JObject GetJsonPrimativeSchemaFromType(Type primativeType)
         {
-            var parameterJson = new JObject();
-            parameterJson["description"] = GetParameterDescription(parameter);
-            parameterJson["type"] = GetJsonTypeFromPrimitive(parameter.ParameterType);
-            return parameterJson;
+            var schema = new JObject();
+            schema["type"] = GetJsonTypeFromPrimitiveType(primativeType);
+            return schema;
         }
 
-        private static string GetJsonTypeFromPrimitive(Type t)
+        private static string GetJsonTypeFromPrimitiveType(Type primativeType)
         {
-            return Type.GetTypeCode(t) switch
+            return Type.GetTypeCode(primativeType) switch
             {
                 TypeCode.Boolean => "boolean",
                 TypeCode.Byte or TypeCode.SByte or TypeCode.Int16 or TypeCode.Int32 or TypeCode.Int64 or
@@ -364,11 +358,30 @@ namespace Azure.AI.Details.Common.CLI.Extensions.HelperFunctions
             };
         }
 
-        private static string GetParameterDescription(ParameterInfo parameter)
+        private static bool IsJsonArrayEquivalentType(Type t)
         {
-            var attributes = parameter.GetCustomAttributes(typeof(HelperFunctionParameterDescriptionAttribute), false);
-            var paramDescriptionAttrib = attributes.Length > 0 ? (attributes[0] as HelperFunctionParameterDescriptionAttribute) : null;
-            return  paramDescriptionAttrib?.Description ?? $"The {parameter.Name} parameter";
+            return IsArrayType(t) || IsTuppleType(t) || IsGenericListOrEquivalentType(t);
+        }
+
+        private static bool IsArrayType(Type t)
+        {
+            return t.IsArray;
+        }
+
+        private static bool IsTuppleType(Type parameterType)
+        {
+            return parameterType.IsGenericType && parameterType.GetGenericTypeDefinition().Name.StartsWith("Tuple");
+        }
+
+        private static bool IsGenericListOrEquivalentType(Type t)
+        {
+            return t.IsGenericType &&
+               (t.GetGenericTypeDefinition() == typeof(List<>) ||
+                t.GetGenericTypeDefinition() == typeof(ICollection<>) ||
+                t.GetGenericTypeDefinition() == typeof(IEnumerable<>) ||
+                t.GetGenericTypeDefinition() == typeof(IList<>) ||
+                t.GetGenericTypeDefinition() == typeof(IReadOnlyCollection<>) ||
+                t.GetGenericTypeDefinition() == typeof(IReadOnlyList<>));
         }
 
         private Dictionary<MethodInfo, FunctionDefinition> _functions = new();
