@@ -70,6 +70,9 @@ namespace Azure.AI.Details.Common.CLI.Extensions.Templates
                 var file = item.Key;
                 var text = item.Value;
                 Console.WriteLine($"```{file}\n{text}\n```");
+
+                FileHelpers.WriteAllText(file, text, Encoding.UTF8);
+                Console.WriteLine();
             }
 
             return true;
