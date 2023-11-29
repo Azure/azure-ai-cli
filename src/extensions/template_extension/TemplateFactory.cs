@@ -69,9 +69,9 @@ namespace Azure.AI.Details.Common.CLI.Extensions.Templates
             {
                 var file = item.Key;
                 var text = item.Value;
-                Console.WriteLine($"```{file}\n{text}\n```");
+                Console.WriteLine($"FILE: {file}:\n```\n{text}\n```");
 
-                FileHelpers.WriteAllText(file, text, Encoding.UTF8);
+                FileHelpers.WriteAllText(file, text, new UTF8Encoding(false));
                 Console.WriteLine();
             }
 
@@ -112,7 +112,7 @@ namespace Azure.AI.Details.Common.CLI.Extensions.Templates
 
         private static void UpdateParameters(string? jsonFile, Dictionary<string, string> parameters)
         {
-            var json = FileHelpers.ReadAllText(jsonFile, Encoding.UTF8);
+            var json = FileHelpers.ReadAllText(jsonFile, new UTF8Encoding(false));
             foreach (var item in JObject.Parse(json))
             {
                 var name = item.Key;
@@ -144,7 +144,7 @@ namespace Azure.AI.Details.Common.CLI.Extensions.Templates
             var processed = new Dictionary<string, string>();
             foreach (var file in files)
             {
-                var text = FileHelpers.ReadAllText(file, Encoding.UTF8);
+                var text = FileHelpers.ReadAllText(file, new UTF8Encoding(false));
                 if (Program.Debug) Console.WriteLine($"```{file}\n{text}\n```");
 
                 var i = file.IndexOf(templateName);

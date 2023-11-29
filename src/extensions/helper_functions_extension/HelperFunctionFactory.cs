@@ -170,7 +170,7 @@ namespace Azure.AI.Details.Common.CLI.Extensions.HelperFunctions
 
         private static string? ConvertFunctionResultToString(object? result)
         {
-            if (result is IEnumerable enumerable)
+            if (result is IEnumerable enumerable && !(result is string))
             {
                 var array = new JArray();
                 foreach (var item in enumerable)
