@@ -25,6 +25,7 @@ namespace Azure.AI.Details.Common.CLI.Extensions.Templates
                 .Select(x => x!)
                 .Distinct()
                 .ToList();
+            templateShortNames.Sort();
 
             var templateLongNames = templateShortNames.Select(x => GetParameters(x)["_Name"]).ToList();
 
