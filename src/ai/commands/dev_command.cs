@@ -82,7 +82,10 @@ namespace Azure.AI.Details.Common.CLI
 
         private void DoNewTemplate(string templateName)
         {
-            if (!TemplateFactory.GenerateTemplateFiles(templateName))
+            var filesInDirAlready = FileHelpers.FindFiles(".", "*").Count() > 0;
+            var outputDirectory = !filesInDirAlready ? "." : templateName;
+
+            if (!TemplateFactory.GenerateTemplateFiles(templateName, outputDirectory))
             {
                 _values.AddThrowError("WARNING:", $"Template '{templateName}' not found",
                                                    "",

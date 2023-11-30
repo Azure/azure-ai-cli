@@ -66,7 +66,7 @@ namespace Azure.AI.Details.Common.CLI.Extensions.Templates
             return true;
         }
 
-        public static bool GenerateTemplateFiles(string templateName)
+        public static bool GenerateTemplateFiles(string templateName, string outputDirectory)
         {
             templateName = templateName.Replace('-', '_');
             var generator = new TemplateGenerator();
@@ -89,7 +89,7 @@ namespace Azure.AI.Details.Common.CLI.Extensions.Templates
                 var text = item.Value;
                 Console.WriteLine($"FILE: {file}:\n```\n{text}\n```");
 
-                FileHelpers.WriteAllText(file, text, new UTF8Encoding(false));
+                FileHelpers.WriteAllText(PathHelpers.Combine(outputDirectory, file), text, new UTF8Encoding(false));
                 Console.WriteLine();
             }
 
