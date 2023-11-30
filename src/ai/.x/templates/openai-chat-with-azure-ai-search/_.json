@@ -1,0 +1,10 @@
+{
+    "_Name": "OpenAI Chat w/ Azure AI Search Class Library",
+    "AICLIExtensionReferencePath": "",
+    "ClassName": "OpenAIChatWithAzureAISearchClass",
+    "OpenAIEndpoint": "https://myaccount.openai.azure.com/",
+    "SearchEndpoint": "https://your-contoso-search-resource.search.windows.net",
+    "SearchApiKey": "your-search-api-key",
+    "SearchIndexName": "contoso-products-index",
+    "OpenAIDeploymentName": "gpt-35-turbo-0613"
+}

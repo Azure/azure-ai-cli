@@ -24,6 +24,7 @@
     <Copyright>© Microsoft Corporation. All rights reserved.</Copyright>
     <PackageProjectUrl>https://learn.microsoft.com/azure/ai-studio/how-to/cli-install</PackageProjectUrl>
     <PackageTags>Azure AI; AI CLI; azureofficial</PackageTags>
+    <SuppressTfmSupportBuildWarnings>true</SuppressTfmSupportBuildWarnings>
   </PropertyGroup>
 
   <PropertyGroup>
@@ -74,6 +75,12 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include=".x\templates\**">
+      <Link>resources\.ai\templates\%(RecursiveDir)%(Filename)%(Extension)</Link>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
     <EmbeddedResource Include=".x\config\*">
       <Link>resources\.ai\config\%(Filename)%(Extension)</Link>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
@@ -97,6 +104,7 @@
   <ItemGroup>
     <ProjectReference Include="..\common\common.csproj" />
     <ProjectReference Include="..\extensions\helper_functions_extension\helper_functions_extension.csproj" />
+    <ProjectReference Include="..\extensions\template_extension\template_extension.csproj" />
   </ItemGroup>
 
   <Import Project="BuildCommon.targets" />
