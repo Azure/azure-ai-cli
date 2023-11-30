@@ -864,7 +864,7 @@ namespace Azure.AI.Details.Common.CLI
 
         private HelperFunctionFactory CreateFunctionFactoryWithBuiltinFunctions()
         {
-            return new HelperFunctionFactory(typeof(CalculatorHelperFunctions), typeof(FileHelperFunctions));
+            return new HelperFunctionFactory(typeof(FileHelperFunctions).Assembly);
         }
 
         private HelperFunctionFactory CreateFunctionFactoryWithNoFunctions()

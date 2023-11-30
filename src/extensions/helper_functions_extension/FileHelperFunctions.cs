@@ -16,7 +16,7 @@ namespace Azure.AI.Details.Common.CLI.Extensions.HelperFunctions
         public static string ReadTextFromFile(string fileName)
         {
             var content = FileHelpers.FileExists(fileName)
-                ? FileHelpers.ReadAllText(fileName, Encoding.UTF8)
+                ? FileHelpers.ReadAllText(fileName, new UTF8Encoding(false))
                 : string.Empty;
             return content;
         }
@@ -24,7 +24,14 @@ namespace Azure.AI.Details.Common.CLI.Extensions.HelperFunctions
         [HelperFunctionDescription("Writes text into a file; if the file exists, it is overwritten")]
         public static bool CreateFileAndSaveText(string fileName, string text)
         {
-            FileHelpers.WriteAllText(fileName, text, Encoding.UTF8);
+            FileHelpers.WriteAllText(fileName, text, new UTF8Encoding(false));
+            return true;
+        }
+
+        [HelperFunctionDescription("Appends text to a file; if the file does not exist, it is created")]
+        public static bool AppendTextToFile(string fileName, string text)
+        {
+            FileHelpers.AppendAllText(fileName, text, new UTF8Encoding(false));
             return true;
         }
 
@@ -64,7 +71,7 @@ namespace Azure.AI.Details.Common.CLI.Extensions.HelperFunctions
             var result = new List<string>();
             foreach (var file in files)
             {
-                var content = FileHelpers.ReadAllText(file, Encoding.UTF8);
+                var content = FileHelpers.ReadAllText(file, new UTF8Encoding(false));
                 if (content.Contains(text))
                 {
                     result.Add(file);
