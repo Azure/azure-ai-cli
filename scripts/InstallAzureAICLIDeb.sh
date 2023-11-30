@@ -116,9 +116,9 @@ if [ "$EUID" -ne 0 ]; then # if we're not root
 elif [ -n "$SUDO_USER" ]; then # if we're root and SUDO_USER is set, run as SUDO_USER
     sudo -u $SUDO_USER dotnet tool install --global --add-source . Azure.AI.CLI --version ${AICLI_VERSION}
     DOTNET_TOOLS_PATH="/home/$SUDO_USER/.dotnet/tools"
-else # if we're root and SUDO_USER is not set, we can't proceed
-    echo "Cannot determine the user to install the Azure.AI.CLI dotnet tool for."
-    exit 1
+else # if we're root and SUDO_USER is not set, use /root as the home directory
+    dotnet tool install --global --add-source . Azure.AI.CLI --version ${AICLI_VERSION}
+    DOTNET_TOOLS_PATH="/root/.dotnet/tools"
 fi
 
 # Check if the installation was successful
