@@ -1,5 +1,9 @@
 {
-  "_Name": "OpenAI Chat Completions Class Library",
-  "ClassName": "OpenAIChatCompletionsClass",
+  "_Name": "OpenAI Chat Completions Hello World",
+  "ClassName": "OpenAIChatHelloWorldClass",
+  "OPENAI_ENDPOINT": "<insert your OpenAI endpoint here>",
+  "OPENAI_API_KEY": "<insert your OpenAI API key here>",
+  "AZURE_OPENAI_CHAT_DEPLOYMENT": "<insert your OpenAI deployment name here>",
+  "AZURE_OPENAI_SYSTEM_PROMPT": "You are a helpful AI assistant.",
   "AICLIExtensionReferencePath": ""
 }
