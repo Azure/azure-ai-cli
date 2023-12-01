@@ -27,30 +27,49 @@ namespace Azure.AI.Details.Common.CLI.Extensions.Templates
                 .ToList();
             templateShortNames.Sort();
 
-            var templateLongNames = templateShortNames.Select(x => GetParameters(x)["_Name"]).ToList();
+            var templateLongNames = new List<string>();
+            var languages = new List<string>();
+            foreach (var item in templateShortNames)
+            {
+                var parameters = GetParameters(item);
+                var longName = parameters["_Name"];
+                var language = parameters["_Language"];
+
+                templateLongNames.Add(longName);
+                languages.Add(language);
+            }
 
             templateShortNames.Insert(0, ".env");
             templateLongNames.Insert(0, "Environment Variables");
+            languages.Insert(0, "");
 
-            var widths = new int[2];
-            widths[0] = templateLongNames.Max(x => x.Length);
-            widths[1] = templateShortNames.Max(x => x.Length);
+            var longNameLabel = "Name";
+            var shortNameLabel = "Short Name";
+            var languageLabel = "Language";
 
-            Console.WriteLine($"{"Name".PadRight(widths[0])}    {"Short Name".PadRight(widths[1])}");
-            Console.WriteLine($"{"-".PadRight(widths[0], '-')}    {"-".PadRight(widths[1], '-')}");
+            var widths = new int[3];
+            widths[0] = Math.Max(longNameLabel.Length, templateLongNames.Max(x => x.Length));
+            widths[1] = Math.Max(shortNameLabel.Length, templateShortNames.Max(x => x.Length));
+            widths[2] = Math.Max(languageLabel.Length, languages.Max(x => x.Length));
+
+            Console.WriteLine($"{longNameLabel.PadRight(widths[0])}    {shortNameLabel.PadRight(widths[1])}    {languageLabel.PadRight(widths[2])}");
+            Console.WriteLine($"{"-".PadRight(widths[0], '-')}    {"-".PadRight(widths[1], '-')}    {"-".PadRight(widths[2], '-')}");
 
             for (int i = 0; i < templateShortNames.Count; i++)
             {
                 var longName = templateLongNames[i];
                 var shortName = templateShortNames[i].Replace('_', '-');
-                Console.WriteLine($"{longName.PadRight(widths[0])}    {shortName.PadRight(widths[1])}");
+                var language = languages[i];
+                Console.WriteLine($"{longName.PadRight(widths[0])}    {shortName.PadRight(widths[1])}    {language.PadRight(widths[2])}");
             }
 
             return true;
         }
 
-        public static bool GenerateTemplateFiles(string templateName)
+        public static bool GenerateTemplateFiles(string templateName, string outputDirectory, bool quiet, bool verbose)
         {
+            outputDirectory = PathHelpers.NormalizePath(outputDirectory);
+
             templateName = templateName.Replace('-', '_');
             var generator = new TemplateGenerator();
             
@@ -65,15 +84,28 @@ namespace Azure.AI.Details.Common.CLI.Extensions.Templates
                 }
             }
 
+            var message = $"Generating '{templateName}' in '{outputDirectory}' ({files.Count()} files)...";
+            if (!quiet) Console.WriteLine(message);
+
             var processed = ProcessTemplates(templateName, generator, files);
             foreach (var item in processed)
             {
                 var file = item.Key;
                 var text = item.Value;
-                Console.WriteLine($"FILE: {file}:\n```\n{text}\n```");
+                if (verbose) Console.WriteLine($"\nFILE: {file}:\n```\n{text}\n```");
 
-                FileHelpers.WriteAllText(file, text, new UTF8Encoding(false));
-                Console.WriteLine();
+                FileHelpers.WriteAllText(PathHelpers.Combine(outputDirectory, file), text, new UTF8Encoding(false));
+            }
+
+            if (!quiet)
+            {
+                if (verbose) Console.WriteLine();
+                Console.WriteLine($"\r{message} DONE!\n");
+
+                foreach (var item in processed)
+                {
+                    Console.WriteLine($"  {item.Key}");
+                }
             }
 
             return true;

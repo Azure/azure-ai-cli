@@ -1,7 +1,6 @@
 {
-  "_Name": "OpenAI Chat Completions in C#",
-  "_Language": "C#",
-  "ClassName": "OpenAIHelloWorldClass",
+  "_Name": "OpenAI Chat Completions in JavaScript",
+  "_Language": "JavaScript",
   "OPENAI_ENDPOINT": "<insert your OpenAI endpoint here>",
   "OPENAI_API_KEY": "<insert your OpenAI API key here>",
   "AZURE_OPENAI_CHAT_DEPLOYMENT": "<insert your OpenAI deployment name here>",

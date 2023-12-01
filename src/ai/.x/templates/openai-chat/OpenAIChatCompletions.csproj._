@@ -8,6 +8,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <EnableDefaultCompileItems>true</EnableDefaultCompileItems>
+    <OutputType>Exe</OutputType>
   </PropertyGroup>
 
   <ItemGroup>

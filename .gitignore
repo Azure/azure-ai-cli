@@ -1,5 +1,6 @@
 **/.ai/data/*
 **/.vs/**
+**/.vscode/**
 **/bin/*/net6.0/*
 **/bin/*/net7.0/*
 **/obj/*

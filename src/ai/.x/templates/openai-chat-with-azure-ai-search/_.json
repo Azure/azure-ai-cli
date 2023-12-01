@@ -1,5 +1,6 @@
 {
     "_Name": "OpenAI Chat w/ Azure AI Search Class Library",
+    "_Language": "C#",
     "AICLIExtensionReferencePath": "",
     "ClassName": "OpenAIChatWithAzureAISearchClass",
     "OpenAIEndpoint": "https://myaccount.openai.azure.com/",

@@ -52,6 +52,11 @@ namespace Azure.AI.Details.Common.CLI
             }
             return list;
         }
+
+        public static string NormalizePath(string outputDirectory)
+        {
+            return new DirectoryInfo(outputDirectory).FullName;
+        }
     }
 
     public class FileHelpers
