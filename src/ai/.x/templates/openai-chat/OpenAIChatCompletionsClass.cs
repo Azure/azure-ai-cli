@@ -53,7 +53,7 @@ public class <#= ClassName #>
             if (string.IsNullOrEmpty(userPrompt) || userPrompt == "exit") break;
 
             var response = chat.GetChatCompletion(userPrompt);
-            Console.WriteLine($"Assistant: {response}");
+            Console.WriteLine($"\nAssistant: {response}\n");
         }
     }
 }

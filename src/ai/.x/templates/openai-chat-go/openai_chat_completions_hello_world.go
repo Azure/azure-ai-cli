@@ -23,34 +23,33 @@ func main() {
 	if azureOpenAIKey == "" {
 		azureOpenAIKey = "<#= OPENAI_API_KEY #>"
 	}
-
 	azureOpenAIEndpoint := os.Getenv("OPENAI_ENDPOINT")
 	if azureOpenAIEndpoint == "" {
 		azureOpenAIEndpoint = "<#= OPENAI_ENDPOINT #>"
+	}
+	modelDeploymentID := os.Getenv("AZURE_OPENAI_CHAT_DEPLOYMENT")
+	if modelDeploymentID == "" {
+		modelDeploymentID = "<#= AZURE_OPENAI_CHAT_DEPLOYMENT #>"
+	}
+	systemPrompt := os.Getenv("OPENAI_SYSTEM_PROMPT")
+	if systemPrompt == "" {
+		systemPrompt = "<#= AZURE_OPENAI_SYSTEM_PROMPT #>"
 	}
 
 	keyCredential, err := azopenai.NewKeyCredential(azureOpenAIKey)
 	if err != nil {
 		log.Fatalf("ERROR: %s", err)
 	}
-
 	client, err := azopenai.NewClientWithKeyCredential(azureOpenAIEndpoint, keyCredential, nil)
 	if err != nil {
 		log.Fatalf("ERROR: %s", err)
 	}
 
-	modelDeploymentID := os.Getenv("AZURE_OPENAI_CHAT_DEPLOYMENT")
-	if modelDeploymentID == "" {
-		modelDeploymentID = "<#= AZURE_OPENAI_CHAT_DEPLOYMENT #>"
-	}
-
-	systemPrompt := os.Getenv("OPENAI_SYSTEM_PROMPT")
-	if systemPrompt == "" {
-		systemPrompt = "<#= AZURE_OPENAI_SYSTEM_PROMPT #>"
-	}
-
-	messages := []azopenai.ChatMessage{
-		{Role: to.Ptr(azopenai.ChatRoleSystem), Content: to.Ptr(systemPrompt)},
+	options := azopenai.ChatCompletionsOptions{
+		Deployment: modelDeploymentID,
+		Messages: []azopenai.ChatMessage{
+			{Role: to.Ptr(azopenai.ChatRoleSystem), Content: to.Ptr(systemPrompt)},
+		},
 	}
 
 	for {
@@ -65,11 +64,7 @@ func main() {
 			break
 		}
 
-		messages = append(messages, azopenai.ChatMessage{Role: to.Ptr(azopenai.ChatRoleUser), Content: to.Ptr(userPrompt)})
-		options := azopenai.ChatCompletionsOptions{
-			Messages:   messages,
-			Deployment: modelDeploymentID,
-		}
+		options.Messages = append(options.Messages, azopenai.ChatMessage{Role: to.Ptr(azopenai.ChatRoleUser), Content: to.Ptr(userPrompt)})
 
 		resp, err := client.GetChatCompletions(context.TODO(), options, nil)
 		if err != nil {
@@ -77,9 +72,9 @@ func main() {
 		}
 
 		responseContent := *resp.Choices[0].Message.Content
-		messages = append(messages, azopenai.ChatMessage{Role: to.Ptr(azopenai.ChatRoleAssistant), Content: to.Ptr(responseContent)})
+		options.Messages = append(options.Messages, azopenai.ChatMessage{Role: to.Ptr(azopenai.ChatRoleAssistant), Content: to.Ptr(responseContent)})
 
-		fmt.Printf("Assistant: %s\n", responseContent)
+		fmt.Printf("\nAssistant: %s\n\n", responseContent)
 	}
 }
 
