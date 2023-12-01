@@ -66,8 +66,10 @@ namespace Azure.AI.Details.Common.CLI.Extensions.Templates
             return true;
         }
 
-        public static bool GenerateTemplateFiles(string templateName, string outputDirectory)
+        public static bool GenerateTemplateFiles(string templateName, string outputDirectory, bool quiet, bool verbose)
         {
+            outputDirectory = PathHelpers.NormalizePath(outputDirectory);
+
             templateName = templateName.Replace('-', '_');
             var generator = new TemplateGenerator();
             
@@ -82,15 +84,28 @@ namespace Azure.AI.Details.Common.CLI.Extensions.Templates
                 }
             }
 
+            var message = $"Generating '{templateName}' in '{outputDirectory}' ({files.Count()} files)...";
+            if (!quiet) Console.WriteLine(message);
+
             var processed = ProcessTemplates(templateName, generator, files);
             foreach (var item in processed)
             {
                 var file = item.Key;
                 var text = item.Value;
-                Console.WriteLine($"FILE: {file}:\n```\n{text}\n```");
+                if (verbose) Console.WriteLine($"\nFILE: {file}:\n```\n{text}\n```");
 
                 FileHelpers.WriteAllText(PathHelpers.Combine(outputDirectory, file), text, new UTF8Encoding(false));
-                Console.WriteLine();
+            }
+
+            if (!quiet)
+            {
+                if (verbose) Console.WriteLine();
+                Console.WriteLine($"\r{message} DONE!\n");
+
+                foreach (var item in processed)
+                {
+                    Console.WriteLine($"  {item.Key}");
+                }
             }
 
             return true;

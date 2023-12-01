@@ -19,7 +19,7 @@ namespace Azure.AI.Details.Common.CLI
         {
             _values = values.ReplaceValues();
             _quiet = _values.GetOrDefault("x.quiet", false);
-            _verbose = _values.GetOrDefault("x.verbose", true);
+            _verbose = _values.GetOrDefault("x.verbose", false);
         }
 
         internal bool RunCommand()
@@ -85,7 +85,7 @@ namespace Azure.AI.Details.Common.CLI
             var filesInDirAlready = FileHelpers.FindFiles(".", "*").Count() > 0;
             var outputDirectory = !filesInDirAlready ? "." : templateName;
 
-            if (!TemplateFactory.GenerateTemplateFiles(templateName, outputDirectory))
+            if (!TemplateFactory.GenerateTemplateFiles(templateName, outputDirectory, _quiet, _verbose))
             {
                 _values.AddThrowError("WARNING:", $"Template '{templateName}' not found",
                                                    "",
