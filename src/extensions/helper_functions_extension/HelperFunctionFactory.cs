@@ -116,7 +116,9 @@ namespace Azure.AI.Details.Common.CLI.Extensions.HelperFunctions
 
         private static string? CallFunction(MethodInfo methodInfo, FunctionDefinition functionDefinition, string argumentsAsJson)
         {
-            AI.DBG_TRACE_VERBOSE($"Calling function {methodInfo.Name} with arguments {argumentsAsJson}");
+            var dbg = $"Calling function {methodInfo.Name} with arguments {argumentsAsJson}";
+            if (Program.Debug) Console.WriteLine(dbg);
+            AI.DBG_TRACE_VERBOSE(dbg);
 
             var jObject = JObject.Parse(argumentsAsJson);
             var arguments = new List<object>();
