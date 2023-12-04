@@ -936,6 +936,13 @@ namespace Azure.AI.Details.Common.CLI
 
         public static string FileNameFromResourceName(string name)
         {
+            var originalFileNames = GetOriginalResourceFileNames();
+            if (originalFileNames.ContainsKey(name))
+            {
+                name = originalFileNames[name];
+                return name.EndsWith("._") ? name.Substring(0, name.Length - 2) : name;
+            }
+
             name = name.Replace(resourcePrefix, "");
 
             var subDir = "";
@@ -961,6 +968,12 @@ namespace Azure.AI.Details.Common.CLI
             {
                 subDir = "templates/";
                 name = name.Replace("." + dotDirectory.Replace("/", ".") + "templates", "");
+            }
+
+            if (name.StartsWith($"..{Program.Name}.internal"))
+            {
+                subDir = "internal/";
+                name = name.Replace("." + dotDirectory.Replace("/", ".") + "internal", "");
             }
 
             name = name.Replace("." + dotDirectory.Replace("/", "."), "");
@@ -992,6 +1005,20 @@ namespace Azure.AI.Details.Common.CLI
             }
 
             yield break;            
+        }
+
+        private static Dictionary<string, string> GetOriginalResourceFileNames()
+        {
+            if (_origDotXfileNamesDictionary != null) return _origDotXfileNamesDictionary;
+
+            var origDotXfileNamesText = ReadAllResourceText($"{Program.Exe}.{dotDirectory}internal/OriginalDotXfileNames.txt", Encoding.UTF8);
+            var origDotXfileNamesLines = origDotXfileNamesText.Split(new char[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
+            var origDotXfileNamesDictionary = origDotXfileNamesLines
+                .Select(x => $"{Program.Exe}/{x}")
+                .ToDictionary(x => ResourceNameFromFileName(x), x => x);
+            _origDotXfileNamesDictionary = origDotXfileNamesDictionary;
+
+            return _origDotXfileNamesDictionary;
         }
 
         private static Stream GetResourceStream(string fileName)
@@ -1371,5 +1398,6 @@ namespace Azure.AI.Details.Common.CLI
         private static readonly string dotDirectory = $".{Program.Name}/";
 
         private static ReaderWriterLockSlim _lockSlim = new ReaderWriterLockSlim();
+        private static Dictionary<string, string> _origDotXfileNamesDictionary;
     }
 }
