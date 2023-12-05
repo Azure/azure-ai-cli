@@ -931,7 +931,7 @@ namespace Azure.AI.Details.Common.CLI
 
         private static string ResourceNameFromFileName(string fileName)
         {
-            return fileName.Replace(Program.Exe, resourcePrefix).Replace('/', '.').Replace('\\', '.');
+            return fileName.Replace(Program.Exe, resourcePrefix).Replace('/', '.').Replace('\\', '.').Replace('-', '_');
         }
 
         public static string FileNameFromResourceName(string name)
@@ -940,6 +940,7 @@ namespace Azure.AI.Details.Common.CLI
             if (originalFileNames.ContainsKey(name))
             {
                 name = originalFileNames[name];
+                name = name.Replace('\\', '/');
                 return name.EndsWith("._") ? name.Substring(0, name.Length - 2) : name;
             }
 
@@ -1178,6 +1179,14 @@ namespace Azure.AI.Details.Common.CLI
 
         private static string GetConfigPath(INamedValues values = null)
         {
+            var cwd = Directory.GetCurrentDirectory();
+            if (_configPathCalculatedFrom != cwd)
+            {
+                _configPathCalculatedFrom = cwd;
+                _configPathScoped = null;
+                _configPath = null;
+            }
+
             CheckScopedConfigPath(values);
             if (!string.IsNullOrEmpty(_configPathScoped)) return _configPathScoped;
             if (!string.IsNullOrEmpty(_configPath)) return _configPath;
@@ -1386,6 +1395,7 @@ namespace Azure.AI.Details.Common.CLI
 
         private const string defaultDataPath = @";./;../;../../;../../../;../../../../;{config.path};";
         
+        private static string _configPathCalculatedFrom = null;
         private static string _configPath = null;
         private static string _configPathScoped = null;
 

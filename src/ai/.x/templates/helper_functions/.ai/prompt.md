@@ -1,4 +1,8 @@
+I will now tell you about a scenario I want to make a helper function for:
+
+---
 {scenario}
+---
 
 Task you must perform:
 1. Please create a new class with these helper functions. Do it now. 

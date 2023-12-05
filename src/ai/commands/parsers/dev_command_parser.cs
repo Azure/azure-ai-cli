@@ -78,6 +78,7 @@ namespace Azure.AI.Details.Common.CLI
         private static INamedValueTokenParser[] _devNewParsers = {
             new CommonDevNamedValueTokenParsers(),
             ArgXToken.Parser(),
+            InstructionsToken.Parser(),
         };
 
         private static INamedValueTokenParser[] _devShellParsers = {

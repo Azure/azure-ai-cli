@@ -59,6 +59,26 @@ namespace Azure.AI.Details.Common.CLI
             return exitCode;
         }
 
+        public static int RunInternal(params string[] mainArgs)
+        {
+            ICommandValues values = new CommandValues();
+            INamedValueTokens tokens = new CmdLineTokenSource(mainArgs, values);
+
+            var exitCode = ParseCommand(tokens, values);
+            if (exitCode != 0) return exitCode;
+
+            exitCode = RunCommand(values) ? 0 : 1;
+
+            var dumpArgs = string.Join(" ", mainArgs);
+            DebugDumpCommandLineArgs(dumpArgs);
+
+            if (OS.IsLinux()) Console.WriteLine();
+
+            AI.DBG_TRACE_INFO($"Command line was: {dumpArgs}");
+            AI.DBG_TRACE_INFO($"Exit code: {exitCode}");
+            return exitCode;
+        }
+
         internal static void DebugDumpResources()
         {
             var assembly = Program.ResourceAssemblyType.Assembly;
