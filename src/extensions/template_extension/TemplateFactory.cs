@@ -17,10 +17,12 @@ namespace Azure.AI.Details.Common.CLI.Extensions.Templates
         public static bool ListTemplates()
         {
             var root = FileHelpers.FileNameFromResourceName("templates") + "/";
+            var files = FileHelpers.FindFilesInTemplatePath("*", null).ToList();
 
-            var templateShortNames = FileHelpers.FindFilesInTemplatePath("*", null)
+            var templateShortNames = files
                 .Select(x => x.Replace(root, string.Empty))
-                .Select(x => x.Split('.').FirstOrDefault())
+                .Where(x => x.EndsWith("_.json"))
+                .Select(x => x.Split(new char[] { '\\', '/' }).FirstOrDefault())
                 .Where(x => x != null)
                 .Select(x => x!)
                 .Distinct()
@@ -66,9 +68,9 @@ namespace Azure.AI.Details.Common.CLI.Extensions.Templates
             return true;
         }
 
-        public static bool GenerateTemplateFiles(string templateName, string outputDirectory, bool quiet, bool verbose)
+        public static bool GenerateTemplateFiles(string templateName, string instructions, string outputDirectory, bool quiet, bool verbose)
         {
-            outputDirectory = PathHelpers.NormalizePath(outputDirectory);
+            var root = FileHelpers.FileNameFromResourceName("templates") + "/";
 
             templateName = templateName.Replace('-', '_');
             var generator = new TemplateGenerator();
@@ -84,6 +86,7 @@ namespace Azure.AI.Details.Common.CLI.Extensions.Templates
                 }
             }
 
+            outputDirectory = PathHelpers.NormalizePath(outputDirectory);
             var message = $"Generating '{templateName}' in '{outputDirectory}' ({files.Count()} files)...";
             if (!quiet) Console.WriteLine(message);
 
@@ -99,12 +102,38 @@ namespace Azure.AI.Details.Common.CLI.Extensions.Templates
 
             if (!quiet)
             {
-                if (verbose) Console.WriteLine();
-                Console.WriteLine($"\r{message} DONE!\n");
-
+                Console.WriteLine();
                 foreach (var item in processed)
                 {
                     Console.WriteLine($"  {item.Key}");
+                }
+
+                Console.WriteLine();
+                Console.WriteLine($"\r{message} DONE!\n");
+            }
+
+            var instructionsOk = !string.IsNullOrEmpty(instructions);
+            var promptsOk = File.Exists($"{outputDirectory}/.ai/system.md") && File.Exists($"{outputDirectory}/.ai/prompt.md");
+
+            if (instructionsOk && promptsOk)
+            {
+                var saved = Directory.GetCurrentDirectory();
+                Directory.SetCurrentDirectory(outputDirectory);
+
+                Console.WriteLine("Applying instructions...\n");
+                var exitCode = Program.RunInternal("chat",
+                    "--quiet", "true",
+                    "--built-in-functions", "true",
+                    "--system", "@system.md",
+                    "--user", "@prompt.md",
+                    "--var", "scenario", instructions
+                );
+                Directory.SetCurrentDirectory(saved);
+
+                if (exitCode != 0)
+                {
+                    Console.WriteLine($"ERROR: chat failed with exit code {exitCode}");
+                    return false;
                 }
             }
 
@@ -174,14 +203,16 @@ namespace Azure.AI.Details.Common.CLI.Extensions.Templates
 
         private static Dictionary<string, string> ProcessTemplates(string templateName, TemplateGenerator generator, IEnumerable<string> files)
         {
+            var root = FileHelpers.FileNameFromResourceName("templates") + "/";
+
             var processed = new Dictionary<string, string>();
             foreach (var file in files)
             {
                 var text = FileHelpers.ReadAllText(file, new UTF8Encoding(false));
                 if (Program.Debug) Console.WriteLine($"```{file}\n{text}\n```");
 
-                var i = file.IndexOf(templateName);
-                var outputFile = file.Substring(i + templateName.Length + 1);
+                if (!file.StartsWith(root)) throw new Exception("Invalid file name");
+                var outputFile = file.Substring(root.Length + templateName.Length + 1);
 
                 var parsed = generator.ParseTemplate(file, text);
                 var settings = TemplatingEngine.GetSettings(generator, parsed);

@@ -68,6 +68,23 @@
     </When>
   </Choose>
 
+  <Target Name="CreateOriginalDotXfileNames" BeforeTargets="PrepareForBuild">
+    <ItemGroup>
+      <DotXfiles Include=".x\**" />
+      <OriginalFileNames Include="@(DotXfiles)">
+        <ResourceName>.ai\%(RecursiveDir)%(Filename)%(Extension)</ResourceName>
+      </OriginalFileNames>
+    </ItemGroup>
+    <WriteLinesToFile File="$(IntermediateOutputPath)OriginalDotXfileNames.txt" Lines="@(OriginalFileNames -> '%(ResourceName)')" Overwrite="true" />
+  </Target>
+
+  <ItemGroup>
+    <EmbeddedResource Include="$(IntermediateOutputPath)OriginalDotXfileNames.txt">
+      <LogicalName>Azure.AI.Details.Common.CLI.resources..ai.internal.OriginalDotXfileNames.txt</LogicalName>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
+  </ItemGroup>
+
   <ItemGroup>
     <EmbeddedResource Include=".x\help\**">
       <Link>resources\.ai\help\%(RecursiveDir)%(Filename)%(Extension)</Link>
