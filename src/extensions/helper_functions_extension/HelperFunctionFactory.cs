@@ -148,7 +148,9 @@ namespace Azure.AI.Details.Common.CLI.Extensions.HelperFunctions
                 ? CallVoidAsyncFunction(methodInfo, args)
                 : t.IsGenericType && t.GetGenericTypeDefinition() == typeof(Task<>)
                     ? CallAsyncFunction(methodInfo, args)
-                    : CallSyncFunction(methodInfo, args);
+                    : t.Name != "Void"
+                        ? CallSyncFunction(methodInfo, args)
+                        : CallVoidFunction(methodInfo, args);
         }
 
         private static object? CallVoidAsyncFunction(MethodInfo methodInfo, object[] args)
@@ -168,6 +170,12 @@ namespace Azure.AI.Details.Common.CLI.Extensions.HelperFunctions
         private static object? CallSyncFunction(MethodInfo methodInfo, object[] args)
         {
             return methodInfo.Invoke(null, args);
+        }
+
+        private static object? CallVoidFunction(MethodInfo methodInfo, object[] args)
+        {
+            methodInfo.Invoke(null, args);
+            return true;
         }
 
         private static string? ConvertFunctionResultToString(object? result)
