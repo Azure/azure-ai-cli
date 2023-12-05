@@ -124,6 +124,7 @@ namespace Azure.AI.Details.Common.CLI.Extensions.Templates
                 var exitCode = Program.RunInternal("chat",
                     "--quiet", "true",
                     "--built-in-functions", "true",
+                    "--index", "@none",
                     "--system", "@system.md",
                     "--user", "@prompt.md",
                     "--var", "scenario", instructions
