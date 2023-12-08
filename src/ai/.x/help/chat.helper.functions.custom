@@ -8,13 +8,13 @@ CHAT
   Helper functions are C# static methods that allow the LLM to perform
   custom operations, such as retrieving data from a database or web service.
 
-
-USAGE: ai chat [...] --custom-functions FILE1;FILE2[;...]
+USAGE: ai chat [...] --custom-functions FILE1
+   OR: ai chat [...] --custom-functions FILE1;FILE2[;...]
    OR: ai chat [...] --custom-functions @FILELIST.txt
    OR: ai chat [...] --custom-functions PATTERN
 
-  WHERE: FILE1;FILE2 represent local dotnet assemblies containing helper functions
-     OR: PATTERN represents a local dotnet assebmly wildcard search pattern
+  WHERE: FILE,FILE1;FILE2 represent file names for assemblies containing helper functions
+     OR: PATTERN represents dotnet assembly filename wildcard search pattern
      OR: FILELIST.txt is a multi-line text file containing files,
          ... or PATTERNs, listed individually, each on separate lines
 
@@ -38,11 +38,11 @@ EXAMPLE
   `STEP 2`: Build the helper function project into an assembly
 
     cd helper-functions
-    dotnet build helper-functions.csproj
+    dotnet build HelperFunctionsProject.csproj
 
   `STEP 3`: Use a custom helper function assembly
 
-    ai chat --custom-functions ./**/*HelperFunctionProject.dll --interactive
+    ai chat --custom-functions ./**/*HelperFunctionsProject.dll --interactive
 
 SEE ALSO
 

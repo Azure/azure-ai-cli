@@ -75,7 +75,7 @@ namespace Azure.AI.Details.Common.CLI.Extensions.HelperFunctions
                     System.Console.WriteLine($"Description: {funcDescription}");
                     System.Console.WriteLine($"Parameters: {json}");
                 }
-                _functions.Add(method, new FunctionDefinition(method.Name)
+                _functions.TryAdd(method, new FunctionDefinition(method.Name)
                 {
                     Description = funcDescription,
                     Parameters = new BinaryData(json)
