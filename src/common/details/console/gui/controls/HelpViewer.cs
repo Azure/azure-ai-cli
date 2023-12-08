@@ -54,7 +54,7 @@ namespace Azure.AI.Details.Common.CLI.ConsoleGui
 
                 // check to see if there's a help command present on that row
                 var helpCommand = GetProgramHelpCommand();
-                var text = lines[selectedRow];
+                var text = lines[selectedRow].TrimEnd();
                 if (text.Contains(helpCommand))
                 {
                     var at = text.LastIndexOf(helpCommand);

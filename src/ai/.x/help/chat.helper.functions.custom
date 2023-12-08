@@ -1,0 +1,51 @@
+CHAT
+
+@include.the.chat.command
+
+  The `--custom-functions` option allows you to specify a pattern for custom
+  helper functions that can be used by the LLM.
+
+  Helper functions are C# static methods that allow the LLM to perform
+  custom operations, such as retrieving data from a database or web service.
+
+
+USAGE: ai chat [...] --custom-functions FILE1;FILE2[;...]
+   OR: ai chat [...] --custom-functions @FILELIST.txt
+   OR: ai chat [...] --custom-functions PATTERN
+
+  WHERE: FILE1;FILE2 represent local dotnet assemblies containing helper functions
+     OR: PATTERN represents a local dotnet assebmly wildcard search pattern
+     OR: FILELIST.txt is a multi-line text file containing files,
+         ... or PATTERNs, listed individually, each on separate lines
+
+EXAMPLE
+
+  `STEP 1`: Create a custom helper function project
+
+    ai dev new helper-functions
+
+    Which generates a class file like this:
+
+      `#a_;public static class HelperFunctionClass`
+      `#a_;{`
+          `#a_;[HelperFunctionDescription("Gets the user's name")]`
+          `#a_;public static string GetUsersName()`
+          `#a_;{`
+              `#a_;return Environment.UserName;`
+          `#a_;}`
+      `#a_;}`
+
+  `STEP 2`: Build the helper function project into an assembly
+
+    cd helper-functions
+    dotnet build helper-functions.csproj
+
+  `STEP 3`: Use a custom helper function assembly
+
+    ai chat --custom-functions ./**/*HelperFunctionProject.dll --interactive
+
+SEE ALSO
+
+  ai help chat examples
+  ai help find topics chat
+  
