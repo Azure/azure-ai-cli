@@ -1,12 +1,11 @@
-CHAT
+CHAT CUSTOM HELPER FUNCTIONS
 
 @include.the.chat.command
 
   The `--custom-functions` option allows you to specify a pattern for custom
   helper functions that can be used by the LLM.
 
-  Helper functions are C# static methods that allow the LLM to perform
-  custom operations, such as retrieving data from a database or web service.
+@include.helper.functions
 
 USAGE: ai chat [...] --custom-functions FILE1
    OR: ai chat [...] --custom-functions FILE1;FILE2[;...]
@@ -24,8 +23,7 @@ EXAMPLE
 
 SEE ALSO
 
-  ai help chat examples
-  ai help chat helper function examples
+  ai help chat built-in helper functions
   ai help chat custom helper function examples
   ai help find topics chat
   

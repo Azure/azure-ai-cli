@@ -24,18 +24,30 @@ CUSTOM HELPER FUNCTION EXAMPLES
           return DateTime.UtcNow.ToString("o");
       }
 
-  `EXAMPLE 3`: Build the helper function project into an assembly
+  `EXAMPLE 3`: Create a custom helper function project with LLM instructions from a file
+
+    Create a file called `instructions.txt` with the following contents:
+
+      `#a_;Create a new class with helper functions that C# process functions that`
+      `#a_;can execute the git executable to do anything I want to with git. The new helper`
+      `#a_;function should accept a string, and return a string, which is the applications`
+      `#a_;combined output from stdout and stderr.`
+      
+      `#a_;If the caller passes in 'git ' as part of the command, ignore that part.`
+
+    ai dev new helper-functions --instructions @instructions.txt
+
+  `EXAMPLE 4`: Build the helper function project into an assembly
 
     cd helper-functions
     dotnet build HelperFunctionsProject.csproj
 
-  `EXAMPLE 4`: Use custom helper functions from an assembly
+  `EXAMPLE 5`: Use custom helper functions from an assembly
 
     ai chat --custom-functions **/HelperFunctionsProject.dll --interactive
 
 SEE ALSO
 
   ai help chat examples
-  ai help chat helper function examples
   ai help chat custom helper functions
   ai help find topics chat

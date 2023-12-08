@@ -1,0 +1,24 @@
+CHAT
+
+@include.the.chat.command
+
+  The `--built-in-functions` option allows the LLM to use pre-defined functions included
+  in the `ai` CLI. These functions can be used to:
+
+    (1) Perform basic math operations with integers and floats.
+    (2) Perform file system operations, such as read, write, append, and find.
+    (3) Access the current date and time.
+
+USAGE: ai chat [...] --built-in-functions
+   OR: ai chat [...] --built-in-functions TRUE/FALSE
+
+EXAMPLE
+
+  ai chat --built-in-functions --question "Show me the names of all the markdown files"
+  ai chat --built-in-functions --question "List what helper functions you have"
+
+SEE ALSO
+
+  ai help chat custom helper functions
+  ai help find topics chat
+  
