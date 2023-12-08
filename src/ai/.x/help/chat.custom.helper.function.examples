@@ -1,0 +1,41 @@
+CUSTOM HELPER FUNCTION EXAMPLES
+
+  `EXAMPLE 1`: Create a custom helper function project
+
+    ai dev new helper-functions
+
+    ... which will create a project, with a class, that has a method like this:
+
+      [HelperFunctionDescription("Gets the user's name")]
+      public static string GetUsersName()
+      {
+          return Environment.UserName;
+      }
+
+  `EXAMPLE 2`: Create a custom helper function project with LLM instructions
+
+    ai dev new helper-functions --instructions "Return the current date and time as a string"
+
+    ... which will create a project, with a class, that has a method like this:
+
+      [HelperFunctionDescription("Returns the current date and time")]
+      public static DateTime CurrentDateTime()
+      {
+          return DateTime.UtcNow;
+      }
+
+  `EXAMPLE 3`: Build the helper function project into an assembly
+
+    cd helper-functions
+    dotnet build HelperFunctionsProject.csproj
+
+  `EXAMPLE 4`: Use custom helper functions from an assembly
+
+    ai chat --custom-functions **/HelperFunctionsProject.dll --interactive
+
+SEE ALSO
+
+  ai help chat examples
+  ai help chat helper function examples
+  ai help chat custom helper functions
+  ai help find topics chat

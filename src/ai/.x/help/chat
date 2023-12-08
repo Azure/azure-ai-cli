@@ -24,9 +24,9 @@ USAGE: ai chat [...]
   CHAT WITH FUNCTION
     --function MODULE:FUNCTION          (see: ai help chat function)
 
-  HELPER FUNCTIONS
-    --built-in-functions TRUE           (see: ai help chat helper functions built-in)
-    --custom-functions PATTERN          (see: ai help chat helper functions custom) 
+  HELPER FUNCTIONS                      (see: ai help chat helper functions)
+    --built-in-functions TRUE           (see: ai help chat built-in helper functions)
+    --custom-functions PATTERN          (see: ai help chat custom helper functions)
   
   OPTIONS                               (see: ai help chat options)
     --temperature TEMPERATURE           (see: ai help chat options temperature)
