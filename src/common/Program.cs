@@ -141,8 +141,20 @@ namespace Azure.AI.Details.Common.CLI
             var sdkAssembly = Program.BindingAssemblySdkType?.Assembly;
             var sdkVersionAttribute = sdkAssembly?.GetCustomAttribute<AssemblyInformationalVersionAttribute>();
             var thisVersionAttribute = typeof(Program).Assembly?.GetCustomAttribute<AssemblyInformationalVersionAttribute>();
-            return sdkVersionAttribute?.InformationalVersion ??
+            var version = sdkVersionAttribute?.InformationalVersion ??
                 thisVersionAttribute?.InformationalVersion;
+
+            // When the version has a trailing +{commit-hash} we want to remove it
+            if (!string.IsNullOrEmpty(version))
+            {
+                var index = version.IndexOf('+');
+                if (index > 0)
+                {
+                    version = version.Substring(0, index);
+                }
+            }
+
+            return version;
         }
 
         private static void DisplayCommandHelp(INamedValueTokens tokens, INamedValues values)
