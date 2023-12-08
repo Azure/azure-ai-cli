@@ -18,10 +18,10 @@ CUSTOM HELPER FUNCTION EXAMPLES
 
     ... which will create a project, with a class, that has a method like this:
 
-      [HelperFunctionDescription("Returns the current date and time")]
-      public static DateTime CurrentDateTime()
+      [HelperFunctionDescription("Returns the current date and time as a string")]
+      public static string GetCurrentDateTime()
       {
-          return DateTime.UtcNow;
+          return DateTime.UtcNow.ToString("o");
       }
 
   `EXAMPLE 3`: Build the helper function project into an assembly
