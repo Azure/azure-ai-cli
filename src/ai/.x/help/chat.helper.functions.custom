@@ -42,7 +42,7 @@ EXAMPLE
 
   `STEP 3`: Use a custom helper function assembly
 
-    ai chat --custom-functions ./**/*HelperFunctionsProject.dll --interactive
+    ai chat --custom-functions **/HelperFunctionsProject.dll --interactive
 
 SEE ALSO
 
