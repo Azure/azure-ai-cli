@@ -931,7 +931,14 @@ namespace Azure.AI.Details.Common.CLI
 
         private static string ResourceNameFromFileName(string fileName)
         {
-            return fileName.Replace(Program.Exe, resourcePrefix).Replace('/', '.').Replace('\\', '.').Replace('-', '_');
+            var phase1 = fileName.Replace(Program.Exe, resourcePrefix).Replace('\\', '/');
+
+            var lastSlash = phase1.LastIndexOf('/');
+            var onlyFileName = phase1.Substring(lastSlash + 1);
+            var onlyPath = phase1.Substring(0, lastSlash).Replace('/', '.').Replace('-', '_');
+
+            var resourceName = $"{onlyPath}.{onlyFileName}";
+            return resourceName;
         }
 
         public static string FileNameFromResourceName(string name)
@@ -940,6 +947,14 @@ namespace Azure.AI.Details.Common.CLI
             if (originalFileNames.ContainsKey(name))
             {
                 name = originalFileNames[name];
+                name = name.Replace('\\', '/');
+                return name.EndsWith("._") ? name.Substring(0, name.Length - 2) : name;
+            }
+
+            var check = name.Replace('-', '_');
+            if (originalFileNames.ContainsKey(check))
+            {
+                name = originalFileNames[check];
                 name = name.Replace('\\', '/');
                 return name.EndsWith("._") ? name.Substring(0, name.Length - 2) : name;
             }
