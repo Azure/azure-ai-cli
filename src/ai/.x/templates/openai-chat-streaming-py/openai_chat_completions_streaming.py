@@ -11,7 +11,7 @@ import openai
 openai.api_type = "azure"
 openai.api_base = os.getenv("OPENAI_ENDPOINT") or "<#= OPENAI_ENDPOINT #>"
 openai.api_key = os.getenv("OPENAI_API_KEY") or "<#= OPENAI_API_KEY #>"
-openai.api_version = os.getenv("OPENAI_API_VERSION") or "<#= 2023-12-01-preview #>"
+openai.api_version = os.getenv("OPENAI_API_VERSION") or "<#= OPENAI_API_VERSION #>"
 
 deploymentName = os.getenv("AZURE_OPENAI_CHAT_DEPLOYMENT") or "<#= AZURE_OPENAI_CHAT_DEPLOYMENT #>"
 systemPrompt = os.getenv("AZURE_OPENAI_SYSTEM_PROMPT") or "<#= AZURE_OPENAI_SYSTEM_PROMPT #>"
