@@ -20,12 +20,9 @@ messages=[
     {"role": "system", "content": systemPrompt},
 ]
 
-while True:
-    userPrompt = input("User: ")
-    if userPrompt == "" or userPrompt == "exit":
-        break
-
+def getChatCompletions() -> str:
     messages.append({"role": "user", "content": userPrompt})
+
     response = openai.ChatCompletion.create(
         engine=deploymentName,
         messages=messages,
@@ -34,5 +31,12 @@ while True:
     response_content = response["choices"][0]["message"]["content"]
     messages.append({"role": "assistant", "content": response_content})
 
-    print(f"\nAssistant: {response_content}\n")
+    return response_content
 
+while True:
+    userPrompt = input("User: ")
+    if userPrompt == "" or userPrompt == "exit":
+        break
+
+    response_content = getChatCompletions()
+    print(f"\nAssistant: {response_content}\n")
