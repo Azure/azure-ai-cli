@@ -303,7 +303,7 @@ namespace Azure.AI.Details.Common.CLI
             {
                 DisplayUserChatPromptLabel();
 
-                var text = ReadLineOrSimulateInput(ref userPrompt);
+                var text = ReadLineOrSimulateInput(ref userPrompt, "exit");
                 if (text.ToLower() == "")
                 {
                     text = PickInteractiveContextMenu(speechInput);
@@ -455,11 +455,11 @@ namespace Azure.AI.Details.Common.CLI
             return handler;
         }
 
-        private static string ReadLineOrSimulateInput(ref string inputToSimulate)
+        private static string ReadLineOrSimulateInput(ref string inputToSimulate, string defaultOnEndOfRedirectedInput = null)
         {
             var simulate = !string.IsNullOrEmpty(inputToSimulate);
 
-            var input = simulate ? inputToSimulate : Console.ReadLine();
+            var input = simulate ? inputToSimulate : ConsoleHelpers.ReadLineOrDefault("", defaultOnEndOfRedirectedInput);
             inputToSimulate = null;
 
             if (simulate) Console.WriteLine(input);

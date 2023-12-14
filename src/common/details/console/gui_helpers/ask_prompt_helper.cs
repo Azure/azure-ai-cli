@@ -28,7 +28,7 @@ namespace Azure.AI.Details.Common.CLI
                 return value;
             }
 
-            return Console.ReadLine();
+            return ConsoleHelpers.ReadLineOrDefault();
         }
     }
 }

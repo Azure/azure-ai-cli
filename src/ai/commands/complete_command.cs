@@ -64,7 +64,7 @@ namespace Azure.AI.Details.Common.CLI
             while (true)
             {
                 Console.Write("[complete] >>> ");
-                var text = Console.ReadLine();
+                var text = ConsoleHelpers.ReadLineOrDefault("", "exit");
 
                 if (text.ToLower() == "") break;
                 if (text.ToLower() == "stop") break;
