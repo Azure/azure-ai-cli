@@ -103,8 +103,8 @@ namespace Azure.AI.Details.Common.CLI
         {
             DisplayBanner("dev.shell");
 
-            var fileName = OS.IsLinux() ? "bash" : "cmd.exe";
-            var arguments = OS.IsLinux() ? "-li" : "/k PROMPT (ai dev shell) %PROMPT%& title (ai dev shell)";
+            var fileName = !OS.IsWindows() ? "bash" : "cmd.exe";
+            var arguments = !OS.IsWindows() ? "-li" : "/k PROMPT (ai dev shell) %PROMPT%& title (ai dev shell)";
 
             Console.WriteLine("Environment populated:\n");
 
