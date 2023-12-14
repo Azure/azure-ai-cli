@@ -34,6 +34,18 @@ fi
 
 # Check if dotnet 7.0 is installed
 if ! command -v dotnet &> /dev/null; then
+  echo "dotnet is not installed."
+  dotnet_version=0
+else
+  dotnet_version=$(dotnet --version | cut -d. -f1)
+fi
+
+if [ "$dotnet_version" -eq "7" ]; then
+    dotnet_version=$(dotnet --version)
+    echo "dotnet $dotnet_version is already installed."
+else
+    echo "Installing dotnet 7.0..."
+
     # Update the package list
     sudo apt-get update
 
