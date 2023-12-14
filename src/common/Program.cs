@@ -23,13 +23,15 @@ namespace Azure.AI.Details.Common.CLI
         {
             _data = data;
 
+            var screen = ConsoleGui.Screen.Current;
             Console.OutputEncoding = Encoding.UTF8;
             Console.CancelKeyPress += (s, e) =>
             {
-                ConsoleGui.Screen.Current.SetCursorVisible(true);
-                ConsoleGui.Screen.Current.ResetColors();
+                e.Cancel = true;
+                screen.SetCursorVisible(true);
+                screen.ResetColors();
                 Console.WriteLine("<ctrl-c> received... terminating ... ");
-                Process.GetCurrentProcess().Kill();
+                Environment.Exit(1);
             };
 
             ICommandValues values = new CommandValues();

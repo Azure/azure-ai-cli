@@ -28,15 +28,21 @@ namespace Azure.AI.Details.Common.CLI.ConsoleGui
 
         public void SetCursorVisible(bool visible)
         {
-            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-            {
-                Console.CursorVisible = visible;
-            }
+            if (Console.IsInputRedirected) return;
+            if (Console.IsOutputRedirected) return;
+            if (Console.IsErrorRedirected) return;
+            if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows)) return;
+
+            Console.CursorVisible = visible;
         }
 
         public static bool GetCursorVisible()
         {
-            return RuntimeInformation.IsOSPlatform(OSPlatform.Windows) && Console.CursorVisible;
+            if (Console.IsInputRedirected) return false;
+            if (Console.IsOutputRedirected) return false;
+            if (Console.IsErrorRedirected) return false;
+            if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows)) return false;
+            return Console.CursorVisible;
         }
 
         public Colors ColorsStart
@@ -190,6 +196,15 @@ namespace Azure.AI.Details.Common.CLI.ConsoleGui
         #endregion
 
         #region write char/text
+
+        public void ClearLineRight()
+        {
+            var x = Console.CursorLeft;
+            var y = Console.CursorTop;
+            var width = GetWindowWidth() - x - 1;
+            WriteChar(x, y, ' ', width);
+            Console.CursorLeft = x;
+        }
 
         public void WriteChar(char ch, int count = 1)
         {
