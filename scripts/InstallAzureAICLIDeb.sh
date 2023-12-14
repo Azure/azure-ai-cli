@@ -34,6 +34,18 @@ fi
 
 # Check if dotnet 7.0 is installed
 if ! command -v dotnet &> /dev/null; then
+  echo "dotnet is not installed."
+  dotnet_version=0
+else
+  dotnet_version=$(dotnet --version | cut -d. -f1)
+fi
+
+if [ "$dotnet_version" -eq "7" ]; then
+    dotnet_version=$(dotnet --version)
+    echo "dotnet $dotnet_version is already installed."
+else
+    echo "Installing dotnet 7.0..."
+
     # Update the package list
     sudo apt-get update
 
@@ -111,13 +123,13 @@ fi
 echo "Installing Azure.AI.CLI..."
 
 if [ "$EUID" -ne 0 ]; then # if we're not root
-    dotnet tool install --global --add-source . Azure.AI.CLI --version ${AICLI_VERSION}
+    dotnet tool update --global --add-source . Azure.AI.CLI --version ${AICLI_VERSION}
     DOTNET_TOOLS_PATH="$HOME/.dotnet/tools"
 elif [ -n "$SUDO_USER" ]; then # if we're root and SUDO_USER is set, run as SUDO_USER
-    sudo -u $SUDO_USER dotnet tool install --global --add-source . Azure.AI.CLI --version ${AICLI_VERSION}
+    sudo -u $SUDO_USER dotnet tool update --global --add-source . Azure.AI.CLI --version ${AICLI_VERSION}
     DOTNET_TOOLS_PATH="/home/$SUDO_USER/.dotnet/tools"
 else # if we're root and SUDO_USER is not set, use /root as the home directory
-    dotnet tool install --global --add-source . Azure.AI.CLI --version ${AICLI_VERSION}
+    dotnet tool update --global --add-source . Azure.AI.CLI --version ${AICLI_VERSION}
     DOTNET_TOOLS_PATH="/root/.dotnet/tools"
 fi
 
