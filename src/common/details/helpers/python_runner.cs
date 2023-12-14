@@ -26,7 +26,7 @@ namespace Azure.AI.Details.Common.CLI
             }
 
             var tempFile = Path.GetTempFileName() + ".py";
-            File.WriteAllText(tempFile, script);
+            FileHelpers.WriteAllText(tempFile, script, new UTF8Encoding(false));
 
             try
             {

@@ -11,6 +11,7 @@ using Newtonsoft.Json.Linq;
 using Azure.AI.Details.Common.CLI.ConsoleGui;
 using System.Text.Json;
 using System.IO;
+using System.Text;
 
 namespace Azure.AI.Details.Common.CLI
 {
@@ -331,7 +332,7 @@ namespace Azure.AI.Details.Common.CLI
 
             var configJson = JsonSerializer.Serialize(configJsonData, new JsonSerializerOptions { WriteIndented = true });
             var configJsonFile = new FileInfo("config.json");
-            File.WriteAllText(configJsonFile.FullName, configJson + "\n");
+            FileHelpers.WriteAllText(configJsonFile.FullName, configJson + "\n", new UTF8Encoding(false));
 
             Console.WriteLine($"{configJsonFile.Name} (saved at {configJsonFile.Directory})\n");
             Console.WriteLine("  " + configJson.Replace("\n", "\n  "));
