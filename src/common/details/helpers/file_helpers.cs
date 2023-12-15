@@ -627,7 +627,7 @@ namespace Azure.AI.Details.Common.CLI
 
             if (ex != null)
             {
-                throw new IOException($"Cannot write to file '{fileName}'");
+                throw new IOException($"Cannot write to file '{fileName}'", ex);
             }
         }
 
@@ -649,7 +649,7 @@ namespace Azure.AI.Details.Common.CLI
 
             if (ex != null)
             {
-                throw new IOException($"Cannot write to file '{fileName}'");
+                throw new IOException($"Cannot write to file '{fileName}'", ex);
             }
         }
 
@@ -670,7 +670,7 @@ namespace Azure.AI.Details.Common.CLI
 
             if (ex != null)
             {
-                throw new IOException($"Cannot write to file '{fileName}'");
+                throw new IOException($"Cannot write to file '{fileName}'", ex);
             }
         }
 
