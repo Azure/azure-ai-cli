@@ -177,7 +177,7 @@ namespace Azure.AI.Details.Common.CLI
 
         public static async Task<ParsedJsonProcessOutput<SubscriptionInfo[]>> ListAccounts()
         {
-            var parsed = await ProcessHelpers.ParseShellCommandJson<JArray>("az", "account list --output json --query \"[?state=='Enabled'].{Name:name,Id:id,IsDefault:isDefault,UserName:user.name}\"", GetUserAgentEnv());
+            var parsed = await ProcessHelpers.ParseShellCommandJson<JArray>("az", "account list --refresh --output json --query \"[?state=='Enabled'].{Name:name,Id:id,IsDefault:isDefault,UserName:user.name}\"", GetUserAgentEnv());
             var accounts = parsed.Payload;
 
             var x = new ParsedJsonProcessOutput<SubscriptionInfo[]>(parsed.Output);
