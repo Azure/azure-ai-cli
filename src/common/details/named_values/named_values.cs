@@ -125,7 +125,7 @@ namespace Azure.AI.Details.Common.CLI
                 }
             }
 
-            FileHelpers.WriteAllLines(fileName, lines, Encoding.UTF8);
+            FileHelpers.WriteAllLines(fileName, lines, new UTF8Encoding(false));
             return allFileNames;
         }
 

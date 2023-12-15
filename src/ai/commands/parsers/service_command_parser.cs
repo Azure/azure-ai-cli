@@ -215,6 +215,7 @@ namespace Azure.AI.Details.Common.CLI
             ProjectConnectionTypeToken.Parser(),
             ProjectConnectionEndpointToken.Parser(),
             ProjectConnectionKeyToken.Parser(),
+            CognitiveServicesResourceKindToken.Parser(),
 
             new NamedValueTokenParser(null, "service.output.json", "011", "1")
         };

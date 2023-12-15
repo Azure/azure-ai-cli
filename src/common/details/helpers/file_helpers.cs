@@ -602,7 +602,7 @@ namespace Azure.AI.Details.Common.CLI
         public static void AppendAllText(string fileName, string text, Encoding encoding)
         {
             EnsureDirectoryForFileExists(fileName);
-            TryCatchHelpers.TryCatchRetry(() => {
+            var ex = TryCatchHelpers.TryCatchRetryNoThrow<Exception>(() => {
 
                 if (IsStandardOutputReference(fileName))
                 {
@@ -623,13 +623,18 @@ namespace Azure.AI.Details.Common.CLI
                         _lockSlim.ExitWriteLock();
                     }
                 }
-            });
+            }, 10);
+
+            if (ex != null)
+            {
+                throw new IOException($"Cannot write to file '{fileName}'", ex);
+            }
         }
 
         public static void WriteAllText(string fileName, string text, Encoding encoding)
         {
             EnsureDirectoryForFileExists(fileName);
-            TryCatchHelpers.TryCatchRetry(() => {
+            var ex = TryCatchHelpers.TryCatchRetryNoThrow<Exception>(() => {
                 
                 if (IsStandardOutputReference(fileName))
                 {
@@ -640,13 +645,18 @@ namespace Azure.AI.Details.Common.CLI
                 {
                     File.WriteAllText(fileName, text, encoding ?? Encoding.Default);
                 }
-            });
+            }, 10);
+
+            if (ex != null)
+            {
+                throw new IOException($"Cannot write to file '{fileName}'", ex);
+            }
         }
 
         public static void WriteAllLines(string fileName, IEnumerable<string> lines, Encoding encoding)
         {
             EnsureDirectoryForFileExists(fileName);
-            TryCatchHelpers.TryCatchRetry(() => {
+            var ex = TryCatchHelpers.TryCatchRetryNoThrow<Exception>(() => {
 
                 if (IsStandardOutputReference(fileName))
                 {
@@ -656,7 +666,12 @@ namespace Azure.AI.Details.Common.CLI
                 {
                     File.WriteAllLines(fileName, lines, encoding ?? Encoding.Default);
                 }
-            });
+            }, 10);
+
+            if (ex != null)
+            {
+                throw new IOException($"Cannot write to file '{fileName}'", ex);
+            }
         }
 
         public static void WriteAllStream(string fileName, Stream stream)

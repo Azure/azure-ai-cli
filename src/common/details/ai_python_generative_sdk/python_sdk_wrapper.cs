@@ -61,9 +61,9 @@ namespace Azure.AI.Details.Common.CLI
             return DoDeleteConnectionViaPython(values, subscription, group, projectName, connectionName);
         }
 
-        static public string CreateConnection(ICommandValues values, string subscription, string group, string projectName, string connectionName, string connectionType, string endpoint, string key)
+        static public string CreateConnection(ICommandValues values, string subscription, string group, string projectName, string connectionName, string connectionType, string cogServicesResourceKind, string endpoint, string key)
         {
-            return DoCreateConnectionViaPython(values, subscription, group, projectName, connectionName, connectionType, endpoint, key);
+            return DoCreateConnectionViaPython(values, subscription, group, projectName, connectionName, connectionType, cogServicesResourceKind, endpoint, key);
         }
 
         static public string GetConnection(ICommandValues values, string subscription, string group, string projectName, string connectionName)
@@ -185,7 +185,7 @@ namespace Azure.AI.Details.Common.CLI
                     "--connection-name", connectionName));
         }
 
-        private static string DoCreateConnectionViaPython(ICommandValues values, string subscription, string group, string projectName, string connectionName, string connectionType, string endpoint, string key)
+        private static string DoCreateConnectionViaPython(ICommandValues values, string subscription, string group, string projectName, string connectionName, string connectionType, string cogServicesResourceKind, string endpoint, string key)
         {
             return PythonRunner.RunEmbeddedPythonScript(values, "api_key_connection_create",
                 CliHelpers.BuildCliArgs(
@@ -194,6 +194,7 @@ namespace Azure.AI.Details.Common.CLI
                     "--project-name", projectName,
                     "--connection-name", connectionName,
                     "--connection-type", connectionType,
+                    "--kind", cogServicesResourceKind,
                     "--endpoint", endpoint,
                     "--key", key));
         }

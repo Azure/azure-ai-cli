@@ -128,18 +128,21 @@ namespace Azure.AI.Details.Common.CLI
             var action = "Creating AI connection";
             var command = "service connection create";
             var subscription = SubscriptionToken.Data().Demand(_values, action, command, checkConfig: "subscription");
-            var project = ProjectNameToken.Data().Demand(_values, action, command);
-            var group = ResourceGroupNameToken.Data().Demand(_values, action, command);
+            var project = ProjectNameToken.Data().Demand(_values, action, command, checkConfig: "project");
+            var group = ResourceGroupNameToken.Data().Demand(_values, action, command, checkConfig: "group");
 
             var connectionName = ProjectConnectionNameToken.Data().Demand(_values, action, command);
             var connectionType = ProjectConnectionTypeToken.Data().Demand(_values, action, command);
             var connectionEndpoint = ProjectConnectionEndpointToken.Data().Demand(_values, action, command);
             var connectionKey = ProjectConnectionKeyToken.Data().Demand(_values, action, command);
+            var cogServicesResourceKind = connectionType.Replace('-', '_') == "cognitive_services"
+                ? CognitiveServicesResourceKindToken.Data().Demand(_values, action, command)
+                : CognitiveServicesResourceKindToken.Data().GetOrDefault(_values);
 
             var message = $"{action} '{connectionName}'";
 
             if (!_quiet) Console.WriteLine(message);
-            var output = PythonSDKWrapper.CreateConnection(_values, subscription, group, project, connectionName, connectionType, connectionEndpoint, connectionKey);
+            var output = PythonSDKWrapper.CreateConnection(_values, subscription, group, project, connectionName, connectionType, cogServicesResourceKind, connectionEndpoint, connectionKey);
             if (!_quiet) Console.WriteLine($"{message} Done!\n");
 
             if (!_quiet) Console.WriteLine(output);
@@ -203,7 +206,7 @@ namespace Azure.AI.Details.Common.CLI
 
             var subscription = SubscriptionToken.Data().Demand(_values, action, command, checkConfig: "subscription");
             var resourceName = ResourceNameToken.Data().Demand(_values, action, command);
-            var group = ResourceGroupNameToken.Data().Demand(_values, action, command);
+            var group = ResourceGroupNameToken.Data().Demand(_values, action, command, checkConfig: "group");
 
             var deleteDependentResources = DeleteDependentResourcesToken.Data().GetOrDefault(_values, false);
 
@@ -224,7 +227,7 @@ namespace Azure.AI.Details.Common.CLI
 
             var subscription = SubscriptionToken.Data().Demand(_values, action, command, checkConfig: "subscription");
             var projectName = ProjectNameToken.Data().Demand(_values, action, command);
-            var group = ResourceGroupNameToken.Data().Demand(_values, action, command);
+            var group = ResourceGroupNameToken.Data().Demand(_values, action, command, checkConfig: "group");
 
             var deleteDependentResources = DeleteDependentResourcesToken.Data().GetOrDefault(_values, false);
 
@@ -244,8 +247,8 @@ namespace Azure.AI.Details.Common.CLI
             var command = "service connection delete";
 
             var subscription = SubscriptionToken.Data().Demand(_values, action, command, checkConfig: "subscription");
-            var group = ResourceGroupNameToken.Data().Demand(_values, action, command);
-            var projectName = ProjectNameToken.Data().Demand(_values, action, command);
+            var group = ResourceGroupNameToken.Data().Demand(_values, action, command, checkConfig: "group");
+            var projectName = ProjectNameToken.Data().Demand(_values, action, command, checkConfig: "project");
             var connectionName = ProjectConnectionNameToken.Data().Demand(_values, action, command);
 
             var message = $"{action} for '{connectionName}'";

@@ -205,7 +205,7 @@ namespace Azure.AI.Details.Common.CLI
             data = sb.ToString();
 
             var dataFile = Path.GetTempFileName();
-            File.WriteAllText(dataFile, data);
+            FileHelpers.WriteAllText(dataFile, data, new UTF8Encoding(false));
 
             var setEnv = _values.GetOrDefault("chat.set.environment", true);
             var env = setEnv ? ConfigEnvironmentHelpers.GetEnvironment(_values) : null;
