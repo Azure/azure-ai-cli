@@ -70,7 +70,6 @@ public class OpenAIQuickstartStreaming {
         Flux<ChatCompletions> response = client.getChatCompletionsStream(deploymentName, options);
 
         response.subscribe(chatResponse -> {
-            // Process each response as it comes in.
             if (chatResponse.getChoices() != null) {
                 for (ChatChoice update : chatResponse.getChoices()) {
                     if (update.getDelta() == null || update.getDelta().getContent() == null)
@@ -94,13 +93,9 @@ public class OpenAIQuickstartStreaming {
 
                 options.getMessages().add(new ChatRequestAssistantMessage(responseContent.toString()));
             }
-        }, error -> {
-            // Error encountered
-        }, () -> {
-            // Stream completed
         });
 
-        return response; // response.toIterable();
+        return response;
     }
 
     public static void main(String[] args) {
@@ -113,13 +108,12 @@ public class OpenAIQuickstartStreaming {
             if (userPrompt.isEmpty() || "exit".equals(userPrompt))
                 break;
 
-            System.out.print("Assistant: ");
+            System.out.print("\nAssistant: ");
             Flux<ChatCompletions> responseFlux = chat.getChatCompletionsStreamingAsync(userPrompt, update -> {
                 System.out.print(update.getContent());
             });
-            // block until the last element is available
             responseFlux.blockLast(Duration.ofSeconds(20));
-            System.out.println("");
+            System.out.println("\n");
         }
         scanner.close();
     }
