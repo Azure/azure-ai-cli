@@ -236,7 +236,7 @@ namespace Azure.AI.Details.Common.CLI
 
                 var connectionType = "azure_open_ai";
                 var connectionJson = createOpenAiConnection
-                    ? PythonSDKWrapper.CreateConnection(values, subscription, groupName, projectName, connectionName, connectionType, openAiEndpoint, openAiKey)
+                    ? PythonSDKWrapper.CreateConnection(values, subscription, groupName, projectName, connectionName, connectionType, null, openAiEndpoint, openAiKey)
                     : GetConnection(values, subscription, groupName, projectName, connectionName);
 
                 var message = createSearchConnection ? "\r*** CREATED ***  " : null;
@@ -276,7 +276,7 @@ namespace Azure.AI.Details.Common.CLI
 
                 var connectionType = "cognitive_search";
                 var connectionJson = createSearchConnection
-                    ? PythonSDKWrapper.CreateConnection(values, subscription, groupName, projectName, connectionName, connectionType, searchEndpoint, searchKey)
+                    ? PythonSDKWrapper.CreateConnection(values, subscription, groupName, projectName, connectionName, connectionType, null, searchEndpoint, searchKey)
                     : GetConnection(values, subscription, groupName, projectName, connectionName);
 
                 var message = createSearchConnection ? "\r*** CREATED ***  " : null;

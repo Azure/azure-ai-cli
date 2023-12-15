@@ -135,11 +135,14 @@ namespace Azure.AI.Details.Common.CLI
             var connectionType = ProjectConnectionTypeToken.Data().Demand(_values, action, command);
             var connectionEndpoint = ProjectConnectionEndpointToken.Data().Demand(_values, action, command);
             var connectionKey = ProjectConnectionKeyToken.Data().Demand(_values, action, command);
+            var cogServicesResourceKind = connectionType.Replace('-', '_') == "cognitive_services"
+                ? CognitiveServicesResourceKindToken.Data().Demand(_values, action, command)
+                : CognitiveServicesResourceKindToken.Data().GetOrDefault(_values);
 
             var message = $"{action} '{connectionName}'";
 
             if (!_quiet) Console.WriteLine(message);
-            var output = PythonSDKWrapper.CreateConnection(_values, subscription, group, project, connectionName, connectionType, connectionEndpoint, connectionKey);
+            var output = PythonSDKWrapper.CreateConnection(_values, subscription, group, project, connectionName, connectionType, cogServicesResourceKind, connectionEndpoint, connectionKey);
             if (!_quiet) Console.WriteLine($"{message} Done!\n");
 
             if (!_quiet) Console.WriteLine(output);
