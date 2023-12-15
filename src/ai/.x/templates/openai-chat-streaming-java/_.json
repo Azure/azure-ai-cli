@@ -1,5 +1,5 @@
 {
-  "_Name": "OpenAI Chat Completions in Java",
+  "_Name": "OpenAI Chat Completions (Streaming) in Java",
   "_Language": "Java",
   "OPENAI_ENDPOINT": "<insert your OpenAI endpoint here>",
   "OPENAI_API_KEY": "<insert your OpenAI API key here>",
