@@ -665,7 +665,7 @@ namespace Azure.AI.Details.Common.CLI
             var frequencyPenalty = _values["chat.options.frequency.penalty"];
             var presencePenalty = _values["chat.options.presence.penalty"];
 
-            options.MaxTokens = TryParse(maxTokens, _defaultMaxTokens);
+            options.MaxTokens = TryParse(maxTokens, null);
             options.Temperature = TryParse(temperature, _defaultTemperature);
             options.FrequencyPenalty = TryParse(frequencyPenalty, _defaultFrequencyPenalty);
             options.PresencePenalty = TryParse(presencePenalty, _defaultPresencePenalty);
@@ -1049,7 +1049,7 @@ namespace Azure.AI.Details.Common.CLI
         // OutputHelper _output = null;
         // DisplayHelper _display = null;
 
-        private int TryParse(string? s, int defaultValue)
+        private int? TryParse(string? s, int? defaultValue)
         {
             return !string.IsNullOrEmpty(s) && int.TryParse(s, out var parsed) ? parsed : defaultValue;
         }
@@ -1164,7 +1164,7 @@ namespace Azure.AI.Details.Common.CLI
 
         public const string DefaultSystemPrompt = "You are an AI assistant that helps people find information regarding Azure AI.";
 
-        private const int _defaultMaxTokens = 800;
+        private const int _defaultMaxTokens = 0;
         private const float _defaultTemperature = 0.7f;
         private const float _defaultFrequencyPenalty = 0.0f;
         private const float _defaultPresencePenalty = 0.0f;
