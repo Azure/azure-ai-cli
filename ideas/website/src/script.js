@@ -21,11 +21,21 @@ function sendMessage() {
 }
 
 async function getChatCompletions(userInput) {
-  var newMessage = appendMessage('computer', '...');
+  var ending = '◼️';
+  var newMessage = appendMessage('computer', ending);
   var computerResponse = await streamingChatCompletions.getChatCompletions(userInput, function (response) {
-    newMessage.innerHTML = (newMessage.innerHTML + response).replace(/\n/g, '<br>');
+    var chatPanel = document.getElementById("chatPanel");
+    var atBottomNow = Math.abs(chatPanel.scrollHeight - chatPanel.clientHeight - chatPanel.scrollTop) < 1;
+
+    var newContent = newMessage.innerHTML.replace(ending, response) + ending;
+    newMessage.innerHTML = newContent.replace(/\n/g, '<br>');
+
+    if (atBottomNow) {
+      chatPanel.scrollTop = chatPanel.scrollHeight;
+    }
   });
   newMessage.innerHTML = computerResponse.replace(/\n/g, '<br>');
+  chatPanel.scrollTop = chatPanel.scrollHeight;
 }
 
 function appendMessage(sender, message) {

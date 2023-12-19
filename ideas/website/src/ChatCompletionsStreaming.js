@@ -29,6 +29,7 @@ class StreamingChatCompletionsHelper {
         if (content != null) {
           console.log(`Assistant: ${content}`);
           callback(content);
+          await new Promise(r => setTimeout(r, 50));
           response_content += content;
         }
       }
