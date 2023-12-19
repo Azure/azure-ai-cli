@@ -85,7 +85,7 @@
     }
 
     #chatPanel {
-      height: calc(100vh - var(--header-height) - var(--input-height) - 80px);
+      height: calc(100vh - var(--header-height) - var(--input-height));
       overflow-y: auto;
       position: fixed;
       width: 100%;
@@ -97,6 +97,7 @@
       font-size: 1em;
       border-radius: 10px;
       background-color: #557CB4;
+      margin-bottom: 24px;
     }
 
     #userInputPanel {
@@ -115,6 +116,7 @@
       max-height: var(--max-textarea-height);
       border-radius: 10px;
       border-width: 2px;
+      margin-bottom: 24px;
     }
 
     textarea {
@@ -147,14 +149,14 @@
 
     .user {
       color: #d8d8d8;
-      background-color: #181818;
+      background-color: #282828;
       max-width: calc(var(--right-side-width) - 32px);
       border-radius: 10px;
     }
 
     .computer {
       color: #d8d8d8;
-      background-color: #282828;
+      background-color: #181818;
       max-width: calc(var(--right-side-width) - 32px);
       border-radius: 10px;
     }
