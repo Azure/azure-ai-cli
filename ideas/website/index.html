@@ -13,9 +13,10 @@
       --send-button-width: 0px;
       --left-side-width: 250px;
       --right-side-width: 0px;
-      --right-side-max-width: 1200px;
+      --right-side-max-width: 800px;
       --max-textarea-height: 200px;
       --logo-size: 0.75in;
+      --logo-icon-size: 1.5em;
     }
 
     body {
@@ -34,6 +35,14 @@
       height: var(--logo-size);
     }
 
+    #logoIcon {
+      margin-bottom: calc(var(--logo-icon-size) / 4);
+      margin-right: calc(var(--logo-icon-size) / 4);
+      filter: grayscale(50%);
+      width: var(--logo-icon-size);
+      height: var(--logo-icon-size);
+    }
+
     #leftSide {
       background-color: #000;
       color: #f2f2f2;
@@ -43,6 +52,17 @@
       top: 0;
       bottom: 0;
       overflow-y: auto;
+    }
+
+    #newChatButton {
+      border: none;
+      cursor: pointer;
+      border-radius: 10px;
+      /* background-co  lor: #557CB4; */
+      width: calc(var(--left-side-width) - 16px);
+      margin-top: 16px;
+      margin-left: auto;
+      margin-right: auto;
     }
 
     #rightSide {
@@ -150,12 +170,11 @@
 <body>
 
   <!-- Left Sidebar with Historical Chats -->
-  <div id="leftSide" class="w3-bar-block">
-    <div id="header" class="w3-container w3-left">
-    </div>
-    <div id="history" class="w3-bar-block w3-left">
-      <!-- Dynamic content will be added here -->
-    </div>
+  <div id="leftSide" class="w3-bar-block w3-center">
+    <button id="newChatButton" class="w3-button w3-center" onclick="newChat()">
+      <div class="w3-left w3-medium"><img id="logoIcon" src="./ai.png" alt="Logo"> New chat</div>
+      <div class="w3-right"><i class="fa fa-edit"></i></div>
+    </button>
   </div>
 
   <div id="rightSideOuter">

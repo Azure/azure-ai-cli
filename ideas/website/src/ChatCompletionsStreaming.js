@@ -7,6 +7,10 @@ class StreamingChatCompletionsHelper {
     this.azureApiKey = azureApiKey;
     this.deploymentName = deploymentName;
     this.client = new OpenAIClient(this.endpoint, new AzureKeyCredential(this.azureApiKey));
+    this.clearConversation();
+  }
+
+  clearConversation() {
     this.messages = [
       { role: 'system', content: this.systemPrompt }
     ];

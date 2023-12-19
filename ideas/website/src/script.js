@@ -8,6 +8,15 @@ const systemPrompt = 'You are a helpful AI assistant.';
 
 const streamingChatCompletions = new chatCompletions.StreamingChatCompletionsHelper(systemPrompt, endpoint, azureApiKey, deploymentName)
 
+function newChat() {
+  var chatPanel = document.getElementById("chatPanel");
+  chatPanel.innerHTML = '';
+  var logo = document.getElementById("logo");
+  logo.style.display = "block";
+  document.getElementById("userInput").focus();
+  streamingChatCompletions.clearConversation();
+}
+
 function sendMessage() {
   var userInput = document.getElementById("userInput");
   var userInputValue = userInput.value;
@@ -111,5 +120,6 @@ document.getElementById("toggleThemeButton").addEventListener('keydown', functio
 
 window.sendMessage = sendMessage;
 window.toggleTheme = toggleTheme;
+window.newChat = newChat;
 
 document.getElementById("userInput").focus();
