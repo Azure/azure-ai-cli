@@ -1,23 +1,43 @@
 const { OpenAIClient, AzureKeyCredential } = require('@azure/openai');
 
-async function getChatCompletions(userInput, systemPrompt, endpoint, azureApiKey, deploymentName) {
-  const client = new OpenAIClient(endpoint, new AzureKeyCredential(azureApiKey));
-  const messages = [
-    { role: 'system', content: systemPrompt },
-    { role: 'user', content: userInput }
-  ];
-  const events = client.listChatCompletions(deploymentName, messages);
-  let response_content = '';
-  for await (const event of events) {
-    for (const choice of event.choices) {
-      const content = choice.delta?.content;
-      if (choice.finishReason === 'length') {
-        content = `${content}\nERROR: Exceeded token limit!`;
-      }
-      if (content != null) response_content += content;
-    }
+class StreamingChatCompletionsHelper {
+  constructor(systemPrompt, endpoint, azureApiKey, deploymentName) {
+    this.systemPrompt = systemPrompt;
+    this.endpoint = endpoint;
+    this.azureApiKey = azureApiKey;
+    this.deploymentName = deploymentName;
+    this.client = new OpenAIClient(this.endpoint, new AzureKeyCredential(this.azureApiKey));
+    this.messages = [
+      { role: 'system', content: this.systemPrompt }
+    ];
   }
-  return response_content;
+
+  async getChatCompletions(userInput, callback) {
+    this.messages.push({ role: 'user', content: userInput });
+
+    const events = this.client.listChatCompletions(this.deploymentName, this.messages);
+
+    let response_content = '';
+    for await (const event of events) {
+      for (const choice of event.choices) {
+
+        let content = choice.delta?.content;
+        if (choice.finishReason === 'length') {
+          content = `${content}\nERROR: Exceeded token limit!`;
+        }
+
+        if (content != null) {
+          console.log(`Assistant: ${content}`);
+          callback(content);
+          response_content += content;
+        }
+      }
+    }
+
+    console.log(`Assistant: ${response_content}`);
+    this.messages.push({ role: 'assistant', content: response_content });
+    return response_content;
+  }
 }
 
-module.exports = { getChatCompletions };
+module.exports = { StreamingChatCompletionsHelper };

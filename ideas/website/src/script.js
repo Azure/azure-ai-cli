@@ -6,20 +6,26 @@ const azureApiKey = '<insert your OpenAI API key here>';
 const deploymentName = '<insert your OpenAI deployment name here>';
 const systemPrompt = 'You are a helpful AI assistant.';
 
+const streamingChatCompletions = new chatCompletions.StreamingChatCompletionsHelper(systemPrompt, endpoint, azureApiKey, deploymentName)
+
 function sendMessage() {
-  var userInput = document.getElementById('userInput').value;
-  if (userInput.trim() !== '') {
-    appendMessage('user', userInput);
-    document.getElementById('userInput').value = '';
+  var userInput = document.getElementById("userInput");
+  var userInputValue = userInput.value;
+  if (userInputValue.trim() !== '') {
+    appendMessage('user', userInputValue);
+    userInput.value = '';
     updateUserInputHeight();
     updateWidthsAndHeights();
-    getChatCompletions(userInput);
+    getChatCompletions(userInputValue);
   }
 }
 
 async function getChatCompletions(userInput) {
-  var computerResponse = await chatCompletions.getChatCompletions(userInput, systemPrompt, endpoint, azureApiKey, deploymentName);
-  appendMessage('computer', computerResponse);
+  var newMessage = appendMessage('computer', '...');
+  var computerResponse = await streamingChatCompletions.getChatCompletions(userInput, function (response) {
+    newMessage.innerHTML = (newMessage.innerHTML + response).replace(/\n/g, '<br>');
+  });
+  newMessage.innerHTML = computerResponse.replace(/\n/g, '<br>');
 }
 
 function appendMessage(sender, message) {
@@ -72,19 +78,28 @@ document.addEventListener('DOMContentLoaded', updateWidthsAndHeights);
 
 function toggleTheme() {
   var body = document.body;
-  var themeToggle = document.getElementById("toggleThemeButton").children[0];
+  var themeToggleIcon = document.getElementById("toggleThemeButton").children[0];
   if (body.classList.contains("light-theme")) {
     body.classList.remove("light-theme");
-    themeToggle.classList.remove("fa-toggle-off");
-    themeToggle.classList.add("fa-toggle-on");
+    themeToggleIcon.classList.remove("fa-toggle-off");
+    themeToggleIcon.classList.add("fa-toggle-on");
   } else {
     body.classList.add("light-theme");
-    themeToggle.classList.remove("fa-toggle-on");
-    themeToggle.classList.add("fa-toggle-off");
+    themeToggleIcon.classList.remove("fa-toggle-on");
+    themeToggleIcon.classList.add("fa-toggle-off");
   }
 }
 
 toggleTheme();
 
+document.getElementById("toggleThemeButton").addEventListener("click", toggleTheme);
+document.getElementById("toggleThemeButton").addEventListener('keydown', function(event) {
+  if (event.code === 'Enter' || event.code === 'Space') {
+    toggleTheme();
+  }
+});
+
 window.sendMessage = sendMessage;
 window.toggleTheme = toggleTheme;
+
+document.getElementById("userInput").focus();
