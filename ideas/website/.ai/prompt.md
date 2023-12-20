@@ -1,14 +1,14 @@
 # Instructions:
-My website mostly works... but, I get this error when i try to call sendMessage().
+In this directory there are some files for a website. To build the website, you need to run the following commands:
 
+```bash
+npm install
+npx webpack
 ```
-index.html:188 Uncaught ReferenceError: sendMessage is not defined
-    at HTMLButtonElement.onclick (index.html:188:91)
-```
 
-Similarly, i get a similar error message when the html tries to call toggleTheme().
+Then to run the website, launch `index.html` in your browser.
 
-Why? Can you fix it?
+I want this directory to also have the appropriate support files for VS Code, so that I can build and run the website from within VS Code.
 
 # Task you must perform
 1. Please read all the files in the current directory, to understand what we've done so far. Do that now.

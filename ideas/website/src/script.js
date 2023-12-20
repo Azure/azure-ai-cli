@@ -1,13 +1,3 @@
-const chatCompletions = require('./ChatCompletionsStreaming');
-
-// You can replace these with your own endpoint, API key, and deployment name
-const endpoint = '<insert your OpenAI endpoint here>';
-const azureApiKey = '<insert your OpenAI API key here>';
-const deploymentName = '<insert your OpenAI deployment name here>';
-const systemPrompt = 'You are a helpful AI assistant.';
-
-const streamingChatCompletions = new chatCompletions.StreamingChatCompletionsHelper(systemPrompt, endpoint, azureApiKey, deploymentName)
-
 function newChat() {
   var chatPanel = document.getElementById("chatPanel");
   chatPanel.innerHTML = '';
@@ -62,17 +52,6 @@ function appendMessage(sender, message) {
   return newMessage;
 }
 
-document.getElementById("userInput").addEventListener("keydown", function(event) {
-  if (event.key === "Enter") {
-    if (!event.shiftKey) {
-      event.preventDefault();
-      sendMessage();
-    }
-  }
-});
-
-document.getElementById("userInput").addEventListener("input", updateUserInputHeight);
-
 function updateUserInputHeight() {
   var userInput = document.getElementById("userInput");
   userInput.style.height = 'auto';
@@ -92,9 +71,6 @@ function updateWidthsAndHeights() {
   document.documentElement.style.setProperty('--right-side-width', rightSideWidth + 'px');
 }
 
-window.addEventListener('resize', updateWidthsAndHeights);
-document.addEventListener('DOMContentLoaded', updateWidthsAndHeights);
-
 function toggleTheme() {
   var body = document.body;
   var themeToggleIcon = document.getElementById("toggleThemeButton").children[0];
@@ -109,17 +85,46 @@ function toggleTheme() {
   }
 }
 
-toggleTheme();
+function userInputHandleKeyDown() {
+  return function (event) {
+    if (event.key === "Enter") {
+      if (!event.shiftKey) {
+        event.preventDefault();
+        sendMessage();
+      }
+    }
+  };
+}
+
+function toggleThemeButtonHandleKeyDown() {
+  return function (event) {
+    if (event.code === 'Enter' || event.code === 'Space') {
+      toggleTheme();
+    }
+  };
+}
+
+document.getElementById("userInput").addEventListener("keydown", userInputHandleKeyDown());
+document.getElementById("userInput").addEventListener("input", updateUserInputHeight);
+document.addEventListener('DOMContentLoaded', updateWidthsAndHeights);
+window.addEventListener('resize', updateWidthsAndHeights);
 
 document.getElementById("toggleThemeButton").addEventListener("click", toggleTheme);
-document.getElementById("toggleThemeButton").addEventListener('keydown', function(event) {
-  if (event.code === 'Enter' || event.code === 'Space') {
-    toggleTheme();
-  }
-});
+document.getElementById("toggleThemeButton").addEventListener('keydown', toggleThemeButtonHandleKeyDown());
 
 window.sendMessage = sendMessage;
 window.toggleTheme = toggleTheme;
 window.newChat = newChat;
 
+toggleTheme();
 document.getElementById("userInput").focus();
+
+const chatCompletions = require('./ChatCompletionsStreaming');
+
+// You can replace these with your own endpoint, API key, and deployment name
+const endpoint = '<insert your OpenAI endpoint here>';
+const azureApiKey = '<insert your OpenAI API key here>';
+const deploymentName = '<insert your OpenAI deployment name here>';
+const systemPrompt = 'You are a helpful AI assistant.';
+
+const streamingChatCompletions = new chatCompletions.StreamingChatCompletionsHelper(systemPrompt, endpoint, azureApiKey, deploymentName)
