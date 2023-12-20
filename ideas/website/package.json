@@ -9,7 +9,9 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@azure/openai": "^1.0.0-beta.7"
+    "@azure/openai": "^1.0.0-beta.7",
+    "marked": "^4.0.10",
+    "highlight.js": "^11.7.2"
   },
   "keywords": [],
   "devDependencies": {

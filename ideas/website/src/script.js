@@ -1,3 +1,7 @@
+const chatCompletions = require('./ChatCompletionsStreaming');
+const marked = require("marked");
+const hljs = require("highlight.js");
+
 function newChat() {
   let chatPanel = document.getElementById("chatPanel");
   chatPanel.innerHTML = '';
@@ -33,8 +37,13 @@ async function getChatCompletions(userInput) {
       chatPanel.scrollTop = chatPanel.scrollHeight;
     }
   });
-  newMessage.innerHTML = computerResponse.replace(/\n/g, '<br>');
+
+  newMessage.innerHTML = markdownToHtml(computerResponse);
   chatPanel.scrollTop = chatPanel.scrollHeight;
+}
+
+function markdownToHtml(markdownText) {
+  return marked.parse(markdownText);
 }
 
 function appendMessage(sender, message) {
@@ -104,6 +113,12 @@ function toggleThemeButtonHandleKeyDown() {
   };
 }
 
+marked.setOptions({
+  highlight: function(code, lang) {
+    return hljs.highlight(lang, code).value;
+  }
+});
+
 document.getElementById("userInput").addEventListener("keydown", userInputHandleKeyDown());
 document.getElementById("userInput").addEventListener("input", updateUserInputHeight);
 document.addEventListener('DOMContentLoaded', updateWidthsAndHeights);
@@ -118,8 +133,6 @@ window.newChat = newChat;
 
 toggleTheme();
 document.getElementById("userInput").focus();
-
-const chatCompletions = require('./ChatCompletionsStreaming');
 
 const endpoint = process.env.OPENAI_ENDPOINT;
 const azureApiKey = process.env.OPENAI_API_KEY;
