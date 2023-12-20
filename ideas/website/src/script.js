@@ -126,4 +126,14 @@ const azureApiKey = process.env.OPENAI_API_KEY;
 const deploymentName = process.env.AZURE_OPENAI_CHAT_DEPLOYMENT;
 const systemPrompt = "You are a helpful AI assistant."
 
+if (!endpoint) {
+  appendMessage('computer', 'Please set OPENAI_ENDPOINT in .env');
+}
+if (!azureApiKey) {
+  appendMessage('computer', 'Please set OPENAI_API_KEY in .env');
+}
+if (!deploymentName) {
+  appendMessage('computer', 'Please set AZURE_OPENAI_CHAT_DEPLOYMENT in .env');
+}
+
 const streamingChatCompletions = new chatCompletions.StreamingChatCompletionsHelper(systemPrompt, endpoint, azureApiKey, deploymentName)
