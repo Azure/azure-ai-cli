@@ -8,7 +8,12 @@ npx webpack
 
 Then to run the website, launch `index.html` in your browser.
 
-I want this directory to also have the appropriate support files for VS Code, so that I can build and run the website from within VS Code.
+These are represented in tasks.json and launch.json, so that you can build and run the website from within VS Code.
+
+However, inside `script.js`, i have some "secrets" hard-coded... What's a better idiomatic way to deal with them, if I both want to:
+(a) keep them secret when I deploy to a static file serving website, and
+(b) make it very easy for a developer to run the website locally, without having to set up a server?
+
 
 # Task you must perform
 1. Please read all the files in the current directory, to understand what we've done so far. Do that now.
