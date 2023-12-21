@@ -14,6 +14,7 @@ body {
     background-color: #111;
     color: #f2f2f2;
     font-size: medium;
+    font-family: system-ui;
 }
 
 #logo {
@@ -141,16 +142,29 @@ body.light-theme textarea.w3-border:focus-visible {
 
 .user {
     color: #d8d8d8;
-    background-color: #282828;
+    background-color: #111;
     max-width: calc(var(--right-side-width) - 32px);
     border-radius: 10px;
 }
 
 .computer {
     color: #d8d8d8;
-    background-color: #181818;
+    background-color: #111;
     max-width: calc(var(--right-side-width) - 32px);
     border-radius: 10px;
+}
+
+div.user {
+    margin-bottom: 16px;
+}
+
+div.computer {
+    margin-bottom: 16px;
+}
+
+.message-author {
+    font-weight: bold;
+    margin: 0px;
 }
 
 .light-theme {
@@ -162,12 +176,12 @@ body.light-theme #toggleThemeButton {
 }
 
 body.light-theme .user {
-    background-color: #f0f0f0;
+    background-color: #fdfdfd;
     color: #111;
 }
 
 body.light-theme .computer {
-    background-color: #e8e8e8;
+    background-color: #fdfdfd;
     color: #111;
 }
 

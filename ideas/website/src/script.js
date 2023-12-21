@@ -15,7 +15,7 @@ function sendMessage() {
   let userInput = document.getElementById("userInput");
   let userInputValue = userInput.value;
   if (userInputValue.trim() !== '') {
-    appendMessage('user', userInputValue);
+    appendMessage('user', markdownToHtml(userInputValue));
     userInput.value = '';
     updateUserInputHeight();
     updateWidthsAndHeights();
@@ -50,15 +50,24 @@ function appendMessage(sender, message) {
   let logo = document.getElementById("logo");
   logo.style.display = "none";
 
-  message = message.replace(/\n/g, '<br>');
+  let p = document.createElement("p");
+  p.className = "message-content";
+  p.innerHTML = message;
+
+  let p2 = document.createElement("p");
+  p2.className = "message-author";
+  p2.innerHTML = sender == "user" ? "You" : "Assistant";
+
+  let d = document.createElement("div");
+  d.className = sender === "user" ? "w3-padding user" : "w3-padding computer";
+  d.appendChild(p2);
+  d.appendChild(p);
+
   let chatPanel = document.getElementById("chatPanel");
-  let newMessage = document.createElement("p");
-  newMessage.className = sender === "user" ? "w3-padding user" : "w3-padding computer";
-  newMessage.innerHTML = message;
-  chatPanel.appendChild(newMessage);
+  chatPanel.appendChild(d);
   chatPanel.scrollTop = chatPanel.scrollHeight;
 
-  return newMessage;
+  return p;
 }
 
 function updateUserInputHeight() {
