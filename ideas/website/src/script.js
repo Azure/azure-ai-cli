@@ -59,7 +59,7 @@ function appendMessage(sender, message) {
   p2.innerHTML = sender == "user" ? "You" : "Assistant";
 
   let d = document.createElement("div");
-  d.className = sender === "user" ? "w3-padding user" : "w3-padding computer";
+  d.className = sender === "user" ? "user" : "computer";
   d.appendChild(p2);
   d.appendChild(p);
 
@@ -124,7 +124,10 @@ function toggleThemeButtonHandleKeyDown() {
 
 marked.setOptions({
   highlight: function(code, lang) {
-    return hljs.highlight(lang, code).value;
+    let hl = lang === undefined || lang === ''
+      ? hljs.highlightAuto(code).value
+      : hljs.highlight(lang, code).value;
+    return `<div class="hljs">${hl}</div>`;
   }
 });
 
