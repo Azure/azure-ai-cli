@@ -27,7 +27,7 @@ class OpenAIStreamingChatCompletions {
 
     const events = this.client.listChatCompletions(this.deploymentName, this.messages);
 
-    let response_content = '';
+    let contentComplete = '';
     for await (const event of events) {
       for (const choice of event.choices) {
 
@@ -39,13 +39,13 @@ class OpenAIStreamingChatCompletions {
         if (content != null) {
           callback(content);
           await new Promise(r => setTimeout(r, 50));
-          response_content += content;
+          contentComplete += content;
         }
       }
     }
 
-    this.messages.push({ role: 'assistant', content: response_content });
-    return response_content;
+    this.messages.push({ role: 'assistant', content: contentComplete });
+    return contentComplete;
   }
 }
 
@@ -56,18 +56,12 @@ const rl = readline.createInterface({
 });
 
 async function main() {
-
   const endpoint = process.env["OPENAI_ENDPOINT"] || "<#= OPENAI_ENDPOINT #>";
   const azureApiKey = process.env["OPENAI_API_KEY"]  || "<#= OPENAI_API_KEY #>";
   const deploymentName = process.env["AZURE_OPENAI_CHAT_DEPLOYMENT"] || "<#= AZURE_OPENAI_CHAT_DEPLOYMENT #>" ;
   const systemPrompt = process.env["AZURE_OPENAI_SYSTEM_PROMPT"] || "<#= AZURE_OPENAI_SYSTEM_PROMPT #>" ;
 
-  const streamingChatCompletions = new OpenAIStreamingChatCompletions(
-    systemPrompt,
-    endpoint,
-    azureApiKey,
-    deploymentName
-  );
+  const streamingChatCompletions = new OpenAIStreamingChatCompletions(systemPrompt, endpoint, azureApiKey, deploymentName);
 
   while (true) {
 

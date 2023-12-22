@@ -110,18 +110,12 @@ const rl = readline.createInterface({
 });
 
 async function main() {
-
   const endpoint = process.env["OPENAI_ENDPOINT"] || "<#= OPENAI_ENDPOINT #>";
   const azureApiKey = process.env["OPENAI_API_KEY"]  || "<#= OPENAI_API_KEY #>";
   const deploymentName = process.env["AZURE_OPENAI_CHAT_DEPLOYMENT"] || "<#= AZURE_OPENAI_CHAT_DEPLOYMENT #>" ;
   const systemPrompt = process.env["AZURE_OPENAI_SYSTEM_PROMPT"] || "<#= AZURE_OPENAI_SYSTEM_PROMPT #>" ;
 
-  const streamingChatCompletions = new OpenAIStreamingChatCompletions(
-    systemPrompt,
-    endpoint,
-    azureApiKey,
-    deploymentName
-  );
+  const streamingChatCompletions = new OpenAIStreamingChatCompletions(systemPrompt, endpoint, azureApiKey, deploymentName);
 
   while (true) {
 
