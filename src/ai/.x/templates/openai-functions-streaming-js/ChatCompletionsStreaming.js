@@ -14,6 +14,25 @@ class OpenAIStreamingChatCompletions {
     this.deploymentName = deploymentName;
     this.client = new OpenAIClient(this.endpoint, new AzureKeyCredential(this.azureApiKey));
     this.clearConversation();
+
+    this.getCurrentWeather = {
+      name: "get_current_weather",
+      description: "Get the current weather in a given location",
+      parameters: {
+        type: "object",
+        properties: {
+          location: {
+            type: "string",
+            description: "The city and state, e.g. San Francisco, CA",
+          },
+          unit: {
+            type: "string",
+            enum: ["celsius", "fahrenheit"],
+          },
+        },
+        required: ["location"],
+      },
+    };
   }
 
   clearConversation() {
@@ -25,11 +44,30 @@ class OpenAIStreamingChatCompletions {
   async getChatCompletions(userInput, callback) {
     this.messages.push({ role: 'user', content: userInput });
 
-    const events = this.client.listChatCompletions(this.deploymentName, this.messages);
+    const events = this.client.listChatCompletions(this.deploymentName, this.messages, {
+      functions: [this.getCurrentWeather]
+    });
 
-    let response_content = '';
+    let response_content = "";
+    let function_name = "";
+    let function_arguments = "";
     for await (const event of events) {
       for (const choice of event.choices) {
+
+        const name = choice.delta?.functionCall?.name;
+        if (function_name === "" && name !== undefined) {
+          function_name = name;
+        }
+
+        const args = choice.delta?.functionCall?.arguments;
+        if (args !== undefined) {
+          function_arguments = `${function_arguments}${args}`;
+        }
+
+        const finishReason = choice.finishReason;
+        if (finishReason == "function_call") {
+          response_content = `${function_name}(${function_arguments})`;
+        }
 
         let content = choice.delta?.content;
         if (choice.finishReason === 'length') {
