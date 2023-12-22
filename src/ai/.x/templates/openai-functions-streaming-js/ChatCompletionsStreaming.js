@@ -44,46 +44,62 @@ class OpenAIStreamingChatCompletions {
   async getChatCompletions(userInput, callback) {
     this.messages.push({ role: 'user', content: userInput });
 
-    const events = this.client.listChatCompletions(this.deploymentName, this.messages, {
-      functions: [this.getCurrentWeather]
-    });
+    let contentComplete = "";
 
-    let response_content = "";
-    let function_name = "";
-    let function_arguments = "";
-    for await (const event of events) {
-      for (const choice of event.choices) {
+    while (true)
+    {
+      const events = this.client.listChatCompletions(this.deploymentName, this.messages, {
+        functions: [this.getCurrentWeather]
+      });
 
-        const name = choice.delta?.functionCall?.name;
-        if (function_name === "" && name !== undefined) {
-          function_name = name;
-        }
+      let function_name = "";
+      let function_arguments = "";
 
-        const args = choice.delta?.functionCall?.arguments;
-        if (args !== undefined) {
-          function_arguments = `${function_arguments}${args}`;
-        }
+      for await (const event of events) {
+        for (const choice of event.choices) {
 
-        const finishReason = choice.finishReason;
-        if (finishReason == "function_call") {
-          response_content = `${function_name}(${function_arguments})`;
-        }
+          const name = choice.delta?.functionCall?.name;
+          if (function_name === "" && name !== undefined) {
+            function_name = name;
+          }
 
-        let content = choice.delta?.content;
-        if (choice.finishReason === 'length') {
-          content = `${content}\nERROR: Exceeded token limit!`;
-        }
+          const args = choice.delta?.functionCall?.arguments;
+          if (args !== undefined) {
+            function_arguments = `${function_arguments}${args}`;
+          }
 
-        if (content != null) {
-          callback(content);
-          await new Promise(r => setTimeout(r, 50));
-          response_content += content;
+          let content = choice.delta?.content;
+          if (choice.finishReason === 'length') {
+            content = `${content}\nERROR: Exceeded token limit!`;
+          }
+
+          if (content != null) {
+            callback(content);
+            await new Promise(r => setTimeout(r, 50));
+            contentComplete += content;
+          }
         }
       }
-    }
 
-    this.messages.push({ role: 'assistant', content: response_content });
-    return response_content;
+      if (function_name !== "" && function_arguments !== "") {
+        console.log(`assistant-function: ${function_name}(${function_arguments})`);
+
+        let result = "";
+        if (function_name === "get_current_weather") {
+          const location = JSON.parse(function_arguments).location;
+          result = `The weather in ${location} is 72 degrees and sunny.`;
+        }
+
+        this.messages.push({ role: 'assistant', function_call: { name: function_name, arguments: function_arguments } });
+        this.messages.push({ role: 'function', content: result, name: function_name });
+        function_name = "";
+        function_arguments = "";
+        continue;
+      }
+
+      this.messages.push({ role: 'assistant', content: contentComplete });
+      return contentComplete;
+    }
   }
 }
 
