@@ -82,13 +82,13 @@ class OpenAIStreamingChatCompletions {
       }
 
       if (function_name !== "" && function_arguments !== "") {
-        console.log(`assistant-function: ${function_name}(${function_arguments})`);
-
         let result = "";
         if (function_name === "get_current_weather") {
           const location = JSON.parse(function_arguments).location;
           result = `The weather in ${location} is 72 degrees and sunny.`;
         }
+
+        console.log(`assistant-function: ${function_name}(${function_arguments}) => ${result}`);
 
         this.messages.push({ role: 'assistant', function_call: { name: function_name, arguments: function_arguments } });
         this.messages.push({ role: 'function', content: result, name: function_name });
