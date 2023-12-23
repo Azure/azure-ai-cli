@@ -4,6 +4,45 @@
 <#@ parameter type="System.String" name="OPENAI_API_KEY" #>
 <#@ parameter type="System.String" name="AZURE_OPENAI_CHAT_DEPLOYMENT" #>
 <#@ parameter type="System.String" name="AZURE_OPENAI_SYSTEM_PROMPT" #>
+function getCurrentWeather(function_arguments) {
+  const location = JSON.parse(function_arguments).location;
+  return `The weather in ${location} is 72 degrees and sunny.`;
+}
+
+const getCurrentWeatherSchema = {
+  name: "get_current_weather",
+  description: "Get the current weather in a given location",
+  parameters: {
+    type: "object",
+    properties: {
+      location: {
+        type: "string",
+        description: "The city and state, e.g. San Francisco, CA",
+      },
+      unit: {
+        type: "string",
+        enum: ["celsius", "fahrenheit"],
+      },
+    },
+    required: ["location"],
+  },
+};
+
+function getCurrentDate() {
+  const date = new Date();
+  return `${date.getFullYear()}-${date.getMonth()}-${date.getDate()}`;
+}
+
+const getCurrentDateSchema = {
+  name: "get_current_date",
+  description: "Get the current date",
+  parameters: {
+    type: "object",
+    properties: {
+    },
+  },
+};
+
 const { OpenAIClient, AzureKeyCredential } = require("@azure/openai");
 
 class OpenAIStreamingChatCompletions {
@@ -14,25 +53,6 @@ class OpenAIStreamingChatCompletions {
     this.deploymentName = deploymentName;
     this.client = new OpenAIClient(this.endpoint, new AzureKeyCredential(this.azureApiKey));
     this.clearConversation();
-
-    this.getCurrentWeather = {
-      name: "get_current_weather",
-      description: "Get the current weather in a given location",
-      parameters: {
-        type: "object",
-        properties: {
-          location: {
-            type: "string",
-            description: "The city and state, e.g. San Francisco, CA",
-          },
-          unit: {
-            type: "string",
-            enum: ["celsius", "fahrenheit"],
-          },
-        },
-        required: ["location"],
-      },
-    };
   }
 
   clearConversation() {
@@ -49,7 +69,7 @@ class OpenAIStreamingChatCompletions {
     while (true)
     {
       const events = this.client.listChatCompletions(this.deploymentName, this.messages, {
-        functions: [this.getCurrentWeather]
+        functions: [getCurrentWeatherSchema, getCurrentDateSchema]
       });
 
       let function_name = "";
@@ -84,8 +104,13 @@ class OpenAIStreamingChatCompletions {
       if (function_name !== "" && function_arguments !== "") {
         let result = "";
         if (function_name === "get_current_weather") {
-          const location = JSON.parse(function_arguments).location;
-          result = `The weather in ${location} is 72 degrees and sunny.`;
+          result = getCurrentWeather(function_arguments);
+        }
+        else if (function_name === "get_current_date") {
+          result = getCurrentDate(function_arguments);
+        }
+        else {
+          result = `ERROR: Unknown function ${function_name}`;
         }
 
         console.log(`assistant-function: ${function_name}(${function_arguments}) => ${result}`);
