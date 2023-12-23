@@ -30,19 +30,25 @@ function streamingChatCompletionsClear() {
 
 async function streamingChatCompletionsProcessInput(userInput) {
   let newMessage = chatPanelAppendMessage('computer', streamingChatIncompleteEnding);
+  let completeResponse = "";
 
   let computerResponse = await streamingChatCompletions.getChatCompletions(userInput, function (response) {
     let atBottomBeforeUpdate = chatPanelIsScrollAtBottom();
 
-    let newContent = newMessage.innerHTML.replace(streamingChatIncompleteEnding, response) + streamingChatIncompleteEnding;
-    newMessage.innerHTML = newContent.replace(/\n/g, '<br>');
+    completeResponse += response;
+    let withEnding = `${completeResponse}${streamingChatIncompleteEnding}`;
+    let asHtml = markdownToHtml(withEnding);
 
-    if (atBottomBeforeUpdate) {
-      chatPanelScrollToBottom();
+    if (asHtml !== undefined) {
+      newMessage.innerHTML = asHtml;
+
+      if (atBottomBeforeUpdate) {
+        chatPanelScrollToBottom();
+      }
     }
   });
 
-  newMessage.innerHTML = markdownToHtml(computerResponse);
+  newMessage.innerHTML = markdownToHtml(computerResponse) || computerResponse.replace(/\n/g, '<br/>');
   chatPanel.scrollTop = chatPanel.scrollHeight;
 }
 
@@ -115,20 +121,60 @@ function markdownInit() {
 }
 
 function markdownToHtml(markdownText) {
-  return marked.parse(markdownText);
+  try {
+    return marked.parse(markdownText);
+  }
+  catch (error) {
+    return undefined;
+  }
 }
 
-function themeToggle() {
-  let iconElement = toggleThemeButtonGetElement().children[0];
-  let bodyElement = document.body;
-  if (bodyElement.classList.contains("light-theme")) {
-    bodyElement.classList.remove("light-theme");
-    iconElement.classList.remove("fa-toggle-off");
-    iconElement.classList.add("fa-toggle-on");
+function themeInit() {
+  let currentTheme = localStorage.getItem('theme');
+  if (currentTheme === 'dark') {
+    themeSetDark();
+  }
+  else if (currentTheme === 'light') {
+    themeSetLight();
+  }
+  toggleThemeButtonInit();
+}
+
+function themeIsLight() {
+  return document.body.classList.contains("light-theme");
+}
+
+function themeIsDark() {
+  return !themeIsLight();
+}
+
+function toggleTheme() {
+  if (themeIsLight()) {
+    themeSetDark();
   } else {
-    bodyElement.classList.add("light-theme");
+    themeSetLight();
+  }
+}
+
+function themeSetLight() {
+  if (!themeIsLight()) {
+    document.body.classList.add("light-theme");
+    localStorage.setItem('theme', 'light');
+
+    let iconElement = toggleThemeButtonGetElement().children[0];
     iconElement.classList.remove("fa-toggle-on");
     iconElement.classList.add("fa-toggle-off");
+  }
+}
+
+function themeSetDark() {
+  if (!themeIsDark()) {
+    document.body.classList.remove("light-theme");
+    localStorage.setItem('theme', 'dark');
+
+    let iconElement = toggleThemeButtonGetElement().children[0];
+    iconElement.classList.remove("fa-toggle-off");
+    iconElement.classList.add("fa-toggle-on");
   }
 }
 
@@ -138,14 +184,14 @@ function toggleThemeButtonGetElement() {
 
 function toggleThemeButtonInit() {
   let buttonElement = toggleThemeButtonGetElement();
-  buttonElement.addEventListener("click", themeToggle);
+  buttonElement.addEventListener("click", toggleTheme);
   buttonElement.addEventListener('keydown', toggleThemeButtonHandleKeyDown());
 }
 
 function toggleThemeButtonHandleKeyDown() {
   return function (event) {
     if (event.code === 'Enter' || event.code === 'Space') {
-      themeToggle();
+      toggleTheme();
     }
   };
 }
@@ -218,7 +264,7 @@ function sendMessage() {
 
   let notEmpty = inputValue.trim() !== '';
   if (notEmpty) {
-    let html = markdownToHtml(inputValue);
+    let html = markdownToHtml(inputValue) || inputValue.replace(/\n/g, '<br/>');
     chatPanelAppendMessage('user', html);
     userInputTextAreaClear();
     varsUpdateHeightsAndWidths();
@@ -226,15 +272,13 @@ function sendMessage() {
   }
 }
 
+themeInit();
 markdownInit();
-toggleThemeButtonInit();
 userInputTextAreaInit();
 varsInit();
 streamingChatCompletionsInit();
-
-themeToggle();
 userInputTextAreaFocus();
 
 window.sendMessage = sendMessage;
-window.toggleTheme = themeToggle;
+window.toggleTheme = toggleTheme;
 window.newChat = newChat;

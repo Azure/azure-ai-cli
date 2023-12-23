@@ -43,15 +43,85 @@ const getCurrentDateSchema = {
   },
 };
 
+class FunctionFactory {
+  constructor() {
+    this.functions = {};
+  }
+
+  addFunction(schema, fun) {
+    this.functions[schema.name] = { schema: schema, function: fun };
+  }
+
+  getFunctionSchemas() {
+    return Object.values(this.functions).map(value => value.schema);
+  }
+
+  tryCallFunction(function_name, function_arguments) {
+    const function_info = this.functions[function_name];
+    if (function_info === undefined) {
+      return undefined;
+    }
+
+    return function_info.function(function_arguments);
+  }
+}  
+
+class FunctionCallContext {
+  constructor(function_factory, messages) {
+    this.function_factory = function_factory;
+    this.messages = messages;
+    this.function_name = "";
+    this.function_arguments = "";
+  }
+
+  checkForUpdate(choice) {
+    let updated = false;
+
+    const name = choice.delta?.functionCall?.name;
+    if (name !== undefined) {
+      this.function_name = name;
+      updated = true;
+    }
+
+    const args = choice.delta?.functionCall?.arguments;
+    if (args !== undefined) {
+      this.function_arguments = `${this.function_arguments}${args}`;
+      updated = true;
+    }
+
+    return updated;
+  }
+
+  tryCallFunction() {
+    let result = this.function_factory.tryCallFunction(this.function_name, this.function_arguments);
+    if (result === undefined) {
+      return undefined;
+    }
+
+    console.log(`assistant-function: ${this.function_name}(${this.function_arguments}) => ${result}`);
+
+    this.messages.push({ role: 'assistant', function_call: { name: this.function_name, arguments: this.function_arguments } });
+    this.messages.push({ role: 'function', content: result, name: this.function_name });
+
+    return result;
+  }
+
+  clear() {
+    this.function_name = "";
+    this.function_arguments = "";
+  }
+}
+
 const { OpenAIClient, AzureKeyCredential } = require("@azure/openai");
 
 class OpenAIStreamingChatCompletions {
-  constructor(systemPrompt, endpoint, azureApiKey, deploymentName) {
+  constructor(systemPrompt, endpoint, azureApiKey, deploymentName, functionFactory) {
     this.systemPrompt = systemPrompt;
     this.endpoint = endpoint;
     this.azureApiKey = azureApiKey;
     this.deploymentName = deploymentName;
     this.client = new OpenAIClient(this.endpoint, new AzureKeyCredential(this.azureApiKey));
+    this.functionFactory = functionFactory || new FunctionFactory();
     this.clearConversation();
   }
 
@@ -59,34 +129,23 @@ class OpenAIStreamingChatCompletions {
     this.messages = [
       { role: 'system', content: this.systemPrompt }
     ];
+    this.functionCallContext = new FunctionCallContext(this.functionFactory, this.messages);
   }
 
   async getChatCompletions(userInput, callback) {
     this.messages.push({ role: 'user', content: userInput });
 
     let contentComplete = "";
-
     while (true)
     {
       const events = this.client.listChatCompletions(this.deploymentName, this.messages, {
-        functions: [getCurrentWeatherSchema, getCurrentDateSchema]
+        functions: this.functionFactory.getFunctionSchemas(),
       });
-
-      let function_name = "";
-      let function_arguments = "";
 
       for await (const event of events) {
         for (const choice of event.choices) {
 
-          const name = choice.delta?.functionCall?.name;
-          if (function_name === "" && name !== undefined) {
-            function_name = name;
-          }
-
-          const args = choice.delta?.functionCall?.arguments;
-          if (args !== undefined) {
-            function_arguments = `${function_arguments}${args}`;
-          }
+          this.functionCallContext.checkForUpdate(choice);
 
           let content = choice.delta?.content;
           if (choice.finishReason === 'length') {
@@ -101,24 +160,8 @@ class OpenAIStreamingChatCompletions {
         }
       }
 
-      if (function_name !== "" && function_arguments !== "") {
-        let result = "";
-        if (function_name === "get_current_weather") {
-          result = getCurrentWeather(function_arguments);
-        }
-        else if (function_name === "get_current_date") {
-          result = getCurrentDate(function_arguments);
-        }
-        else {
-          result = `ERROR: Unknown function ${function_name}`;
-        }
-
-        console.log(`assistant-function: ${function_name}(${function_arguments}) => ${result}`);
-
-        this.messages.push({ role: 'assistant', function_call: { name: function_name, arguments: function_arguments } });
-        this.messages.push({ role: 'function', content: result, name: function_name });
-        function_name = "";
-        function_arguments = "";
+      if (this.functionCallContext.tryCallFunction() !== undefined) {
+        this.functionCallContext.clear();
         continue;
       }
 
@@ -140,7 +183,11 @@ async function main() {
   const deploymentName = process.env["AZURE_OPENAI_CHAT_DEPLOYMENT"] || "<#= AZURE_OPENAI_CHAT_DEPLOYMENT #>" ;
   const systemPrompt = process.env["AZURE_OPENAI_SYSTEM_PROMPT"] || "<#= AZURE_OPENAI_SYSTEM_PROMPT #>" ;
 
-  const streamingChatCompletions = new OpenAIStreamingChatCompletions(systemPrompt, endpoint, azureApiKey, deploymentName);
+  let factory = new FunctionFactory();
+  factory.addFunction(getCurrentWeatherSchema, getCurrentWeather);
+  factory.addFunction(getCurrentDateSchema, getCurrentDate);
+
+  const streamingChatCompletions = new OpenAIStreamingChatCompletions(systemPrompt, endpoint, azureApiKey, deploymentName, factory);
 
   while (true) {
 
