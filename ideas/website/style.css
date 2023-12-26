@@ -1,7 +1,7 @@
 :root {
     --header-height: 0px;
     --input-height: 0px;
-    --send-button-width: 0px;
+    --send-button-width: 36;
     --left-side-width: 250px;
     --right-side-width: 0px;
     --right-side-max-width: 800px;
@@ -15,6 +15,10 @@ body {
     color: #f2f2f2;
     font-size: medium;
     font-family: system-ui;
+    height: 100vh;
+    margin: 0px;
+    overflow: hidden;
+    max-height: 100vh;
 }
 
 #logo {
@@ -39,10 +43,9 @@ body {
     background-color: #000;
     color: #f2f2f2;
     width: var(--left-side-width);
+    max-width: var(--left-side-width);
     height: 100vh;
-    position: fixed;
-    top: 0;
-    bottom: 0;
+    max-height: 100vh;
     overflow-y: auto;
 }
 
@@ -58,14 +61,16 @@ body {
 }
 
 #rightSide {
-    width: min(var(--right-side-max-width), calc(100vw - var(--left-side-width)));
+    width: 100%;
     margin-left: auto;
     margin-right: auto;
+    max-width: var(--right-side-max-width);
 }
 
-#rightSideOuter {
-    margin-left: calc(var(--left-side-width));
-    width: calc(100vw - var(--left-side-width));
+#rightSideInside {
+    margin-left: auto;
+    margin-right: auto;
+    max-width: var(--right-side-max-width);
 }
 
 #toggleThemeButton {
@@ -77,10 +82,9 @@ body {
 }
 
 #chatPanel {
-    height: calc(100vh - var(--header-height) - var(--input-height));
+    height: 100%;
+    max-height: calc(100vh - var(--header-height) - var(--input-height) - 50px);
     overflow-y: auto;
-    position: fixed;
-    width: 100%;
 }
 
 #sendButton {
@@ -89,26 +93,20 @@ body {
     font-size: 1em;
     border-radius: 10px;
     background-color: #557CB4;
-    margin-bottom: 24px;
+    width: var(--send-button-width);
 }
 
 #userInputPanel {
     display: flex;
-    justify-content: space-between;
-    position: fixed;
-    bottom: 0;
-    width: calc(100vw - var(--send-button-width));
-    max-width: var(--right-side-width);
+    max-width: 800px;
 }
 
 #userInput {
-    flex-grow: 1;
     margin-right: 15px;
-    overflow: auto;
+    width: 100%;
     max-height: var(--max-textarea-height);
     border-radius: 10px;
     border-width: 2px;
-    margin-bottom: 24px;
 }
 
 textarea {
@@ -143,30 +141,29 @@ body.light-theme textarea.w3-border:focus-visible {
 .user {
     color: #d8d8d8;
     background-color: #111;
-    max-width: calc(var(--right-side-width) - 32px);
     border-radius: 10px;
 }
 
 .computer {
     color: #d8d8d8;
     background-color: #111;
-    max-width: calc(var(--right-side-width) - 32px);
     border-radius: 10px;
 }
 
 div.user {
     margin-bottom: 16px;
     margin-right: 0px;
+    text-align: left;
 }
 
 div.computer {
     margin-bottom: 16px;
     margin-right: 0px;
+    text-align: left;
 }
 
 .message-author {
     font-weight: bold;
-    margin: 0px;
 }
 
 .light-theme {
@@ -194,6 +191,42 @@ body.light-theme .computer {
     -ms-overflow-style: none;
     scrollbar-width: none;
 }
+
+::-webkit-scrollbar {
+    height: 1rem;
+    width: .5rem;
+    background-color: #111;
+}
+
+body.light-theme ::-webkit-scrollbar {
+    background-color: #fdfdfd;
+}
+
+::-webkit-scrollbar:horizontal {
+    height: .5rem;
+    width: 1rem
+}
+
+::-webkit-scrollbar-track {
+    background-color: transparent;
+    border-radius: 9999px;
+}
+
+::-webkit-scrollbar-thumb {
+    background-color: #0a0a0a;
+    border-color: rgba(255,255,255,var(--tw-border-opacity));
+    border-radius: 9999px;
+    border-width: 1px;
+}
+
+body.light-theme ::-webkit-scrollbar-thumb {
+    background-color: #fafafa;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background-color: rgba(217,217,227,var(--tw-bg-opacity))
+}
+
 
 .hljs {
     margin: 0px;

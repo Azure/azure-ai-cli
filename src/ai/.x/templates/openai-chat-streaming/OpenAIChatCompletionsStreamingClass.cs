@@ -28,12 +28,12 @@ public class <#= ClassName #>
 
         options = new ChatCompletionsOptions();
         options.DeploymentName = deploymentName;
-        options.Messages.Add(new ChatMessage(ChatRole.System, systemPrompt));
+        options.Messages.Add(new ChatRequestSystemMessage(systemPrompt));
     }
 
     public async Task<string> GetChatCompletionsStreamingAsync(string userPrompt, Action<StreamingChatCompletionsUpdate> callback = null)
     {
-        options.Messages.Add(new ChatMessage(ChatRole.User, userPrompt));
+        options.Messages.Add(new ChatRequestUserMessage(userPrompt));
 
         var responseContent = string.Empty;
         var response = await client.GetChatCompletionsStreamingAsync(options);
@@ -56,7 +56,7 @@ public class <#= ClassName #>
             responseContent += content;
         }
 
-        options.Messages.Add(new ChatMessage(ChatRole.Assistant, responseContent));
+        options.Messages.Add(new ChatRequestAssistantMessage(responseContent));
         return responseContent;
     }
 

@@ -242,13 +242,9 @@ function varsUpdateHeightsAndWidths() {
   let headerHeight = document.querySelector('#header').offsetHeight;
   let userInputHeight = document.querySelector('#userInputPanel').offsetHeight;
   let sendButtonWidth = document.querySelector('#sendButton').offsetWidth;
-  let leftSideWidth = document.querySelector('#leftSide').offsetWidth;
-  let rightSideWidth = document.querySelector('#rightSide').offsetWidth;
   document.documentElement.style.setProperty('--header-height', headerHeight + 'px');
   document.documentElement.style.setProperty('--input-height', userInputHeight + 'px');
   document.documentElement.style.setProperty('--send-button-width', sendButtonWidth + 'px');
-  document.documentElement.style.setProperty('--left-side-width', leftSideWidth + 'px');
-  document.documentElement.style.setProperty('--right-side-width', rightSideWidth + 'px');
 }
 
 function newChat() {

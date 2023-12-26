@@ -9,7 +9,7 @@ namespace Azure.AI.Details.Common.CLI.Extensions.HelperFunctions
             _factory = factory;
         }
 
-        public bool CheckForFunction(ChatMessage message)
+        public bool CheckForFunction(ChatResponseMessage message)
         {
             var updated = false;
 
