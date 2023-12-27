@@ -88,26 +88,17 @@ namespace Azure.AI.Details.Common.CLI.Extensions.Templates
 
             outputDirectory = PathHelpers.NormalizePath(outputDirectory);
             var message = $"Generating '{templateName}' in '{outputDirectory}' ({files.Count()} files)...";
-            if (!quiet) Console.WriteLine(message);
+            if (!quiet) Console.WriteLine($"{message}\n");
 
-            var processed = ProcessTemplates(templateName, generator, files);
-            foreach (var item in processed)
+            var generated = ProcessTemplates(templateName, generator, files, outputDirectory);
+            foreach (var item in generated)
             {
-                var file = item.Key;
-                var text = item.Value;
-                if (verbose) Console.WriteLine($"\nFILE: {file}:\n```\n{text}\n```");
-
-                FileHelpers.WriteAllText(PathHelpers.Combine(outputDirectory, file), text, new UTF8Encoding(false));
+                var file = item.Replace(outputDirectory, string.Empty).Trim('\\', '/');
+                if (!quiet) Console.WriteLine($"  {file}");
             }
 
             if (!quiet)
             {
-                Console.WriteLine();
-                foreach (var item in processed)
-                {
-                    Console.WriteLine($"  {item.Key}");
-                }
-
                 Console.WriteLine();
                 Console.WriteLine($"\r{message} DONE!\n");
             }
@@ -202,30 +193,43 @@ namespace Azure.AI.Details.Common.CLI.Extensions.Templates
             return parameters;
         }
 
-        private static Dictionary<string, string> ProcessTemplates(string templateName, TemplateGenerator generator, IEnumerable<string> files)
+        private static IEnumerable<string> ProcessTemplates(string templateName, TemplateGenerator generator, IEnumerable<string> files, string outputDirectory)
         {
             var root = FileHelpers.FileNameFromResourceName("templates") + "/";
 
-            var processed = new Dictionary<string, string>();
             foreach (var file in files)
             {
-                var text = FileHelpers.ReadAllText(file, new UTF8Encoding(false));
-                if (Program.Debug) Console.WriteLine($"```{file}\n{text}\n```");
-
                 if (!file.StartsWith(root)) throw new Exception("Invalid file name");
                 var outputFile = file.Substring(root.Length + templateName.Length + 1);
+                var outputFileWithPath = PathHelpers.Combine(outputDirectory, outputFile);
 
-                var parsed = generator.ParseTemplate(file, text);
-                var settings = TemplatingEngine.GetSettings(generator, parsed);
-                settings.CompilerOptions = "-nullable:enable";
-
-                (string generatedFileName, string generatedContent) = generator.ProcessTemplateAsync(parsed, file, text, outputFile, settings).Result;
-                if (Program.Debug) Console.WriteLine($"```{generatedFileName}\n{generatedContent}\n```");
-
-                processed.Add(generatedFileName, generatedContent);
+                var isBinary = file.EndsWith(".png") || file.EndsWith(".ico");
+                if (!isBinary)
+                {
+                    ProcessTemplate(generator, file, outputFileWithPath, out var generatedFileName, out var generatedContent);
+                    FileHelpers.WriteAllText(generatedFileName, generatedContent, new UTF8Encoding(false));
+                    yield return generatedFileName;
+                }
+                else
+                {
+                    var bytes = FileHelpers.ReadAllBytes(file);
+                    FileHelpers.WriteAllBytes(outputFileWithPath, bytes);
+                    yield return outputFileWithPath;
+                }
             }
+        }
 
-            return processed;
+        private static void ProcessTemplate(TemplateGenerator generator, string file, string outputFile, out string generatedFileName, out string generatedContent)
+        {
+            var text = FileHelpers.ReadAllText(file, new UTF8Encoding(false));
+            if (Program.Debug) Console.WriteLine($"```{file}\n{text}\n```");
+
+            var parsed = generator.ParseTemplate(file, text);
+            var settings = TemplatingEngine.GetSettings(generator, parsed);
+            settings.CompilerOptions = "-nullable:enable";
+
+            (generatedFileName, generatedContent) = generator.ProcessTemplateAsync(parsed, file, text, outputFile, settings).Result;
+            if (Program.Debug) Console.WriteLine($"```{generatedFileName}\n{generatedContent}\n```");
         }
     }
 }

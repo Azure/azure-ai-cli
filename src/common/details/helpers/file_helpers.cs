@@ -533,7 +533,9 @@ namespace Azure.AI.Details.Common.CLI
         {
             byte[] bytes = IsStandardInputReference(fileName)
                 ? ConsoleHelpers.ReadAllStandardInputBytes()
-                : File.ReadAllBytes(fileName);
+                : IsResource(fileName)
+                    ? ReadAllResourceBytes(fileName)
+                    : File.ReadAllBytes(fileName);
             return bytes;
         }
 
@@ -1071,6 +1073,18 @@ namespace Azure.AI.Details.Common.CLI
 
             stream.Dispose();
             return text;
+        }
+
+        private static byte[] ReadAllResourceBytes(string fileName)
+        {
+            var stream = GetResourceStream(fileName);
+            var length = stream.Length;
+
+            byte[] buffer = new byte[length];
+            stream.Read(buffer, 0, (int)length);
+
+            stream.Dispose();
+            return buffer;
         }
 
         public static bool IsStandardInputReference(string fileName)
