@@ -241,10 +241,8 @@ function varsInit() {
 function varsUpdateHeightsAndWidths() {
   let headerHeight = document.querySelector('#header').offsetHeight;
   let userInputHeight = document.querySelector('#userInputPanel').offsetHeight;
-  let sendButtonWidth = document.querySelector('#sendButton').offsetWidth;
   document.documentElement.style.setProperty('--header-height', headerHeight + 'px');
   document.documentElement.style.setProperty('--input-height', userInputHeight + 'px');
-  document.documentElement.style.setProperty('--send-button-width', sendButtonWidth + 'px');
 }
 
 function newChat() {
