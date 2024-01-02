@@ -38,7 +38,7 @@ class OpenAIStreamingChatCompletions {
 
         if (content != null) {
           callback(content);
-          await new Promise(r => setTimeout(r, 50));
+          await new Promise(r => setTimeout(r, 50)); // delay to simulate real-time output, word by word
           contentComplete += content;
         }
       }
