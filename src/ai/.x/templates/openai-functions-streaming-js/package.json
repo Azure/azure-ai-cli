@@ -1,8 +1,8 @@
 {
-    "name": "openai-chat-streaming",
+    "name": "openai-functions-streaming",
     "version": "1.0.0",
     "description": "",
-    "main": "ChatCompletionsStreaming.js",
+    "main": "Main.js",
     "scripts": {
       "test": "echo \"Error: no test specified\" && exit 1"
     },
