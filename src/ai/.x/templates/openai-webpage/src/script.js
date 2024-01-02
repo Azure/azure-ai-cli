@@ -1,10 +1,18 @@
 const marked = require("marked");
 const hljs = require("highlight.js");
 
-const chatCompletions = require('./ChatCompletionsStreaming');
+const customFunctions = require("./ChatCompletionsCustomFunctions");
+const { getCurrentDateSchema, getCurrentDate } = customFunctions;
+const { FunctionFactory } = require("./FunctionFactory");
+
+const { ChatCompletionsFunctionsStreaming } = require('./ChatCompletionsFunctionsStreaming');
 let streamingChatCompletions;
 
 function streamingChatCompletionsInit() {
+
+  let factory = new FunctionFactory();
+  factory.addFunction(getCurrentDateSchema, getCurrentDate);
+
   const endpoint = process.env.OPENAI_ENDPOINT;
   const azureApiKey = process.env.OPENAI_API_KEY;
   const deploymentName = process.env.AZURE_OPENAI_CHAT_DEPLOYMENT;
@@ -20,7 +28,7 @@ function streamingChatCompletionsInit() {
     chatPanelAppendMessage('computer', 'Please set AZURE_OPENAI_CHAT_DEPLOYMENT in .env');
   }
 
-  streamingChatCompletions = new chatCompletions.StreamingChatCompletionsHelper(systemPrompt, endpoint, azureApiKey, deploymentName);
+  streamingChatCompletions = new ChatCompletionsFunctionsStreaming(systemPrompt, endpoint, azureApiKey, deploymentName, factory);
 }
 
 function streamingChatCompletionsClear() {
