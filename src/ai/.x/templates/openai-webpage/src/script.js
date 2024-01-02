@@ -2,7 +2,6 @@ const marked = require("marked");
 const hljs = require("highlight.js");
 
 const chatCompletions = require('./ChatCompletionsStreaming');
-const streamingChatIncompleteEnding = '◼️';
 let streamingChatCompletions;
 
 function streamingChatCompletionsInit() {
@@ -29,14 +28,16 @@ function streamingChatCompletionsClear() {
 }
 
 async function streamingChatCompletionsProcessInput(userInput) {
-  let newMessage = chatPanelAppendMessage('computer', streamingChatIncompleteEnding);
+  const blackVerticalRectangle = '\u25AE'; // Black vertical rectangle ('▮') to simulate an insertion point
+
+  let newMessage = chatPanelAppendMessage('computer', blackVerticalRectangle);
   let completeResponse = "";
 
   let computerResponse = await streamingChatCompletions.getChatCompletions(userInput, function (response) {
     let atBottomBeforeUpdate = chatPanelIsScrollAtBottom();
 
     completeResponse += response;
-    let withEnding = `${completeResponse}${streamingChatIncompleteEnding}`;
+    let withEnding = `${completeResponse}${blackVerticalRectangle}`;
     let asHtml = markdownToHtml(withEnding);
 
     if (asHtml !== undefined) {
