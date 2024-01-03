@@ -125,7 +125,7 @@ namespace Azure.AI.Details.Common.CLI
                 options.Messages.Clear();
 
                 options.Messages.Add(systemMessage);
-                options.Messages.Add(new ChatMessage(ChatRole.User, text));
+                options.Messages.Add(new ChatRequestUserMessage(text));
 
                 var message = GetChatCompletion(client, options, funcContext);
                 var answer = message.Content;
@@ -159,7 +159,7 @@ namespace Azure.AI.Details.Common.CLI
             return results.ToString(Formatting.None);
         }
 
-        private ChatMessage GetChatCompletion(OpenAIClient client, ChatCompletionsOptions options, HelperFunctionCallContext funcContext)
+        private ChatResponseMessage GetChatCompletion(OpenAIClient client, ChatCompletionsOptions options, HelperFunctionCallContext funcContext)
         {
             while (true)
             {
@@ -370,15 +370,15 @@ namespace Azure.AI.Details.Common.CLI
             var setEnv = _values.GetOrDefault("chat.set.environment", true);
             var env = setEnv ? ConfigEnvironmentHelpers.GetEnvironment(_values) : null;
 
-            var messages = new List<ChatMessage>();
+            var messages = new List<ChatRequestMessage>();
 
             var systemPrompt = _values.GetOrDefault("chat.message.system.prompt", DefaultSystemPrompt);
-            messages.Add(new ChatMessage(ChatRole.System, systemPrompt));
+            messages.Add(new ChatRequestSystemMessage(systemPrompt));
 
             return await Task.Run(() => {
                 Func<string, Task<string>> handler = (string text) => {
 
-                    messages.Add(new ChatMessage(ChatRole.User, text));
+                    messages.Add(new ChatRequestUserMessage(text));
 
                     DisplayAssistantPromptLabel();
                     Console.ForegroundColor = ConsoleColor.Gray;
@@ -420,7 +420,7 @@ namespace Azure.AI.Details.Common.CLI
                     DisplayAssistantPromptTextStreamingDone();
                     CheckWriteChatAnswerOutputFile(output);
 
-                    messages.Add(new ChatMessage(ChatRole.Assistant, output));
+                    messages.Add(new ChatRequestAssistantMessage(output));
 
                     return Task.FromResult(output);
                 };
@@ -600,7 +600,7 @@ namespace Azure.AI.Details.Common.CLI
 
         private async Task<StreamingResponse<StreamingChatCompletionsUpdate>> GetChatCompletionsAsync(OpenAIClient client, ChatCompletionsOptions options, HelperFunctionCallContext funcContext, string text)
         {
-            options.Messages.Add(new ChatMessage(ChatRole.User, text));
+            options.Messages.Add(new ChatRequestUserMessage(text));
 
             DisplayAssistantPromptLabel();
             Console.ForegroundColor = ConsoleColor.Gray;
@@ -633,7 +633,7 @@ namespace Azure.AI.Details.Common.CLI
                 DisplayAssistantPromptTextStreamingDone();
                 CheckWriteChatAnswerOutputFile(contentComplete);
 
-                options.Messages.Add(new ChatMessage(ChatRole.Assistant, contentComplete));
+                options.Messages.Add(new ChatRequestAssistantMessage(contentComplete));
 
                 return response;
             }
@@ -655,7 +655,7 @@ namespace Azure.AI.Details.Common.CLI
             options.DeploymentName = deployment;
 
             var systemPrompt = _values.GetOrDefault("chat.message.system.prompt", DefaultSystemPrompt);
-            options.Messages.Add(new ChatMessage(ChatRole.System, systemPrompt));
+            options.Messages.Add(new ChatRequestSystemMessage(systemPrompt));
 
             var textFile = _values["chat.message.history.text.file"];
             if (!string.IsNullOrEmpty(textFile)) AddChatMessagesFromTextFile(options.Messages, textFile);
@@ -665,7 +665,7 @@ namespace Azure.AI.Details.Common.CLI
             var frequencyPenalty = _values["chat.options.frequency.penalty"];
             var presencePenalty = _values["chat.options.presence.penalty"];
 
-            options.MaxTokens = TryParse(maxTokens, _defaultMaxTokens);
+            options.MaxTokens = TryParse(maxTokens, null);
             options.Temperature = TryParse(temperature, _defaultTemperature);
             options.FrequencyPenalty = TryParse(frequencyPenalty, _defaultFrequencyPenalty);
             options.PresencePenalty = TryParse(presencePenalty, _defaultPresencePenalty);
@@ -707,17 +707,16 @@ namespace Azure.AI.Details.Common.CLI
 
             var queryType = QueryTypeFrom(_values["service.config.search.query.type"]) ?? AzureCognitiveSearchQueryType.VectorSimpleHybrid;
 
-            var search = new AzureCognitiveSearchChatExtensionConfiguration(
-                            AzureChatExtensionType.AzureCognitiveSearch,
-                            new Uri(searchEndpoint),
-                            indexName)
+            var search = new AzureCognitiveSearchChatExtensionConfiguration()
             {
+                SearchEndpoint = new Uri(searchEndpoint),
+                Key = searchKey,
+                IndexName = indexName,
                 QueryType = queryType,
                 DocumentCount = 16,
                 EmbeddingEndpoint = embeddingEndpoint,
+                EmbeddingKey = embeddingsKey,
             };
-            search.SetEmbeddingKey(embeddingsKey);
-            search.SetSearchKey(searchKey);
 
             options.AzureExtensionsOptions = new() { Extensions = { search } };
         }
@@ -920,7 +919,7 @@ namespace Azure.AI.Details.Common.CLI
             return currentRole ?? ChatRole.System;
         }
 
-        private void AddChatMessagesFromTextFile(IList<ChatMessage> messages, string textFile)
+        private void AddChatMessagesFromTextFile(IList<ChatRequestMessage> messages, string textFile)
         {
             var existing = FileHelpers.DemandFindFileInDataPath(textFile, _values, "chat history");
             var text = FileHelpers.ReadAllText(existing, Encoding.Default);
@@ -945,29 +944,41 @@ namespace Azure.AI.Details.Common.CLI
 
                 if (i == 0 && role == ChatRole.System && FirstMessageIsDefaultSystemPrompt(messages, role))
                 {
-                    messages.First().Content = line;
+                    messages[0] = new ChatRequestSystemMessage(line);
                     continue;
                 }
 
-                messages.Add(new ChatMessage(role, line));
+                messages.Add(role == ChatRole.System
+                    ? new ChatRequestSystemMessage(line)
+                    : role == ChatRole.User
+                        ? new ChatRequestUserMessage(line)
+                        : new ChatRequestAssistantMessage(line));
             }
         }
 
-        private static bool FirstMessageIsDefaultSystemPrompt(IList<ChatMessage> messages, ChatRole role)
+        private static bool FirstMessageIsDefaultSystemPrompt(IList<ChatRequestMessage> messages, ChatRole role)
         {
-            return messages.Count() == 1
-                && messages.First().Role == ChatRole.System
-                && messages.First().Content == DefaultSystemPrompt;
+            var message = messages.FirstOrDefault() as ChatRequestSystemMessage;
+            return message != null && message.Content == DefaultSystemPrompt;
         }
 
-        private static string ConvertMessagesToJson(IList<ChatMessage> messages)
+        private static string ConvertMessagesToJson(IList<ChatRequestMessage> messages)
         {
             var sb = new StringBuilder();
             sb.Append("[");
             foreach (var message in messages)
             {
+                var user = message as ChatRequestUserMessage;
+                var system = message as ChatRequestSystemMessage;
+                var assistant = message as ChatRequestAssistantMessage;
+                var content = system?.Content ?? user?.Content ?? assistant?.Content;
+
+                var ok = !string.IsNullOrEmpty(content);
+                if (!ok) continue;
+
                 if (sb.Length > 1) sb.Append(",");
-                sb.Append($"{{\"role\": \"{message.Role}\", \"content\": \"{message.Content}\"}}");
+
+                sb.Append($"{{\"role\": \"{message.Role}\", \"content\": \"{content}\"}}");
             }
             sb.Append("]");
             var theDict = $"{{ \"messages\": {sb.ToString()} }}";
@@ -1049,7 +1060,7 @@ namespace Azure.AI.Details.Common.CLI
         // OutputHelper _output = null;
         // DisplayHelper _display = null;
 
-        private int TryParse(string? s, int defaultValue)
+        private int? TryParse(string? s, int? defaultValue)
         {
             return !string.IsNullOrEmpty(s) && int.TryParse(s, out var parsed) ? parsed : defaultValue;
         }
@@ -1164,7 +1175,7 @@ namespace Azure.AI.Details.Common.CLI
 
         public const string DefaultSystemPrompt = "You are an AI assistant that helps people find information regarding Azure AI.";
 
-        private const int _defaultMaxTokens = 800;
+        private const int _defaultMaxTokens = 0;
         private const float _defaultTemperature = 0.7f;
         private const float _defaultFrequencyPenalty = 0.0f;
         private const float _defaultPresencePenalty = 0.0f;

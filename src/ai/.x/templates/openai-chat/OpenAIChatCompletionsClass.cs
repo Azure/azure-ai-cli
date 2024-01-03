@@ -28,23 +28,23 @@ public class <#= ClassName #>
 
         options = new ChatCompletionsOptions();
         options.DeploymentName = deploymentName;
-        options.Messages.Add(new ChatMessage(ChatRole.System, systemPrompt));
+        options.Messages.Add(new ChatRequestSystemMessage(systemPrompt));
     }
 
     public string GetChatCompletion(string userPrompt)
     {
-        options.Messages.Add(new ChatMessage(ChatRole.User, userPrompt));
+        options.Messages.Add(new ChatRequestUserMessage(userPrompt));
 
         var response = client.GetChatCompletions(options);
         var responseContent = response.Value.Choices[0].Message.Content;
-        options.Messages.Add(new ChatMessage(ChatRole.Assistant, responseContent));
+        options.Messages.Add(new ChatRequestAssistantMessage(responseContent));
 
         return responseContent;
     }
 
     public static void Main(string[] args)
     {
-        var chat = new <#= ClassName #>();
+        var chat = new OpenAIHelloWorldClass();
 
         while (true)
         {

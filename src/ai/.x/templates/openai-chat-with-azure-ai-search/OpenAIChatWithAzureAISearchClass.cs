@@ -26,37 +26,36 @@ public class <#= ClassName #>
     {
         var client = new OpenAIClient(new Uri(_openAIEndpoint), new DefaultAzureCredential());
 
-        AzureCognitiveSearchChatExtensionConfiguration contosoExtensionConfig = new()
+        var contosoExtensionConfig = new AzureCognitiveSearchChatExtensionConfiguration()
         {
             SearchEndpoint = new Uri(_searchEndpoint),
+            Key = _searchApiKey,
             IndexName = _searchIndexName,
         };
-
-        contosoExtensionConfig.SetSearchKey(_searchApiKey);
 
         ChatCompletionsOptions chatCompletionsOptions = new()
         {
             DeploymentName = _openAIDeploymentName,
             Messages =
             {
-                new ChatMessage(ChatRole.System, "You are a helpful assistant that answers questions about the Contoso product database."),
-                new ChatMessage(ChatRole.User, "What are the best-selling Contoso products this month?")
+                new ChatRequestSystemMessage("You are a helpful assistant that answers questions about the Contoso product database."),
+                new ChatRequestUserMessage("What are the best-selling Contoso products this month?")
             },
 
-            AzureExtensionsOptions = new AzureChatExtensionsOptions()
+            AzureExtensionsOptions = new()
             {
                 Extensions = { contosoExtensionConfig }
             }
         };
 
         Response<ChatCompletions> response = await client.GetChatCompletionsAsync(chatCompletionsOptions);
-        ChatMessage message = response.Value.Choices[0].Message;
+        var message = response.Value.Choices[0].Message;
 
         Console.WriteLine($"{message.Role}: {message.Content}");
 
         Console.WriteLine("Citations and other information:");
 
-        foreach (ChatMessage contextMessage in message.AzureExtensionsContext.Messages)
+        foreach (var contextMessage in message.AzureExtensionsContext.Messages)
         {
             Console.WriteLine($"{contextMessage.Role}: {contextMessage.Content}");
         }

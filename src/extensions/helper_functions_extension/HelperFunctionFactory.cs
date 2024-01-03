@@ -97,8 +97,8 @@ namespace Azure.AI.Details.Common.CLI.Extensions.HelperFunctions
                 if (function.Key != null)
                 {
                     result = CallFunction(function.Key, function.Value, context.Arguments);
-                    options.Messages.Add(new ChatMessage() { Role = ChatRole.Assistant, FunctionCall = new FunctionCall(context.FunctionName, context.Arguments) });
-                    options.Messages.Add(new ChatMessage(ChatRole.Function, result) { Name = context.FunctionName });
+                    options.Messages.Add(new ChatRequestAssistantMessage("") { FunctionCall = new FunctionCall(context.FunctionName, context.Arguments) });
+                    options.Messages.Add(new ChatRequestFunctionMessage(context.FunctionName, result));
                     return true;
                 }
             }

@@ -14,6 +14,7 @@ namespace Azure.AI.Details.Common.CLI.Extensions.HelperFunctions
         {
             foreach (var function in functionFactory.GetFunctionDefinitions())
             {
+                // options.Tools.Add(new ChatCompletionsFunctionToolDefinition(function));
                 options.Functions.Add(function);
             }
 

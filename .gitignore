@@ -4,3 +4,4 @@
 **/bin/*/net6.0/*
 **/bin/*/net7.0/*
 **/obj/*
+ideas/website/node_modules/**
