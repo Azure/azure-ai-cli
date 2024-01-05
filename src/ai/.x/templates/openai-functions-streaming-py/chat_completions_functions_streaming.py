@@ -1,10 +1,3 @@
-<#@ template hostspecific="true" #>
-<#@ output extension=".py" encoding="utf-8" #>
-<#@ parameter type="System.String" name="OPENAI_ENDPOINT" #>
-<#@ parameter type="System.String" name="OPENAI_API_KEY" #>
-<#@ parameter type="System.String" name="OPENAI_API_VERSION" #>
-<#@ parameter type="System.String" name="AZURE_OPENAI_CHAT_DEPLOYMENT" #>
-<#@ parameter type="System.String" name="AZURE_OPENAI_SYSTEM_PROMPT" #>
 import openai
 from function_factory import FunctionFactory
 from function_call_context import FunctionCallContext
