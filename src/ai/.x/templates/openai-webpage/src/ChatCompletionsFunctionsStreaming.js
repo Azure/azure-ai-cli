@@ -9,7 +9,7 @@ class ChatCompletionsFunctionsStreaming {
     this.azureApiKey = azureApiKey;
     this.deploymentName = deploymentName;
     this.client = new OpenAIClient(this.endpoint, new AzureKeyCredential(this.azureApiKey));
-    this.functionFactory = functionFactory || new FunctionFactory();
+    this.functionFactory = functionFactory;
     this.clearConversation();
   }
 

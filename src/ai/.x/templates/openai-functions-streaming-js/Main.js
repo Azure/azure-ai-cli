@@ -4,10 +4,7 @@
 <#@ parameter type="System.String" name="OPENAI_API_KEY" #>
 <#@ parameter type="System.String" name="AZURE_OPENAI_CHAT_DEPLOYMENT" #>
 <#@ parameter type="System.String" name="AZURE_OPENAI_SYSTEM_PROMPT" #>
-const customFunctions = require("./ChatCompletionsCustomFunctions");
-const { getCurrentWeatherSchema, getCurrentWeather } = customFunctions;
-const { getCurrentDateSchema, getCurrentDate } = customFunctions;
-const { FunctionFactory } = require("./FunctionFactory");
+const { factory } = require("./ChatCompletionsCustomFunctions");
 const { ChatCompletionsFunctionsStreaming } = require("./ChatCompletionsFunctionsStreaming");
 
 const readline = require('readline');
@@ -17,10 +14,6 @@ const rl = readline.createInterface({
 });
 
 async function main() {
-
-  let factory = new FunctionFactory();
-  factory.addFunction(getCurrentWeatherSchema, getCurrentWeather);
-  factory.addFunction(getCurrentDateSchema, getCurrentDate);
 
   const endpoint = process.env["OPENAI_ENDPOINT"] || "<#= OPENAI_ENDPOINT #>";
   const azureApiKey = process.env["OPENAI_API_KEY"]  || "<#= OPENAI_API_KEY #>";

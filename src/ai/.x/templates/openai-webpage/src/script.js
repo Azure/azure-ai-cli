@@ -1,17 +1,12 @@
 const marked = require("marked");
 const hljs = require("highlight.js");
 
-const customFunctions = require("./ChatCompletionsCustomFunctions");
-const { getCurrentDateSchema, getCurrentDate } = customFunctions;
-const { FunctionFactory } = require("./FunctionFactory");
+const { factory } = require("./ChatCompletionsCustomFunctions");
 
 const { ChatCompletionsFunctionsStreaming } = require('./ChatCompletionsFunctionsStreaming');
 let streamingChatCompletions;
 
 function streamingChatCompletionsInit() {
-
-  let factory = new FunctionFactory();
-  factory.addFunction(getCurrentDateSchema, getCurrentDate);
 
   const endpoint = process.env.OPENAI_ENDPOINT;
   const azureApiKey = process.env.OPENAI_API_KEY;

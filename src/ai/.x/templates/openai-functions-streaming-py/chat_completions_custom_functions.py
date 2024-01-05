@@ -1,3 +1,6 @@
+from function_factory import FunctionFactory
+factory = FunctionFactory()
+
 def ignore_args_decorator(func):
     def wrapper(*args, **kwargs):
         return func()
@@ -17,6 +20,8 @@ get_current_date_schema = {
         'properties': {},
     },
 }
+
+factory.add_function(get_current_date_schema, get_current_date)
 
 def get_current_weather(function_arguments):
     location = function_arguments.get('location')
@@ -41,3 +46,4 @@ get_current_weather_schema = {
     },
 }
 
+factory.add_function(get_current_weather_schema, get_current_weather)
