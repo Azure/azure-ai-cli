@@ -15,7 +15,6 @@ def main():
     factory.add_function(get_current_weather_schema, get_current_weather)
     factory.add_function(get_current_date_schema, get_current_date)
 
-
     endpoint = os.getenv('OPENAI_ENDPOINT', '<#= OPENAI_ENDPOINT #>')
     azure_api_key = os.getenv('OPENAI_API_KEY', '<#= OPENAI_API_KEY #>')
     deployment_name = os.getenv('AZURE_OPENAI_CHAT_DEPLOYMENT', '<#= AZURE_OPENAI_CHAT_DEPLOYMENT #>')
