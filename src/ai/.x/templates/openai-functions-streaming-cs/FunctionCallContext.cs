@@ -42,7 +42,8 @@ public class FunctionCallContext
         var ok = _functionFactory.TryCallFunction(_functionName, _functionArguments, out var result);
         if (!ok) return null;
 
-        // Console.WriteLine($"assistant-function: {_functionName}({_functionArguments}) => {result}");
+        Console.WriteLine($"\rassistant-function: {_functionName}({_functionArguments}) => {result}");
+        Console.Write("\nAssistant: ");
 
         _messages.Add(new ChatRequestAssistantMessage("") { FunctionCall = new FunctionCall(_functionName, _functionArguments) });
         _messages.Add(new ChatRequestFunctionMessage(_functionName, result));

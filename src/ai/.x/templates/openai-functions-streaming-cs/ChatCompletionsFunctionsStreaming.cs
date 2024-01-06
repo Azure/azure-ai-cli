@@ -29,6 +29,7 @@ public class <#= ClassName #>
             // _options.Tools.Add(new ChatCompletionsFunctionToolDefinition(function));
         }
 
+        _functionCallContext = new(_functionFactory, _options.Messages);
         ClearConversation();
     }
 
@@ -36,11 +37,9 @@ public class <#= ClassName #>
     {
         _options.Messages.Clear();
         _options.Messages.Add(new ChatRequestSystemMessage(_systemPrompt));
-
-        _functionCallContext = new(_functionFactory, _options.Messages);
     }
 
-    public async Task<string> GetChatCompletionsStreamingAsync(string userPrompt, Action<StreamingChatCompletionsUpdate> callback = null)
+    public async Task<string> GetChatCompletionsStreamingAsync(string userPrompt, Action<StreamingChatCompletionsUpdate>? callback = null)
     {
         _options.Messages.Add(new ChatRequestUserMessage(userPrompt));
 
@@ -64,7 +63,7 @@ public class <#= ClassName #>
 
                 if (string.IsNullOrEmpty(content)) continue;
 
-                callback(update);
+                if (callback != null) callback(update);
                 responseContent += content;
             }
 
