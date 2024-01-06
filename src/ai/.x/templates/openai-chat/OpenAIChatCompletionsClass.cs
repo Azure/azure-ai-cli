@@ -12,39 +12,45 @@ using System;
 
 public class <#= ClassName #>
 {
-    private OpenAIClient client;
-    private ChatCompletionsOptions options;
-
-    public <#= ClassName #>()
+    public <#= ClassName #>(string systemPrompt, string endpoint, string azureApiKey, string deploymentName)
     {
-        var key = Environment.GetEnvironmentVariable("OPENAI_API_KEY") ?? "<#= OPENAI_API_KEY #>";
-        var endpoint = Environment.GetEnvironmentVariable("OPENAI_ENDPOINT") ?? "<#= OPENAI_ENDPOINT #>";
-        var deploymentName = Environment.GetEnvironmentVariable("AZURE_OPENAI_CHAT_DEPLOYMENT") ?? "<#= AZURE_OPENAI_CHAT_DEPLOYMENT #>";
-        var systemPrompt = Environment.GetEnvironmentVariable("AZURE_OPENAI_SYSTEM_PROMPT") ?? "<#= AZURE_OPENAI_SYSTEM_PROMPT #>";
+        _systemPrompt = systemPrompt;
 
-        client = string.IsNullOrEmpty(key)
+        _client = string.IsNullOrEmpty(azureApiKey)
             ? new OpenAIClient(new Uri(endpoint), new DefaultAzureCredential())
-            : new OpenAIClient(new Uri(endpoint), new AzureKeyCredential(key));
+            : new OpenAIClient(new Uri(endpoint), new AzureKeyCredential(azureApiKey));
 
-        options = new ChatCompletionsOptions();
-        options.DeploymentName = deploymentName;
-        options.Messages.Add(new ChatRequestSystemMessage(systemPrompt));
+        _options = new ChatCompletionsOptions();
+        _options.DeploymentName = deploymentName;
+		
+        ClearConversation();
+    }
+
+    public void ClearConversation()
+    {
+        _options.Messages.Clear();
+        _options.Messages.Add(new ChatRequestSystemMessage(_systemPrompt));
     }
 
     public string GetChatCompletion(string userPrompt)
     {
-        options.Messages.Add(new ChatRequestUserMessage(userPrompt));
+        _options.Messages.Add(new ChatRequestUserMessage(userPrompt));
 
-        var response = client.GetChatCompletions(options);
+        var response = _client.GetChatCompletions(_options);
         var responseContent = response.Value.Choices[0].Message.Content;
-        options.Messages.Add(new ChatRequestAssistantMessage(responseContent));
 
+        _options.Messages.Add(new ChatRequestAssistantMessage(responseContent));
         return responseContent;
     }
 
     public static void Main(string[] args)
     {
-        var chat = new OpenAIHelloWorldClass();
+        var endpoint = Environment.GetEnvironmentVariable("OPENAI_ENDPOINT") ?? "<#= OPENAI_ENDPOINT #>";
+        var azureApiKey = Environment.GetEnvironmentVariable("OPENAI_API_KEY") ?? "<#= OPENAI_API_KEY #>";
+        var deploymentName = Environment.GetEnvironmentVariable("AZURE_OPENAI_CHAT_DEPLOYMENT") ?? "<#= AZURE_OPENAI_CHAT_DEPLOYMENT #>";
+        var systemPrompt = Environment.GetEnvironmentVariable("AZURE_OPENAI_SYSTEM_PROMPT") ?? "<#= AZURE_OPENAI_SYSTEM_PROMPT #>";
+		
+		var chat = new <#= ClassName #>(systemPrompt, endpoint, azureApiKey, deploymentName);
 
         while (true)
         {
@@ -56,4 +62,8 @@ public class <#= ClassName #>
             Console.WriteLine($"\nAssistant: {response}\n");
         }
     }
+
+    private string _systemPrompt;
+    private ChatCompletionsOptions _options;
+    private OpenAIClient _client;
 }

@@ -11,9 +11,6 @@ public class <#= ClassName #>
     public <#= ClassName #>(string systemPrompt, string endpoint, string azureApiKey, string deploymentName, FunctionFactory factory)
     {
         _systemPrompt = systemPrompt;
-        _endpoint = endpoint;
-        _azureApiKey = azureApiKey;
-        _deploymentName = deploymentName;
         _functionFactory = factory;
 
         _client = string.IsNullOrEmpty(azureApiKey)
@@ -80,10 +77,6 @@ public class <#= ClassName #>
     }
 
     private string _systemPrompt;
-    private string _endpoint;
-    private string _azureApiKey;
-    private string _deploymentName;
-
     private FunctionFactory _functionFactory;
     private FunctionCallContext _functionCallContext;
     private ChatCompletionsOptions _options;
