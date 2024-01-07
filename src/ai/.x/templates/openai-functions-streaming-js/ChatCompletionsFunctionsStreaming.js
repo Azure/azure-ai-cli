@@ -1,5 +1,4 @@
 const { OpenAIClient, AzureKeyCredential } = require("@azure/openai");
-const { FunctionFactory } = require("./FunctionFactory");
 const { FunctionCallContext } = require("./FunctionCallContext");
 
 class ChatCompletionsFunctionsStreaming {
@@ -9,7 +8,7 @@ class ChatCompletionsFunctionsStreaming {
     this.azureApiKey = azureApiKey;
     this.deploymentName = deploymentName;
     this.client = new OpenAIClient(this.endpoint, new AzureKeyCredential(this.azureApiKey));
-    this.functionFactory = functionFactory || new FunctionFactory();
+    this.functionFactory = functionFactory;
     this.clearConversation();
   }
 
@@ -23,7 +22,7 @@ class ChatCompletionsFunctionsStreaming {
   async getChatCompletions(userInput, callback) {
     this.messages.push({ role: 'user', content: userInput });
 
-    let contentComplete = "";
+    let contentComplete = '';
     while (true) {
       const events = this.client.listChatCompletions(this.deploymentName, this.messages, {
         functions: this.functionFactory.getFunctionSchemas(),
