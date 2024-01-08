@@ -11,8 +11,8 @@ from openai import AzureOpenAI
 api_key = os.getenv("AZURE_OPENAI_KEY") or "<#= AZURE_OPENAI_KEY #>"
 endpoint = os.getenv("AZURE_OPENAI_ENDPOINT") or "<#= AZURE_OPENAI_ENDPOINT #>"
 api_version = os.getenv("AZURE_OPENAI_API_VERSION") or "<#= AZURE_OPENAI_API_VERSION #>"
-deploymentName = os.getenv("AZURE_OPENAI_CHAT_DEPLOYMENT") or "<#= AZURE_OPENAI_CHAT_DEPLOYMENT #>"
-systemPrompt = os.getenv("AZURE_OPENAI_SYSTEM_PROMPT") or "<#= AZURE_OPENAI_SYSTEM_PROMPT #>"
+deployment_name = os.getenv("AZURE_OPENAI_CHAT_DEPLOYMENT") or "<#= AZURE_OPENAI_CHAT_DEPLOYMENT #>"
+system_prompt = os.getenv("AZURE_OPENAI_SYSTEM_PROMPT") or "<#= AZURE_OPENAI_SYSTEM_PROMPT #>"
 
 client = AzureOpenAI(
   api_key=api_key,
@@ -21,14 +21,14 @@ client = AzureOpenAI(
 )
 
 messages=[
-    {"role": "system", "content": systemPrompt},
+    {"role": "system", "content": system_prompt},
 ]
 
-def getChatCompletions(user_input) -> str:
+def get_chat_completions(user_input) -> str:
     messages.append({"role": "user", "content": user_input})
 
     response = client.chat.completions.create(
-        model=deploymentName,
+        model=deployment_name,
         messages=messages,
     )
 
@@ -42,5 +42,5 @@ while True:
     if user_input == "" or user_input == "exit":
         break
 
-    response_content = getChatCompletions(user_input)
+    response_content = get_chat_completions(user_input)
     print(f"\nAssistant: {response_content}\n")
