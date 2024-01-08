@@ -1,5 +1,4 @@
 from openai import AzureOpenAI
-from function_factory import FunctionFactory
 from function_call_context import FunctionCallContext
 
 class ChatCompletionsFunctionsStreaming:
@@ -9,7 +8,7 @@ class ChatCompletionsFunctionsStreaming:
         self.azure_api_key = azure_api_key
         self.azure_api_version = azure_api_version
         self.deployment_name = deployment_name
-        self.function_factory = function_factory or FunctionFactory()
+        self.function_factory = function_factory
         self.client = AzureOpenAI(
             api_key=self.azure_api_key,
             api_version=self.azure_api_version,
