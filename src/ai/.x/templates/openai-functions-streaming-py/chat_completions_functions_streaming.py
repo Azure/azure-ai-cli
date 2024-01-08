@@ -1,14 +1,20 @@
-import openai
+from openai import AzureOpenAI
 from function_factory import FunctionFactory
 from function_call_context import FunctionCallContext
 
 class ChatCompletionsFunctionsStreaming:
-    def __init__(self, system_prompt, endpoint, azure_api_key, deployment_name, function_factory=None):
+    def __init__(self, system_prompt, endpoint, azure_api_key, azure_api_version, deployment_name, function_factory=None):
         self.system_prompt = system_prompt
         self.endpoint = endpoint
         self.azure_api_key = azure_api_key
+        self.azure_api_version = azure_api_version
         self.deployment_name = deployment_name
         self.function_factory = function_factory or FunctionFactory()
+        self.client = AzureOpenAI(
+            api_key=self.azure_api_key,
+            api_version=self.azure_api_version,
+            azure_endpoint = endpoint
+            )
         self.clear_conversation()
 
     def clear_conversation(self):
@@ -20,31 +26,31 @@ class ChatCompletionsFunctionsStreaming:
     def get_chat_completions(self, user_input, callback):
         self.messages.append({'role': 'user', 'content': user_input})
 
-        response_content = ""
+        complete_content = ""
         functions = self.function_factory.get_function_schemas()
 
         while True:
-            response = openai.ChatCompletion.create(
-                engine=self.deployment_name,
+            response = self.client.chat.completions.create(
+                model=self.deployment_name,
                 messages=self.messages,
                 stream=True,
                 functions=functions,
                 function_call="auto")
 
-            for update in response:
+            for chunk in response:
 
-                choices = update["choices"] if "choices" in update else []
-                choice0 = choices[0] if len(choices) > 0 else {}
+                choice0 = chunk.choices[0] if hasattr(chunk, 'choices') and chunk.choices else None
                 self.function_call_context.check_for_update(choice0)
 
-                delta = choice0["delta"] if "delta" in choice0 else {}
-                content = delta["content"] if "content" in delta else ""
+                delta = choice0.delta if choice0 and hasattr(choice0, 'delta') else None
+                content = delta.content if delta and hasattr(delta, 'content') else ""
+                if content is None: continue
 
                 if content is not None:
                     callback(content)
-                    response_content += content
+                    complete_content += content
 
-                finish_reason = choice0["finish_reason"] if "finish_reason" in choice0 else ""
+                finish_reason = choice0.finish_reason if choice0 and hasattr(choice0, 'finish_reason') else None
                 if finish_reason == "length":
                     content += f"{content}\nERROR: Exceeded max token length!"
 
@@ -52,5 +58,5 @@ class ChatCompletionsFunctionsStreaming:
                 self.function_call_context.clear()
                 continue
 
-            self.messages.append({"role": "assistant", "content": response_content})
-            return response_content
+            self.messages.append({"role": "assistant", "content": complete_content})
+            return complete_content

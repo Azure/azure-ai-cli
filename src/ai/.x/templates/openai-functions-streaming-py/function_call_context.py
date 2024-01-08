@@ -11,13 +11,13 @@ class FunctionCallContext:
     def check_for_update(self, choice):
         updated = False
 
-        delta = choice["delta"] if "delta" in choice else {}
-        name = delta.get('function_call').get('name') if delta and delta.get('function_call') else None
+        delta = choice.delta if choice and hasattr(choice, 'delta') else {}
+        name = delta.function_call.name if delta and hasattr(delta, 'function_call') and delta.function_call and hasattr(delta.function_call, 'name') else None
         if name is not None:
             self.function_name = name
             updated = True
 
-        args = delta.get('function_call').get('arguments') if delta and delta.get('function_call') else None
+        args = delta.function_call.arguments if delta and hasattr(delta, 'function_call') and delta.function_call and hasattr(delta.function_call, 'arguments') else None
         if args is not None:
             self.function_arguments = f'{self.function_arguments}{args}'
             updated = True
