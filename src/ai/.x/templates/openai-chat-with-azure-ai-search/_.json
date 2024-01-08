@@ -3,9 +3,9 @@
     "_Language": "C#",
     "AICLIExtensionReferencePath": "",
     "ClassName": "OpenAIChatWithAzureAISearchClass",
-    "OpenAIEndpoint": "https://myaccount.openai.azure.com/",
-    "SearchEndpoint": "https://your-contoso-search-resource.search.windows.net",
-    "SearchApiKey": "your-search-api-key",
-    "SearchIndexName": "contoso-products-index",
-    "OpenAIDeploymentName": "gpt-35-turbo-0613"
+    "OPENAI_ENDPOINT": "<insert your OpenAI endpoint here>",
+    "AZURE_AI_SEARCH_ENDPOINT": "<insert your search endpoint here>",
+    "AZURE_AI_SEARCH_KEY": "your-search-api-key",
+    "AZURE_AI_SEARCH_INDEX_NAME": "your-search-index-name",
+    "AZURE_OPENAI_CHAT_DEPLOYMENT": "gpt-35-turbo-0613"
 }
