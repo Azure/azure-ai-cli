@@ -3,7 +3,7 @@ from function_factory import FunctionFactory
 from function_call_context import FunctionCallContext
 
 class ChatCompletionsFunctionsStreaming:
-    def __init__(self, system_prompt, endpoint, azure_api_key, azure_api_version, deployment_name, function_factory=None):
+    def __init__(self, system_prompt, endpoint, azure_api_key, azure_api_version, deployment_name, function_factory):
         self.system_prompt = system_prompt
         self.endpoint = endpoint
         self.azure_api_key = azure_api_key
