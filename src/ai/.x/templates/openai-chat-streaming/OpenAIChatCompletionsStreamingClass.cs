@@ -1,8 +1,8 @@
 <#@ template hostspecific="true" #>
 <#@ output extension=".cs" encoding="utf-8" #>
 <#@ parameter type="System.String" name="ClassName" #>
-<#@ parameter type="System.String" name="OPENAI_ENDPOINT" #>
-<#@ parameter type="System.String" name="OPENAI_API_KEY" #>
+<#@ parameter type="System.String" name="AZURE_OPENAI_ENDPOINT" #>
+<#@ parameter type="System.String" name="AZURE_OPENAI_KEY" #>
 <#@ parameter type="System.String" name="AZURE_OPENAI_CHAT_DEPLOYMENT" #>
 <#@ parameter type="System.String" name="AZURE_OPENAI_SYSTEM_PROMPT" #>
 using Azure;
@@ -62,8 +62,8 @@ public class <#= ClassName #>
 
     public static async Task Main(string[] args)
     {
-        var endpoint = Environment.GetEnvironmentVariable("OPENAI_ENDPOINT") ?? "<#= OPENAI_ENDPOINT #>";
-        var azureApiKey = Environment.GetEnvironmentVariable("OPENAI_API_KEY") ?? "<#= OPENAI_API_KEY #>";
+        var endpoint = Environment.GetEnvironmentVariable("AZURE_OPENAI_ENDPOINT") ?? "<#= AZURE_OPENAI_ENDPOINT #>";
+        var azureApiKey = Environment.GetEnvironmentVariable("AZURE_OPENAI_KEY") ?? "<#= AZURE_OPENAI_KEY #>";
         var deploymentName = Environment.GetEnvironmentVariable("AZURE_OPENAI_CHAT_DEPLOYMENT") ?? "<#= AZURE_OPENAI_CHAT_DEPLOYMENT #>";
         var systemPrompt = Environment.GetEnvironmentVariable("AZURE_OPENAI_SYSTEM_PROMPT") ?? "<#= AZURE_OPENAI_SYSTEM_PROMPT #>";
 		

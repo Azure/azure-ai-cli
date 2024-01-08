@@ -1,7 +1,7 @@
 <#@ template hostspecific="true" #>
 <#@ output extension=".js" encoding="utf-8" #>
-<#@ parameter type="System.String" name="OPENAI_ENDPOINT" #>
-<#@ parameter type="System.String" name="OPENAI_API_KEY" #>
+<#@ parameter type="System.String" name="AZURE_OPENAI_ENDPOINT" #>
+<#@ parameter type="System.String" name="AZURE_OPENAI_KEY" #>
 <#@ parameter type="System.String" name="AZURE_OPENAI_CHAT_DEPLOYMENT" #>
 <#@ parameter type="System.String" name="AZURE_OPENAI_SYSTEM_PROMPT" #>
 const { ChatCompletionsStreaming } = require("./ChatCompletionsStreaming");
@@ -14,8 +14,8 @@ const rl = readline.createInterface({
 
 async function main() {
 
-  const endpoint = process.env["OPENAI_ENDPOINT"] || "<#= OPENAI_ENDPOINT #>";
-  const azureApiKey = process.env["OPENAI_API_KEY"]  || "<#= OPENAI_API_KEY #>";
+  const endpoint = process.env["AZURE_OPENAI_ENDPOINT"] || "<#= AZURE_OPENAI_ENDPOINT #>";
+  const azureApiKey = process.env["AZURE_OPENAI_KEY"]  || "<#= AZURE_OPENAI_KEY #>";
   const deploymentName = process.env["AZURE_OPENAI_CHAT_DEPLOYMENT"] || "<#= AZURE_OPENAI_CHAT_DEPLOYMENT #>" ;
   const systemPrompt = process.env["AZURE_OPENAI_SYSTEM_PROMPT"] || "<#= AZURE_OPENAI_SYSTEM_PROMPT #>" ;
 

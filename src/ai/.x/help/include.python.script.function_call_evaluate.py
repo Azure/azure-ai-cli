@@ -236,7 +236,7 @@ def run_evaluate_part(subscription_id, resource_group_name, project_name, run_re
             "api_version": os.getenv("OPENAI_API_VERSION"),
             "api_base": os.getenv("OPENAI_API_BASE"),
             "api_type": os.getenv("OPENAI_API_TYPE"),
-            "api_key": os.getenv("OPENAI_API_KEY"),
+            "api_key": os.getenv("AZURE_OPENAI_KEY"),
             "deployment_id": os.getenv("AZURE_OPENAI_EVALUATION_DEPLOYMENT")
         },
         tracking_uri=client.tracking_uri,

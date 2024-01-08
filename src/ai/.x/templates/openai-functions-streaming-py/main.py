@@ -1,7 +1,7 @@
 <#@ template hostspecific="true" #>
 <#@ output extension=".py" encoding="utf-8" #>
-<#@ parameter type="System.String" name="OPENAI_ENDPOINT" #>
-<#@ parameter type="System.String" name="OPENAI_API_KEY" #>
+<#@ parameter type="System.String" name="AZURE_OPENAI_ENDPOINT" #>
+<#@ parameter type="System.String" name="AZURE_OPENAI_KEY" #>
 <#@ parameter type="System.String" name="OPENAI_API_VERSION" #>
 <#@ parameter type="System.String" name="AZURE_OPENAI_CHAT_DEPLOYMENT" #>
 <#@ parameter type="System.String" name="AZURE_OPENAI_SYSTEM_PROMPT" #>
@@ -10,8 +10,8 @@ from chat_completions_functions_streaming import ChatCompletionsFunctionsStreami
 import os
 
 def main():
-    endpoint = os.getenv('OPENAI_ENDPOINT', '<#= OPENAI_ENDPOINT #>')
-    azure_api_key = os.getenv('OPENAI_API_KEY', '<#= OPENAI_API_KEY #>')
+    endpoint = os.getenv('AZURE_OPENAI_ENDPOINT', '<#= AZURE_OPENAI_ENDPOINT #>')
+    azure_api_key = os.getenv('AZURE_OPENAI_KEY', '<#= AZURE_OPENAI_KEY #>')
     deployment_name = os.getenv('AZURE_OPENAI_CHAT_DEPLOYMENT', '<#= AZURE_OPENAI_CHAT_DEPLOYMENT #>')
     system_prompt = os.getenv('AZURE_OPENAI_SYSTEM_PROMPT', '<#= AZURE_OPENAI_SYSTEM_PROMPT #>')
 

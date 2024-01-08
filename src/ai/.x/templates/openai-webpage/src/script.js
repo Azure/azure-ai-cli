@@ -8,16 +8,16 @@ let streamingChatCompletions;
 
 function streamingChatCompletionsInit() {
 
-  const endpoint = process.env.OPENAI_ENDPOINT;
-  const azureApiKey = process.env.OPENAI_API_KEY;
+  const endpoint = process.env.AZURE_OPENAI_ENDPOINT;
+  const azureApiKey = process.env.AZURE_OPENAI_KEY;
   const deploymentName = process.env.AZURE_OPENAI_CHAT_DEPLOYMENT;
   const systemPrompt = "You are a helpful AI assistant.";
 
   if (!endpoint || endpoint.startsWith('<insert')) {
-    chatPanelAppendMessage('computer', 'Please set OPENAI_ENDPOINT in .env');
+    chatPanelAppendMessage('computer', 'Please set AZURE_OPENAI_ENDPOINT in .env');
   }
   if (!azureApiKey || azureApiKey.startsWith('<insert')) {
-    chatPanelAppendMessage('computer', 'Please set OPENAI_API_KEY in .env');
+    chatPanelAppendMessage('computer', 'Please set AZURE_OPENAI_KEY in .env');
   }
   if (!deploymentName || deploymentName.startsWith('<insert')) {
     chatPanelAppendMessage('computer', 'Please set AZURE_OPENAI_CHAT_DEPLOYMENT in .env');
