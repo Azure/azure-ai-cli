@@ -1,8 +1,8 @@
 {
-    "_Name": "OpenAI Chat w/ Azure AI Search Class Library",
+    "_Name": "OpenAI Chat w/ your own data",
     "_Language": "C#",
     "AICLIExtensionReferencePath": "",
-    "ClassName": "OpenAIChatWithAzureAISearchClass",
+    "ClassName": "OpenAIChatWithData",
     "OPENAI_ENDPOINT": "<insert your OpenAI endpoint here>",
     "AZURE_AI_SEARCH_ENDPOINT": "<insert your search endpoint here>",
     "AZURE_AI_SEARCH_KEY": "your-search-api-key",

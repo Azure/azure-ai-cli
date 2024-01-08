@@ -44,7 +44,7 @@ public class <#= ClassName #>
 
     public static void Main(string[] args)
     {
-        var chat = new OpenAIHelloWorldClass();
+        var chat = new <#= ClassName #>();
 
         while (true)
         {

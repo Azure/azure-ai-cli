@@ -22,7 +22,7 @@ public class <#= ClassName #>
 
     public <#= ClassName #>()
     {
-        var openAIEndpoint = Environment.GetEnvironmentVariable("OPENAI_ENDPOINT") ?? "<#= OPENAI_API_KEY #>";
+        var openAIEndpoint = Environment.GetEnvironmentVariable("OPENAI_ENDPOINT") ?? "<#= OPENAI_ENDPOINT #>";
         var openAIDeploymentName = Environment.GetEnvironmentVariable("AZURE_OPENAI_CHAT_DEPLOYMENT") ?? "<#= AZURE_OPENAI_CHAT_DEPLOYMENT #>";
         var searchEndpoint = Environment.GetEnvironmentVariable("AZURE_AI_SEARCH_ENDPOINT") ?? "<#= AZURE_AI_SEARCH_ENDPOINT #>";
         var searchApiKey = Environment.GetEnvironmentVariable("AZURE_AI_SEARCH_KEY") ?? "<#= AZURE_AI_SEARCH_KEY #>";
@@ -53,28 +53,24 @@ public class <#= ClassName #>
         };
     }
 
-    public async Task ChatUsingYourOwnData(string userPrompt)
+    public async Task<ChatResponseMessage> ChatUsingYourOwnData(string userPrompt, Action<ChatResponseMessage> callback = null)
     {
         options.Messages.Add(new ChatRequestUserMessage(userPrompt));
 
-        Response<ChatCompletions> response = await client.GetChatCompletionsAsync(options);
+        var response = await client.GetChatCompletionsAsync(options);
         var responseContent = response.Value.Choices[0].Message;
 
-        Console.WriteLine($"{responseContent.Role}: {responseContent.Content}");
-
-        Console.WriteLine("Citations and other information:");
-
-        foreach (var contextMessage in responseContent.AzureExtensionsContext.Messages)
+        if(callback != null)
         {
-            Console.WriteLine($"{contextMessage.Role}: {contextMessage.Content}");
+            callback(responseContent);
         }
         options.Messages.Add(new ChatRequestAssistantMessage(responseContent));
-
+        return responseContent;
     }
 
-    public static void Main(string[] args)
+    public static async Task Main(string[] args)
     {
-        var chat = new OpenAIChatWithAzureAISearchClass();
+        var chat = new <#= ClassName #>();
 
         while (true)
         {
@@ -82,8 +78,18 @@ public class <#= ClassName #>
             var userPrompt = Console.ReadLine();
             if (string.IsNullOrEmpty(userPrompt) || userPrompt == "exit") break;
 
-            var response = chat.ChatUsingYourOwnData(userPrompt);
-            Console.WriteLine($"\nAssistant: {response}\n");
+            var response = await chat.ChatUsingYourOwnData(userPrompt, responseContent =>
+                {
+                    Console.WriteLine($"Assistant: {responseContent.Content}");
+                    // Console.WriteLine("Citations and other information:");
+
+                    // foreach (var contextMessage in responseContent.AzureExtensionsContext.Messages)
+                    // {
+                    //     Console.WriteLine($"Assistant: {contextMessage.Content}");
+                    // }
+                }
+            );
+            Console.WriteLine("\n");
         }
     }
 }
