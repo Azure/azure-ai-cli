@@ -3,10 +3,8 @@ const { OpenAIClient, AzureKeyCredential } = require("@azure/openai");
 class ChatCompletionsStreaming {
   constructor(systemPrompt, endpoint, azureApiKey, deploymentName) {
     this.systemPrompt = systemPrompt;
-    this.endpoint = endpoint;
-    this.azureApiKey = azureApiKey;
     this.deploymentName = deploymentName;
-    this.client = new OpenAIClient(this.endpoint, new AzureKeyCredential(this.azureApiKey));
+    this.client = new OpenAIClient(endpoint, new AzureKeyCredential(azureApiKey));
     this.clearConversation();
   }
 

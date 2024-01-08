@@ -20,14 +20,14 @@ async function main() {
   const deploymentName = process.env["AZURE_OPENAI_CHAT_DEPLOYMENT"] || "<#= AZURE_OPENAI_CHAT_DEPLOYMENT #>" ;
   const systemPrompt = process.env["AZURE_OPENAI_SYSTEM_PROMPT"] || "<#= AZURE_OPENAI_SYSTEM_PROMPT #>" ;
 
-  const streamingChatCompletions = new ChatCompletionsFunctionsStreaming(systemPrompt, endpoint, azureApiKey, deploymentName, factory);
+  const chat = new ChatCompletionsFunctionsStreaming(systemPrompt, endpoint, azureApiKey, deploymentName, factory);
 
   while (true) {
 
     const input = await new Promise(resolve => rl.question('User: ', resolve));
     if (input === 'exit' || input === '') break;
 
-    let response = await streamingChatCompletions.getChatCompletions(input, (content) => {
+    let response = await chat.getChatCompletions(input, (content) => {
       console.log(`assistant-streaming: ${content}`);
     });
 
