@@ -26,8 +26,7 @@ class ChatCompletionsStreaming:
         response = self.client.chat.completions.create(
             model=self.deployment_name,
             messages=self.messages,
-            stream=True,
-            function_call="auto")
+            stream=True)
 
         for chunk in response:
 
