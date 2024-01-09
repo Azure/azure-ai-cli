@@ -1,6 +1,6 @@
 using System;
 
-public class ChatCompletionsCustomFunctions
+public class OpenAIChatCompletionsCustomFunctions
 {
     [HelperFunctionDescription("Gets the current weather for a location.")]
     public static string GetCurrentWeather(string location)
