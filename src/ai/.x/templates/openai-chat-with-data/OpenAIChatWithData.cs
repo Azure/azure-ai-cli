@@ -31,7 +31,7 @@ public class <#= ClassName #>
             ? new OpenAIClient(new Uri(openAIEndpoint), new DefaultAzureCredential())
             : new OpenAIClient(new Uri(openAIEndpoint), new AzureKeyCredential(openAIKey));
 
-        var contosoExtensionConfig = new AzureCognitiveSearchChatExtensionConfiguration()
+        var extensionConfig = new AzureCognitiveSearchChatExtensionConfiguration()
         {
             SearchEndpoint = new Uri(searchEndpoint),
             Key = searchApiKey,
@@ -49,7 +49,7 @@ public class <#= ClassName #>
 
             AzureExtensionsOptions = new()
             {
-                Extensions = { contosoExtensionConfig }
+                Extensions = { extensionConfig }
             }
         };
     }
