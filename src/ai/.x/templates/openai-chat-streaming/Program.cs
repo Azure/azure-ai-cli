@@ -15,11 +15,8 @@ public class Program
         var azureApiKey = Environment.GetEnvironmentVariable("AZURE_OPENAI_KEY") ?? "<#= AZURE_OPENAI_KEY #>";
         var deploymentName = Environment.GetEnvironmentVariable("AZURE_OPENAI_CHAT_DEPLOYMENT") ?? "<#= AZURE_OPENAI_CHAT_DEPLOYMENT #>";
         var systemPrompt = Environment.GetEnvironmentVariable("AZURE_OPENAI_SYSTEM_PROMPT") ?? "<#= AZURE_OPENAI_SYSTEM_PROMPT #>";
-
-        var factory = new FunctionFactory();
-        factory.AddFunctions(typeof(ChatCompletionsCustomFunctions));
-        
-        var chat = new <#= ClassName #>(systemPrompt, endpoint, azureApiKey, deploymentName, factory);
+		
+		var chat = new <#= ClassName #>(systemPrompt, endpoint, azureApiKey, deploymentName);
 
         while (true)
         {

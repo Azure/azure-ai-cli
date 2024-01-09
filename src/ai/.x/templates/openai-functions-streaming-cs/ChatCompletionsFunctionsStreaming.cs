@@ -70,7 +70,6 @@ public class <#= ClassName #>
                 continue;
             }
 
-
             _options.Messages.Add(new ChatRequestAssistantMessage(responseContent));
             return responseContent;
         }
