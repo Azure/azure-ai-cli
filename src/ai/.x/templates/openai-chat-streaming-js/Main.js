@@ -5,8 +5,7 @@
 <#@ parameter type="System.String" name="AZURE_OPENAI_KEY" #>
 <#@ parameter type="System.String" name="AZURE_OPENAI_CHAT_DEPLOYMENT" #>
 <#@ parameter type="System.String" name="AZURE_OPENAI_SYSTEM_PROMPT" #>
-const { factory } = require("./OpenAIChatCompletionsCustomFunctions");
-const { <#= ClassName #> } = require("./OpenAIChatCompletionsFunctionsStreamingClass");
+const { <#= ClassName #> } = require("./OpenAIChatCompletionsStreamingClass");
 
 const readline = require('readline');
 const rl = readline.createInterface({
@@ -17,11 +16,11 @@ const rl = readline.createInterface({
 async function main() {
 
   const endpoint = process.env["AZURE_OPENAI_ENDPOINT"] || "<#= AZURE_OPENAI_ENDPOINT #>";
-  const azureApiKey = process.env["AZURE_OPENAI_KEY"] || "<#= AZURE_OPENAI_KEY #>";
+  const azureApiKey = process.env["AZURE_OPENAI_KEY"]  || "<#= AZURE_OPENAI_KEY #>";
   const deploymentName = process.env["AZURE_OPENAI_CHAT_DEPLOYMENT"] || "<#= AZURE_OPENAI_CHAT_DEPLOYMENT #>" ;
   const systemPrompt = process.env["AZURE_OPENAI_SYSTEM_PROMPT"] || "<#= AZURE_OPENAI_SYSTEM_PROMPT #>" ;
 
-  const chat = new <#= ClassName #>(systemPrompt, endpoint, azureApiKey, deploymentName, factory);
+  const chat = new <#= ClassName #>(systemPrompt, endpoint, azureApiKey, deploymentName);
 
   while (true) {
 
