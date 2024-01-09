@@ -12,34 +12,34 @@ using System;
 
 public class <#= ClassName #>
 {
-    private OpenAIClient client;
-    private ChatCompletionsOptions options;
-
     public <#= ClassName #>()
     {
-        var key = Environment.GetEnvironmentVariable("OPENAI_API_KEY") ?? "<#= OPENAI_API_KEY #>";
-        var endpoint = Environment.GetEnvironmentVariable("OPENAI_ENDPOINT") ?? "<#= OPENAI_ENDPOINT #>";
-        var deploymentName = Environment.GetEnvironmentVariable("AZURE_OPENAI_CHAT_DEPLOYMENT") ?? "<#= AZURE_OPENAI_CHAT_DEPLOYMENT #>";
+        var openAIKey = Environment.GetEnvironmentVariable("OPENAI_API_KEY") ?? "<#= OPENAI_API_KEY #>";
+        var openAIEndpoint = Environment.GetEnvironmentVariable("OPENAI_ENDPOINT") ?? "<#= OPENAI_ENDPOINT #>";
+        var openAIDeploymentName = Environment.GetEnvironmentVariable("AZURE_OPENAI_CHAT_DEPLOYMENT") ?? "<#= AZURE_OPENAI_CHAT_DEPLOYMENT #>";
         var systemPrompt = Environment.GetEnvironmentVariable("AZURE_OPENAI_SYSTEM_PROMPT") ?? "<#= AZURE_OPENAI_SYSTEM_PROMPT #>";
 
-        client = string.IsNullOrEmpty(key)
-            ? new OpenAIClient(new Uri(endpoint), new DefaultAzureCredential())
-            : new OpenAIClient(new Uri(endpoint), new AzureKeyCredential(key));
+        _client = string.IsNullOrEmpty(openAIKey)
+            ? new OpenAIClient(new Uri(openAIEndpoint), new DefaultAzureCredential())
+            : new OpenAIClient(new Uri(openAIEndpoint), new AzureKeyCredential(openAIKey));
 
-        options = new ChatCompletionsOptions();
-        options.DeploymentName = deploymentName;
-        options.Messages.Add(new ChatRequestSystemMessage(systemPrompt));
+        _options = new ChatCompletionsOptions();
+        _options.DeploymentName = openAIDeploymentName;
+        _options.Messages.Add(new ChatRequestSystemMessage(systemPrompt));
     }
 
     public async Task<string> GetChatCompletionsStreamingAsync(string userPrompt, Action<StreamingChatCompletionsUpdate> callback = null)
     {
-        options.Messages.Add(new ChatRequestUserMessage(userPrompt));
+        _options.Messages.Add(new ChatRequestUserMessage(userPrompt));
 
         var responseContent = string.Empty;
-        var response = await client.GetChatCompletionsStreamingAsync(options);
+        var response = await _client.GetChatCompletionsStreamingAsync(_options);
         await foreach (var update in response.EnumerateValues())
         {
-            callback(update);
+            if (callback != null)
+            {
+                callback(update);
+            }
 
             var content = update.ContentUpdate;
             if (update.FinishReason == CompletionsFinishReason.ContentFiltered)
@@ -56,7 +56,7 @@ public class <#= ClassName #>
             responseContent += content;
         }
 
-        options.Messages.Add(new ChatRequestAssistantMessage(responseContent));
+        _options.Messages.Add(new ChatRequestAssistantMessage(responseContent));
         return responseContent;
     }
 
@@ -77,4 +77,6 @@ public class <#= ClassName #>
             Console.WriteLine("\n");
         }
     }
+    private OpenAIClient _client;
+    private ChatCompletionsOptions _options;
 }

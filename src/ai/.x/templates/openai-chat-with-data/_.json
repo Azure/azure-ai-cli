@@ -3,9 +3,11 @@
     "_Language": "C#",
     "AICLIExtensionReferencePath": "",
     "ClassName": "OpenAIChatWithData",
+    "OPENAI_API_KEY": "<insert your OpenAI API key here>",
     "OPENAI_ENDPOINT": "<insert your OpenAI endpoint here>",
     "AZURE_AI_SEARCH_ENDPOINT": "<insert your search endpoint here>",
-    "AZURE_AI_SEARCH_KEY": "your-search-api-key",
-    "AZURE_AI_SEARCH_INDEX_NAME": "your-search-index-name",
-    "AZURE_OPENAI_CHAT_DEPLOYMENT": "gpt-35-turbo-0613"
+    "AZURE_AI_SEARCH_KEY": "<insert your search api key here>",
+    "AZURE_AI_SEARCH_INDEX_NAME": "<insert your search index name here>",
+    "AZURE_OPENAI_CHAT_DEPLOYMENT": "<insert your chat deployment here>",
+    "OPTION_INCLUDE_CITATIONS": false
 }
