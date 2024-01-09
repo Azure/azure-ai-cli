@@ -1,10 +1,11 @@
 <#@ template hostspecific="true" #>
 <#@ output extension=".js" encoding="utf-8" #>
+<#@ parameter type="System.String" name="ClassName" #>
 <#@ parameter type="System.String" name="AZURE_OPENAI_ENDPOINT" #>
 <#@ parameter type="System.String" name="AZURE_OPENAI_KEY" #>
 <#@ parameter type="System.String" name="AZURE_OPENAI_CHAT_DEPLOYMENT" #>
 <#@ parameter type="System.String" name="AZURE_OPENAI_SYSTEM_PROMPT" #>
-const { ChatCompletionsStreaming } = require("./ChatCompletionsStreaming");
+const { <#= ClassName #> } = require("./OpenAIChatCompletionsStreamingClass");
 
 const readline = require('readline');
 const rl = readline.createInterface({
@@ -19,7 +20,7 @@ async function main() {
   const deploymentName = process.env["AZURE_OPENAI_CHAT_DEPLOYMENT"] || "<#= AZURE_OPENAI_CHAT_DEPLOYMENT #>" ;
   const systemPrompt = process.env["AZURE_OPENAI_SYSTEM_PROMPT"] || "<#= AZURE_OPENAI_SYSTEM_PROMPT #>" ;
 
-  const chat = new ChatCompletionsStreaming(systemPrompt, endpoint, azureApiKey, deploymentName);
+  const chat = new <#= ClassName #>(systemPrompt, endpoint, azureApiKey, deploymentName);
 
   while (true) {
 
