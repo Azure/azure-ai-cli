@@ -7,84 +7,84 @@
 package main
 
 import (
-	"bufio"
-	"context"
-	"fmt"
-	"log"
-	"os"
-	"strings"
+    "bufio"
+    "context"
+    "fmt"
+    "log"
+    "os"
+    "strings"
 
-	"github.com/Azure/azure-sdk-for-go/sdk/ai/azopenai"
-	"github.com/Azure/azure-sdk-for-go/sdk/azcore/to"
+    "github.com/Azure/azure-sdk-for-go/sdk/ai/azopenai"
+    "github.com/Azure/azure-sdk-for-go/sdk/azcore/to"
 )
 
 func main() {
-	azureOpenAIKey := os.Getenv("AZURE_OPENAI_KEY")
-	if azureOpenAIKey == "" {
-		azureOpenAIKey = "<#= AZURE_OPENAI_KEY #>"
-	}
-	azureOpenAIEndpoint := os.Getenv("AZURE_OPENAI_ENDPOINT")
-	if azureOpenAIEndpoint == "" {
-		azureOpenAIEndpoint = "<#= AZURE_OPENAI_ENDPOINT #>"
-	}
-	modelDeploymentID := os.Getenv("AZURE_OPENAI_CHAT_DEPLOYMENT")
-	if modelDeploymentID == "" {
-		modelDeploymentID = "<#= AZURE_OPENAI_CHAT_DEPLOYMENT #>"
-	}
-	systemPrompt := os.Getenv("OPENAI_SYSTEM_PROMPT")
-	if systemPrompt == "" {
-		systemPrompt = "<#= AZURE_OPENAI_SYSTEM_PROMPT #>"
-	}
+    azureOpenAIKey := os.Getenv("AZURE_OPENAI_KEY")
+    if azureOpenAIKey == "" {
+        azureOpenAIKey = "<#= AZURE_OPENAI_KEY #>"
+    }
+    azureOpenAIEndpoint := os.Getenv("AZURE_OPENAI_ENDPOINT")
+    if azureOpenAIEndpoint == "" {
+        azureOpenAIEndpoint = "<#= AZURE_OPENAI_ENDPOINT #>"
+    }
+    deploymentName := os.Getenv("AZURE_OPENAI_CHAT_DEPLOYMENT")
+    if deploymentName == "" {
+        deploymentName = "<#= AZURE_OPENAI_CHAT_DEPLOYMENT #>"
+    }
+    systemPrompt := os.Getenv("OPENAI_SYSTEM_PROMPT")
+    if systemPrompt == "" {
+        systemPrompt = "<#= AZURE_OPENAI_SYSTEM_PROMPT #>"
+    }
 
-	keyCredential, err := azopenai.NewKeyCredential(azureOpenAIKey)
-	if err != nil {
-		log.Fatalf("ERROR: %s", err)
-	}
-	client, err := azopenai.NewClientWithKeyCredential(azureOpenAIEndpoint, keyCredential, nil)
-	if err != nil {
-		log.Fatalf("ERROR: %s", err)
-	}
+    keyCredential, err := azopenai.NewKeyCredential(azureOpenAIKey)
+    if err != nil {
+        log.Fatalf("ERROR: %s", err)
+    }
+    client, err := azopenai.NewClientWithKeyCredential(azureOpenAIEndpoint, keyCredential, nil)
+    if err != nil {
+        log.Fatalf("ERROR: %s", err)
+    }
 
-	options := azopenai.ChatCompletionsOptions{
-		Deployment: modelDeploymentID,
-		Messages: []azopenai.ChatMessage{
-			{Role: to.Ptr(azopenai.ChatRoleSystem), Content: to.Ptr(systemPrompt)},
-		},
-	}
+    options := azopenai.ChatCompletionsOptions{
+        Deployment: deploymentName,
+        Messages: []azopenai.ChatMessage{
+            {Role: to.Ptr(azopenai.ChatRoleSystem), Content: to.Ptr(systemPrompt)},
+        },
+    }
 
-	for {
-		fmt.Print("User: ")
+    for {
+        fmt.Print("User: ")
 
-		userPrompt, err := getUserInput()
-		if err != nil {
-			fmt.Println("Error reading input:", err)
-			break
-		}
-		if userPrompt == "exit" || userPrompt == "" {
-			break
-		}
+        userPrompt, err := getUserInput()
+        if err != nil {
+            fmt.Println("Error reading input:", err)
+            break
+        }
+        if userPrompt == "exit" || userPrompt == "" {
+            break
+        }
 
-		options.Messages = append(options.Messages, azopenai.ChatMessage{Role: to.Ptr(azopenai.ChatRoleUser), Content: to.Ptr(userPrompt)})
+        options.Messages = append(options.Messages, azopenai.ChatMessage{Role: to.Ptr(azopenai.ChatRoleUser), Content: to.Ptr(userPrompt)})
 
-		resp, err := client.GetChatCompletions(context.TODO(), options, nil)
-		if err != nil {
-			log.Fatalf("ERROR: %s", err)
-		}
+        resp, err := client.GetChatCompletions(context.TODO(), options, nil)
+        if err != nil {
+            log.Fatalf("ERROR: %s", err)
+        }
 
-		responseContent := *resp.Choices[0].Message.Content
-		options.Messages = append(options.Messages, azopenai.ChatMessage{Role: to.Ptr(azopenai.ChatRoleAssistant), Content: to.Ptr(responseContent)})
+        responseContent := *resp.Choices[0].Message.Content
+        options.Messages = append(options.Messages, azopenai.ChatMessage{Role: to.Ptr(azopenai.ChatRoleAssistant), Content: to.Ptr(responseContent)})
 
-		fmt.Printf("\nAssistant: %s\n\n", responseContent)
-	}
+        fmt.Printf("\nAssistant: %s\n\n", responseContent)
+    }
 }
 
 func getUserInput() (string, error) {
-	reader := bufio.NewReader(os.Stdin)
-	userInput, err := reader.ReadString('\n')
-	if err != nil {
-		return "", err
-	}
-	userInput = strings.TrimSuffix(userInput, "\n")
-	userInput = strings.TrimSuffix(userInput, "\r")
-	return userInput, nil
+    reader := bufio.NewReader(os.Stdin)
+    userInput, err := reader.ReadString('\n')
+    if err != nil {
+        return "", err
+    }
+    userInput = strings.TrimSuffix(userInput, "\n")
+    userInput = strings.TrimSuffix(userInput, "\r")
+    return userInput, nil
 }
