@@ -19,13 +19,15 @@ public class <#= ClassName #>
             ? new OpenAIClient(new Uri(openAIEndpoint), new DefaultAzureCredential())
             : new OpenAIClient(new Uri(openAIEndpoint), new AzureKeyCredential(openAIKey));
 
+        var queryType = AzureCognitiveSearchQueryType.VectorSimpleHybrid; // Use VectorSimpleHybrid to get the best of both vector and keyword types.
         var extensionConfig = new AzureCognitiveSearchChatExtensionConfiguration()
         {
             SearchEndpoint = new Uri(searchEndpoint),
             Key = searchApiKey,
             IndexName = searchIndexName,
+            QueryType = queryType,
         };
-        _options = new()
+        _options = new ChatCompletionsOptions()
         {
             DeploymentName = openAIDeploymentName,
 
@@ -43,7 +45,7 @@ public class <#= ClassName #>
         _options.Messages.Add(new ChatRequestSystemMessage(_systemPrompt));
     }
 
-    public async Task<string> ChatUsingYourOwnDataStreamingAsync(string userPrompt, Action<StreamingChatCompletionsUpdate> callback = null)
+    public async Task<string> GetChatCompletionsStreamingAsync(string userPrompt, Action<StreamingChatCompletionsUpdate> callback = null)
     {
         _options.Messages.Add(new ChatRequestUserMessage(userPrompt));
 

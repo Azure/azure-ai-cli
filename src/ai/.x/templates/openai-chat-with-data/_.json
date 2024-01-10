@@ -2,7 +2,7 @@
     "_Name": "OpenAI Chat w/ your own data",
     "_Language": "C#",
     "AICLIExtensionReferencePath": "",
-    "ClassName": "OpenAIChatWithData",
+    "ClassName": "OpenAIChatCompletionsWithDataStreamingClass",
     "AZURE_OPENAI_KEY": "<insert your OpenAI API key here>",
     "AZURE_OPENAI_ENDPOINT": "<insert your OpenAI endpoint here>",
     "AZURE_OPENAI_SYSTEM_PROMPT": "<insert your OpenAI system prompt here>",

@@ -8,7 +8,7 @@ using System;
 
 public class <#= ClassName #>
 {
-    public <#= ClassName #>(string systemPrompt, string openAIEndpoint, string azureApiKey, string openAIDeploymentName)
+    public <#= ClassName #>(string systemPrompt, string azureApiKey, string openAIEndpoint, string openAIDeploymentName)
     {
         _systemPrompt = systemPrompt;
 
