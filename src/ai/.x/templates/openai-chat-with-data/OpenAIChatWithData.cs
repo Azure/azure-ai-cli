@@ -19,11 +19,6 @@ public class <#= ClassName #>
             ? new OpenAIClient(new Uri(openAIEndpoint), new DefaultAzureCredential())
             : new OpenAIClient(new Uri(openAIEndpoint), new AzureKeyCredential(openAIKey));
 
-        ClearConversation();
-    }
-
-    public void ClearConversation()
-    {
         var extensionConfig = new AzureCognitiveSearchChatExtensionConfiguration()
         {
             SearchEndpoint = new Uri(searchEndpoint),
@@ -39,6 +34,11 @@ public class <#= ClassName #>
                 Extensions = { extensionConfig }
             }
         };
+        ClearConversation();
+    }
+
+    public void ClearConversation()
+    {
         _options.Messages.Clear();
         _options.Messages.Add(new ChatRequestSystemMessage(_systemPrompt));
     }
