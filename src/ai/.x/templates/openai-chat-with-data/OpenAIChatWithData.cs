@@ -1,12 +1,6 @@
 <#@ template hostspecific="true" #>
 <#@ output extension=".cs" encoding="utf-8" #>
 <#@ parameter type="System.String" name="ClassName" #>
-<#@ parameter type="System.String" name="OPENAI_API_KEY" #>
-<#@ parameter type="System.String" name="OPENAI_ENDPOINT" #>
-<#@ parameter type="System.String" name="AZURE_OPENAI_CHAT_DEPLOYMENT" #>
-<#@ parameter type="System.String" name="AZURE_AI_SEARCH_ENDPOINT" #>
-<#@ parameter type="System.String" name="AZURE_AI_SEARCH_KEY" #>
-<#@ parameter type="System.String" name="AZURE_AI_SEARCH_INDEX_NAME" #>
 <#@ parameter type="System.Boolean" name="OPTION_INCLUDE_CITATIONS" #>
 using Azure;
 using Azure.AI.OpenAI;
@@ -18,15 +12,8 @@ using System.Threading.Tasks;
 
 public class <#= ClassName #>
 {
-    public <#= ClassName #>()
+    public <#= ClassName #>(string openAIKey, string openAIEndpoint, string openAIDeploymentName, string searchEndpoint, string searchApiKey, string searchIndexName)
     {
-        var openAIKey = Environment.GetEnvironmentVariable("OPENAI_API_KEY") ?? "<#= OPENAI_API_KEY #>";
-        var openAIEndpoint = Environment.GetEnvironmentVariable("OPENAI_ENDPOINT") ?? "<#= OPENAI_ENDPOINT #>";
-        var openAIDeploymentName = Environment.GetEnvironmentVariable("AZURE_OPENAI_CHAT_DEPLOYMENT") ?? "<#= AZURE_OPENAI_CHAT_DEPLOYMENT #>";
-        var searchEndpoint = Environment.GetEnvironmentVariable("AZURE_AI_SEARCH_ENDPOINT") ?? "<#= AZURE_AI_SEARCH_ENDPOINT #>";
-        var searchApiKey = Environment.GetEnvironmentVariable("AZURE_AI_SEARCH_KEY") ?? "<#= AZURE_AI_SEARCH_KEY #>";
-        var searchIndexName = Environment.GetEnvironmentVariable("AZURE_AI_SEARCH_INDEX_NAME") ?? "<#= AZURE_AI_SEARCH_INDEX_NAME #>";
-
         _client = string.IsNullOrEmpty(openAIKey)
             ? new OpenAIClient(new Uri(openAIEndpoint), new DefaultAzureCredential())
             : new OpenAIClient(new Uri(openAIEndpoint), new AzureKeyCredential(openAIKey));
