@@ -4,6 +4,7 @@
 <#@ parameter type="System.String" name="AZURE_OPENAI_ENDPOINT" #>
 <#@ parameter type="System.String" name="AZURE_OPENAI_KEY" #>
 <#@ parameter type="System.String" name="AZURE_OPENAI_CHAT_DEPLOYMENT" #>
+<#@ parameter type="System.String" name="AZURE_OPENAI_SYSTEM_PROMPT" #>
 <#@ parameter type="System.String" name="AZURE_AI_SEARCH_ENDPOINT" #>
 <#@ parameter type="System.String" name="AZURE_AI_SEARCH_KEY" #>
 <#@ parameter type="System.String" name="AZURE_AI_SEARCH_INDEX_NAME" #>
