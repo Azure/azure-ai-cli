@@ -18,7 +18,6 @@ public class <#= ClassName #>
 
         _options = new ChatCompletionsOptions();
         _options.DeploymentName = openAIDeploymentName;
-        _options.Messages.Add(new ChatRequestSystemMessage(systemPrompt));
         ClearConversation();
     }
 
@@ -36,10 +35,7 @@ public class <#= ClassName #>
         var response = await _client.GetChatCompletionsStreamingAsync(_options);
         await foreach (var update in response.EnumerateValues())
         {
-            if (callback != null)
-            {
-                callback(update);
-            }
+
             var content = update.ContentUpdate;
             if (update.FinishReason == CompletionsFinishReason.ContentFiltered)
             {
@@ -53,6 +49,10 @@ public class <#= ClassName #>
             if (string.IsNullOrEmpty(content)) continue;
 
             responseContent += content;
+            if (callback != null)
+            {
+                callback(update);
+            }
         }
 
         _options.Messages.Add(new ChatRequestAssistantMessage(responseContent));

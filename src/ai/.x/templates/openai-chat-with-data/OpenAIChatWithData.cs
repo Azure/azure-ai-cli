@@ -49,11 +49,6 @@ public class <#= ClassName #>
         var response = await _client.GetChatCompletionsStreamingAsync(_options);
         await foreach (var update in response.EnumerateValues())
         {
-            if (callback != null)
-            {
-                callback(update);
-            }
-
             var content = update.ContentUpdate;
             if (update.FinishReason == CompletionsFinishReason.ContentFiltered)
             {
@@ -67,6 +62,10 @@ public class <#= ClassName #>
             if (string.IsNullOrEmpty(content)) continue;
 
             responseContent += content;
+            if (callback != null)
+            {
+                callback(update);
+            }
         }
 
         <# if (OPTION_INCLUDE_CITATIONS)
