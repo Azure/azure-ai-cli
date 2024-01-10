@@ -21,7 +21,7 @@ class <#= ClassName #> {
     this.messages.push({ role: 'user', content: userInput });
 
     let contentComplete = '';
-    const events = this.client.listChatCompletions(this.deploymentName, this.messages);
+    const events = await this.client.streamChatCompletions(this.deploymentName, this.messages);
 
     for await (const event of events) {
       for (const choice of event.choices) {
