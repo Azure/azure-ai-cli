@@ -1,7 +1,7 @@
 <#@ template hostspecific="true" #>
 <#@ output extension=".go" encoding="utf-8" #>
-<#@ parameter type="System.String" name="OPENAI_ENDPOINT" #>
-<#@ parameter type="System.String" name="OPENAI_API_KEY" #>
+<#@ parameter type="System.String" name="AZURE_OPENAI_ENDPOINT" #>
+<#@ parameter type="System.String" name="AZURE_OPENAI_KEY" #>
 <#@ parameter type="System.String" name="AZURE_OPENAI_CHAT_DEPLOYMENT" #>
 <#@ parameter type="System.String" name="AZURE_OPENAI_SYSTEM_PROMPT" #>
 package main
@@ -19,13 +19,13 @@ import (
 )
 
 func main() {
-	azureOpenAIKey := os.Getenv("OPENAI_API_KEY")
+	azureOpenAIKey := os.Getenv("AZURE_OPENAI_KEY")
 	if azureOpenAIKey == "" {
-		azureOpenAIKey = "<#= OPENAI_API_KEY #>"
+		azureOpenAIKey = "<#= AZURE_OPENAI_KEY #>"
 	}
-	azureOpenAIEndpoint := os.Getenv("OPENAI_ENDPOINT")
+	azureOpenAIEndpoint := os.Getenv("AZURE_OPENAI_ENDPOINT")
 	if azureOpenAIEndpoint == "" {
-		azureOpenAIEndpoint = "<#= OPENAI_ENDPOINT #>"
+		azureOpenAIEndpoint = "<#= AZURE_OPENAI_ENDPOINT #>"
 	}
 	modelDeploymentID := os.Getenv("AZURE_OPENAI_CHAT_DEPLOYMENT")
 	if modelDeploymentID == "" {

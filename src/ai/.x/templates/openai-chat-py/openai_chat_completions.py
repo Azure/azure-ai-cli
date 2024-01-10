@@ -1,42 +1,46 @@
 <#@ template hostspecific="true" #>
 <#@ output extension=".py" encoding="utf-8" #>
-<#@ parameter type="System.String" name="OPENAI_ENDPOINT" #>
-<#@ parameter type="System.String" name="OPENAI_API_KEY" #>
-<#@ parameter type="System.String" name="OPENAI_API_VERSION" #>
+<#@ parameter type="System.String" name="AZURE_OPENAI_ENDPOINT" #>
+<#@ parameter type="System.String" name="AZURE_OPENAI_KEY" #>
+<#@ parameter type="System.String" name="AZURE_OPENAI_API_VERSION" #>
 <#@ parameter type="System.String" name="AZURE_OPENAI_CHAT_DEPLOYMENT" #>
 <#@ parameter type="System.String" name="AZURE_OPENAI_SYSTEM_PROMPT" #>
 import os
-import openai
+from openai import AzureOpenAI
 
-openai.api_type = "azure"
-openai.api_base = os.getenv("OPENAI_ENDPOINT") or "<#= OPENAI_ENDPOINT #>"
-openai.api_key = os.getenv("OPENAI_API_KEY") or "<#= OPENAI_API_KEY #>"
-openai.api_version = os.getenv("OPENAI_API_VERSION") or "<#= OPENAI_API_VERSION #>"
+api_key = os.getenv("AZURE_OPENAI_KEY") or "<#= AZURE_OPENAI_KEY #>"
+endpoint = os.getenv("AZURE_OPENAI_ENDPOINT") or "<#= AZURE_OPENAI_ENDPOINT #>"
+api_version = os.getenv("AZURE_OPENAI_API_VERSION") or "<#= AZURE_OPENAI_API_VERSION #>"
+deployment_name = os.getenv("AZURE_OPENAI_CHAT_DEPLOYMENT") or "<#= AZURE_OPENAI_CHAT_DEPLOYMENT #>"
+system_prompt = os.getenv("AZURE_OPENAI_SYSTEM_PROMPT") or "<#= AZURE_OPENAI_SYSTEM_PROMPT #>"
 
-deploymentName = os.getenv("AZURE_OPENAI_CHAT_DEPLOYMENT") or "<#= AZURE_OPENAI_CHAT_DEPLOYMENT #>"
-systemPrompt = os.getenv("AZURE_OPENAI_SYSTEM_PROMPT") or "<#= AZURE_OPENAI_SYSTEM_PROMPT #>"
+client = AzureOpenAI(
+  api_key=api_key,
+  api_version=api_version,
+  azure_endpoint = endpoint
+)
 
 messages=[
-    {"role": "system", "content": systemPrompt},
+    {"role": "system", "content": system_prompt},
 ]
 
-def getChatCompletions() -> str:
-    messages.append({"role": "user", "content": userPrompt})
+def get_chat_completions(user_input) -> str:
+    messages.append({"role": "user", "content": user_input})
 
-    response = openai.ChatCompletion.create(
-        engine=deploymentName,
+    response = client.chat.completions.create(
+        model=deployment_name,
         messages=messages,
     )
 
-    response_content = response["choices"][0]["message"]["content"]
+    response_content = response.choices[0].message.content
     messages.append({"role": "assistant", "content": response_content})
 
     return response_content
 
 while True:
-    userPrompt = input("User: ")
-    if userPrompt == "" or userPrompt == "exit":
+    user_input = input("User: ")
+    if user_input == "" or user_input == "exit":
         break
 
-    response_content = getChatCompletions()
+    response_content = get_chat_completions(user_input)
     print(f"\nAssistant: {response_content}\n")

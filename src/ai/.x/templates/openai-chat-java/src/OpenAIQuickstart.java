@@ -1,8 +1,8 @@
 <#@ template hostspecific="true" #>
 <#@ output extension=".java" encoding="utf-8" #>
 <#@ parameter type="System.String" name="ClassName" #>
-<#@ parameter type="System.String" name="OPENAI_ENDPOINT" #>
-<#@ parameter type="System.String" name="OPENAI_API_KEY" #>
+<#@ parameter type="System.String" name="AZURE_OPENAI_ENDPOINT" #>
+<#@ parameter type="System.String" name="AZURE_OPENAI_KEY" #>
 <#@ parameter type="System.String" name="AZURE_OPENAI_CHAT_DEPLOYMENT" #>
 <#@ parameter type="System.String" name="AZURE_OPENAI_SYSTEM_PROMPT" #>
 import com.azure.ai.openai.OpenAIClient;
@@ -24,8 +24,8 @@ public class OpenAIQuickstart {
     private OpenAIClient client;
     private ChatCompletionsOptions options;
 
-    private String key = (System.getenv("OPENAI_API_KEY") != null) ? System.getenv("OPENAI_API_KEY") : "<#= OPENAI_API_KEY #>";
-    private String endpoint = (System.getenv("OPENAI_ENDPOINT") != null) ? System.getenv("OPENAI_ENDPOINT") : "<#= OPENAI_ENDPOINT #>";
+    private String key = (System.getenv("AZURE_OPENAI_KEY") != null) ? System.getenv("AZURE_OPENAI_KEY") : "<#= AZURE_OPENAI_KEY #>";
+    private String endpoint = (System.getenv("AZURE_OPENAI_ENDPOINT") != null) ? System.getenv("AZURE_OPENAI_ENDPOINT") : "<#= AZURE_OPENAI_ENDPOINT #>";
     private String deploymentName = (System.getenv("AZURE_OPENAI_CHAT_DEPLOYMENT") != null) ? System.getenv("AZURE_OPENAI_CHAT_DEPLOYMENT") : "<#= AZURE_OPENAI_CHAT_DEPLOYMENT #>";
     private String systemPrompt = (System.getenv("AZURE_OPENAI_SYSTEM_PROMPT") != null) ? System.getenv("AZURE_OPENAI_SYSTEM_PROMPT") : "<#= AZURE_OPENAI_SYSTEM_PROMPT #>";
 

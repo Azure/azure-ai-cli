@@ -22,6 +22,10 @@ namespace Azure.AI.Details.Common.CLI
             env.Add("AZURE_AI_PROJECT_NAME", ReadConfig(values, "project"));
             env.Add("AZURE_AI_RESOURCE_NAME", ReadConfig(values, "resource"));
 
+            env.Add("AZURE_OPENAI_ENDPOINT", ReadConfig(values, "chat.endpoint"));
+            env.Add("AZURE_OPENAI_KEY", ReadConfig(values, "chat.key"));
+            env.Add("AZURE_OPENAI_API_VERSION", ChatCommand.GetOpenAIClientVersionNumber());
+
             env.Add("AZURE_OPENAI_CHAT_DEPLOYMENT", ReadConfig(values, "chat.deployment"));
             env.Add("AZURE_OPENAI_EVALUATION_DEPLOYMENT", ReadConfig(values, "chat.evaluation.model.deployment.name") ?? ReadConfig(values, "chat.deployment"));
             env.Add("AZURE_OPENAI_EMBEDDING_DEPLOYMENT", ReadConfig(values, "search.embedding.model.deployment.name"));

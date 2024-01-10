@@ -1,34 +1,36 @@
+<#@ template hostspecific="true" #>
+<#@ output extension=".js" encoding="utf-8" #>
+<#@ parameter type="System.String" name="ClassName" #>
+<#@ parameter type="System.String" name="AZURE_OPENAI_ENDPOINT" #>
+<#@ parameter type="System.String" name="AZURE_OPENAI_KEY" #>
+<#@ parameter type="System.String" name="AZURE_OPENAI_CHAT_DEPLOYMENT" #>
+<#@ parameter type="System.String" name="AZURE_OPENAI_SYSTEM_PROMPT" #>
 const marked = require("marked");
 const hljs = require("highlight.js");
 
-const customFunctions = require("./ChatCompletionsCustomFunctions");
-const { getCurrentDateSchema, getCurrentDate } = customFunctions;
-const { FunctionFactory } = require("./FunctionFactory");
+const { factory } = require("./OpenAIChatCompletionsCustomFunctions");
 
-const { ChatCompletionsFunctionsStreaming } = require('./ChatCompletionsFunctionsStreaming');
+const { <#= ClassName #> } = require('./OpenAIChatCompletionsFunctionsStreamingClass');
 let streamingChatCompletions;
 
 function streamingChatCompletionsInit() {
 
-  let factory = new FunctionFactory();
-  factory.addFunction(getCurrentDateSchema, getCurrentDate);
-
-  const endpoint = process.env.OPENAI_ENDPOINT;
-  const azureApiKey = process.env.OPENAI_API_KEY;
-  const deploymentName = process.env.AZURE_OPENAI_CHAT_DEPLOYMENT;
-  const systemPrompt = "You are a helpful AI assistant.";
+  const endpoint = process.env.AZURE_OPENAI_ENDPOINT || "<#= AZURE_OPENAI_ENDPOINT #>";
+  const azureApiKey = process.env.AZURE_OPENAI_KEY || "<#= AZURE_OPENAI_KEY #>";
+  const deploymentName = process.env.AZURE_OPENAI_CHAT_DEPLOYMENT || "<#= AZURE_OPENAI_CHAT_DEPLOYMENT #>" ;
+  const systemPrompt = process.env.AZURE_OPENAI_SYSTEM_PROMPT || "<#= AZURE_OPENAI_SYSTEM_PROMPT #>";
 
   if (!endpoint || endpoint.startsWith('<insert')) {
-    chatPanelAppendMessage('computer', 'Please set OPENAI_ENDPOINT in .env');
+    chatPanelAppendMessage('computer', 'Please set AZURE_OPENAI_ENDPOINT in .env');
   }
   if (!azureApiKey || azureApiKey.startsWith('<insert')) {
-    chatPanelAppendMessage('computer', 'Please set OPENAI_API_KEY in .env');
+    chatPanelAppendMessage('computer', 'Please set AZURE_OPENAI_KEY in .env');
   }
   if (!deploymentName || deploymentName.startsWith('<insert')) {
     chatPanelAppendMessage('computer', 'Please set AZURE_OPENAI_CHAT_DEPLOYMENT in .env');
   }
 
-  streamingChatCompletions = new ChatCompletionsFunctionsStreaming(systemPrompt, endpoint, azureApiKey, deploymentName, factory);
+  streamingChatCompletions = new <#= ClassName #>(systemPrompt, endpoint, azureApiKey, deploymentName, factory);
 }
 
 function streamingChatCompletionsClear() {
