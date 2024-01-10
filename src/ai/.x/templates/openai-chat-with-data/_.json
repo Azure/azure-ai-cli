@@ -5,6 +5,7 @@
     "ClassName": "OpenAIChatWithData",
     "AZURE_OPENAI_KEY": "<insert your OpenAI API key here>",
     "AZURE_OPENAI_ENDPOINT": "<insert your OpenAI endpoint here>",
+    "AZURE_OPENAI_SYSTEM_PROMPT": "<insert your OpenAI system prompt here>",
     "AZURE_AI_SEARCH_ENDPOINT": "<insert your search endpoint here>",
     "AZURE_AI_SEARCH_KEY": "<insert your search api key here>",
     "AZURE_AI_SEARCH_INDEX_NAME": "<insert your search index name here>",

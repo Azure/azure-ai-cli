@@ -12,33 +12,35 @@ using System.Threading.Tasks;
 
 public class <#= ClassName #>
 {
-    public <#= ClassName #>(string openAIKey, string openAIEndpoint, string openAIDeploymentName, string searchEndpoint, string searchApiKey, string searchIndexName)
+    public <#= ClassName #>(string systemPrompt, string openAIKey, string openAIEndpoint, string openAIDeploymentName, string searchEndpoint, string searchApiKey, string searchIndexName)
     {
+        _systemPrompt = systemPrompt;
         _client = string.IsNullOrEmpty(openAIKey)
             ? new OpenAIClient(new Uri(openAIEndpoint), new DefaultAzureCredential())
             : new OpenAIClient(new Uri(openAIEndpoint), new AzureKeyCredential(openAIKey));
 
+        ClearConversation();
+    }
+
+    public void ClearConversation()
+    {
         var extensionConfig = new AzureCognitiveSearchChatExtensionConfiguration()
         {
             SearchEndpoint = new Uri(searchEndpoint),
             Key = searchApiKey,
             IndexName = searchIndexName,
         };
-
         _options = new()
         {
             DeploymentName = openAIDeploymentName,
-            Messages =
-            {
-                new ChatRequestSystemMessage("You are a helpful assistant that answers questions about the Contoso product database."),
-                new ChatRequestUserMessage("What are the best-selling Contoso products this month?")
-            },
 
             AzureExtensionsOptions = new()
             {
                 Extensions = { extensionConfig }
             }
         };
+        _options.Messages.Clear();
+        _options.Messages.Add(new ChatRequestSystemMessage(_systemPrompt));
     }
 
     public async Task<string> ChatUsingYourOwnDataStreamingAsync(string userPrompt, Action<StreamingChatCompletionsUpdate> callback = null)
@@ -80,6 +82,7 @@ public class <#= ClassName #>
         return responseContent;
     }
 
+    private string _systemPrompt;
     private OpenAIClient _client;
     private ChatCompletionsOptions _options;
 }
