@@ -8,13 +8,13 @@ using System;
 
 public class <#= ClassName #>
 {
-    public <#= ClassName #>(string systemPrompt, string endpoint, string azureApiKey, string deploymentName)
+    public <#= ClassName #>(string systemPrompt, string openAIEndpoint, string azureApiKey, string openAIDeploymentName)
     {
         _systemPrompt = systemPrompt;
 
         _client = string.IsNullOrEmpty(azureApiKey)
             ? new OpenAIClient(new Uri(openAIEndpoint), new DefaultAzureCredential())
-            : new OpenAIClient(new Uri(endpoint), new AzureKeyCredential(azureApiKey));
+            : new OpenAIClient(new Uri(openAIEndpoint), new AzureKeyCredential(azureApiKey));
 
         _options = new ChatCompletionsOptions();
         _options.DeploymentName = openAIDeploymentName;
@@ -52,7 +52,6 @@ public class <#= ClassName #>
 
             if (string.IsNullOrEmpty(content)) continue;
 
-            if (callback != null) callback(update); 
             responseContent += content;
         }
 
@@ -61,8 +60,6 @@ public class <#= ClassName #>
     }
 
     private string _systemPrompt;
-    private ChatCompletionsOptions _options;
-    private OpenAIClient _client;
     private OpenAIClient _client;
     private ChatCompletionsOptions _options;
 }

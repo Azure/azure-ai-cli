@@ -81,24 +81,6 @@ public class <#= ClassName #>
         return responseContent;
     }
 
-    public static async Task Main(string[] args)
-    {
-        var chat = new <#= ClassName #>();
-
-        while (true)
-        {
-            Console.Write("User: ");
-            var userPrompt = Console.ReadLine();
-            if (string.IsNullOrEmpty(userPrompt) || userPrompt == "exit") break;
-
-            Console.Write("\nAssistant: ");
-            var response = await chat.ChatUsingYourOwnDataStreamingAsync(userPrompt, update =>
-                Console.Write(update.ContentUpdate)
-            );
-            Console.WriteLine("\n");
-        }
-    }
-
     private OpenAIClient _client;
     private ChatCompletionsOptions _options;
 }
