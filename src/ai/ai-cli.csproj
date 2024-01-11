@@ -122,6 +122,7 @@
     <ProjectReference Include="..\common\common.csproj" />
     <ProjectReference Include="..\extensions\helper_functions_extension\helper_functions_extension.csproj" />
     <ProjectReference Include="..\extensions\template_extension\template_extension.csproj" />
+    <ProjectReference Include="..\telemetry\telemetry.csproj" />
   </ItemGroup>
 
   <Import Project="BuildCommon.targets" />

@@ -3,12 +3,9 @@
 // Licensed under the MIT license. See LICENSE.md file in the project root for full license information.
 //
 
+using Azure.AI.Details.Common.CLI.Telemetry;
 using System;
-using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
-using System.Reflection;
-using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 // using Azure.AI.OpenAI;
@@ -17,14 +14,37 @@ namespace Azure.AI.Details.Common.CLI
 {
     public class AiProgram
     {
-        static void Main(string[] args)
+        static async Task Main(string[] args)
         {
-            Program.Main(new AiProgramData(), args);
+            IProgramData data = new AiProgramData();
+            int exitCode = Program.Main(data, args);
+
+            if (data.Telemetry != null)
+            {
+                await data.Telemetry.DisposeAsync()
+                    .ConfigureAwait(false);
+            }
+
+            Environment.Exit(exitCode);
         }
     }
 
     public class AiProgramData : IProgramData
     {
+        private Lazy<ITelemetry> _telemetry;
+
+        public AiProgramData()
+        {
+            _telemetry = new Lazy<ITelemetry>(() =>
+            {
+                // TODO get telemetry type from config
+                // TODO get telemetry configuration (e.g. TenantID) from config
+                return new AriaTelemetry(
+                    Encoding.UTF8.GetString(Convert.FromBase64String("MGMxZTEzMjc4OWQwNDcxZmEyMTg1ZDVkOThmNTcyNTAtZDIwOTE0YzQtMDYyNS00NDZmLWI0NDQtMzZhZmMzYzY4ZWFiLTcyOTM=")),
+                    this);
+            }, System.Threading.LazyThreadSafetyMode.ExecutionAndPublication);
+        }
+
         #region name data
         public string Name => "ai";
         public string DisplayName => "Azure AI CLI";
@@ -128,7 +148,7 @@ namespace Azure.AI.Details.Common.CLI
             var command = values.GetCommand(null) ?? tokens.PeekNextToken();
             var root = command.Split('.').FirstOrDefault();
 
-            return root switch 
+            return root switch
             {
                 "help" => HelpCommandParser.ParseCommand(tokens, values),
                 "init" => InitCommandParser.ParseCommand(tokens, values),
@@ -208,5 +228,6 @@ namespace Azure.AI.Details.Common.CLI
         }
 
         public IEventLoggerHelpers EventLoggerHelpers => new AiEventLoggerHelpers();
+        public ITelemetry Telemetry => _telemetry.Value;
     }
 }

@@ -3,15 +3,10 @@
 // Licensed under the MIT license. See LICENSE.md file in the project root for full license information.
 //
 
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.IO;
-using System.Linq;
 using System.Reflection;
-using System.Runtime.InteropServices;
 using System.Text;
-using System.Threading.Tasks;
+using Azure.AI.Details.Common.CLI.Telemetry;
+using Azure.AI.Details.Common.CLI.Telemetry.Events;
 
 namespace Azure.AI.Details.Common.CLI
 {
@@ -291,35 +286,49 @@ namespace Azure.AI.Details.Common.CLI
             DisplayException(ex);
         }
 
-        private static void TryCatchErrorOrException(ICommandValues values, Action action)
-        {
-            if (System.Diagnostics.Debugger.IsAttached)
-            {
-                action();
-            }
-            else
-            {
-                try
-                {
-                    action();
-                }
-                catch (Exception ex)
-                {
-                    DisplayErrorOrException(values, ex);
-                }
-            }
-        }
-
         private static bool RunCommand(ICommandValues values)
         {
-            bool passed = false;
+            string errorInfo = null;
+            var outcome = Outcome.Unknown;
 
-            TryCatchErrorOrException(values, () =>
+            try
             {
-                passed = CommandRunDispatcher.DispatchRunCommand(values);
-            });
+                bool success = CommandRunDispatcher.DispatchRunCommand(values);
+                if (success)
+                {
+                    outcome = Outcome.Success;
+                }
+                else
+                {
+                    outcome = Outcome.Failed;
+                    errorInfo = $"Failed while running '{values.GetCommand()}' command";
+                }
+            }
+            catch (OperationCanceledException ex)
+            {
+                errorInfo = "Timed out";
+                outcome = Outcome.TimedOut;
 
-            return passed;
+                DisplayErrorOrException(values, ex);
+            }
+            catch (Exception ex)
+            {
+                errorInfo = ex.Message;
+                outcome = Outcome.Failed;
+
+                DisplayErrorOrException(values, ex);
+            }
+            finally
+            {
+                var _ = _data?.Telemetry?.LogEventAsync(new CommandTelemetryEvent()
+                {
+                    Type = values.GetCommand("unknown"),
+                    Outcome = outcome,
+                    ErrorInfo = errorInfo
+                });
+            }
+
+            return outcome == Outcome.Success;
         }
 
         private static IProgramData _data;
