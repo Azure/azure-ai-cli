@@ -16,10 +16,7 @@ import (
     "github.com/Azure/azure-sdk-for-go/sdk/azcore/to"
 )
 
-
 type <#= ClassName #> struct {
-    systemPrompt        string
-    deploymentName      string
     client              *azopenai.Client
     options             *azopenai.ChatCompletionsOptions
     functionFactory     *FunctionFactory
@@ -42,7 +39,7 @@ func New<#= ClassName #>(systemPrompt string, endpoint string, azureApiKey strin
 
     options := &azopenai.ChatCompletionsOptions{
         Deployment: deploymentName,
-        Messages:   messages,
+        Messages: messages,
         FunctionCall: &azopenai.ChatCompletionsOptionsFunctionCall{
             Value: to.Ptr("auto"),
         },
@@ -50,26 +47,24 @@ func New<#= ClassName #>(systemPrompt string, endpoint string, azureApiKey strin
     }
 
     return &<#= ClassName #>{
-        systemPrompt:   systemPrompt,
-        deploymentName: deploymentName,
-        client:         client,
+        client: client,
         options: options,
         functionCallContext: NewFunctionCallContext(functionFactory, options),
     }, nil
 }
 
-func (oac *<#= ClassName #>) clearConversation() {
-    oac.options.Messages = oac.options.Messages[:1]
+func (chat *<#= ClassName #>) ClearConversation() {
+    chat.options.Messages = chat.options.Messages[:1]
 }
 
-func (chat *<#= ClassName #>) GetChatCompletionsStream(userPrompt string, callback func(content string)) error {
+func (chat *<#= ClassName #>) GetChatCompletionsStream(userPrompt string, callback func(content string)) (string, error) {
     chat.options.Messages = append(chat.options.Messages, azopenai.ChatMessage{Role: to.Ptr(azopenai.ChatRoleUser), Content: to.Ptr(userPrompt)})
 
     responseContent := ""
     for {
         resp, err := chat.client.GetChatCompletionsStream(context.TODO(), *chat.options, nil)
         if err != nil {
-            return err
+            return "", err
         }
         defer resp.ChatCompletionsStream.Close()
 
@@ -79,7 +74,7 @@ func (chat *<#= ClassName #>) GetChatCompletionsStream(userPrompt string, callba
                 break
             }
             if err != nil {
-                return err
+                return "", err
             }
 
             for _, choice := range chatCompletions.Choices {
@@ -113,6 +108,6 @@ func (chat *<#= ClassName #>) GetChatCompletionsStream(userPrompt string, callba
         }
 
         chat.options.Messages = append(chat.options.Messages, azopenai.ChatMessage{Role: to.Ptr(azopenai.ChatRoleAssistant), Content: to.Ptr(responseContent)})
-        return nil
+        return responseContent, nil
     }
 }

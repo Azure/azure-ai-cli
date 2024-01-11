@@ -1,90 +1,59 @@
 <#@ template hostspecific="true" #>
 <#@ output extension=".go" encoding="utf-8" #>
-<#@ parameter type="System.String" name="AZURE_OPENAI_ENDPOINT" #>
-<#@ parameter type="System.String" name="AZURE_OPENAI_KEY" #>
-<#@ parameter type="System.String" name="AZURE_OPENAI_CHAT_DEPLOYMENT" #>
-<#@ parameter type="System.String" name="AZURE_OPENAI_SYSTEM_PROMPT" #>
+<#@ parameter type="System.String" name="ClassName" #>
 package main
 
 import (
-    "bufio"
     "context"
-    "fmt"
-    "log"
-    "os"
-    "strings"
 
     "github.com/Azure/azure-sdk-for-go/sdk/ai/azopenai"
     "github.com/Azure/azure-sdk-for-go/sdk/azcore/to"
 )
 
-func main() {
-    azureOpenAIKey := os.Getenv("AZURE_OPENAI_KEY")
-    if azureOpenAIKey == "" {
-        azureOpenAIKey = "<#= AZURE_OPENAI_KEY #>"
-    }
-    azureOpenAIEndpoint := os.Getenv("AZURE_OPENAI_ENDPOINT")
-    if azureOpenAIEndpoint == "" {
-        azureOpenAIEndpoint = "<#= AZURE_OPENAI_ENDPOINT #>"
-    }
-    deploymentName := os.Getenv("AZURE_OPENAI_CHAT_DEPLOYMENT")
-    if deploymentName == "" {
-        deploymentName = "<#= AZURE_OPENAI_CHAT_DEPLOYMENT #>"
-    }
-    systemPrompt := os.Getenv("OPENAI_SYSTEM_PROMPT")
-    if systemPrompt == "" {
-        systemPrompt = "<#= AZURE_OPENAI_SYSTEM_PROMPT #>"
-    }
-
-    keyCredential, err := azopenai.NewKeyCredential(azureOpenAIKey)
-    if err != nil {
-        log.Fatalf("ERROR: %s", err)
-    }
-    client, err := azopenai.NewClientWithKeyCredential(azureOpenAIEndpoint, keyCredential, nil)
-    if err != nil {
-        log.Fatalf("ERROR: %s", err)
-    }
-
-    options := azopenai.ChatCompletionsOptions{
-        Deployment: deploymentName,
-        Messages: []azopenai.ChatMessage{
-            {Role: to.Ptr(azopenai.ChatRoleSystem), Content: to.Ptr(systemPrompt)},
-        },
-    }
-
-    for {
-        fmt.Print("User: ")
-
-        userPrompt, err := getUserInput()
-        if err != nil {
-            fmt.Println("Error reading input:", err)
-            break
-        }
-        if userPrompt == "exit" || userPrompt == "" {
-            break
-        }
-
-        options.Messages = append(options.Messages, azopenai.ChatMessage{Role: to.Ptr(azopenai.ChatRoleUser), Content: to.Ptr(userPrompt)})
-
-        resp, err := client.GetChatCompletions(context.TODO(), options, nil)
-        if err != nil {
-            log.Fatalf("ERROR: %s", err)
-        }
-
-        responseContent := *resp.Choices[0].Message.Content
-        options.Messages = append(options.Messages, azopenai.ChatMessage{Role: to.Ptr(azopenai.ChatRoleAssistant), Content: to.Ptr(responseContent)})
-
-        fmt.Printf("\nAssistant: %s\n\n", responseContent)
-    }
+type <#= ClassName #> struct {
+    client   *azopenai.Client
+    options  *azopenai.ChatCompletionsOptions
 }
 
-func getUserInput() (string, error) {
-    reader := bufio.NewReader(os.Stdin)
-    userInput, err := reader.ReadString('\n')
+func New<#= ClassName #>(systemPrompt string, endpoint string, azureApiKey string, deploymentName string) (*<#= ClassName #>, error) {
+    keyCredential, err := azopenai.NewKeyCredential(azureApiKey)
+    if err != nil {
+        return nil, err
+    }
+    client, err := azopenai.NewClientWithKeyCredential(endpoint, keyCredential, nil)
+    if err != nil {
+        return nil, err
+    }
+
+    messages := []azopenai.ChatMessage{
+        {Role: to.Ptr(azopenai.ChatRoleSystem), Content: to.Ptr(systemPrompt)},
+    }
+
+    options := &azopenai.ChatCompletionsOptions{
+        Deployment: deploymentName,
+        Messages: messages,
+    }
+
+    return &<#= ClassName #> {
+        client: client,
+        options: options,
+    }, nil
+}
+
+func (chat *<#= ClassName #>) ClearConversation() {
+    chat.options.Messages = chat.options.Messages[:1]
+}
+
+func (chat *<#= ClassName #>) GetChatCompletions(userPrompt string) (string, error) {
+    chat.options.Messages = append(chat.options.Messages, azopenai.ChatMessage{Role: to.Ptr(azopenai.ChatRoleUser), Content: to.Ptr(userPrompt)})
+
+    resp, err := chat.client.GetChatCompletions(context.TODO(), *chat.options, nil)
     if err != nil {
         return "", err
     }
-    userInput = strings.TrimSuffix(userInput, "\n")
-    userInput = strings.TrimSuffix(userInput, "\r")
-    return userInput, nil
+
+    responseContent := *resp.Choices[0].Message.Content
+    chat.options.Messages = append(chat.options.Messages, azopenai.ChatMessage{Role: to.Ptr(azopenai.ChatRoleAssistant), Content: to.Ptr(responseContent)})
+
+    return responseContent, nil
 }

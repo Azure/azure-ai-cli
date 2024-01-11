@@ -38,8 +38,7 @@ func main() {
         os.Exit(1)
     }
 
-    factory := NewFunctionFactoryWithCustomFunctions()
-    chat, err := New<#= ClassName #>(systemPrompt, azureOpenAIEndpoint, azureOpenAIKey, deploymentName, factory)
+    chat, err := New<#= ClassName #>(systemPrompt, azureOpenAIEndpoint, azureOpenAIKey, deploymentName)
     if err != nil {
         log.Fatalf("ERROR: %s", err)
     }
@@ -51,14 +50,12 @@ func main() {
             break
         }
 
-        fmt.Printf("\nAssistant: ")
-        _, err := chat.GetChatCompletionsStream(input, func(content string) {
-            fmt.Printf("%s", content)
-        })
+        response, err := chat.GetChatCompletions(input)
         if err != nil {
             log.Fatalf("ERROR: %s", err)
         }
-        fmt.Printf("\n\n")
+
+        fmt.Printf("Assistant: %s\n\n", response)
     }
 }
 

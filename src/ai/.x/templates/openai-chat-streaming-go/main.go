@@ -38,8 +38,7 @@ func main() {
         os.Exit(1)
     }
 
-    factory := NewFunctionFactoryWithCustomFunctions()
-    chat, err := New<#= ClassName #>(systemPrompt, azureOpenAIEndpoint, azureOpenAIKey, deploymentName, factory)
+    chat, err := New<#= ClassName #>(systemPrompt, azureOpenAIEndpoint, azureOpenAIKey, deploymentName)
     if err != nil {
         log.Fatalf("ERROR: %s", err)
     }
