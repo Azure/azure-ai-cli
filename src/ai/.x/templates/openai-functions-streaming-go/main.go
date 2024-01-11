@@ -8,11 +8,11 @@
 package main
 
 import (
-	"bufio"
-	"fmt"
-	"log"
-	"os"
-	"strings"
+    "bufio"
+    "fmt"
+    "log"
+    "os"
+    "strings"
 )
 
 func main() {
@@ -33,31 +33,31 @@ func main() {
         systemPrompt = "<#= AZURE_OPENAI_SYSTEM_PROMPT #>"
     }
 
-	if azureOpenAIEndpoint == "" || azureOpenAIKey == "" || deploymentName == "" || systemPrompt == "" {
-		fmt.Println("Please set the environment variables.")
-		os.Exit(1)
-	}
+    if azureOpenAIEndpoint == "" || azureOpenAIKey == "" || deploymentName == "" || systemPrompt == "" {
+        fmt.Println("Please set the environment variables.")
+        os.Exit(1)
+    }
 
-	factory := NewFunctionFactoryWithCustomFunctions()
-	chat, err := New<#= ClassName #>(systemPrompt, azureOpenAIEndpoint, azureOpenAIKey, deploymentName, factory)
-	if err != nil {
-		log.Fatalf("ERROR: %s", err)
-	}
+    factory := NewFunctionFactoryWithCustomFunctions()
+    chat, err := New<#= ClassName #>(systemPrompt, azureOpenAIEndpoint, azureOpenAIKey, deploymentName, factory)
+    if err != nil {
+        log.Fatalf("ERROR: %s", err)
+    }
 
-	reader := bufio.NewReader(os.Stdin)
+    reader := bufio.NewReader(os.Stdin)
 
-	for {
-		fmt.Print("User: ")
-		input, _ := reader.ReadString('\n')
-		input = strings.TrimRight(input, "\r\n")
-		if input == "exit" || input == "" {
-			break
-		}
+    for {
+        fmt.Print("User: ")
+        input, _ := reader.ReadString('\n')
+        input = strings.TrimRight(input, "\r\n")
+        if input == "exit" || input == "" {
+            break
+        }
 
-		fmt.Printf("\nAssistant: ")
-		chat.GetChatCompletionsStream(input, func(content string) {
-			fmt.Printf("%s", content)
-		})
-		fmt.Printf("\n\n")
-	}
+        fmt.Printf("\nAssistant: ")
+        chat.GetChatCompletionsStream(input, func(content string) {
+            fmt.Printf("%s", content)
+        })
+        fmt.Printf("\n\n")
+    }
 }

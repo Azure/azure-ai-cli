@@ -8,111 +8,111 @@
 package main
 
 import (
-	"context"
-	"errors"
-	"io"
+    "context"
+    "errors"
+    "io"
 
-	"github.com/Azure/azure-sdk-for-go/sdk/ai/azopenai"
-	"github.com/Azure/azure-sdk-for-go/sdk/azcore/to"
+    "github.com/Azure/azure-sdk-for-go/sdk/ai/azopenai"
+    "github.com/Azure/azure-sdk-for-go/sdk/azcore/to"
 )
 
 
 type <#= ClassName #> struct {
-	systemPrompt       string
-	deploymentName     string
-	client              *azopenai.Client
-    options             azopenai.ChatCompletionsOptions
-	functionFactory    *FunctionFactory
-	functionCallContext *FunctionCallContext
+    systemPrompt        string
+    deploymentName      string
+    client              *azopenai.Client
+    options             *azopenai.ChatCompletionsOptions
+    functionFactory     *FunctionFactory
+    functionCallContext *FunctionCallContext
 }
 
 func New<#= ClassName #>(systemPrompt string, endpoint string, azureApiKey string, deploymentName string, functionFactory *FunctionFactory) (*<#= ClassName #>, error) {
-	keyCredential, err := azopenai.NewKeyCredential(azureApiKey)
-	if err != nil {
-		return nil, err
-	}
-	client, err := azopenai.NewClientWithKeyCredential(endpoint, keyCredential, nil)
-	if err != nil {
-		return nil, err
-	}
+    keyCredential, err := azopenai.NewKeyCredential(azureApiKey)
+    if err != nil {
+        return nil, err
+    }
+    client, err := azopenai.NewClientWithKeyCredential(endpoint, keyCredential, nil)
+    if err != nil {
+        return nil, err
+    }
 
-	messages := []azopenai.ChatMessage{
-		{Role: to.Ptr(azopenai.ChatRoleSystem), Content: to.Ptr(systemPrompt)},
-	}
+    messages := []azopenai.ChatMessage{
+        {Role: to.Ptr(azopenai.ChatRoleSystem), Content: to.Ptr(systemPrompt)},
+    }
 
-	return &<#= ClassName #>{
-		systemPrompt:   systemPrompt,
-		deploymentName: deploymentName,
-		client:         client,
-		options: azopenai.ChatCompletionsOptions{
-			Deployment: deploymentName,
-			Messages:   messages,
-			FunctionCall: &azopenai.ChatCompletionsOptionsFunctionCall{
-				Value: to.Ptr("auto"),
-			},
-			Functions: functionFactory.GetFunctionSchemas(),
-		},
-		functionFactory:     functionFactory,
-		functionCallContext: NewFunctionCallContext(functionFactory, messages),
-	}, nil
+    options := &azopenai.ChatCompletionsOptions{
+        Deployment: deploymentName,
+        Messages:   messages,
+        FunctionCall: &azopenai.ChatCompletionsOptionsFunctionCall{
+            Value: to.Ptr("auto"),
+        },
+        Functions: functionFactory.GetFunctionSchemas(),
+    }
+
+    return &<#= ClassName #>{
+        systemPrompt:   systemPrompt,
+        deploymentName: deploymentName,
+        client:         client,
+        options: options,
+        functionCallContext: NewFunctionCallContext(functionFactory, options),
+    }, nil
 }
 
 func (oac *<#= ClassName #>) clearConversation() {
-	oac.options.Messages = oac.options.Messages[:1]
-	oac.functionCallContext = NewFunctionCallContext(oac.functionFactory, oac.options.Messages)
+    oac.options.Messages = oac.options.Messages[:1]
 }
 
 func (chat *<#= ClassName #>) GetChatCompletionsStream(userPrompt string, callback func(content string)) error {
-	chat.options.Messages = append(chat.options.Messages, azopenai.ChatMessage{Role: to.Ptr(azopenai.ChatRoleUser), Content: to.Ptr(userPrompt)})
+    chat.options.Messages = append(chat.options.Messages, azopenai.ChatMessage{Role: to.Ptr(azopenai.ChatRoleUser), Content: to.Ptr(userPrompt)})
 
-	responseContent := ""
-	for {
-		resp, err := chat.client.GetChatCompletionsStream(context.TODO(), chat.options, nil)
-		if err != nil {
-			return err
-		}
-		defer resp.ChatCompletionsStream.Close()
+    responseContent := ""
+    for {
+        resp, err := chat.client.GetChatCompletionsStream(context.TODO(), *chat.options, nil)
+        if err != nil {
+            return err
+        }
+        defer resp.ChatCompletionsStream.Close()
 
-		for {
-			chatCompletions, err := resp.ChatCompletionsStream.Read()
-			if errors.Is(err, io.EOF) {
-				break
-			}
-			if err != nil {
-				return err
-			}
+        for {
+            chatCompletions, err := resp.ChatCompletionsStream.Read()
+            if errors.Is(err, io.EOF) {
+                break
+            }
+            if err != nil {
+                return err
+            }
 
-			for _, choice := range chatCompletions.Choices {
+            for _, choice := range chatCompletions.Choices {
 
-				chat.functionCallContext.CheckForUpdate(choice)
+                chat.functionCallContext.CheckForUpdate(choice)
 
-				content := ""
-				if choice.Delta.Content != nil {
-					content = *choice.Delta.Content
-				}
+                content := ""
+                if choice.Delta.Content != nil {
+                    content = *choice.Delta.Content
+                }
 
-				if choice.FinishReason != nil {
-					finishReason := *choice.FinishReason
-					if finishReason == azopenai.CompletionsFinishReasonLength {
-						content = content + "\nWARNING: Exceeded token limit!"
-					}
-				}
+                if choice.FinishReason != nil {
+                    finishReason := *choice.FinishReason
+                    if finishReason == azopenai.CompletionsFinishReasonLength {
+                        content = content + "\nWARNING: Exceeded token limit!"
+                    }
+                }
 
-				if content == "" {
-					continue
-				}
+                if content == "" {
+                    continue
+                }
 
-				callback(content)
-				responseContent += content
-			}
-		}
+                callback(content)
+                responseContent += content
+            }
+        }
 
-		if chat.functionCallContext.TryCallFunction() != "" {
-			chat.functionCallContext.Clear()
-			continue
-		}
+        if chat.functionCallContext.TryCallFunction() != "" {
+            chat.functionCallContext.Clear()
+            continue
+        }
 
-		chat.options.Messages = append(chat.options.Messages, azopenai.ChatMessage{Role: to.Ptr(azopenai.ChatRoleAssistant), Content: to.Ptr(responseContent)})
-		return nil
-	}
+        chat.options.Messages = append(chat.options.Messages, azopenai.ChatMessage{Role: to.Ptr(azopenai.ChatRoleAssistant), Content: to.Ptr(responseContent)})
+        return nil
+    }
 }
