@@ -72,14 +72,14 @@ namespace Azure.AI.Details.Common.CLI.Extensions.Templates
         {
             var root = FileHelpers.FileNameFromResourceName("templates") + "/";
 
-            templateName = templateName.Replace('-', '_');
+            var normalizedTemplateName = templateName.Replace('-', '_');
             var generator = new TemplateGenerator();
             
-            var files = GetTemplateFileNames(templateName, generator);
+            var files = GetTemplateFileNames(normalizedTemplateName, generator).ToList();
             if (files.Count() == 0)
             {
-                templateName = templateName.Replace(" ", "_");
-                files = GetTemplateFileNames(templateName, generator);
+                normalizedTemplateName = normalizedTemplateName.Replace(" ", "_");
+                files = GetTemplateFileNames(normalizedTemplateName, generator).ToList();
                 if (files.Count() == 0)
                 {
                     return false;
@@ -87,10 +87,13 @@ namespace Azure.AI.Details.Common.CLI.Extensions.Templates
             }
 
             outputDirectory = PathHelpers.NormalizePath(outputDirectory);
-            var message = $"Generating '{templateName}' in '{outputDirectory}' ({files.Count()} files)...";
+            var message = templateName != outputDirectory
+                ? $"Generating '{templateName}' in '{outputDirectory}' ({files.Count()} files)..."
+                : $"Generating '{templateName}' ({files.Count()} files)...";
             if (!quiet) Console.WriteLine($"{message}\n");
 
-            var generated = ProcessTemplates(templateName, generator, files, outputDirectory);
+            files.Sort();
+            var generated = ProcessTemplates(normalizedTemplateName, generator, files, outputDirectory);
             foreach (var item in generated)
             {
                 var file = item.Replace(outputDirectory, string.Empty).Trim('\\', '/');

@@ -55,7 +55,9 @@ namespace Azure.AI.Details.Common.CLI
 
         public static string NormalizePath(string outputDirectory)
         {
-            return new DirectoryInfo(outputDirectory).FullName;
+            var normalized = new DirectoryInfo(outputDirectory).FullName;
+            var cwd = Directory.GetCurrentDirectory();
+            return normalized.StartsWith(cwd) ? normalized.Substring(cwd.Length + 1) : normalized;
         }
     }
 
