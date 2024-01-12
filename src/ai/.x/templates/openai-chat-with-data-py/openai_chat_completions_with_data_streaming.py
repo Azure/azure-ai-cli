@@ -1,16 +1,16 @@
 from openai import AzureOpenAI
 
 class <#= ClassName #>:
-    def __init__(self, system_prompt, endpoint, azure_api_key, azure_api_version, deployment_name):
+    def __init__(self, system_prompt, azure_openai_endpoint, azure_openai_api_key, azure_openai_api_version, azure_openai_deployment_name):
         self.system_prompt = system_prompt
-        self.endpoint = endpoint
-        self.azure_api_key = azure_api_key
-        self.azure_api_version = azure_api_version
-        self.deployment_name = deployment_name
+        self.azure_openai_endpoint = azure_openai_endpoint
+        self.azure_openai_api_key = azure_openai_api_key
+        self.azure_openai_api_version = azure_openai_api_version
+        self.azure_openai_deployment_name = azure_openai_deployment_name
         self.client = AzureOpenAI(
-            api_key=self.azure_api_key,
-            api_version=self.azure_api_version,
-            azure_endpoint = endpoint
+            api_key=self.azure_openai_api_key,
+            api_version=self.azure_openai_api_version,
+            azure_endpoint = self.azure_openai_endpoint
             )
         self.clear_conversation()
 
@@ -24,7 +24,7 @@ class <#= ClassName #>:
 
         complete_content = ""
         response = self.client.chat.completions.create(
-            model=self.deployment_name,
+            model=self.azure_openai_deployment_name,
             messages=self.messages,
             stream=True)
 
