@@ -10,5 +10,6 @@
     "AZURE_AI_SEARCH_KEY": "<insert your search api key here>",
     "AZURE_AI_SEARCH_INDEX_NAME": "<insert your search index name here>",
     "AZURE_OPENAI_CHAT_DEPLOYMENT": "<insert your chat deployment here>",
-    "OPTION_INCLUDE_CITATIONS": false
+    "AZURE_OPENAI_EMBEDDING_DEPLOYMENT": "<insert your embeddings deployment here>",
+    "OPENAI_API_VERSION": "<insert your open api version here>"
 }

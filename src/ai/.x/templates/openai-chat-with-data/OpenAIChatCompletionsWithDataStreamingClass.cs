@@ -12,7 +12,8 @@ using System.Threading.Tasks;
 
 public class <#= ClassName #>
 {
-    public <#= ClassName #>(string systemPrompt, string openAIKey, string openAIEndpoint, string openAIDeploymentName, string searchEndpoint, string searchApiKey, string searchIndexName)
+    public <#= ClassName #>(
+        string systemPrompt, string openAIKey, string openAIEndpoint, string openAIDeploymentName, string searchEndpoint, string searchApiKey, string searchIndexName, string embeddingsEndpoint)
     {
         _systemPrompt = systemPrompt;
         _client = string.IsNullOrEmpty(openAIKey)
@@ -26,6 +27,8 @@ public class <#= ClassName #>
             Key = searchApiKey,
             IndexName = searchIndexName,
             QueryType = queryType,
+            EmbeddingEndpoint = new Uri(embeddingsEndpoint),
+            EmbeddingKey = openAIKey,
         };
         _options = new ChatCompletionsOptions()
         {
@@ -72,14 +75,6 @@ public class <#= ClassName #>
             }
         }
 
-        <# if (OPTION_INCLUDE_CITATIONS)
-        { #>
-        Console.WriteLine("Citations and other information:");
-        foreach (var contextMessage in responseContent.AzureExtensionsContext.Messages)
-        {
-            Console.WriteLine($"Assistant: {contextMessage.Content}");
-        }
-        <# } #>
         _options.Messages.Add(new ChatRequestAssistantMessage(responseContent));
         return responseContent;
     }
