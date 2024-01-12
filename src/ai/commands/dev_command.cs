@@ -87,11 +87,46 @@ namespace Azure.AI.Details.Common.CLI
             var outputDirectory = !filesInDirAlready ? "." : templateName + ProgrammingLanguageToken.GetSuffix(language);
             var instructions = InstructionsToken.Data().GetOrDefault(_values);
 
-            if (!TemplateFactory.GenerateTemplateFiles(templateName, language, instructions, outputDirectory, _quiet, _verbose))
+            var found = TemplateFactory.GenerateTemplateFiles(templateName, language, instructions, outputDirectory, _quiet, _verbose);
+            if (found != null && found is TemplateFactory.Group)
             {
-                _values.AddThrowError("WARNING:", $"Template '{templateName}' not found",
-                                                   "",
-                                          "TRY:", $"{Program.Name} dev new list");
+                var group = found as TemplateFactory.Group;
+                var groupHasZeroLanguages = string.IsNullOrEmpty(group.Languages);
+                var groupHasMultipleLanguages = group.Languages.Contains(',');
+                var groupHasOneLanguage = !groupHasZeroLanguages && !groupHasMultipleLanguages;
+                
+                var languageSupplied = !string.IsNullOrEmpty(language);
+                if (languageSupplied)
+                {
+                    if (groupHasZeroLanguages || groupHasOneLanguage)
+                    {
+                        _values.AddThrowError("WARNING:", $"Template '{templateName}' does not support language '{language}'.",
+                                                          "",
+                                                  "TRY:", $"{Program.Name} dev new {templateName}");
+                    }
+                    else
+                    {
+                        _values.AddThrowError("WARNING:", $"Template '{templateName}' doesn't support language '{language}'.",
+                                                          "",
+                                                  "TRY:", $"{Program.Name} dev new {templateName} --LANGUAGE",
+                                                          "",
+                                                  "WHERE:", $"LANGUAGE is one of {group.Languages}");
+                    }
+                }
+                else
+                {
+                    _values.AddThrowError("WARNING:", $"Template '{templateName}' supports multiple languages.",
+                                                      "",
+                                              "TRY:", $"{Program.Name} dev new {templateName} --LANGUAGE",
+                                                      "",
+                                            "WHERE:", $"LANGUAGE is one of {group.Languages}");
+                }
+            }
+            if (found == null)
+            {
+                _values.AddThrowError("WARNING:", $"Template '{templateName}' not found.",
+                                                    "",
+                                            "TRY:", $"{Program.Name} dev new list");
             }
         }
 

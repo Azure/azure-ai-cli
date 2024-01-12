@@ -14,7 +14,7 @@ namespace Azure.AI.Details.Common.CLI.Extensions.Templates
 {
     public class TemplateFactory
     {
-        class NameShortLangItem
+        public class Item
         {
             public string LongName { get; set; } = string.Empty;
             public string ShortName { get; set; } = string.Empty;
@@ -22,47 +22,56 @@ namespace Azure.AI.Details.Common.CLI.Extensions.Templates
             public string UniqueName { get; set; } = string.Empty;
         }
 
-        class GroupedLongNameItem
+        public class Group
         {
             public string LongName { get; set; } = string.Empty;
             public string ShortName { get; set; } = String.Empty;
             public string Languages { get { return string.Join(", ", Items.OrderBy(x => x.Language).Select(x => x.Language)); } }
-            public List<NameShortLangItem> Items { get; set; } = new List<NameShortLangItem>();
+            public List<Item> Items { get; set; } = new List<Item>();
         }
 
         public static bool ListTemplates()
         {
-            var grouped = GetGroupedTemplateItems();
+            var groups = GetTemplateGroups();
 
             var longNameLabel = "Name";
             var shortNameLabel = "Short Name";
             var languageLabel = "Language";
 
             var widths = new int[3];
-            widths[0] = Math.Max(longNameLabel.Length, grouped.Max(x => x.LongName.Length));
-            widths[1] = Math.Max(shortNameLabel.Length, grouped.Max(x => x.ShortName.Length));
-            widths[2] = Math.Max(languageLabel.Length, grouped.Max(x => x.Languages.Length));
+            widths[0] = Math.Max(longNameLabel.Length, groups.Max(x => x.LongName.Length));
+            widths[1] = Math.Max(shortNameLabel.Length, groups.Max(x => x.ShortName.Length));
+            widths[2] = Math.Max(languageLabel.Length, groups.Max(x => x.Languages.Length));
 
             Console.WriteLine($"{longNameLabel.PadRight(widths[0])}    {shortNameLabel.PadRight(widths[1])}    {languageLabel.PadRight(widths[2])}");
             Console.WriteLine($"{"-".PadRight(widths[0], '-')}    {"-".PadRight(widths[1], '-')}    {"-".PadRight(widths[2], '-')}");
 
-            for (int i = 0; i < grouped.Count; i++)
+            for (int i = 0; i < groups.Count; i++)
             {
-                var longName = grouped[i].LongName;
-                var shortName = grouped[i].ShortName.Replace('_', '-');
-                var languages = grouped[i].Languages;
+                var longName = groups[i].LongName;
+                var shortName = groups[i].ShortName.Replace('_', '-');
+                var languages = groups[i].Languages;
                 Console.WriteLine($"{longName.PadRight(widths[0])}    {shortName.PadRight(widths[1])}    {languages.PadRight(widths[2])}");
             }
 
             return true;
         }
 
-        public static bool GenerateTemplateFiles(string templateName, string language, string instructions, string outputDirectory, bool quiet, bool verbose)
+        public static object? GenerateTemplateFiles(string templateName, string language, string instructions, string outputDirectory, bool quiet, bool verbose)
         {
-            var root = FileHelpers.FileNameFromResourceName("templates") + "/";
+            var groups = GetTemplateGroups();
+            var groupFound = groups.Where(x => x.ShortName == templateName).FirstOrDefault()
+                          ?? groups.Where(x => x.LongName == templateName).FirstOrDefault();
+            if (groupFound == null) return null;
 
-            var suffix = ProgrammingLanguageToken.GetSuffix(language);
-            templateName += suffix;
+            var templateFound = !string.IsNullOrEmpty(language)
+                ? groupFound.Items.Where(x => x.Language == language).FirstOrDefault()
+                : groupFound.Items.Count != 1
+                    ? groupFound.Items.Where(x => x.Language == string.Empty).FirstOrDefault()
+                    : groupFound.Items.FirstOrDefault();
+            if (templateFound == null) return groupFound;
+
+            templateName = templateFound.UniqueName;
 
             var normalizedTemplateName = templateName.Replace('-', '_');
             var generator = new TemplateGenerator();
@@ -127,7 +136,7 @@ namespace Azure.AI.Details.Common.CLI.Extensions.Templates
             return true;
         }
 
-        private static List<GroupedLongNameItem> GetGroupedTemplateItems()
+        private static List<Group> GetTemplateGroups()
         {
             var root = FileHelpers.FileNameFromResourceName("templates") + "/";
             var files = FileHelpers.FindFilesInTemplatePath("*", null).ToList();
@@ -142,7 +151,7 @@ namespace Azure.AI.Details.Common.CLI.Extensions.Templates
                 .ToList();
             uniqueNames.Sort();
 
-            var templates = new List<NameShortLangItem>();
+            var templates = new List<Item>();
             foreach (var uniqueName in uniqueNames)
             {
                 var parameters = GetParameters(uniqueName);
@@ -150,7 +159,7 @@ namespace Azure.AI.Details.Common.CLI.Extensions.Templates
                 var shortName = parameters["_Short"];
                 var language = parameters["_Language"];
 
-                templates.Add(new NameShortLangItem()
+                templates.Add(new Item()
                 {
                     LongName = longName,
                     ShortName = shortName,
@@ -159,7 +168,7 @@ namespace Azure.AI.Details.Common.CLI.Extensions.Templates
                 });
             }
 
-            templates.Add(new NameShortLangItem()
+            templates.Add(new Item()
             {
                 LongName = "Environment Variables",
                 ShortName = ".env",
@@ -169,7 +178,7 @@ namespace Azure.AI.Details.Common.CLI.Extensions.Templates
 
             var grouped = templates
                 .GroupBy(x => x.LongName)
-                .Select(x => new GroupedLongNameItem()
+                .Select(x => new Group()
                 {
                     LongName = x.Key,
                     ShortName = x.First().ShortName,
@@ -179,6 +188,7 @@ namespace Azure.AI.Details.Common.CLI.Extensions.Templates
                 .ToList();
             return grouped;
         }
+
         private static IEnumerable<string> GetTemplateFileNames(string templateName, TemplateGenerator generator)
         {
             var files = FileHelpers.FindFilesInTemplatePath($"{templateName}/*", null).ToList();
