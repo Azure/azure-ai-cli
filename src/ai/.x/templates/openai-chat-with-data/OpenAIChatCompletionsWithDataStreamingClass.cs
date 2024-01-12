@@ -48,7 +48,7 @@ public class <#= ClassName #>
         _options.Messages.Add(new ChatRequestSystemMessage(_systemPrompt));
     }
 
-    public async Task<string> GetChatCompletionsStreamingAsync(string userPrompt, Action<StreamingChatCompletionsUpdate> callback = null)
+    public async Task<string> GetChatCompletionsStreamingAsync(string userPrompt, Action<StreamingChatCompletionsUpdate>? callback = null)
     {
         _options.Messages.Add(new ChatRequestUserMessage(userPrompt));
 
