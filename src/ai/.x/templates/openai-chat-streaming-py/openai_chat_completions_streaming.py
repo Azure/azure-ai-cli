@@ -1,6 +1,6 @@
 from openai import AzureOpenAI
 
-class ChatCompletionsStreaming:
+class OpenAIChatCompletionsStreaming:
     def __init__(self, system_prompt, endpoint, azure_api_key, azure_api_version, deployment_name):
         self.system_prompt = system_prompt
         self.endpoint = endpoint
