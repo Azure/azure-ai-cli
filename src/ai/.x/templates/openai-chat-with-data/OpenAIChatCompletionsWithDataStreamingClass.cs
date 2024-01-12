@@ -1,23 +1,43 @@
 <#@ template hostspecific="true" #>
 <#@ output extension=".cs" encoding="utf-8" #>
 <#@ parameter type="System.String" name="ClassName" #>
+<#@ parameter type="System.Boolean" name="OPTION_INCLUDE_CITATIONS" #>
 using Azure;
 using Azure.AI.OpenAI;
 using Azure.Identity;
 using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Threading.Tasks;
 
 public class <#= ClassName #>
 {
-    public <#= ClassName #>(string systemPrompt, string azureApiKey, string openAIEndpoint, string openAIDeploymentName)
+    public <#= ClassName #>(
+        string systemPrompt, string openAIKey, string openAIEndpoint, string openAIDeploymentName, string searchEndpoint, string searchApiKey, string searchIndexName, string embeddingsEndpoint)
     {
         _systemPrompt = systemPrompt;
-
-        _client = string.IsNullOrEmpty(azureApiKey)
+        _client = string.IsNullOrEmpty(openAIKey)
             ? new OpenAIClient(new Uri(openAIEndpoint), new DefaultAzureCredential())
-            : new OpenAIClient(new Uri(openAIEndpoint), new AzureKeyCredential(azureApiKey));
+            : new OpenAIClient(new Uri(openAIEndpoint), new AzureKeyCredential(openAIKey));
 
-        _options = new ChatCompletionsOptions();
-        _options.DeploymentName = openAIDeploymentName;
+        var extensionConfig = new AzureCognitiveSearchChatExtensionConfiguration()
+        {
+            SearchEndpoint = new Uri(searchEndpoint),
+            Key = searchApiKey,
+            IndexName = searchIndexName,
+            QueryType = AzureCognitiveSearchQueryType.VectorSimpleHybrid, // Use VectorSimpleHybrid to get the best of both vector and keyword types.
+            EmbeddingEndpoint = new Uri(embeddingsEndpoint),
+            EmbeddingKey = openAIKey,
+        };
+        _options = new ChatCompletionsOptions()
+        {
+            DeploymentName = openAIDeploymentName,
+
+            AzureExtensionsOptions = new()
+            {
+                Extensions = { extensionConfig }
+            }
+        };
         ClearConversation();
     }
 
@@ -35,7 +55,6 @@ public class <#= ClassName #>
         var response = await _client.GetChatCompletionsStreamingAsync(_options);
         await foreach (var update in response.EnumerateValues())
         {
-
             var content = update.ContentUpdate;
             if (update.FinishReason == CompletionsFinishReason.ContentFiltered)
             {
