@@ -5,6 +5,8 @@ package main
 
 import (
     "context"
+    "errors"
+    "io"
 
     "github.com/Azure/azure-sdk-for-go/sdk/ai/azopenai"
     "github.com/Azure/azure-sdk-for-go/sdk/azcore/to"
@@ -44,16 +46,48 @@ func (chat *<#= ClassName #>) ClearConversation() {
     chat.options.Messages = chat.options.Messages[:1]
 }
 
-func (chat *<#= ClassName #>) GetChatCompletions(userPrompt string) (string, error) {
+func (chat *<#= ClassName #>) GetChatCompletionsStream(userPrompt string, callback func(content string)) (string, error) {
     chat.options.Messages = append(chat.options.Messages, azopenai.ChatMessage{Role: to.Ptr(azopenai.ChatRoleUser), Content: to.Ptr(userPrompt)})
 
-    resp, err := chat.client.GetChatCompletions(context.TODO(), *chat.options, nil)
+    resp, err := chat.client.GetChatCompletionsStream(context.TODO(), *chat.options, nil)
     if err != nil {
         return "", err
     }
+    defer resp.ChatCompletionsStream.Close()
 
-    responseContent := *resp.Choices[0].Message.Content
+    responseContent := ""
+    for {
+        chatCompletions, err := resp.ChatCompletionsStream.Read()
+        if errors.Is(err, io.EOF) {
+            break
+        }
+        if err != nil {
+            return "", err
+        }
+
+        for _, choice := range chatCompletions.Choices {
+
+            content := ""
+            if choice.Delta.Content != nil {
+                content = *choice.Delta.Content
+            }
+
+            if choice.FinishReason != nil {
+                finishReason := *choice.FinishReason
+                if finishReason == azopenai.CompletionsFinishReasonLength {
+                    content = content + "\nWARNING: Exceeded token limit!"
+                }
+            }
+
+            if content == "" {
+                continue
+            }
+
+            callback(content)
+            responseContent += content
+        }
+    }
+
     chat.options.Messages = append(chat.options.Messages, azopenai.ChatMessage{Role: to.Ptr(azopenai.ChatRoleAssistant), Content: to.Ptr(responseContent)})
-
     return responseContent, nil
 }

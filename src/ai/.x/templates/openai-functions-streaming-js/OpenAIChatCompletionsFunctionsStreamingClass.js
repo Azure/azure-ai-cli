@@ -25,7 +25,7 @@ class <#= ClassName #> {
 
     let contentComplete = '';
     while (true) {
-      const events = this.client.listChatCompletions(this.deploymentName, this.messages, {
+      const events = await this.client.streamChatCompletions(this.deploymentName, this.messages, {
         functions: this.functionFactory.getFunctionSchemas(),
       });
 

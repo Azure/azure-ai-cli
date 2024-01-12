@@ -1,4 +1,4 @@
-module openai_chat_completions_hello_world
+module openai_chat_completions_streaming_hello_world
 
 require (
 	github.com/Azure/azure-sdk-for-go/sdk/ai/azopenai v0.3.0
