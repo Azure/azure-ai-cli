@@ -5,8 +5,8 @@
 <#@ parameter type="System.String" name="AZURE_OPENAI_API_VERSION" #>
 <#@ parameter type="System.String" name="AZURE_OPENAI_CHAT_DEPLOYMENT" #>
 <#@ parameter type="System.String" name="AZURE_OPENAI_SYSTEM_PROMPT" #>
-from chat_completions_custom_functions import factory
-from chat_completions_functions_streaming import ChatCompletionsFunctionsStreaming
+from openai_chat_completions_custom_functions import factory
+from openai_chat_completions_functions_streaming import OpenAIChatCompletionsFunctionsStreaming
 import os
 
 def main():
@@ -16,7 +16,7 @@ def main():
     deployment_name = os.getenv('AZURE_OPENAI_CHAT_DEPLOYMENT', '<#= AZURE_OPENAI_CHAT_DEPLOYMENT #>')
     system_prompt = os.getenv('AZURE_OPENAI_SYSTEM_PROMPT', '<#= AZURE_OPENAI_SYSTEM_PROMPT #>')
 
-    chat = ChatCompletionsFunctionsStreaming(system_prompt, endpoint, azure_api_key, api_version, deployment_name, factory)
+    chat = OpenAIChatCompletionsFunctionsStreaming(system_prompt, endpoint, azure_api_key, api_version, deployment_name, factory)
 
     while True:
         user_input = input('User: ')
