@@ -1,7 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
-  <Product Id="*" Name="Azure AI CLI" Language="1033" Version="1.0.0.0" Manufacturer="Microsoft" UpgradeCode="436172626F6E20697320636F6F6C2121">
-    <Package InstallerVersion="200" Compressed="yes" InstallScope="perMachine" />
+
+  <Product Id="*" Name="Azure AI CLI" Language="1033" Version="1.0.0" Manufacturer="Microsoft" UpgradeCode="436172626F6E20697320636F6F6C2121">
+    <Package InstallerVersion="500" Compressed="yes" InstallScope="perMachine" Platform="$(var.platform)" />
+
+    <Upgrade Id='436172626F6E20697320636F6F6C2121'>
+      <!-- same version already installed -->
+      <UpgradeVersion OnlyDetect='yes' Property='SELFFOUND'
+        Minimum='1.0.0' IncludeMinimum='yes'
+        Maximum='1.0.0' IncludeMaximum='yes' />
+      <!-- newer version already installed -->
+      <UpgradeVersion OnlyDetect='yes' Property='NEWERFOUND'
+        Minimum='1.0.0' IncludeMinimum='no' />
+      <!-- older version already installed -->
+      <!--
+      <UpgradeVersion OnlyDetect='no' Property='PREVIOUSFOUND'
+        Minimum='1.0.0' IncludeMinimum='yes'
+        Maximum='2.0.0' IncludeMaximum='no' />
+      -->
+    </Upgrade>
 
     <Media Id="1" Cabinet="media1.cab" EmbedCab="yes" />
 
@@ -11,8 +28,25 @@
       </Directory>
     </Directory>
 
-    <CustomAction Id="RunInstallBatchScript" FileKey="InstallBatchScript" ExeCommand="" Execute="immediate" Return="check"/>
+    <CustomAction Id='AlreadyUpdated' Error='This product version is already installed.' />
+    <CustomAction Id='NoDowngrade' Error='A newer product version is already installed.' />
+
+    <Property Id="CLI_INSTALL_ERROR" Secure="yes" />
+    <CustomAction Id="RunInstallBatchScript"
+              Script="vbscript"
+              Execute="immediate">
+      <![CDATA[
+        On Error Resume Next
+        Dim objShell, intReturnCode
+        Set objShell = CreateObject("WScript.Shell")
+        intReturnCode = objShell.Run("$(sys.SOURCEFILEDIR)\InstallCLI.cmd", 0, True)
+        If intReturnCode <> 0 Then
+            Session.Property("CLI_INSTALL_ERROR") = "Error installing AI CLI: " & intReturnCode
+        End If
+      ]]>
+    </CustomAction>
     <CustomAction Id="RunUninstallBatchScript" FileKey="UninstallBatchScript" ExeCommand="" Execute="immediate" Return="ignore"/>
+    <CustomAction Id="RunUninstallOnInstallFailureBatchScript" FileKey="UninstallBatchScript" ExeCommand="" Execute="immediate" Return="ignore"/>
 
     <ComponentGroup Id="ProductComponents" Directory="INSTALLFOLDER">
       <Component Id="InstallBatchScriptComponent" Guid="436172626F6E20697320636F6F6C2120">
@@ -24,8 +58,18 @@
     </ComponentGroup>
 
     <InstallExecuteSequence>
-      <Custom Action="RunInstallBatchScript" After="InstallFinalize">NOT Installed</Custom>
+      <!-- CLI install/uninstall options -->
+      <Custom Action='AlreadyUpdated' After='FindRelatedProducts'>SELFFOUND</Custom>
+      <Custom Action='NoDowngrade' After='FindRelatedProducts'>NEWERFOUND</Custom>
+      <Custom Action="RunInstallBatchScript" After="InstallFinalize">
+        <![CDATA[NOT Installed OR REINSTALL OR UPGRADINGPRODUCTCODE]]>
+      </Custom>
       <Custom Action="RunUninstallBatchScript" Before="RemoveFiles">Installed</Custom>
+
+      <!-- Ensure INSTALLFOLDER is cleared if the initial installation fails -->
+      <Custom Action="RunUninstallOnInstallFailureBatchScript" After="RunInstallBatchScript">
+        <![CDATA[NOT Installed AND CLI_INSTALL_ERROR]]>
+      </Custom>
     </InstallExecuteSequence>
 
     <Feature Id="MainFeature" Title="Main Feature" Level="1">

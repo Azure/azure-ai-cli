@@ -1,2 +1,2 @@
 @echo off
-dotnet.exe tool uninstall --global Azure.AI.CLI
+dotnet.exe tool uninstall --global Azure.AI.CLI 2>nul

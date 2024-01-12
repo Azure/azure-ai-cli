@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi"
+     xmlns:bal="http://schemas.microsoft.com/wix/BalExtension"
+     xmlns:util="http://schemas.microsoft.com/wix/UtilExtension">
+
+    <Bundle Name="Azure AI CLI"
+            Version="1.0.0.0"
+            Manufacturer="Microsoft"
+            UpgradeCode="436172626F6E20697320636F6F6C2123">
+
+        <BootstrapperApplicationRef Id="WixStandardBootstrapperApplication.RtfLicense">
+            <bal:WixStandardBootstrapperApplication LicenseFile="CLI_License.rtf" SuppressOptionsUI="yes" SuppressRepair="yes"/>
+        </BootstrapperApplicationRef>
+
+        <Chain>
+            <PackageGroupRef Id="Dependencies"/>
+            <MsiPackage Id="AzureAI_CLI" SourceFile="Azure-AI-CLI.msi" Vital="yes"/>
+        </Chain>
+    </Bundle>
+
+    <Fragment>
+        <!-- .NET Runtime location -->
+        <util:DirectorySearch Id="DotNetDirectory"
+                              Path="[ProgramFiles64Folder]dotnet\shared\Microsoft.NETCore.App\$(var.dotNetVersion)"
+                              Result="exists"
+                              Variable="DOTNET_RUNTIME_INSTALLED"/>
+
+        <!-- Azure CLI location -->
+        <util:DirectorySearch Id="AzureCLIDirectory"
+                              Path="[ProgramFiles64Folder]Microsoft SDKs\Azure\CLI2"
+                              Result="exists"
+                              Variable="AZURE_CLI_INSTALLED"/>
+
+        <PackageGroup Id="Dependencies">
+            <!-- .NET Runtime -->
+            <ExePackage Id="DotNetRuntime"
+                        Name="dotnet-runtime-$(var.dotNetVersion)-win-$(var.platform).exe"
+                        Compressed="no"
+                        DetectCondition="DOTNET_RUNTIME_INSTALLED"
+                        DownloadUrl="$(var.dotNetUrl)"
+                        InstallCommand="/passive /norestart"
+                        PerMachine="yes"
+                        Permanent="yes"
+                        Vital="yes">
+                <RemotePayload Description=".NET Runtime"
+                               ProductName=".NET Runtime"
+                               Version="$(var.dotNetVersion).0"
+                               Size="$(var.dotNetSize)"
+                               Hash="$(var.dotNetSha1)"/>
+            </ExePackage>
+
+            <!-- Azure CLI -->
+            <ExePackage Id="AzureCLI"
+                        Name="InstallAzureCLI.cmd"
+                        Compressed="yes"
+                        DetectCondition="AZURE_CLI_INSTALLED"
+                        SourceFile="InstallAzureCLI.cmd"
+                        InstallCommand="$(var.azureCliVersion) $(var.platform)"
+                        PerMachine="yes"
+                        Permanent="yes"
+                        Vital="yes"/>
+        </PackageGroup>
+    </Fragment>
+</Wix>
