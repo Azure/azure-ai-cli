@@ -1,0 +1,15 @@
+{
+  "_Name": "OpenAI Chat Completions w/ your own data in Python",
+  "_Language": "Python",
+  "AICLIExtensionReferencePath": "",
+  "ClassName": "OpenAIChatCompletionsWithDataStreamingClass",
+  "AZURE_OPENAI_KEY": "<insert your OpenAI API key here>",
+  "AZURE_OPENAI_ENDPOINT": "<insert your OpenAI endpoint here>",
+  "AZURE_OPENAI_SYSTEM_PROMPT": "<insert your OpenAI system prompt here>",
+  "AZURE_AI_SEARCH_ENDPOINT": "<insert your search endpoint here>",
+  "AZURE_AI_SEARCH_KEY": "<insert your search api key here>",
+  "AZURE_AI_SEARCH_INDEX_NAME": "<insert your search index name here>",
+  "AZURE_OPENAI_CHAT_DEPLOYMENT": "<insert your chat deployment here>",
+  "AZURE_OPENAI_EMBEDDING_DEPLOYMENT": "<insert your embeddings deployment here>",
+  "OPENAI_API_VERSION": "<insert your open api version here>"
+}
