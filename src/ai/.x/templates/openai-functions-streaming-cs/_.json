@@ -1,5 +1,6 @@
 {
-  "_Name": "OpenAI Chat Completions (Functions) in C#",
+  "_Name": "OpenAI Chat Completions (Functions)",
+  "_Short": "openai-functions-streaming",
   "_Language": "C#",
   "ClassName": "OpenAIChatCompletionsFunctionsStreamingClass",
   "AZURE_OPENAI_ENDPOINT": "<insert your OpenAI endpoint here>",

@@ -1,5 +1,6 @@
 {
-  "_Name": "OpenAI Chat Completions (Functions) in Python",
+  "_Name": "OpenAI Chat Completions (Functions)",
+  "_Short": "openai-functions-streaming",
   "_Language": "Python",
   "AZURE_OPENAI_ENDPOINT": "<insert your OpenAI endpoint here>",
   "AZURE_OPENAI_KEY": "<insert your OpenAI API key here>",

@@ -1,5 +1,6 @@
 {
   "_Name": "OpenAI Webpage (Streaming + Functions)",
+  "_Short": "openai-webpage",
   "_Language": "Javascript",
   "ClassName": "OpenAIChatCompletionsFunctionsStreamingClass",
   "AZURE_OPENAI_ENDPOINT": "<insert your OpenAI endpoint here>",

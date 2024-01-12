@@ -62,10 +62,11 @@ namespace Azure.AI.Details.Common.CLI
         private void DoNew()
         {
             var newWhat = string.Join(" ", ArgXToken.GetArgs(_values));
+            var language = ProgrammingLanguageToken.Data().GetOrDefault(_values);
             switch (newWhat)
             {
                 case ".env": DoNewEnv(); break;
-                default: DoNewTemplate(newWhat); break;
+                default: DoNewTemplate(newWhat, language); break;
             }
         }
 
@@ -80,13 +81,13 @@ namespace Azure.AI.Details.Common.CLI
             ConfigEnvironmentHelpers.PrintEnvironment(env);
         }
 
-        private void DoNewTemplate(string templateName)
+        private void DoNewTemplate(string templateName, string language)
         {
             var filesInDirAlready = FileHelpers.FindFiles(".", "*").Count() > 0;
-            var outputDirectory = !filesInDirAlready ? "." : templateName;
+            var outputDirectory = !filesInDirAlready ? "." : templateName + ProgrammingLanguageToken.GetSuffix(language);
             var instructions = InstructionsToken.Data().GetOrDefault(_values);
 
-            if (!TemplateFactory.GenerateTemplateFiles(templateName, instructions, outputDirectory, _quiet, _verbose))
+            if (!TemplateFactory.GenerateTemplateFiles(templateName, language, instructions, outputDirectory, _quiet, _verbose))
             {
                 _values.AddThrowError("WARNING:", $"Template '{templateName}' not found",
                                                    "",
