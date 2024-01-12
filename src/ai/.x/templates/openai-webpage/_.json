@@ -1,5 +1,5 @@
 {
-  "_Name": "OpenAI Webpage (Streaming + Functions)",
+  "_Name": "OpenAI Webpage (w/ Functions)",
   "_Short": "openai-webpage",
   "_Language": "JavaScript",
   "ClassName": "OpenAIChatCompletionsFunctionsStreamingClass",
