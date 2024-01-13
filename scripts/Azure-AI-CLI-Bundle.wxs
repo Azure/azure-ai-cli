@@ -42,6 +42,7 @@
         <PackageGroup Id="DotNetRuntime">
             <ExePackage Id="DotNetRuntime"
                         Name="dotnet-runtime-$(var.dotNetVersion)-win-$(var.platform).exe"
+                        Cache="no"
                         Compressed="no"
                         DetectCondition="DOTNET_RUNTIME_INSTALLED"
                         DownloadUrl="$(var.dotNetUrl)"

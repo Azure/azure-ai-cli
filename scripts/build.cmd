@@ -4,6 +4,8 @@ setlocal
 REM Use x.y.z for version. MSI ignores the fourth product version field.
 set VERSION=1.0.0
 set PLATFORM=x64
+set INSTALLER=Azure-AI-CLI-Setup-%VERSION%-%PLATFORM%.exe
+REM Dependencies
 set AZURE_CLI_VERSION=2.56.0
 set DOTNET_VERSION=7.0.15
 set DOTNET_URL=https://download.visualstudio.microsoft.com/download/pr/83b58670-c0ea-4442-ad35-beb5009f5396/bcf1e10f57dbeea2f46490430abf6882/dotnet-runtime-%DOTNET_VERSION%-win-%PLATFORM%.exe
@@ -41,7 +43,7 @@ if %ERRORLEVEL% neq 0 (
   exit /b %EXITCODE%
 )
 
-light.exe Azure-AI-CLI-Bundle.wixobj -ext WixBalExtension -ext WixUtilExtension -o Azure-AI-CLI-Setup.exe
+light.exe Azure-AI-CLI-Bundle.wixobj -ext WixBalExtension -ext WixUtilExtension -o %INSTALLER%
 if %ERRORLEVEL% neq 0 (
   set EXITCODE=%ERRORLEVEL%
   echo Error from light.exe [%EXITCODE%] 1>&2
@@ -49,6 +51,5 @@ if %ERRORLEVEL% neq 0 (
 )
 
 :end
+echo Run %INSTALLER% to install.
 endlocal
-
-echo Run Azure-AI-CLI-Setup.exe to install.
