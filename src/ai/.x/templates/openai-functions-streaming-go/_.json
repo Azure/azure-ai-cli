@@ -1,5 +1,6 @@
 {
-  "_Name": "OpenAI Chat Completions (Functions) in Go",
+  "_Name": "OpenAI Chat Completions (w/ Functions)",
+  "_Short": "openai-functions-streaming",
   "_Language": "Go",
   "ClassName": "OpenAIChatCompletionsStreamingExample",
   "AZURE_OPENAI_ENDPOINT": "<insert your OpenAI endpoint here>",
