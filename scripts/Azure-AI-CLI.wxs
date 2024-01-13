@@ -1,24 +1,30 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
 
-  <Product Id="*" Name="Azure AI CLI" Language="1033" Version="1.0.0" Manufacturer="Microsoft" UpgradeCode="436172626F6E20697320636F6F6C2121">
+  <Product Id="*" Name="Azure AI CLI" Language="1033" Version="$(var.version)" Manufacturer="Microsoft" UpgradeCode="436172626F6E20697320636F6F6C2121">
     <Package InstallerVersion="500" Compressed="yes" InstallScope="perMachine" Platform="$(var.platform)" />
+    <!--
+    To prevent problems with bundle upgrades, use MajorUpgrade element here + ProductSearch in the bundle .wxs. Ref.
+    https://stackoverflow.com/questions/15156081/wix-bundle-upgrade-a-new-version-of-msi-is-installed-before-the-old-version-is
+    -->
+    <MajorUpgrade AllowDowngrades="no" DowngradeErrorMessage="A newer version is already installed."/>
 
-    <Upgrade Id='436172626F6E20697320636F6F6C2121'>
-      <!-- same version already installed -->
-      <UpgradeVersion OnlyDetect='yes' Property='SELFFOUND'
-        Minimum='1.0.0' IncludeMinimum='yes'
-        Maximum='1.0.0' IncludeMaximum='yes' />
-      <!-- newer version already installed -->
-      <UpgradeVersion OnlyDetect='yes' Property='NEWERFOUND'
-        Minimum='1.0.0' IncludeMinimum='no' />
-      <!-- older version already installed -->
-      <!--
-      <UpgradeVersion OnlyDetect='no' Property='PREVIOUSFOUND'
-        Minimum='1.0.0' IncludeMinimum='yes'
-        Maximum='2.0.0' IncludeMaximum='no' />
-      -->
+    <!-- Below can be used with single MSI-only installations -->
+    <!--
+    <Upgrade Id="436172626F6E20697320636F6F6C2121">
+      <UpgradeVersion OnlyDetect="yes" Property="SELFFOUND"
+        Minimum="$(var.version)" IncludeMinimum="yes"
+        Maximum="$(var.version)" IncludeMaximum="yes" />
+      <UpgradeVersion OnlyDetect="yes" Property="NEWERFOUND"
+        Minimum="$(var.version)" IncludeMinimum="no" />
+      <UpgradeVersion OnlyDetect="no" Property="PREVIOUSFOUND"
+        Minimum="1.0.0" IncludeMinimum="yes"
+        Maximum="$(var.version)" IncludeMaximum="no" />
     </Upgrade>
+
+    <CustomAction Id="AlreadyUpdated" Error="This version is already installed." />
+    <CustomAction Id="NoDowngrade" Error="A newer version is already installed." />
+    -->
 
     <Media Id="1" Cabinet="media1.cab" EmbedCab="yes" />
 
@@ -28,20 +34,22 @@
       </Directory>
     </Directory>
 
-    <CustomAction Id='AlreadyUpdated' Error='This product version is already installed.' />
-    <CustomAction Id='NoDowngrade' Error='A newer product version is already installed.' />
-
     <Property Id="CLI_INSTALL_ERROR" Secure="yes" />
     <CustomAction Id="RunInstallBatchScript"
               Script="vbscript"
               Execute="immediate">
       <![CDATA[
         On Error Resume Next
-        Dim objShell, intReturnCode
+        Dim objShell, intReturnCode, logFile
         Set objShell = CreateObject("WScript.Shell")
-        intReturnCode = objShell.Run("$(sys.SOURCEFILEDIR)\InstallCLI.cmd", 0, True)
+        logFile = objShell.ExpandEnvironmentStrings("%TEMP%") & "\InstallCLI.log"
+        intReturnCode = objShell.Run("$(sys.SOURCEFILEDIR)\InstallCLI.cmd >" & logFile & " 2>&1", 0, True)
         If intReturnCode <> 0 Then
-            Session.Property("CLI_INSTALL_ERROR") = "Error installing AI CLI: " & intReturnCode
+            Set fso = CreateObject("Scripting.FileSystemObject")
+            Set file = fso.OpenTextFile(logFile, 1)
+            text = file.ReadAll
+            file.Close
+            Session.Property("CLI_INSTALL_ERROR") = "Error installing AI CLI: " & text
         End If
       ]]>
     </CustomAction>
@@ -58,18 +66,14 @@
     </ComponentGroup>
 
     <InstallExecuteSequence>
-      <!-- CLI install/uninstall options -->
-      <Custom Action='AlreadyUpdated' After='FindRelatedProducts'>SELFFOUND</Custom>
-      <Custom Action='NoDowngrade' After='FindRelatedProducts'>NEWERFOUND</Custom>
-      <Custom Action="RunInstallBatchScript" After="InstallFinalize">
-        <![CDATA[NOT Installed OR REINSTALL OR UPGRADINGPRODUCTCODE]]>
-      </Custom>
-      <Custom Action="RunUninstallBatchScript" Before="RemoveFiles">Installed</Custom>
-
-      <!-- Ensure INSTALLFOLDER is cleared if the initial installation fails -->
-      <Custom Action="RunUninstallOnInstallFailureBatchScript" After="RunInstallBatchScript">
-        <![CDATA[NOT Installed AND CLI_INSTALL_ERROR]]>
-      </Custom>
+      <!--
+      <Custom Action="AlreadyUpdated" After="FindRelatedProducts">SELFFOUND</Custom>
+      <Custom Action="NoDowngrade" After="FindRelatedProducts">NEWERFOUND</Custom>
+      -->
+      <Custom Action="RunInstallBatchScript" After="InstallFinalize">NOT Installed OR REINSTALL OR UPGRADINGPRODUCTCODE</Custom>
+      <Custom Action="RunUninstallBatchScript" Before="RemoveFiles">Installed AND NOT REINSTALL AND NOT UPGRADINGPRODUCTCODE</Custom>
+      <!-- Ensure INSTALLFOLDER is cleared if installation fails -->
+      <Custom Action="RunUninstallOnInstallFailureBatchScript" After="RunInstallBatchScript">NOT Installed AND CLI_INSTALL_ERROR</Custom>
     </InstallExecuteSequence>
 
     <Feature Id="MainFeature" Title="Main Feature" Level="1">

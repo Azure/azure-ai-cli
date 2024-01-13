@@ -4,35 +4,42 @@
      xmlns:util="http://schemas.microsoft.com/wix/UtilExtension">
 
     <Bundle Name="Azure AI CLI"
-            Version="1.0.0.0"
+            Version="$(var.version)"
             Manufacturer="Microsoft"
-            UpgradeCode="436172626F6E20697320636F6F6C2123">
+            UpgradeCode="436172626F6E20697320636F6F6C2123"
+            DisableModify="yes">
 
         <BootstrapperApplicationRef Id="WixStandardBootstrapperApplication.RtfLicense">
             <bal:WixStandardBootstrapperApplication LicenseFile="CLI_License.rtf" SuppressOptionsUI="yes" SuppressRepair="yes"/>
         </BootstrapperApplicationRef>
 
+        <!-- Check the version of existing Azure AI CLI .msi installation -->
+        <util:ProductSearch Variable="AlreadyInstalledVersion"
+                            UpgradeCode="436172626F6E20697320636F6F6C2121"
+                            Id="AlreadyInstalledVersionSearch"
+                            Result="version"/>
+        <!-- Workaround for https://github.com/wixtoolset/issues/issues/3746 (note: WixBundleAction is 5 on Uninstall) -->
+        <bal:Condition Message="This version is already installed.">
+        NOT WixBundleAction = 5 OR NOT AlreadyInstalledVersion = v$(var.version)
+        </bal:Condition>
+
         <Chain>
-            <PackageGroupRef Id="Dependencies"/>
+            <!-- Dependencies -->
+            <PackageGroupRef Id="DotNetRuntime"/>
+            <PackageGroupRef Id="AzureCLI"/>
+
             <MsiPackage Id="AzureAI_CLI" SourceFile="Azure-AI-CLI.msi" Vital="yes"/>
         </Chain>
     </Bundle>
 
     <Fragment>
-        <!-- .NET Runtime location -->
+        <!-- .NET Runtime -->
         <util:DirectorySearch Id="DotNetDirectory"
                               Path="[ProgramFiles64Folder]dotnet\shared\Microsoft.NETCore.App\$(var.dotNetVersion)"
                               Result="exists"
                               Variable="DOTNET_RUNTIME_INSTALLED"/>
 
-        <!-- Azure CLI location -->
-        <util:DirectorySearch Id="AzureCLIDirectory"
-                              Path="[ProgramFiles64Folder]Microsoft SDKs\Azure\CLI2"
-                              Result="exists"
-                              Variable="AZURE_CLI_INSTALLED"/>
-
-        <PackageGroup Id="Dependencies">
-            <!-- .NET Runtime -->
+        <PackageGroup Id="DotNetRuntime">
             <ExePackage Id="DotNetRuntime"
                         Name="dotnet-runtime-$(var.dotNetVersion)-win-$(var.platform).exe"
                         Compressed="no"
@@ -48,8 +55,16 @@
                                Size="$(var.dotNetSize)"
                                Hash="$(var.dotNetSha1)"/>
             </ExePackage>
+        </PackageGroup>
 
-            <!-- Azure CLI -->
+        <!-- Azure CLI -->
+        <util:DirectorySearch Id="AzureCLIDirectory"
+                              Path="[ProgramFiles64Folder]Microsoft SDKs\Azure\CLI2"
+                              Result="exists"
+                              Variable="AZURE_CLI_INSTALLED"/>
+
+        <PackageGroup Id="AzureCLI">
+            <!-- Workaround for RemotePayload not supported with MsiPackage -->
             <ExePackage Id="AzureCLI"
                         Name="InstallAzureCLI.cmd"
                         Compressed="yes"

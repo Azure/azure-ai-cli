@@ -1,2 +1,2 @@
 @echo off
-dotnet.exe tool install --global Azure.AI.CLI --prerelease
+dotnet.exe tool update --global Azure.AI.CLI --prerelease
