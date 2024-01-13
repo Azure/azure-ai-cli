@@ -1,8 +1,9 @@
 {
-  "_Name": "OpenAI Chat Completions w/ your own data in Python",
+  "_Name": "OpenAI Chat Completions (w/ Data + AI Search)",
+  "_Short": "openai-data-ai-search-py",
   "_Language": "Python",
   "AICLIExtensionReferencePath": "",
-  "ClassName": "OpenAIChatCompletionsWithDataStreamingClass",
+  "ClassName": "OpenAIChatCompletionsStreamingWithDataAISearch",
   "AZURE_OPENAI_KEY": "<insert your OpenAI API key here>",
   "AZURE_OPENAI_ENDPOINT": "<insert your OpenAI endpoint here>",
   "AZURE_OPENAI_SYSTEM_PROMPT": "<insert your OpenAI system prompt here>",

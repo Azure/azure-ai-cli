@@ -1,17 +1,33 @@
+<#@ template hostspecific="true" #>
+<#@ output extension=".py" encoding="utf-8" #>
+<#@ parameter type="System.String" name="ClassName" #>
 from openai import AzureOpenAI
 
 class <#= ClassName #>:
-    def __init__(self, system_prompt, azure_openai_endpoint, azure_openai_api_key, azure_openai_api_version, azure_openai_deployment_name):
+    def __init__(self, system_prompt, azure_openai_endpoint, azure_openai_key, azure_openai_api_version, azure_openai_deployment_name, search_endpoint, search_api_key, search_index_name, embeddings_endpoint):
         self.system_prompt = system_prompt
-        self.azure_openai_endpoint = azure_openai_endpoint
-        self.azure_openai_api_key = azure_openai_api_key
-        self.azure_openai_api_version = azure_openai_api_version
         self.azure_openai_deployment_name = azure_openai_deployment_name
         self.client = AzureOpenAI(
-            api_key=self.azure_openai_api_key,
-            api_version=self.azure_openai_api_version,
-            azure_endpoint = self.azure_openai_endpoint
+            api_key=azure_openai_key,
+            api_version=azure_openai_api_version,
+            base_url = azure_openai_endpoint
             )
+        self.extra_body={
+            "dataSources": [
+                {
+                    "type": "AzureCognitiveSearch",
+                    "parameters": {
+                        "endpoint": search_endpoint,
+                        "key": search_api_key,
+                        "indexName": search_index_name,
+                        "embeddingEndpoint": embeddings_endpoint,
+                        "embeddingKey": azure_openai_key,
+                        "queryType": "vectorSimpleHybrid"
+                    }
+                }
+            ]
+        }
+
         self.clear_conversation()
 
     def clear_conversation(self):
@@ -26,6 +42,7 @@ class <#= ClassName #>:
         response = self.client.chat.completions.create(
             model=self.azure_openai_deployment_name,
             messages=self.messages,
+            extra_body=self.extra_body,
             stream=True)
 
         for chunk in response:

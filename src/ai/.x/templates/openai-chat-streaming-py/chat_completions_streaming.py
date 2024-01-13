@@ -1,16 +1,16 @@
+<#@ template hostspecific="true" #>
+<#@ output extension=".py" encoding="utf-8" #>
+<#@ parameter type="System.String" name="ClassName" #>
 from openai import AzureOpenAI
 
 class <#= ClassName #>:
-    def __init__(self, system_prompt, azure_openai_endpoint, azure_openai_api_key, azure_openai_api_version, azure_openai_deployment_name):
+    def __init__(self, system_prompt, azure_openai_endpoint, azure_openai_key, azure_openai_api_version, azure_openai_deployment_name):
         self.system_prompt = system_prompt
-        self.azure_openai_endpoint = azure_openai_endpoint
-        self.azure_openai_api_key = azure_openai_api_key
-        self.azure_openai_api_version = azure_openai_api_version
         self.azure_openai_deployment_name = azure_openai_deployment_name
         self.client = AzureOpenAI(
-            api_key=self.azure_openai_api_key,
-            api_version=self.azure_openai_api_version,
-            azure_endpoint = self.azure_openai_endpoint
+            api_key=azure_openai_key,
+            api_version=azure_openai_api_version,
+            azure_endpoint = azure_openai_endpoint
             )
         self.clear_conversation()
 
