@@ -10,7 +10,7 @@ class <#= ClassName #>:
         self.client = AzureOpenAI(
             api_key=azure_openai_key,
             api_version=azure_openai_api_version,
-            base_url = azure_openai_endpoint
+            base_url = f"{azure_openai_endpoint.rstrip('/')}/openai/deployments/{azure_openai_deployment_name}/extensions"
             )
         self.extra_body={
             "dataSources": [
