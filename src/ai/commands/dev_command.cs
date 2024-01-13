@@ -62,10 +62,11 @@ namespace Azure.AI.Details.Common.CLI
         private void DoNew()
         {
             var newWhat = string.Join(" ", ArgXToken.GetArgs(_values));
+            var language = ProgrammingLanguageToken.Data().GetOrDefault(_values);
             switch (newWhat)
             {
                 case ".env": DoNewEnv(); break;
-                default: DoNewTemplate(newWhat); break;
+                default: DoNewTemplate(newWhat, language); break;
             }
         }
 
@@ -80,18 +81,14 @@ namespace Azure.AI.Details.Common.CLI
             ConfigEnvironmentHelpers.PrintEnvironment(env);
         }
 
-        private void DoNewTemplate(string templateName)
+        private void DoNewTemplate(string templateName, string language)
         {
             var filesInDirAlready = FileHelpers.FindFiles(".", "*").Count() > 0;
-            var outputDirectory = !filesInDirAlready ? "." : templateName;
+            var outputDirectory = !filesInDirAlready ? "." : templateName + ProgrammingLanguageToken.GetSuffix(language);
             var instructions = InstructionsToken.Data().GetOrDefault(_values);
 
-            if (!TemplateFactory.GenerateTemplateFiles(templateName, instructions, outputDirectory, _quiet, _verbose))
-            {
-                _values.AddThrowError("WARNING:", $"Template '{templateName}' not found",
-                                                   "",
-                                          "TRY:", $"{Program.Name} dev new list");
-            }
+            var found = TemplateFactory.GenerateTemplateFiles(templateName, language, instructions, outputDirectory, _quiet, _verbose);
+            CheckGenerateTemplateFileWarnings(templateName, language, found);
         }
 
         private void DoNewList()
@@ -158,6 +155,50 @@ namespace Azure.AI.Details.Common.CLI
             {
                 var text = FileHelpers.ReadAllHelpText(logo, Encoding.UTF8);
                 ConsoleHelpers.WriteLineWithHighlight(text);
+            }
+        }
+
+        private void CheckGenerateTemplateFileWarnings(string templateName, string language, object check)
+        {
+            if (check != null && check is TemplateFactory.Group)
+            {
+                var group = check as TemplateFactory.Group;
+                var groupHasZeroLanguages = string.IsNullOrEmpty(group.Languages);
+                var groupHasMultipleLanguages = group.Languages.Contains(',');
+                var groupHasOneLanguage = !groupHasZeroLanguages && !groupHasMultipleLanguages;
+
+                var languageSupplied = !string.IsNullOrEmpty(language);
+                if (languageSupplied)
+                {
+                    if (groupHasZeroLanguages || groupHasOneLanguage)
+                    {
+                        _values.AddThrowError("WARNING:", $"Template '{templateName}' does not support language '{language}'.",
+                                                          "",
+                                                  "TRY:", $"{Program.Name} dev new {templateName}");
+                    }
+                    else
+                    {
+                        _values.AddThrowError("WARNING:", $"Template '{templateName}' doesn't support language '{language}'.",
+                                                          "",
+                                                  "TRY:", $"{Program.Name} dev new {templateName} --LANGUAGE",
+                                                          "",
+                                                  "WHERE:", $"LANGUAGE is one of {group.Languages}");
+                    }
+                }
+                else
+                {
+                    _values.AddThrowError("WARNING:", $"Template '{templateName}' supports multiple languages.",
+                                                      "",
+                                              "TRY:", $"{Program.Name} dev new {templateName} --LANGUAGE",
+                                                      "",
+                                            "WHERE:", $"LANGUAGE is one of {group.Languages}");
+                }
+            }
+            if (check == null)
+            {
+                _values.AddThrowError("WARNING:", $"Template '{templateName}' not found.",
+                                                    "",
+                                            "TRY:", $"{Program.Name} dev new list");
             }
         }
 

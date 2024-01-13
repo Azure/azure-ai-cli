@@ -1,5 +1,6 @@
 {
-  "_Name": "OpenAI Chat Completions in C#",
+  "_Name": "OpenAI Chat Completions",
+  "_Short": "openai-chat",
   "_Language": "C#",
   "ClassName": "OpenAIChatCompletionsClass",
   "AZURE_OPENAI_ENDPOINT": "<insert your OpenAI endpoint here>",
