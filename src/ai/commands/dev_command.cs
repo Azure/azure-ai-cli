@@ -93,7 +93,10 @@ namespace Azure.AI.Details.Common.CLI
 
         private void DoNewList()
         {
-            TemplateFactory.ListTemplates();
+            var newWhat = string.Join(" ", ArgXToken.GetArgs(_values));
+            var language = ProgrammingLanguageToken.Data().GetOrDefault(_values);
+
+            TemplateFactory.ListTemplates(newWhat, language);
         }
 
         private void DoDevShell()

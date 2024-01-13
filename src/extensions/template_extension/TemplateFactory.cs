@@ -30,9 +30,14 @@ namespace Azure.AI.Details.Common.CLI.Extensions.Templates
             public List<Item> Items { get; set; } = new List<Item>();
         }
 
-        public static bool ListTemplates()
+        public static bool ListTemplates(string? templateFilter, string? languageFilter)
         {
-            var groups = GetTemplateGroups();
+            var groups = GetFilteredTemplateGroups(templateFilter, languageFilter);
+            if (groups.Count == 0)
+            {
+                Console.WriteLine($"No matching templates found\n");
+                groups = GetTemplateGroups();
+            }
 
             var longNameLabel = "Name";
             var shortNameLabel = "Short Name";
@@ -187,6 +192,34 @@ namespace Azure.AI.Details.Common.CLI.Extensions.Templates
                 .OrderBy(x => x.ShortName)
                 .ToList();
             return grouped;
+        }
+
+        private static List<Group> GetFilteredTemplateGroups(string? templateFilter, string? languageFilter)
+        {
+            var groups = GetTemplateGroups();
+            if (string.IsNullOrEmpty(templateFilter) && string.IsNullOrEmpty(languageFilter)) return groups;
+
+            var filtered = groups
+                .Where(x => string.IsNullOrEmpty(templateFilter) || x.ShortName.Contains(templateFilter) || x.LongName.Contains(templateFilter))
+                .Where(x => string.IsNullOrEmpty(languageFilter) || x.Languages.Split(", ").Contains(languageFilter) || x.Languages == string.Empty)
+                .ToList();
+
+            if (filtered.Count > 0 && !string.IsNullOrEmpty(languageFilter))
+            {
+                groups.Clear();
+                foreach (var item in filtered)
+                {
+                    groups.Add(new Group()
+                    {
+                        LongName = item.LongName,
+                        ShortName = item.ShortName,
+                        Items = item.Items.Where(x => x.Language == languageFilter).ToList()
+                    });
+                }
+                return groups;
+            }
+
+            return filtered;
         }
 
         private static IEnumerable<string> GetTemplateFileNames(string templateName, TemplateGenerator generator)
