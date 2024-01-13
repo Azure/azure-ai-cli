@@ -49,7 +49,7 @@ namespace Azure.AI.Details.Common.CLI.Extensions.Templates
             widths[1] = Math.Max(shortNameLabel.Length, groups.Max(x => x.ShortName.Length));
             widths[2] = Math.Max(languageLabel.Length, groups.Max(x => x.Languages.Length));
 
-            var hideLongName = Screen.GetRightColumn() < widths.Sum() + 4 * 2 + 1;
+            var hideLongName = !Console.IsOutputRedirected && Screen.GetRightColumn() < widths.Sum() + 4 * 2 + 1;
 
             if (!hideLongName) Console.Write($"{longNameLabel.PadRight(widths[0])}    ");
             Console.WriteLine($"{shortNameLabel.PadRight(widths[1])}    {languageLabel.PadRight(widths[2])}");
