@@ -1,6 +1,6 @@
 {
     "_Name": "OpenAI Chat Completions (w/ Data + AI Search)",
-    "_Short": "openai-data-ai-search",
+    "_Short": "openai-chat-streaming-with-data",
     "_Language": "C#",
     "ClassName": "OpenAIChatCompletionsWithDataStreamingClass",
     "AZURE_OPENAI_ENDPOINT": "<insert your OpenAI endpoint here>",
