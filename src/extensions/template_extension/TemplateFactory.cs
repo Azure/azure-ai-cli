@@ -9,6 +9,7 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 using Azure.AI.Details.Common.CLI;
+using Azure.AI.Details.Common.CLI.ConsoleGui;
 
 namespace Azure.AI.Details.Common.CLI.Extensions.Templates
 {
@@ -48,15 +49,22 @@ namespace Azure.AI.Details.Common.CLI.Extensions.Templates
             widths[1] = Math.Max(shortNameLabel.Length, groups.Max(x => x.ShortName.Length));
             widths[2] = Math.Max(languageLabel.Length, groups.Max(x => x.Languages.Length));
 
-            Console.WriteLine($"{longNameLabel.PadRight(widths[0])}    {shortNameLabel.PadRight(widths[1])}    {languageLabel.PadRight(widths[2])}");
-            Console.WriteLine($"{"-".PadRight(widths[0], '-')}    {"-".PadRight(widths[1], '-')}    {"-".PadRight(widths[2], '-')}");
+            var hideLongName = Screen.GetRightColumn() < widths.Sum() + 4 * 2 + 1;
+
+            if (!hideLongName) Console.Write($"{longNameLabel.PadRight(widths[0])}    ");
+            Console.WriteLine($"{shortNameLabel.PadRight(widths[1])}    {languageLabel.PadRight(widths[2])}");
+
+            if (!hideLongName) Console.Write($"{"-".PadRight(widths[0], '-')}    ");
+            Console.WriteLine($"{"-".PadRight(widths[1], '-')}    {"-".PadRight(widths[2], '-')}");
 
             for (int i = 0; i < groups.Count; i++)
             {
                 var longName = groups[i].LongName;
                 var shortName = groups[i].ShortName.Replace('_', '-');
                 var languages = groups[i].Languages;
-                Console.WriteLine($"{longName.PadRight(widths[0])}    {shortName.PadRight(widths[1])}    {languages.PadRight(widths[2])}");
+
+                if (!hideLongName) Console.Write($"{longName.PadRight(widths[0])}    ");
+                Console.WriteLine($"{shortName.PadRight(widths[1])}    {languages.PadRight(widths[2])}");
             }
 
             return true;
