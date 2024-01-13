@@ -168,8 +168,8 @@ namespace Azure.AI.Details.Common.CLI.Extensions.Templates
             foreach (var uniqueName in uniqueNames)
             {
                 var parameters = GetParameters(uniqueName);
-                var longName = parameters["_Name"];
-                var shortName = parameters["_Short"];
+                var longName = parameters["_LongName"];
+                var shortName = parameters["_ShortName"];
                 var language = parameters["_Language"];
 
                 templates.Add(new Item()
