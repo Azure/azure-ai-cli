@@ -57,7 +57,9 @@ namespace Azure.AI.Details.Common.CLI
         {
             var normalized = new DirectoryInfo(outputDirectory).FullName;
             var cwd = Directory.GetCurrentDirectory();
-            return normalized.StartsWith(cwd) ? normalized.Substring(cwd.Length + 1) : normalized;
+            return normalized.StartsWith(cwd) && normalized.Length > cwd.Length + 1
+                ? normalized.Substring(cwd.Length + 1)
+                : normalized;
         }
     }
 
