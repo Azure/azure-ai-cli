@@ -6,7 +6,7 @@
 <#@ parameter type="System.String" name="AZURE_OPENAI_API_VERSION" #>
 <#@ parameter type="System.String" name="AZURE_OPENAI_CHAT_DEPLOYMENT" #>
 <#@ parameter type="System.String" name="AZURE_OPENAI_SYSTEM_PROMPT" #>
-from chat_completions_streaming import <#= ClassName #>
+from openai_chat_completions_streaming import <#= ClassName #>
 import os
 
 def main():
