@@ -9,13 +9,13 @@ from openai_chat_completions_streaming import OpenAIChatCompletionsStreaming
 import os
 
 def main():
-    azure_api_key = os.getenv('AZURE_OPENAI_KEY', '<#= AZURE_OPENAI_KEY #>')
-    endpoint = os.getenv('AZURE_OPENAI_ENDPOINT', '<#= AZURE_OPENAI_ENDPOINT #>')
-    api_version = os.getenv("AZURE_OPENAI_API_VERSION") or "<#= AZURE_OPENAI_API_VERSION #>"
-    deployment_name = os.getenv('AZURE_OPENAI_CHAT_DEPLOYMENT', '<#= AZURE_OPENAI_CHAT_DEPLOYMENT #>')
-    system_prompt = os.getenv('AZURE_OPENAI_SYSTEM_PROMPT', '<#= AZURE_OPENAI_SYSTEM_PROMPT #>')
+    openai_api_version = os.getenv('AZURE_OPENAI_API_VERSION', '<#= AZURE_OPENAI_API_VERSION #>')
+    openai_endpoint = os.getenv('AZURE_OPENAI_ENDPOINT', '<#= AZURE_OPENAI_ENDPOINT #>')
+    openai_key = os.getenv('AZURE_OPENAI_KEY', '<#= AZURE_OPENAI_KEY #>')
+    openai_chat_deployment_name = os.getenv('AZURE_OPENAI_CHAT_DEPLOYMENT', '<#= AZURE_OPENAI_CHAT_DEPLOYMENT #>')
+    openai_system_prompt = os.getenv('AZURE_OPENAI_SYSTEM_PROMPT', '<#= AZURE_OPENAI_SYSTEM_PROMPT #>')
 
-    chat = OpenAIChatCompletionsStreaming(system_prompt, endpoint, azure_api_key, api_version, deployment_name)
+    chat = OpenAIChatCompletionsStreaming(openai_api_version, openai_endpoint, openai_key, openai_chat_deployment_name, openai_system_prompt)
 
     while True:
         user_input = input('User: ')
@@ -30,4 +30,4 @@ if __name__ == '__main__':
     try:
         main()
     except Exception as e:
-        print(f'The sample encountered an error: {e}')
+        print(f"The sample encountered an error: {e}")

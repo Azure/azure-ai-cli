@@ -5,17 +5,17 @@ const { OpenAIClient, AzureKeyCredential } = require("@azure/openai");
 const { FunctionCallContext } = require("./FunctionCallContext");
 
 class <#= ClassName #> {
-  constructor(systemPrompt, endpoint, azureApiKey, deploymentName, functionFactory) {
-    this.systemPrompt = systemPrompt;
-    this.deploymentName = deploymentName;
-    this.client = new OpenAIClient(endpoint, new AzureKeyCredential(azureApiKey));
+  constructor(openAIEndpoint, openAIKey, openAIChatDeploymentName, openAISystemPrompt, functionFactory) {
+    this.openAISystemPrompt = openAISystemPrompt;
+    this.openAIChatDeploymentName = openAIChatDeploymentName;
+    this.client = new OpenAIClient(openAIEndpoint, new AzureKeyCredential(openAIKey));
     this.functionFactory = functionFactory;
     this.clearConversation();
   }
 
   clearConversation() {
     this.messages = [
-      { role: 'system', content: this.systemPrompt }
+      { role: 'system', content: this.openAISystemPrompt }
     ];
     this.functionCallContext = new FunctionCallContext(this.functionFactory, this.messages);
   }
@@ -25,7 +25,7 @@ class <#= ClassName #> {
 
     let contentComplete = '';
     while (true) {
-      const events = await this.client.streamChatCompletions(this.deploymentName, this.messages, {
+      const events = await this.client.streamChatCompletions(this.openAIChatDeploymentName, this.messages, {
         functions: this.functionFactory.getFunctionSchemas(),
       });
 

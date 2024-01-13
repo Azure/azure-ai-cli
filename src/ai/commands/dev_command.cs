@@ -83,8 +83,7 @@ namespace Azure.AI.Details.Common.CLI
 
         private void DoNewTemplate(string templateName, string language)
         {
-            var filesInDirAlready = FileHelpers.FindFiles(".", "*").Count() > 0;
-            var outputDirectory = !filesInDirAlready ? "." : templateName + ProgrammingLanguageToken.GetSuffix(language);
+            var outputDirectory = templateName + ProgrammingLanguageToken.GetSuffix(language);
             var instructions = InstructionsToken.Data().GetOrDefault(_values);
 
             var found = TemplateFactory.GenerateTemplateFiles(templateName, language, instructions, outputDirectory, _quiet, _verbose);

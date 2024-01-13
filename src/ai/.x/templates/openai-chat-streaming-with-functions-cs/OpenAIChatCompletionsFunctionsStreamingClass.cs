@@ -8,17 +8,17 @@ using System;
 
 public class <#= ClassName #>
 {
-    public <#= ClassName #>(string systemPrompt, string endpoint, string azureApiKey, string deploymentName, FunctionFactory factory)
+    public <#= ClassName #>(string openAIEndpoint, string openAIKey, string openAIChatDeploymentName, string openAISystemPrompt, FunctionFactory factory)
     {
-        _systemPrompt = systemPrompt;
+        _openAISystemPrompt = openAISystemPrompt;
         _functionFactory = factory;
 
-        _client = string.IsNullOrEmpty(azureApiKey)
-            ? new OpenAIClient(new Uri(endpoint), new DefaultAzureCredential())
-            : new OpenAIClient(new Uri(endpoint), new AzureKeyCredential(azureApiKey));
+        _client = string.IsNullOrEmpty(openAIKey)
+            ? new OpenAIClient(new Uri(openAIEndpoint), new DefaultAzureCredential())
+            : new OpenAIClient(new Uri(openAIEndpoint), new AzureKeyCredential(openAIKey));
 
         _options = new ChatCompletionsOptions();
-        _options.DeploymentName = deploymentName;
+        _options.DeploymentName = openAIChatDeploymentName;
 
         foreach (var function in _functionFactory.GetFunctionDefinitions())
         {
@@ -26,14 +26,14 @@ public class <#= ClassName #>
             // _options.Tools.Add(new ChatCompletionsFunctionToolDefinition(function));
         }
 
-        _functionCallContext = new(_functionFactory, _options.Messages);
+        _functionCallContext = new FunctionCallContext(_functionFactory, _options.Messages);
         ClearConversation();
     }
 
     public void ClearConversation()
     {
         _options.Messages.Clear();
-        _options.Messages.Add(new ChatRequestSystemMessage(_systemPrompt));
+        _options.Messages.Add(new ChatRequestSystemMessage(_openAISystemPrompt));
     }
 
     public async Task<string> GetChatCompletionsStreamingAsync(string userPrompt, Action<StreamingChatCompletionsUpdate>? callback = null)
@@ -60,8 +60,8 @@ public class <#= ClassName #>
 
                 if (string.IsNullOrEmpty(content)) continue;
 
-                if (callback != null) callback(update);
                 responseContent += content;
+                if (callback != null) callback(update);
             }
 
             if (_functionCallContext.TryCallFunction() != null)
@@ -75,7 +75,7 @@ public class <#= ClassName #>
         }
     }
 
-    private string _systemPrompt;
+    private string _openAISystemPrompt;
     private FunctionFactory _functionFactory;
     private FunctionCallContext _functionCallContext;
     private ChatCompletionsOptions _options;

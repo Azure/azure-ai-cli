@@ -15,22 +15,22 @@ let streamingChatCompletions;
 
 function streamingChatCompletionsInit() {
 
-  const endpoint = process.env.AZURE_OPENAI_ENDPOINT || "<#= AZURE_OPENAI_ENDPOINT #>";
-  const azureApiKey = process.env.AZURE_OPENAI_KEY || "<#= AZURE_OPENAI_KEY #>";
-  const deploymentName = process.env.AZURE_OPENAI_CHAT_DEPLOYMENT || "<#= AZURE_OPENAI_CHAT_DEPLOYMENT #>" ;
-  const systemPrompt = process.env.AZURE_OPENAI_SYSTEM_PROMPT || "<#= AZURE_OPENAI_SYSTEM_PROMPT #>";
+  const openAIEndpoint = process.env.AZURE_OPENAI_ENDPOINT || "<#= AZURE_OPENAI_ENDPOINT #>";
+  const openAIKey = process.env.AZURE_OPENAI_KEY || "<#= AZURE_OPENAI_KEY #>";
+  const openAIChatDeploymentName = process.env.AZURE_OPENAI_CHAT_DEPLOYMENT || "<#= AZURE_OPENAI_CHAT_DEPLOYMENT #>" ;
+  const openAISystemPrompt = process.env.AZURE_OPENAI_SYSTEM_PROMPT || "<#= AZURE_OPENAI_SYSTEM_PROMPT #>";
 
-  if (!endpoint || endpoint.startsWith('<insert')) {
+  if (!openAIEndpoint || openAIEndpoint.startsWith('<insert')) {
     chatPanelAppendMessage('computer', 'Please set AZURE_OPENAI_ENDPOINT in .env');
   }
-  if (!azureApiKey || azureApiKey.startsWith('<insert')) {
+  if (!openAIKey || openAIKey.startsWith('<insert')) {
     chatPanelAppendMessage('computer', 'Please set AZURE_OPENAI_KEY in .env');
   }
-  if (!deploymentName || deploymentName.startsWith('<insert')) {
+  if (!openAIChatDeploymentName || openAIChatDeploymentName.startsWith('<insert')) {
     chatPanelAppendMessage('computer', 'Please set AZURE_OPENAI_CHAT_DEPLOYMENT in .env');
   }
 
-  streamingChatCompletions = new <#= ClassName #>(systemPrompt, endpoint, azureApiKey, deploymentName, factory);
+  streamingChatCompletions = new <#= ClassName #>(openAIEndpoint, openAIKey, openAIChatDeploymentName, openAISystemPrompt, factory);
 }
 
 function streamingChatCompletionsClear() {
