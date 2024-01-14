@@ -8,7 +8,9 @@
 const marked = require("marked");
 const hljs = require("highlight.js");
 
-const { <#= ClassName #> } = require('./OpenAIChatCompletionsStreamingClass');
+const { factory } = require("./OpenAIChatCompletionsCustomFunctions");
+
+const { <#= ClassName #> } = require('./OpenAIChatCompletionsFunctionsStreamingClass');
 let streamingChatCompletions;
 
 function streamingChatCompletionsInit() {
@@ -28,7 +30,7 @@ function streamingChatCompletionsInit() {
     chatPanelAppendMessage('computer', 'Please set AZURE_OPENAI_CHAT_DEPLOYMENT in .env');
   }
 
-  streamingChatCompletions = new <#= ClassName #>(openAIEndpoint, openAIKey, openAIChatDeploymentName, openAISystemPrompt);
+  streamingChatCompletions = new <#= ClassName #>(openAIEndpoint, openAIKey, openAIChatDeploymentName, openAISystemPrompt, factory);
 }
 
 function streamingChatCompletionsClear() {
