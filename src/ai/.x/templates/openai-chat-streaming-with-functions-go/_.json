@@ -1,8 +1,8 @@
 {
-  "_Name": "OpenAI Chat Completions (w/ Functions)",
-  "_Short": "openai-functions-streaming",
+  "_LongName": "OpenAI Chat Completions (w/ Functions)",
+  "_ShortName": "openai-chat-streaming-with-functions",
   "_Language": "Go",
-  "ClassName": "OpenAIChatCompletionsStreamingExample",
+  "ClassName": "OpenAIChatCompletionsFunctionsStreamingExample",
   "AZURE_OPENAI_ENDPOINT": "<insert your OpenAI endpoint here>",
   "AZURE_OPENAI_KEY": "<insert your OpenAI API key here>",
   "AZURE_OPENAI_CHAT_DEPLOYMENT": "<insert your OpenAI deployment name here>",

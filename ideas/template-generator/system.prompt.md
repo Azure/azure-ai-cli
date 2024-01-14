@@ -13,13 +13,13 @@ Are comprised of multiple project template files:
 
 ## `_.json` project template file:
 
-`"_Name"` is the long descriptive name of the project template. This is required.  
+`"_LongName"` is the long descriptive name of the project template. This is required.  
 
 Example:
 
    ```json
    {
-   "_Name": "OpenAI Chat Completions Class Library",
+   "_LongName": "OpenAI Chat Completions Class Library",
    "ClassName": "OpenAIChatCompletionsClass",
    "AICLIExtensionReferencePath": ""
    }

@@ -1,7 +1,6 @@
 <#@ template hostspecific="true" #>
 <#@ output extension=".cs" encoding="utf-8" #>
 <#@ parameter type="System.String" name="ClassName" #>
-<#@ parameter type="System.Boolean" name="OPTION_INCLUDE_CITATIONS" #>
 using Azure;
 using Azure.AI.OpenAI;
 using Azure.Identity;
@@ -12,10 +11,10 @@ using System.Threading.Tasks;
 
 public class <#= ClassName #>
 {
-    public <#= ClassName #>(
-        string systemPrompt, string openAIKey, string openAIEndpoint, string openAIDeploymentName, string searchEndpoint, string searchApiKey, string searchIndexName, string embeddingsEndpoint)
+    public <#= ClassName #>(string openAIEndpoint, string openAIKey, string openAIChatDeploymentName, string openAISystemPrompt, string searchEndpoint, string searchApiKey, string searchIndexName, string embeddingsEndpoint)
     {
-        _systemPrompt = systemPrompt;
+        _openAISystemPrompt = openAISystemPrompt;
+
         _client = string.IsNullOrEmpty(openAIKey)
             ? new OpenAIClient(new Uri(openAIEndpoint), new DefaultAzureCredential())
             : new OpenAIClient(new Uri(openAIEndpoint), new AzureKeyCredential(openAIKey));
@@ -25,26 +24,26 @@ public class <#= ClassName #>
             SearchEndpoint = new Uri(searchEndpoint),
             Key = searchApiKey,
             IndexName = searchIndexName,
-            QueryType = AzureCognitiveSearchQueryType.VectorSimpleHybrid, // Use VectorSimpleHybrid to get the best of both vector and keyword types.
+            QueryType = AzureCognitiveSearchQueryType.VectorSimpleHybrid, // Use VectorSimpleHybrid to get the best vector and keyword search query types.
             EmbeddingEndpoint = new Uri(embeddingsEndpoint),
             EmbeddingKey = openAIKey,
         };
         _options = new ChatCompletionsOptions()
         {
-            DeploymentName = openAIDeploymentName,
-
+            DeploymentName = openAIChatDeploymentName,
             AzureExtensionsOptions = new()
             {
                 Extensions = { extensionConfig }
             }
         };
+
         ClearConversation();
     }
 
     public void ClearConversation()
     {
         _options.Messages.Clear();
-        _options.Messages.Add(new ChatRequestSystemMessage(_systemPrompt));
+        _options.Messages.Add(new ChatRequestSystemMessage(_openAISystemPrompt));
     }
 
     public async Task<string> GetChatCompletionsStreamingAsync(string userPrompt, Action<StreamingChatCompletionsUpdate>? callback = null)
@@ -68,17 +67,14 @@ public class <#= ClassName #>
             if (string.IsNullOrEmpty(content)) continue;
 
             responseContent += content;
-            if (callback != null)
-            {
-                callback(update);
-            }
+            if (callback != null) callback(update);
         }
 
         _options.Messages.Add(new ChatRequestAssistantMessage(responseContent));
         return responseContent;
     }
 
-    private string _systemPrompt;
-    private OpenAIClient _client;
+    private string _openAISystemPrompt;
     private ChatCompletionsOptions _options;
+    private OpenAIClient _client;
 }

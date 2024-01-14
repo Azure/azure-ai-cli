@@ -8,24 +8,24 @@ using System;
 
 public class <#= ClassName #>
 {
-    public <#= ClassName #>(string systemPrompt, string endpoint, string azureApiKey, string deploymentName)
+    public <#= ClassName #>(string openAIEndpoint, string openAIKey, string openAIChatDeploymentName, string openAISystemPrompt)
     {
-        _systemPrompt = systemPrompt;
+        _openAISystemPrompt = openAISystemPrompt;
 
-        _client = string.IsNullOrEmpty(azureApiKey)
-            ? new OpenAIClient(new Uri(endpoint), new DefaultAzureCredential())
-            : new OpenAIClient(new Uri(endpoint), new AzureKeyCredential(azureApiKey));
+        _client = string.IsNullOrEmpty(openAIKey)
+            ? new OpenAIClient(new Uri(openAIEndpoint), new DefaultAzureCredential())
+            : new OpenAIClient(new Uri(openAIEndpoint), new AzureKeyCredential(openAIKey));
 
         _options = new ChatCompletionsOptions();
-        _options.DeploymentName = deploymentName;
-		
+        _options.DeploymentName = openAIChatDeploymentName;
+
         ClearConversation();
     }
 
     public void ClearConversation()
     {
         _options.Messages.Clear();
-        _options.Messages.Add(new ChatRequestSystemMessage(_systemPrompt));
+        _options.Messages.Add(new ChatRequestSystemMessage(_openAISystemPrompt));
     }
 
     public string GetChatCompletion(string userPrompt)
@@ -39,7 +39,7 @@ public class <#= ClassName #>
         return responseContent;
     }
 
-    private string _systemPrompt;
+    private string _openAISystemPrompt;
     private ChatCompletionsOptions _options;
     private OpenAIClient _client;
 }

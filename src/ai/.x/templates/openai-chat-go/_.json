@@ -1,6 +1,6 @@
 {
-  "_Name": "OpenAI Chat Completions",
-  "_Short": "openai-chat",
+  "_LongName": "OpenAI Chat Completions",
+  "_ShortName": "openai-chat",
   "_Language": "Go",
   "ClassName": "OpenAIChatCompletionsExample",
   "AZURE_OPENAI_ENDPOINT": "<insert your OpenAI endpoint here>",
