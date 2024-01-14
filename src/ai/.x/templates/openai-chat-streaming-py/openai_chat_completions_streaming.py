@@ -3,7 +3,7 @@
 <#@ parameter type="System.String" name="ClassName" #>
 from openai import AzureOpenAI
 
-class OpenAIChatCompletionsStreaming:
+class <#= ClassName #>:
     def __init__(self, openai_api_version, openai_endpoint, openai_key, openai_chat_deployment_name, openai_system_prompt):
         self.openai_system_prompt = openai_system_prompt
         self.openai_chat_deployment_name = openai_chat_deployment_name
