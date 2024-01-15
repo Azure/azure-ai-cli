@@ -8,7 +8,9 @@
 import { marked } from "marked"
 import hljs from "highlight.js";
 
-import { <#= ClassName #> } from './OpenAIChatCompletionsStreamingClass';
+import { factory } from './OpenAIChatCompletionsCustomFunctions';
+
+import { <#= ClassName #> } from './OpenAIChatCompletionsFunctionsStreamingClass';
 let streamingChatCompletions: <#= ClassName #> | undefined;
 
 function streamingChatCompletionsInit(): void {
@@ -28,7 +30,7 @@ function streamingChatCompletionsInit(): void {
     chatPanelAppendMessage('computer', 'Please set AZURE_OPENAI_CHAT_DEPLOYMENT in .env');
   }
 
-  streamingChatCompletions = new <#= ClassName #>(openAIEndpoint, openAIKey, openAIChatDeploymentName, openAISystemPrompt);
+  streamingChatCompletions = new <#= ClassName #>(openAIEndpoint, openAIKey, openAIChatDeploymentName, openAISystemPrompt, factory);
 }
 
 function streamingChatCompletionsClear(): void {

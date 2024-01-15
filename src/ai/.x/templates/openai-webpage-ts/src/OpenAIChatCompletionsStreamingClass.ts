@@ -7,7 +7,7 @@ export class <#= ClassName #> {
   private openAISystemPrompt: string;
   private openAIChatDeploymentName: string;
   private client: OpenAIClient;
-  private messages: ChatRequestMessage[] = [];  
+  private messages: ChatRequestMessage[] = [];
 
   constructor(openAIEndpoint: string, openAIKey: string, openAIChatDeploymentName: string, openAISystemPrompt: string) {
     this.openAISystemPrompt = openAISystemPrompt;
