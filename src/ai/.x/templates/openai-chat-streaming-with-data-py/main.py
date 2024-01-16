@@ -10,7 +10,7 @@
 <#@ parameter type="System.String" name="AZURE_AI_SEARCH_KEY" #>
 <#@ parameter type="System.String" name="AZURE_AI_SEARCH_INDEX_NAME" #>
 <#@ parameter type="System.String" name="AZURE_OPENAI_EMBEDDING_DEPLOYMENT" #>
-from openai_chat_completions_streaming_with_data_ai_search import <#= ClassName #>
+from openai_chat_completions_with_data_streaming import <#= ClassName #>
 import os
 
 def main():
