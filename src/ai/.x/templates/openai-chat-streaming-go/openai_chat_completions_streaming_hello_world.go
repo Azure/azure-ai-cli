@@ -17,22 +17,22 @@ type <#= ClassName #> struct {
     options  *azopenai.ChatCompletionsOptions
 }
 
-func New<#= ClassName #>(systemPrompt string, endpoint string, azureApiKey string, deploymentName string) (*<#= ClassName #>, error) {
-    keyCredential, err := azopenai.NewKeyCredential(azureApiKey)
+func New<#= ClassName #>(openAIEndpoint string, openAIKey string, openAIChatDeploymentName string, openAISystemPrompt string) (*<#= ClassName #>, error) {
+    keyCredential, err := azopenai.NewKeyCredential(openAIKey)
     if err != nil {
         return nil, err
     }
-    client, err := azopenai.NewClientWithKeyCredential(endpoint, keyCredential, nil)
+    client, err := azopenai.NewClientWithKeyCredential(openAIEndpoint, keyCredential, nil)
     if err != nil {
         return nil, err
     }
 
     messages := []azopenai.ChatMessage{
-        {Role: to.Ptr(azopenai.ChatRoleSystem), Content: to.Ptr(systemPrompt)},
+        {Role: to.Ptr(azopenai.ChatRoleSystem), Content: to.Ptr(openAISystemPrompt)},
     }
 
     options := &azopenai.ChatCompletionsOptions{
-        Deployment: deploymentName,
+        Deployment: openAIChatDeploymentName,
         Messages: messages,
     }
 

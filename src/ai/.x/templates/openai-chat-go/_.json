@@ -1,10 +1,10 @@
 {
-  "_Name": "OpenAI Chat Completions",
-  "_Short": "openai-chat",
+  "_LongName": "OpenAI Chat Completions",
+  "_ShortName": "openai-chat",
   "_Language": "Go",
   "ClassName": "OpenAIChatCompletionsExample",
   "AZURE_OPENAI_ENDPOINT": "<insert your OpenAI endpoint here>",
   "AZURE_OPENAI_KEY": "<insert your OpenAI API key here>",
-  "AZURE_OPENAI_CHAT_DEPLOYMENT": "<insert your OpenAI deployment name here>",
+  "AZURE_OPENAI_CHAT_DEPLOYMENT": "<insert your OpenAI chat deployment name here>",
   "AZURE_OPENAI_SYSTEM_PROMPT": "You are a helpful AI assistant."
 }

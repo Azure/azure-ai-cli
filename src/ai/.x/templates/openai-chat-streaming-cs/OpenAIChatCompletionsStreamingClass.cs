@@ -8,23 +8,24 @@ using System;
 
 public class <#= ClassName #>
 {
-    public <#= ClassName #>(string systemPrompt, string azureApiKey, string openAIEndpoint, string openAIDeploymentName)
+    public <#= ClassName #>(string openAIEndpoint, string openAIKey, string openAIChatDeploymentName, string openAISystemPrompt)
     {
-        _systemPrompt = systemPrompt;
+        _openAISystemPrompt = openAISystemPrompt;
 
-        _client = string.IsNullOrEmpty(azureApiKey)
+        _client = string.IsNullOrEmpty(openAIKey)
             ? new OpenAIClient(new Uri(openAIEndpoint), new DefaultAzureCredential())
-            : new OpenAIClient(new Uri(openAIEndpoint), new AzureKeyCredential(azureApiKey));
+            : new OpenAIClient(new Uri(openAIEndpoint), new AzureKeyCredential(openAIKey));
 
         _options = new ChatCompletionsOptions();
-        _options.DeploymentName = openAIDeploymentName;
+        _options.DeploymentName = openAIChatDeploymentName;
+
         ClearConversation();
     }
 
     public void ClearConversation()
     {
         _options.Messages.Clear();
-        _options.Messages.Add(new ChatRequestSystemMessage(_systemPrompt));
+        _options.Messages.Add(new ChatRequestSystemMessage(_openAISystemPrompt));
     }
 
     public async Task<string> GetChatCompletionsStreamingAsync(string userPrompt, Action<StreamingChatCompletionsUpdate>? callback = null)
@@ -35,7 +36,6 @@ public class <#= ClassName #>
         var response = await _client.GetChatCompletionsStreamingAsync(_options);
         await foreach (var update in response.EnumerateValues())
         {
-
             var content = update.ContentUpdate;
             if (update.FinishReason == CompletionsFinishReason.ContentFiltered)
             {
@@ -49,17 +49,14 @@ public class <#= ClassName #>
             if (string.IsNullOrEmpty(content)) continue;
 
             responseContent += content;
-            if (callback != null)
-            {
-                callback(update);
-            }
+            if (callback != null) callback(update);
         }
 
         _options.Messages.Add(new ChatRequestAssistantMessage(responseContent));
         return responseContent;
     }
 
-    private string _systemPrompt;
-    private OpenAIClient _client;
+    private string _openAISystemPrompt;
     private ChatCompletionsOptions _options;
+    private OpenAIClient _client;
 }
