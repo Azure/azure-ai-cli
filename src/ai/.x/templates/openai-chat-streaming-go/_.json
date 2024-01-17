@@ -5,6 +5,6 @@
   "ClassName": "OpenAIChatCompletionsStreamingExample",
   "AZURE_OPENAI_ENDPOINT": "<insert your OpenAI endpoint here>",
   "AZURE_OPENAI_KEY": "<insert your OpenAI API key here>",
-  "AZURE_OPENAI_CHAT_DEPLOYMENT": "<insert your OpenAI deployment name here>",
+  "AZURE_OPENAI_CHAT_DEPLOYMENT": "<insert your OpenAI chat deployment name here>",
   "AZURE_OPENAI_SYSTEM_PROMPT": "You are a helpful AI assistant."
 }
