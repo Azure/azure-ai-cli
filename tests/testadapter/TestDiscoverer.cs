@@ -33,7 +33,7 @@ namespace TestAdapterTest
             catch (Exception ex)
             {
                 Logger.Log($"EXCEPTION: {ex.Message}\nSTACK: {ex.StackTrace}");
-                throw ex;
+                throw;
             }
         }
     }
