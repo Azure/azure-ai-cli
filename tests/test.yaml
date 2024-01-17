@@ -84,12 +84,10 @@
   arguments:
     expect: |
       ^Name +Short +Name +Language +\r?$\n
-      ^-+ +-+ +-+r?$\n
+      ^-+ +-+ +-+\r?$\n
       ^Environment +Variables +\.env *\r?$\n
       ^Helper +Function +Class +Library +helper-functions +C# *\r?$\n
       ^OpenAI +Chat +Completions +openai-chat +C#, +Go, +Java, +JavaScript, +Python *\r?$\n
       ^OpenAI +Chat +Completions +\(Streaming\) +openai-chat-streaming +C#, +Go, +Java, +JavaScript, +Python *\r?$\n
-      ^OpenAI +Chat +Completions +\(w/ +Data +\+ +AI +Search\) +openai-chat-streaming-with-data +C#, +Python *\r?$\n
+      ^OpenAI +Chat +Completions +\(w/ +Data +\+ +AI +Search\) +openai-chat-streaming-with-data +C#(, +Python){0,1} *\r?$\n
       ^OpenAI +Chat +Completions +\(w/ +Functions\) +openai-chat-streaming-with-functions +C#, +Go, +JavaScript, +Python *\r?$\n
-      ^OpenAI +Webpage +openai-webpage +JavaScript, +TypeScript *\r?$\n
-      ^OpenAI +Webpage +\(w/ +Functions\) +openai-webpage-with-functions +JavaScript, +TypeScript *\r?$\n

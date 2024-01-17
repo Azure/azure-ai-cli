@@ -15,46 +15,16 @@ namespace TestAdapterTest
         public static IEnumerable<TestCase> TestCasesFromYaml(string source, FileInfo file)
         {
             var area = GetRootArea(file);
-            var parsed = ParseYamlStream(file.FullName);
+            var parsed = YamlHelpers.ParseYamlStream(file.FullName);
             return TestCasesFromYamlStream(source, file, area, parsed);
         }
 
         #region private methods
 
-        private static YamlStream ParseYamlStream(string fullName)
-        {
-            var stream = new YamlStream();
-            var text = File.OpenText(fullName);
-            var error = string.Empty;
-
-            try
-            {
-                stream.Load(text);
-            }
-            catch (YamlDotNet.Core.YamlException ex)
-            {
-                var where = $"{fullName}({ex.Start.Line},{ex.Start.Column})";
-                error = $"Error parsing YAML (YamlException={ex.GetType()}):\n  {where}\n  {ex.Message}";
-            }
-            catch (Exception ex)
-            {
-                var where = fullName;
-                error = $"Error parsing YAML (YamlException={ex.GetType()}):\n  {where}\n  {ex.Message}";
-            }
-
-            if (!string.IsNullOrEmpty(error))
-            {
-                Logger.LogError(error);
-                Logger.TraceError(error);
-            }
-
-            return stream;
-        }
-
         private static IEnumerable<TestCase> TestCasesFromYamlStream(string source, FileInfo file, string area, YamlStream parsed)
         {
             var tests = new List<TestCase>();
-            var defaultTags = GetDefaultTags(file.Directory);
+            var defaultTags = YamlTagHelpers.GetDefaultTags(file.Directory);
             var parallelize = "false";
             if (defaultTags.ContainsKey("parallelize"))
             {
@@ -165,7 +135,7 @@ namespace TestAdapterTest
             SetTestCaseProperty(test, "expect", mapping, "expect");
             SetTestCaseProperty(test, "not-expect", mapping, "not-expect");
 
-            SetTestCaseTagsAsTraits(test, UpdateCopyTags(tags, mapping));
+            SetTestCaseTagsAsTraits(test, YamlTagHelpers.UpdateCopyTags(tags, mapping));
 
             CheckInvalidTestCaseNodes(file, mapping, test);
             return test;
@@ -180,7 +150,7 @@ namespace TestAdapterTest
 
             @class = GetScalarString(mapping, "class", @class);
             area = UpdateArea(mapping, area);
-            tags = UpdateCopyTags(tags, mapping);
+            tags = YamlTagHelpers.UpdateCopyTags(tags, mapping);
             parallelize = GetParallelizeTag(mapping, parallelize);
 
             return TestCasesFromYamlSequence(source, file, sequence, area, @class, tags, parallelize);
@@ -423,124 +393,10 @@ namespace TestAdapterTest
             return $"{area}.{@class}.{name}";
         }
 
-        private static string GetYamlDefaultsFullFileName(DirectoryInfo directory)
-        {
-            var found = directory.GetFiles(YamlTestAdapter.YamlDefaultsFileName);
-            return found.Length == 1
-                ? found[0].FullName
-                : directory.Parent != null
-                    ? GetYamlDefaultsFullFileName(directory.Parent)
-                    : null;
-        }
-
-        private static Dictionary<string, List<string>> GetDefaultTags(DirectoryInfo directory)
-        {
-            var defaultTags = new Dictionary<string, List<string>>();
-
-            var defaultsFile = GetYamlDefaultsFullFileName(directory);
-            if (defaultsFile != null)
-            {
-                var parsed = ParseYamlStream(defaultsFile);
-                if (parsed.Documents.Count() > 0)
-                {
-                    var tagsNode = parsed.Documents[0].RootNode;
-                    if (tagsNode != null)
-                    {
-                        defaultTags = UpdateCopyTags(defaultTags, null, tagsNode);
-                    }
-                }
-            }
-
-            return defaultTags;
-        }
-
         private static string GetParallelizeTag(YamlMappingNode mapping, string currentParallelize)
         {
             var parallelizeNode = mapping.Children.ContainsKey("parallelize") ? mapping.Children["parallelize"] : null;
             return parallelizeNode == null ? currentParallelize : (parallelizeNode as YamlScalarNode)?.Value;
-        }
-
-        private static Dictionary<string, List<string>> UpdateCopyTags(Dictionary<string, List<string>> tags, YamlMappingNode mapping)
-        {
-            var tagNode = mapping.Children.ContainsKey("tag") ? mapping.Children["tag"] : null;
-            var tagsNode = mapping.Children.ContainsKey("tags") ? mapping.Children["tags"] : null;
-            if (tagNode == null && tagsNode == null) return tags;
-
-            return UpdateCopyTags(tags, tagNode, tagsNode);
-        }
-
-        private static Dictionary<string, List<string>> UpdateCopyTags(Dictionary<string, List<string>> tags, YamlNode tagNode, YamlNode tagsNode)
-        {
-            // make a copy that we'll update and return
-            tags = new Dictionary<string, List<string>>(tags);
-
-            var value = (tagNode as YamlScalarNode)?.Value;
-            AddOptionalTag(tags, "tag", value);
-
-            var values = (tagsNode as YamlScalarNode)?.Value;
-            AddOptionalCommaSeparatedTags(tags, values);
-
-            AddOptionalNameValueTags(tags, tagsNode as YamlMappingNode);
-            AddOptionalTagsForEachChild(tags, tagsNode as YamlSequenceNode);
-
-            return tags;
-        }
-
-        private static void AddOptionalTag(Dictionary<string, List<string>> tags, string name, string value)
-        {
-            if (!string.IsNullOrEmpty(name) && !string.IsNullOrEmpty(value))
-            {
-                if (!tags.ContainsKey(name))
-                {
-                    tags.Add(name, new List<string>());
-                }
-                tags[name].Add(value);
-            }
-        }
-
-        private static void AddOptionalCommaSeparatedTags(Dictionary<string, List<string>> tags, string values)
-        {
-            if (values != null)
-            {
-                foreach (var tag in values.Split(",".ToArray(), StringSplitOptions.RemoveEmptyEntries))
-                {
-                    AddOptionalTag(tags, "tag", tag);
-                }
-            }
-        }
-
-        private static void AddOptionalNameValueTags(Dictionary<string, List<string>> tags, YamlMappingNode mapping)
-        {
-            var children = mapping?.Children;
-            if (children == null) return;
-
-            foreach (var child in children)
-            {
-                var key = (child.Key as YamlScalarNode)?.Value;
-                var value = (child.Value as YamlScalarNode)?.Value;
-                AddOptionalTag(tags, key, value);
-            }
-        }
-
-        private static void AddOptionalTagsForEachChild(Dictionary<string, List<string>> tags, YamlSequenceNode sequence)
-        {
-            var children = sequence?.Children;
-            if (children == null) return;
-
-            foreach (var child in children)
-            {
-                if (child is YamlScalarNode)
-                {
-                    AddOptionalTag(tags, "tag", (child as YamlScalarNode).Value);
-                    continue;
-                }
-
-                if (child is YamlMappingNode)
-                {
-                    AddOptionalNameValueTags(tags, child as YamlMappingNode);
-                    continue;
-                }
-            }
         }
 
         private static void SetTestCaseTagsAsTraits(TestCase test, Dictionary<string, List<string>> tags)

@@ -412,11 +412,11 @@ namespace TestAdapterTest
             }
             else
             {
-                var clis = new[] { "spx", "vz" };
+                var clis = new[] { "ai", "spx", "vz" };
                 var found = PickCliOrNull(clis);
                 return found != null
                     ? PickCliFound(clis, found)         // use what we found
-                    : PickCliNotFound(clis, clis[0]);   // use spx
+                    : PickCliNotFound(clis, clis[0]);   // use ai
             }
         }
 
@@ -497,7 +497,7 @@ namespace TestAdapterTest
         private static void PickCliUpdateYamlDefaultsFileWarning(IEnumerable<string> clis)
         {
             var message = string.Join(" or ", clis.Select(cli => $"`cli: {cli}`"));
-            message = $"PickCli: CLI not specified; please create/update {YamlTestAdapter.YamlDefaultsFileName} with one of: {message}";
+            message = $"PickCli: CLI not specified; please create/update {YamlTestAdapter.YamlDefaultTagsFileName} with one of: {message}";
             Logger.LogWarning(message);
             Logger.TraceWarning(message);
         }

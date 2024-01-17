@@ -5,31 +5,9 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using YamlDotNet.RepresentationModel;
-using YamlDotNet.Serialization;
 
 namespace TestAdapterTest
 {
-    public class YamlHelpers
-    {
-        public static string ToYamlOrJsonString(YamlNode node, bool yaml)
-        {
-            var serializer = yaml
-                ? new SerializerBuilder().Build()
-                : new SerializerBuilder().JsonCompatible().Build();
-
-            using var writer = new StringWriter();
-            var stream = new YamlStream { new YamlDocument(node) };
-            stream.Save(writer);
-
-            using var reader = new StringReader(writer.ToString());
-            var deserializer = new Deserializer();
-            var yamlObject = deserializer.Deserialize(reader);
-
-            var trimmed = serializer.Serialize(yamlObject).Trim('\r', '\n');
-            return yaml ? trimmed : trimmed.Replace("\t", "\\t").Replace("\f", "\\f");
-        }
-    }
-
     public static class YamlNodeExtensions
     {
         public static string ToYamlString(this YamlNode node)

@@ -96,6 +96,8 @@ namespace TestAdapterTest
         private static IEnumerable<TestCase> GetTestsFromDirectory(string source, DirectoryInfo directory)
         {
             Logger.Log($"YamlTestAdapter.GetTestsFromDirectory('{source}', '{directory.FullName}'): ENTER");
+
+            directory = YamlTagHelpers.GetYamlDefaultTagsFullFileName(directory)?.Directory ?? directory;
             foreach (var file in FindFiles(directory))
             {
                 foreach (var test in GetTestsFromYaml(source, file))
@@ -109,7 +111,7 @@ namespace TestAdapterTest
         private static IEnumerable<FileInfo> FindFiles(DirectoryInfo directory)
         {
             return directory.GetFiles($"*{FileExtensionYaml}", SearchOption.AllDirectories)
-                .Where(file => file.Name != YamlDefaultsFileName);
+                .Where(file => file.Name != YamlDefaultTagsFileName);
         }
 
         private static IEnumerable<TestCase> GetTestsFromYaml(string source, FileInfo file)
@@ -154,11 +156,11 @@ namespace TestAdapterTest
         #region test adapter registration data
         public const string FileExtensionDll = ".dll";
         public const string FileExtensionYaml = ".yaml";
-        public const string Executor = "executor://spx/yaml/VsTestRunner1";
+        public const string Executor = "executor://ai/yaml/VsTestRunner1";
         #endregion
 
         #region other constants
-        public const string YamlDefaultsFileName = "Azure-AI-CLI-TestRunner-Defaults.yaml";
+        public const string YamlDefaultTagsFileName = "Azure-AI-CLI-TestRunner-Default-Tags.yaml";
         public const string DefaultTimeout = "600000";
         #endregion
     }
