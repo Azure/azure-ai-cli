@@ -10,7 +10,7 @@
 # Helper Function Class Library                    helper-functions                        C#                              
 # OpenAI Chat Completions                          openai-chat                             C#, Go, Java, JavaScript, Python
 # OpenAI Chat Completions (Streaming)              openai-chat-streaming                   C#, Go, Java, JavaScript, Python
-# OpenAI Chat Completions (w/ Data + AI Search)    openai-chat-streaming-with-data         C#, Python                      
+# OpenAI Chat Completions (w/ Data + AI Search)    openai-chat-streaming-with-data         C#, JavaScript, Python                      
 # OpenAI Chat Completions (w/ Functions)           openai-chat-streaming-with-functions    C#, Go, JavaScript, Python      
 # OpenAI Webpage                                   openai-webpage                          JavaScript, TypeScript          
 # OpenAI Webpage (w/ Functions)                    openai-webpage-with-functions           JavaScript, TypeScript          
@@ -62,6 +62,9 @@
 
   - name: dev new openai-chat-streaming-with-data (c#)
     command: ai dev new openai-chat-streaming-with-data --cs
+
+  - name: dev new openai-chat-streaming-with-data (javascript)
+    command: ai dev new openai-chat-streaming-with-data --javascript
 
   - name: dev new openai-chat-streaming-with-data (python)
     command: ai dev new openai-chat-streaming-with-data --python
