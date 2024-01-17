@@ -4,10 +4,27 @@
 const { OpenAIClient, AzureKeyCredential } = require("@azure/openai");
 
 class <#= ClassName #> {
-  constructor(openAIEndpoint, openAIKey, openAIChatDeploymentName, openAISystemPrompt) {
+  constructor(openAIEndpoint, openAIKey, openAIChatDeploymentName, openAISystemPrompt, searchEndpoint, searchAPIKey, searchIndexName, openAIEmbeddingsEndpoint) {
     this.openAISystemPrompt = openAISystemPrompt;
     this.openAIChatDeploymentName = openAIChatDeploymentName;
     this.client = new OpenAIClient(openAIEndpoint, new AzureKeyCredential(openAIKey));
+
+    this.azureExtensionOptions = {
+      azureExtensionOptions: {
+        extensions: [
+          {
+            type: "AzureCognitiveSearch",
+            endpoint: searchEndpoint,
+            key: searchAPIKey,
+            indexName: searchIndexName,
+            embeddingEndpoint: openAIEmbeddingsEndpoint,
+            embeddingKey: openAIKey,
+            queryType: "vectorSimpleHybrid"
+          },
+        ],
+      }
+    }
+
     this.clearConversation();
   }
 
@@ -21,7 +38,7 @@ class <#= ClassName #> {
     this.messages.push({ role: 'user', content: userInput });
 
     let contentComplete = '';
-    const events = await this.client.streamChatCompletions(this.openAIChatDeploymentName, this.messages);
+    const events = await this.client.streamChatCompletions(this.openAIChatDeploymentName, this.messages, this.azureExtensionOptions);
 
     for await (const event of events) {
       for (const choice of event.choices) {
