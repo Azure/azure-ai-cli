@@ -34,25 +34,22 @@ if exist "%TEMP%"\ (
 REM Windows curl.exe (https://techcommunity.microsoft.com/t5/containers/tar-and-curl-come-to-windows/ba-p/382409)
 where curl.exe >nul
 if %ERRORLEVEL% neq 0 (
-  set EXITCODE=%ERRORLEVEL%
-  echo Error: curl.exe not found [%EXITCODE%] 1>&2
-  exit /b %EXITCODE%
+  echo Error: curl.exe not found 1>&2
+  exit /b 4
 )
 
 REM Download Azure CLI installer
 curl.exe --output "%CLI_MSI_LOCAL_PATH%" --silent --url %CLI_INSTALLER_URL%
 if %ERRORLEVEL% neq 0 (
-  set EXITCODE=%ERRORLEVEL%
-  echo Error while downloading Acure CLI installer [%EXITCODE%] 1>&2
-  exit /b %EXITCODE%
+  echo Error while downloading Azure CLI installer 1>&2
+  exit /b 5
 )
 
 REM Install Azure CLI
 start /wait msiexec /i "%CLI_MSI_LOCAL_PATH%" /passive /norestart
 if %ERRORLEVEL% neq 0 (
-  set EXITCODE=%ERRORLEVEL%
-  echo Error while installing Acure CLI [%EXITCODE%] 1>&2
-  exit /b %EXITCODE%
+  echo Error while installing Azure CLI 1>&2
+  exit /b 6
 )
 
 REM Clean up

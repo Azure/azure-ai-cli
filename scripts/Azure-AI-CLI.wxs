@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
 
-  <Product Id="*" Name="Azure AI CLI" Language="1033" Version="$(var.version)" Manufacturer="Microsoft" UpgradeCode="436172626F6E20697320636F6F6C2121">
+  <Product Id="*" Name="Azure AI CLI" Language="1033" Version="$(var.version)" Manufacturer="Microsoft" UpgradeCode="BDE6DEF4-9259-4BD5-9BC8-FDA1660FF7AD">
     <Package InstallerVersion="500" Compressed="yes" InstallScope="perMachine" Platform="$(var.platform)" />
     <!--
     To prevent problems with bundle upgrades, use MajorUpgrade element here + ProductSearch in the bundle .wxs. Ref.
@@ -11,7 +11,7 @@
 
     <!-- Below can be used with single MSI-only installations -->
     <!--
-    <Upgrade Id="436172626F6E20697320636F6F6C2121">
+    <Upgrade Id="BDE6DEF4-9259-4BD5-9BC8-FDA1660FF7AD">
       <UpgradeVersion OnlyDetect="yes" Property="SELFFOUND"
         Minimum="$(var.version)" IncludeMinimum="yes"
         Maximum="$(var.version)" IncludeMaximum="yes" />
@@ -34,6 +34,7 @@
       </Directory>
     </Directory>
 
+    <Property Id="CLI_PACKAGE_VERSION" Value="$(var.packageVersion)" />
     <Property Id="CLI_INSTALL_ERROR" Secure="yes" />
     <CustomAction Id="RunInstallBatchScript"
               Script="vbscript"
@@ -43,7 +44,7 @@
         Dim objShell, intReturnCode, logFile
         Set objShell = CreateObject("WScript.Shell")
         logFile = objShell.ExpandEnvironmentStrings("%TEMP%") & "\InstallCLI.log"
-        intReturnCode = objShell.Run("$(sys.SOURCEFILEDIR)\InstallCLI.cmd >" & logFile & " 2>&1", 0, True)
+        intReturnCode = objShell.Run("$(sys.SOURCEFILEDIR)\InstallCLI.cmd " & Session.Property("CLI_PACKAGE_VERSION") & " >" & logFile & " 2>&1", 0, True)
         If intReturnCode <> 0 Then
             Set fso = CreateObject("Scripting.FileSystemObject")
             Set file = fso.OpenTextFile(logFile, 1)
@@ -57,10 +58,10 @@
     <CustomAction Id="RunUninstallOnInstallFailureBatchScript" FileKey="UninstallBatchScript" ExeCommand="" Execute="immediate" Return="ignore"/>
 
     <ComponentGroup Id="ProductComponents" Directory="INSTALLFOLDER">
-      <Component Id="InstallBatchScriptComponent" Guid="436172626F6E20697320636F6F6C2120">
+      <Component Id="InstallBatchScriptComponent" Guid="C7E5D3A1-F3AF-4608-98FB-50A0F93E9831">
         <File Id="InstallBatchScript" Source="$(sys.SOURCEFILEDIR)\InstallCLI.cmd" KeyPath="yes"/>
       </Component>
-      <Component Id="UninstallBatchScriptComponent" Guid="436172626F6E20697320636F6F6C2122">
+      <Component Id="UninstallBatchScriptComponent" Guid="F5C23F1E-C9E1-4F07-BFDA-CBB1B9F72C09">
         <File Id="UninstallBatchScript" Source="$(sys.SOURCEFILEDIR)\UninstallCLI.cmd" KeyPath="yes"/>
       </Component>
     </ComponentGroup>

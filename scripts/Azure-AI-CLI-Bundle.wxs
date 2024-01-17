@@ -15,17 +15,20 @@
 
         <!-- Check the version of existing Azure AI CLI .msi installation -->
         <util:ProductSearch Variable="AlreadyInstalledVersion"
-                            UpgradeCode="436172626F6E20697320636F6F6C2121"
+                            UpgradeCode="BDE6DEF4-9259-4BD5-9BC8-FDA1660FF7AD"
                             Id="AlreadyInstalledVersionSearch"
                             Result="version"/>
-        <!-- Workaround for https://github.com/wixtoolset/issues/issues/3746 (note: WixBundleAction is 5 on Uninstall) -->
-        <bal:Condition Message="This version is already installed.">
-        NOT WixBundleAction = 5 OR NOT AlreadyInstalledVersion = v$(var.version)
+        <!--
+        Workaround for https://github.com/wixtoolset/issues/issues/3746 (note: WixBundleAction is 5 on Uninstall)
+        https://stackoverflow.com/questions/26596354/upgrade-a-bootstrapper-bundle-if-the-same-version-is-detected
+        -->
+        <bal:Condition Message="The same or newer version of this product is already installed. Please uninstall the existing version first.">
+        NOT WixBundleAction = 5 OR NOT AlreadyInstalledVersion &gt;= v$(var.version)
         </bal:Condition>
 
         <Chain>
             <!-- Dependencies -->
-            <PackageGroupRef Id="DotNetRuntime"/>
+            <PackageGroupRef Id="DotNetSdk"/>
             <PackageGroupRef Id="AzureCLI"/>
 
             <MsiPackage Id="AzureAI_CLI" SourceFile="Azure-AI-CLI.msi" Vital="yes"/>
@@ -33,25 +36,25 @@
     </Bundle>
 
     <Fragment>
-        <!-- .NET Runtime -->
+        <!-- .NET SDK -->
         <util:DirectorySearch Id="DotNetDirectory"
-                              Path="[ProgramFiles64Folder]dotnet\shared\Microsoft.NETCore.App\$(var.dotNetVersion)"
+                              Path="[ProgramFiles64Folder]dotnet\sdk\$(var.dotNetVersion)"
                               Result="exists"
-                              Variable="DOTNET_RUNTIME_INSTALLED"/>
+                              Variable="DOTNET_SDK_INSTALLED"/>
 
-        <PackageGroup Id="DotNetRuntime">
-            <ExePackage Id="DotNetRuntime"
-                        Name="dotnet-runtime-$(var.dotNetVersion)-win-$(var.platform).exe"
+        <PackageGroup Id="DotNetSdk">
+            <ExePackage Id="DotNetSdk"
+                        Name="dotnet-sdk-$(var.dotNetVersion)-win-$(var.platform).exe"
                         Cache="no"
                         Compressed="no"
-                        DetectCondition="DOTNET_RUNTIME_INSTALLED"
+                        DetectCondition="DOTNET_SDK_INSTALLED"
                         DownloadUrl="$(var.dotNetUrl)"
                         InstallCommand="/passive /norestart"
                         PerMachine="yes"
                         Permanent="yes"
                         Vital="yes">
-                <RemotePayload Description=".NET Runtime"
-                               ProductName=".NET Runtime"
+                <RemotePayload Description=".NET SDK"
+                               ProductName=".NET SDK"
                                Version="$(var.dotNetVersion).0"
                                Size="$(var.dotNetSize)"
                                Hash="$(var.dotNetSha1)"/>
