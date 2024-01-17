@@ -23,7 +23,7 @@ def main():
     search_api_key = os.getenv('AZURE_AI_SEARCH_KEY', '<#= AZURE_AI_SEARCH_KEY #>')
     search_index_name = os.getenv('AZURE_AI_SEARCH_INDEX_NAME', '<#= AZURE_AI_SEARCH_INDEX_NAME #>')
     openai_embeddings_deployment_name = os.getenv('AZURE_OPENAI_EMBEDDING_DEPLOYMENT', '<#= AZURE_OPENAI_EMBEDDING_DEPLOYMENT #>')
-    openai_embeddings_endpoint = f"{openai_endpoint.rstrip('/')}/openai/deployments/{openai_embeddings_deployment_name}/embeddings?api-version={openai_api_version}";
+    openai_embeddings_endpoint = f"{openai_endpoint.rstrip('/')}/openai/deployments/{openai_embeddings_deployment_name}/embeddings?api-version={openai_api_version}"
 
     chat = <#= ClassName #>(openai_api_version, openai_endpoint, openai_key, openai_chat_deployment_name, openai_system_prompt, search_endpoint, search_api_key, search_index_name, openai_embeddings_endpoint)
 
