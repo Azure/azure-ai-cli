@@ -71,6 +71,11 @@ namespace TestAdapterTest
             var timeout = int.Parse(YamlTestProperties.Get(test, "timeout"));
             var simulate = YamlTestProperties.Get(test, "simulate");
 
+            var basePath = new FileInfo(test.CodeFilePath).DirectoryName;
+            workingDirectory = Path.Combine(basePath, workingDirectory ?? "");
+            var tryCreateWorkingDirectory = !string.IsNullOrEmpty(workingDirectory) && !Directory.Exists(workingDirectory);
+            if (tryCreateWorkingDirectory) Directory.CreateDirectory(workingDirectory);
+
             var expanded = ExpandForEachGroups(@foreach);
             Logger.Log($"YamlTestCaseRunner.TestCaseGetResults: expanded count = {expanded.Count()}");
 

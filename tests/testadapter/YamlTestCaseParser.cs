@@ -84,11 +84,7 @@ namespace TestAdapterTest
             string simulate = GetScalarString(mapping, "simulate");
             var simulating = !string.IsNullOrEmpty(simulate);
 
-            string cli = GetScalarString(mapping, "cli");
-            if (cli == null && tags.ContainsKey("cli"))
-            {
-                cli = tags["cli"].Last();
-            }
+            string cli = GetScalarString(mapping, tags, "cli");
 
             string currentParallelize = GetScalarString(mapping, "parallelize");
             parallelize = currentParallelize == null ? parallelize : currentParallelize;
@@ -123,10 +119,10 @@ namespace TestAdapterTest
             SetTestCaseProperty(test, "simulate", simulate);
             SetTestCaseProperty(test, "parallelize", parallelize);
 
-            var timeout = GetScalarString(mapping, "timeout") ?? YamlTestAdapter.DefaultTimeout;
+            var timeout = GetScalarString(mapping, tags, "timeout", YamlTestAdapter.DefaultTimeout);
             SetTestCaseProperty(test, "timeout", timeout);
 
-            var workingDirectory = GetScalarString(mapping, "workingDirectory") ?? file.DirectoryName;
+            var workingDirectory = GetScalarString(mapping, tags, "workingDirectory", file.Directory.FullName);
             SetTestCaseProperty(test, "working-directory", workingDirectory);
 
             SetTestCasePropertyMap(test, "foreach", mapping, "foreach", workingDirectory);
@@ -172,7 +168,7 @@ namespace TestAdapterTest
 
         private static bool IsValidTestCaseNode(string value)
         {
-            return ";area;class;name;cli;command;script;timeout;foreach;arguments;expect;not-expect;simulate;tag;tags;parallelize".IndexOf($";{value};") >= 0;
+            return ";area;class;name;cli;command;script;timeout;foreach;arguments;expect;not-expect;simulate;tag;tags;parallelize;workingDirectory;".IndexOf($";{value};") >= 0;
         }
 
         private static void SetTestCaseProperty(TestCase test, string propertyName, YamlMappingNode mapping, string mappingName)
@@ -321,6 +317,19 @@ namespace TestAdapterTest
 
             fileContent = "";
             return false;
+        }
+
+        private static string GetScalarString(YamlMappingNode mapping, Dictionary<string, List<string>> tags, string mappingName, string defaultValue = null)
+        {
+            var value = GetScalarString(mapping, mappingName, null);
+            if (value != null) return value;
+
+            if (tags.ContainsKey(mappingName))
+            {
+                value = tags[mappingName].Last();
+            }
+
+            return value ?? defaultValue;
         }
 
         private static string GetScalarString(YamlMappingNode mapping, string mappingName, string defaultValue = null)
