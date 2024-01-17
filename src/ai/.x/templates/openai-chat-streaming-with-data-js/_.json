@@ -1,8 +1,8 @@
 {
   "_LongName": "OpenAI Chat Completions (w/ Data + AI Search)",
   "_ShortName": "openai-chat-streaming-with-data",
-  "_Language": "Python",
-  "ClassName": "OpenAIChatCompletionsStreamingWithData",
+  "_Language": "JavaScript",
+  "ClassName": "OpenAIChatCompletionsStreamingWithDataClass",
   "AZURE_OPENAI_ENDPOINT": "<insert your OpenAI endpoint here>",
   "AZURE_OPENAI_KEY": "<insert your OpenAI API key here>",
   "AZURE_OPENAI_API_VERSION": "<insert your OpenAI API version here>",
