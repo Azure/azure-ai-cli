@@ -1,14 +1,13 @@
-# `spx` CLI Yaml Test Adapter + Test Runner
+# `ai` CLI Yaml Test Adapter
 
 PRE-REQUISITES:
-* `spx` must be accessible in `PATH`
-* `spx` must be configured as required for tests (e.g. `region` and `key`, or `endpoint` setup)
-- see: https://crbn.us/searchdocs?spx
+* `ai` must be accessible in `PATH`
+* `ai` must be configured as required for tests (run `ai init`, or use `ai config --set KEY=VALUE` for all required information)
+- see: https://crbn.us/searchdocs?ai
 - OR ...
   ```dotnetcli
-  dotnet tool install --global Microsoft.CognitiveServices.Speech.CLI
-  spx config @region --set YOUR-REGION-HERE
-  spx config @key --set YOUR-KEY-HERE`
+  dotnet tool install --global Azure.AI.CLI
+  ai init
   ```
 
 ## Run ALL tests
@@ -27,26 +26,26 @@ From fresh clone (one step, CLI):
 OR ... [Build](#BUILD) first, then w/CLI:
 * DEBUG:
   ```dotnetcli
-  cd src\TestRunner\bin\Debug\net6.0
-  dotnet test Azure.AI.CLI.TestRunner.dll --logger:trx
+  cd tests\testadapter\bin\Debug\net7.0
+  dotnet test Azure.AI.CLI.TestAdapter.dll --logger:trx
   ```
 * RELEASE:
   ```dotnetcli
-  cd src\TestRunner\bin\Release\net6.0
-  dotnet test Azure.AI.CLI.TestRunner.dll --logger:trx --logger:console;verbosity=normal
+  cd tests\testadapter\bin\Release\net7.0
+  dotnet test Azure.AI.CLI.TestAdapter.dll --logger:trx --logger:console;verbosity=normal
   ```
 
 **dotnet vstest**  
 OR ... [Build](#BUILD) first, then w/CLI:
 * DEBUG:
   ```dotnetcli
-  cd src\TestRunner\bin\Debug\net6.0
-  dotnet vstest Azure.AI.CLI.TestRunner.dll --logger:trx
+  cd tests\testadapter\bin\Debug\net7.0
+  dotnet vstest Azure.AI.CLI.TestAdapter.dll --logger:trx
   ```
 * RELEASE:
   ```dotnetcli
-  cd src\TestRunner\bin\Release\net6.0
-  dotnet vstest Azure.AI.CLI.TestRunner.dll --logger:trx --logger:console;verbosity=normal
+  cd tests\testadapter\bin\Release\net7.0
+  dotnet vstest Azure.AI.CLI.TestAdapter.dll --logger:trx --logger:console;verbosity=normal
   ```
 
 **VS 2019+**  
@@ -71,26 +70,26 @@ From fresh clone (one step, CLI):
 OR ... [Build](#BUILD) first, then w/CLI:
 * DEBUG:
   ```dotnetcli
-  cd src\TestRunner\bin\Debug\net6.0
-  dotnet test Azure.AI.CLI.TestRunner.dll -t
+  cd tests\testadapter\bin\Debug\net7.0
+  dotnet test Azure.AI.CLI.TestAdapter.dll -t
   ```
 * RELEASE:
   ```dotnetcli
-  cd src\TestRunner\bin\Release\net6.0
-  dotnet test Azure.AI.CLI.TestRunner.dll -t
+  cd tests\testadapter\bin\Release\net7.0
+  dotnet test Azure.AI.CLI.TestAdapter.dll -t
   ```
 
 **dotnet vstest**  
 OR ... [Build](#BUILD) first, then w/CLI:
 * DEBUG:
   ```dotnetcli
-  cd src\TestRunner\bin\Debug\net6.0
-  dotnet vstest Azure.AI.CLI.TestRunner.dll -lt
+  cd tests\testadapter\bin\Debug\net7.0
+  dotnet vstest Azure.AI.CLI.TestAdapter.dll -lt
   ```
 * RELEASE:
   ```dotnetcli
-  cd src\TestRunner\bin\Release\net6.0
-  dotnet vstest Azure.AI.CLI.TestRunner.dll -lt
+  cd tests\testadapter\bin\Release\net7.0
+  dotnet vstest Azure.AI.CLI.TestAdapter.dll -lt
   ```
 
 ---
@@ -111,26 +110,26 @@ OR ... [Build](#BUILD) first, then w/CLI:
 
 * DEBUG:
   ```dotnetcli
-  cd src\TestRunner\bin\Debug\net6.0
-  dotnet test --filter:name~PARTIAL_NAME Azure.AI.CLI.TestRunner.dll
+  cd tests\testadapter\bin\Debug\net7.0
+  dotnet test --filter:name~PARTIAL_NAME Azure.AI.CLI.TestAdapter.dll
   ```
 * RELEASE:
   ```dotnetcli
-  cd src\TestRunner\bin\Release\net6.0
-  dotnet test --filter:name~PARTIAL_NAME Azure.AI.CLI.TestRunner.dll
+  cd tests\testadapter\bin\Release\net7.0
+  dotnet test --filter:name~PARTIAL_NAME Azure.AI.CLI.TestAdapter.dll
   ```
 
 **dotnet vstest**  
 OR ... [Build](#BUILD) first, then w/CLI:
 * DEBUG:
   ```dotnetcli
-  cd src\TestRunner\bin\Debug\net6.0
-  dotnet vstest Azure.AI.CLI.TestRunner.dll --logger:trx --testcasefilter:name~PARTIAL_NAME
+  cd tests\testadapter\bin\Debug\net7.0
+  dotnet vstest Azure.AI.CLI.TestAdapter.dll --logger:trx --testcasefilter:name~PARTIAL_NAME
   ```
 * RELEASE:
   ```dotnetcli
-  cd src\TestRunner\bin\Release\net6.0
-  dotnet vstest Azure.AI.CLI.TestRunner.dll --logger:trx --testcasefilter:name~PARTIAL_NAME
+  cd tests\testadapter\bin\Release\net7.0
+  dotnet vstest Azure.AI.CLI.TestAdapter.dll --logger:trx --testcasefilter:name~PARTIAL_NAME
   ```
 
 **VS 2019+**  
@@ -179,7 +178,7 @@ Parenthesis () can be used to group sub-expressions.
 * RELEASE: `dotnet build --configuration release` 
 
 **VS 2019+**
-* Open `SpxYaml.sln`
+* Open `ai-cli.sln`
 * Select `Debug` or `Release`
 * Run (`<ctrl-shift-B>`)
 
@@ -204,4 +203,4 @@ Console logging: `--logger:console`, optionally followed by one of:
 * `;verbosity=normal`
 * `;verbosity=detailed`
 
-e.g. `dotnet vstest Azure.AI.CLI.TestRunner.dll --logger:trx --logger:console;verbosity=normal`
+e.g. `dotnet vstest Azure.AI.CLI.TestAdapter.dll --logger:trx --logger:console;verbosity=normal`
