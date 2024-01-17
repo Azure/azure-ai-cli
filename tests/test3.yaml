@@ -1,0 +1,2 @@
+﻿- name: simple dev new command
+  command: ai dev new openai-chat --cs
