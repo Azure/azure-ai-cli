@@ -1,2 +1,101 @@
-﻿- name: simple dev new command
-  command: ai dev new openai-chat --cs
+﻿# AI - Azure AI CLI, Version 1.0.0-DEV-robc-20240117
+# Copyright (c) 2023 Microsoft Corporation. All Rights Reserved.
+
+# This PUBLIC PREVIEW version may change at any time.
+# See: https://aka.ms/azure-ai-cli-public-preview
+
+# Name                                             Short Name                              Language                        
+# ---------------------------------------------    ------------------------------------    --------------------------------
+# Environment Variables                            .env                                                                    
+# Helper Function Class Library                    helper-functions                        C#                              
+# OpenAI Chat Completions                          openai-chat                             C#, Go, Java, JavaScript, Python
+# OpenAI Chat Completions (Streaming)              openai-chat-streaming                   C#, Go, Java, JavaScript, Python
+# OpenAI Chat Completions (w/ Data + AI Search)    openai-chat-streaming-with-data         C#, Python                      
+# OpenAI Chat Completions (w/ Functions)           openai-chat-streaming-with-functions    C#, Go, JavaScript, Python      
+# OpenAI Webpage                                   openai-webpage                          JavaScript, TypeScript          
+# OpenAI Webpage (w/ Functions)                    openai-webpage-with-functions           JavaScript, TypeScript          
+
+- name: dev new environment
+  command: ai dev new .env
+
+- name: dev new helper-functions
+  command: ai dev new helper-functions
+
+- class: ai dev new openai-chat
+  tests:
+
+  - name: dev new openai-chat (c#)
+    command: ai dev new openai-chat --cs
+
+  - name: dev new openai-chat (go)
+    command: ai dev new openai-chat --go
+
+  - name: dev new openai-chat (java)
+    command: ai dev new openai-chat --java
+
+  - name: dev new openai-chat (javascript)
+    command: ai dev new openai-chat --javascript
+
+  - name: dev new openai-chat (python)
+    command: ai dev new openai-chat --python
+
+- class: ai dev new openai-chat-streaming
+  tests:
+
+  - name: dev new openai-chat-streaming (c#)
+    command: ai dev new openai-chat-streaming --cs
+
+  - name: dev new openai-chat-streaming (go)
+    command: ai dev new openai-chat-streaming --go
+
+  - name: dev new openai-chat-streaming (java)
+    command: ai dev new openai-chat-streaming --java
+
+  - name: dev new openai-chat-streaming (javascript)
+    command: ai dev new openai-chat-streaming --javascript
+
+  - name: dev new openai-chat-streaming (python)
+    command: ai dev new openai-chat-streaming --python
+
+- class: ai dev new openai-chat-streaming-with-data
+  tests:
+
+  - name: dev new openai-chat-streaming-with-data (c#)
+    command: ai dev new openai-chat-streaming-with-data --cs
+
+  - name: dev new openai-chat-streaming-with-data (python)
+    command: ai dev new openai-chat-streaming-with-data --python
+
+- class: ai dev new openai-chat-streaming-with-functions
+  tests:
+
+  - name: dev new openai-chat-streaming-with-functions (c#)
+    command: ai dev new openai-chat-streaming-with-functions --cs
+
+  - name: dev new openai-chat-streaming-with-functions (go)
+    command: ai dev new openai-chat-streaming-with-functions --go
+
+  - name: dev new openai-chat-streaming-with-functions (javascript)
+    command: ai dev new openai-chat-streaming-with-functions --javascript
+
+  - name: dev new openai-chat-streaming-with-functions (python)
+    command: ai dev new openai-chat-streaming-with-functions --python
+
+- class: ai dev new openai-webpage
+  tests:
+
+  - name: dev new openai-webpage (javascript)
+    command: ai dev new openai-webpage --javascript
+
+  - name: dev new openai-webpage (typescript)
+    command: ai dev new openai-webpage --typescript
+
+- class: ai dev new openai-webpage-with-functions
+  tests:
+
+  - name: dev new openai-webpage-with-functions (javascript)
+    command: ai dev new openai-webpage-with-functions --javascript
+
+  - name: dev new openai-webpage-with-functions (typescript)
+    command: ai dev new openai-webpage-with-functions --typescript
+    
