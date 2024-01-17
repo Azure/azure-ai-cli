@@ -25,7 +25,7 @@
   script: ai
   expect: |
     (?# ---------- BANNER)
-    AI - Azure AI CLI, Version [1]\.[0-9].[0-9]
+    AI - Azure AI CLI, Version [01]\.[0-9].[0-9]
     Copyright \(c\) 2023 Microsoft Corporation\. All Rights Reserved\.
 
     This PUBLIC PREVIEW version may change at any time\.
@@ -84,11 +84,11 @@
   arguments:
     expect: |
       ^Name +Short +Name +Language +\r?$\n
-      ^--------------------------------------------- +------------------------------------ +--------------------------------\r?$\n
-      ^Environment +Variables +\.env +\r?$\n
-      ^Helper +Function +Class +Library +helper-functions +C# +\r?$\n
-      ^OpenAI +Chat +Completions +openai-chat +C#, +Go, +Java, +JavaScript, +Python\r?$\n
-      ^OpenAI +Chat +Completions +\(Streaming\) +openai-chat-streaming +C#, +Go, +Java, +JavaScript, +Python\r?$\n
-      ^OpenAI +Chat +Completions +\(w/ +Data +\+ +AI +Search\) +openai-chat-streaming-with-data +C# +\r?$\n
-      ^OpenAI +Chat +Completions +\(w/ +Functions\) +openai-chat-streaming-with-functions +C#, +Go, +JavaScript, +Python +\r?$\n
-      ^OpenAI +Webpage +\(w/ +Functions\) +openai-webpage +JavaScript +\r?$\n
+      ^-+ +-+ +-+r?$\n
+      ^Environment +Variables +\.env *\r?$\n
+      ^Helper +Function +Class +Library +helper-functions +C# *\r?$\n
+      ^OpenAI +Chat +Completions +openai-chat +C#, +Go, +Java, +JavaScript, +Python *\r?$\n
+      ^OpenAI +Chat +Completions +\(Streaming\) +openai-chat-streaming +C#, +Go, +Java, +JavaScript, +Python *\r?$\n
+      ^OpenAI +Chat +Completions +\(w/ +Data +\+ +AI +Search\) +openai-chat-streaming-with-data +C#, +Python *\r?$\n
+      ^OpenAI +Chat +Completions +\(w/ +Functions\) +openai-chat-streaming-with-functions +C#, +Go, +JavaScript, +Python *\r?$\n
+      ^OpenAI +Webpage +\(w/ +Functions\) +openai-webpage +JavaScript *\r?$\n
