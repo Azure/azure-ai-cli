@@ -21,11 +21,24 @@
 - name: dev new helper-functions
   command: ai dev new helper-functions
 
-- class: ai dev new openai-chat
+- area: ai dev new openai-chat
   tests:
 
-  - name: dev new openai-chat (c#)
-    command: ai dev new openai-chat --cs
+  - class: dev new openai-chat (c#)
+    tests:
+    - name: generate template
+      command: ai dev new openai-chat --cs
+
+    - name: run template
+      command: ai dev shell
+      arguments:
+        run: |
+          cd openai-chat-cs
+          dotnet run
+        stdin: |
+          Tell me a joke
+          Tell me another joke
+      tag: skip
 
   - name: dev new openai-chat (go)
     command: ai dev new openai-chat --go
@@ -39,11 +52,23 @@
   - name: dev new openai-chat (python)
     command: ai dev new openai-chat --python
 
-- class: ai dev new openai-chat-streaming
+- area: ai dev new openai-chat-streaming
   tests:
 
-  - name: dev new openai-chat-streaming (c#)
-    command: ai dev new openai-chat-streaming --cs
+  - class: dev new openai-chat-streaming (c#)
+    tests:
+    - name: generate template
+      command: ai dev new openai-chat-streaming --cs
+    - name: run template
+      command: ai dev shell
+      arguments:
+        run: |
+          cd openai-chat-streaming-cs
+          dotnet run
+        stdin: |
+          Tell me a joke
+          Tell me another joke
+      tag: skip
 
   - name: dev new openai-chat-streaming (go)
     command: ai dev new openai-chat-streaming --go
@@ -57,11 +82,22 @@
   - name: dev new openai-chat-streaming (python)
     command: ai dev new openai-chat-streaming --python
 
-- class: ai dev new openai-chat-streaming-with-data
+- area: ai dev new openai-chat-streaming-with-data
   tests:
 
-  - name: dev new openai-chat-streaming-with-data (c#)
-    command: ai dev new openai-chat-streaming-with-data --cs
+  - class: dev new openai-chat-streaming-with-data (c#)
+    tests:
+    - name: generate template
+      command: ai dev new openai-chat-streaming-with-data --cs
+    - name: run template
+      command: ai dev shell
+      arguments:
+        run: |
+          cd openai-chat-streaming-with-data-cs
+          dotnet run
+        stdin: |
+          What parameter should i use to initialize?
+      tag: skip
 
   - name: dev new openai-chat-streaming-with-data (javascript)
     command: ai dev new openai-chat-streaming-with-data --javascript
@@ -69,11 +105,23 @@
   - name: dev new openai-chat-streaming-with-data (python)
     command: ai dev new openai-chat-streaming-with-data --python
 
-- class: ai dev new openai-chat-streaming-with-functions
+- area: ai dev new openai-chat-streaming-with-functions
   tests:
 
-  - name: dev new openai-chat-streaming-with-functions (c#)
-    command: ai dev new openai-chat-streaming-with-functions --cs
+  - class: dev new openai-chat-streaming-with-functions (c#)
+    tests:
+    - name: generate template
+      command: ai dev new openai-chat-streaming-with-functions --cs
+    - name: run template
+      command: ai dev shell
+      arguments:
+        run: |
+          cd openai-chat-streaming-with-functions-cs
+          dotnet run
+        stdin: |
+          What is the date?
+          What is the time?
+      tag: skip
 
   - name: dev new openai-chat-streaming-with-functions (go)
     command: ai dev new openai-chat-streaming-with-functions --go
@@ -84,7 +132,7 @@
   - name: dev new openai-chat-streaming-with-functions (python)
     command: ai dev new openai-chat-streaming-with-functions --python
 
-- class: ai dev new openai-webpage
+- area: ai dev new openai-webpage
   tests:
 
   - name: dev new openai-webpage (javascript)
@@ -93,7 +141,7 @@
   - name: dev new openai-webpage (typescript)
     command: ai dev new openai-webpage --typescript
 
-- class: ai dev new openai-webpage-with-functions
+- area: ai dev new openai-webpage-with-functions
   tests:
 
   - name: dev new openai-webpage-with-functions (javascript)
