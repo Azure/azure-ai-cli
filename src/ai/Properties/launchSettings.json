@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "ai-cli": {
+      "commandName": "Project",
+      "commandLineArgs": "chat --interactive --question hello --output-chat-history-file history.json"
+    }
+  }
+}
