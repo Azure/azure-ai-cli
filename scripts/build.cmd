@@ -1,8 +1,7 @@
 @echo off
 setlocal
 
-REM Use x.y.z for version. MSI ignores the fourth product version field.
-REM This is also shown as the product version in the list of installed programs.
+REM The product version x.y.z shown in the list of installed programs.
 set VERSION=1.0.0
 REM The AI CLI package (nupkg) version. This cannot be used as a product version.
 set PACKAGE_VERSION=1.0.0-preview-20231214.1

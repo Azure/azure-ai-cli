@@ -6,7 +6,7 @@
     <Bundle Name="Azure AI CLI"
             Version="$(var.version)"
             Manufacturer="Microsoft"
-            UpgradeCode="436172626F6E20697320636F6F6C2123"
+            UpgradeCode="9C0F36A8-BFA3-4AF6-AC2D-F6ABC4B16327"
             DisableModify="yes">
 
         <BootstrapperApplicationRef Id="WixStandardBootstrapperApplication.RtfLicense">
