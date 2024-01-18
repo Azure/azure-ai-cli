@@ -16,29 +16,29 @@ import (
 )
 
 func main() {
-    azureOpenAIEndpoint := os.Getenv("AZURE_OPENAI_ENDPOINT")
-    if azureOpenAIEndpoint == "" {
-        azureOpenAIEndpoint = "<#= AZURE_OPENAI_ENDPOINT #>"
+    openAIEndpoint := os.Getenv("AZURE_OPENAI_ENDPOINT")
+    if openAIEndpoint == "" {
+        openAIEndpoint = "<#= AZURE_OPENAI_ENDPOINT #>"
     }
-    azureOpenAIKey := os.Getenv("AZURE_OPENAI_KEY")
-    if azureOpenAIKey == "" {
-        azureOpenAIKey = "<#= AZURE_OPENAI_KEY #>"
+    openAIKey := os.Getenv("AZURE_OPENAI_KEY")
+    if openAIKey == "" {
+        openAIKey = "<#= AZURE_OPENAI_KEY #>"
     }
-    deploymentName := os.Getenv("AZURE_OPENAI_CHAT_DEPLOYMENT")
-    if deploymentName == "" {
-        deploymentName = "<#= AZURE_OPENAI_CHAT_DEPLOYMENT #>"
+    openAIChatDeploymentName := os.Getenv("AZURE_OPENAI_CHAT_DEPLOYMENT")
+    if openAIChatDeploymentName == "" {
+        openAIChatDeploymentName = "<#= AZURE_OPENAI_CHAT_DEPLOYMENT #>"
     }
-    systemPrompt := os.Getenv("OPENAI_SYSTEM_PROMPT")
-    if systemPrompt == "" {
-        systemPrompt = "<#= AZURE_OPENAI_SYSTEM_PROMPT #>"
+    openAISystemPrompt := os.Getenv("OPENAI_SYSTEM_PROMPT")
+    if openAISystemPrompt == "" {
+        openAISystemPrompt = "<#= AZURE_OPENAI_SYSTEM_PROMPT #>"
     }
 
-    if azureOpenAIEndpoint == "" || azureOpenAIKey == "" || deploymentName == "" || systemPrompt == "" {
+    if openAIEndpoint == "" || openAIKey == "" || openAIChatDeploymentName == "" || openAISystemPrompt == "" {
         fmt.Println("Please set the environment variables.")
         os.Exit(1)
     }
 
-    chat, err := New<#= ClassName #>(systemPrompt, azureOpenAIEndpoint, azureOpenAIKey, deploymentName)
+    chat, err := New<#= ClassName #>(openAIEndpoint, openAIKey, openAIChatDeploymentName, openAISystemPrompt)
     if err != nil {
         log.Fatalf("ERROR: %s", err)
     }

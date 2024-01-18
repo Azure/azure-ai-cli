@@ -17,9 +17,9 @@ namespace Azure.AI.Details.Common.CLI
 {
     public class AiProgram
     {
-        static void Main(string[] args)
+        static int Main(string[] args)
         {
-            Program.Main(new AiProgramData(), args);
+            return Program.Main(new AiProgramData(), args);
         }
     }
 

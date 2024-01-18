@@ -15,12 +15,12 @@ const rl = readline.createInterface({
 
 async function main() {
 
-  const endpoint = process.env["AZURE_OPENAI_ENDPOINT"] || "<#= AZURE_OPENAI_ENDPOINT #>";
-  const azureApiKey = process.env["AZURE_OPENAI_KEY"]  || "<#= AZURE_OPENAI_KEY #>";
-  const deploymentName = process.env["AZURE_OPENAI_CHAT_DEPLOYMENT"] || "<#= AZURE_OPENAI_CHAT_DEPLOYMENT #>" ;
-  const systemPrompt = process.env["AZURE_OPENAI_SYSTEM_PROMPT"] || "<#= AZURE_OPENAI_SYSTEM_PROMPT #>" ;
+  const openAIEndpoint = process.env["AZURE_OPENAI_ENDPOINT"] || "<#= AZURE_OPENAI_ENDPOINT #>";
+  const openAIKey = process.env["AZURE_OPENAI_KEY"] || "<#= AZURE_OPENAI_KEY #>";
+  const openAIChatDeploymentName = process.env["AZURE_OPENAI_CHAT_DEPLOYMENT"] || "<#= AZURE_OPENAI_CHAT_DEPLOYMENT #>" ;
+  const openAISystemPrompt = process.env["AZURE_OPENAI_SYSTEM_PROMPT"] || "<#= AZURE_OPENAI_SYSTEM_PROMPT #>" ;
 
-  const chat = new <#= ClassName #>(systemPrompt, endpoint, azureApiKey, deploymentName);
+  const chat = new <#= ClassName #>(openAIEndpoint, openAIKey, openAIChatDeploymentName, openAISystemPrompt);
 
   while (true) {
 
@@ -32,6 +32,7 @@ async function main() {
   }
 
   console.log('Bye!');
+  process.exit();
 }
 
 main().catch((err) => {

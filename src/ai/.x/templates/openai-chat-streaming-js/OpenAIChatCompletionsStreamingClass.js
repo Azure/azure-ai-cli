@@ -4,16 +4,16 @@
 const { OpenAIClient, AzureKeyCredential } = require("@azure/openai");
 
 class <#= ClassName #> {
-  constructor(systemPrompt, endpoint, azureApiKey, deploymentName) {
-    this.systemPrompt = systemPrompt;
-    this.deploymentName = deploymentName;
-    this.client = new OpenAIClient(endpoint, new AzureKeyCredential(azureApiKey));
+  constructor(openAIEndpoint, openAIKey, openAIChatDeploymentName, openAISystemPrompt) {
+    this.openAISystemPrompt = openAISystemPrompt;
+    this.openAIChatDeploymentName = openAIChatDeploymentName;
+    this.client = new OpenAIClient(openAIEndpoint, new AzureKeyCredential(openAIKey));
     this.clearConversation();
   }
 
   clearConversation() {
     this.messages = [
-      { role: 'system', content: this.systemPrompt }
+      { role: 'system', content: this.openAISystemPrompt }
     ];
   }
 
@@ -21,7 +21,7 @@ class <#= ClassName #> {
     this.messages.push({ role: 'user', content: userInput });
 
     let contentComplete = '';
-    const events = await this.client.streamChatCompletions(this.deploymentName, this.messages);
+    const events = await this.client.streamChatCompletions(this.openAIChatDeploymentName, this.messages);
 
     for await (const event of events) {
       for (const choice of event.choices) {
@@ -32,7 +32,9 @@ class <#= ClassName #> {
         }
 
         if (content != null) {
-          callback(content);
+          if(callback != null) {
+            callback(content);
+          }
           await new Promise(r => setTimeout(r, 50)); // delay to simulate real-time output, word by word
           contentComplete += content;
         }

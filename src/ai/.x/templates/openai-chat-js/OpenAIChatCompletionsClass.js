@@ -4,23 +4,23 @@
 const { OpenAIClient, AzureKeyCredential } = require("@azure/openai");
 
 class <#= ClassName #> {
-  constructor(systemPrompt, endpoint, azureApiKey, deploymentName) {
-    this.systemPrompt = systemPrompt;
-    this.deploymentName = deploymentName;
-    this.client = new OpenAIClient(endpoint, new AzureKeyCredential(azureApiKey));
+  constructor(openAIEndpoint, openAIKey, openAIChatDeploymentName, openAISystemPrompt) {
+    this.openAISystemPrompt = openAISystemPrompt;
+    this.openAIChatDeploymentName = openAIChatDeploymentName;
+    this.client = new OpenAIClient(openAIEndpoint, new AzureKeyCredential(openAIKey));
     this.clearConversation();
   }
 
   clearConversation() {
     this.messages = [
-      { role: 'system', content: this.systemPrompt }
+      { role: 'system', content: this.openAISystemPrompt }
     ];
   }
 
   async getChatCompletions(userInput) {
     this.messages.push({ role: 'user', content: userInput });
 
-    const result = await this.client.getChatCompletions(this.deploymentName, this.messages);
+    const result = await this.client.getChatCompletions(this.openAIChatDeploymentName, this.messages);
     const responseContent = result.choices[0].message.content;
 
     this.messages.push({ role: 'assistant', content: responseContent });

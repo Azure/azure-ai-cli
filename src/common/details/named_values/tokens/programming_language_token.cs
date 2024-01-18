@@ -16,6 +16,7 @@ namespace Azure.AI.Details.Common.CLI
                 "java" => ".java",
                 "javascript" => ".js",
                 "python" => ".py",
+                "typescript" => ".ts",
                 _ => string.Empty
             };
         }
@@ -27,7 +28,7 @@ namespace Azure.AI.Details.Common.CLI
 
         public static NamedValueTokenData Data() => new NamedValueTokenData(_optionName, _fullName, _optionExample, _requiredDisplayName);
         public static INamedValueTokenParser Parser() => new NamedValueTokenParserList(
-            new NamedValueTokenParser(_optionName, _fullName, "01", "1", "C#;c#;cs;Go;go;Java;java;JavaScript;javascript;js;Python;python;py"),
+            new NamedValueTokenParser(_optionName, _fullName, "01", "1", "C#;c#;cs;Go;go;Java;java;JavaScript;javascript;js;Python;python;py;TypeScript;typescript;ts"),
             new NamedValueTokenParser("--C#", "programming.language.csharp", "001", "0", null, null, "C#", _fullName),
             new NamedValueTokenParser("--CS", "programming.language.csharp", "001", "0", null, null, "C#", _fullName),
             new NamedValueTokenParser("--Go", "programming.language.go", "001", "0", null, null, "Go", _fullName),
@@ -35,7 +36,9 @@ namespace Azure.AI.Details.Common.CLI
             new NamedValueTokenParser("--JavaScript", "programming.language.javascript", "001", "0", null, null, "JavaScript", _fullName),
             new NamedValueTokenParser("--JS", "programming.language.javascript", "001", "0", null, null, "JavaScript", _fullName),
             new NamedValueTokenParser("--Python", "programming.language.python", "001", "0", null, null, "Python", _fullName),
-            new NamedValueTokenParser("--PY", "programming.language.python", "001", "0", null, null, "Python", _fullName)
+            new NamedValueTokenParser("--PY", "programming.language.python", "001", "0", null, null, "Python", _fullName),
+            new NamedValueTokenParser("--TypeScript", "programming.language.typescript", "001", "0", null, null, "TypeScript", _fullName),
+            new NamedValueTokenParser("--TS", "programming.language.typescript", "001", "0", null, null, "TypeScript", _fullName)
         );
 
         private const string _requiredDisplayName = "programming language";
