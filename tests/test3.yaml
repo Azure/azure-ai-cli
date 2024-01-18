@@ -80,7 +80,7 @@
         cd openai-chat-java
         javac -cp target/lib/* src/OpenAIQuickstart.java -d out
     - name: 4-run template
-      command: ai dev shell --run "java -cp openai-chat-java/out;openai-chat-java/target/lib/* OpenAIQuickstart"
+      command: ai dev shell --run "java -cp \"openai-chat-java/out;openai-chat-java/target/lib/*\" OpenAIQuickstart"
       input: |-
         Tell me a joke
         Tell me another joke
