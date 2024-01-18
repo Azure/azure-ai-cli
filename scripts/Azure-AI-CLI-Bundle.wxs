@@ -45,7 +45,6 @@
         <PackageGroup Id="DotNetSdk">
             <ExePackage Id="DotNetSdk"
                         Name="dotnet-sdk-$(var.dotNetVersion)-win-$(var.platform).exe"
-                        Cache="no"
                         Compressed="no"
                         DetectCondition="DOTNET_SDK_INSTALLED"
                         DownloadUrl="$(var.dotNetUrl)"
