@@ -18,39 +18,103 @@
 - name: dev new environment
   command: ai dev new .env
 
-- name: dev new helper-functions
-  command: ai dev new helper-functions
+- class: dev new helper-functions
+  tests:
+  - name: 1-generate template
+    command: ai dev new helper-functions
+  - name: 2-build template
+    script: |
+      cd helper-functions
+      dotnet build
+  - name: 3-run template
+    command: ai chat --interactive --helper-functions helper-functions/bin/Debug/net7.0/HelperFunctionsProject.dll
+    input: |
+      What is my name?
+    expect: |
+      assistant-function: GetUsersName\({}\) = 
+    tag: skip
 
 - area: ai dev new openai-chat
   tests:
 
   - class: dev new openai-chat (c#)
     tests:
-    - name: generate template
+    - name: 1-generate template
       command: ai dev new openai-chat --cs
-
-    - name: run template
-      command: ai dev shell
-      arguments:
-        run: |
-          cd openai-chat-cs
-          dotnet run
-        stdin: |
-          Tell me a joke
-          Tell me another joke
+    - name: 2-build template
+      script: |
+        cd openai-chat-cs
+        dotnet build
+    - name: 3-run template
+      command: ai dev shell --run "openai-chat-cs/bin/Debug/net7.0/OpenAIChatCompletions"
+      input: |-
+        Tell me a joke
+        Tell me another joke
       tag: skip
 
-  - name: dev new openai-chat (go)
-    command: ai dev new openai-chat --go
+  - class: dev new openai-chat (go)
+    tests:
+    - name: 1-generate template
+      command: ai dev new openai-chat --go
+    - name: 2-build template
+      script: |
+        cd openai-chat-go
+        go mod tidy && go build
+    - name: 3-run template
+      command: ai dev shell --run "openai-chat-go/openai_chat_completions_hello_world"
+      input: |-
+        Tell me a joke
+        Tell me another joke
+      tag: skip
 
-  - name: dev new openai-chat (java)
-    command: ai dev new openai-chat --java
+  - class: dev new openai-chat (java)
+    tests:
+    - name: 1-generate template
+      command: ai dev new openai-chat --java
+    - name: 2-restore packages
+      script: |
+        cd openai-chat-java
+        mvn clean package
+    - name: 3-build template
+      script: |
+        cd openai-chat-java
+        javac -cp target/lib/* src/OpenAIQuickstart.java -d out
+    - name: 4-run template
+      command: ai dev shell --run "java -cp openai-chat-java/out;openai-chat-java/target/lib/* OpenAIQuickstart"
+      input: |-
+        Tell me a joke
+        Tell me another joke
+      tag: skip
 
-  - name: dev new openai-chat (javascript)
-    command: ai dev new openai-chat --javascript
+  - class: dev new openai-chat (javascript)
+    tests:
+    - name: 1-generate template
+      command: ai dev new openai-chat --javascript
+    - name: 2-build template
+      script: |
+        cd openai-chat-js
+        npm install
+    - name: 3-run template
+      command: ai dev shell --run "cd openai-chat-js && node main.js"
+      input: |
+        Tell me a joke
+        Tell me another joke
+      tag: skip
 
-  - name: dev new openai-chat (python)
-    command: ai dev new openai-chat --python
+  - class: dev new openai-chat (python)
+    tests:
+    - name: 1-generate template
+      command: ai dev new openai-chat --python
+    - name: 2-build template
+      script: |
+        cd openai-chat-py
+        pip install -r requirements.txt
+    - name: 3-run template
+      command: ai dev shell --run "cd openai-chat-py && python openai_chat_completions.py"
+      input: |
+        Tell me a joke
+        Tell me another joke
+      tag: skip
 
 - area: ai dev new openai-chat-streaming
   tests:

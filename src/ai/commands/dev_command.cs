@@ -115,17 +115,9 @@ namespace Azure.AI.Details.Common.CLI
             var runCommand = RunCommandToken.Data().GetOrDefault(_values);
             UpdateFileNameArguments(runCommand, ref fileName, ref arguments, out var deleteWhenDone);
 
-            var runCommandStdIn = RunCommandStdInToken.Data().GetOrDefault(_values);
-            var hasStandardInput = !string.IsNullOrEmpty(runCommandStdIn);
-
-            var process = ProcessHelpers.StartProcess(fileName, arguments, env, false, hasStandardInput);
-            if (hasStandardInput)
-            {
-                process.StandardInput.Write(runCommandStdIn);
-                process.StandardInput.Close();
-            }
-
+            var process = ProcessHelpers.StartProcess(fileName, arguments, env, false);
             process.WaitForExit();
+
             if (!string.IsNullOrEmpty(deleteWhenDone))
             {
                 File.Delete(deleteWhenDone);

@@ -65,6 +65,7 @@ namespace TestAdapterTest
             var script = YamlTestProperties.Get(test, "script");
             var @foreach = YamlTestProperties.Get(test, "foreach");
             var arguments = YamlTestProperties.Get(test, "arguments");
+            var input = YamlTestProperties.Get(test, "input");
             var expect = YamlTestProperties.Get(test, "expect");
             var notExpect = YamlTestProperties.Get(test, "not-expect");
             var workingDirectory = YamlTestProperties.Get(test, "working-directory");
@@ -84,8 +85,8 @@ namespace TestAdapterTest
                 var start = DateTime.Now;
 
                 var outcome = string.IsNullOrEmpty(simulate)
-                    ? RunTestCase(test, cli, command, script, foreachItem, arguments, expect, notExpect, workingDirectory, timeout, out string stdOut, out string stdErr, out string errorMessage, out string stackTrace, out string additional, out string debugTrace)
-                    : SimulateTestCase(test, simulate, cli, command, script, foreachItem, arguments, expect, notExpect, workingDirectory, out stdOut, out stdErr, out errorMessage, out stackTrace, out additional, out debugTrace);
+                    ? RunTestCase(test, cli, command, script, foreachItem, arguments, input, expect, notExpect, workingDirectory, timeout, out string stdOut, out string stdErr, out string errorMessage, out string stackTrace, out string additional, out string debugTrace)
+                    : SimulateTestCase(test, simulate, cli, command, script, foreachItem, arguments, input, expect, notExpect, workingDirectory, out stdOut, out stdErr, out errorMessage, out stackTrace, out additional, out debugTrace);
 
                 #if DEBUG
                 additional += outcome == TestOutcome.Failed ? $"\nEXTRA: {ExtraDebugInfo()}" : "";
@@ -204,7 +205,7 @@ namespace TestAdapterTest
             return dup;
         }
 
-        private static TestOutcome RunTestCase(TestCase test, string cli, string command, string script, string @foreach, string arguments, string expect, string notExpect, string workingDirectory, int timeout, out string stdOut, out string stdErr, out string errorMessage, out string stackTrace, out string additional, out string debugTrace)
+        private static TestOutcome RunTestCase(TestCase test, string cli, string command, string script, string @foreach, string arguments, string input, string expect, string notExpect, string workingDirectory, int timeout, out string stdOut, out string stdErr, out string errorMessage, out string stackTrace, out string additional, out string debugTrace)
         {
             var outcome = TestOutcome.None;
 
@@ -243,6 +244,8 @@ namespace TestAdapterTest
                 UpdatePathEnvironment(startInfo);
 
                 var process = Process.Start(startInfo);
+                process.StandardInput.WriteLine(input ?? string.Empty);
+                process.StandardInput.Close();
                 stdOutTask = process.StandardOutput.ReadToEndAsync();
                 stdErrTask = process.StandardError.ReadToEndAsync();
 
@@ -685,7 +688,7 @@ namespace TestAdapterTest
             return args.ToString().TrimEnd();
         }
 
-        private static TestOutcome SimulateTestCase(TestCase test, string simulate, string cli, string command, string script, string @foreach, string arguments, string expect, string notExpect, string workingDirectory, out string stdOut, out string stdErr, out string errorMessage, out string stackTrace, out string additional, out string debugTrace)
+        private static TestOutcome SimulateTestCase(TestCase test, string simulate, string cli, string command, string script, string @foreach, string arguments, string input, string expect, string notExpect, string workingDirectory, out string stdOut, out string stdErr, out string errorMessage, out string stackTrace, out string additional, out string debugTrace)
         {
             var sb = new StringBuilder();
             sb.AppendLine($"cli='{cli?.Replace("\n", "\\n")}'");
@@ -693,6 +696,7 @@ namespace TestAdapterTest
             sb.AppendLine($"script='{script?.Replace("\n", "\\n")}'");
             sb.AppendLine($"foreach='{@foreach?.Replace("\n", "\\n")}'");
             sb.AppendLine($"arguments='{arguments?.Replace("\n", "\\n")}'");
+            sb.AppendLine($"input='{input?.Replace("\n", "\\n")}'");
             sb.AppendLine($"expect='{expect?.Replace("\n", "\\n")}'");
             sb.AppendLine($"not-expect='{notExpect?.Replace("\n", "\\n")}'");
             sb.AppendLine($"working-directory='{workingDirectory}'");

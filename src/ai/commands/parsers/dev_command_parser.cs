@@ -84,8 +84,7 @@ namespace Azure.AI.Details.Common.CLI
 
         private static INamedValueTokenParser[] _devShellParsers = {
             new CommonDevNamedValueTokenParsers(),
-            RunCommandToken.Parser(),
-            RunCommandStdInToken.Parser()
+            RunCommandToken.Parser()
         };
     }
 }
