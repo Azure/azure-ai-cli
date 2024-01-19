@@ -127,6 +127,7 @@ namespace TestAdapterTest
 
             SetTestCasePropertyMap(test, "foreach", mapping, "foreach", workingDirectory);
             SetTestCasePropertyMap(test, "arguments", mapping, "arguments", workingDirectory);
+            SetTestCasePropertyMap(test, "input", mapping, "input", workingDirectory);
 
             SetTestCaseProperty(test, "expect", mapping, "expect");
             SetTestCaseProperty(test, "not-expect", mapping, "not-expect");
@@ -168,7 +169,7 @@ namespace TestAdapterTest
 
         private static bool IsValidTestCaseNode(string value)
         {
-            return ";area;class;name;cli;command;script;timeout;foreach;arguments;expect;not-expect;simulate;tag;tags;parallelize;workingDirectory;".IndexOf($";{value};") >= 0;
+            return ";area;class;name;cli;command;script;timeout;foreach;arguments;input;expect;not-expect;simulate;tag;tags;parallelize;workingDirectory;".IndexOf($";{value};") >= 0;
         }
 
         private static void SetTestCaseProperty(TestCase test, string propertyName, YamlMappingNode mapping, string mappingName)
