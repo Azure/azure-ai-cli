@@ -233,43 +233,119 @@
 
   - class: dev new openai-chat-streaming-with-functions (c#)
     tests:
-    - name: generate template
+    - name: 1-generate template
       command: ai dev new openai-chat-streaming-with-functions --cs
-    - name: run template
-      command: ai dev shell
-      arguments:
-        run: |
-          cd openai-chat-streaming-with-functions-cs
-          dotnet run
-        stdin: |
-          What is the date?
-          What is the time?
+    - name: 2-build template
+      script: |
+        cd openai-chat-streaming-with-functions-cs
+        dotnet build
+    - name: 3-run template
+      command: ai dev shell --run "cd openai-chat-streaming-with-functions-cs && bin\Debug\net7.0\OpenAIChatCompletionsFunctionsStreaming"
+      input: |-
+        What is the date?
+        What is the time?
       tag: skip
 
-  - name: dev new openai-chat-streaming-with-functions (go)
-    command: ai dev new openai-chat-streaming-with-functions --go
+  - class: dev new openai-chat-streaming-with-functions (go)
+    tests:
+    - name: 1-generate template
+      command: ai dev new openai-chat-streaming-with-functions --go
+    - name: 2-build template
+      script: |
+        cd openai-chat-streaming-with-functions-go
+        go mod tidy && go build
+    - name: 3-run template
+      command: ai dev shell --run "cd openai-chat-streaming-with-functions-go && openai_chat_completions_functions_streaming_hello_world"
+      input: |-
+        What is the date?
+        What is the time?
+      tag: skip
 
-  - name: dev new openai-chat-streaming-with-functions (javascript)
-    command: ai dev new openai-chat-streaming-with-functions --javascript
+  - class: dev new openai-chat-streaming-with-functions (javascript)
+    tests:
+    - name: 1-generate template
+      command: ai dev new openai-chat-streaming-with-functions --javascript
+    - name: 2-build template
+      script: |
+        cd openai-chat-streaming-with-functions-js
+        npm install
+    - name: 3-run template
+      command: ai dev shell --run "cd openai-chat-streaming-with-functions-js && node main.js"
+      input: |-
+        What is the date?
+        What is the time?
+      tag: skip
 
-  - name: dev new openai-chat-streaming-with-functions (python)
-    command: ai dev new openai-chat-streaming-with-functions --python
+  - class: dev new openai-chat-streaming-with-functions (python)
+    tests:
+    - name: 1-generate template
+      command: ai dev new openai-chat-streaming-with-functions --python
+    - name: 2-build template
+      script: |
+        cd openai-chat-streaming-with-functions-py
+        pip install -r requirements.txt
+    - name: 3-run template
+      command: ai dev shell --run "cd openai-chat-streaming-with-functions-py && python main.py"
+      input: |-
+        What is the date?
+        What is the time?
+      tag: skip
 
 - area: ai dev new openai-webpage
   tests:
 
-  - name: dev new openai-webpage (javascript)
-    command: ai dev new openai-webpage --javascript
+  - class: dev new openai-webpage (javascript)
+    tests:
+    - name: 1-generate template
+      command: ai dev new openai-webpage --javascript
+    - name: 2-build template
+      script: |
+        cd openai-webpage-js
+        npm install
+    - name: 3-pack template
+      script: |
+        cd openai-webpage-js
+        npx webpack
 
-  - name: dev new openai-webpage (typescript)
-    command: ai dev new openai-webpage --typescript
+  - class: dev new openai-webpage (typescript)
+    tests:
+    - name: 1-generate template
+      command: ai dev new openai-webpage --typescript
+    - name: 2-build template
+      script: |
+        cd openai-webpage-ts
+        npm install
+    - name: 3-pack template
+      script: |
+        cd openai-webpage-ts
+        npx webpack
 
 - area: ai dev new openai-webpage-with-functions
   tests:
 
-  - name: dev new openai-webpage-with-functions (javascript)
-    command: ai dev new openai-webpage-with-functions --javascript
+  - class: dev new openai-webpage-with-functions (javascript)
+    tests:
+    - name: 1-generate template
+      command: ai dev new openai-webpage-with-functions --javascript  
+    - name: 2-build template  
+      script: |
+        cd openai-webpage-with-functions-js
+        npm install
+    - name: 3-pack template 
+      script: |
+        cd openai-webpage-with-functions-js
+        npx webpack
 
-  - name: dev new openai-webpage-with-functions (typescript)
-    command: ai dev new openai-webpage-with-functions --typescript
+  - class: dev new openai-webpage-with-functions (typescript)
+    tests:
+    - name: 1-generate template
+      command: ai dev new openai-webpage-with-functions --typescript
+    - name: 2-build template
+      script: |
+        cd openai-webpage-with-functions-ts
+        npm install
+    - name: 3-pack template
+      script: |
+        cd openai-webpage-with-functions-ts
+        npx webpack
     
