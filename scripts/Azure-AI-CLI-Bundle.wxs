@@ -6,7 +6,7 @@
     <Bundle Name="Azure AI CLI"
             Version="$(var.version)"
             Manufacturer="Microsoft"
-            UpgradeCode="9C0F36A8-BFA3-4AF6-AC2D-F6ABC4B16327"
+            UpgradeCode="BF9A65EF-7D5A-4DC4-90E4-CDC44F042E96"
             DisableModify="yes">
 
         <BootstrapperApplicationRef Id="WixStandardBootstrapperApplication.RtfLicense">
@@ -15,7 +15,7 @@
 
         <!-- Check the version of existing Azure AI CLI .msi installation -->
         <util:ProductSearch Variable="AlreadyInstalledVersion"
-                            UpgradeCode="BDE6DEF4-9259-4BD5-9BC8-FDA1660FF7AD"
+                            UpgradeCode="F1CDBA9C-E353-4039-9A20-059A1E587E73"
                             Id="AlreadyInstalledVersionSearch"
                             Result="version"/>
         <!--
