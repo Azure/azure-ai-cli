@@ -41,6 +41,7 @@ namespace TestAdapterTest
             { "parallelize", RegisterTestCaseProperty("Parallelize") },
             { "foreach", RegisterTestCaseProperty("ForEach") },
             { "arguments", RegisterTestCaseProperty("Arguments") },
+            { "input", RegisterTestCaseProperty("Input")},
             { "expect", RegisterTestCaseProperty("Expect") },
             { "not-expect", RegisterTestCaseProperty("NotExpect") },
             { "simulate", RegisterTestCaseProperty("Simulate") },

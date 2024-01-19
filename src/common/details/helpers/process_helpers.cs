@@ -47,12 +47,13 @@ namespace Azure.AI.Details.Common.CLI
                         : null;
         }
 
-        public static Process StartProcess(string fileName, string arguments, Dictionary<string, string> addToEnvironment = null, bool redirect = true)
+        public static Process StartProcess(string fileName, string arguments, Dictionary<string, string> addToEnvironment = null, bool redirectOutput = true, bool redirectInput = false)
         {
             var start = new ProcessStartInfo(fileName, arguments);
             start.UseShellExecute = false;
-            start.RedirectStandardOutput = redirect;
-            start.RedirectStandardError = redirect;
+            start.RedirectStandardOutput = redirectOutput;
+            start.RedirectStandardError = redirectOutput;
+            start.RedirectStandardInput = redirectInput;
 
             if (addToEnvironment != null)
             {

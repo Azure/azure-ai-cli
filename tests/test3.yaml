@@ -1,2 +1,216 @@
-﻿- name: simple dev new command
-  command: ai dev new openai-chat --cs
+﻿# AI - Azure AI CLI, Version 1.0.0-DEV-robc-20240117
+# Copyright (c) 2023 Microsoft Corporation. All Rights Reserved.
+
+# This PUBLIC PREVIEW version may change at any time.
+# See: https://aka.ms/azure-ai-cli-public-preview
+
+# Name                                             Short Name                              Language                        
+# ---------------------------------------------    ------------------------------------    --------------------------------
+# Environment Variables                            .env                                                                    
+# Helper Function Class Library                    helper-functions                        C#                              
+# OpenAI Chat Completions                          openai-chat                             C#, Go, Java, JavaScript, Python
+# OpenAI Chat Completions (Streaming)              openai-chat-streaming                   C#, Go, Java, JavaScript, Python
+# OpenAI Chat Completions (w/ Data + AI Search)    openai-chat-streaming-with-data         C#, JavaScript, Python                      
+# OpenAI Chat Completions (w/ Functions)           openai-chat-streaming-with-functions    C#, Go, JavaScript, Python      
+# OpenAI Webpage                                   openai-webpage                          JavaScript, TypeScript          
+# OpenAI Webpage (w/ Functions)                    openai-webpage-with-functions           JavaScript, TypeScript          
+
+- name: dev new environment
+  command: ai dev new .env
+
+- class: dev new helper-functions
+  tests:
+  - name: 1-generate template
+    command: ai dev new helper-functions
+  - name: 2-build template
+    script: |
+      cd helper-functions
+      dotnet build
+  - name: 3-run template
+    command: ai chat --interactive --helper-functions helper-functions/bin/Debug/net7.0/HelperFunctionsProject.dll
+    input: |
+      What is my name?
+    expect: |
+      assistant-function: GetUsersName\({}\) = 
+    tag: skip
+
+- area: ai dev new openai-chat
+  tests:
+
+  - class: dev new openai-chat (c#)
+    tests:
+    - name: 1-generate template
+      command: ai dev new openai-chat --cs
+    - name: 2-build template
+      script: |
+        cd openai-chat-cs
+        dotnet build
+    - name: 3-run template
+      command: ai dev shell --run "openai-chat-cs/bin/Debug/net7.0/OpenAIChatCompletions"
+      input: |-
+        Tell me a joke
+        Tell me another joke
+      tag: skip
+
+  - class: dev new openai-chat (go)
+    tests:
+    - name: 1-generate template
+      command: ai dev new openai-chat --go
+    - name: 2-build template
+      script: |
+        cd openai-chat-go
+        go mod tidy && go build
+    - name: 3-run template
+      command: ai dev shell --run "openai-chat-go/openai_chat_completions_hello_world"
+      input: |-
+        Tell me a joke
+        Tell me another joke
+      tag: skip
+
+  - class: dev new openai-chat (java)
+    tests:
+    - name: 1-generate template
+      command: ai dev new openai-chat --java
+    - name: 2-restore packages
+      script: |
+        cd openai-chat-java
+        mvn clean package
+    - name: 3-build template
+      script: |
+        cd openai-chat-java
+        javac -cp "target/lib/*" src/OpenAIQuickstart.java -d out
+    - name: 4-run template
+      command: ai dev shell --run "java -cp \"openai-chat-java/out;openai-chat-java/target/lib/*\" OpenAIQuickstart"
+      input: |-
+        Tell me a joke
+        Tell me another joke
+      tag: skip
+
+  - class: dev new openai-chat (javascript)
+    tests:
+    - name: 1-generate template
+      command: ai dev new openai-chat --javascript
+    - name: 2-build template
+      script: |
+        cd openai-chat-js
+        npm install
+    - name: 3-run template
+      command: ai dev shell --run "cd openai-chat-js && node main.js"
+      input: |
+        Tell me a joke
+        Tell me another joke
+      tag: skip
+
+  - class: dev new openai-chat (python)
+    tests:
+    - name: 1-generate template
+      command: ai dev new openai-chat --python
+    - name: 2-build template
+      script: |
+        cd openai-chat-py
+        pip install -r requirements.txt
+    - name: 3-run template
+      command: ai dev shell --run "cd openai-chat-py && python openai_chat_completions.py"
+      input: |
+        Tell me a joke
+        Tell me another joke
+      tag: skip
+
+- area: ai dev new openai-chat-streaming
+  tests:
+
+  - class: dev new openai-chat-streaming (c#)
+    tests:
+    - name: generate template
+      command: ai dev new openai-chat-streaming --cs
+    - name: run template
+      command: ai dev shell
+      arguments:
+        run: |
+          cd openai-chat-streaming-cs
+          dotnet run
+        stdin: |
+          Tell me a joke
+          Tell me another joke
+      tag: skip
+
+  - name: dev new openai-chat-streaming (go)
+    command: ai dev new openai-chat-streaming --go
+
+  - name: dev new openai-chat-streaming (java)
+    command: ai dev new openai-chat-streaming --java
+
+  - name: dev new openai-chat-streaming (javascript)
+    command: ai dev new openai-chat-streaming --javascript
+
+  - name: dev new openai-chat-streaming (python)
+    command: ai dev new openai-chat-streaming --python
+
+- area: ai dev new openai-chat-streaming-with-data
+  tests:
+
+  - class: dev new openai-chat-streaming-with-data (c#)
+    tests:
+    - name: generate template
+      command: ai dev new openai-chat-streaming-with-data --cs
+    - name: run template
+      command: ai dev shell
+      arguments:
+        run: |
+          cd openai-chat-streaming-with-data-cs
+          dotnet run
+        stdin: |
+          What parameter should i use to initialize?
+      tag: skip
+
+  - name: dev new openai-chat-streaming-with-data (javascript)
+    command: ai dev new openai-chat-streaming-with-data --javascript
+
+  - name: dev new openai-chat-streaming-with-data (python)
+    command: ai dev new openai-chat-streaming-with-data --python
+
+- area: ai dev new openai-chat-streaming-with-functions
+  tests:
+
+  - class: dev new openai-chat-streaming-with-functions (c#)
+    tests:
+    - name: generate template
+      command: ai dev new openai-chat-streaming-with-functions --cs
+    - name: run template
+      command: ai dev shell
+      arguments:
+        run: |
+          cd openai-chat-streaming-with-functions-cs
+          dotnet run
+        stdin: |
+          What is the date?
+          What is the time?
+      tag: skip
+
+  - name: dev new openai-chat-streaming-with-functions (go)
+    command: ai dev new openai-chat-streaming-with-functions --go
+
+  - name: dev new openai-chat-streaming-with-functions (javascript)
+    command: ai dev new openai-chat-streaming-with-functions --javascript
+
+  - name: dev new openai-chat-streaming-with-functions (python)
+    command: ai dev new openai-chat-streaming-with-functions --python
+
+- area: ai dev new openai-webpage
+  tests:
+
+  - name: dev new openai-webpage (javascript)
+    command: ai dev new openai-webpage --javascript
+
+  - name: dev new openai-webpage (typescript)
+    command: ai dev new openai-webpage --typescript
+
+- area: ai dev new openai-webpage-with-functions
+  tests:
+
+  - name: dev new openai-webpage-with-functions (javascript)
+    command: ai dev new openai-webpage-with-functions --javascript
+
+  - name: dev new openai-webpage-with-functions (typescript)
+    command: ai dev new openai-webpage-with-functions --typescript
+    
