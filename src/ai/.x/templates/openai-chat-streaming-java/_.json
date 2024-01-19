@@ -2,6 +2,7 @@
   "_LongName": "OpenAI Chat Completions (Streaming)",
   "_ShortName": "openai-chat-streaming",
   "_Language": "Java",
+  "ClassName": "OpenAIChatCompletionsStreamingClass",
   "AZURE_OPENAI_ENDPOINT": "<insert your OpenAI endpoint here>",
   "AZURE_OPENAI_KEY": "<insert your OpenAI API key here>",
   "AZURE_OPENAI_CHAT_DEPLOYMENT": "<insert your OpenAI chat deployment name here>",
