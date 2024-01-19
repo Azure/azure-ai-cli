@@ -1,1 +1,1 @@
-javac -cp target/lib/* src/OpenAIQuickstart.java -d out
+javac -cp target/lib/* src/OpenAIChatCompletionsClass.java src/Main.java -d out
