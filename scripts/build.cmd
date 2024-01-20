@@ -16,9 +16,9 @@ set DOTNET_URL=https://download.visualstudio.microsoft.com/download/pr/febc46ff-
 set DOTNET_SIZE=229741072
 set DOTNET_SHA1=8d40790ae79bfc6f29f1ab280801e6c019ae5633
 
-where candle.exe >nul
-if %ERRORLEVEL% neq 0 set PATH=%PATH%;C:\Program Files (x86)\WiX Toolset v3.14\bin
-where candle.exe >nul
+where candle.exe >nul 2>&1
+if %ERRORLEVEL% neq 0 set PATH=%PATH%;C:\Program Files (x86)\WiX Toolset v3.11\bin;C:\Program Files (x86)\WiX Toolset v3.14\bin
+where candle.exe >nul 2>&1
 if %ERRORLEVEL% neq 0 (
   echo Error: Install WiX v3.14 Toolset from https://wixtoolset.org/docs/v3/releases/v3-14-0-6526/ 1>&2
   exit /b 1
