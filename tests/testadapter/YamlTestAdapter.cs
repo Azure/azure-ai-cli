@@ -73,12 +73,27 @@ namespace TestAdapterTest
                         while (true)
                         {
                             var nextStepId = YamlTestProperties.Get(checkTest, "nextStepId");
-                            if (string.IsNullOrEmpty(nextStepId)) break;
+                            if (string.IsNullOrEmpty(nextStepId))
+                            {
+                                Logger.LogInfo($"YamlTestAdapter.RunTests() ==> No nextStepId for test '{checkTest.DisplayName}'");
+                                break;
+                            }
 
-                            var stepTest = testFromIdMap[nextStepId];
-                            var stepCompletion = completionFromIdMap[nextStepId];
+                            var stepTest = testFromIdMap.ContainsKey(nextStepId) ? testFromIdMap[nextStepId] : null;
+                            if (stepTest == null)
+                            {
+                                Logger.LogError($"YamlTestAdapter.RunTests() ==> ERROR: nextStepId '{nextStepId}' not found for test '{checkTest.DisplayName}'");
+                                break;
+                            }
+
+                            var stepCompletion = completionFromIdMap.ContainsKey(nextStepId) ? completionFromIdMap[nextStepId] : null;
+                            if (stepCompletion == null)
+                            {
+                                Logger.LogError($"YamlTestAdapter.RunTests() ==> ERROR: nextStepId '{nextStepId}' completion not found for test '{checkTest.DisplayName}'");
+                                break;
+                            }
+
                             var stepOutcome = RunAndRecordTestCase(stepTest, frameworkHandle);
-
                             Logger.Log($"YamlTestAdapter.RunTests() ==> Setting completion outcome for {stepTest.DisplayName} to {stepOutcome}");
                             completionFromIdMap[nextStepId].SetResult(stepOutcome);
 
