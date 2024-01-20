@@ -12,14 +12,19 @@ MAJOR_VERSION="1"
 MINOR_VERSION="0"
 BUILD_VERSION="0"
 if [ ! -z "$1" ]; then
-    # e.g. "20240120.2" -> BuildMonthDay 0120, BuildRunNumber 2
-    BuildMonthDay=$(echo "$1" | sed 's/^[0-9]\{4\}\([0-9]\{4\}\)\.[0-9]*$/\1/')
+    # e.g. "20240120.2" -> BuildMonth 01, BuildDay 20, BuildRunNumber 2
+    BuildMonth=$(echo "$1" | sed 's/^[0-9]\{4\}\([0-9]\{2\}\)[0-9]\{2\}\.[0-9]*$/\1/')
+    BuildDay=$(echo "$1" | sed 's/^[0-9]\{6\}\([0-9]\{2\}\)\.[0-9]*$/\1/')
     BuildRunNumber=$(echo "$1" | sed 's/^[0-9]\{8\}\.\([0-9]*$\)/\1/')
-    if [ $BuildMonthDay -ge 0101 -a $BuildMonthDay -le 1231 -a $BuildRunNumber -gt 0 -a $BuildRunNumber -le 99 ]; then
+    if [ ! -z "$BuildMonth"     -a $BuildMonth     -ge 1 -a $BuildMonth     -le 12 -a \
+         ! -z "$BuildDay"       -a $BuildDay       -ge 1 -a $BuildDay       -le 31 -a \
+         ! -z "$BuildRunNumber" -a $BuildRunNumber -ge 1 -a $BuildRunNumber -le 99 ]
+    then
+        let DayOfYear="($BuildMonth - 1) * 31 + $BuildDay" # estimate using max days/month
         if [ $BuildRunNumber -lt 10 ]; then
-            BUILD_VERSION="${BuildMonthDay}0${BuildRunNumber}"
+            BUILD_VERSION="${DayOfYear}0${BuildRunNumber}"
         else
-            BUILD_VERSION="${BuildMonthDay}${BuildRunNumber}"
+            BUILD_VERSION="${DayOfYear}${BuildRunNumber}"
         fi
     else
         >&2 echo "Ignored invalid argument: BuildNumber $1"
