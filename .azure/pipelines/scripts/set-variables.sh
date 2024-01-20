@@ -1,7 +1,8 @@
 #!/bin/bash
-# Parameters:
-# 1. Day of the year  - from DevOps $(DayOfYear)
-# 2. Build run number - from DevOps $(Rev:r)
+
+# Script arguments:
+# 1. Day of the year  - from DevOps DayOfYear
+# 2. Build run number - from DevOps Rev:r
 
 define_variable () {
     echo "$1=$2"
@@ -15,12 +16,12 @@ MAJOR_VERSION="1"
 MINOR_VERSION="0"
 BUILD_VERSION="0"
 if [ ! -z "$1" -a ! -z "$2" ]; then
-    DayOfYear=$1
+    BuildDayOfYear=$1
     BuildRevR=$2
-    if [ $DayOfYear -gt 0 -a $DayOfYear -le 366 -a $BuildRevR -gt 0 -a $BuildRevR -le 99 ]; then
-        let BUILD_VERSION="$DayOfYear * 100 + $BuildRevR"
+    if [ $BuildDayOfYear -gt 0 -a $BuildDayOfYear -le 366 -a $BuildRevR -gt 0 -a $BuildRevR -le 99 ]; then
+        let BUILD_VERSION="$BuildDayOfYear * 100 + $BuildRevR"
     else
-        >&2 echo "Ignored invalid arguments: DayOfYear ${DayOfYear} BuildRevR ${BuildRevR}"
+        >&2 echo "Ignored invalid arguments: BuildDayOfYear ${BuildDayOfYear} BuildRevR ${BuildRevR}"
     fi
 fi
 PRODUCT_VERSION="${MAJOR_VERSION}.${MINOR_VERSION}.${BUILD_VERSION}"
