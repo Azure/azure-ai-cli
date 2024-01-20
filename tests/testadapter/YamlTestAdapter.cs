@@ -45,87 +45,104 @@ namespace TestAdapterTest
 
         public static void RunTests(IEnumerable<TestCase> tests, IRunContext runContext, IFrameworkHandle frameworkHandle)
         {
-            var testFromIdMap = new Dictionary<string, TestCase>();
-            var completionFromIdMap = new Dictionary<string, TaskCompletionSource<TestOutcome>>();
-
             var filteredBeforeMiddleAndAfterTestSets = FilterTestCases(tests, runContext, frameworkHandle);
             foreach (var testSet in filteredBeforeMiddleAndAfterTestSets)
             {
                 if (!testSet.Any()) continue;
-
-                foreach (var test in testSet)
-                {
-                    var id = test.Id.ToString();
-                    testFromIdMap[id] = test;
-                    completionFromIdMap[id] = new TaskCompletionSource<TestOutcome>();
-                }
-
-                var parallelTestSet = testSet.Where(test => YamlTestProperties.Get(test, "parallelize") == "true");
-                foreach (var test in parallelTestSet)
-                {
-                    ThreadPool.QueueUserWorkItem(state => {
-                        var parallelTestId = test.Id.ToString();
-                        var parallelTest = testFromIdMap[parallelTestId];
-                        var parallelTestOutcome = RunAndRecordTestCase(parallelTest, frameworkHandle);
-                        // defer setting completion outcome until all steps are complete
-
-                        var checkTest = parallelTest;
-                        while (true)
-                        {
-                            var nextStepId = YamlTestProperties.Get(checkTest, "nextStepId");
-                            if (string.IsNullOrEmpty(nextStepId))
-                            {
-                                Logger.LogInfo($"YamlTestAdapter.RunTests() ==> No nextStepId for test '{checkTest.DisplayName}'");
-                                break;
-                            }
-
-                            var stepTest = testFromIdMap.ContainsKey(nextStepId) ? testFromIdMap[nextStepId] : null;
-                            if (stepTest == null)
-                            {
-                                Logger.LogError($"YamlTestAdapter.RunTests() ==> ERROR: nextStepId '{nextStepId}' not found for test '{checkTest.DisplayName}'");
-                                break;
-                            }
-
-                            var stepCompletion = completionFromIdMap.ContainsKey(nextStepId) ? completionFromIdMap[nextStepId] : null;
-                            if (stepCompletion == null)
-                            {
-                                Logger.LogError($"YamlTestAdapter.RunTests() ==> ERROR: nextStepId '{nextStepId}' completion not found for test '{checkTest.DisplayName}'");
-                                break;
-                            }
-
-                            var stepOutcome = RunAndRecordTestCase(stepTest, frameworkHandle);
-                            Logger.Log($"YamlTestAdapter.RunTests() ==> Setting completion outcome for {stepTest.DisplayName} to {stepOutcome}");
-                            completionFromIdMap[nextStepId].SetResult(stepOutcome);
-
-                            checkTest = stepTest;
-                        }
-
-                        // now that all steps are complete, set the completion outcome
-                        completionFromIdMap[parallelTestId].SetResult(parallelTestOutcome);
-                        Logger.Log($"YamlTestAdapter.RunTests() ==> Setting completion outcome for {parallelTest.DisplayName} to {parallelTestOutcome}");
-
-                    }, test.Id);
-                }
-
-                Logger.Log($"YamlTestAdapter.RunTests() ==> Waiting for parallel tests to complete");
-                var parallelCompletions = completionFromIdMap
-                    .Where(x => parallelTestSet.Any(y => y.Id.ToString() == x.Key))
-                    .Select(x => x.Value.Task);
-                Task.WaitAll(parallelCompletions.ToArray());
-                Logger.Log($"YamlTestAdapter.RunTests() ==> All parallel tests complete");
-
-                var remainingTests = completionFromIdMap
-                    .Where(x => x.Value.Task.Status != TaskStatus.RanToCompletion)
-                    .Select(x => testFromIdMap[x.Key]);
-                foreach (var test in remainingTests)
-                {
-                    var outcome = RunAndRecordTestCase(test, frameworkHandle);
-                    completionFromIdMap[test.Id.ToString()].SetResult(outcome);
-                }
+                RunAndRecordTests(frameworkHandle, testSet);
             }
         }
 
         #region private methods
+
+        private static void RunAndRecordTests(IFrameworkHandle frameworkHandle, IEnumerable<TestCase> tests)
+        {
+            InitRunAndRecordTestCaseMaps(tests, out var testFromIdMap, out var completionFromIdMap);
+            RunAndRecordParallelizedTestCases(frameworkHandle, testFromIdMap, completionFromIdMap, tests);
+            RunAndRecordRemainingTestCases(frameworkHandle, testFromIdMap, completionFromIdMap);
+        }
+
+        private static void InitRunAndRecordTestCaseMaps(IEnumerable<TestCase> tests, out Dictionary<string, TestCase> testFromIdMap, out Dictionary<string, TaskCompletionSource<TestOutcome>> completionFromIdMap)
+        {
+            testFromIdMap = new Dictionary<string, TestCase>();
+            completionFromIdMap = new Dictionary<string, TaskCompletionSource<TestOutcome>>();
+            foreach (var test in tests)
+            {
+                var id = test.Id.ToString();
+                testFromIdMap[id] = test;
+                completionFromIdMap[id] = new TaskCompletionSource<TestOutcome>();
+            }
+        }
+
+        private static void RunAndRecordParallelizedTestCases(IFrameworkHandle frameworkHandle, Dictionary<string, TestCase> testFromIdMap, Dictionary<string, TaskCompletionSource<TestOutcome>> completionFromIdMap, IEnumerable<TestCase> tests)
+        {
+            var parallelTestSet = tests.Where(test => YamlTestProperties.Get(test, "parallelize") == "true");
+            foreach (var test in parallelTestSet)
+            {
+                ThreadPool.QueueUserWorkItem(state =>
+                {
+                    var parallelTestId = test.Id.ToString();
+                    var parallelTest = testFromIdMap[parallelTestId];
+                    var parallelTestOutcome = RunAndRecordTestCase(parallelTest, frameworkHandle);
+                    // defer setting completion outcome until all steps are complete
+
+                    var checkTest = parallelTest;
+                    while (true)
+                    {
+                        var nextStepId = YamlTestProperties.Get(checkTest, "nextStepId");
+                        if (string.IsNullOrEmpty(nextStepId))
+                        {
+                            Logger.LogInfo($"YamlTestAdapter.RunTests() ==> No nextStepId for test '{checkTest.DisplayName}'");
+                            break;
+                        }
+
+                        var stepTest = testFromIdMap.ContainsKey(nextStepId) ? testFromIdMap[nextStepId] : null;
+                        if (stepTest == null)
+                        {
+                            Logger.LogError($"YamlTestAdapter.RunTests() ==> ERROR: nextStepId '{nextStepId}' not found for test '{checkTest.DisplayName}'");
+                            break;
+                        }
+
+                        var stepCompletion = completionFromIdMap.ContainsKey(nextStepId) ? completionFromIdMap[nextStepId] : null;
+                        if (stepCompletion == null)
+                        {
+                            Logger.LogError($"YamlTestAdapter.RunTests() ==> ERROR: nextStepId '{nextStepId}' completion not found for test '{checkTest.DisplayName}'");
+                            break;
+                        }
+
+                        var stepOutcome = RunAndRecordTestCase(stepTest, frameworkHandle);
+                        Logger.Log($"YamlTestAdapter.RunTests() ==> Setting completion outcome for {stepTest.DisplayName} to {stepOutcome}");
+                        completionFromIdMap[nextStepId].SetResult(stepOutcome);
+
+                        checkTest = stepTest;
+                    }
+
+                    // now that all steps are complete, set the completion outcome
+                    completionFromIdMap[parallelTestId].SetResult(parallelTestOutcome);
+                    Logger.Log($"YamlTestAdapter.RunTests() ==> Setting completion outcome for {parallelTest.DisplayName} to {parallelTestOutcome}");
+
+                }, test.Id);
+            }
+
+            Logger.Log($"YamlTestAdapter.RunTests() ==> Waiting for parallel tests to complete");
+            var parallelCompletions = completionFromIdMap
+                .Where(x => parallelTestSet.Any(y => y.Id.ToString() == x.Key))
+                .Select(x => x.Value.Task);
+            Task.WaitAll(parallelCompletions.ToArray());
+            Logger.Log($"YamlTestAdapter.RunTests() ==> All parallel tests complete");
+        }
+
+        private static void RunAndRecordRemainingTestCases(IFrameworkHandle frameworkHandle, Dictionary<string, TestCase> testFromIdMap, Dictionary<string, TaskCompletionSource<TestOutcome>> completionFromIdMap)
+        {
+            var remainingTests = completionFromIdMap
+                .Where(x => x.Value.Task.Status != TaskStatus.RanToCompletion)
+                .Select(x => testFromIdMap[x.Key]);
+            foreach (var test in remainingTests)
+            {
+                var outcome = RunAndRecordTestCase(test, frameworkHandle);
+                completionFromIdMap[test.Id.ToString()].SetResult(outcome);
+            }
+        }
 
         private static IEnumerable<TestCase> GetTestsFromSource(string source, FileInfo file)
         {
