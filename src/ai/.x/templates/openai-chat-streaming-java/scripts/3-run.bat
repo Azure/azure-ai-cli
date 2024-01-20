@@ -1,1 +1,1 @@
-java -cp out;target/lib/* OpenAIQuickstartStreaming
+java -cp out;target/lib/* Main

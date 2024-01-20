@@ -1,1 +1,1 @@
-java -cp out;target/lib/* OpenAIQuickstart
+java -cp out;target/lib/* Main
