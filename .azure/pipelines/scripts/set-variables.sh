@@ -1,9 +1,5 @@
 #!/bin/bash
 
-# Script arguments:
-# 1. Day of the year  - from DevOps DayOfYear
-# 2. Build run number - from DevOps Rev:r
-
 define_variable () {
     echo "$1=$2"
     echo "##vso[task.setvariable variable=$1;isOutput=true]$2"
@@ -15,13 +11,18 @@ echo "Source branch: $BUILD_SOURCEBRANCH"
 MAJOR_VERSION="1"
 MINOR_VERSION="0"
 BUILD_VERSION="0"
-if [ ! -z "$1" -a ! -z "$2" ]; then
-    BuildDayOfYear=$1
-    BuildRevR=$2
-    if [ $BuildDayOfYear -gt 0 -a $BuildDayOfYear -le 366 -a $BuildRevR -gt 0 -a $BuildRevR -le 99 ]; then
-        let BUILD_VERSION="$BuildDayOfYear * 100 + $BuildRevR"
+if [ ! -z "$1" ]; then
+    # e.g. "20240120.2" -> BuildMonthDay 0120, BuildRunNumber 2
+    BuildMonthDay=$(echo "$1" | sed 's/^[0-9]\{4\}\([0-9]\{4\}\)\.[0-9]*$/\1/')
+    BuildRunNumber=$(echo "$1" | sed 's/^[0-9]\{8\}\.\([0-9]*$\)/\1/')
+    if [ $BuildMonthDay -ge 0101 -a $BuildMonthDay -le 1231 -a $BuildRunNumber -gt 0 -a $BuildRunNumber -le 99 ]; then
+        if [ $BuildRunNumber -lt 10 ]; then
+            BUILD_VERSION="${BuildMonthDay}0${BuildRunNumber}"
+        else
+            BUILD_VERSION="${BuildMonthDay}${BuildRunNumber}"
+        fi
     else
-        >&2 echo "Ignored invalid arguments: BuildDayOfYear ${BuildDayOfYear} BuildRevR ${BuildRevR}"
+        >&2 echo "Ignored invalid argument: BuildNumber $1"
     fi
 fi
 PRODUCT_VERSION="${MAJOR_VERSION}.${MINOR_VERSION}.${BUILD_VERSION}"
