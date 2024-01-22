@@ -61,9 +61,9 @@
     - name: build template
       script: |
         cd openai-chat-java
-        javac -cp "target/lib/*" src/OpenAIQuickstart.java -d out
+        javac -cp "target/lib/*" src/OpenAIChatCompletionsClass.java src/Main.java -d out
     - name: run template
-      command: ai dev shell --run "cd openai-chat-java && java -cp \"out;target/lib/*\" OpenAIQuickstart"
+      command: ai dev shell --run "cd openai-chat-java && java -cp \"out;target/lib/*\" Main"
       input: |-
         Tell me a joke
         Tell me another joke
@@ -143,9 +143,9 @@
     - name: build template
       script: |
         cd openai-chat-streaming-java
-        javac -cp "target/lib/*" src/OpenAIQuickstartStreaming.java -d out
+        javac -cp "target/lib/*" src/OpenAIChatCompletionsStreamingClass.java src/Main.java -d out
     - name: run template
-      command: ai dev shell --run "cd openai-chat-streaming-java && java -cp \"out;target/lib/*\" OpenAIQuickstartStreaming"
+      command: ai dev shell --run "cd openai-chat-streaming-java && java -cp \"out;target/lib/*\" Main"
       input: |-
         Tell me a joke
         Tell me another joke

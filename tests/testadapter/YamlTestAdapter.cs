@@ -191,7 +191,7 @@ namespace TestAdapterTest
             {
                 yield return test;
             }
-           Logger.Log($"YamlTestAdapter.GetTestsFromYaml('{source}', '{file.FullName}'): EXIT");
+            Logger.Log($"YamlTestAdapter.GetTestsFromYaml('{source}', '{file.FullName}'): EXIT");
         }
 
         private static bool IsTrait(Trait trait, string check)
