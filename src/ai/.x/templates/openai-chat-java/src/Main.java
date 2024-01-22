@@ -18,6 +18,8 @@ public class Main {
         Scanner scanner = new Scanner(System.in);
         while (true) {
             System.out.print("User: ");
+            if (!scanner.hasNextLine()) break;
+
             String userPrompt = scanner.nextLine();
             if (userPrompt.isEmpty() || "exit".equals(userPrompt)) break;
 

@@ -2,14 +2,14 @@
   command: ai dev new .env
 
 - class: dev new helper-functions
-  tests:
-  - name: 1-generate template
+  steps:
+  - name: generate template
     command: ai dev new helper-functions
-  - name: 2-build template
+  - name: build template
     script: |
       cd helper-functions
       dotnet build
-  - name: 3-run template
+  - name: run template
     command: ai chat --interactive --helper-functions helper-functions/bin/Debug/net7.0/HelperFunctionsProject.dll
     input: |
       What is my name?
@@ -21,14 +21,14 @@
   tests:
 
   - class: dev new openai-chat (c#)
-    tests:
-    - name: 1-generate template
+    steps:
+    - name: generate template
       command: ai dev new openai-chat --cs
-    - name: 2-build template
+    - name: build template
       script: |
         cd openai-chat-cs
         dotnet build
-    - name: 3-run template
+    - name: run template
       command: ai dev shell --run "openai-chat-cs\bin\Debug\net7.0\OpenAIChatCompletions"
       input: |-
         Tell me a joke
@@ -36,14 +36,14 @@
       tag: skip
 
   - class: dev new openai-chat (go)
-    tests:
-    - name: 1-generate template
+    steps:
+    - name: generate template
       command: ai dev new openai-chat --go
-    - name: 2-build template
+    - name: build template
       script: |
         cd openai-chat-go
         go mod tidy && go build
-    - name: 3-run template
+    - name: run template
       command: ai dev shell --run "openai-chat-go\openai_chat_completions_hello_world"
       input: |-
         Tell me a joke
@@ -51,33 +51,33 @@
       tag: skip
 
   - class: dev new openai-chat (java)
-    tests:
-    - name: 1-generate template
+    steps:
+    - name: generate template
       command: ai dev new openai-chat --java
-    - name: 2-restore packages
+    - name: restore packages
       script: |
         cd openai-chat-java
         mvn clean package
-    - name: 3-build template
+    - name: build template
       script: |
         cd openai-chat-java
-        javac -cp "target/lib/*" src/OpenAIQuickstart.java -d out
-    - name: 4-run template
-      command: ai dev shell --run "cd openai-chat-java && java -cp \"out;target/lib/*\" OpenAIQuickstart"
+        javac -cp "target/lib/*" src/OpenAIChatCompletionsClass.java src/Main.java -d out
+    - name: run template
+      command: ai dev shell --run "cd openai-chat-java && java -cp \"out;target/lib/*\" Main"
       input: |-
         Tell me a joke
         Tell me another joke
       tag: skip
 
   - class: dev new openai-chat (javascript)
-    tests:
-    - name: 1-generate template
+    steps:
+    - name: generate template
       command: ai dev new openai-chat --javascript
-    - name: 2-build template
+    - name: build template
       script: |
         cd openai-chat-js
         npm install
-    - name: 3-run template
+    - name: run template
       command: ai dev shell --run "cd openai-chat-js && node main.js"
       input: |-
         Tell me a joke
@@ -85,14 +85,14 @@
       tag: skip
 
   - class: dev new openai-chat (python)
-    tests:
-    - name: 1-generate template
+    steps:
+    - name: generate template
       command: ai dev new openai-chat --python
-    - name: 2-build template
+    - name: build template
       script: |
         cd openai-chat-py
         pip install -r requirements.txt
-    - name: 3-run template
+    - name: run template
       command: ai dev shell --run "cd openai-chat-py && python openai_chat_completions.py"
       input: |-
         Tell me a joke
@@ -103,14 +103,14 @@
   tests:
 
   - class: dev new openai-chat-streaming (c#)
-    tests:
-    - name: 1-generate template
+    steps:
+    - name: generate template
       command: ai dev new openai-chat-streaming --cs
-    - name: 2-build template
+    - name: build template
       script: |
         cd openai-chat-streaming-cs
         dotnet build
-    - name: 3-run template
+    - name: run template
       command: ai dev shell --run "openai-chat-streaming-cs\bin\Debug\net7.0\OpenAIChatCompletionsStreaming"
       input: |-
         Tell me a joke
@@ -118,14 +118,14 @@
       tag: skip
 
   - class: dev new openai-chat-streaming (go)
-    tests:
-    - name: 1-generate template
+    steps:
+    - name: generate template
       command: ai dev new openai-chat-streaming --go
-    - name: 2-build template
+    - name: build template
       script: |
         cd openai-chat-streaming-go
         go mod tidy && go build
-    - name: 3-run template
+    - name: run template
       command: ai dev shell --run "openai-chat-streaming-go\openai_chat_completions_streaming_hello_world"
       input: |-
         Tell me a joke
@@ -133,19 +133,19 @@
       tag: skip
 
   - class: dev new openai-chat-streaming (java)
-    tests:
-    - name: 1-generate template
+    steps:
+    - name: generate template
       command: ai dev new openai-chat-streaming --java
-    - name: 2-restore packages
+    - name: restore packages
       script: |
         cd openai-chat-streaming-java
         mvn clean package
-    - name: 3-build template
+    - name: build template
       script: |
         cd openai-chat-streaming-java
-        javac -cp "target/lib/*" src/OpenAIQuickstartStreaming.java -d out
-    - name: 4-run template
-      command: ai dev shell --run "cd openai-chat-streaming-java && java -cp \"out;target/lib/*\" OpenAIQuickstartStreaming"
+        javac -cp "target/lib/*" src/OpenAIChatCompletionsStreamingClass.java src/Main.java -d out
+    - name: run template
+      command: ai dev shell --run "cd openai-chat-streaming-java && java -cp \"out;target/lib/*\" Main"
       input: |-
         Tell me a joke
         Tell me another joke
@@ -154,14 +154,14 @@
     command: ai dev new openai-chat-streaming --java
 
   - class: dev new openai-chat-streaming (javascript)
-    tests:
-    - name: 1-generate template
+    steps:
+    - name: generate template
       command: ai dev new openai-chat-streaming --javascript
-    - name: 2-build template
+    - name: build template
       script: |
         cd openai-chat-streaming-js
         npm install
-    - name: 3-run template
+    - name: run template
       command: ai dev shell --run "cd openai-chat-streaming-js && node main.js"
       input: |-
         Tell me a joke
@@ -169,14 +169,14 @@
       tag: skip
 
   - class: dev new openai-chat-streaming (python)
-    tests:
-    - name: 1-generate template
+    steps:
+    - name: generate template
       command: ai dev new openai-chat-streaming --python
-    - name: 2-build template
+    - name: build template
       script: |
         cd openai-chat-streaming-py
         pip install -r requirements.txt
-    - name: 3-run template
+    - name: run template
       command: ai dev shell --run "cd openai-chat-streaming-py && python main.py"
       input: |-
         Tell me a joke
@@ -187,42 +187,42 @@
   tests:
 
   - class: dev new openai-chat-streaming-with-data (c#)
-    tests:
-    - name: 1-generate template
+    steps:
+    - name: generate template
       command: ai dev new openai-chat-streaming-with-data --cs
-    - name: 2-build template
+    - name: build template
       script: |
         cd openai-chat-streaming-with-data-cs
         dotnet build
-    - name: 3-run template
+    - name: run template
       command: ai dev shell --run "openai-chat-streaming-with-data-cs\bin\Debug\net7.0\OpenAIChatCompletionsWithDataStreaming"
       input: |-
         What parameter should i use to initialize?
       tag: skip
 
   - class: dev new openai-chat-streaming-with-data (javascript)
-    tests:
-    - name: 1-generate template
+    steps:
+    - name: generate template
       command: ai dev new openai-chat-streaming-with-data --javascript
-    - name: 2-build template
+    - name: build template
       script: |
         cd openai-chat-streaming-with-data-js
         npm install
-    - name: 3-run template
+    - name: run template
       command: ai dev shell --run "cd openai-chat-streaming-with-data-js && node main.js"
       input: |-
         What parameter should i use to initialize?
       tag: skip
 
   - class: dev new openai-chat-streaming-with-data (python)
-    tests:
-    - name: 1-generate template
+    steps:
+    - name: generate template
       command: ai dev new openai-chat-streaming-with-data --python
-    - name: 2-build template
+    - name: build template
       script: |
         cd openai-chat-streaming-with-data-py
         pip install -r requirements.txt
-    - name: 3-run template
+    - name: run template
       command: ai dev shell --run "cd openai-chat-streaming-with-data-py && python main.py"
       input: |-
         What parameter should i use to initialize?
@@ -232,14 +232,14 @@
   tests:
 
   - class: dev new openai-chat-streaming-with-functions (c#)
-    tests:
-    - name: 1-generate template
+    steps:
+    - name: generate template
       command: ai dev new openai-chat-streaming-with-functions --cs
-    - name: 2-build template
+    - name: build template
       script: |
         cd openai-chat-streaming-with-functions-cs
         dotnet build
-    - name: 3-run template
+    - name: run template
       command: ai dev shell --run "cd openai-chat-streaming-with-functions-cs && bin\Debug\net7.0\OpenAIChatCompletionsFunctionsStreaming"
       input: |-
         What is the date?
@@ -247,14 +247,14 @@
       tag: skip
 
   - class: dev new openai-chat-streaming-with-functions (go)
-    tests:
-    - name: 1-generate template
+    steps:
+    - name: generate template
       command: ai dev new openai-chat-streaming-with-functions --go
-    - name: 2-build template
+    - name: build template
       script: |
         cd openai-chat-streaming-with-functions-go
         go mod tidy && go build
-    - name: 3-run template
+    - name: run template
       command: ai dev shell --run "cd openai-chat-streaming-with-functions-go && openai_chat_completions_functions_streaming_hello_world"
       input: |-
         What is the date?
@@ -262,14 +262,14 @@
       tag: skip
 
   - class: dev new openai-chat-streaming-with-functions (javascript)
-    tests:
-    - name: 1-generate template
+    steps:
+    - name: generate template
       command: ai dev new openai-chat-streaming-with-functions --javascript
-    - name: 2-build template
+    - name: build template
       script: |
         cd openai-chat-streaming-with-functions-js
         npm install
-    - name: 3-run template
+    - name: run template
       command: ai dev shell --run "cd openai-chat-streaming-with-functions-js && node main.js"
       input: |-
         What is the date?
@@ -277,14 +277,14 @@
       tag: skip
 
   - class: dev new openai-chat-streaming-with-functions (python)
-    tests:
-    - name: 1-generate template
+    steps:
+    - name: generate template
       command: ai dev new openai-chat-streaming-with-functions --python
-    - name: 2-build template
+    - name: build template
       script: |
         cd openai-chat-streaming-with-functions-py
         pip install -r requirements.txt
-    - name: 3-run template
+    - name: run template
       command: ai dev shell --run "cd openai-chat-streaming-with-functions-py && python main.py"
       input: |-
         What is the date?
@@ -295,27 +295,27 @@
   tests:
 
   - class: dev new openai-webpage (javascript)
-    tests:
-    - name: 1-generate template
+    steps:
+    - name: generate template
       command: ai dev new openai-webpage --javascript
-    - name: 2-build template
+    - name: build template
       script: |
         cd openai-webpage-js
         npm install
-    - name: 3-pack template
+    - name: pack template
       script: |
         cd openai-webpage-js
         npx webpack
 
   - class: dev new openai-webpage (typescript)
-    tests:
-    - name: 1-generate template
+    steps:
+    - name: generate template
       command: ai dev new openai-webpage --typescript
-    - name: 2-build template
+    - name: build template
       script: |
         cd openai-webpage-ts
         npm install
-    - name: 3-pack template
+    - name: pack template
       script: |
         cd openai-webpage-ts
         npx webpack
@@ -324,27 +324,27 @@
   tests:
 
   - class: dev new openai-webpage-with-functions (javascript)
-    tests:
-    - name: 1-generate template
+    steps:
+    - name: generate template
       command: ai dev new openai-webpage-with-functions --javascript  
-    - name: 2-build template  
+    - name: build template  
       script: |
         cd openai-webpage-with-functions-js
         npm install
-    - name: 3-pack template 
+    - name: pack template 
       script: |
         cd openai-webpage-with-functions-js
         npx webpack
 
   - class: dev new openai-webpage-with-functions (typescript)
-    tests:
-    - name: 1-generate template
+    steps:
+    - name: generate template
       command: ai dev new openai-webpage-with-functions --typescript
-    - name: 2-build template
+    - name: build template
       script: |
         cd openai-webpage-with-functions-ts
         npm install
-    - name: 3-pack template
+    - name: pack template
       script: |
         cd openai-webpage-with-functions-ts
         npx webpack
