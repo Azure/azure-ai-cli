@@ -50,7 +50,10 @@ async function main() {
 }
 
 main().catch((err) => {
-  console.error("The sample encountered an error:", err);
+  if (err.code !== 'ERR_USE_AFTER_CLOSE') { // filter out expected error (EOF on redirected input)
+    console.error("The sample encountered an error:", err);
+    process.exit(1);
+  }
 });
 
 module.exports = { main };
