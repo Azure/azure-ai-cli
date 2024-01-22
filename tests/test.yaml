@@ -89,5 +89,5 @@
       ^Helper +Function +Class +Library +helper-functions +C# *\r?$\n
       ^OpenAI +Chat +Completions +openai-chat +C#, +Go, +Java, +JavaScript, +Python *\r?$\n
       ^OpenAI +Chat +Completions +\(Streaming\) +openai-chat-streaming +C#, +Go, +Java, +JavaScript, +Python *\r?$\n
-      ^OpenAI +Chat +Completions +\(w/ +Data +\+ +AI +Search\) +openai-chat-streaming-with-data +C#, +JavaScript, +Python *\r?$\n
+      ^OpenAI +Chat +Completions +\(w/ +Data +\+ +AI +Search\) +openai-chat-streaming-with-data +C#, +Java, +JavaScript, +Python *\r?$\n
       ^OpenAI +Chat +Completions +\(w/ +Functions\) +openai-chat-streaming-with-functions +C#, +Go, +JavaScript, +Python *\r?$\n
