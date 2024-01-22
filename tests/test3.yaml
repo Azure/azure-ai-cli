@@ -1,8 +1,11 @@
-﻿- area: setup
-  tests:
+﻿- class: setup
+  tags: [before]
+  steps:
+  - name: az login
+    script: az login --identity
+    skipOnFailure: true
   - name: ai init
-    command: ai debug init speech --subscription e72e5254-f265-4e95-9bd2-9ee8e7329051 --name robch-cranky-red-koala-ais
-    tags: [before]
+    command: ai debug init speech --subscription e72e5254-f265-4e95-9bd2-9ee8e7329051 --name robch-cranky-red-koala-ais --interactive false
 
 - name: dev new environment
   command: ai dev new .env
