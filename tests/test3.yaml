@@ -1,4 +1,10 @@
-﻿- name: dev new environment
+﻿- area: setup
+  tests:
+  - name: ai init
+    command: ai debug init speech --subscription e72e5254-f265-4e95-9bd2-9ee8e7329051 --name robch-cranky-red-koala-ais
+    tags: [before]
+
+- name: dev new environment
   command: ai dev new .env
 
 - class: dev new helper-functions
