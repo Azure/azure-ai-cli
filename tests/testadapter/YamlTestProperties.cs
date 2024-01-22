@@ -46,6 +46,7 @@ namespace TestAdapterTest
             { "expect", RegisterTestCaseProperty("Expect") },
             { "not-expect", RegisterTestCaseProperty("NotExpect") },
             { "simulate", RegisterTestCaseProperty("Simulate") },
+            { "skipOnFailure", RegisterTestCaseProperty("SkipOnFailure") },
             { "timeout", RegisterTestCaseProperty("Timeout") },
             { "working-directory", RegisterTestCaseProperty("WorkingDirectory") }
         };
