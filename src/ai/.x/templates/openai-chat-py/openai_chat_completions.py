@@ -50,6 +50,8 @@ def main():
 if __name__ == '__main__':
     try:
         main()
+    except EOFError:
+        pass
     except Exception as e:
         print(f"The sample encountered an error: {e}")
         sys.exit(1)
