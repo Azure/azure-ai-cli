@@ -8,6 +8,7 @@
 <#@ parameter type="System.String" name="AZURE_OPENAI_SYSTEM_PROMPT" #>
 from openai_chat_completions_streaming import <#= ClassName #>
 import os
+import sys
 
 def main():
     openai_api_version = os.getenv('AZURE_OPENAI_API_VERSION', '<#= AZURE_OPENAI_API_VERSION #>')
@@ -32,3 +33,4 @@ if __name__ == '__main__':
         main()
     except Exception as e:
         print(f"The sample encountered an error: {e}")
+        sys.exit(1)

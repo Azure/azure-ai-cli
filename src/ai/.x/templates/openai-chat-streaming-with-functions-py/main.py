@@ -8,6 +8,7 @@
 from openai_chat_completions_custom_functions import factory
 from openai_chat_completions_functions_streaming import OpenAIChatCompletionsFunctionsStreaming
 import os
+import sys
 
 def main():
     openai_api_version = os.getenv('AZURE_OPENAI_API_VERSION', '<#= AZURE_OPENAI_API_VERSION #>')
@@ -32,3 +33,4 @@ if __name__ == '__main__':
         main()
     except Exception as e:
         print(f"The sample encountered an error: {e}")
+        sys.exit(1)
