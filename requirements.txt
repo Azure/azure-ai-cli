@@ -10,7 +10,8 @@ azure-ai-generative[evaluate,index] @https://pkgs.dev.azure.com/azure-sdk/29ec60
 
 # hardcoded the version of azureml-mlflow here for faster Docker image building speed
 azureml-mlflow==1.53.0
-	@@ -11,5 +15,6 @@ pytest
+pytest
+
 # langchain dependencies, these should be optional in the future
 # langchain moved Embeddings from langchain.embeddings.base to langchain.schema.embeddings while azureml-rag is still referencing it.
 # once azureml-rag fixes, we should remove the langchain reference from this file
