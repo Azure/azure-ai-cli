@@ -3,27 +3,25 @@
 // Licensed under the MIT license. See LICENSE.md file in the project root for full license information.
 //
 
-using System;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
-using System.Collections.Generic;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
-using System.Net;
-using Azure.AI.OpenAI;
 using Azure.AI.Details.Common.CLI.ConsoleGui;
-
+using Azure.AI.Details.Common.CLI.Extensions.HelperFunctions;
+using Azure.AI.OpenAI;
+using Azure.Core.Diagnostics;
+using Microsoft.CognitiveServices.Speech;
 using Microsoft.SemanticKernel;
 using Microsoft.SemanticKernel.Connectors.Memory.AzureCognitiveSearch;
 using Microsoft.SemanticKernel.Memory;
-using Azure.Core.Diagnostics;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+using System;
+using System.Collections.Generic;
 using System.Diagnostics.Tracing;
-using Microsoft.CognitiveServices.Speech;
-using Azure.AI.Details.Common.CLI.Extensions.HelperFunctions;
+using System.IO;
+using System.Linq;
 using System.Reflection;
+using System.Text;
+using System.Text.Json;
+using System.Threading.Tasks;
 
 namespace Azure.AI.Details.Common.CLI
 {
@@ -375,8 +373,10 @@ namespace Azure.AI.Details.Common.CLI
             var systemPrompt = _values.GetOrDefault("chat.message.system.prompt", DefaultSystemPrompt);
             messages.Add(new ChatRequestSystemMessage(systemPrompt));
 
-            return await Task.Run(() => {
-                Func<string, Task<string>> handler = (string text) => {
+            return await Task.Run(() =>
+            {
+                Func<string, Task<string>> handler = (string text) =>
+                {
 
                     messages.Add(new ChatRequestUserMessage(text));
 
@@ -391,12 +391,13 @@ namespace Azure.AI.Details.Common.CLI
                                 "--parameters", ConvertMessagesToJson(messages)),
                             addToEnvironment: env);
                     });
-                    var questionFunc = new Func<string>(() => {
-                         return PythonRunner.RunEmbeddedPythonScript(_values, "function_call",
-                            CliHelpers.BuildCliArgs(
-                                "--function", function,
-                                "--parameters", $"{{\"question\": \"{text}\"}}"),
-                            addToEnvironment: env);
+                    var questionFunc = new Func<string>(() =>
+                    {
+                        return PythonRunner.RunEmbeddedPythonScript(_values, "function_call",
+                           CliHelpers.BuildCliArgs(
+                               "--function", function,
+                               "--parameters", $"{{\"question\": \"{text}\"}}"),
+                           addToEnvironment: env);
                     });
 
                     var output = TryCatchHelpers.TryCatchNoThrow<string>(chatProtocolFunc, null, out var ex1);
@@ -600,7 +601,9 @@ namespace Azure.AI.Details.Common.CLI
 
         private async Task<StreamingResponse<StreamingChatCompletionsUpdate>> GetChatCompletionsAsync(OpenAIClient client, ChatCompletionsOptions options, HelperFunctionCallContext funcContext, string text)
         {
-            options.Messages.Add(new ChatRequestUserMessage(text));
+            var requestMessage = new ChatRequestUserMessage(text);
+            options.Messages.Add(requestMessage);
+            CheckWriteChatHistoryOutputFile(requestMessage);
 
             DisplayAssistantPromptLabel();
             Console.ForegroundColor = ConsoleColor.Gray;
@@ -633,7 +636,9 @@ namespace Azure.AI.Details.Common.CLI
                 DisplayAssistantPromptTextStreamingDone();
                 CheckWriteChatAnswerOutputFile(contentComplete);
 
-                options.Messages.Add(new ChatRequestAssistantMessage(contentComplete));
+                var responseMessage = new ChatRequestAssistantMessage(contentComplete);
+                options.Messages.Add(responseMessage);
+                CheckWriteChatHistoryOutputFile(responseMessage);
 
                 return response;
             }
@@ -646,6 +651,36 @@ namespace Azure.AI.Details.Common.CLI
             {
                 var fileName = FileHelpers.GetOutputDataFileName(outputAnswerFile, _values);
                 FileHelpers.WriteAllText(fileName, completeResponse, Encoding.UTF8);
+            }
+        }
+
+        private void CheckWriteChatHistoryOutputFile(ChatRequestMessage message)
+        {
+            var outputHistoryFile = OutputChatHistoryFileToken.Data().GetOrDefault(_values);
+            if (!string.IsNullOrEmpty(outputHistoryFile))
+            {
+                switch (message)
+                {
+                    case ChatRequestUserMessage userMessage:
+                        var userMessageText = System.Text.Json.JsonSerializer.Serialize(userMessage);
+                        if (!string.IsNullOrEmpty(userMessageText))
+                        {
+                            var fileName = FileHelpers.GetOutputDataFileName(outputHistoryFile, _values);
+                            FileHelpers.AppendAllText(fileName,userMessageText, Encoding.UTF8);
+                        }
+                        break;
+                    case ChatRequestAssistantMessage assistantMessage:
+                        var assistantMessageText = assistantMessage.Content;
+                        if (!string.IsNullOrEmpty(assistantMessageText))
+                        {
+                            var fileName = FileHelpers.GetOutputDataFileName(outputHistoryFile, _values);
+                            FileHelpers.AppendAllText(fileName, assistantMessageText, Encoding.UTF8);
+                        }
+                        break;
+                }
+               
+                //var fileName = FileHelpers.GetOutputDataFileName(outputHistoryFile, _values);
+                //FileHelpers.AppendAllText(fileName, null, Encoding.UTF8);
             }
         }
 
@@ -1102,75 +1137,75 @@ namespace Azure.AI.Details.Common.CLI
 
         private async Task StoreMemoryAsync(IKernel kernel, string index)
         {
-           if (!_quiet) Console.Write("Storing files in semantic memory...");
-           var githubFiles = SampleData();
-           foreach (var entry in githubFiles)
-           {
-               await kernel.Memory.SaveReferenceAsync(
-                   collection: index,
-                   externalSourceName: "GitHub",
-                   externalId: entry.Key,
-                   description: entry.Value,
-                   text: entry.Value);
+            if (!_quiet) Console.Write("Storing files in semantic memory...");
+            var githubFiles = SampleData();
+            foreach (var entry in githubFiles)
+            {
+                await kernel.Memory.SaveReferenceAsync(
+                    collection: index,
+                    externalSourceName: "GitHub",
+                    externalId: entry.Key,
+                    description: entry.Value,
+                    text: entry.Value);
 
-               if (!_quiet) Console.Write(".");
-           }
+                if (!_quiet) Console.Write(".");
+            }
 
-           if (!_quiet) Console.WriteLine(". Done!\n");
+            if (!_quiet) Console.WriteLine(". Done!\n");
         }
 
         private static async Task<string?> SearchMemoryAsync(IKernel? kernel, string collection, string text)
         {
-           if (kernel == null) return null;
-            
-           var sb = new StringBuilder();
-           var memories = kernel.Memory.SearchAsync(collection, text, limit: 2, minRelevanceScore: 0.5);
-           int i = 0;
-           await foreach (var memory in memories)
-           {
-               i++;
-               sb.AppendLine($"[{memory.Metadata.Id}]: {memory.Metadata.Description}");
-           }
+            if (kernel == null) return null;
 
-           var result = i > 0 ? sb.ToString().Trim() : null;
+            var sb = new StringBuilder();
+            var memories = kernel.Memory.SearchAsync(collection, text, limit: 2, minRelevanceScore: 0.5);
+            int i = 0;
+            await foreach (var memory in memories)
+            {
+                i++;
+                sb.AppendLine($"[{memory.Metadata.Id}]: {memory.Metadata.Description}");
+            }
 
-           // Console.ForegroundColor = ConsoleColor.DarkGray;
-           // Console.WriteLine("Relevant?\n" + result + "\n");
-           // Console.ResetColor();
+            var result = i > 0 ? sb.ToString().Trim() : null;
 
-           return result;
+            // Console.ForegroundColor = ConsoleColor.DarkGray;
+            // Console.WriteLine("Relevant?\n" + result + "\n");
+            // Console.ResetColor();
+
+            return result;
         }
 
         private string UpdateUserInputWithSearchResultInfo(string input, string searchResults)
         {
-           var sb = new StringBuilder();
-           sb.Append("The below might be relevant information.\n[START INFO]\n");
-           sb.Append(searchResults);
-           sb.Append("\n[END INFO]");
-           sb.Append("\nEach source has a name followed by colon and the actual information, always include the source name for each fact you use in the response. Use square brackets to reference the source, e.g. [info1.txt]. Don't combine sources, list each source separately, e.g. [info1.txt][info2.pdf].");
-           sb.Append($"\n{input}");
-           return sb.ToString();
+            var sb = new StringBuilder();
+            sb.Append("The below might be relevant information.\n[START INFO]\n");
+            sb.Append(searchResults);
+            sb.Append("\n[END INFO]");
+            sb.Append("\nEach source has a name followed by colon and the actual information, always include the source name for each fact you use in the response. Use square brackets to reference the source, e.g. [info1.txt]. Don't combine sources, list each source separately, e.g. [info1.txt][info2.pdf].");
+            sb.Append($"\n{input}");
+            return sb.ToString();
         }
 
         private static Dictionary<string, string> SampleData()
         {
-           return new Dictionary<string, string>
-           {
-               ["https://github.com/microsoft/semantic-kernel/blob/main/README.md"]
-                   = "README: Installation, getting started, and how to contribute",
-               ["https://github.com/microsoft/semantic-kernel/blob/main/samples/notebooks/dotnet/02-running-prompts-from-file.ipynb"]
-                   = "Jupyter notebook describing how to pass prompts from a file to a semantic skill or function",
-               ["https://github.com/microsoft/semantic-kernel/blob/main/samples/notebooks/dotnet/00-getting-started.ipynb"]
-                   = "Jupyter notebook describing how to get started with the Semantic Kernel",
-               ["https://github.com/microsoft/semantic-kernel/tree/main/samples/skills/ChatSkill/ChatGPT"]
-                   = "Sample demonstrating how to create a chat skill interfacing with ChatGPT",
-               ["https://github.com/microsoft/semantic-kernel/blob/main/dotnet/src/SemanticKernel/Memory/VolatileMemoryStore.cs"]
-                   = "C# class that defines a volatile embedding store",
-               ["https://github.com/microsoft/semantic-kernel/blob/main/samples/dotnet/KernelHttpServer/README.md"]
-                   = "README: How to set up a Semantic Kernel Service API using Azure Function Runtime v4",
-               ["https://github.com/microsoft/semantic-kernel/blob/main/samples/apps/chat-summary-webapp-react/README.md"]
-                   = "README: README associated with a sample chat summary react-based webapp",
-           };
+            return new Dictionary<string, string>
+            {
+                ["https://github.com/microsoft/semantic-kernel/blob/main/README.md"]
+                    = "README: Installation, getting started, and how to contribute",
+                ["https://github.com/microsoft/semantic-kernel/blob/main/samples/notebooks/dotnet/02-running-prompts-from-file.ipynb"]
+                    = "Jupyter notebook describing how to pass prompts from a file to a semantic skill or function",
+                ["https://github.com/microsoft/semantic-kernel/blob/main/samples/notebooks/dotnet/00-getting-started.ipynb"]
+                    = "Jupyter notebook describing how to get started with the Semantic Kernel",
+                ["https://github.com/microsoft/semantic-kernel/tree/main/samples/skills/ChatSkill/ChatGPT"]
+                    = "Sample demonstrating how to create a chat skill interfacing with ChatGPT",
+                ["https://github.com/microsoft/semantic-kernel/blob/main/dotnet/src/SemanticKernel/Memory/VolatileMemoryStore.cs"]
+                    = "C# class that defines a volatile embedding store",
+                ["https://github.com/microsoft/semantic-kernel/blob/main/samples/dotnet/KernelHttpServer/README.md"]
+                    = "README: How to set up a Semantic Kernel Service API using Azure Function Runtime v4",
+                ["https://github.com/microsoft/semantic-kernel/blob/main/samples/apps/chat-summary-webapp-react/README.md"]
+                    = "README: README associated with a sample chat summary react-based webapp",
+            };
         }
 
         public const string DefaultSystemPrompt = "You are an AI assistant that helps people find information regarding Azure AI.";
