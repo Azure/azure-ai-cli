@@ -17,21 +17,32 @@ namespace Azure.AI.Details.Common.CLI.ConsoleGui
 
         public Screen()
         {
+            var env = Environment.GetEnvironmentVariable("AI_MAX_LINES");
+            if (!string.IsNullOrEmpty(env) && int.TryParse(env, out var maxLines))
+            {
+                _initialHeight = maxLines;
+            }
         }
 
         #region cursor and colors
 
         public void SetCursorVisible(bool visible)
         {
-            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-            {
-                Console.CursorVisible = visible;
-            }
+            if (Console.IsInputRedirected) return;
+            if (Console.IsOutputRedirected) return;
+            if (Console.IsErrorRedirected) return;
+            if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows)) return;
+
+            Console.CursorVisible = visible;
         }
 
         public static bool GetCursorVisible()
         {
-            return RuntimeInformation.IsOSPlatform(OSPlatform.Windows) && Console.CursorVisible;
+            if (Console.IsInputRedirected) return false;
+            if (Console.IsOutputRedirected) return false;
+            if (Console.IsErrorRedirected) return false;
+            if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows)) return false;
+            return Console.CursorVisible;
         }
 
         public Colors ColorsStart
@@ -186,6 +197,15 @@ namespace Azure.AI.Details.Common.CLI.ConsoleGui
 
         #region write char/text
 
+        public void ClearLineRight()
+        {
+            var x = Console.CursorLeft;
+            var y = Console.CursorTop;
+            var width = GetWindowWidth() - x - 1;
+            WriteChar(x, y, ' ', width);
+            Console.CursorLeft = x;
+        }
+
         public void WriteChar(char ch, int count = 1)
         {
             if (count == 1)
@@ -308,11 +328,23 @@ namespace Azure.AI.Details.Common.CLI.ConsoleGui
             return new Colors(Console.ForegroundColor, Console.BackgroundColor);
         }
 
+        private static int TryCatchNoThrow(Func<int> function, int defaultResult)
+        {
+            try
+            {
+                return function();
+            }
+            catch (Exception)
+            {
+                return defaultResult;
+            }
+        }
+
         private static Screen _current = new Screen();
-        private int _initialWidth = Console.WindowWidth;
-        private int _initialHeight = Console.WindowHeight;
-        private int _initialTop = Console.CursorTop; // Console.WindowTop;
-        private int _initialLeft = Console.WindowLeft;
+        private int _initialWidth = TryCatchNoThrow(() => Console.WindowWidth, 200);
+        private int _initialHeight = TryCatchNoThrow(() => Console.WindowHeight, 50);
+        private int _initialTop = TryCatchNoThrow(() => Console.CursorTop, 0);
+        private int _initialLeft = TryCatchNoThrow(() => Console.WindowLeft, 0);
         private bool _initialCursorVisible = GetCursorVisible();
         private Colors _initialColors = GetColorsNow();
         private int _biggestYSoFar = 0;

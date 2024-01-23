@@ -1,11 +1,10 @@
 import argparse
 import json
-from azure.ai.generative import AIClient
-from azure.ai.generative.entities import Connection
-from azure.ai.ml.entities._credentials import ApiKeyConfiguration
-from azure.identity import DefaultAzureCredential
 
 def list_connections(subscription_id, resource_group_name, project_name):
+
+    from azure.identity import DefaultAzureCredential
+    from azure.ai.resources.client import AIClient
 
     client = AIClient(
         credential=DefaultAzureCredential(),
@@ -48,4 +47,13 @@ def main():
     print(formatted)
 
 if __name__ == "__main__":
-    main()
+    try:
+        main()
+    except Exception as e:
+        import sys
+        import traceback
+        print("MESSAGE: " + str(sys.exc_info()[1]), file=sys.stderr)
+        print("EXCEPTION: " + str(sys.exc_info()[0]), file=sys.stderr)
+        print("TRACEBACK: " + "".join(traceback.format_tb(sys.exc_info()[2])), file=sys.stderr)
+        sys.exit(1)
+

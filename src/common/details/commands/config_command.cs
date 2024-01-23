@@ -144,7 +144,7 @@ namespace Azure.AI.Details.Common.CLI
             files.AddRange(FileHelpers.FindFilesInConfigPath(file + ".*", values));
             files.AddRange(FileHelpers.FindFilesInConfigPath("*" + file + "*", values));
 
-            var found = files.Where(x => !x.Contains("/help/"))
+            var found = files.Where(x => !x.Contains("/help/") && !x.Contains("/templates/") && !x.Contains("/internal/"))
                 .Select(x => File.Exists(x)
                     ? new FileInfo(x).FullName
                     : x).ToList();

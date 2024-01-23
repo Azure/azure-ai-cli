@@ -178,7 +178,7 @@ namespace Azure.AI.Details.Common.CLI
                     var notOnlyEndpoints = allow != AllowList.Endpoints;
                     Add(new NamedValueTokenParser("--endpoints", "csr.list.endpoints", "001", "0", null, null, "endpoints", "csr.list.kind"));
                     Add(new NamedValueTokenParser(null,          "csr.list.endpoint.languages", notOnlyEndpoints ? "0011" : "0001", "0", null, null, "endpoint", "csr.list.languages.kind"));
-                    Add(new NamedValueTokenParser(null,          "csr.list.endpoint.logs", "0001", "1;0", "true;false", null, "true"));
+                    Add(new TrueFalseNamedValueTokenParser("csr.list.endpoint.logs", "0001"));
                     Add(new NamedValueTokenParser(null,          "csr.endpoint.id", notOnlyEndpoints ? "010" : "001;010", "1"));
                 }
                 if ((allow & AllowList.Evaluations) != 0)
@@ -193,7 +193,7 @@ namespace Azure.AI.Details.Common.CLI
                 Add(new NamedValueTokenParser(null, "csr.list.kind", "001", "1", "endpoints;projects;datasets;models;models/base;evaluations"));
 
                 Add(new NamedValueTokenParser(null, "csr.list.languages.kind", "0011", "1;0", "endpoint;project;dataset;model"));
-                Add(new NamedValueTokenParser(null, "csr.list.languages", "001", "1;0", "true;false", null, "true"));
+                Add(new TrueFalseNamedValueTokenParser("csr.list.languages", "001"));
 
                 Add(new NamedValueTokenParser(null, "csr.list.id", "001", "1"));
                 Add(new NamedValueTokenParser(null, "csr.project.id", "010", "1"));
@@ -396,7 +396,7 @@ namespace Azure.AI.Details.Common.CLI
             new NamedValueTokenParser("--name",             "csr.endpoint.name", "001", "1"),
             new NamedValueTokenParser("--description",      "csr.endpoint.description", "001", "1"),
             new NamedValueTokenParser("--language",         "csr.endpoint.language", "001", "1"),
-            new NamedValueTokenParser(null,                 "service.config.content.logging.enabled", "00011;00110", "1;0", "true;false", null, "true"),
+            new TrueFalseNamedValueTokenParser("service.config.content.logging.enabled", "00011;00110"),
 
             new NamedValueTokenParser("--text",             "csr.endpoint.create.text", "0011", "1"),
             new NamedValueTokenParser(null,                 "csr.endpoint.create.model.id", "00010", "1"),

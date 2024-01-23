@@ -1,0 +1,21 @@
+FLOW SERVE
+
+@include.the.flow.serve.command
+
+USAGE: ai flow serve [...]
+
+  FLOW
+    --name NAME
+    --port PORT
+    --host HOST
+
+EXAMPLE
+
+  ai flow serve --name my_flow --port 8080
+
+SEE ALSO
+
+  ai help flow
+  ai help flow new
+  ai help flow examples
+  ai help find topics flow

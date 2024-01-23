@@ -43,6 +43,18 @@ namespace Azure.AI.Details.Common.CLI
             return parsed;
         }
 
+        public static string NotRequired(string dottedTokenParts)
+        {
+            var count = dottedTokenParts.Count(x => x == '.');
+            return new string('0', count + 1);
+        }
+
+        public static string Required(string dottedTokenParts)
+        {
+            var count = dottedTokenParts.Count(x => x == '.');
+            return new string('1', count + 1);
+        }
+
         #region private methods
 
         private bool ParseNameAndValues(INamedValueTokens tokens, INamedValues values, string partsRequired)

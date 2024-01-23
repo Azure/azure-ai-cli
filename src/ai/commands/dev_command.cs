@@ -6,8 +6,10 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Net;
 using System.Text;
+using Azure.AI.Details.Common.CLI.Extensions.Templates;
 
 namespace Azure.AI.Details.Common.CLI
 {
@@ -17,7 +19,7 @@ namespace Azure.AI.Details.Common.CLI
         {
             _values = values.ReplaceValues();
             _quiet = _values.GetOrDefault("x.quiet", false);
-            _verbose = _values.GetOrDefault("x.verbose", true);
+            _verbose = _values.GetOrDefault("x.verbose", false);
         }
 
         internal bool RunCommand()
@@ -47,8 +49,8 @@ namespace Azure.AI.Details.Common.CLI
 
             switch (command)
             {
-                case "dev.new.env": DoNewEnv(); break;
                 case "dev.new": DoNew(); break;
+                case "dev.new.list": DoNewList(); break;
                 case "dev.shell": DoDevShell(); break;
 
                 default:
@@ -59,108 +61,111 @@ namespace Azure.AI.Details.Common.CLI
 
         private void DoNew()
         {
-            _values.AddThrowError("WARNING:", $"''ai dev new' NOT YET IMPLEMENTED!!");
+            var newWhat = string.Join(" ", ArgXToken.GetArgs(_values));
+            var language = ProgrammingLanguageToken.Data().GetOrDefault(_values);
+            switch (newWhat)
+            {
+                case ".env": DoNewEnv(); break;
+                default: DoNewTemplate(newWhat, language); break;
+            }
         }
 
         private void DoNewEnv()
         {
             var fileName = ".env";
 
-            var env = GetEnvironment();
-            var fqn = SaveEnvironment(env, fileName);
+            var env = ConfigEnvironmentHelpers.GetEnvironment(_values);
+            var fqn = ConfigEnvironmentHelpers.SaveEnvironment(env, fileName);
 
             Console.WriteLine($"{fileName} (saved at '{fqn}')\n");
-            PrintEnvironment(env);
+            ConfigEnvironmentHelpers.PrintEnvironment(env);
+        }
+
+        private void DoNewTemplate(string templateName, string language)
+        {
+            var outputDirectory = templateName + ProgrammingLanguageToken.GetSuffix(language);
+            var instructions = InstructionsToken.Data().GetOrDefault(_values);
+
+            var found = TemplateFactory.GenerateTemplateFiles(templateName, language, instructions, outputDirectory, _quiet, _verbose);
+            CheckGenerateTemplateFileWarnings(templateName, language, found);
+        }
+
+        private void DoNewList()
+        {
+            var newWhat = string.Join(" ", ArgXToken.GetArgs(_values));
+            var language = ProgrammingLanguageToken.Data().GetOrDefault(_values);
+
+            TemplateFactory.ListTemplates(newWhat, language);
         }
 
         private void DoDevShell()
         {
             DisplayBanner("dev.shell");
 
+            var fileName = !OS.IsWindows() ? "bash" : "cmd.exe";
+            var arguments = !OS.IsWindows() ? "-li" : "/k PROMPT (ai dev shell) %PROMPT%& title (ai dev shell)";
+
             Console.WriteLine("Environment populated:\n");
 
-            var env = GetEnvironment();
-            PrintEnvironment(env);
-            SetEnvironment(env);
+            var env = ConfigEnvironmentHelpers.GetEnvironment(_values);
+            ConfigEnvironmentHelpers.PrintEnvironment(env);
+            ConfigEnvironmentHelpers.SetEnvironment(env);
+            Console.WriteLine();
 
-            var fileName = OS.IsLinux() ? "bash" : "cmd.exe";
-            var arguments = OS.IsLinux() ? "-li" : "/k PROMPT (ai dev shell) %PROMPT%& title (ai dev shell)";
+            var runCommand = RunCommandToken.Data().GetOrDefault(_values);
+            UpdateFileNameArguments(runCommand, ref fileName, ref arguments, out var deleteWhenDone);
 
             var process = ProcessHelpers.StartProcess(fileName, arguments, env, false);
             process.WaitForExit();
 
+            if (!string.IsNullOrEmpty(deleteWhenDone))
+            {
+                File.Delete(deleteWhenDone);
+            }
+
             if (process.ExitCode != 0)
             {
+                Console.WriteLine("\n(ai dev shell) FAILED!\n");
                 _values.AddThrowError("ERROR:", $"Shell exited with code {process.ExitCode}");
             }
             else
             {
-                Console.WriteLine("(ai dev shell) exited successfully");
+                Console.WriteLine("\n(ai dev shell) exited successfully");
             }
         }
 
-        private string ReadConfig(string name)
+        private static void UpdateFileNameArguments(string runCommand, ref string fileName, ref string arguments, out string? deleteTempFileWhenDone)
         {
-            return FileHelpers.FileExistsInConfigPath(name, _values)
-                ? FileHelpers.ReadAllText(FileHelpers.DemandFindFileInConfigPath(name, _values, "configuration"), Encoding.UTF8)
-                : null;
-        }
+            deleteTempFileWhenDone = null;
 
-        private Dictionary<string, string> GetEnvironment()
-        {
-            var env = new Dictionary<string, string>();
-            env.Add("AZURE_SUBSCRIPTION_ID", ReadConfig("subscription"));
-            env.Add("AZURE_RESOURCE_GROUP", ReadConfig("group"));
-            env.Add("AZURE_AI_PROJECT_NAME", ReadConfig("project"));
-            env.Add("AZURE_AI_HUB_NAME", ReadConfig("hub"));
-
-            env.Add("OPENAI_API_KEY", ReadConfig("chat.key"));
-            env.Add("OPENAI_API_VERSION", ReadConfig("chat.version"));
-            env.Add("OPENAI_API_BASE", ReadConfig("chat.base"));
-            env.Add("OPENAI_ENDPOINT", ReadConfig("chat.endpoint"));
-
-            env.Add("OPENAI_CHAT_DEPLOYMENT", ReadConfig("chat.deployment"));
-            env.Add("OPENAI_EVALUATION_DEPLOYMENT", ReadConfig("chat.evaluation.deployment"));
-            env.Add("OPENAI_EMBEDDING_DEPLOYMENT", ReadConfig("search.embeddings.deployment"));
-
-            env.Add("AZURE_AI_SEARCH_ENDPOINT", ReadConfig("search.endpoint"));
-            env.Add("AZURE_AI_SEARCH_INDEX_NAME", ReadConfig("chat.search.index"));
-            env.Add("AZURE_AI_SEARCH_KEY", ReadConfig("search.key"));
-            return env;
-        }
-
-        private static void SetEnvironment(Dictionary<string, string> env)
-        {
-            foreach (var item in env)
+            if (!string.IsNullOrEmpty(runCommand))
             {
-                if (string.IsNullOrEmpty(item.Value)) continue;
-                Environment.SetEnvironmentVariable(item.Key, item.Value);
-            }
-        }
+                var isSingleLine = !runCommand.Contains('\n') && !runCommand.Contains('\r');
+                if (isSingleLine)
+                {
+                    var parts = runCommand.Split(new char[] { ' ' }, 2);
+                    var inPath = FileHelpers.FileExistsInOsPath(parts[0]) || (OS.IsWindows() && FileHelpers.FileExistsInOsPath(parts[0] + ".exe"));
 
-        private string SaveEnvironment(Dictionary<string, string> env, string fileName)
-        {
-            var sb = new StringBuilder();
-            foreach (var item in env)
-            {
-                sb.AppendLine($"{item.Key}={item.Value}");
-            }
+                    var filePart = parts[0];
+                    var argsPart = parts.Length == 2 ? parts[1] : null;
 
-            FileHelpers.WriteAllText(fileName, sb.ToString(), Encoding.Default);
-            return new FileInfo(FileHelpers.DemandFindFileInDataPath(fileName, null, fileName)).DirectoryName;
-        }
+                    fileName = inPath ? filePart : fileName;
+                    arguments = inPath ? argsPart : (OS.IsLinux()
+                        ? $"-lic \"{runCommand}\""
+                        : $"/c \"{runCommand}\"");
 
-        private static void PrintEnvironment(Dictionary<string, string> env)
-        {
-            foreach (var item in env)
-            {
-                if (string.IsNullOrEmpty(item.Value)) continue;
+                    Console.WriteLine($"Running command: {runCommand}\n");
+                }
+                else
+                {
+                    deleteTempFileWhenDone = Path.GetTempFileName() + (OS.IsWindows() ? ".cmd" : ".sh");
+                    File.WriteAllText(deleteTempFileWhenDone, runCommand);
 
-                var value = item.Key.EndsWith("_KEY")
-                    ? item.Value.Substring(0, 4) + "****************************"
-                    : item.Value;
+                    fileName = OS.IsLinux() ? "bash" : "cmd.exe";
+                    arguments = OS.IsLinux() ? $"-lic \"{deleteTempFileWhenDone}\"" : $"/c \"{deleteTempFileWhenDone}\"";
 
-                Console.WriteLine($"  {item.Key} = {value}");
+                    Console.WriteLine($"Running script:\n\n{runCommand}\n");
+                }
             }
         }
 
@@ -173,6 +178,50 @@ namespace Azure.AI.Details.Common.CLI
             {
                 var text = FileHelpers.ReadAllHelpText(logo, Encoding.UTF8);
                 ConsoleHelpers.WriteLineWithHighlight(text);
+            }
+        }
+
+        private void CheckGenerateTemplateFileWarnings(string templateName, string language, object check)
+        {
+            if (check != null && check is TemplateFactory.Group)
+            {
+                var group = check as TemplateFactory.Group;
+                var groupHasZeroLanguages = string.IsNullOrEmpty(group.Languages);
+                var groupHasMultipleLanguages = group.Languages.Contains(',');
+                var groupHasOneLanguage = !groupHasZeroLanguages && !groupHasMultipleLanguages;
+
+                var languageSupplied = !string.IsNullOrEmpty(language);
+                if (languageSupplied)
+                {
+                    if (groupHasZeroLanguages || groupHasOneLanguage)
+                    {
+                        _values.AddThrowError("WARNING:", $"Template '{templateName}' does not support language '{language}'.",
+                                                          "",
+                                                  "TRY:", $"{Program.Name} dev new {templateName}");
+                    }
+                    else
+                    {
+                        _values.AddThrowError("WARNING:", $"Template '{templateName}' doesn't support language '{language}'.",
+                                                          "",
+                                                  "TRY:", $"{Program.Name} dev new {templateName} --LANGUAGE",
+                                                          "",
+                                                  "WHERE:", $"LANGUAGE is one of {group.Languages}");
+                    }
+                }
+                else
+                {
+                    _values.AddThrowError("WARNING:", $"Template '{templateName}' supports multiple languages.",
+                                                      "",
+                                              "TRY:", $"{Program.Name} dev new {templateName} --LANGUAGE",
+                                                      "",
+                                            "WHERE:", $"LANGUAGE is one of {group.Languages}");
+                }
+            }
+            if (check == null)
+            {
+                _values.AddThrowError("WARNING:", $"Template '{templateName}' not found.",
+                                                    "",
+                                            "TRY:", $"{Program.Name} dev new list");
             }
         }
 

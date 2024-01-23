@@ -1,9 +1,9 @@
 CHAT
 
-  The `ai chat` command initiates interactive or non-interactive conversations
-  with an AI language model (e.g. OpenAI's GPT4).
+@include.the.chat.command
 
 USAGE: ai chat [...]
+   OR: ai chat <sub-command> [...]
 
   CONNECTION                            (see: ai help connection)
     --deployment DEPLOYMENT             (see: ai help chat deployment)
@@ -13,24 +13,20 @@ USAGE: ai chat [...]
   INPUT                                 (see: ai help chat input)
     --interactive                       (see: ai help chat interactive)
     --system PROMPT                     (see: ai help chat system prompt)
-  `#e_;*` --file FILE                         (see: ai help chat history file)
-  `#e_;*` --files PATTERN                     (see: ai help chat history files)
-  `#e_;*` --files @FILELIST.txt               (see: ai help chat history files)
-  `#e_;*` --json FILE                         (see: ai help chat history json)
-  `#e_;*` --jsonl FILE                        (see: ai help chat history jsonl)
     --user MESSAGE                      (see: ai help chat user message)
-
-  `#e_;* - COMING SOON`
+    --chat-history FILE                 (see: ai help chat history)
 
   CHAT WITH DATA                        (see: ai help chat with data)
-  `#e_;*` --data DATA                         (see: ai help chat data)
-  `#e_;*` --data-file FILE                    (see: ai help chat data file)
-  `#e_;*` --data-files PATTERN                (see: ai help chat data files)
-  `#e_;*` --data-files @FILELIST.txt          (see: ai help chat data files)
-  `#e_;*` --embeddings-deployment DEPLOYMENT  (see: ai help chat embeddings deployment)
     --index-name INDEX                  (see: ai help index name)
     --search-endpoint ENDPOINT          (see: ai help search endpoint)
     --search-api-key KEY                (see: ai help search key)
+
+  CHAT WITH FUNCTION
+    --function MODULE:FUNCTION          (see: ai help chat function)
+
+  HELPER FUNCTIONS                      (see: ai help chat helper functions)
+    --built-in-functions TRUE           (see: ai help chat built-in helper functions)
+    --custom-functions PATTERN          (see: ai help chat custom helper functions)
 
   OPTIONS                               (see: ai help chat options)
     --temperature TEMPERATURE           (see: ai help chat options temperature)
@@ -38,35 +34,16 @@ USAGE: ai chat [...]
     --top-p TOP_P                       (see: ai help chat options top-p)
     --n N                               (see: ai help chat options n)
 
-EXAMPLES
+  SUB-COMMANDS
+    ai chat run [...]                   (see: ai help chat run)
+    ai chat evaluate [...]              (see: ai help chat evaluate)
 
-  `EXAMPLE 1`: Chat interactively using a specific system prompt
+EXAMPLEs
 
-    ai chat --interactive --system @prompt.txt
-
-  `EXAMPLE 2`: Chat (non-interactively) using a specific system prompt and user input
-
-    ai chat --system @prompt.txt --user "What can you do?"
-
-  `EXAMPLE 3`: Chat using chat message history stored in a file
-
-    ai chat --file chat-history.txt --user "Tell me a joke"
-
-  `EXAMPLE 4`: Chat w/ data using in-memory vector index (real-time embeddings)
-
-    ai config @ada --set text-embedding-ada-002
-    ai service openai deployment create --name @ada --model @ada --wait
-    ai chat --data-files *.txt --embeddings-deployment @ada --interactive
-
-  `EXAMPLE 5`: Chat w/ data using Azure Search vector index (pre-computed embeddings)
-
-    ai config @myindex --set MyIndex
-    ai search index create --name @myindex --files *.txt --interactive
-    ai chat --index-name @myindex --interactive
+  ai chat --system @prompt.txt --interactive
+  ai chat --system @prompt.txt --user "What can you do?"
 
 SEE ALSO
 
-  ai help chat setup
-  ai help chat advanced
   ai help chat examples
   ai help find topics chat

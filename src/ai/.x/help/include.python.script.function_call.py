@@ -1,26 +1,45 @@
+import asyncio
 import argparse
 import importlib
 import inspect
 import json
 import os
 import sys
-from typing import Generator
+from typing import Any, List, Dict, Generator
 
-def ensure_and_strip_module_path(module_path) -> str:
-    module_path = os.path.join(os.getcwd(), module_path)
+async def ensure_and_strip_module_path(module_path) -> str:
+    cwd = os.getcwd()
+    module_path = os.path.join(cwd, module_path)
     module_name = os.path.basename(module_path)
+
+    print("current working directory: " + os.getcwd())
 
     if os.path.exists(module_path + ".py"):
         module_dirname = os.path.dirname(module_path)
+
+        # Add the module_dirname to sys.path
         if module_dirname not in sys.path:
             sys.path.append(module_dirname)
+
+        # Add all directories between cwd and module_dirname to sys.path
+        common_path = os.path.commonpath([cwd, module_dirname])
+        subdirectories = os.path.relpath(module_dirname, common_path).split(os.path.sep)
+        for subdir in subdirectories:
+            common_path = os.path.join(common_path, subdir)
+            if common_path not in sys.path:
+                sys.path.append(common_path)
+
+        # Also, add cwd to sys.path if it's not already there
+        if os.getcwd() not in sys.path:
+            sys.path.append(os.getcwd())
+
         return module_name
-    
+
     raise ModuleNotFoundError("Module not found: " + module_path)
-    
-def call_function(module_path: str, function_name: str, json_params: str):
+
+async def call_async_function(module_path: str, function_name: str, json_params: str):
     try:
-        module_name = ensure_and_strip_module_path(module_path)
+        module_name = await ensure_and_strip_module_path(module_path)
 
         # Import the module
         target_module = importlib.import_module(module_name)
@@ -28,8 +47,17 @@ def call_function(module_path: str, function_name: str, json_params: str):
         # Use inspect to find the function by name
         target_function = getattr(target_module, function_name)
 
+        # Check if the target_function is a coroutine function
+        if asyncio.iscoroutinefunction(target_function):
+            # Parse the JSON parameter string to a dictionary
+            params = json.loads(json_params)
+
+            # Call the asynchronous function
+            result = await target_function(**params)
+            return result
+        
         # Check if the target_function is callable
-        if callable(target_function):
+        elif callable(target_function):
             # Parse the JSON parameter string to a dictionary
             params = json.loads(json_params)
 
@@ -44,9 +72,9 @@ def call_function(module_path: str, function_name: str, json_params: str):
             return result
 
         else:
-            return "Function not found or not callable."
-        
-    # handle TypeError
+            return "Function not found, not an asynchronous function, or not callable."
+
+    # Handle exceptions
     except ModuleNotFoundError:
         print("Module not found: " + module_path)
         raise
@@ -61,17 +89,17 @@ def call_function(module_path: str, function_name: str, json_params: str):
         raise
 
 def ensure_args() -> list:
-    parser = argparse.ArgumentParser(description="Call a function in a module with specified parameters.")
+    parser = argparse.ArgumentParser(description="Call a function (async or not) in a module with specified parameters.")
     parser.add_argument("--function", required=True, help="Module and function name in the format MODULE:FUNCTION.")
     parser.add_argument("--parameters", default="{}", help="JSON string containing parameters.")
     args = parser.parse_args()
-    
+
     return args.function, args.parameters
 
-def main():
+async def main():
     function, json_params = ensure_args()
     module_function_parts = function.rsplit(":", 1)
-    
+
     if len(module_function_parts) != 2:
         print("Invalid argument format. Please use MODULE:FUNCTION.")
         sys.exit(1)
@@ -79,32 +107,38 @@ def main():
     module_name = module_function_parts[0]
     function_name = module_function_parts[1]
 
-    result = call_function(module_name, function_name, json_params)
+    result = await call_async_function(module_name, function_name, json_params)
 
     if result is not None:
-        # if it's a string...
         if isinstance(result, str):
             print("---it's a string---")
-            for word in result.split():
-                print(word)
-
-        # if it's a list of strings
+            print(result)
+            
         elif isinstance(result, list) and all(isinstance(item, str) for item in result):
             print("---it's a list---")
             for item in result:
-                for word in item.split():
-                    print(word)
+                print(item)
 
         # if it's a generator
         elif issubclass(type(result), Generator) :
             print("---it's a generator---")
             for item in result:
-                for word in item.split():
-                    print(word)
+                print(item)
+
+        # if the "openai.openai_object.OpenAIObject"
+        elif (type(result).__name__ == "OpenAIObject"):
+            print("---it's an OpenAIObject---")
+            print(result.choices[0].message.content)
+
+        # if it's a dictionary that has a "choices" key
+        elif (isinstance(result, dict) and "choices" in result):
+            print("---it's a dictionary with a 'choices' key---")
+            print(result["choices"][0]["message"]["content"])
 
         else:
             print("---it's something else---")
             print(type(result))
+            print(result)
 
 if __name__ == "__main__":
-    main()
+    asyncio.run(main())  # Use asyncio.run() to run the asynchronous main function

@@ -169,7 +169,7 @@ namespace Azure.AI.Details.Common.CLI.ConsoleGui
 
         public void WriteChar(char ch, int count = 1)
         {
-            if (IsOpen())
+            if (IsOpen() && Height > 0)
             {
                 Screen.Current.WriteChar(ch, count);
             }
@@ -177,7 +177,7 @@ namespace Azure.AI.Details.Common.CLI.ConsoleGui
 
         public void WriteText(string text, int cch = int.MaxValue)
         {
-            if (IsOpen())
+            if (IsOpen() && Height > 0)
             {
                 Screen.Current.WriteText(text, cch);
             }
@@ -185,7 +185,7 @@ namespace Azure.AI.Details.Common.CLI.ConsoleGui
 
         public void WriteChar(int x, int y, char ch, int count = 1)
         {
-            if (IsOpen())
+            if (IsOpen() && Height > 0)
             {
                 Screen.Current.WriteChar(X + x, Y + y, ch, count);
             }
@@ -193,7 +193,7 @@ namespace Azure.AI.Details.Common.CLI.ConsoleGui
 
         public void WriteText(int x, int y, string text, int cch = int.MaxValue)
         {
-            if (IsOpen())
+            if (IsOpen() && Height > 0)
             {
                 Screen.Current.WriteText(X + x, Y + y, text, cch);
             }
@@ -201,7 +201,7 @@ namespace Azure.AI.Details.Common.CLI.ConsoleGui
 
         public void WriteChar(Colors colors, int x, int y, char ch, int count = 1)
         {
-            if (IsOpen())
+            if (IsOpen() && Height > 0)
             {
                 Screen.Current.WriteChar(colors, X + x, Y + y, ch, count);
             }
@@ -209,7 +209,7 @@ namespace Azure.AI.Details.Common.CLI.ConsoleGui
 
         public void WriteText(Colors colors, int x, int y, string text, int cch = int.MaxValue)
         {
-            if (IsOpen())
+            if (IsOpen() && Height > 0)
             {
                 Screen.Current.WriteText(colors, X + x, Y + y, text, cch);
             }
@@ -217,7 +217,7 @@ namespace Azure.AI.Details.Common.CLI.ConsoleGui
 
         public void WriteTextWithHighlight(Colors colors, Colors highlight, int x, int y, string text, int cch = int.MaxValue)
         {
-            if (IsOpen())
+            if (IsOpen() && Height > 0)
             {
                 Screen.Current.WriteTextWithHighlight(colors, highlight, X + x, Y + y, text, cch);
             }
@@ -229,7 +229,7 @@ namespace Azure.AI.Details.Common.CLI.ConsoleGui
         
         public void WriteClientChar(int x, int y, char ch, int count = 1)
         {
-            if (IsOpen())
+            if (IsOpen() && Height > 0)
             {
                 Screen.Current.WriteChar(_rectClient.X + x, _rectClient.Y + y, ch, count);
             }
@@ -237,7 +237,7 @@ namespace Azure.AI.Details.Common.CLI.ConsoleGui
 
         public void WriteClientText(int x, int y, string text, int cch = int.MaxValue)
         {
-            if (IsOpen())
+            if (IsOpen() && Height > 0)
             {
                 Screen.Current.WriteText(_rectClient.X + x, _rectClient.Y + y, text, cch);
             }
@@ -245,7 +245,7 @@ namespace Azure.AI.Details.Common.CLI.ConsoleGui
 
         public void WriteClientChar(Colors colors, int x, int y, char ch, int count = 1)
         {
-            if (IsOpen())
+            if (IsOpen() && Height > 0)
             {
                 Screen.Current.WriteChar(colors, _rectClient.X + x, _rectClient.Y + y, ch, count);
             }
@@ -253,7 +253,7 @@ namespace Azure.AI.Details.Common.CLI.ConsoleGui
 
         public void WriteClientText(Colors colors, int x, int y, string text, int cch = int.MaxValue)
         {
-            if (IsOpen())
+            if (IsOpen() && Height > 0)
             {
                 Screen.Current.WriteText(colors, _rectClient.X + x, _rectClient.Y + y, text, cch);
             }
@@ -261,7 +261,7 @@ namespace Azure.AI.Details.Common.CLI.ConsoleGui
 
         public void WriteClientTextWithHighlight(Colors colors, Colors highlight, int x, int y, string text, int cch = int.MaxValue)
         {
-            if (IsOpen())
+            if (IsOpen() && Height > 0)
             {
                 Screen.Current.WriteTextWithHighlight(colors, highlight, _rectClient.X + x, _rectClient.Y + y, text, cch);
             }

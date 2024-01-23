@@ -1,0 +1,93 @@
+﻿- name: simulate pass
+  simulate: Passed
+
+- name: simulate skipped
+  simulate: Skipped
+
+- test1: run --script "echo hello"
+- test2: run --script "echo oh yeah?"
+
+- name: try1a command ... ai
+  command: ai
+
+- name: try1b command ... ai run --script "echo hello"
+  command: ai run --script "echo hello"
+  expect: hello
+
+- name: try2a script ... ai
+  script: ai
+
+- name: try2b script ... ai run --script "echo hello"
+  script: ai run --script "echo hello"
+  expect: hello
+
+- name: simple help test
+  script: ai
+  expect: |
+    (?# ---------- BANNER)
+    AI - Azure AI CLI, Version [01]\.[0-9].[0-9]
+    Copyright \(c\) 2023 Microsoft Corporation\. All Rights Reserved\.
+
+    This PUBLIC PREVIEW version may change at any time\.
+    See: https://aka\.ms/azure-ai-cli-public-preview
+
+       ___ ____  ___  _____
+      / _ /_  / / _ |/_  _/
+     / __ |/ /_/ __ |_/ /_
+    /_/ |_/___/_/ |_/____/
+
+    USAGE: ai <command> \[\.\.\.\]\r?$\n
+    ^\r?$\n
+    ^HELP\r?$\n
+    ^\r?$\n
+    ^  ai help\r?$\n
+    ^  ai help init\r?$\n
+    ^\r?$\n
+    ^COMMANDS\r?$\n
+    ^\r?$\n
+    ^  ai init \[\.\.\.\]             \(see: ai help init\)\r?$\n
+    ^  ai config \[\.\.\.\]           \(see: ai help config\)\r?$\n
+    ^\r?$\n
+    ^  ai dev \[\.\.\.\]              \(see: ai help dev\)\r?$\n
+    ^\r?$\n
+    ^  ai chat \[\.\.\.\]             \(see: ai help chat\)\r?$\n
+    ^  ai flow \[\.\.\.\]             \(see: ai help flow\)\r?$\n
+    ^\r?$\n
+    ^  ai search \[\.\.\.\]           \(see: ai help search\)\r?$\n
+    ^  ai speech \[\.\.\.\]           \(see: ai help speech\)\r?$\n
+    ^\r?$\n
+    ^  ai service \[\.\.\.\]          \(see: ai help service\)\r?$\n
+    ^\r?$\n
+    ^EXAMPLES\r?$\n
+    ^\r?$\n
+    ^  ai init\r?$\n
+    ^  ai chat --interactive --system @prompt\.txt\r?$\n
+    ^\r?$\n
+    ^  ai search index update --name MyIndex --files \*\.md\r?$\n
+    ^  ai chat --interactive --system @prompt\.txt --index-name MyIndex\r?$\n
+    ^\r?$\n
+    ^SEE ALSO\r?$\n
+    ^\r?$\n
+    ^  ai help examples\r?$\n
+    ^\r?$\n
+    ^  ai help find "prompt"\r?$\n
+    ^  ai help find "prompt" --expand\r?$\n
+    ^\r?$\n
+    ^  ai help find topics "examples"\r?$\n
+    ^  ai help list topics\r?$\n
+    ^\r?$\n
+    ^  ai help documentation\r?$\n
+    ^\r?$\n
+
+- name: dev new list
+  command: dev new list
+  arguments:
+    expect: |
+      ^Name +Short +Name +Language +\r?$\n
+      ^-+ +-+ +-+\r?$\n
+      ^Environment +Variables +\.env *\r?$\n
+      ^Helper +Function +Class +Library +helper-functions +C# *\r?$\n
+      ^OpenAI +Chat +Completions +openai-chat +C#, +Go, +Java, +JavaScript, +Python *\r?$\n
+      ^OpenAI +Chat +Completions +\(Streaming\) +openai-chat-streaming +C#, +Go, +Java, +JavaScript, +Python *\r?$\n
+      ^OpenAI +Chat +Completions +\(w/ +Data +\+ +AI +Search\) +openai-chat-streaming-with-data +C#, +JavaScript, +Python *\r?$\n
+      ^OpenAI +Chat +Completions +\(w/ +Functions\) +openai-chat-streaming-with-functions +C#, +Go, +JavaScript, +Python *\r?$\n

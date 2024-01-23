@@ -2,15 +2,29 @@
 
 # Use the base image for Ubuntu 22.04 (jammy)
 FROM mcr.microsoft.com/devcontainers/base:jammy AS base
+ENV DEBIAN_FRONTEND=noninteractive
 
-# Feature flags/arguments
-ARG AZURE_CLI_VERSION=1.0.0-alpha12
-ARG DOWNLOAD_SCRIPT=false
+# Install dependencies
+WORKDIR /
+
+# Install dependencies
+RUN apt-get update
+RUN apt install fuse -y
+RUN apt install dos2unix -y
+RUN apt-get install python3.10 -y --no-install-recommends
+RUN apt install python3-pip -y
+RUN pip install --upgrade pip setuptools
+COPY requirements.txt .
+RUN pip install -r requirements.txt
 
 # Copy the required scripts into the container
 WORKDIR /_scratch
 COPY ./scripts/InstallAzureAICLIDeb.sh /_scratch/
 COPY ./scripts/InstallAzureAICLIDeb-UpdateVersion.sh /_scratch/
+
+# Feature flags/arguments
+ARG AZURE_CLI_VERSION=1.0.0-alpha1107.1
+ARG DOWNLOAD_SCRIPT=false
 
 # If we're downloading the script, do so
 RUN if [ "${DOWNLOAD_SCRIPT}" = "true" ]; then \
@@ -20,7 +34,8 @@ RUN if [ "${DOWNLOAD_SCRIPT}" = "true" ]; then \
 # If we're not downloading the script, update the version
 RUN if [ "${DOWNLOAD_SCRIPT}" = "false" ]; then \
     chmod +x InstallAzureAICLIDeb-UpdateVersion.sh && \
-    /bin/bash InstallAzureAICLIDeb-UpdateVersion.sh ${AZURE_CLI_VERSION} /_scratch/; \
+    /bin/bash InstallAzureAICLIDeb-UpdateVersion.sh ${AZURE_CLI_VERSION} /_scratch/ && \
+    dos2unix /_scratch/InstallAzureAICLIDeb-${AZURE_CLI_VERSION}.sh; \
     fi
 
 # Copy installation script into the container, and make sure it is executable

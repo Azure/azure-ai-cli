@@ -20,10 +20,10 @@ using Microsoft.SemanticKernel;
 using Microsoft.SemanticKernel.Connectors.Memory.AzureCognitiveSearch;
 using Microsoft.SemanticKernel.Memory;
 using Azure.Core.Diagnostics;
-using Azure.Core.Pipeline;
-using Azure.Core;
 using System.Diagnostics.Tracing;
 using Microsoft.CognitiveServices.Speech;
+using Azure.AI.Details.Common.CLI.Extensions.HelperFunctions;
+using System.Reflection;
 
 namespace Azure.AI.Details.Common.CLI
 {
@@ -32,18 +32,253 @@ namespace Azure.AI.Details.Common.CLI
         internal ChatCommand(ICommandValues values)
         {
             _values = values.ReplaceValues();
+            _quiet = _values.GetOrDefault("x.quiet", false);
+            _verbose = _values.GetOrDefault("x.verbose", true);
         }
 
         internal bool RunCommand()
         {
-            Chat();
+            DoCommand(_values.GetCommand());
             return _values.GetOrDefault("passed", true);
         }
 
-        private void Chat()
+        private void DoCommand(string command)
         {
             StartCommand();
 
+            switch (command)
+            {
+                case "chat": DoChat(); break;
+                case "chat.run": DoChatRun(); break;
+                case "chat.evaluate": DoChatEvaluate(); break;
+
+                default:
+                    _values.AddThrowError("WARNING:", $"'{command.Replace('.', ' ')}' NOT YET IMPLEMENTED!!");
+                    break;
+            }
+
+            StopCommand();
+            DisposeAfterStop();
+            DeleteTemporaryFiles();
+        }
+
+        private void DoChatRun()
+        {
+            var action = "Running chats";
+            var command = "chat run";
+
+            var function = FunctionToken.Data().GetOrDefault(_values, null);
+            var isFunction = function != null;
+
+            var message = isFunction ? $"{action} w/ {function} ..." : $"{action} ...";
+            if (!_quiet) Console.WriteLine(message);
+
+            string output = isFunction
+                ? ChatRunFunction(action, command, function)
+                : ChatRunNonFunction();
+
+            if (!_quiet) Console.WriteLine($"{message} Done!\n");
+
+            if (!string.IsNullOrEmpty(output))
+            {
+                var parsed = JArray.Parse(output);
+                foreach (var item in parsed)
+                {
+                    Console.WriteLine(item.ToString(Formatting.None));
+                }
+            }
+        }
+
+        private void DoChatEvaluate()
+        {
+            var action = "Evaluating chats";
+            var command = "chat evaluate";
+
+            var function = FunctionToken.Data().GetOrDefault(_values, null);
+            var isFunction = function != null;
+
+            var message = isFunction ? $"{action} w/ {function} ..." : $"{action} ...";
+            if (!_quiet) Console.WriteLine(message);
+
+            string output = isFunction
+                ? ChatEvalFunction(action, command, function)
+                : ChatEvalNonFunction(action, command);
+
+            if (!_quiet) Console.WriteLine($"{message} Done!\n");
+
+            if (!string.IsNullOrEmpty(output)) Console.WriteLine(output);
+        }
+
+        private string ChatRunNonFunction()
+        {
+            var data = InputDataFileToken.Data().Demand(_values, "Running chats", "chat run");
+            var dataFile = FileHelpers.DemandFindFileInDataPath(data, _values, "chat data");
+            var lines = File.ReadAllLines(dataFile);
+
+            var client = CreateOpenAIClient(out var deployment);
+            var options = CreateChatCompletionOptions(deployment);
+            var funcContext = CreateFunctionFactoryAndCallContext(options);
+
+            var chatTextHandler = (string text) =>
+            {
+                var systemMessage = options.Messages.First();
+                options.Messages.Clear();
+
+                options.Messages.Add(systemMessage);
+                options.Messages.Add(new ChatRequestUserMessage(text));
+
+                var message = GetChatCompletion(client, options, funcContext);
+                var answer = message.Content;
+                var context = message.AzureExtensionsContext != null && message.AzureExtensionsContext.Messages != null
+                    ? string.Join('\n', message.AzureExtensionsContext.Messages.Select(x => x.Content))
+                    : null;
+                return (answer, context);
+            };
+
+            var results = new JArray();
+            foreach (var line in lines)
+            {
+                var jsonText = line.Trim();
+                if (string.IsNullOrEmpty(jsonText)) continue;
+
+                var json = JObject.Parse(jsonText);
+                var question = json["question"].ToString();
+
+                var (answer, context) = chatTextHandler(question);
+                if (!string.IsNullOrEmpty(answer))
+                {
+                    var result = new JObject();
+                    result["question"] = question;
+                    result["answer"] = answer;
+                    if (json.ContainsKey("truth")) result["truth"] = json["truth"];
+                    if (!string.IsNullOrEmpty(context)) result["context"] = context;
+                    results.Add(result);
+                }
+            }
+
+            return results.ToString(Formatting.None);
+        }
+
+        private ChatResponseMessage GetChatCompletion(OpenAIClient client, ChatCompletionsOptions options, HelperFunctionCallContext funcContext)
+        {
+            while (true)
+            {
+                var response = client.GetChatCompletions(options);
+                var message = CheckChoiceFinishReason(response.Value.Choices.Last()).Message;
+
+                if (funcContext.CheckForFunction(message))
+                {
+                    if (options.TryCallFunction(funcContext, out var result))
+                    {
+                        funcContext.Reset();
+                        continue;
+                    }
+                }
+
+                return message;
+            }
+        }
+
+        private string ChatRunFunction(string action, string command, string function)
+        {
+            var setEnv = _values.GetOrDefault("chat.set.environment", true);
+            var env = setEnv ? ConfigEnvironmentHelpers.GetEnvironment(_values) : null;
+
+            var data = InputDataFileToken.Data().Demand(_values, action, command);
+            var dataFile = FileHelpers.DemandFindFileInDataPath(data, _values, "chat data");
+
+            var output = PythonRunner.RunEmbeddedPythonScript(_values, "function_call_run",
+                CliHelpers.BuildCliArgs(
+                    "--function", function,
+                    "--data", dataFile),
+                addToEnvironment: env);
+            return output;
+        }
+
+        private string ChatEvalNonFunction(string action, string command)
+        {
+            var data = ChatRunNonFunction();
+            var parsed = JArray.Parse(data);
+
+            var sb = new StringBuilder();
+            parsed.ToList().ForEach(x => sb.AppendLine(x.ToString(Formatting.None)));
+            data = sb.ToString();
+
+            var dataFile = Path.GetTempFileName();
+            FileHelpers.WriteAllText(dataFile, data, new UTF8Encoding(false));
+
+            var setEnv = _values.GetOrDefault("chat.set.environment", true);
+            var env = setEnv ? ConfigEnvironmentHelpers.GetEnvironment(_values) : null;
+
+            var subscription = SubscriptionToken.Data().Demand(_values, action, command, checkConfig: "subscription");
+            var group = ResourceGroupNameToken.Data().Demand(_values, action, command, checkConfig: "group");
+            var project = ProjectNameToken.Data().Demand(_values, action, command, checkConfig: "project");
+
+            var dataFileForEvaluationNameOnly = InputDataFileToken.Data().Demand(_values, action, command);
+            var evaluationName = $"{new FileInfo(dataFileForEvaluationNameOnly).Name}"
+                .Replace(' ', '-')
+                .Replace('.', '-')
+                .Replace('_', '-')
+                .Replace(':', '-')
+                .Replace(Path.DirectorySeparatorChar, '-')
+                .Replace(Path.AltDirectorySeparatorChar, '-')
+                .Replace("--", "-")
+                .Trim('-')
+                .ToLower();
+            evaluationName = $"{evaluationName}-{DateTime.Now.ToString("yyyyMMddHHmmss")}";
+
+            var output = PythonRunner.RunEmbeddedPythonScript(_values, "function_call_evaluate",
+                CliHelpers.BuildCliArgs(
+                    "--data", dataFile,
+                    "--subscription", subscription,
+                    "--group", group,
+                    "--project-name", project,
+                    "--name", evaluationName),
+                addToEnvironment: env);
+            return output;
+        }
+
+        private string ChatEvalFunction(string action, string command, string function)
+        {
+            var setEnv = _values.GetOrDefault("chat.set.environment", true);
+            var env = setEnv ? ConfigEnvironmentHelpers.GetEnvironment(_values) : null;
+
+            var subscription = SubscriptionToken.Data().Demand(_values, action, command, checkConfig: "subscription");
+            var group = ResourceGroupNameToken.Data().Demand(_values, action, command, checkConfig: "group");
+            var project = ProjectNameToken.Data().Demand(_values, action, command, checkConfig: "project");
+
+            var data = InputDataFileToken.Data().Demand(_values, action, command);
+            var dataFile = FileHelpers.DemandFindFileInDataPath(data, _values, "chat data");
+
+            var evaluationName = $"{function}-{new FileInfo(dataFile).Name}"
+                .Replace(' ', '-')
+                .Replace('.', '-')
+                .Replace('_', '-')
+                .Replace(':', '-')
+                .Replace(Path.DirectorySeparatorChar, '-')
+                .Replace(Path.AltDirectorySeparatorChar, '-')
+                .Replace("--", "-")
+                .Trim('-')
+                .ToLower();
+            evaluationName = $"{evaluationName}-{DateTime.Now.ToString("yyyyMMddHHmmss")}";
+
+            Action<string> stdErrVerbose = x => Console.Error.WriteLine(x);
+            var stdErr = (Program.Debug || _verbose) ? stdErrVerbose : null;
+
+            var output = PythonRunner.RunEmbeddedPythonScript(_values, "function_call_evaluate",
+                CliHelpers.BuildCliArgs(
+                    "--function", function,
+                    "--data", dataFile,
+                    "--subscription", subscription,
+                    "--group", group,
+                    "--project-name", project,
+                    "--name", evaluationName),
+                addToEnvironment: env, null, stdErr, null);
+            return output;
+        }
+
+        private void DoChat()
+        {
             var interactive = _values.GetOrDefault("chat.input.interactive", false);
             if (interactive)
             {
@@ -53,10 +288,6 @@ namespace Azure.AI.Details.Common.CLI
             {
                 ChatNonInteractively().Wait();
             }
-
-            StopCommand();
-            DisposeAfterStop();
-            DeleteTemporaryFiles();
         }
 
         private async Task ChatInteractively()
@@ -65,31 +296,32 @@ namespace Azure.AI.Details.Common.CLI
 
             var speechInput = _values.GetOrDefault("chat.speech.input", false);
             var userPrompt = _values["chat.message.user.prompt"];
-            userPrompt = userPrompt.ReplaceValues(_values);
 
-            Console.WriteLine("Press ENTER for more options.\n");
+            if (!_quiet) Console.WriteLine("Press ENTER for more options.\n");
 
             while (true)
             {
-                DisplayUserChatPrompt();
+                DisplayUserChatPromptLabel();
 
-                var text = ReadLineOrSimulateInput(ref userPrompt);
+                var text = ReadLineOrSimulateInput(ref userPrompt, "exit");
                 if (text.ToLower() == "")
                 {
                     text = PickInteractiveContextMenu(speechInput);
                     if (text == null) continue;
+
+                    var fromSpeech = false;
                     if (text == "speech")
                     {
                         text = await GetSpeechInputAsync();
+                        fromSpeech = true;
                     }
 
-                    Console.ForegroundColor = ConsoleColor.Yellow;
-                    Console.WriteLine(text);
+                    DisplayUserChatPromptText(text, fromSpeech);
                 }
 
                 if (text.ToLower() == "stop") break;
                 if (text.ToLower() == "quit") break;
-                if (text.ToLower() == "exit") break;
+                if (text.ToLower().Trim('.') == "exit") break;
 
                 var task = chatTextHandler(text);
                 WaitForStopOrCancel(task);
@@ -114,13 +346,10 @@ namespace Azure.AI.Details.Common.CLI
                                 "",
                         "SEE:", $"{Program.Name} help chat");
             }
-            userPrompt = userPrompt.ReplaceValues(_values);
 
-            DisplayUserChatPrompt();
+            DisplayUserChatPromptLabel();
             var text = userPrompt;
-
-            Console.ForegroundColor = ConsoleColor.Yellow;
-            Console.WriteLine(text);
+            DisplayUserChatPromptText(text);
 
             var task = chatTextHandler(text);
             WaitForStopOrCancel(task);
@@ -130,32 +359,70 @@ namespace Azure.AI.Details.Common.CLI
 
         private async Task<Func<string, Task>> GetChatTextHandler()
         {
-            var function = ChatFunctionToken.Data().GetOrDefault(_values);
+            var function = FunctionToken.Data().GetOrDefault(_values);
             return function != null
                 ? await GetChatFunctionTextHandler(function)
                 : await GetNormalChatTextHandler();
         }
 
-        private async Task<Func<string, Task>> GetChatFunctionTextHandler(string function)
+        private async Task<Func<string, Task<string>>> GetChatFunctionTextHandler(string function)
         {
+            var setEnv = _values.GetOrDefault("chat.set.environment", true);
+            var env = setEnv ? ConfigEnvironmentHelpers.GetEnvironment(_values) : null;
+
+            var messages = new List<ChatRequestMessage>();
+
+            var systemPrompt = _values.GetOrDefault("chat.message.system.prompt", DefaultSystemPrompt);
+            messages.Add(new ChatRequestSystemMessage(systemPrompt));
+
             return await Task.Run(() => {
-                var handler = (string text) => {
+                Func<string, Task<string>> handler = (string text) => {
 
-                    Console.ForegroundColor = ConsoleColor.Green;
-                    Console.Write("assistant");
+                    messages.Add(new ChatRequestUserMessage(text));
 
-                    Console.ForegroundColor = ConsoleColor.White;
-                    Console.Write(": ");
-
+                    DisplayAssistantPromptLabel();
                     Console.ForegroundColor = ConsoleColor.Gray;
 
-                    var parameters = $"{{\"question\": \"{text}\"}}";
-                    var output = PythonRunner.RunEmbeddedPythonScript(_values, "function_call", "--function", function, "--parameters", parameters);
+                    var chatProtocolFunc = new Func<string>(() =>
+                    {
+                        return PythonRunner.RunEmbeddedPythonScript(_values, "function_call",
+                            CliHelpers.BuildCliArgs(
+                                "--function", function,
+                                "--parameters", ConvertMessagesToJson(messages)),
+                            addToEnvironment: env);
+                    });
+                    var questionFunc = new Func<string>(() => {
+                         return PythonRunner.RunEmbeddedPythonScript(_values, "function_call",
+                            CliHelpers.BuildCliArgs(
+                                "--function", function,
+                                "--parameters", $"{{\"question\": \"{text}\"}}"),
+                            addToEnvironment: env);
+                    });
 
-                    output = output.Replace("\n", "\n           ");
-                    Console.WriteLine(output);
+                    var output = TryCatchHelpers.TryCatchNoThrow<string>(chatProtocolFunc, null, out var ex1);
+                    if (output == null && ex1 != null)
+                    {
+                        var error1 = _values.GetOrDefault("error", null);
+                        _values.Reset("error");
 
-                    return Task.CompletedTask;
+                        output = TryCatchHelpers.TryCatchNoThrow<string>(questionFunc, null, out var ex2);
+
+                        if (output == null && ex2 != null)
+                        {
+                            var error2 = _values.GetOrDefault("error", null);
+                            _values.Reset("error");
+
+                            _values.AddThrowError("ERROR", $"{ex1.Message}\n\n{error1}\n\n{ex2.Message}\n\n{error2}");
+                        }
+                    }
+
+                    DisplayAssistantPromptTextStreaming(output);
+                    DisplayAssistantPromptTextStreamingDone();
+                    CheckWriteChatAnswerOutputFile(output);
+
+                    messages.Add(new ChatRequestAssistantMessage(output));
+
+                    return Task.FromResult(output);
                 };
                 return handler;
             });
@@ -163,30 +430,36 @@ namespace Azure.AI.Details.Common.CLI
 
         private async Task<Func<string, Task>> GetNormalChatTextHandler()
         {
+            var doSK = SKIndexNameToken.IsSKIndexKind(_values);
+
             var kernel = CreateSemanticKernel(out var acsIndex);
-            if (kernel != null) await StoreMemoryAsync(kernel, acsIndex);
+            if (kernel != null && doSK) await StoreMemoryAsync(kernel, acsIndex);
 
             var client = CreateOpenAIClient(out var deployment);
-            var options = CreateChatCompletionOptions();
+            var options = CreateChatCompletionOptions(deployment);
+            var funcContext = CreateFunctionFactoryAndCallContext(options);
 
             var handler = async (string text) =>
             {
-                var relevantMemories = await SearchMemoryAsync(kernel, acsIndex, text);
-                if (relevantMemories != null)
+                if (doSK)
                 {
-                    text = UpdateUserInputWithSearchResultInfo(text, relevantMemories);
+                    var relevantMemories = await SearchMemoryAsync(kernel, acsIndex, text);
+                    if (relevantMemories != null)
+                    {
+                        text = UpdateUserInputWithSearchResultInfo(text, relevantMemories);
+                    }
                 }
 
-                await GetChatCompletionsAsync(client, deployment, options, text);
+                await GetChatCompletionsAsync(client, options, funcContext, text);
             };
             return handler;
         }
 
-        private static string ReadLineOrSimulateInput(ref string inputToSimulate)
+        private static string ReadLineOrSimulateInput(ref string inputToSimulate, string defaultOnEndOfRedirectedInput = null)
         {
             var simulate = !string.IsNullOrEmpty(inputToSimulate);
 
-            var input = simulate ? inputToSimulate : Console.ReadLine();
+            var input = simulate ? inputToSimulate : ConsoleHelpers.ReadLineOrDefault("", defaultOnEndOfRedirectedInput);
             inputToSimulate = null;
 
             if (simulate) Console.WriteLine(input);
@@ -207,7 +480,7 @@ namespace Azure.AI.Details.Common.CLI
         private async Task<string> GetSpeechInputAsync()
         {
             Console.Write("\r");
-            DisplayUserChatPrompt();
+            DisplayUserChatPromptLabel();
             Console.ForegroundColor = ConsoleColor.DarkGray;
 
             var text = "(listening)";
@@ -219,7 +492,7 @@ namespace Azure.AI.Details.Common.CLI
             recognizer.Recognizing += (s, e) =>
             {
                 Console.Write("\r");
-                DisplayUserChatPrompt();
+                DisplayUserChatPromptLabel();
                 Console.ForegroundColor = ConsoleColor.DarkGray;
 
                 Console.Write($"{e.Result.Text} ...");
@@ -230,20 +503,21 @@ namespace Azure.AI.Details.Common.CLI
             var result = await recognizer.RecognizeOnceAsync();
 
             Console.Write("\r");
-            DisplayUserChatPrompt();
+            DisplayUserChatPromptLabel();
             Console.Write(new string(' ', result.Text.Length + 4));
 
             Console.Write("\r");
-            DisplayUserChatPrompt();
+            DisplayUserChatPromptLabel();
 
             return result.Text;
         }
 
-        private static string PickInteractiveContextMenu(bool allowSpeechInput)
+        private string PickInteractiveContextMenu(bool allowSpeechInput)
         {
             if (Console.CursorTop > 0)
             {
-                Console.SetCursorPosition(11, Console.CursorTop - 1);
+                var x = _quiet ? 0 : 11;
+                Console.SetCursorPosition(x, Console.CursorTop - 1);
             }
 
             var choices = allowSpeechInput
@@ -253,71 +527,145 @@ namespace Azure.AI.Details.Common.CLI
             return ListBoxPicker.PickString(choices, 20, choices.Length + 2, new Colors(ConsoleColor.White, ConsoleColor.Blue), new Colors(ConsoleColor.White, ConsoleColor.Red), select);
         }
 
-        private static void DisplayUserChatPrompt()
+        private void DisplayUserChatPromptLabel()
         {
-            Console.SetCursorPosition(0, Console.CursorTop);
-            Console.ForegroundColor = ConsoleColor.Green;
-            Console.Write("user");
-            Console.ForegroundColor = ConsoleColor.White;
-            Console.Write("@");
-            Console.ForegroundColor = ConsoleColor.Blue;
-            Console.Write("CHAT");
-            Console.ForegroundColor = ConsoleColor.Yellow;
-            Console.Write(": ");
+            if (!_quiet)
+            {
+                Console.Write('\r');
+                Console.ForegroundColor = ConsoleColor.Green;
+                Console.Write("user");
+                Console.ForegroundColor = ConsoleColor.White;
+                Console.Write("@");
+                Console.ForegroundColor = ConsoleColor.Blue;
+                Console.Write("CHAT");
+                Console.ForegroundColor = ConsoleColor.Yellow;
+                Console.Write(": ");
+            }
+            else
+            {
+                Console.ForegroundColor = ConsoleColor.Yellow;
+            }
         }
 
-        private async Task<Response<StreamingChatCompletions>> GetChatCompletionsAsync(OpenAIClient client, string deployment, ChatCompletionsOptions options, string text)
+        private void DisplayUserChatPromptText(string text, bool fromSpeech = false)
         {
-            options.Messages.Add(new ChatMessage(ChatRole.User, text));
+            if (_quiet && !fromSpeech) return;
+            Console.ForegroundColor = ConsoleColor.Yellow;
+            Console.WriteLine(text);
+        }
 
-            Console.ForegroundColor = ConsoleColor.Green;
-            Console.Write("assistant");
+        private void DisplayAssistantPromptLabel()
+        {
+            if (!_quiet)
+            {
+                Console.ForegroundColor = ConsoleColor.Green;
+                Console.Write("assistant");
+                Console.ForegroundColor = ConsoleColor.White;
+                Console.Write(": ");
+            }
+            else
+            {
+                Console.ForegroundColor = ConsoleColor.White;
+            }
+        }
 
-            Console.ForegroundColor = ConsoleColor.White;
-            Console.Write(": ");
+        private void DisplayAssistantPromptTextStreaming(string text)
+        {
+            // do "tab" indentation when not quiet
+            Console.Write(!_quiet
+                ? text.Replace("\n", "\n           ")
+                : text);
+        }
 
+        private void DisplayAssistantPromptTextStreamingDone()
+        {
+            Console.WriteLine("\n");
+        }
+
+        private void DisplayAssistantFunctionCall(HelperFunctionCallContext context, string result)
+        {
+            if (!_quiet && _verbose)
+            {
+                Console.ForegroundColor = ConsoleColor.Green;
+                Console.Write("\rassistant-function");
+                Console.ForegroundColor = ConsoleColor.White;
+                Console.Write(": ");
+                Console.ForegroundColor = ConsoleColor.DarkGray;
+                Console.WriteLine($"{context.FunctionName}({context.Arguments}) = {result}");
+
+                DisplayAssistantPromptLabel();
+                Console.ForegroundColor = ConsoleColor.Gray;
+            }
+        }
+
+        private async Task<StreamingResponse<StreamingChatCompletionsUpdate>> GetChatCompletionsAsync(OpenAIClient client, ChatCompletionsOptions options, HelperFunctionCallContext funcContext, string text)
+        {
+            options.Messages.Add(new ChatRequestUserMessage(text));
+
+            DisplayAssistantPromptLabel();
             Console.ForegroundColor = ConsoleColor.Gray;
 
-            var response = await client.GetChatCompletionsStreamingAsync(deployment, options);
+            string contentComplete = string.Empty;
 
-            var completeResponse = string.Empty;
-            await foreach (var choice in response.Value.GetChoicesStreaming())
+            while (true)
             {
-                await foreach (var message in choice.GetMessageStreaming())
+                var response = await client.GetChatCompletionsStreamingAsync(options);
+                await foreach (var update in response.EnumerateValues())
                 {
-                    var str = message.Content;
-                    if (string.IsNullOrEmpty(str)) continue;
+                    funcContext.CheckForUpdate(update);
 
-                    completeResponse = completeResponse + str;
+                    CheckChoiceFinishReason(update.FinishReason);
 
-                    str = str.Replace("\n", "\n           ");
-                    Console.Write(str);
+                    var content = update.ContentUpdate;
+                    if (content == null) continue;
+
+                    contentComplete += content;
+                    DisplayAssistantPromptTextStreaming(content);
                 }
-                Console.WriteLine();
+
+                if (options.TryCallFunction(funcContext, out var result))
+                {
+                    DisplayAssistantFunctionCall(funcContext, result);
+                    funcContext.Reset();
+                    continue;
+                }
+
+                DisplayAssistantPromptTextStreamingDone();
+                CheckWriteChatAnswerOutputFile(contentComplete);
+
+                options.Messages.Add(new ChatRequestAssistantMessage(contentComplete));
+
+                return response;
             }
-
-            options.Messages.Add(new ChatMessage(ChatRole.Assistant, completeResponse));
-            Console.WriteLine();
-
-            return response;
         }
 
-        private ChatCompletionsOptions CreateChatCompletionOptions()
+        private void CheckWriteChatAnswerOutputFile(string completeResponse)
+        {
+            var outputAnswerFile = OutputChatAnswerFileToken.Data().GetOrDefault(_values);
+            if (!string.IsNullOrEmpty(outputAnswerFile))
+            {
+                var fileName = FileHelpers.GetOutputDataFileName(outputAnswerFile, _values);
+                FileHelpers.WriteAllText(fileName, completeResponse, Encoding.UTF8);
+            }
+        }
+
+        private ChatCompletionsOptions CreateChatCompletionOptions(string deployment)
         {
             var options = new ChatCompletionsOptions();
+            options.DeploymentName = deployment;
 
             var systemPrompt = _values.GetOrDefault("chat.message.system.prompt", DefaultSystemPrompt);
-            options.Messages.Add(new ChatMessage(ChatRole.System, systemPrompt.ReplaceValues(_values)));
+            options.Messages.Add(new ChatRequestSystemMessage(systemPrompt));
 
             var textFile = _values["chat.message.history.text.file"];
-            if (!string.IsNullOrEmpty(textFile)) AddChatMessagesFromTextFile(options, textFile);
+            if (!string.IsNullOrEmpty(textFile)) AddChatMessagesFromTextFile(options.Messages, textFile);
 
             var maxTokens = _values["chat.options.max.tokens"];
             var temperature = _values["chat.options.temperature"];
             var frequencyPenalty = _values["chat.options.frequency.penalty"];
             var presencePenalty = _values["chat.options.presence.penalty"];
 
-            options.MaxTokens = TryParse(maxTokens, _defaultMaxTokens);
+            options.MaxTokens = TryParse(maxTokens, null);
             options.Temperature = TryParse(temperature, _defaultTemperature);
             options.FrequencyPenalty = TryParse(frequencyPenalty, _defaultFrequencyPenalty);
             options.PresencePenalty = TryParse(presencePenalty, _defaultPresencePenalty);
@@ -336,7 +684,7 @@ namespace Azure.AI.Details.Common.CLI
 
         private void AddAzureExtensionOptions(ChatCompletionsOptions options)
         {
-            var indexName = _values["service.config.search.index.name"];
+            var indexName = SearchIndexNameToken.Data().GetOrDefault(_values);
             var indexOk = !string.IsNullOrEmpty(indexName);
             if (!indexOk) return;
 
@@ -354,28 +702,23 @@ namespace Azure.AI.Details.Common.CLI
             }
             else if (!embeddingsOk)
             {
-                _values.AddThrowError("ERROR:", $"Creating Azure AI Search extension; requires embeddings key, endpoint, and deployment.");
+                _values.AddThrowError("ERROR:", $"Creating Azure AI Search extension; requires embedding key, endpoint, and deployment.");
             }
 
-            var queryType = QueryTypeFrom(_values["service.config.search.query.type"]) ?? AzureCognitiveSearchQueryType.Vector;
+            var queryType = QueryTypeFrom(_values["service.config.search.query.type"]) ?? AzureCognitiveSearchQueryType.VectorSimpleHybrid;
 
-            options.AzureExtensionsOptions = new()
+            var search = new AzureCognitiveSearchChatExtensionConfiguration()
             {
-                Extensions =
-                {
-                    new AzureCognitiveSearchChatExtensionConfiguration(
-                            AzureChatExtensionType.AzureCognitiveSearch,
-                            new Uri(searchEndpoint),
-                            new AzureKeyCredential(searchKey),
-                            indexName)
-                    {
-                        QueryType = queryType,
-                        EmbeddingEndpoint = embeddingEndpoint,
-                        EmbeddingKey = new AzureKeyCredential(embeddingsKey),
-                        DocumentCount = 16,
-                    }
-                }
+                SearchEndpoint = new Uri(searchEndpoint),
+                Key = searchKey,
+                IndexName = indexName,
+                QueryType = queryType,
+                DocumentCount = 16,
+                EmbeddingEndpoint = embeddingEndpoint,
+                EmbeddingKey = embeddingsKey,
             };
+
+            options.AzureExtensionsOptions = new() { Extensions = { search } };
         }
 
         private static AzureCognitiveSearchQueryType? QueryTypeFrom(string queryType)
@@ -406,7 +749,7 @@ namespace Azure.AI.Details.Common.CLI
         private Uri GetEmbeddingsDeploymentEndpoint()
         {
             var embeddingsEndpoint = ConfigEndpointUriToken.Data().GetOrDefault(_values);
-            var embeddingsDeployment = _values["service.config.embeddings.deployment"];
+            var embeddingsDeployment = SearchEmbeddingModelDeploymentNameToken.Data().GetOrDefault(_values);
 
             var baseOk = !string.IsNullOrEmpty(embeddingsEndpoint) && !string.IsNullOrEmpty(embeddingsDeployment);
             var pathOk = embeddingsEndpoint.Contains("embeddings?") && embeddingsEndpoint.Contains("api-version=");
@@ -421,72 +764,11 @@ namespace Azure.AI.Details.Common.CLI
             return baseOk && pathOk ? new Uri(embeddingsEndpoint) : null;
         }
 
-        private static string GetOpenAIClientVersionNumber()
+        public static string GetOpenAIClientVersionNumber()
         {
             var latest = ((OpenAIClientOptions.ServiceVersion[])Enum.GetValues(typeof(OpenAIClientOptions.ServiceVersion))).MaxBy(i => (int)i);
             var latestVersion = latest.ToString().ToLower().Replace("_", "-").Substring(1);
             return latestVersion;
-        }
-
-        private void AddChatMessagesFromTextFile(ChatCompletionsOptions options, string textFile)
-        {
-            var existing = FileHelpers.DemandFindFileInDataPath(textFile, _values, "chat history");
-            var text = FileHelpers.ReadAllText(existing, Encoding.Default);
-
-            var lines = text.Split(new char[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries)
-                .Where(x => !string.IsNullOrEmpty(x))
-                .Select(x => x.Trim())
-                .ToList();
-
-            var first = lines.FirstOrDefault();
-            var role = UpdateRole(ref first);
-
-            for (int i = 0; i < lines.Count; i++)
-            {
-                var line = lines[i];
-                role = UpdateRole(ref line, role);
-
-                if (role == ChatRole.System || role == ChatRole.User)
-                {
-                    line = line.ReplaceValues(_values);
-                }
-
-                if (i == 0 && role == ChatRole.System && FirstMessageIsDefaultSystemPrompt(options, role))
-                {
-                    options.Messages.First().Content = line;
-                    continue;
-                }
-
-                options.Messages.Add(new ChatMessage(role, line));
-            }
-        }
-
-        private ChatRole UpdateRole(ref string line, ChatRole? currentRole = null)
-        {
-            var lower = line.ToLower();
-            if (lower.StartsWith("system:"))
-            {
-                line = line.Substring(7).Trim();
-                return ChatRole.System;
-            }
-            else if (lower.StartsWith("user:"))
-            {
-                line = line.Substring(5).Trim();
-                return ChatRole.User;
-            }
-            else if (lower.StartsWith("assistant:"))
-            {
-                line = line.Substring(10).Trim();
-                return ChatRole.Assistant;
-            }
-            return currentRole ?? ChatRole.System;
-        }
-
-        private static bool FirstMessageIsDefaultSystemPrompt(ChatCompletionsOptions options, ChatRole role)
-        {
-            return options.Messages.Count() == 1
-                && options.Messages.First().Role == ChatRole.System
-                && options.Messages.First().Content == DefaultSystemPrompt;
         }
 
         private OpenAIClient CreateOpenAIClient(out string deployment)
@@ -536,6 +818,173 @@ namespace Azure.AI.Details.Common.CLI
                 _values.AddThrowError("ERROR:", $"Creating OpenAIClient; Not-yet-implemented create from region.");
                 return null;
             }
+        }
+
+        private HelperFunctionCallContext CreateFunctionFactoryAndCallContext(ChatCompletionsOptions options)
+        {
+            var customFunctions = _values.GetOrDefault("chat.custom.helper.functions", null);
+            var useCustomFunctions = !string.IsNullOrEmpty(customFunctions);
+            var useBuiltInFunctions = _values.GetOrDefault("chat.built.in.helper.functions", false);
+
+            var factory = useCustomFunctions && useBuiltInFunctions
+                ? CreateFunctionFactoryForCustomFunctions(customFunctions) + CreateFunctionFactoryWithBuiltinFunctions()
+                : useCustomFunctions
+                    ? CreateFunctionFactoryForCustomFunctions(customFunctions)
+                    : useBuiltInFunctions
+                        ? CreateFunctionFactoryWithBuiltinFunctions()
+                        : CreateFunctionFactoryWithNoFunctions();
+
+            return options.AddFunctions(factory);
+        }
+
+        private HelperFunctionFactory CreateFunctionFactoryForCustomFunctions(string customFunctions)
+        {
+            var factory = new HelperFunctionFactory();
+
+            var patterns = customFunctions.Split(new char[] { ';', '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
+            foreach (var pattern in patterns)
+            {
+                var files = FileHelpers.FindFiles(pattern, _values);
+                if (files.Count() == 0)
+                {
+                    files = FileHelpers.FindFilesInOsPath(pattern);
+                }
+
+                foreach (var file in files)
+                {
+                    if (Program.Debug) Console.WriteLine($"Trying to load custom functions from: {file}");
+                    var assembly = TryCatchHelpers.TryCatchNoThrow<Assembly>(() => Assembly.LoadFrom(file), null, out var ex);
+                    if (assembly != null) factory.AddFunctions(assembly);
+                }
+            }
+
+            return factory;
+        }
+
+        private HelperFunctionFactory CreateFunctionFactoryWithBuiltinFunctions()
+        {
+            return new HelperFunctionFactory(typeof(FileHelperFunctions).Assembly);
+        }
+
+        private HelperFunctionFactory CreateFunctionFactoryWithNoFunctions()
+        {
+            return new HelperFunctionFactory();
+        }
+
+        private ChatChoice CheckChoiceFinishReason(ChatChoice choice)
+        {
+            if (choice.FinishReason == CompletionsFinishReason.ContentFiltered)
+            {
+                if (!_quiet) ConsoleHelpers.WriteLineWithHighlight("#e_;WARNING: Content filtered!");
+            }
+            if (choice.FinishReason == CompletionsFinishReason.TokenLimitReached)
+            {
+                _values.AddThrowError("ERROR:", $"exceeded token limit!",
+                                         "TRY:", $"{Program.Name} chat --max-tokens TOKENS");
+            }
+            return choice;
+        }
+
+        private void CheckChoiceFinishReason(CompletionsFinishReason? finishReason)
+        {
+            if (finishReason == CompletionsFinishReason.ContentFiltered)
+            {
+                if (!_quiet) ConsoleHelpers.WriteLineWithHighlight("#e_;WARNING: Content filtered!");
+            }
+            if (finishReason == CompletionsFinishReason.TokenLimitReached)
+            {
+                _values.AddThrowError("ERROR:", $"exceeded token limit!",
+                                         "TRY:", $"{Program.Name} chat --max-tokens TOKENS");
+            }
+        }
+
+        private ChatRole UpdateRole(ref string line, ChatRole? currentRole = null)
+        {
+            var lower = line.ToLower();
+            if (lower.StartsWith("system:"))
+            {
+                line = line.Substring(7).Trim();
+                return ChatRole.System;
+            }
+            else if (lower.StartsWith("user:"))
+            {
+                line = line.Substring(5).Trim();
+                return ChatRole.User;
+            }
+            else if (lower.StartsWith("assistant:"))
+            {
+                line = line.Substring(10).Trim();
+                return ChatRole.Assistant;
+            }
+            return currentRole ?? ChatRole.System;
+        }
+
+        private void AddChatMessagesFromTextFile(IList<ChatRequestMessage> messages, string textFile)
+        {
+            var existing = FileHelpers.DemandFindFileInDataPath(textFile, _values, "chat history");
+            var text = FileHelpers.ReadAllText(existing, Encoding.Default);
+
+            var lines = text.Split(new char[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries)
+                .Where(x => !string.IsNullOrEmpty(x))
+                .Select(x => x.Trim())
+                .ToList();
+
+            var first = lines.FirstOrDefault();
+            var role = UpdateRole(ref first);
+
+            for (int i = 0; i < lines.Count; i++)
+            {
+                var line = lines[i];
+                role = UpdateRole(ref line, role);
+
+                if (role == ChatRole.System || role == ChatRole.User)
+                {
+                    line = line.ReplaceValues(_values);
+                }
+
+                if (i == 0 && role == ChatRole.System && FirstMessageIsDefaultSystemPrompt(messages, role))
+                {
+                    messages[0] = new ChatRequestSystemMessage(line);
+                    continue;
+                }
+
+                messages.Add(role == ChatRole.System
+                    ? new ChatRequestSystemMessage(line)
+                    : role == ChatRole.User
+                        ? new ChatRequestUserMessage(line)
+                        : new ChatRequestAssistantMessage(line));
+            }
+        }
+
+        private static bool FirstMessageIsDefaultSystemPrompt(IList<ChatRequestMessage> messages, ChatRole role)
+        {
+            var message = messages.FirstOrDefault() as ChatRequestSystemMessage;
+            return message != null && message.Content == DefaultSystemPrompt;
+        }
+
+        private static string ConvertMessagesToJson(IList<ChatRequestMessage> messages)
+        {
+            var sb = new StringBuilder();
+            sb.Append("[");
+            foreach (var message in messages)
+            {
+                var user = message as ChatRequestUserMessage;
+                var system = message as ChatRequestSystemMessage;
+                var assistant = message as ChatRequestAssistantMessage;
+                var content = system?.Content ?? user?.Content ?? assistant?.Content;
+
+                var ok = !string.IsNullOrEmpty(content);
+                if (!ok) continue;
+
+                if (sb.Length > 1) sb.Append(",");
+
+                sb.Append($"{{\"role\": \"{message.Role}\", \"content\": \"{content}\"}}");
+            }
+            sb.Append("]");
+            var theDict = $"{{ \"messages\": {sb.ToString()} }}";
+
+            if (Program.Debug) Console.WriteLine(theDict);
+            return theDict;
         }
 
         private void WaitForStopOrCancel(Task task)
@@ -603,12 +1052,15 @@ namespace Azure.AI.Details.Common.CLI
         }
 
         private SpinLock _lock = null;
+        private readonly bool _quiet = false;
+        private readonly bool _verbose = false;
+
         private AzureEventSourceListener _azureEventSourceListener;
 
         // OutputHelper _output = null;
         // DisplayHelper _display = null;
 
-        private int TryParse(string? s, int defaultValue)
+        private int? TryParse(string? s, int? defaultValue)
         {
             return !string.IsNullOrEmpty(s) && int.TryParse(s, out var parsed) ? parsed : defaultValue;
         }
@@ -620,37 +1072,37 @@ namespace Azure.AI.Details.Common.CLI
 
         private IKernel? CreateSemanticKernel(out string acsIndex)
         {
-           var key = _values["service.config.key"];
-           var endpoint = ConfigEndpointUriToken.Data().GetOrDefault(_values);
-           var deployment = _values["service.config.embeddings.deployment"];
+            var key = _values["service.config.key"];
+            var endpoint = ConfigEndpointUriToken.Data().GetOrDefault(_values);
+            var deployment = SearchEmbeddingModelDeploymentNameToken.Data().GetOrDefault(_values);
 
-           acsIndex = _values["service.config.embeddings.index.name"];
-           if (acsIndex == null) return null;
+            acsIndex = SearchIndexNameToken.Data().GetOrDefault(_values);
+            if (acsIndex == null) return null;
 
-           if (string.IsNullOrEmpty(key) || string.IsNullOrEmpty(endpoint) || string.IsNullOrEmpty(deployment))
-           {
-               return null;
-           }
+            if (string.IsNullOrEmpty(key) || string.IsNullOrEmpty(endpoint) || string.IsNullOrEmpty(deployment))
+            {
+                return null;
+            }
 
-           var acsKey = _values["service.config.acs.key"];
-           var acsEndpoint = _values["service.config.acs.endpoint.uri"];
-           var acsOk = !string.IsNullOrEmpty(acsKey) && !string.IsNullOrEmpty(acsEndpoint);
+            var acsKey = _values["service.config.acs.key"];
+            var acsEndpoint = _values["service.config.acs.endpoint.uri"];
+            var acsOk = !string.IsNullOrEmpty(acsKey) && !string.IsNullOrEmpty(acsEndpoint);
 
-           IMemoryStore store = acsOk
-               ? new AzureCognitiveSearchMemoryStore(acsEndpoint, acsKey)
-               : new VolatileMemoryStore();
+            IMemoryStore store = acsOk
+                ? new AzureCognitiveSearchMemoryStore(acsEndpoint, acsKey)
+                : new VolatileMemoryStore();
 
-           var kernelWithACS = Kernel.Builder
-               .WithAzureTextEmbeddingGenerationService(deployment, endpoint, key)
-               .WithMemoryStorage(store)
-               .Build();
+            var kernelWithACS = Kernel.Builder
+                .WithAzureTextEmbeddingGenerationService(deployment, endpoint, key)
+                .WithMemoryStorage(store)
+                .Build();
 
-           return kernelWithACS;
+            return kernelWithACS;
         }
 
-        private static async Task StoreMemoryAsync(IKernel kernel, string index)
+        private async Task StoreMemoryAsync(IKernel kernel, string index)
         {
-           Console.Write("Storing files in semantic memory...");
+           if (!_quiet) Console.Write("Storing files in semantic memory...");
            var githubFiles = SampleData();
            foreach (var entry in githubFiles)
            {
@@ -661,10 +1113,10 @@ namespace Azure.AI.Details.Common.CLI
                    description: entry.Value,
                    text: entry.Value);
 
-               Console.Write(".");
+               if (!_quiet) Console.Write(".");
            }
 
-           Console.WriteLine(". Done!\n");
+           if (!_quiet) Console.WriteLine(". Done!\n");
         }
 
         private static async Task<string?> SearchMemoryAsync(IKernel? kernel, string collection, string text)
@@ -723,7 +1175,7 @@ namespace Azure.AI.Details.Common.CLI
 
         public const string DefaultSystemPrompt = "You are an AI assistant that helps people find information regarding Azure AI.";
 
-        private const int _defaultMaxTokens = 800;
+        private const int _defaultMaxTokens = 0;
         private const float _defaultTemperature = 0.7f;
         private const float _defaultFrequencyPenalty = 0.0f;
         private const float _defaultPresencePenalty = 0.0f;

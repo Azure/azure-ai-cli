@@ -8,11 +8,41 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Text;
+using Azure.AI.Details.Common.CLI.ConsoleGui;
 
 namespace Azure.AI.Details.Common.CLI
 {
     public static class ConsoleHelpers
     {
+        public static string ReadLineOrDefault(string defaultOnEmpty = "", string defaultOnEndOfRedirectedInput = null)
+        {
+            if (Console.IsInputRedirected)
+            {
+                var line = Console.ReadLine();
+                line ??= defaultOnEndOfRedirectedInput;
+                if (line != null) Console.WriteLine(line);
+                return line;
+            }
+
+            Screen.Current.MakeSpaceAtCursor(0, 1);
+
+            var saved = new Cursor();
+            saved.Save();
+
+            while (true)
+            {
+                var line = Console.ReadLine();
+                if (line == null) // Ctrl+C
+                {
+                    saved.Restore();
+                    Screen.Current.ClearLineRight();
+                    continue;
+                }
+
+                return string.IsNullOrEmpty(line) ? defaultOnEmpty : line;
+            }
+        }
+
         public static string ReadAllStandardInputText()
         {
             if (stdinText == null)

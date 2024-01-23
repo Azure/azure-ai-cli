@@ -2,12 +2,11 @@ import argparse
 import json
 import time
 from datetime import datetime, timedelta
-from azure.ai.generative import AIClient
-from azure.ai.generative.entities import Connection
-from azure.ai.ml.entities._credentials import ApiKeyConfiguration
-from azure.identity import DefaultAzureCredential
 
 def get_api_key_connection(subscription_id, resource_group_name, project_name, connection_name):
+
+    from azure.identity import DefaultAzureCredential
+    from azure.ai.resources.client import AIClient
 
     client = AIClient(
         credential=DefaultAzureCredential(),
@@ -43,27 +42,20 @@ def main():
     project_name = args.project_name
     connection_name = args.connection_name
 
-    timeout_seconds = 10
+    connection = get_api_key_connection(subscription_id, resource_group_name, project_name, connection_name)
+    formatted = json.dumps({"connection": connection}, indent=2)
 
-    start_time = datetime.now()
-    timeout = timedelta(seconds=timeout_seconds)
-    success = False
-
-    while datetime.now() - start_time < timeout:
-        try:
-            connection = get_api_key_connection(subscription_id, resource_group_name, project_name, connection_name)
-            if connection is not None:
-                success = True
-                break
-        except Exception as e:
-            print("An error occurred:", str(e))
-        
-        time.sleep(1)  # Wait for 1 second before the next attempt
-    
-    if success:
-        formatted = json.dumps({"connection": connection}, indent=2)
-        print("---")
-        print(formatted)
+    print("---")
+    print(formatted)
 
 if __name__ == "__main__":
-    main()
+    try:
+        main()
+    except Exception as e:
+        import sys
+        import traceback
+        print("MESSAGE: " + str(sys.exc_info()[1]), file=sys.stderr)
+        print("EXCEPTION: " + str(sys.exc_info()[0]), file=sys.stderr)
+        print("TRACEBACK: " + "".join(traceback.format_tb(sys.exc_info()[2])), file=sys.stderr)
+        sys.exit(1)
+

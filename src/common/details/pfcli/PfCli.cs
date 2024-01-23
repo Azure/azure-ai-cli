@@ -15,257 +15,191 @@ namespace Azure.AI.Details.Common.CLI
 {
     public class PfCli
     {
-        public static async Task<ProcessResponse<string>> FlowInit(string flowPath, string entryFile = null, string functionName = null, string promptTemplate = null, string type = null, bool yes = false)
+        public static async Task<ProcessOutput> FlowInit(string flowPath, string entryFile = null, string functionName = null, string promptTemplate = null, string type = null, bool yes = false)
         {
             var cmdPart = "flow init";
-            var flowPart = $"--flow {flowPath}";
-            var entryPart = string.IsNullOrEmpty(entryFile) ? "" : $"--entry {entryFile}";
-            var functionPart = string.IsNullOrEmpty(functionName) ? "" : $"--function {functionName}";
-            var promptPart = string.IsNullOrEmpty(promptTemplate) ? "" : $"--prompt-template {promptTemplate}";
-            var typePart = string.IsNullOrEmpty(type) ? "" : $"--type {type}";
-            var yesPart = yes ? "--yes" : "";
+            var argsPart = CliHelpers.BuildCliArgs(
+                "--flow", flowPath,
+                "--entry", entryFile,
+                "--function", functionName,
+                "--prompt-template", promptTemplate,
+                "--type", type) +
+                (yes ? " --yes" : "");
 
-            var process = await ProcessHelpers.ParseShellCommandJson<JObject>("pf", $"{cmdPart} {flowPart} {entryPart} {functionPart} {promptPart} {typePart} {yesPart}");
-
-            var x = new ProcessResponse<string>();
-            x.StdOutput = process.StdOutput;
-            x.StdError = process.StdError;
-
-            x.Payload = process.StdOutput;
-
-            return x;
+            return await ProcessHelpers.RunShellCommandAsync("pf", $"{cmdPart} {argsPart}", null, StdOutputHandler(), StandardErrorHandler());
         }
 
-        public static async Task<ProcessResponse<string>> FlowTest(string flowPath, string inputs, string node, string variant, bool debug, bool interactive, bool verbose)
+        public static async Task<ProcessOutput> FlowTest(string flowPath, string inputs, string node = null, string variant = null, bool debug = false, bool interactive = false, bool verbose = false)
         {
             var cmdPart = "flow test";
-            var flowPart = $"--flow {flowPath}";
-            var inputsPart = string.IsNullOrEmpty(inputs) ? "" : $"--inputs {inputs}";
-            var nodePart = string.IsNullOrEmpty(node) ? "" : $"--node {node}";
-            var variantPart = string.IsNullOrEmpty(variant) ? "" : $"--variant {variant}";
-            var debugPart = debug ? "--debug" : "";
-            var interactivePart = interactive ? "--interactive" : "";
-            var verbosePart = verbose ? "--verbose" : "";
+            var argsPart = CliHelpers.BuildCliArgs(
+                "--config", "connection.provider=azureml",
+                "--flow", flowPath,
+                "--inputs", inputs,
+                "--node", node,
+                "--variant", variant) +
+                (debug ? " --debug" : "") +
+                (interactive ? " --interactive" : "") +
+                (verbose ? " --verbose" : "");
 
-            var process = await ProcessHelpers.ParseShellCommandJson<JObject>("pf", $"{cmdPart} {flowPart} {inputsPart} {nodePart} {variantPart} {debugPart} {interactivePart} {verbosePart}");
-
-            var x = new ProcessResponse<string>();
-            x.StdOutput = process.StdOutput;
-            x.StdError = process.StdError;
-
-            x.Payload = process.StdOutput;
-
-            return x;
+            return await ProcessHelpers.RunShellCommandAsync("pf", $"{cmdPart} {argsPart}", null, StdOutputHandler(), StandardErrorHandler());
         }
 
-        public static async Task<ProcessResponse<string>> FlowBuild(string flowPath, string output, string format, string variant, bool verbose, bool debug)
+        public static Task FlowUpload(string subscription, string resourceGroup, string projectName, string flowName)
+        {
+            var cmdPart = "flow create";
+            var argsPart = CliHelpers.BuildCliArgs(
+                "--subscription", subscription,
+                "--resource-group", resourceGroup,
+                "--workspace-name", projectName,
+                "--flow", flowName);
+
+            return ProcessHelpers.RunShellCommandAsync("pfazure", $"{cmdPart} {argsPart} --set name={flowName} type=chat", null, StdOutputHandler(), StandardErrorHandler());
+        }
+
+        public static async Task<ProcessOutput> FlowBuild(string flowPath, string output, string format, string variant = null, bool verbose = false, bool debug = false)
         {
             var cmdPart = "flow build";
-            var flowPart = $"--source {flowPath}";
-            var outputPart = string.IsNullOrEmpty(output) ? "" : $"--output {output}";
-            var formatPart = string.IsNullOrEmpty(format) ? "" : $"--format {format}";
-            var variantPart = string.IsNullOrEmpty(variant) ? "" : $"--variant {variant}";
-            var verbosePart = verbose ? "--verbose" : "";
-            var debugPart = debug ? "--debug" : "";
+            var argsPart = CliHelpers.BuildCliArgs(
+                "--source", flowPath,
+                "--output", output,
+                "--format", format,
+                "--variant", variant) +
+                (verbose ? " --verbose" : "") +
+                (debug ? " --debug" : "");
 
-            var process = await ProcessHelpers.ParseShellCommandJson<JObject>("pf", $"{cmdPart} {flowPart} {outputPart} {formatPart} {variantPart} {verbosePart} {debugPart}");
-
-            var x = new ProcessResponse<string>();
-            x.StdOutput = process.StdOutput;
-            x.StdError = process.StdError;
-
-            x.Payload = flowPath;
-
-            return x;
+            return await ProcessHelpers.RunShellCommandAsync("pf", $"{cmdPart} {argsPart}", null, StdOutputHandler(), StandardErrorHandler());
         }
 
-        public static async Task<ProcessResponse<string>> FlowServe(string flowPath, string port, string host, string environmentVariables, bool verbose, bool debug)
+        public static async Task<ProcessOutput> FlowServe(string flowPath, string port = null, string host = null, string environmentVariables = null, bool verbose = false, bool debug = false)
         {
             var cmdPart = "flow serve";
-            var flowPart = $"--source {flowPath}";
-            var portPart = string.IsNullOrEmpty(port) ? "" : $"--port {port}";
-            var hostPart = string.IsNullOrEmpty(host) ? "" : $"--host {host}";
-            var environmentVariablesPart = string.IsNullOrEmpty(environmentVariables) ? "" : $"--environment-variables {environmentVariables}";
-            var verbosePart = verbose ? "--verbose" : "";
-            var debugPart = debug ? "--debug" : "";
+            var argsPart = CliHelpers.BuildCliArgs(
+                "--config", "connection.provider=azureml",
+                "--source", flowPath,
+                "--port", port,
+                "--host", host,
+                "--environment-variables", environmentVariables) +
+                (verbose ? " --verbose" : "") +
+                (debug ? " --debug" : "");
 
-            var process = await ProcessHelpers.ParseShellCommandJson<JObject>("pf", $"{cmdPart} {flowPart} {portPart} {hostPart} {environmentVariablesPart} {verbosePart} {debugPart}");
-
-            var x = new ProcessResponse<string>();
-            x.StdOutput = process.StdOutput;
-            x.StdError = process.StdError;
-
-            x.Payload = process.StdOutput;
-
-            return x;
+            return await ProcessHelpers.RunShellCommandAsync("pf", $"{cmdPart} {argsPart}", null, StdOutputHandler(), StandardErrorHandler());
         }
 
-        public static async Task<ProcessResponse<string>> RunCreate(string flowPath, string file, string flow, string data, string columnMapping, string run, string variant, bool stream, string environmentVariables, string connections, string set)
+        public static async Task<ProcessOutput> RunCreate(string flowPath, string file, string data, string columnMapping, string run, string variant, bool stream, string environmentVariables, string connections, string set)
         {
             var cmdPart = "run create";
-            var filePart = string.IsNullOrEmpty(file) ? "" : $"--file {file}";
-            var flowPart = string.IsNullOrEmpty(flow) ? "" : $"--flow {flow}";
-            var dataPart = string.IsNullOrEmpty(data) ? "" : $"--data {data}";
-            var columnMappingPart = string.IsNullOrEmpty(columnMapping) ? "" : $"--column-mapping {columnMapping}";
-            var runPart = string.IsNullOrEmpty(run) ? "" : $"--run {run}";
-            var variantPart = string.IsNullOrEmpty(variant) ? "" : $"--variant {variant}";
-            var streamPart = stream ? "--stream" : "";
-            var environmentVariablesPart = string.IsNullOrEmpty(environmentVariables) ? "" : $"--environment-variables {environmentVariables}";
-            var connectionsPart = string.IsNullOrEmpty(connections) ? "" : $"--connections {connections}";
-            var setPart = string.IsNullOrEmpty(set) ? "" : $"--set {set}";
+            var argsPart = CliHelpers.BuildCliArgs(
+                "--flow", flowPath,
+                "--file", file,
+                "--data", data,
+                "--column-mapping", columnMapping,
+                "--run", run,
+                "--variant", variant,
+                "--environment-variables", environmentVariables,
+                "--connections", connections,
+                "--set", set) +
+                (stream ? " --stream" : "");
 
-            var process = await ProcessHelpers.ParseShellCommandJson<JObject>("pf", $"{cmdPart} {filePart} {flowPart} {dataPart} {columnMappingPart} {runPart} {variantPart} {streamPart} {environmentVariablesPart} {connectionsPart} {setPart}");
-
-            var x = new ProcessResponse<string>();
-            x.StdOutput = process.StdOutput;
-            x.StdError = process.StdError;
-
-            x.Payload = process.StdOutput;
-
-            return x;
+            return await ProcessHelpers.RunShellCommandAsync("pf", $"{cmdPart} {argsPart}", null, StdOutputHandler(), StandardErrorHandler());
         }
 
-        public static async Task<ProcessResponse<string>> RunUpdate(string name, string set)
+        public static async Task<ProcessOutput> RunUpdate(string name, string set)
         {
             var cmdPart = "run update";
-            var namePart = string.IsNullOrEmpty(name) ? "" : $"--name {name}";
-            var setPart = string.IsNullOrEmpty(set) ? "" : $"--set {set}";
+            var argsPart = CliHelpers.BuildCliArgs(
+                "--name", name,
+                "--set", set);
 
-            var process = await ProcessHelpers.ParseShellCommandJson<JObject>("pf", $"{cmdPart} {namePart} {setPart}");
-
-            var x = new ProcessResponse<string>();
-            x.StdOutput = process.StdOutput;
-            x.StdError = process.StdError;
-
-            x.Payload = process.StdOutput;
-
-            return x;
+            return await ProcessHelpers.RunShellCommandAsync("pf", $"{cmdPart} {argsPart}", null, StdOutputHandler(), StandardErrorHandler());
         }
 
-        public static async Task<ProcessResponse<string>> RunStream(string name)
+        public static async Task<ProcessOutput> RunStream(string name)
         {
             var cmdPart = "run stream";
-            var namePart = string.IsNullOrEmpty(name) ? "" : $"--name {name}";
+            var argsPart = CliHelpers.BuildCliArgs("--name", name);
 
-            var process = await ProcessHelpers.ParseShellCommandJson<JObject>("pf", $"{cmdPart} {namePart}");
-
-            var x = new ProcessResponse<string>();
-            x.StdOutput = process.StdOutput;
-            x.StdError = process.StdError;
-
-            x.Payload = process.StdOutput;
-
-            return x;
+            return await ProcessHelpers.RunShellCommandAsync("pf", $"{cmdPart} {argsPart}", null, StdOutputHandler(), StandardErrorHandler());
         }
 
-        public static async Task<ProcessResponse<string>> RunList(bool allResults, bool archivedOnly, bool includeArchived, int maxResults)
+        public static async Task<ProcessOutput> RunList(bool allResults, bool archivedOnly, bool includeArchived, int maxResults)
         {
             var cmdPart = "run list";
-            var allResultsPart = allResults ? "--all-results" : "";
-            var archivedOnlyPart = archivedOnly ? "--archived-only" : "";
-            var includeArchivedPart = includeArchived ? "--include-archived" : "";
-            var maxResultsPart = maxResults > 0 ? $"--max-results {maxResults}" : "";
+            var argsPart = CliHelpers.BuildCliArgs(
+                "--max-results", maxResults.ToString()) +
+                (allResults ? " --all-results" : "") +
+                (archivedOnly ? " --archived-only" : "") +
+                (includeArchived ? " --include-archived" : "");
 
-            var process = await ProcessHelpers.ParseShellCommandJson<JObject>("pf", $"{cmdPart} {allResultsPart} {archivedOnlyPart} {includeArchivedPart} {maxResultsPart}");
-
-            var x = new ProcessResponse<string>();
-            x.StdOutput = process.StdOutput;
-            x.StdError = process.StdError;
-
-            x.Payload = process.StdOutput;
-
-            return x;
+            return await ProcessHelpers.RunShellCommandAsync("pf", $"{cmdPart} {argsPart}", null, StdOutputHandler(), StandardErrorHandler());
         }
 
-        public static async Task<ProcessResponse<string>> RunShow(string name)
+        public static async Task<ProcessOutput> RunShow(string name)
         {
             var cmdPart = "run show";
-            var namePart = string.IsNullOrEmpty(name) ? "" : $"--name {name}";
+            var argsPart = CliHelpers.BuildCliArgs("--name", name);
 
-            var process = await ProcessHelpers.ParseShellCommandJson<JObject>("pf", $"{cmdPart} {namePart}");
-
-            var x = new ProcessResponse<string>();
-            x.StdOutput = process.StdOutput;
-            x.StdError = process.StdError;
-
-            x.Payload = process.StdOutput;
-
-            return x;
+            return await ProcessHelpers.RunShellCommandAsync("pf", $"{cmdPart} {argsPart}", null, StdOutputHandler(), StandardErrorHandler());
         }
 
-        public static async Task<ProcessResponse<string>> RunShowDetails(string name)
+        public static async Task<ProcessOutput> RunShowDetails(string name)
         {
             var cmdPart = "run show-details";
-            var namePart = string.IsNullOrEmpty(name) ? "" : $"--name {name}";
+            var argsPart = CliHelpers.BuildCliArgs("--name", name);
 
-            var process = await ProcessHelpers.ParseShellCommandJson<JObject>("pf", $"{cmdPart} {namePart}");
-
-            var x = new ProcessResponse<string>();
-            x.StdOutput = process.StdOutput;
-            x.StdError = process.StdError;
-
-            x.Payload = process.StdOutput;
-
-            return x;
+            return await ProcessHelpers.RunShellCommandAsync("pf", $"{cmdPart} {argsPart}", null, StdOutputHandler(), StandardErrorHandler());
         }
 
-        public static async Task<ProcessResponse<string>> RunShowMetrics(string name)
+        public static async Task<ProcessOutput> RunShowMetrics(string name)
         {
             var cmdPart = "run show-metrics";
-            var namePart = string.IsNullOrEmpty(name) ? "" : $"--name {name}";
+            var argsPart = CliHelpers.BuildCliArgs("--name", name);
 
-            var process = await ProcessHelpers.ParseShellCommandJson<JObject>("pf", $"{cmdPart} {namePart}");
-
-            var x = new ProcessResponse<string>();
-            x.StdOutput = process.StdOutput;
-            x.StdError = process.StdError;
-
-            x.Payload = process.StdOutput;
-
-            return x;
+            return await ProcessHelpers.RunShellCommandAsync("pf", $"{cmdPart} {argsPart}", null, StdOutputHandler(), StandardErrorHandler());
         }
 
-        public static async Task<ProcessResponse<string>> RunVisualize(string names)
+        public static async Task<ProcessOutput> RunVisualize(string names)
         {
             var cmdPart = "run visualize";
-            var namesPart = string.IsNullOrEmpty(names) ? "" : $"--names {names}";
+            var argsPart = CliHelpers.BuildCliArgs("--names", names);
 
-            var process = await ProcessHelpers.ParseShellCommandJson<JObject>("pf", $"{cmdPart} {namesPart}");
-
-            var x = new ProcessResponse<string>();
-            x.StdOutput = process.StdOutput;
-            x.StdError = process.StdError;
-
-            x.Payload = process.StdError;
-
-            return x;
+            return await ProcessHelpers.RunShellCommandAsync("pf", $"{cmdPart} {argsPart}", null, StdOutputHandler(), StandardErrorHandler());
         }
 
-        public static async Task<ProcessResponse<string>> RunArchive(string name)
+        public static async Task<ProcessOutput> RunArchive(string name)
         {
             var cmdPart = "run archive";
-            var namePart = string.IsNullOrEmpty(name) ? "" : $"--name {name}";
+            var argsPart = CliHelpers.BuildCliArgs("--name", name);
 
-            var process = await ProcessHelpers.ParseShellCommandJson<JObject>("pf", $"{cmdPart} {namePart}");
-
-            var x = new ProcessResponse<string>();
-            x.StdOutput = process.StdOutput;
-            x.StdError = process.StdError;
-
-            return x;
+            return await ProcessHelpers.RunShellCommandAsync("pf", $"{cmdPart} {argsPart}", null, StdOutputHandler(), StandardErrorHandler());
         }
 
-        public static async Task<ProcessResponse<string>> RunRestore(string name)
+        public static async Task<ProcessOutput> RunRestore(string name)
         {
             var cmdPart = "run restore";
-            var namePart = string.IsNullOrEmpty(name) ? "" : $"--name {name}";
+            var argsPart = CliHelpers.BuildCliArgs("--name", name);
 
-            var process = await ProcessHelpers.ParseShellCommandJson<JObject>("pf", $"{cmdPart} {namePart}");
+            return await ProcessHelpers.RunShellCommandAsync("pf", $"{cmdPart} {argsPart}", null, StdOutputHandler(), StandardErrorHandler());
+        }
 
-            var x = new ProcessResponse<string>();
-            x.StdOutput = process.StdOutput;
-            x.StdError = process.StdError;
+        private static Action<string> StandardErrorHandler()
+        {
+            return x => Console.Error.WriteLine(RemapStrings(x));
+        }
 
+        private static Action<string> StdOutputHandler()
+        {
+            return x => Console.WriteLine(RemapStrings(x));
+        }
+
+        private static string RemapStrings(string x)
+        {
+            var check = "You can execute this command to test the flow, pf flow test";
+            if (x.StartsWith(check))
+            {
+                x = x.Replace(check, "You can execute this command to test the flow, ai flow invoke");
+                x = x.Replace(" --interactive", "");
+            }
             return x;
         }
     }

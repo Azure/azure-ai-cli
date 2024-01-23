@@ -13,13 +13,13 @@ In the future, you'll even be able to use the `AI` CLI to dynamically create cod
 
 You can install the Azure `AI` CLI locally on Linux, Mac, or Windows computers, or use it thru an internet browser or Docker container. 
 
-During this private preview, we recommend using the Azure `AI` CLI thru GitHub Codespaces. This will allow you to quickly get started without having to install anything locally.
+During this public preview, we recommend using the Azure `AI` CLI thru GitHub Codespaces. This will allow you to quickly get started without having to install anything locally.
 
 ### OPTION 1: GitHub Codespaces
 
 You can run the Azure `AI` CLI in a browser using GitHub Codespaces:
 
-[![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/Azure/aistudio-chat-demo?quickstart=1)
+[![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/Azure/azure-ai-cli?quickstart=1)
 
 </div><div class="content" id="content2">
 
@@ -28,29 +28,14 @@ You can run the Azure `AI` CLI in a browser using GitHub Codespaces:
 You can run the Azure `AI` CLI in a Docker container using VS Code Dev Containers:
 
 1. Follow the [installation instructions](https://code.visualstudio.com/docs/devcontainers/containers#_installation) for VS Code Dev Containers.
-2. Clone the [aistudio-chat-demo](https://github.com/Azure/aistudio-chat-demo) repository and open it with VS Code:
+2. Clone the [azure-ai-cli](https://github.com/Azure/azure-ai-cli) repository and open it with VS Code:
     ```
-    git clone https://github.com/azure/aistudio-chat-demo
-    code aistudio-chat-demo
+    git clone https://github.com/Azure/azure-ai-cli
+    code azure-ai-cli
     ```
 3. Click the button "Reopen in Dev Containers", if it does not appear open the command pallete (`Ctrl+Shift+P` on Windows/Linux, `Cmd+Shift+P` on Mac) and run the `Dev Containers: Reopen in Container` command
 
 </div><div class="content" id="content3">
-
-### OPTION 3: Install locally
-
-You can install the Azure `AI` CLI locally on Linux, Mac, or Windows computers:
-
-1. Install the [Azure CLI](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli)
-2. Install the [Generative AI SDK Packages](./use_azureai_sdk.md#install-the-generative-ai-sdk-packages)
-3. Install the [Azure AI CLI](https://csspeechstorage.blob.core.windows.net/drop/private/ai/Azure.AI.CLI.1.0.0-alpha12d.nupkg)
-    ```
-    wget https://csspeechstorage.blob.core.windows.net/drop/private/ai/Azure.AI.CLI.1.0.0-alpha12d.nupkg && \
-    dotnet tool install --global --add-source . Azure.AI.CLI --version 1.0.0-alpha12d && \
-    rm Azure.AI.CLI.1.0.0-alpha12d.nupkg
-    ```
-
-</div>
 
 ## **STEP 2**: Initialize resource connections and configuration w/ `ai init`
 
@@ -135,8 +120,8 @@ ai search index update --files "../../data/3-product-info/*.md" --index-name "pr
 AI - Azure AI CLI, Version 1.0.0
 Copyright (c) 2023 Microsoft Corporation. All Rights Reserved.
 
-This PRIVATE PREVIEW version may change at any time.
-See: https://aka.ms/azure-ai-cli-private-preview
+This PUBLIC PREVIEW version may change at any time.
+See: https://aka.ms/azure-ai-cli-public-preview
 
 SEARCH INDEX UPDATE
 
@@ -145,8 +130,8 @@ SEARCH INDEX UPDATE
 USAGE: ai index update [...]
 
   EMBEDDINGS
-    --embeddings-index-name NAME            (see: ai help search index embeddings name)
-    --embeddings-deployment DEPLOYMENT      (see: ai help search index embeddings deployment)
+    --embedding-index-name NAME             (see: ai help search index embedding name)
+    --embedding-deployment DEPLOYMENT       (see: ai help search index embedding deployment)
 
   ITEM
     --id ID                                 (see: ai help search index id)

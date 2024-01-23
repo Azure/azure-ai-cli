@@ -1,0 +1,2 @@
+  Helper functions are C# static methods that allow the LLM to perform
+  custom operations, such as retrieving data from a database or web service.

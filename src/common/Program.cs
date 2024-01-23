@@ -23,44 +23,16 @@ namespace Azure.AI.Details.Common.CLI
         {
             _data = data;
 
+            var screen = ConsoleGui.Screen.Current;
             Console.OutputEncoding = Encoding.UTF8;
             Console.CancelKeyPress += (s, e) =>
             {
-                ConsoleGui.Screen.Current.SetCursorVisible(true);
-                ConsoleGui.Screen.Current.ResetColors();
+                e.Cancel = true;
+                screen.SetCursorVisible(true);
+                screen.ResetColors();
                 Console.WriteLine("<ctrl-c> received... terminating ... ");
-                Process.GetCurrentProcess().Kill();
+                Environment.Exit(1);
             };
-
-            var tryPythonRunner = mainArgs.Any(x => x == "python");
-            if (tryPythonRunner)
-            {
-                DisplayBanner(new CommandValues());
-
-                var path = FileHelpers.FindFileInHelpPath($"help/include.python.script.function_call.py");
-                var script = FileHelpers.ReadAllHelpText(path, Encoding.UTF8);
-
-                var index = mainArgs.ToList().FindIndex(x => x == "--call-function");
-                if (index < 0 || index + 1 >= mainArgs.Length)
-                {
-                    ConsoleHelpers.WriteLineError("\nERROR: --call-function option not found!\n");
-                    return 1;
-                }
-                var function = mainArgs[index + 1];
-
-                (var exit, var output)= PythonRunner.RunScriptAsync(script, function).Result;
-                if (exit == 0)
-                {
-                    Console.WriteLine(output);
-                }
-                else
-                {
-                    ConsoleHelpers.WriteLineError("\nERROR: Python script failed!\n");
-                    Console.WriteLine("  " + output.Trim().Replace("\n", "\n  "));
-                }
-
-                return exit;
-            }
 
             ICommandValues values = new CommandValues();
             INamedValueTokens tokens = new CmdLineTokenSource(mainArgs, values);
@@ -78,6 +50,26 @@ namespace Azure.AI.Details.Common.CLI
                 Console.Write("Press ENTER to exit... ");
                 Console.ReadLine();
             }
+
+            var dumpArgs = string.Join(" ", mainArgs);
+            DebugDumpCommandLineArgs(dumpArgs);
+
+            if (OS.IsLinux()) Console.WriteLine();
+
+            AI.DBG_TRACE_INFO($"Command line was: {dumpArgs}");
+            AI.DBG_TRACE_INFO($"Exit code: {exitCode}");
+            return exitCode;
+        }
+
+        public static int RunInternal(params string[] mainArgs)
+        {
+            ICommandValues values = new CommandValues();
+            INamedValueTokens tokens = new CmdLineTokenSource(mainArgs, values);
+
+            var exitCode = ParseCommand(tokens, values);
+            if (exitCode != 0) return exitCode;
+
+            exitCode = RunCommand(values) ? 0 : 1;
 
             var dumpArgs = string.Join(" ", mainArgs);
             DebugDumpCommandLineArgs(dumpArgs);
@@ -151,8 +143,20 @@ namespace Azure.AI.Details.Common.CLI
             var sdkAssembly = Program.BindingAssemblySdkType?.Assembly;
             var sdkVersionAttribute = sdkAssembly?.GetCustomAttribute<AssemblyInformationalVersionAttribute>();
             var thisVersionAttribute = typeof(Program).Assembly?.GetCustomAttribute<AssemblyInformationalVersionAttribute>();
-            return sdkVersionAttribute?.InformationalVersion ??
+            var version = sdkVersionAttribute?.InformationalVersion ??
                 thisVersionAttribute?.InformationalVersion;
+
+            // When the version has a trailing +{commit-hash} we want to remove it
+            if (!string.IsNullOrEmpty(version))
+            {
+                var index = version.IndexOf('+');
+                if (index > 0)
+                {
+                    version = version.Substring(0, index);
+                }
+            }
+
+            return version;
         }
 
         private static void DisplayCommandHelp(INamedValueTokens tokens, INamedValues values)

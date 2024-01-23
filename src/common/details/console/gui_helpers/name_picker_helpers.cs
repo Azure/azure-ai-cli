@@ -13,15 +13,46 @@ namespace Azure.AI.Details.Common.CLI
 {
     public class NameGenHelper
     {
-        public static string GenerateName()
+        public static string GenerateName(string userName = null, int maxCch = 24)
         {
             EnsureLoaded();
 
-            var adjective = GetRandomElement(_adjectives);
-            var color = GetRandomElement(_colors);
-            var animal = GetRandomElement(_animals);
+            userName = userName ?? Environment.UserName;
+            userName = userName?.Trim().Replace("_", "-");
+            userName = userName?.Split(new[] { '@' }, StringSplitOptions.RemoveEmptyEntries).FirstOrDefault();
 
-            return $"{adjective}-{color}-{animal}";
+            var approaches = 8;
+            var maxTries = 1000;
+
+            for (int approach = 0; approach < approaches; approach++)
+            {
+                if (approach < approaches / 2 && string.IsNullOrEmpty(userName)) continue;
+
+                for (int i = 0; i < maxTries; i++)
+                {
+                    var animal = GetRandomElement(_animals);
+                    var color = GetRandomElement(_colors);
+                    var adjective = GetRandomElement(_adjectives);
+
+                    var name = approach switch
+                    {
+                        0 => $"{userName}-{adjective}-{color}-{animal}",
+                        1 => $"{userName}-{adjective}-{animal}",
+                        2 => $"{userName}-{color}-{animal}",
+                        3 => $"{userName}-{animal}",
+                        4 => $"{adjective}-{color}-{animal}",
+                        5 => $"{adjective}-{animal}",
+                        6 => $"{color}-{animal}",
+                        7 => $"{animal}",
+
+                        _ => throw new ApplicationException($"Unexpected approach '{approach}'."),
+                    };
+
+                    if (name.Length <= maxCch) return name;
+                }
+            }
+
+            return Guid.NewGuid().ToString().Substring(0, maxCch);
         }
 
         private static void EnsureLoaded()
@@ -69,35 +100,66 @@ namespace Azure.AI.Details.Common.CLI
 
     public class NamePickerHelper
     {
-        public static string DemandPickOrEnterName(string namePrompt, string nameOutKind, string nameIn = null, string nameInKind = null)
+        public static string DemandPickOrEnterName(string namePrompt, string nameOutKind, string nameIn = null, string nameInKind = null, string userName = null, int maxCch = 32)
         {
-            var choices = GetNameChoices(nameIn, nameInKind, nameOutKind);
+            var choices = GetNameChoices(nameIn, nameInKind, nameOutKind, userName, maxCch);
             var usePicker = choices != null && choices.Count() > 1;
 
-            if (usePicker)
+            while (usePicker)
             {
+                choices.Insert(0, "(Regenerate choices)");
+
                 Console.Write(namePrompt);
-                var pick = ListBoxPicker.PickIndexOf(choices);
+                var pick = ListBoxPicker.PickIndexOf(choices.ToArray());
                 if (pick < 0) ThrowPromptNotAnsweredApplicationException();
 
                 Console.Write("\r");
 
-                var pickedUseCustomName = pick == choices.Length - 1;
+                if (pick == 0)
+                {
+                    choices = GetNameChoices(null, null, nameOutKind, userName, maxCch);
+                    continue;
+                }
+
+                var pickedUseCustomName = pick == choices.Count() - 1;
                 if (!pickedUseCustomName)
                 {
                     Console.WriteLine($"{namePrompt}{choices[pick]}");
                     return choices[pick];
                 }
+
+                break;
             }
 
-            return DemandAskPrompt(namePrompt);
+            while (true)
+            {
+                var name = DemandAskPrompt(namePrompt);
+                if (name.Length > maxCch)
+                {
+                    Console.WriteLine($"*** WARNING: Name is too long. Max length is {maxCch}.\n");
+                    continue;
+                }
+
+                if (name.Count(x => !char.IsLetterOrDigit(x) && x != '-') > 0)
+                {
+                    Console.WriteLine($"*** WARNING: Name contains invalid characters. Only letters, digits, and dashes are allowed.\n");
+                    continue;
+                }
+
+                return name;
+            }
         }
 
-        private static string[] GetNameChoices(string nameIn, string nameInKind, string nameOutKind)
+        private static List<string> GetNameChoices(string nameIn, string nameInKind, string nameOutKind, string userName, int maxCch)
         {
             var choices = new List<string>();
 
             var nameInOk = !string.IsNullOrEmpty(nameIn) && !string.IsNullOrEmpty(nameInKind);
+            if (nameInOk)
+            {
+                nameIn = nameIn.Trim().Replace("_", "-");
+            }
+
             if (nameInOk && nameIn.StartsWith($"{nameInKind}-"))
             {
                 var nameBase = nameIn.Substring(nameInKind.Length + 1);
@@ -122,9 +184,11 @@ namespace Azure.AI.Details.Common.CLI
                 choices.Add($"{nameOutKind}-{nameIn}");
             }
 
-            if (!nameInOk)
+            choices = choices.Where(x => x.Length <= maxCch).ToList();
+
+            if (!nameInOk || choices.Count() == 0)
             {
-                var name = NameGenHelper.GenerateName();
+                var name = NameGenHelper.GenerateName(userName, maxCch - 1 - nameOutKind.Length);
                 choices.Add($"{nameOutKind}-{name}");
                 choices.Add($"{name}-{nameOutKind}");
             }
@@ -132,7 +196,7 @@ namespace Azure.AI.Details.Common.CLI
             choices.Sort();
             choices.Add("(Enter custom name)");
 
-            return choices.ToArray();
+            return choices;
         }
 
         private static string DemandAskPrompt(string prompt, string value = null, bool useEditBox = false)
@@ -142,6 +206,7 @@ namespace Azure.AI.Details.Common.CLI
             {
                 ThrowPromptNotAnsweredApplicationException();
             }
+
             return answer;
         }
 

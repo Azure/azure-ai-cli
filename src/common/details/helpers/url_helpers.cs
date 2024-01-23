@@ -167,14 +167,14 @@ namespace Azure.AI.Details.Common.CLI
             if (atUrlsOk)
             {
                 var atUrlsFile = FileHelpers.GetOutputDataFileName(atUrls, values);
-                FileHelpers.WriteAllLines(atUrlsFile, urls, Encoding.UTF8);
+                FileHelpers.WriteAllLines(atUrlsFile, urls, new UTF8Encoding(false));
                 values.Reset(atUrlsName); // only write once
             }
 
             if (atIdsOk)
             {
                 var atIdsFile = FileHelpers.GetOutputDataFileName(atIds, values);
-                FileHelpers.WriteAllLines(atIdsFile, ids, Encoding.UTF8);
+                FileHelpers.WriteAllLines(atIdsFile, ids, new UTF8Encoding(false));
                 values.Reset(atIdsName);
             }
 

@@ -17,10 +17,47 @@ namespace Azure.AI.Details.Common.CLI
 {
     public class AiProgram
     {
-        static void Main(string[] args)
+        static int Main(string[] args)
         {
-            Program.Main(new AiProgramData(), args);
+            var debug = args.Length > 0 && args[0] == "debug";
+
+            if (debug) StartStopWatch();
+            var result = Program.Main(new AiProgramData(), args);
+            if (debug) StopStopWatch();
+
+            return result;
         }
+
+        static void StartStopWatch()
+        {
+            Console.WriteLine($"StopWatch: Started at {DateTime.Now}");
+            _stopwatch = new Stopwatch();
+            _stopwatch.Start();
+        }
+
+        static void StopStopWatch()
+        {
+            _stopwatch.Stop();
+            Console.WriteLine($"StopWatch: Stopped at {DateTime.Now} ({GetStopWatchElapsedAsString()})");
+        }
+
+        static string GetStopWatchElapsedAsString()
+        {
+            var elapsed = _stopwatch.Elapsed;
+            var elapsedMilliseconds = elapsed.TotalMilliseconds;
+            var elapsedSeconds = elapsed.TotalSeconds;
+            var elapsedMinutes = elapsed.TotalMinutes;
+            var elapsedHours = elapsed.TotalHours;
+
+            var elapsedString = elapsedSeconds < 1 ? $"{elapsedMilliseconds} ms"
+                              : elapsedMinutes < 1 ? $"{elapsedSeconds:0.00} sec"
+                              : elapsedHours < 1 ? $"{elapsedMinutes:0.00} min"
+                              : $"{elapsedHours:0.00} hr";
+
+            return elapsedString;
+        }
+
+        static Stopwatch _stopwatch = null;
     }
 
     public class AiProgramData : IProgramData
@@ -28,7 +65,7 @@ namespace Azure.AI.Details.Common.CLI
         #region name data
         public string Name => "ai";
         public string DisplayName => "Azure AI CLI";
-        public string WarningBanner => "`#e_;This PRIVATE PREVIEW version may change at any time.\nSee: https://aka.ms/azure-ai-cli-private-preview";
+        public string WarningBanner => "`#e_;This PUBLIC PREVIEW version may change at any time.\nSee: https://aka.ms/azure-ai-cli-public-preview";
         public string TelemetryUserAgent => "ai-cli 0.0.1";
         #endregion
 
@@ -40,7 +77,7 @@ namespace Azure.AI.Details.Common.CLI
         #endregion
 
         #region init command data
-        public string SERVICE_RESOURCE_DISPLAY_NAME_ALL_CAPS => "OPEN AI RESOURCE";
+        public string SERVICE_RESOURCE_DISPLAY_NAME_ALL_CAPS => "AZURE OPENAI RESOURCE";
         public string CognitiveServiceResourceKind => "OpenAI";
         public string CognitiveServiceResourceSku => "s0";
         public bool InitConfigsEndpoint => true;
@@ -48,11 +85,11 @@ namespace Azure.AI.Details.Common.CLI
         #endregion
 
         #region help command data
-        public string HelpCommandTokens => "wizard;dev;init;config;chat;speech;vision;language;search;service;tool;samples;code;eval;run";
+        public string HelpCommandTokens => "wizard;dev;init;config;chat;flow;speech;vision;language;search;service;tool;samples;code;eval;run";
         #endregion
 
         #region config command data
-        public string ConfigScopeTokens => $"wizard;dev;init;chat;speech;vision;language;search;service;tool;samples;code;eval;run;*";
+        public string ConfigScopeTokens => $"wizard;dev;init;chat;flow;speech;vision;language;search;service;tool;samples;code;eval;run;*";
         #endregion
 
         #region zip option data
@@ -63,6 +100,8 @@ namespace Azure.AI.Details.Common.CLI
             "Azure.Core.dll",
             "Azure.Identity.dll",
             "Azure.AI.CLI.Common.dll",
+            "Azure.AI.CLI.Extensions.HelperFunctions.dll",
+            "Azure.AI.CLI.Extensions.Templates.dll",
             "Azure.AI.OpenAI.dll",
             "Azure.Core.dll",
             "Azure.Search.Documents.dll",
@@ -104,6 +143,7 @@ namespace Azure.AI.Details.Common.CLI
             return root switch {
                 "init" => (new InitCommand(values)).RunCommand(),
                 "chat" => (new ChatCommand(values)).RunCommand(),
+                "flow" => (new FlowCommand(values)).RunCommand(),
                 "speech" => (new SpeechCommand(values)).RunCommand(),
                 "vision" => (new VisionCommand(values)).RunCommand(),
                 "language" => (new LanguageCommand(values)).RunCommand(),
@@ -131,6 +171,7 @@ namespace Azure.AI.Details.Common.CLI
                 "init" => InitCommandParser.ParseCommand(tokens, values),
                 "config" => ConfigCommandParser.ParseCommand(tokens, values),
                 "chat" => ChatCommandParser.ParseCommand(tokens, values),
+                "flow" => FlowCommandParser.ParseCommand(tokens, values),
                 "eval" => EvalCommandParser.ParseCommand(tokens, values),
                 "speech" => SpeechCommandParser.ParseCommand(tokens, values),
                 "vision" => VisionCommandParser.ParseCommand(tokens, values),
@@ -155,6 +196,7 @@ namespace Azure.AI.Details.Common.CLI
                 "init" => InitCommandParser.ParseCommandValues(tokens, values),
                 "config" => ConfigCommandParser.ParseCommandValues(tokens, values),
                 "chat" => ChatCommandParser.ParseCommandValues(tokens, values),
+                "flow" => FlowCommandParser.ParseCommandValues(tokens, values),
                 "eval" => EvalCommandParser.ParseCommandValues(tokens, values),
                 "speech" => SpeechCommandParser.ParseCommandValues(tokens, values),
                 "vision" => VisionCommandParser.ParseCommandValues(tokens, values),
@@ -174,7 +216,22 @@ namespace Azure.AI.Details.Common.CLI
 
         public bool DisplayKnownErrors(ICommandValues values, Exception ex)
         {
-            if (ex.Message.Contains("refresh token") && ex.Message.Contains("expired"))
+            var message = ex.Message;
+
+            if (message.Contains("az login"))
+            {
+                ErrorHelpers.WriteLineMessage(
+                       "ERROR:", $"Azure CLI credential not found.",
+                                 "",
+                         "TRY:", $"az login",
+                                 "",
+                         "SEE:", "https://docs.microsoft.com/cli/azure/authenticate-azure-cli");
+
+                values.Reset("x.verbose", "false");
+                return true;
+            }
+
+            if (message.Contains("refresh token") && message.Contains("expired"))
             {
                 ErrorHelpers.WriteLineMessage(
                        "ERROR:", $"Refresh token expired.",

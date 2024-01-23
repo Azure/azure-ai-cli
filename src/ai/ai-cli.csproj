@@ -19,10 +19,12 @@
     <PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
     <Authors>Microsoft</Authors>
-    <Description>Azure AI CLI (AI) is a command line tool for using the Azure AI service without writing any code. See https://docs.microsoft.com/azure/ai for more information.</Description>
+    <Title>Azuure.AI.CLI</Title>
+    <Description>Azure AI CLI (AI) is a command line tool for using the Azure AI service without writing any code. See https://learn.microsoft.com/azure/ai-studio/how-to/cli-install for more information.</Description>
     <Copyright>© Microsoft Corporation. All rights reserved.</Copyright>
-    <PackageProjectUrl>https://docs.microsoft.com/azure/ai</PackageProjectUrl>
+    <PackageProjectUrl>https://learn.microsoft.com/azure/ai-studio/how-to/cli-install</PackageProjectUrl>
     <PackageTags>Azure AI; AI CLI; azureofficial</PackageTags>
+    <SuppressTfmSupportBuildWarnings>true</SuppressTfmSupportBuildWarnings>
   </PropertyGroup>
 
   <PropertyGroup>
@@ -66,9 +68,32 @@
     </When>
   </Choose>
 
+  <Target Name="CreateOriginalDotXfileNames" BeforeTargets="PrepareForBuild">
+    <ItemGroup>
+      <DotXfiles Include=".x\**" />
+      <OriginalFileNames Include="@(DotXfiles)">
+        <ResourceName>.ai\%(RecursiveDir)%(Filename)%(Extension)</ResourceName>
+      </OriginalFileNames>
+    </ItemGroup>
+    <WriteLinesToFile File="$(IntermediateOutputPath)OriginalDotXfileNames.txt" Lines="@(OriginalFileNames -> '%(ResourceName)')" Overwrite="true" />
+  </Target>
+
+  <ItemGroup>
+    <EmbeddedResource Include="$(IntermediateOutputPath)OriginalDotXfileNames.txt">
+      <LogicalName>Azure.AI.Details.Common.CLI.resources..ai.internal.OriginalDotXfileNames.txt</LogicalName>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
+  </ItemGroup>
+
   <ItemGroup>
     <EmbeddedResource Include=".x\help\**">
       <Link>resources\.ai\help\%(RecursiveDir)%(Filename)%(Extension)</Link>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include=".x\templates\**">
+      <Link>resources\.ai\templates\%(RecursiveDir)%(Filename)%(Extension)</Link>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </EmbeddedResource>
   </ItemGroup>
@@ -80,24 +105,24 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Azure.Core" Version="1.34.0" />
+    <PackageReference Include="Azure.Core" Version="1.36.0" />
+    <PackageReference Include="Azure.Identity" Version="1.10.4" />
+    <PackageReference Include="Azure.Search.Documents" Version="11.5.0-beta.5" />
+    <PackageReference Include="Azure.Storage.Blobs" Version="12.19.1" />
     <PackageReference Include="JmesPath.Net" Version="1.0.308" />
-    <PackageReference Include="Microsoft.CognitiveServices.Speech" Version="1.32.1" />
+    <PackageReference Include="Microsoft.CognitiveServices.Speech" Version="1.33.0" />
     <PackageReference Include="Microsoft.SemanticKernel" Version="0.18.230725.3-preview" />
     <PackageReference Include="Microsoft.SemanticKernel.Connectors.Memory.AzureCognitiveSearch" Version="0.18.230725.3-preview" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
     <PackageReference Include="System.Interactive.Async" Version="6.0.1" />
+    <PackageReference Include="Azure.AI.OpenAI" Version="1.0.0-beta.12" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\common\common.csproj" />
+    <ProjectReference Include="..\extensions\helper_functions_extension\helper_functions_extension.csproj" />
+    <ProjectReference Include="..\extensions\template_extension\template_extension.csproj" />
   </ItemGroup>
-
-  <!-- <ItemGroup>
-    <ProjectReference Include="..\..\..\..\..\semantic-kernel\dotnet\src\Connectors\Connectors.AI.OpenAI\Connectors.AI.OpenAI.csproj" />
-    <ProjectReference Include="..\..\..\..\..\semantic-kernel\dotnet\src\Connectors\Connectors.Memory.AzureCognitiveSearch\Connectors.Memory.AzureCognitiveSearch.csproj" />
-    <ProjectReference Include="..\..\..\..\..\semantic-kernel\dotnet\src\SemanticKernel\SemanticKernel.csproj" />
-  </ItemGroup> -->
 
   <Import Project="BuildCommon.targets" />
 

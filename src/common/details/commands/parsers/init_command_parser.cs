@@ -21,18 +21,19 @@ namespace Azure.AI.Details.Common.CLI
         }
 
         private static readonly (string name, bool valuesRequired)[] _commands =  {
+            ("init.aiservices", false),
+            ("init.cognitiveservices", false),
             ("init.openai", false),
             ("init.search", false),
+            ("init.speech", false),
+            ("init.project.new", false),
+            ("init.project.select", false),
             ("init.project", false),
             ("init.resource", false),
             ("init", false)
         };
 
         private static readonly string[] _partialCommands = {
-            "init.openai",
-            "init.search",
-            "init.project",
-            "init.resource",
             "init"
         };
 
@@ -41,9 +42,14 @@ namespace Azure.AI.Details.Common.CLI
             var commandName = values.GetCommand();
             switch (commandName)
             {
+                case "init.aiservices":
+                case "init.cognitiveservices":
                 case "init.openai":
                 case "init.search":
+                case "init.speech":
                 case "init.project":
+                case "init.project.new":
+                case "init.project.select":
                 case "init.resource":
 
                 case "init":

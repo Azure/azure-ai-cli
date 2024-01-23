@@ -34,6 +34,18 @@ fi
 
 # Check if dotnet 7.0 is installed
 if ! command -v dotnet &> /dev/null; then
+  echo "dotnet is not installed."
+  dotnet_version=0
+else
+  dotnet_version=$(dotnet --version | cut -d. -f1)
+fi
+
+if [ "$dotnet_version" -eq "7" ]; then
+    dotnet_version=$(dotnet --version)
+    echo "dotnet $dotnet_version is already installed."
+else
+    echo "Installing dotnet 7.0..."
+
     # Update the package list
     sudo apt-get update
 
@@ -111,14 +123,14 @@ fi
 echo "Installing Azure.AI.CLI..."
 
 if [ "$EUID" -ne 0 ]; then # if we're not root
-    dotnet tool install --global --add-source . Azure.AI.CLI --version ${AICLI_VERSION}
+    dotnet tool update --global --add-source . Azure.AI.CLI --version ${AICLI_VERSION}
     DOTNET_TOOLS_PATH="$HOME/.dotnet/tools"
 elif [ -n "$SUDO_USER" ]; then # if we're root and SUDO_USER is set, run as SUDO_USER
-    sudo -u $SUDO_USER dotnet tool install --global --add-source . Azure.AI.CLI --version ${AICLI_VERSION}
+    sudo -u $SUDO_USER dotnet tool update --global --add-source . Azure.AI.CLI --version ${AICLI_VERSION}
     DOTNET_TOOLS_PATH="/home/$SUDO_USER/.dotnet/tools"
-else # if we're root and SUDO_USER is not set, we can't proceed
-    echo "Cannot determine the user to install the Azure.AI.CLI dotnet tool for."
-    exit 1
+else # if we're root and SUDO_USER is not set, use /root as the home directory
+    dotnet tool update --global --add-source . Azure.AI.CLI --version ${AICLI_VERSION}
+    DOTNET_TOOLS_PATH="/root/.dotnet/tools"
 fi
 
 # Check if the installation was successful
@@ -136,9 +148,9 @@ fi
 # Add the .NET tools directory to the PATH
 echo ""
 echo "Adding $DOTNET_TOOLS_PATH to PATH..."
-export PATH="$DOTNET_TOOLS_PATH:$PATH"                               # For current shell
-echo "export PATH=\"$DOTNET_TOOLS_PATH:\$PATH\"" >> "$HOME/.bashrc"  # For bash
-echo "export PATH=\"$DOTNET_TOOLS_PATH:\$PATH\"" >> "$HOME/.zshrc"   # For zsh (if using)
+export PATH="$DOTNET_TOOLS_PATH:$PATH"                                           # For current shell
+echo "export PATH=\"$DOTNET_TOOLS_PATH:\$PATH\"" >> "$HOME/.bashrc"              # For bash
+echo "export PATH=\"$DOTNET_TOOLS_PATH:\$PATH\"" >> "${ZDOTDIR:-$HOME}/.zshrc"   # For zsh (if using)
 echo ""
 echo "Don't forget to source your shell's rc file, for example:"
 echo ""

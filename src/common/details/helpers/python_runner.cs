@@ -15,25 +15,25 @@ namespace Azure.AI.Details.Common.CLI
 {
     public class PythonRunner
     {
-        public static async Task<(int, string)> RunScriptAsync(string script, string args = null)
+        public static async Task<ProcessOutput> RunPythonScriptAsync(string script, string args = null, Dictionary<string, string> addToEnvironment = null, Action<string> stdOutHandler = null, Action<string> stdErrHandler = null, Action<string> mergedOutputHandler = null)
         {
             EnsureFindPython();
             if (_pythonBinary == null)
             {
                 ConsoleHelpers.WriteLineError("*** Please install Python 3.10 or above ***");
                 Console.Write("\nNOTE: If it's already installed ensure it's in the system PATH and working (try: `python --version`)\n");
-                return (-1, null);
+                return new ProcessOutput() { ExitCode = -1 };
             }
 
             var tempFile = Path.GetTempFileName() + ".py";
-            File.WriteAllText(tempFile, script);
+            FileHelpers.WriteAllText(tempFile, script, new UTF8Encoding(false));
 
             try
             {
                 args = args != null
                     ? $"\"{tempFile}\" {args}"
                     : $"\"{tempFile}\"";
-                return await ProcessHelpers.RunShellCommandAsync(_pythonBinary, args);
+                return await ProcessHelpers.RunShellCommandAsync(_pythonBinary, args, addToEnvironment, stdOutHandler, stdErrHandler, mergedOutputHandler);
             }
             finally
             {
@@ -41,71 +41,127 @@ namespace Azure.AI.Details.Common.CLI
             }
         }
 
-        public static string RunEmbeddedPythonScript(INamedValues values, string scriptName, params string[] args)
+        public static string RunEmbeddedPythonScript(ICommandValues values, string scriptName, string scriptArgs = null, Dictionary<string, string> addToEnvironment = null, Action<string> stdOutHandler = null, Action<string> stdErrHandler = null, Action<string> mergedOutputHandler = null)
         {
             var path = FileHelpers.FindFileInHelpPath($"help/include.python.script.{scriptName}.py");
             var script = FileHelpers.ReadAllHelpText(path, Encoding.UTF8);
-            var scriptArgs = BuildPythonScriptArgs(args);
 
-            if (Program.Debug) Console.WriteLine($"DEBUG: {scriptName}.py:\n{script}");
-            if (Program.Debug) Console.WriteLine($"DEBUG: PythonRunner.RunScriptAsync: '{scriptName}' {scriptArgs}");
+            if (Program.Debug)
+            {
+                Console.WriteLine($"DEBUG: {scriptName}.py:\n{script}");
+                Console.WriteLine($"DEBUG: PythonRunner.RunEmbeddedPythonScript: '{scriptName}' {scriptArgs}");
+
+                var verbose = values.GetOrDefault("x.verbose", "false") != "false";
+                if (verbose)
+                {
+                    var file = $"{scriptName}.py";
+                    FileHelpers.WriteAllText(file, script, Encoding.UTF8);
+                    ConsoleHelpers.WriteLineWithHighlight($"DEBUG: `{file} {scriptArgs}`");
+                }
+            }
 
             var dbgOut = script.Replace("\n", "\\n").Replace("\r", "");
             AI.DBG_TRACE_VERBOSE($"RunEmbeddedPythonScript: {scriptName}.py: {dbgOut}");
             AI.DBG_TRACE_VERBOSE($"RunEmbeddedPythonScript: '{scriptName}' {scriptArgs}");
 
-            (var exit, var output)= PythonRunner.RunScriptAsync(script, scriptArgs).Result;
-            if (exit != 0) AI.DBG_TRACE_WARNING($"RunEmbeddedPythonScript: exit={exit}");
-
-            dbgOut = output.Replace("\n", "\\n").Replace("\r", "");
-            AI.DBG_TRACE_INFO($"RunEmbeddedPythonScript: exit={exit}; output:{dbgOut}");
-            if (Program.Debug) Console.WriteLine($"DEBUG: RunEmbeddedPythonScript: exit={exit}; output=\n<---start--->{output}\n<---stop--->");
+            var process = PythonRunner.RunPythonScriptAsync(script, scriptArgs, addToEnvironment, stdOutHandler, stdErrHandler, mergedOutputHandler).Result;
+            var output = process.MergedOutput;
+            var exit = process.ExitCode;
 
             if (exit != 0)
             {
+                AI.DBG_TRACE_WARNING($"RunEmbeddedPythonScript: exit={exit}");
+
                 output = output.Trim('\r', '\n', ' ');
                 output = "\n\n    " + output.Replace("\n", "\n    ");
 
                 var info = new List<string>();
 
-                if (output.Contains("azure.identity"))
+                if (output.Contains("MESSAGE:") && output.Contains("EXCEPTION:") && output.Contains("TRACEBACK:"))
                 {
-                    info.Add("WARNING:");
-                    info.Add("azure-identity Python wheel not found!");
-                    info.Add("");
-                    info.Add("TRY:");
-                    info.Add("pip install azure-identity");
-                    info.Add("SEE:");
-                    info.Add("https://pypi.org/project/azure-identity/");
-                    info.Add("");
-                }
-                else if (output.Contains("azure.mgmt.resource"))
-                {
-                    info.Add("WARNING:");
-                    info.Add("azure-mgmt-resource Python wheel not found!");
-                    info.Add("");
-                    info.Add("TRY:");
-                    info.Add("pip install azure-mgmt-resource");
-                    info.Add("SEE:");
-                    info.Add("https://pypi.org/project/azure-mgmt-resource/");
-                    info.Add("");
-                }
-                else if (output.Contains("azure.ai.ml"))
-                {
-                    info.Add("WARNING:");
-                    info.Add("azure-ai-ml Python wheel not found!");
-                    info.Add("");
-                    info.Add("TRY:");
-                    info.Add("pip install azure-ai-ml");
-                    info.Add("SEE:");
-                    info.Add("https://pypi.org/project/azure-ai-ml/");
-                    info.Add("");
-                }
-                else if (output.Contains("ModuleNotFoundError"))
-                {
-                    info.Add("WARNING:");
-                    info.Add("Python wheel not found!");
-                    info.Add("");
+                    var messageLine = process.StdError.Split(new[] { '\r', '\n' }).FirstOrDefault(x => x.StartsWith("MESSAGE:"));
+                    var message = messageLine.Substring("MESSAGE:".Length).Trim();
+                    FileHelpers.LogException(values, new PythonScriptException(output, exit));
+
+                    if (output.Contains("az login"))
+                    {
+                        values.AddThrowError(
+                            "WARNING:", "Azure CLI credential not found!",
+                                        "",
+                                "TRY:", "az login",
+                                "OR:", "az login --use-device-code",
+                                        "",
+                                "SEE:", "https://docs.microsoft.com/cli/azure/authenticate-azure-cli");
+                    }
+                    else if (output.Contains("azure.ai.resources"))
+                    {
+                        info.Add("WARNING:");
+                        info.Add("azure-ai-resources Python wheel not found!");
+                        info.Add("");
+                        info.Add("TRY:");
+                        info.Add("pip install azure-ai-resources");
+                        info.Add("SEE:");
+                        info.Add("https://pypi.org/project/azure-ai-resources/");
+                        info.Add("");
+                    }
+                    else if (output.Contains("azure.ai.generative"))
+                    {
+                        info.Add("WARNING:");
+                        info.Add("azure-ai-resources Python wheel not found!");
+                        info.Add("");
+                        info.Add("TRY:");
+                        info.Add("pip install azure-ai-generative");
+                        info.Add("SEE:");
+                        info.Add("https://pypi.org/project/azure-ai-generative/");
+                        info.Add("");
+                    }
+                    else if (output.Contains("azure.identity"))
+                    {
+                        info.Add("WARNING:");
+                        info.Add("azure-identity Python wheel not found!");
+                        info.Add("");
+                        info.Add("TRY:");
+                        info.Add("pip install azure-identity");
+                        info.Add("SEE:");
+                        info.Add("https://pypi.org/project/azure-identity/");
+                        info.Add("");
+                    }
+                    else if (output.Contains("azure.mgmt.resource"))
+                    {
+                        info.Add("WARNING:");
+                        info.Add("azure-mgmt-resource Python wheel not found!");
+                        info.Add("");
+                        info.Add("TRY:");
+                        info.Add("pip install azure-mgmt-resource");
+                        info.Add("SEE:");
+                        info.Add("https://pypi.org/project/azure-mgmt-resource/");
+                        info.Add("");
+                    }
+                    else if (output.Contains("azure.ai.ml"))
+                    {
+                        info.Add("WARNING:");
+                        info.Add("azure-ai-ml Python wheel not found!");
+                        info.Add("");
+                        info.Add("TRY:");
+                        info.Add("pip install azure-ai-ml");
+                        info.Add("SEE:");
+                        info.Add("https://pypi.org/project/azure-ai-ml/");
+                        info.Add("");
+                    }
+                    else if (output.Contains("ModuleNotFoundError"))
+                    {
+                        info.Add("WARNING:");
+                        info.Add("Python wheel not found!");
+                        info.Add("");
+                    }
+                    else
+                    {
+                        info.Add("WARNING:");
+                        info.Add("Unhandled exception in Python script!");
+                        info.Add("");
+                    }
+
+                    output = message;
                 }
 
                 info.Add("ERROR:");
@@ -118,34 +174,6 @@ namespace Azure.AI.Details.Common.CLI
             }
 
             return ParseOutputAndSkipLinesUntilStartsWith(output, "---").Trim('\r', '\n', ' ');
-        }
-
-        private static string BuildPythonScriptArgs(params string[] args)
-        {
-            var sb = new StringBuilder();
-            for (int i = 0; i + 1 < args.Length; i += 2)
-            {
-                var argName = args[i];
-                var argValue = args[i + 1];
-
-                if (string.IsNullOrWhiteSpace(argValue)) continue;
-
-                // if the argValue contains quotes or anything that needs to be "escaped" or enclosed in 
-                // double quotes so we can successfully execute on the command shell, do that here.
-
-                if (!argValue.Contains('\"') && !argValue.Contains('\'') && !argValue.Contains(' ') && !argValue.Contains('\t'))
-                {
-                    sb.Append($"{argName} {argValue}");
-                    sb.Append(' ');
-                    continue;
-                }
-
-                argValue = argValue.Replace("\"", "\\\"");
-
-                sb.Append($"{argName} \"{argValue}\"");
-                sb.Append(' ');
-            }
-            return sb.ToString().Trim();
         }
 
         private static string ParseOutputAndSkipLinesUntilStartsWith(string output, string startsWith)
@@ -172,21 +200,17 @@ namespace Azure.AI.Details.Common.CLI
             if (_pythonBinary == null)
             {
                 _pythonBinary = FindPython();
+                AI.DBG_TRACE_VERBOSE($"Python found: {_pythonBinary}");
             }
+
             return _pythonBinary;
         }
 
         private static string FindPython()
         {
-            (var code, var version) = ProcessHelpers.RunShellCommandAsync("python3", "--version").Result;
-            if (code == 0 && version.Contains("Python 3.")) return "python3";
-
-            (code, version) = ProcessHelpers.RunShellCommandAsync("python", "--version").Result;
-            if (code == 0 && version.Contains("Python 3.")) return "python";
-
             var lastTry = FindPythonBinaryInOsPath();
-            (code, version) = ProcessHelpers.RunShellCommandAsync("python", "--version").Result;
-            if (code == 0 && version.Contains("Python 3.")) return lastTry;
+            var process = ProcessHelpers.RunShellCommandAsync(lastTry, "--version").Result;
+            if (process.ExitCode == 0 && process.MergedOutput.Contains("Python 3.")) return lastTry;
 
             return null;
         }
@@ -197,21 +221,21 @@ namespace Azure.AI.Details.Common.CLI
                 ? "python.exe"
                 : "python3";
 
-            var lookIn = Environment.GetEnvironmentVariable("PATH")!.Split(System.IO.Path.PathSeparator);
-            var found = lookIn.SelectMany(x =>
-            {
-                try
-                {
-                    return System.IO.Directory.GetFiles(x, search);
-                }
-                catch (Exception)
-                {
-                    return Enumerable.Empty<string>();
-                }
-            });
-            return found.FirstOrDefault();
+            return FileHelpers.FindFileInOsPath(search);
         }
 
         private static string? _pythonBinary;
+    }
+
+    internal class PythonScriptException : Exception
+    {
+        private string output;
+        private int exit;
+
+        public PythonScriptException(string output, int exit) : base($"Python script failed! (exit code={exit})")
+        {
+            this.output = output;
+            this.exit = exit;
+        }
     }
 }
