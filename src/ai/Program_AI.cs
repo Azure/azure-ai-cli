@@ -17,10 +17,47 @@ namespace Azure.AI.Details.Common.CLI
 {
     public class AiProgram
     {
-        static void Main(string[] args)
+        static int Main(string[] args)
         {
-            Program.Main(new AiProgramData(), args);
+            var debug = args.Length > 0 && args[0] == "debug";
+
+            if (debug) StartStopWatch();
+            var result = Program.Main(new AiProgramData(), args);
+            if (debug) StopStopWatch();
+
+            return result;
         }
+
+        static void StartStopWatch()
+        {
+            Console.WriteLine($"StopWatch: Started at {DateTime.Now}");
+            _stopwatch = new Stopwatch();
+            _stopwatch.Start();
+        }
+
+        static void StopStopWatch()
+        {
+            _stopwatch.Stop();
+            Console.WriteLine($"StopWatch: Stopped at {DateTime.Now} ({GetStopWatchElapsedAsString()})");
+        }
+
+        static string GetStopWatchElapsedAsString()
+        {
+            var elapsed = _stopwatch.Elapsed;
+            var elapsedMilliseconds = elapsed.TotalMilliseconds;
+            var elapsedSeconds = elapsed.TotalSeconds;
+            var elapsedMinutes = elapsed.TotalMinutes;
+            var elapsedHours = elapsed.TotalHours;
+
+            var elapsedString = elapsedSeconds < 1 ? $"{elapsedMilliseconds} ms"
+                              : elapsedMinutes < 1 ? $"{elapsedSeconds:0.00} sec"
+                              : elapsedHours < 1 ? $"{elapsedMinutes:0.00} min"
+                              : $"{elapsedHours:0.00} hr";
+
+            return elapsedString;
+        }
+
+        static Stopwatch _stopwatch = null;
     }
 
     public class AiProgramData : IProgramData

@@ -1,8 +1,10 @@
 {
-  "_Name": "OpenAI Chat Completions (Streaming) in JavaScript",
+  "_LongName": "OpenAI Chat Completions (Streaming)",
+  "_ShortName": "openai-chat-streaming",
   "_Language": "JavaScript",
-  "OPENAI_ENDPOINT": "<insert your OpenAI endpoint here>",
-  "OPENAI_API_KEY": "<insert your OpenAI API key here>",
-  "AZURE_OPENAI_CHAT_DEPLOYMENT": "<insert your OpenAI deployment name here>",
+  "ClassName": "OpenAIChatCompletionsStreamingClass",
+  "AZURE_OPENAI_ENDPOINT": "<insert your OpenAI endpoint here>",
+  "AZURE_OPENAI_KEY": "<insert your OpenAI API key here>",
+  "AZURE_OPENAI_CHAT_DEPLOYMENT": "<insert your OpenAI chat deployment name here>",
   "AZURE_OPENAI_SYSTEM_PROMPT": "You are a helpful AI assistant."
 }

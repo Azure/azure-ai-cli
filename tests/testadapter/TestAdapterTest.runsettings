@@ -1,0 +1,7 @@
+<RunSettings>
+  <RunConfiguration>
+    <TestAdaptersPaths>.</TestAdaptersPaths>
+  </RunConfiguration>
+  <YamlTestAdapter>
+  </YamlTestAdapter>
+</RunSettings>

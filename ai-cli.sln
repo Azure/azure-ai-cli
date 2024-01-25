@@ -15,6 +15,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "test_helper_functions_exten
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "template_extension", "src\extensions\template_extension\template_extension.csproj", "{023B4F9C-E2B3-4CCD-A993-87E337C16EDE}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "YamlTestAdapter", "tests\testadapter\YamlTestAdapter.csproj", "{7C3F1355-B679-487D-904D-7E5FEBA9E75C}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -41,6 +43,10 @@ Global
 		{023B4F9C-E2B3-4CCD-A993-87E337C16EDE}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{023B4F9C-E2B3-4CCD-A993-87E337C16EDE}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{023B4F9C-E2B3-4CCD-A993-87E337C16EDE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7C3F1355-B679-487D-904D-7E5FEBA9E75C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7C3F1355-B679-487D-904D-7E5FEBA9E75C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7C3F1355-B679-487D-904D-7E5FEBA9E75C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7C3F1355-B679-487D-904D-7E5FEBA9E75C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
