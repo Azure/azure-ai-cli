@@ -11,7 +11,7 @@ namespace Azure.AI.Details.Common.CLI
         public static INamedValueTokenParser Parser() => _parser;
 
         private static _Parser _parser = new();
-        private class _Parser : OutputFileOptionalPrefixNamedValueTokenParser
+        private class _Parser : InputFileOptionalPrefixNamedValueTokenParser
         {
             public _Parser() : base("chat", "history", "1")
             {

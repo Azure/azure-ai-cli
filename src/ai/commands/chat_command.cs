@@ -14,6 +14,7 @@ using Microsoft.SemanticKernel.Memory;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
+using System.ClientModel.Primitives;
 using System.Collections.Generic;
 using System.Diagnostics.Tracing;
 using System.IO;
@@ -603,9 +604,9 @@ namespace Azure.AI.Details.Common.CLI
         {
             var requestMessage = new ChatRequestUserMessage(text);
             options.Messages.Add(requestMessage);
-            CheckWriteChatHistoryOutputFile(requestMessage);
-
+            CheckWriteChatHistoryOutputFile(options);
             DisplayAssistantPromptLabel();
+
             Console.ForegroundColor = ConsoleColor.Gray;
 
             string contentComplete = string.Empty;
@@ -630,6 +631,7 @@ namespace Azure.AI.Details.Common.CLI
                 {
                     DisplayAssistantFunctionCall(funcContext, result);
                     funcContext.Reset();
+                    CheckWriteChatHistoryOutputFile(options);
                     continue;
                 }
 
@@ -638,7 +640,7 @@ namespace Azure.AI.Details.Common.CLI
 
                 var responseMessage = new ChatRequestAssistantMessage(contentComplete);
                 options.Messages.Add(responseMessage);
-                CheckWriteChatHistoryOutputFile(responseMessage);
+                CheckWriteChatHistoryOutputFile(options);
 
                 return response;
             }
@@ -654,33 +656,23 @@ namespace Azure.AI.Details.Common.CLI
             }
         }
 
-        private void CheckWriteChatHistoryOutputFile(ChatRequestMessage message)
+        private void ClearMessageHistory()
         {
             var outputHistoryFile = OutputChatHistoryFileToken.Data().GetOrDefault(_values);
             if (!string.IsNullOrEmpty(outputHistoryFile))
             {
-                switch (message)
-                {
-                    case ChatRequestUserMessage userMessage:
-                        var userMessageText = System.Text.Json.JsonSerializer.Serialize(userMessage);
-                        if (!string.IsNullOrEmpty(userMessageText))
-                        {
-                            var fileName = FileHelpers.GetOutputDataFileName(outputHistoryFile, _values);
-                            FileHelpers.AppendAllText(fileName,userMessageText, Encoding.UTF8);
-                        }
-                        break;
-                    case ChatRequestAssistantMessage assistantMessage:
-                        var assistantMessageText = assistantMessage.Content;
-                        if (!string.IsNullOrEmpty(assistantMessageText))
-                        {
-                            var fileName = FileHelpers.GetOutputDataFileName(outputHistoryFile, _values);
-                            FileHelpers.AppendAllText(fileName, assistantMessageText, Encoding.UTF8);
-                        }
-                        break;
-                }
-               
-                //var fileName = FileHelpers.GetOutputDataFileName(outputHistoryFile, _values);
-                //FileHelpers.AppendAllText(fileName, null, Encoding.UTF8);
+                var fileName = FileHelpers.GetOutputDataFileName(outputHistoryFile, _values);
+                FileHelpers.WriteAllText(fileName, "", Encoding.UTF8);
+            }
+        }
+
+        private void CheckWriteChatHistoryOutputFile(ChatCompletionsOptions options)
+        {
+            var outputHistoryFile = OutputChatHistoryFileToken.Data().GetOrDefault(_values);
+            if (!string.IsNullOrEmpty(outputHistoryFile))
+            {
+                var fileName = FileHelpers.GetOutputDataFileName(outputHistoryFile, _values);
+                options.SaveChatHistoryToFile(fileName);
             }
         }
 
@@ -693,6 +685,14 @@ namespace Azure.AI.Details.Common.CLI
             options.Messages.Add(new ChatRequestSystemMessage(systemPrompt));
 
             var textFile = _values["chat.message.history.text.file"];
+            var jsonFile = InputChatHistoryJsonFileToken.Data().GetOrDefault(_values);
+
+            if(!string.IsNullOrEmpty(jsonFile) && !string.IsNullOrEmpty(textFile))
+            {
+                _values.AddThrowError("chat.message.history.text.file", "chat.message.history.json.file", "Only one of these options can be specified");
+            }
+
+            if (!string.IsNullOrEmpty(jsonFile)) options.ReadChatHistoryFromFile(jsonFile);
             if (!string.IsNullOrEmpty(textFile)) AddChatMessagesFromTextFile(options.Messages, textFile);
 
             var maxTokens = _values["chat.options.max.tokens"];

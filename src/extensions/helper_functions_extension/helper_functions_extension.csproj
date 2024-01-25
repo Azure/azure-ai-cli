@@ -9,7 +9,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Azure.AI.OpenAI" Version="1.0.0-beta.12" />
+      <PackageReference Include="Azure.AI.OpenAI" Version="1.0.0-beta.12" />
+      <PackageReference Include="System.ClientModel" Version="1.0.0" />
   </ItemGroup>
 
   <ItemGroup>
