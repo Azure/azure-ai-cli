@@ -39,12 +39,14 @@ namespace TestAdapterTest
             { "command", RegisterTestCaseProperty("Command") },
             { "script", RegisterTestCaseProperty("Script") },
             { "parallelize", RegisterTestCaseProperty("Parallelize") },
+            { "nextStepId", RegisterTestCaseProperty("nextStepId") },
             { "foreach", RegisterTestCaseProperty("ForEach") },
             { "arguments", RegisterTestCaseProperty("Arguments") },
             { "input", RegisterTestCaseProperty("Input")},
             { "expect", RegisterTestCaseProperty("Expect") },
             { "not-expect", RegisterTestCaseProperty("NotExpect") },
             { "simulate", RegisterTestCaseProperty("Simulate") },
+            { "skipOnFailure", RegisterTestCaseProperty("SkipOnFailure") },
             { "timeout", RegisterTestCaseProperty("Timeout") },
             { "working-directory", RegisterTestCaseProperty("WorkingDirectory") }
         };

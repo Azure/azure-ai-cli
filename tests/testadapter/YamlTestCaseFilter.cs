@@ -58,7 +58,9 @@ namespace TestAdapterTest
                 case "expect": return YamlTestProperties.Get(test, "expect");
                 case "not-expect": return YamlTestProperties.Get(test, "not-expect");
 
+                case "parallelize": return YamlTestProperties.Get(test, "parallelize");
                 case "simulate": return YamlTestProperties.Get(test, "simulate");
+                case "skipOnFailure": return YamlTestProperties.Get(test, "skipOnFailure");
 
                 case "timeout": return YamlTestProperties.Get(test, "timeout");
                 case "working-directory": return YamlTestProperties.Get(test, "working-directory");
@@ -70,6 +72,6 @@ namespace TestAdapterTest
             return tags.Select(x => x.Value).ToArray();
         }
 
-        private static readonly string[] supportedFilterProperties = { "DisplayName", "FullyQualifiedName", "Category", "cli", "command", "script", "foreach", "arguments", "input", "expect", "not-expect", "simulate" };
+        private static readonly string[] supportedFilterProperties = { "DisplayName", "FullyQualifiedName", "Category", "cli", "command", "script", "foreach", "arguments", "input", "expect", "not-expect", "parallelize", "simulate", "skipOnFailure" };
     }
 }
