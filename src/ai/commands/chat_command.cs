@@ -6,7 +6,9 @@
 using Azure.AI.Details.Common.CLI.ConsoleGui;
 using Azure.AI.Details.Common.CLI.Extensions.HelperFunctions;
 using Azure.AI.OpenAI;
+using Azure.Core;
 using Azure.Core.Diagnostics;
+using Azure.Core.Pipeline;
 using Microsoft.CognitiveServices.Speech;
 using Microsoft.SemanticKernel;
 using Microsoft.SemanticKernel.Connectors.Memory.AzureCognitiveSearch;
@@ -19,6 +21,7 @@ using System.Collections.Generic;
 using System.Diagnostics.Tracing;
 using System.IO;
 using System.Linq;
+using System.Net.Http;
 using System.Reflection;
 using System.Text;
 using System.Text.Json;
@@ -687,7 +690,7 @@ namespace Azure.AI.Details.Common.CLI
             var textFile = _values["chat.message.history.text.file"];
             var jsonFile = InputChatHistoryJsonFileToken.Data().GetOrDefault(_values);
 
-            if(!string.IsNullOrEmpty(jsonFile) && !string.IsNullOrEmpty(textFile))
+            if (!string.IsNullOrEmpty(jsonFile) && !string.IsNullOrEmpty(textFile))
             {
                 _values.AddThrowError("chat.message.history.text.file", "chat.message.history.json.file", "Only one of these options can be specified");
             }
@@ -837,6 +840,14 @@ namespace Azure.AI.Details.Common.CLI
                 options.Diagnostics.IsLoggingContentEnabled = true;
                 options.Diagnostics.IsLoggingEnabled = true;
 
+                var testMode = Environment.GetEnvironmentVariable("TEST_MODE");
+                var recordingId = Environment.GetEnvironmentVariable("TEST_RECORDING_ID");
+                if (!string.IsNullOrEmpty(testMode) && !string.IsNullOrEmpty(recordingId))
+                {
+                    var transport = new TestProxyTransport("localhost", 5001, recordingId, testMode);
+                    options.Transport = transport;
+                }
+
                 return new OpenAIClient(
                     new Uri(endpoint!),
                     new AzureKeyCredential(key!),
@@ -852,6 +863,68 @@ namespace Azure.AI.Details.Common.CLI
             {
                 _values.AddThrowError("ERROR:", $"Creating OpenAIClient; Not-yet-implemented create from region.");
                 return null;
+            }
+        }
+
+        private class TestProxyTransport : HttpPipelineTransport
+        {
+            private readonly HttpPipelineTransport _transport;
+            private readonly string _host;
+            private readonly int? _port;
+            private readonly string _recordingId;
+            private readonly string _mode;
+
+            public TestProxyTransport(string host, int? port, string recordingId, string mode)
+            {
+                _transport = new HttpClientTransport(new HttpClient(new HttpClientHandler()
+                {
+                    ServerCertificateCustomValidationCallback = (message, cert, chain, errors) =>
+                    {
+                        return true;
+                    }
+                }));
+                _host = host;
+                _port = port;
+                _recordingId = recordingId;
+                _mode = mode;
+
+            }
+
+            public override Request CreateRequest()
+            {
+                return _transport.CreateRequest();
+            }
+
+            public override void Process(HttpMessage message)
+            {
+                RedirectToTestProxy(message);
+                _transport.Process(message);
+            }
+
+            public override ValueTask ProcessAsync(HttpMessage message)
+            {
+                RedirectToTestProxy(message);
+                return _transport.ProcessAsync(message);
+            }
+
+            private void RedirectToTestProxy(HttpMessage message)
+            {
+                message.Request.Headers.Add("x-recording-id", _recordingId);
+                message.Request.Headers.Add("x-recording-mode", _mode);
+
+                var baseUri = new RequestUriBuilder()
+                {
+                    Scheme = message.Request.Uri.Scheme,
+                    Host = message.Request.Uri.Host,
+                    Port = message.Request.Uri.Port,
+                };
+                message.Request.Headers.Add("x-recording-upstream-base-uri", baseUri.ToString());
+
+                message.Request.Uri.Host = _host;
+                if (_port.HasValue)
+                {
+                    message.Request.Uri.Port = _port.Value;
+                }
             }
         }
 

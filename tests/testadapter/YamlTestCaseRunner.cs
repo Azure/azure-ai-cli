@@ -6,12 +6,14 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Runtime.InteropServices;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Adapter;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using YamlDotNet.RepresentationModel;
+using YamlTestAdapter;
 
 namespace TestAdapterTest
 {
@@ -33,10 +35,10 @@ namespace TestAdapterTest
             frameworkHandle.RecordStart(test);
         }
 
-        private static TestOutcome TestCaseRun(TestCase test, IFrameworkHandle frameworkHandle, out TestOutcome outcome) 
+        private static TestOutcome TestCaseRun(TestCase test, IFrameworkHandle frameworkHandle, out TestOutcome outcome)
         {
             Logger.Log($"YamlTestCaseRunner.TestCaseRun({test.DisplayName})");
-            
+
             // run the test case, getting all the results, prior to recording any of those results
             // (not doing this in this order seems to, for some reason, cause "foreach" test cases to run 5 times!?)
             var results = TestCaseGetResults(test).ToList();
@@ -72,6 +74,7 @@ namespace TestAdapterTest
             var timeout = int.Parse(YamlTestProperties.Get(test, "timeout"));
             var simulate = YamlTestProperties.Get(test, "simulate");
             var skipOnFailure = YamlTestProperties.Get(test, "skipOnFailure") switch { "true" => true, _ => false };
+            var recorded = YamlTestProperties.Get(test, "recorded") switch { "true" => true, _ => false };
 
             var basePath = new FileInfo(test.CodeFilePath).DirectoryName;
             workingDirectory = Path.Combine(basePath, workingDirectory ?? "");
@@ -86,12 +89,12 @@ namespace TestAdapterTest
                 var start = DateTime.Now;
 
                 var outcome = string.IsNullOrEmpty(simulate)
-                    ? RunTestCase(test, skipOnFailure, cli, command, script, foreachItem, arguments, input, expect, notExpect, workingDirectory, timeout, out string stdOut, out string stdErr, out string errorMessage, out string stackTrace, out string additional, out string debugTrace)
+                    ? RunTestCase(test, skipOnFailure, cli, command, script, foreachItem, arguments, input, expect, notExpect, workingDirectory, recorded, timeout, out string stdOut, out string stdErr, out string errorMessage, out string stackTrace, out string additional, out string debugTrace)
                     : SimulateTestCase(test, simulate, cli, command, script, foreachItem, arguments, input, expect, notExpect, workingDirectory, out stdOut, out stdErr, out errorMessage, out stackTrace, out additional, out debugTrace);
 
-                #if DEBUG
+#if DEBUG
                 additional += outcome == TestOutcome.Failed ? $"\nEXTRA: {ExtraDebugInfo()}" : "";
-                #endif
+#endif
 
                 var stop = DateTime.Now;
                 var result = CreateTestResult(test, start, stop, stdOut, stdErr, errorMessage, stackTrace, additional, debugTrace, outcome);
@@ -109,11 +112,11 @@ namespace TestAdapterTest
         {
             var testResultDisplayName = testDisplayName;
 
-            if(JToken.Parse(foreachItem).Type == JTokenType.Object)
+            if (JToken.Parse(foreachItem).Type == JTokenType.Object)
             {
                 // get JObject properties
                 JObject foreachItemObject = JObject.Parse(foreachItem);
-                foreach(var property in foreachItemObject.Properties())
+                foreach (var property in foreachItemObject.Properties())
                 {
                     var keys = property.Name.Split(new char[] { '\t' });
                     var values = property.Value.Value<string>().Split(new char[] { '\t' });
@@ -122,7 +125,7 @@ namespace TestAdapterTest
                     {
                         if (testResultDisplayName.Contains("{" + keys[i] + "}"))
                         {
-                            testResultDisplayName = testResultDisplayName.Replace("{" +keys[i] + "}", values[i]);
+                            testResultDisplayName = testResultDisplayName.Replace("{" + keys[i] + "}", values[i]);
                         }
                     }
                 }
@@ -141,11 +144,11 @@ namespace TestAdapterTest
         private static string RedactSensitiveDataFromForeachItem(string foreachItem)
         {
             var foreachObject = JObject.Parse(foreachItem);
-            
+
             var sb = new StringBuilder();
             var sw = new StringWriter(sb);
 
-            using (JsonWriter writer = new JsonTextWriter(sw){Formatting = Formatting.None})
+            using (JsonWriter writer = new JsonTextWriter(sw) { Formatting = Formatting.None })
             {
                 writer.WriteStartObject();
                 foreach (var item in foreachObject)
@@ -154,15 +157,15 @@ namespace TestAdapterTest
                     {
                         continue;
                     }
-                    var keys = item.Key.ToLower().Split(new char[] {'\t'});
-                    
+                    var keys = item.Key.ToLower().Split(new char[] { '\t' });
+
                     // find index of "token" in foreach key and redact its value to avoid getting it displayed
                     var tokenIndex = Array.IndexOf(keys, "token");
                     var valueString = item.Value;
-                    
+
                     if (tokenIndex >= 0)
                     {
-                        var values = item.Value.ToString().Split(new char[] {'\t'});
+                        var values = item.Value.ToString().Split(new char[] { '\t' });
                         if (values.Count() == keys.Count())
                         {
                             values[tokenIndex] = "***";
@@ -206,7 +209,25 @@ namespace TestAdapterTest
             return dup;
         }
 
-        private static TestOutcome RunTestCase(TestCase test, bool skipOnFailure, string cli, string command, string script, string @foreach, string arguments, string input, string expect, string notExpect, string workingDirectory, int timeout, out string stdOut, out string stdErr, out string errorMessage, out string stackTrace, out string additional, out string debugTrace)
+        private static TestOutcome RunTestCase(TestCase test,
+                                               bool skipOnFailure,
+                                               string cli,
+                                               string command,
+                                               string script,
+                                               string @foreach,
+                                               string arguments,
+                                               string input,
+                                               string expect,
+                                               string notExpect,
+                                               string workingDirectory,
+                                               bool recorded,
+                                               int timeout,
+                                               out string stdOut,
+                                               out string stdErr,
+                                               out string errorMessage,
+                                               out string stackTrace,
+                                               out string additional,
+                                               out string debugTrace)
         {
             var outcome = TestOutcome.None;
 
@@ -218,8 +239,33 @@ namespace TestAdapterTest
             Task<string> stdErrTask = null;
             List<string> filesToDelete = null;
 
+            Process proxyProcess = null;
+            string recordingId = string.Empty;
+            var testMode = Environment.GetEnvironmentVariable("TEST_MODE")?.ToLowerInvariant();
+
             try
             {
+                if (recorded)
+                {
+                   // proxyProcess = TestProxyClient.InvokeProxy();
+                    if (string.IsNullOrEmpty(testMode) || "live" == testMode)
+                    { }
+                    else if ("record" == testMode)
+                    {
+                        recordingId = TestProxyClient.StartRecording(test.DisplayName).Result;
+                    }
+                    else if ("playback" == testMode)
+                    {
+                        recordingId = TestProxyClient.StartPlayback(test.DisplayName).Result;
+                    }
+                    else
+                    {
+                        throw new Exception($"Unknown TEST_MODE: {testMode}");
+                    }
+
+                    Environment.SetEnvironmentVariable("TEST_RECORDING_ID", recordingId);
+                }
+
                 var isWindows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
                 script = WriteTextToTempFile(script, isWindows ? "cmd" : null);
 
@@ -282,6 +328,27 @@ namespace TestAdapterTest
                 if (expect != null) File.Delete(expect);
                 if (notExpect != null) File.Delete(notExpect);
                 filesToDelete?.ForEach(x => File.Delete(x));
+
+                if (recorded)
+                {
+                    if (string.IsNullOrEmpty(testMode) || "live" == testMode)
+                    { }
+                    else if ("record" == testMode)
+                    {
+                        TestProxyClient.StopRecording(recordingId).Wait();
+                    }
+                    else if ("playback" == testMode)
+                    {
+                        TestProxyClient.StopPlayback(recordingId).Wait();
+                    }
+                    else
+                    {
+                        throw new Exception($"Unknown TEST_MODE: {testMode}");
+                    }
+
+
+               //     TestProxyClient.StopProxy(proxyProcess);
+                }
             }
 
             stdOut = stdOutTask?.Result;
@@ -442,7 +509,7 @@ namespace TestAdapterTest
             var path = $"{path3}{Path.PathSeparator}{path2}{Path.PathSeparator}{path1}";
 
             var paths = path.Split(Path.PathSeparator);
-            foreach (var part2 in new string[]{ "", "net6.0"})
+            foreach (var part2 in new string[] { "", "net6.0" })
             {
                 foreach (var part1 in paths)
                 {
@@ -537,17 +604,17 @@ namespace TestAdapterTest
         {
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
             {
-                return new string[]{ "", "runtimes/win-x64/native/", "../runtimes/win-x64/native/" };
+                return new string[] { "", "runtimes/win-x64/native/", "../runtimes/win-x64/native/" };
             }
             else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
             {
-                return new string[]{ "", "runtimes/linux-x64/native/", "../../runtimes/linux-x64/native/" };
+                return new string[] { "", "runtimes/linux-x64/native/", "../../runtimes/linux-x64/native/" };
             }
             else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
             {
-                return new string[]{ "", "runtimes/osx-x64/native/", "../../runtimes/osx-x64/native/" };
+                return new string[] { "", "runtimes/osx-x64/native/", "../../runtimes/osx-x64/native/" };
             }
-            return new string[]{ "" };
+            return new string[] { "" };
         }
 
         static void UpdatePathEnvironment(ProcessStartInfo startInfo)
@@ -677,7 +744,7 @@ namespace TestAdapterTest
                     {
                         args.Append($"--{item.Key} ");
                     }
-                    
+
                     if (!string.IsNullOrEmpty(item.Value))
                     {
                         args.Append($"\"{item.Value}\" ");

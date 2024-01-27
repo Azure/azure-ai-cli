@@ -48,7 +48,8 @@ namespace TestAdapterTest
             { "simulate", RegisterTestCaseProperty("Simulate") },
             { "skipOnFailure", RegisterTestCaseProperty("SkipOnFailure") },
             { "timeout", RegisterTestCaseProperty("Timeout") },
-            { "working-directory", RegisterTestCaseProperty("WorkingDirectory") }
+            { "working-directory", RegisterTestCaseProperty("WorkingDirectory") },
+            { "recorded", RegisterTestCaseProperty("Recorded") }
         };
 
         #endregion

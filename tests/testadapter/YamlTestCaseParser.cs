@@ -83,6 +83,7 @@ namespace TestAdapterTest
             string simulate = GetScalarString(mapping, "simulate");
             string command = GetScalarString(mapping, "command");
             string script = GetScalarString(mapping, "script");
+            string recorded = GetScalarString(mapping, "recorded");
 
             string fullyQualifiedName = command == null && script == null
                 ? GetFullyQualifiedNameAndCommandFromShortForm(mapping, area, @class, ref command, stepNumber)
@@ -112,6 +113,7 @@ namespace TestAdapterTest
             SetTestCaseProperty(test, "simulate", simulate);
             SetTestCaseProperty(test, "parallelize", parallelize);
             SetTestCaseProperty(test, "skipOnFailure", skipOnFailure);
+            SetTestCaseProperty(test, "recorded", recorded);
 
             var timeout = GetScalarString(mapping, tags, "timeout", YamlTestAdapter.DefaultTimeout);
             SetTestCaseProperty(test, "timeout", timeout);
@@ -195,7 +197,7 @@ namespace TestAdapterTest
 
         private static bool IsValidTestCaseNode(string value)
         {
-            return ";area;class;name;cli;command;script;timeout;foreach;arguments;input;expect;not-expect;parallelize;simulate;skipOnFailure;tag;tags;workingDirectory;".IndexOf($";{value};") >= 0;
+            return ";area;class;name;cli;command;script;timeout;foreach;arguments;input;expect;not-expect;parallelize;simulate;skipOnFailure;tag;tags;workingDirectory;recorded;".IndexOf($";{value};") >= 0;
         }
 
         private static void SetTestCaseProperty(TestCase test, string propertyName, YamlMappingNode mapping, string mappingName)

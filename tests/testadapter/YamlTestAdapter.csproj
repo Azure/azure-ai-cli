@@ -6,4 +6,10 @@
 
   <Import Project="YamlTestAdapterCommon.targets" />
 
+  <ItemGroup>
+    <None Include="..\test-chat-basic.yaml" Link="test-chat-basic.yaml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>

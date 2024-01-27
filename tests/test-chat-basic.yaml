@@ -1,0 +1,11 @@
+- class: Basic chat test
+  steps:
+  - name: hello world
+    command: ai chat --question "Hello, how are you?"
+    recorded: true
+
+- class: Basic History Test
+  steps:
+  - name: Save Simple History
+    command: ai chat --question "What is your speciality?" --output-chat-history-file history.jsonl
+    recorded: true
