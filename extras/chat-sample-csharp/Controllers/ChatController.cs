@@ -10,27 +10,65 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Azure.AI.Chat.SampleService;
 
-internal class ChatResponse: IActionResult
+internal class ChatResponseBaseClass
 {
-    private readonly OpenAIClient _client;
+    protected readonly OpenAIClient _client;
     private readonly string _deployment;
     private readonly ChatCompletionOptions _options;
 
-    public ChatResponse(OpenAIClient client, string deployment, ChatCompletionOptions options)
+    internal ChatResponseBaseClass(OpenAIClient client, string deployment, ChatCompletionOptions options)
     {
         _client = client;
         _deployment = deployment;
         _options = options;
     }
 
+    internal ChatCompletionsOptions GetChatCompletionsOptions()
+    {
+        var messages = new List<ChatRequestMessage>();
+
+        foreach (ChatMessage chatMessage in _options.Messages)
+        {
+            switch (chatMessage.Role)
+            {
+                // See https://learn.microsoft.com/dotnet/api/azure.ai.openai.chatrequestmessage?view=azure-dotnet-preview
+                case "system":
+                    messages.Add(new ChatRequestSystemMessage(chatMessage.Content));
+                    break;
+                case "user":
+                    messages.Add(new ChatRequestUserMessage(chatMessage.Content));
+                    break;
+                case "assistant":
+                    messages.Add(new ChatRequestAssistantMessage(chatMessage.Content));
+                    break;
+                case "tool": // TODO 
+                case "function": // TODO (but deprecated)
+                default:
+                    // This will result in "HTTP/1.1 500 Internal Server Error" response to the client
+                    throw new Exception("Invalid role value");
+            }
+        }
+
+        return new ChatCompletionsOptions(_deployment, messages);
+    }
+}
+
+internal class ChatResponse: ChatResponseBaseClass, IActionResult
+{
+    internal ChatResponse(OpenAIClient client, string deployment, ChatCompletionOptions options) 
+        : base(client, deployment, options)
+    {
+    }
+
     public async Task ExecuteResultAsync(ActionContext context)
     {
-        ChatCompletions completions = await _client.GetChatCompletionsAsync(_deployment, new ChatCompletionsOptions(
-            messages: _options.Messages.Select(msg => new Azure.AI.OpenAI.ChatMessage(msg.Role, msg.Content)).ToList()));
+        // Throws Azure.RequestFailedException if the response is not successful (HTTP status code is not in the 200s)
+        Response<ChatCompletions> chatCompletionsResponse =
+            await _client.GetChatCompletionsAsync(GetChatCompletionsOptions());
 
         ChatCompletion completion = new()
         {
-            Choices = completions.Choices.Select(choice => new ChatChoice
+            Choices = chatCompletionsResponse.Value.Choices.Select(choice => new ChatChoice
             {
                 Index = choice.Index,
                 Message = new ChatMessage
@@ -41,60 +79,59 @@ internal class ChatResponse: IActionResult
                 FinishReason = choice.FinishReason?.ToString() ?? ""
             }).ToList()
         };
-        var response = context.HttpContext.Response;
-        response.StatusCode = (int)HttpStatusCode.OK;
-        response.ContentType = "application/json";
-        await response.WriteAsync(JsonSerializer.Serialize(completion), Encoding.UTF8);
+
+        HttpResponse httpResponse = context.HttpContext.Response;
+        httpResponse.StatusCode = (int)HttpStatusCode.OK;
+        httpResponse.ContentType = "application/json";
+        await httpResponse.WriteAsync(JsonSerializer.Serialize(completion), Encoding.UTF8);
     }
 }
 
-internal class StreamingChatResponse: IActionResult
+internal class StreamingChatResponse: ChatResponseBaseClass, IActionResult
 {
-    private readonly OpenAIClient _client;
-    private readonly string _deployment;
-    private readonly ChatCompletionOptions _options;
-
-    public StreamingChatResponse(OpenAIClient client, string deployment, ChatCompletionOptions options)
+    internal StreamingChatResponse(OpenAIClient client, string deployment, ChatCompletionOptions options)
+        : base(client, deployment, options)
     {
-        _client = client;
-        _deployment = deployment;
-        _options = options;
     }
 
     public async Task ExecuteResultAsync(ActionContext context)
     {
-        StreamingChatCompletions completions = await _client.GetChatCompletionsStreamingAsync(_deployment, new ChatCompletionsOptions(
-            messages: _options.Messages.Select(msg => new OpenAI.ChatMessage(msg.Role, msg.Content)).ToList()));
+        // Throws Azure.RequestFailedException if the response is not successful (HTTP status code is not in the 200s)
+        StreamingResponse<StreamingChatCompletionsUpdate> streamingChatCompletionsUpdateResponse =
+            await _client.GetChatCompletionsStreamingAsync(GetChatCompletionsOptions());
 
-        var response = context.HttpContext.Response;
-        response.StatusCode = (int)HttpStatusCode.OK;
-        response.ContentType = "text/event-stream";
-        await foreach (StreamingChatChoice chunk in completions.GetChoicesStreaming())
+        HttpResponse httpResponse = context.HttpContext.Response;
+        httpResponse.StatusCode = (int)HttpStatusCode.OK;
+        httpResponse.ContentType = "text/event-stream";
+
+        await foreach (StreamingChatCompletionsUpdate chatUpdate in streamingChatCompletionsUpdateResponse)
         {
-            await foreach (var message in chunk.GetMessageStreaming())
+            if (!chatUpdate.ChoiceIndex.HasValue)
             {
-                if (!chunk.Index.HasValue)
-                {
-                    continue;
-                }
-                ChoiceDelta delta = new()
-                {
-                    Index = chunk.Index.Value,
-                    Delta = new ChatMessageDelta
-                    {
-                        Content = message.Content,
-                        Role = message.Role.ToString()
-                    },
-                    FinishReason = chunk.FinishReason?.ToString()
-                };
-                ChatCompletionChunk completion = new()
-                {
-                    Choices = new List<ChoiceDelta> { delta }
-                };
-                await response.WriteAsync($"data: {JsonSerializer.Serialize(completion)}\n\n", Encoding.UTF8);
+                continue;
             }
+
+            int choiceIndex = chatUpdate.ChoiceIndex.Value;
+
+            ChoiceDelta delta = new()
+            {
+                Index = choiceIndex,
+                Delta = new ChatMessageDelta
+                {
+                    Content = chatUpdate.ContentUpdate,
+                    Role = chatUpdate.Role?.ToString()
+                },
+                FinishReason = chatUpdate.FinishReason?.ToString()
+            };
+
+            ChatCompletionChunk completion = new()
+            {
+                Choices = new List<ChoiceDelta> { delta }
+            };
+
+            await httpResponse.WriteAsync($"{JsonSerializer.Serialize(completion)}\n", Encoding.UTF8);
         }
-        await response.WriteAsync("data: [DONE]");
+        await httpResponse.WriteAsync("[DONE]\n");
     }
 }
 
@@ -122,5 +159,4 @@ public class ChatController : ControllerBase
         }
         return new ChatResponse(client, deployment, options);
     }
-
 }
