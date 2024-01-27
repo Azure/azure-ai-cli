@@ -6,7 +6,9 @@ using System.Text;
 using System.Text.Json;
 using Azure.AI.Chat.SampleService.Services;
 using Azure.AI.OpenAI;
+using Azure.Core.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
+using System.Diagnostics.Tracing;
 
 namespace Azure.AI.Chat.SampleService;
 
@@ -15,12 +17,14 @@ internal class ChatResponseBaseClass
     protected readonly OpenAIClient _client;
     private readonly string _deployment;
     private readonly ChatCompletionOptions _options;
+    private readonly AzureEventSourceListener _listener;
 
     internal ChatResponseBaseClass(OpenAIClient client, string deployment, ChatCompletionOptions options)
     {
         _client = client;
         _deployment = deployment;
         _options = options;
+        _listener = AzureEventSourceListener.CreateConsoleLogger(EventLevel.Verbose);
     }
 
     internal ChatCompletionsOptions GetChatCompletionsOptions()

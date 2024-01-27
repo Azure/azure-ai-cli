@@ -25,7 +25,15 @@ public class OpenAIClientProvider : IOpenAIClientProvider
         {
             throw new InvalidOperationException("Azure Open AI key and endpoint must be set");
         }
-        return new OpenAIClient(new(_azureOpenAIEndpoint), new AzureKeyCredential(_azureOpenAIKey));
+
+        var clientOptions = new OpenAIClientOptions();
+        clientOptions.Diagnostics.IsLoggingEnabled = true;
+        clientOptions.Diagnostics.IsLoggingContentEnabled = true;
+
+        return new OpenAIClient(
+            new(_azureOpenAIEndpoint),
+            new AzureKeyCredential(_azureOpenAIKey),
+            clientOptions);
     }
 
     public string GetDeployment()
