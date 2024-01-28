@@ -391,8 +391,6 @@ namespace Azure.AI.Details.Common.CLI
 
         private async Task DoInitRootOpenAi(bool interactive)
         {
-            if (!interactive) ThrowInteractiveNotSupportedApplicationException(); // POST-IGNITE: TODO: Add back non-interactive mode support
-
             await DoInitSubscriptionId(interactive);
             await DoInitOpenAi(interactive);
         }

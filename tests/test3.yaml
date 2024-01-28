@@ -1,10 +1,21 @@
-﻿- class: setup
+﻿- area: ai init
   tags: [before]
-  steps:
+  tests:
+  - name: ai init openai
+    command: ai init openai
+    arguments:
+      subscription: e72e5254-f265-4e95-9bd2-9ee8e7329051
+      name: robch-oai-eastus2
+      chat-deployment-name: gpt-4-32k-0613
+      embeddings-deployment-name: text-embedding-ada-002-2
+      evaluation-deployment-name: gpt-4-32k-0613
+      interactive: false
   - name: ai init speech
-    command: ai init speech --subscription e72e5254-f265-4e95-9bd2-9ee8e7329051 --name robch-cranky-red-koala-ais --interactive false
-  - name: ai init openai-chat
-    command: ai init openai --name robch-oai-eastus2 --subscription e72e5254-f265-4e95-9bd2-9ee8e7329051 --chat-deployment-name gpt-4-32k-0613 --embeddings-deployment-name text-embedding-ada-002-2 --evaluation-deployment-name gpt-4-32k-0613
+    command: ai init speech
+    arguments:
+      subscription: e72e5254-f265-4e95-9bd2-9ee8e7329051
+      name: robch-cranky-red-koala-ais
+      interactive: false
 
 - name: test ai chat
   command: ai chat --question "Why is the sky blue"
