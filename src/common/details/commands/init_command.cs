@@ -391,8 +391,6 @@ namespace Azure.AI.Details.Common.CLI
 
         private async Task DoInitRootOpenAi(bool interactive)
         {
-            if (!interactive) ThrowInteractiveNotSupportedApplicationException(); // POST-IGNITE: TODO: Add back non-interactive mode support
-
             await DoInitSubscriptionId(interactive);
             await DoInitOpenAi(interactive);
         }
@@ -407,7 +405,11 @@ namespace Azure.AI.Details.Common.CLI
             var sku = _values.GetOrDefault("init.service.cognitiveservices.resource.sku", Program.CognitiveServiceResourceSku);
             var yes = _values.GetOrDefault("init.service.cognitiveservices.terms.agree", false);
 
-            var resource = await AzCliConsoleGui.PickOrCreateAndConfigCognitiveServicesOpenAiKindResource(interactive, allowSkipDeployments, subscriptionId, regionFilter, groupFilter, resourceFilter, kind, sku, yes);
+            var chatDeploymentFilter = _values.GetOrDefault("init.chat.model.deployment.name", "");
+            var embeddingsDeploymentFilter = _values.GetOrDefault("init.embeddings.model.deployment.name", "");
+            var evaluationsDeploymentFilter = _values.GetOrDefault("init.evaluation.model.deployment.name", "");
+
+            var resource = await AzCliConsoleGui.PickOrCreateAndConfigCognitiveServicesOpenAiKindResource(interactive, allowSkipDeployments, subscriptionId, regionFilter, groupFilter, resourceFilter, kind, sku, yes, chatDeploymentFilter, embeddingsDeploymentFilter, evaluationsDeploymentFilter);
             _values.Reset("service.openai.deployments.picked", "true");
 
             SubscriptionToken.Data().Set(_values, subscriptionId);
