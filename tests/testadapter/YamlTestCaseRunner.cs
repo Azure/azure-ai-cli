@@ -67,6 +67,7 @@ namespace TestAdapterTest
             var arguments = YamlTestProperties.Get(test, "arguments");
             var input = YamlTestProperties.Get(test, "input");
             var expect = YamlTestProperties.Get(test, "expect");
+            var expectGpt = YamlTestProperties.Get(test, "expect-gpt");
             var notExpect = YamlTestProperties.Get(test, "not-expect");
             var workingDirectory = YamlTestProperties.Get(test, "working-directory");
             var timeout = int.Parse(YamlTestProperties.Get(test, "timeout"));
@@ -86,8 +87,8 @@ namespace TestAdapterTest
                 var start = DateTime.Now;
 
                 var outcome = string.IsNullOrEmpty(simulate)
-                    ? RunTestCase(test, skipOnFailure, cli, command, script, foreachItem, arguments, input, expect, notExpect, workingDirectory, timeout, out string stdOut, out string stdErr, out string errorMessage, out string stackTrace, out string additional, out string debugTrace)
-                    : SimulateTestCase(test, simulate, cli, command, script, foreachItem, arguments, input, expect, notExpect, workingDirectory, out stdOut, out stdErr, out errorMessage, out stackTrace, out additional, out debugTrace);
+                    ? RunTestCase(test, skipOnFailure, cli, command, script, foreachItem, arguments, input, expect, expectGpt, notExpect, workingDirectory, timeout, out string stdOut, out string stdErr, out string errorMessage, out string stackTrace, out string additional, out string debugTrace)
+                    : SimulateTestCase(test, simulate, cli, command, script, foreachItem, arguments, input, expect, expectGpt, notExpect, workingDirectory, out stdOut, out stdErr, out errorMessage, out stackTrace, out additional, out debugTrace);
 
                 #if DEBUG
                 additional += outcome == TestOutcome.Failed ? $"\nEXTRA: {ExtraDebugInfo()}" : "";
@@ -206,7 +207,7 @@ namespace TestAdapterTest
             return dup;
         }
 
-        private static TestOutcome RunTestCase(TestCase test, bool skipOnFailure, string cli, string command, string script, string @foreach, string arguments, string input, string expect, string notExpect, string workingDirectory, int timeout, out string stdOut, out string stdErr, out string errorMessage, out string stackTrace, out string additional, out string debugTrace)
+        private static TestOutcome RunTestCase(TestCase test, bool skipOnFailure, string cli, string command, string script, string @foreach, string arguments, string input, string expect, string expectGpt, string notExpect, string workingDirectory, int timeout, out string stdOut, out string stdErr, out string errorMessage, out string stackTrace, out string additional, out string debugTrace)
         {
             var outcome = TestOutcome.None;
 
@@ -214,9 +215,11 @@ namespace TestAdapterTest
             debugTrace = "";
             stackTrace = script;
 
-            Task<string> stdOutTask = null;
-            Task<string> stdErrTask = null;
             List<string> filesToDelete = null;
+
+            var sbOut = new StringBuilder();
+            var sbErr = new StringBuilder();
+            var sbMerged = new StringBuilder();
 
             try
             {
@@ -247,8 +250,11 @@ namespace TestAdapterTest
                 var process = Process.Start(startInfo);
                 process.StandardInput.WriteLine(input ?? string.Empty);
                 process.StandardInput.Close();
-                stdOutTask = process.StandardOutput.ReadToEndAsync();
-                stdErrTask = process.StandardError.ReadToEndAsync();
+
+                process.OutputDataReceived += (sender, e) => { if (e.Data != null) { sbOut.AppendLine(e.Data); sbMerged.AppendLine(e.Data); } };
+                process.ErrorDataReceived += (sender, e) => { if (e.Data != null) { sbErr.AppendLine(e.Data); sbMerged.AppendLine(e.Data); } };
+                process.BeginOutputReadLine();
+                process.BeginErrorReadLine();
 
                 var exitedNotKilled = WaitForExit(process, timeout);
                 outcome = exitedNotKilled && process.ExitCode == 0
@@ -284,8 +290,12 @@ namespace TestAdapterTest
                 filesToDelete?.ForEach(x => File.Delete(x));
             }
 
-            stdOut = stdOutTask?.Result;
-            stdErr = stdErrTask?.Result;
+            stdOut = sbOut.ToString();
+            stdErr = sbErr.ToString();
+
+            if (!string.IsNullOrEmpty(expectGpt) && outcome == TestOutcome.Passed)
+            {
+            }
 
             return outcome;
         }
@@ -691,7 +701,7 @@ namespace TestAdapterTest
             return args.ToString().TrimEnd();
         }
 
-        private static TestOutcome SimulateTestCase(TestCase test, string simulate, string cli, string command, string script, string @foreach, string arguments, string input, string expect, string notExpect, string workingDirectory, out string stdOut, out string stdErr, out string errorMessage, out string stackTrace, out string additional, out string debugTrace)
+        private static TestOutcome SimulateTestCase(TestCase test, string simulate, string cli, string command, string script, string @foreach, string arguments, string input, string expect, string expectGpt, string notExpect, string workingDirectory, out string stdOut, out string stdErr, out string errorMessage, out string stackTrace, out string additional, out string debugTrace)
         {
             var sb = new StringBuilder();
             sb.AppendLine($"cli='{cli?.Replace("\n", "\\n")}'");

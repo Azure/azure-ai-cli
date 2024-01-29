@@ -124,6 +124,7 @@ namespace TestAdapterTest
             SetTestCasePropertyMap(test, "input", mapping, "input", workingDirectory);
 
             SetTestCaseProperty(test, "expect", mapping, "expect");
+            SetTestCaseProperty(test, "expect-gpt", mapping, "expect-gpt");
             SetTestCaseProperty(test, "not-expect", mapping, "not-expect");
 
             SetTestCaseTagsAsTraits(test, YamlTagHelpers.UpdateCopyTags(tags, mapping));
@@ -195,7 +196,7 @@ namespace TestAdapterTest
 
         private static bool IsValidTestCaseNode(string value)
         {
-            return ";area;class;name;cli;command;script;timeout;foreach;arguments;input;expect;not-expect;parallelize;simulate;skipOnFailure;tag;tags;workingDirectory;".IndexOf($";{value};") >= 0;
+            return ";area;class;name;cli;command;script;timeout;foreach;arguments;input;expect;expect-gpt;not-expect;parallelize;simulate;skipOnFailure;tag;tags;workingDirectory;".IndexOf($";{value};") >= 0;
         }
 
         private static void SetTestCaseProperty(TestCase test, string propertyName, YamlMappingNode mapping, string mappingName)

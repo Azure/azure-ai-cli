@@ -19,6 +19,7 @@
 
 - name: test ai chat
   command: ai chat --question "Why is the sky blue"
+  expect: Rayleigh
 
 - name: dev new environment
   command: ai dev new .env
@@ -55,6 +56,11 @@
       input: |-
         Tell me a joke
         Tell me another joke
+      expect-gpt: |
+        The output should contain exactly two jokes.
+        If it does, you should answer "PASS".
+        If it does not, you should answer "FAIL".
+        You must only answer "PASS" or "FAIL".
       tag: skip
 
   - class: dev new openai-chat (go)
