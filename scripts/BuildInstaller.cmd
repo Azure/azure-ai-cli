@@ -1,10 +1,16 @@
 @echo off
 setlocal
 
+REM Azure AI CLI version e.g. 1.0.0 or 1.0.0-preview-20231214.1
+if "%~1"=="" (
+  echo Error: Azure AI CLI version number is not set. 1>&2
+  exit /b 1
+)
+
 REM The product version x.y.z shown in the list of installed programs.
-set VERSION=1.0.0
+set VERSION=%~1
 REM The AI CLI package (nupkg) version. This cannot be used as a product version.
-set PACKAGE_VERSION=1.0.0-preview-20231214.1
+set PACKAGE_VERSION=%VERSION%
 
 set PLATFORM=x64
 set INSTALLER=Azure-AI-CLI-Setup-%PACKAGE_VERSION%-%PLATFORM%.exe
