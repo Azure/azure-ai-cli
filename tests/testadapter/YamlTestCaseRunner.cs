@@ -293,11 +293,9 @@ namespace TestAdapterTest
             stdOut = sbOut.ToString();
             stdErr = sbErr.ToString();
 
-            if (!string.IsNullOrEmpty(expectGpt) && outcome == TestOutcome.Passed)
-            {
-            }
-
-            return outcome;
+            return outcome == TestOutcome.Passed && !string.IsNullOrEmpty(expectGpt)
+                ? CheckExpectGptOutcome(sbMerged.ToString(), expectGpt, ref stdOut, ref stdErr)
+                : outcome;
         }
 
         private static List<KeyValuePair<string, string>> ConvertValuesToAtArgs(List<KeyValuePair<string, string>> kvs, ref List<string> files)
@@ -812,6 +810,87 @@ namespace TestAdapterTest
             }
 
             return sb.ToString();
+        }
+
+        private static TestOutcome CheckExpectGptOutcome(string output, string expectGpt, ref string stdOut, ref string stdErr)
+        {
+            var outcome = ExpectGptOutcome(output, expectGpt, out var gptStdOut, out var gptStdErr, out var gptMerged);
+            if (outcome == TestOutcome.Failed)
+            {
+                if (!string.IsNullOrEmpty(gptStdOut)) stdOut = $"{stdOut}\n--expect-gpt--\n{gptStdOut}\n".Trim('\n');
+                if (!string.IsNullOrEmpty(gptStdErr)) stdErr = $"{stdErr}\n--expect-gpt--\n{gptStdErr}\n".Trim('\n');
+            }
+            return outcome;
+        }
+
+        private static TestOutcome ExpectGptOutcome(string output, string expect, out string gptStdOut, out string gptStdErr, out string gptMerged)
+        {
+            var outcome = TestOutcome.None;
+
+            var sbOut = new StringBuilder();
+            var sbErr = new StringBuilder();
+            var sbMerged = new StringBuilder();
+
+            var question = new StringBuilder();
+            question.AppendLine($"Here's the console output:\n\n{output}\n");
+            question.AppendLine($"Here's the expectation:\n\n{expect}\n");
+            question.AppendLine("You **must always** answer \"PASS\" if the expectation is met.");
+            question.AppendLine("You **must always** answer \"FAIL\" if the expectation is not met.");
+            question.AppendLine("You **must only** answer \"PASS\" or \"FAIL\".");
+            var questionTempFile = WriteTextToTempFile(question.ToString());
+
+            try
+            {
+                var startProcess = FindCacheCli("ai");
+                var startArgs = $"chat --quiet true --index-name @none --question @{questionTempFile}";
+                var startInfo = new ProcessStartInfo(startProcess, startArgs)
+                {
+                    UseShellExecute = false,
+                    RedirectStandardInput = true,
+                    RedirectStandardError = true,
+                    RedirectStandardOutput = true
+                };
+
+                Logger.Log($"Process.Start('{startProcess} {startArgs}')");
+                var process = Process.Start(startInfo);
+                process.StandardInput.Close();
+
+                process.OutputDataReceived += (sender, e) => { if (e.Data != null) { sbOut.AppendLine(e.Data); sbMerged.AppendLine(e.Data); } };
+                process.ErrorDataReceived += (sender, e) => { if (e.Data != null) { sbErr.AppendLine(e.Data); sbMerged.AppendLine(e.Data); } };
+                process.BeginOutputReadLine();
+                process.BeginErrorReadLine();
+
+                var exitedNotKilled = WaitForExit(process, 30000);
+
+                outcome = exitedNotKilled && process.ExitCode == 0
+                    ? TestOutcome.Passed
+                    : TestOutcome.Failed;
+            }
+            catch
+            {
+                outcome = TestOutcome.Failed;
+            }
+            finally
+            {
+                gptStdOut = sbOut.ToString();
+                gptStdErr = sbErr.ToString();
+                gptMerged = sbMerged.ToString();
+
+                File.Delete(questionTempFile);
+            }
+
+            if (outcome == TestOutcome.Passed)
+            {
+                Logger.Log($"ExpectGptOutcome: Checking for 'PASS' in '{gptMerged}'");
+                var passed = gptMerged.Contains("PASS") || gptMerged.Contains("TRUE") || gptMerged.Contains("YES");
+                var failed = gptMerged.Contains("FAIL") || gptMerged.Contains("FALSE") || gptMerged.Contains("NO");
+                outcome = passed && !failed
+                    ? TestOutcome.Passed
+                    : TestOutcome.Failed;
+                Logger.Log($"ExpectGptOutcome: {outcome}");
+            }
+
+            return outcome;
         }
 
         #endregion
