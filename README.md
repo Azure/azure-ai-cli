@@ -118,7 +118,7 @@ ai search index update --files "../../data/3-product-info/*.md" --index-name "pr
 
 ```
 AI - Azure AI CLI, Version 1.0.0
-Copyright (c) 2023 Microsoft Corporation. All Rights Reserved.
+Copyright (c) 2024 Microsoft Corporation. All Rights Reserved.
 
 This PUBLIC PREVIEW version may change at any time.
 See: https://aka.ms/azure-ai-cli-public-preview
