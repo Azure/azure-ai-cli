@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using YamlDotNet.RepresentationModel;
 
-namespace TestAdapterTest
+namespace Azure.AI.Details.Common.CLI.TestFramework
 {
     public static class YamlNodeExtensions
     {

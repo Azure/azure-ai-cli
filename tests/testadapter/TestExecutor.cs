@@ -9,8 +9,9 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Azure.AI.Details.Common.CLI.TestFramework;
 
-namespace TestAdapterTest
+namespace Azure.AI.Details.Common.CLI.TestAdapter
 {
     [ExtensionUri(YamlTestAdapter.Executor)]
     public class TextExecutor : ITestExecutor

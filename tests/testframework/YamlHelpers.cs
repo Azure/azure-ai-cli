@@ -3,7 +3,7 @@ using System.IO;
 using YamlDotNet.RepresentationModel;
 using YamlDotNet.Serialization;
 
-namespace TestAdapterTest
+namespace Azure.AI.Details.Common.CLI.TestFramework
 {
     public class YamlHelpers
     {

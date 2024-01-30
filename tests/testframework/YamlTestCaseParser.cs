@@ -8,7 +8,7 @@ using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using YamlDotNet.Helpers;
 using YamlDotNet.RepresentationModel;
 
-namespace TestAdapterTest
+namespace Azure.AI.Details.Common.CLI.TestFramework
 {
     public class YamlTestCaseParser
     {
@@ -100,7 +100,7 @@ namespace TestAdapterTest
             }
 
             Logger.Log($"YamlTestCaseParser.GetTests(): new TestCase('{fullyQualifiedName}')");
-            var test = new TestCase(fullyQualifiedName, new Uri(YamlTestAdapter.Executor), source)
+            var test = new TestCase(fullyQualifiedName, new Uri(YamlTestFramework.FakeExecutor), source)
             {
                 CodeFilePath = file.FullName,
                 LineNumber = mapping.Start.Line
@@ -113,7 +113,7 @@ namespace TestAdapterTest
             SetTestCaseProperty(test, "parallelize", parallelize);
             SetTestCaseProperty(test, "skipOnFailure", skipOnFailure);
 
-            var timeout = GetScalarString(mapping, tags, "timeout", YamlTestAdapter.DefaultTimeout);
+            var timeout = GetScalarString(mapping, tags, "timeout", YamlTestFramework.DefaultTimeout);
             SetTestCaseProperty(test, "timeout", timeout);
 
             var workingDirectory = GetScalarString(mapping, tags, "workingDirectory", file.Directory.FullName);

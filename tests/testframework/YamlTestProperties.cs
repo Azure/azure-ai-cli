@@ -7,7 +7,7 @@ using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Adapter;
 using YamlDotNet.RepresentationModel;
 
-namespace TestAdapterTest
+namespace Azure.AI.Details.Common.CLI.TestFramework
 {
     public class YamlTestProperties
     {

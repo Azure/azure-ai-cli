@@ -13,7 +13,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using YamlDotNet.RepresentationModel;
 
-namespace TestAdapterTest
+namespace Azure.AI.Details.Common.CLI.TestFramework
 {
     public class YamlTestCaseRunner
     {
@@ -516,7 +516,7 @@ namespace TestAdapterTest
         private static void PickCliUpdateYamlDefaultsFileWarning(IEnumerable<string> clis)
         {
             var message = string.Join(" or ", clis.Select(cli => $"`cli: {cli}`"));
-            message = $"PickCli: CLI not specified; please create/update {YamlTestAdapter.YamlDefaultTagsFileName} with one of: {message}";
+            message = $"PickCli: CLI not specified; please create/update {YamlTestFramework.YamlDefaultTagsFileName} with one of: {message}";
             Logger.LogWarning(message);
             Logger.TraceWarning(message);
         }
