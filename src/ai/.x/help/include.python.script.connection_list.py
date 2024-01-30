@@ -22,7 +22,7 @@ def list_connections(subscription_id, resource_group_name, project_name):
             "name": item.name,
             "type": item.type,
             "target": item.target,
-            "credentials": item.credentials.values()
+            "credentials": item.credentials.values() if item.credentials else None,
         }
         connections.append(connection)
 
