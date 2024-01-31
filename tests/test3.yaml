@@ -38,7 +38,6 @@
       What is my name?
     expect: |
       assistant-function: GetUsersName\({}\) = 
-    tag: skip
 
 - area: ai dev new openai-chat
   tests:
@@ -58,7 +57,6 @@
         Tell me another joke
       expect-gpt: |
         The output should contain exactly two jokes.
-      tag: skip
 
   - class: dev new openai-chat (go)
     steps:
@@ -73,7 +71,6 @@
       input: |-
         Tell me a joke
         Tell me another joke
-      tag: skip
 
   - class: dev new openai-chat (java)
     steps:
@@ -92,7 +89,6 @@
       input: |-
         Tell me a joke
         Tell me another joke
-      tag: skip
 
   - class: dev new openai-chat (javascript)
     steps:
@@ -107,7 +103,6 @@
       input: |-
         Tell me a joke
         Tell me another joke
-      tag: skip
 
   - class: dev new openai-chat (python)
     steps:
@@ -122,7 +117,6 @@
       input: |-
         Tell me a joke
         Tell me another joke
-      tag: skip
 
 - area: ai dev new openai-chat-streaming
   tests:
@@ -140,7 +134,6 @@
       input: |-
         Tell me a joke
         Tell me another joke
-      tag: skip
 
   - class: dev new openai-chat-streaming (go)
     steps:
@@ -155,7 +148,6 @@
       input: |-
         Tell me a joke
         Tell me another joke
-      tag: skip
 
   - class: dev new openai-chat-streaming (java)
     steps:
@@ -174,7 +166,6 @@
       input: |-
         Tell me a joke
         Tell me another joke
-      tag: skip
 
     command: ai dev new openai-chat-streaming --java
 
@@ -191,7 +182,6 @@
       input: |-
         Tell me a joke
         Tell me another joke
-      tag: skip
 
   - class: dev new openai-chat-streaming (python)
     steps:
@@ -206,7 +196,6 @@
       input: |-
         Tell me a joke
         Tell me another joke
-      tag: skip
 
 - area: ai dev new openai-chat-streaming-with-data
   tests:
@@ -223,7 +212,6 @@
       command: ai dev shell --run "openai-chat-streaming-with-data-cs\bin\Debug\net7.0\OpenAIChatCompletionsWithDataStreaming"
       input: |-
         What parameter should i use to initialize?
-      tag: skip
 
   - class: dev new openai-chat-streaming-with-data (javascript)
     steps:
@@ -237,7 +225,6 @@
       command: ai dev shell --run "cd openai-chat-streaming-with-data-js && node main.js"
       input: |-
         What parameter should i use to initialize?
-      tag: skip
 
   - class: dev new openai-chat-streaming-with-data (python)
     steps:
@@ -251,7 +238,6 @@
       command: ai dev shell --run "cd openai-chat-streaming-with-data-py && python main.py"
       input: |-
         What parameter should i use to initialize?
-      tag: skip
 
 - area: ai dev new openai-chat-streaming-with-functions
   tests:
@@ -269,7 +255,6 @@
       input: |-
         What is the date?
         What is the time?
-      tag: skip
 
   - class: dev new openai-chat-streaming-with-functions (go)
     steps:
@@ -284,7 +269,6 @@
       input: |-
         What is the date?
         What is the time?
-      tag: skip
 
   - class: dev new openai-chat-streaming-with-functions (javascript)
     steps:
@@ -299,7 +283,6 @@
       input: |-
         What is the date?
         What is the time?
-      tag: skip
 
   - class: dev new openai-chat-streaming-with-functions (python)
     steps:
@@ -314,7 +297,6 @@
       input: |-
         What is the date?
         What is the time?
-      tag: skip
 
 - area: ai dev new openai-webpage
   tests:
