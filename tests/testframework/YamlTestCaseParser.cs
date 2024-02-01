@@ -28,7 +28,10 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
             foreach (var document in parsed?.Documents)
             {
                 var fromDocument = TestCasesFromYamlDocumentRootNode(source, file, document.RootNode, area, defaultClassName, defaultTags);
-                tests.AddRange(fromDocument);
+                if (fromDocument != null)
+                {
+                    tests.AddRange(fromDocument);
+                }
             }
             return tests;
         }
@@ -163,7 +166,10 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
             {
                 var mapping = sequence.Children[i] as YamlMappingNode;
                 var test = GetTestFromNode(source, file, mapping, area, @class, tags, i + 1);
-                tests.Add(test);
+                if (test != null)
+                {
+                    tests.Add(test);
+                }
             }
 
             if (tests.Count > 0)

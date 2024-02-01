@@ -7,7 +7,6 @@
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
     <ApplicationIcon />
     <StartupObject />
-    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
     <PackageVersion>1.1.0</PackageVersion>
   </PropertyGroup>
 

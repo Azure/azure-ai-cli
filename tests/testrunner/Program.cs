@@ -18,21 +18,57 @@ namespace Azure.AI.Details.Common.CLI.TestRunner
 {
     public class Program
     {
-        public static bool Debug { get; internal set; }
-
-        public static int Main(string[] mainArgs)
+        public static int Main(string[] args)
         {
-            var tests = YamlTestFramework.GetTestsFromDirectory("TestRunner", new DirectoryInfo("d:\\src\\ai-cli\\tests"));
-
-            foreach (var test in tests)
+            if (args.Length == 0)
             {
-                Console.WriteLine(test.FullyQualifiedName);
+                return DisplayUsage();
             }
 
-            // YamlTestFramework.RunTests(tests, null, null);
+            var command = args[0];
+            return command switch
+            {
+                "list" => DoCommand(args.Skip(1).ToArray(), true, false),
+                "run" => DoCommand(args.Skip(1).ToArray(), false, true),
+                _ => DisplayUsage()
+            };
+        }
 
+        private static int DisplayUsage()
+        {
+            Console.WriteLine("USAGE: TestRunner COMMAND [test-directory]\n");
+            Console.WriteLine("COMMANDS\n");
+            Console.WriteLine("  list  - List all tests in the specified directory.");
+            Console.WriteLine("  run   - Run all tests in the specified directory.");
+            return 1;
+        }
+
+        private static int DoCommand(string[] args, bool list, bool run)
+        {
+            var argOrCwd = args.Length > 0 ? args[0] : ".";
+            var testDirectory = new DirectoryInfo(argOrCwd);
+            if (!testDirectory.Exists)
+            {
+                Console.WriteLine($"Directory '{testDirectory.FullName}' does not exist.");
+                return 1;
+            }
+
+            var tests = YamlTestFramework.GetTestsFromDirectory("TestRunner", testDirectory);
+            if (list)
+            {
+                foreach (var test in tests)
+                {
+                    Console.WriteLine(test.FullyQualifiedName);
+                }
+            }
+
+            if (run)
+            {
+                YamlTestFramework.RunTests(tests, null, null);
+            }
+            
+            // TODO: return non zero if test failed
             return 0;
         }
     }
 }
-
