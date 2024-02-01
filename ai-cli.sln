@@ -19,6 +19,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "YamlTestAdapter", "tests\te
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "YamlTestFramework", "tests\testframework\YamlTestFramework.csproj", "{B0B3437F-1828-4A13-866F-1CF7C924015E}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "YamlTestRunner", "tests\testrunner\YamlTestRunner.csproj", "{39876475-2D98-40CF-8B08-CD423A5EB4E8}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -53,6 +55,10 @@ Global
 		{B0B3437F-1828-4A13-866F-1CF7C924015E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B0B3437F-1828-4A13-866F-1CF7C924015E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B0B3437F-1828-4A13-866F-1CF7C924015E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{39876475-2D98-40CF-8B08-CD423A5EB4E8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{39876475-2D98-40CF-8B08-CD423A5EB4E8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{39876475-2D98-40CF-8B08-CD423A5EB4E8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{39876475-2D98-40CF-8B08-CD423A5EB4E8}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
