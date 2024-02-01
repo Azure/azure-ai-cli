@@ -26,7 +26,7 @@ if "%~2"=="" (
 set PACKAGE_VERSION=%~1
 set PRODUCT_VERSION=%~2
 set TARGET_PLATFORM=x64
-set INSTALLER_FILE=Azure-AI-CLI-Setup-%PACKAGE_VERSION%-%TARGET_PLATFORM%.exe
+set INSTALLER_FILE=Setup-%TARGET_PLATFORM%.exe
 
 REM Check for WiX toolset
 where candle.exe >nul 2>&1
@@ -70,5 +70,5 @@ if %ERRORLEVEL% neq 0 (
 )
 
 :end
-echo Run %INSTALLER_FILE% to install.
+echo Built %INSTALLER_FILE% successfully!
 endlocal
