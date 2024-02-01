@@ -46,7 +46,8 @@ namespace Azure.AI.Details.Common.CLI.TestAdapter
 
         public static void RunTests(IEnumerable<TestCase> tests, IRunContext runContext, IFrameworkHandle frameworkHandle)
         {
-            YamlTestFramework.RunTests(tests, runContext, frameworkHandle);
+            var filtered = YamlTestCaseFilter.FilterTestCases(tests, runContext);
+            YamlTestFramework.RunTests(filtered, new YamlTestFrameworkHandleReporter(frameworkHandle));
         }
 
         #region private methods

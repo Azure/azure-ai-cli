@@ -64,7 +64,7 @@ namespace Azure.AI.Details.Common.CLI.TestRunner
 
             if (run)
             {
-                YamlTestFramework.RunTests(tests, null, null);
+                YamlTestFramework.RunTests(tests, null);
             }
             
             // TODO: return non zero if test failed

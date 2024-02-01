@@ -14,7 +14,7 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
 {
     public class YamlTestCaseFilter
     {
-        public static IEnumerable<TestCase> FilterTestCases(IEnumerable<TestCase> tests, IRunContext runContext, IFrameworkHandle frameworkHandle)
+        public static IEnumerable<TestCase> FilterTestCases(IEnumerable<TestCase> tests, IRunContext runContext)
         {
             var names = GetSupportedFilterableNames(tests);
             var filter = runContext.GetTestCaseFilter(names, null);

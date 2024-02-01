@@ -1,5 +1,4 @@
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
-using Microsoft.VisualStudio.TestPlatform.ObjectModel.Adapter;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 using System;
 using System.Collections.Generic;
@@ -41,23 +40,23 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
             Logger.Log($"YamlTestFramework.GetTestsFromYaml('{source}', '{file.FullName}'): EXIT");
         }
 
-        public static void RunTests(IEnumerable<TestCase> tests, IRunContext runContext, IFrameworkHandle frameworkHandle)
+        public static void RunTests(IEnumerable<TestCase> tests, IYamlTestFrameworkReporter reporter)
         {
-            var filteredBeforeMiddleAndAfterTestSets = FilterTestCases(tests, runContext, frameworkHandle);
-            foreach (var testSet in filteredBeforeMiddleAndAfterTestSets)
+            var grouped = GroupTestCasesByPriority(tests);
+            foreach (var priorityGroup in grouped)
             {
-                if (!testSet.Any()) continue;
-                RunAndRecordTests(frameworkHandle, testSet);
+                if (!priorityGroup.Any()) continue;
+                RunAndRecordTests(reporter, priorityGroup);
             }
         }
 
         #region private methods
 
-        private static void RunAndRecordTests(IFrameworkHandle frameworkHandle, IEnumerable<TestCase> tests)
+        private static void RunAndRecordTests(IYamlTestFrameworkReporter reporter, IEnumerable<TestCase> tests)
         {
             InitRunAndRecordTestCaseMaps(tests, out var testFromIdMap, out var completionFromIdMap);
-            RunAndRecordParallelizedTestCases(frameworkHandle, testFromIdMap, completionFromIdMap, tests);
-            RunAndRecordRemainingTestCases(frameworkHandle, testFromIdMap, completionFromIdMap);
+            RunAndRecordParallelizedTestCases(reporter, testFromIdMap, completionFromIdMap, tests);
+            RunAndRecordRemainingTestCases(reporter, testFromIdMap, completionFromIdMap);
         }
 
         private static void InitRunAndRecordTestCaseMaps(IEnumerable<TestCase> tests, out Dictionary<string, TestCase> testFromIdMap, out Dictionary<string, TaskCompletionSource<TestOutcome>> completionFromIdMap)
@@ -72,7 +71,7 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
             }
         }
 
-        private static void RunAndRecordParallelizedTestCases(IFrameworkHandle frameworkHandle, Dictionary<string, TestCase> testFromIdMap, Dictionary<string, TaskCompletionSource<TestOutcome>> completionFromIdMap, IEnumerable<TestCase> tests)
+        private static void RunAndRecordParallelizedTestCases(IYamlTestFrameworkReporter reporter, Dictionary<string, TestCase> testFromIdMap, Dictionary<string, TaskCompletionSource<TestOutcome>> completionFromIdMap, IEnumerable<TestCase> tests)
         {
             var parallelTestSet = tests.Where(test => YamlTestProperties.Get(test, "parallelize") == "true");
             foreach (var test in parallelTestSet)
@@ -81,7 +80,7 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
                 {
                     var parallelTestId = test.Id.ToString();
                     var parallelTest = testFromIdMap[parallelTestId];
-                    var parallelTestOutcome = RunAndRecordTestCase(parallelTest, frameworkHandle);
+                    var parallelTestOutcome = RunAndRecordTestCase(parallelTest, reporter);
                     // defer setting completion outcome until all steps are complete
 
                     var checkTest = parallelTest;
@@ -108,7 +107,7 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
                             break;
                         }
 
-                        var stepOutcome = RunAndRecordTestCase(stepTest, frameworkHandle);
+                        var stepOutcome = RunAndRecordTestCase(stepTest, reporter);
                         Logger.Log($"YamlTestFramework.RunTests() ==> Setting completion outcome for {stepTest.DisplayName} to {stepOutcome}");
                         completionFromIdMap[nextStepId].SetResult(stepOutcome);
 
@@ -130,14 +129,14 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
             Logger.Log($"YamlTestFramework.RunTests() ==> All parallel tests complete");
         }
 
-        private static void RunAndRecordRemainingTestCases(IFrameworkHandle frameworkHandle, Dictionary<string, TestCase> testFromIdMap, Dictionary<string, TaskCompletionSource<TestOutcome>> completionFromIdMap)
+        private static void RunAndRecordRemainingTestCases(IYamlTestFrameworkReporter reporter, Dictionary<string, TestCase> testFromIdMap, Dictionary<string, TaskCompletionSource<TestOutcome>> completionFromIdMap)
         {
             var remainingTests = completionFromIdMap
                 .Where(x => x.Value.Task.Status != TaskStatus.RanToCompletion)
                 .Select(x => testFromIdMap[x.Key]);
             foreach (var test in remainingTests)
             {
-                var outcome = RunAndRecordTestCase(test, frameworkHandle);
+                var outcome = RunAndRecordTestCase(test, reporter);
                 completionFromIdMap[test.Id.ToString()].SetResult(outcome);
             }
         }
@@ -153,26 +152,24 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
             return trait.Name == check || trait.Value == check;
         }
 
-        private static IEnumerable<IEnumerable<TestCase>> FilterTestCases(IEnumerable<TestCase> tests, IRunContext runContext, IFrameworkHandle frameworkHandle)
+        private static IEnumerable<IEnumerable<TestCase>> GroupTestCasesByPriority(IEnumerable<TestCase> tests)
         {
-            Logger.Log($"YamlTestFramework.FilterTestCases()");
+            Logger.Log($"YamlTestFramework.GroupTestCasesByPriority()");
 
-            tests = YamlTestCaseFilter.FilterTestCases(tests, runContext, frameworkHandle);
-            
             var before = tests.Where(test => test.Traits.Count(x => IsTrait(x, "before")) > 0);
             var after = tests.Where(test => test.Traits.Count(x => IsTrait(x, "after")) > 0);
             var middle = tests.Where(test => !before.Contains(test) && !after.Contains(test));
 
             var testsList = new List<IEnumerable<TestCase>> { before, middle, after };
-            Logger.Log("YamlTestFramework.FilterTestCases() ==> {string.Join('\n', tests.Select(x => x.Name))}");
+            Logger.Log("YamlTestFramework.GroupTestCasesByPriority() ==> {string.Join('\n', tests.Select(x => x.Name))}");
 
             return testsList;
         }
 
-        private static TestOutcome RunAndRecordTestCase(TestCase test, IFrameworkHandle frameworkHandle)
+        private static TestOutcome RunAndRecordTestCase(TestCase test, IYamlTestFrameworkReporter reporter)
         {
             Logger.Log($"YamlTestFramework.TestRunAndRecord({test.DisplayName})");
-            return YamlTestCaseRunner.RunAndRecordTestCase(test, frameworkHandle);
+            return YamlTestCaseRunner.RunAndRecordTestCase(test, reporter);
         }
 
         #endregion
