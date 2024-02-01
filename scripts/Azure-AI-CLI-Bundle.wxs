@@ -4,7 +4,7 @@
      xmlns:util="http://schemas.microsoft.com/wix/UtilExtension">
 
     <Bundle Name="Azure AI CLI"
-            Version="$(var.version)"
+            Version="$(var.productVersion)"
             Manufacturer="Microsoft"
             UpgradeCode="BF9A65EF-7D5A-4DC4-90E4-CDC44F042E96"
             DisableModify="yes">
@@ -22,8 +22,8 @@
         Workaround for https://github.com/wixtoolset/issues/issues/3746 (note: WixBundleAction is 5 on Uninstall)
         https://stackoverflow.com/questions/26596354/upgrade-a-bootstrapper-bundle-if-the-same-version-is-detected
         -->
-        <bal:Condition Message="The same or newer version of this product is already installed. Please uninstall the existing version first.">
-        NOT WixBundleAction = 5 OR NOT AlreadyInstalledVersion &gt;= v$(var.version)
+        <bal:Condition Message="The same or newer version [AlreadyInstalledVersion] is already installed.">
+        NOT WixBundleAction = 5 OR NOT AlreadyInstalledVersion &gt;= v$(var.productVersion)
         </bal:Condition>
 
         <Chain>
@@ -44,7 +44,7 @@
 
         <PackageGroup Id="DotNetSdk">
             <ExePackage Id="DotNetSdk"
-                        Name="dotnet-sdk-$(var.dotNetVersion)-win-$(var.platform).exe"
+                        Name="dotnet-sdk-$(var.dotNetVersion)-win-$(var.targetPlatform).exe"
                         Compressed="no"
                         DetectCondition="DOTNET_SDK_INSTALLED"
                         DownloadUrl="$(var.dotNetUrl)"
@@ -73,7 +73,7 @@
                         Compressed="yes"
                         DetectCondition="AZURE_CLI_INSTALLED"
                         SourceFile="InstallAzureCLI.cmd"
-                        InstallCommand="$(var.azureCliVersion) $(var.platform)"
+                        InstallCommand="$(var.azureCliVersion) $(var.targetPlatform)"
                         PerMachine="yes"
                         Permanent="yes"
                         Vital="yes"/>

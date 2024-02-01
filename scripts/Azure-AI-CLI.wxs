@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
 
-  <Product Id="*" Name="Azure AI CLI" Language="1033" Version="$(var.version)" Manufacturer="Microsoft" UpgradeCode="F1CDBA9C-E353-4039-9A20-059A1E587E73">
-    <Package InstallerVersion="500" Compressed="yes" InstallScope="perMachine" Platform="$(var.platform)" />
+  <Product Id="*" Name="Azure AI CLI" Language="1033" Version="$(var.productVersion)" Manufacturer="Microsoft" UpgradeCode="F1CDBA9C-E353-4039-9A20-059A1E587E73">
+    <Package InstallerVersion="500" Compressed="yes" InstallScope="perMachine" Platform="$(var.targetPlatform)" />
     <!--
     To prevent problems with bundle upgrades, use MajorUpgrade element here + ProductSearch in the bundle .wxs. Ref.
     https://stackoverflow.com/questions/15156081/wix-bundle-upgrade-a-new-version-of-msi-is-installed-before-the-old-version-is
@@ -13,13 +13,13 @@
     <!--
     <Upgrade Id="F1CDBA9C-E353-4039-9A20-059A1E587E73">
       <UpgradeVersion OnlyDetect="yes" Property="SELFFOUND"
-        Minimum="$(var.version)" IncludeMinimum="yes"
-        Maximum="$(var.version)" IncludeMaximum="yes" />
+        Minimum="$(var.productVersion)" IncludeMinimum="yes"
+        Maximum="$(var.productVersion)" IncludeMaximum="yes" />
       <UpgradeVersion OnlyDetect="yes" Property="NEWERFOUND"
-        Minimum="$(var.version)" IncludeMinimum="no" />
+        Minimum="$(var.productVersion)" IncludeMinimum="no" />
       <UpgradeVersion OnlyDetect="no" Property="PREVIOUSFOUND"
         Minimum="1.0.0" IncludeMinimum="yes"
-        Maximum="$(var.version)" IncludeMaximum="no" />
+        Maximum="$(var.productVersion)" IncludeMaximum="no" />
     </Upgrade>
 
     <CustomAction Id="AlreadyUpdated" Error="This version is already installed." />
