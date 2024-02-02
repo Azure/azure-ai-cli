@@ -13,14 +13,15 @@
             <bal:WixStandardBootstrapperApplication LicenseFile="CLI_License.rtf" SuppressOptionsUI="yes" SuppressRepair="yes"/>
         </BootstrapperApplicationRef>
 
-        <!-- Check the version of existing Azure AI CLI .msi installation -->
+        <!--
+        Check the version of existing Azure AI CLI .msi installation.
+        -->
         <util:ProductSearch Variable="AlreadyInstalledVersion"
                             UpgradeCode="F1CDBA9C-E353-4039-9A20-059A1E587E73"
                             Id="AlreadyInstalledVersionSearch"
                             Result="version"/>
         <!--
-        Workaround for https://github.com/wixtoolset/issues/issues/3746 (note: WixBundleAction is 5 on Uninstall)
-        https://stackoverflow.com/questions/26596354/upgrade-a-bootstrapper-bundle-if-the-same-version-is-detected
+        Workaround for https://github.com/wixtoolset/issues/issues/3746 (note: WixBundleAction 5 = Uninstall).
         -->
         <bal:Condition Message="The same or newer version [AlreadyInstalledVersion] is already installed.">
         NOT WixBundleAction = 5 OR NOT AlreadyInstalledVersion &gt;= v$(var.productVersion)
@@ -67,7 +68,9 @@
                               Variable="AZURE_CLI_INSTALLED"/>
 
         <PackageGroup Id="AzureCLI">
-            <!-- Workaround for RemotePayload not supported with MsiPackage -->
+            <!--
+            Workaround for RemotePayload not supported on MsiPackage.
+            -->
             <ExePackage Id="AzureCLI"
                         Name="InstallAzureCLI.cmd"
                         Compressed="yes"

@@ -1,6 +1,9 @@
 @echo off
 setlocal
 
+REM Detach/attach the bundle bootstrap engine so that it can be properly signed together with the bundle exe.
+REM ref. https://wixtoolset.org/docs/v3/overview/insignia/
+
 if "%~1"=="" (
   echo Error: Action is not specified. 1>&2
   exit /b 1

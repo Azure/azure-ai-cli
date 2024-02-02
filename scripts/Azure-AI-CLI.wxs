@@ -4,12 +4,13 @@
   <Product Id="*" Name="Azure AI CLI" Language="1033" Version="$(var.productVersion)" Manufacturer="Microsoft" UpgradeCode="F1CDBA9C-E353-4039-9A20-059A1E587E73">
     <Package InstallerVersion="500" Compressed="yes" InstallScope="perMachine" Platform="$(var.targetPlatform)" />
     <!--
-    To prevent problems with bundle upgrades, use MajorUpgrade element here + ProductSearch in the bundle .wxs. Ref.
-    https://stackoverflow.com/questions/15156081/wix-bundle-upgrade-a-new-version-of-msi-is-installed-before-the-old-version-is
+    To prevent problems with bundle upgrades, use MajorUpgrade element here and ProductSearch in the bundle .wxs.
     -->
     <MajorUpgrade AllowDowngrades="no" DowngradeErrorMessage="A newer version is already installed."/>
 
-    <!-- Below can be used to control upgrades on a single MSI-only (non-bundle) installation. -->
+    <!--
+    Below can be used to control upgrades on a single MSI-only (non-bundle) installation.
+    -->
     <!--
     <Upgrade Id="F1CDBA9C-E353-4039-9A20-059A1E587E73">
       <UpgradeVersion OnlyDetect="yes" Property="SELFFOUND"
@@ -35,6 +36,9 @@
     </Directory>
 
     <!--
+    Below would check errors from the installation script and log the output. Didn't work in a clean Win11 environment.
+    -->
+    <!--
     <Property Id="CLI_PACKAGE_VERSION" Value="$(var.packageVersion)" />
     <Property Id="CLI_INSTALL_ERROR" Secure="yes" />
     <CustomAction Id="RunInstallBatchScript"
@@ -57,13 +61,6 @@
     </CustomAction>
     -->
     <CustomAction Id="RunInstallBatchScript" FileKey="InstallBatchScript" ExeCommand="$(var.packageVersion)" Execute="immediate" Return="ignore"/>
-    <!--
-    <CustomAction Id="ShowNoteOnInstallSuccess" Script="vbscript">
-      <![CDATA[
-        MsgBox("To use the Azure AI CLI please open a new Command Prompt window." & vbNewLine & vbNewLine & "You can invoke the tool with the following command: ai")
-      ]]>
-    </CustomAction>
-    -->
     <CustomAction Id="RunUninstallBatchScript" FileKey="UninstallBatchScript" ExeCommand="" Execute="immediate" Return="ignore"/>
     <!--
     <CustomAction Id="RunUninstallOnInstallFailureBatchScript" FileKey="UninstallBatchScript" ExeCommand="" Execute="immediate" Return="ignore"/>
@@ -84,11 +81,10 @@
       <Custom Action="NoDowngrade" After="FindRelatedProducts">NEWERFOUND</Custom>
       -->
       <Custom Action="RunInstallBatchScript" After="InstallFinalize">NOT Installed OR REINSTALL OR UPGRADINGPRODUCTCODE</Custom>
-      <!--
-      <Custom Action="ShowNoteOnInstallSuccess" After="RunInstallBatchScript">NOT Installed AND NOT CLI_INSTALL_ERROR</Custom>
-      -->
       <Custom Action="RunUninstallBatchScript" Before="RemoveFiles">Installed AND NOT REINSTALL AND NOT UPGRADINGPRODUCTCODE</Custom>
-      <!-- Ensure INSTALLFOLDER is cleared if installation fails -->
+      <!--
+      Ensure INSTALLFOLDER is cleared if installation fails.
+      -->
       <!--
       <Custom Action="RunUninstallOnInstallFailureBatchScript" After="RunInstallBatchScript">NOT Installed AND CLI_INSTALL_ERROR</Custom>
       -->

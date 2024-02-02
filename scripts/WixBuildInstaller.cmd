@@ -62,7 +62,7 @@ if %ERRORLEVEL% neq 0 (
   exit /b %EXITCODE%
 )
 
-light.exe Azure-AI-CLI-Bundle.wixobj -cultures:en-us -loc Azure-AI-CLI-Bundle.wxl -ext WixBalExtension -ext WixUtilExtension -out %INSTALLER_FILE%
+light.exe Azure-AI-CLI-Bundle.wixobj -ext WixBalExtension -ext WixUtilExtension -out %INSTALLER_FILE%
 if %ERRORLEVEL% neq 0 (
   set EXITCODE=%ERRORLEVEL%
   echo Error from light.exe [%EXITCODE%] 1>&2

@@ -8,19 +8,20 @@ define_variable () {
 echo "Source branch: $BUILD_SOURCEBRANCH"
 
 # Determine the product version (major.minor.build).
+# ref. https://learn.microsoft.com/windows/win32/msi/productversion
 # NOTE: If the major or minor version is not updated before a new year, the version number becomes ambiguous
 # and it may not be possible to upgrade an old version from the previous year without manual uninstallation.
 # Example:
 # - last build of year N:    1.0.36599
-# - first build of year N+1: 1.0.101   -> cannot update 1.0.36599 with this, must uninstall 1.0.36599 first.
+# - first build of year N+1: 1.0.101   -> cannot update with this, must uninstall 1.0.36599 first.
 
 MAJOR_VERSION="1"
 MINOR_VERSION="0"
 BUILD_VERSION="0"
 
-# Parse Build.BuildNumber for build date and run.
+# Parse Build.BuildNumber for build date and daily run # (max 99).
 if [ ! -z "$1" ]; then
-    # e.g. "20240120.2" -> build year 2024, month 01, day 20, (daily build) run 2
+    # e.g. "20240120.2" -> build year 2024, month 01, day 20, run 2
     BUILD_YEAR=$(echo "$1" | sed 's/^\([0-9]\{4\}\)[0-9]\{4\}\.[0-9]*$/\1/')
     BUILD_MONTH=$(echo "$1" | sed 's/^[0-9]\{4\}\([0-9]\{2\}\)[0-9]\{2\}\.[0-9]*$/\1/')
     BUILD_DAY=$(echo "$1" | sed 's/^[0-9]\{6\}\([0-9]\{2\}\)\.[0-9]*$/\1/')
@@ -37,7 +38,7 @@ if [ ! -z "$1" ]; then
             BUILD_VERSION="${DayOfYear}${BUILD_RUN}"
         fi
     else
-        >&2 echo "Ignored invalid argument: BuildNumber $1"
+        >&2 echo "Ignored invalid argument: Build.BuildNumber $1"
     fi
 fi
 
