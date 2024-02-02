@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+
+  <PropertyGroup>
+    <TargetFramework>net7.0</TargetFramework>
+    <OutputType>Library</OutputType>
+    <AssemblyName>Azure.AI.CLI.RecordedTestAdapter</AssemblyName>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <ApplicationIcon />
+    <StartupObject />
+    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+    <PackageVersion>1.1.0</PackageVersion>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <LocalBinOutputPath Condition="'$(LocalBinOutputPath)' == '' And '$(LocalBuildSDKBinPath)' != ''">$(LocalBuildSDKBinPath)</LocalBinOutputPath>
+    <LocalBinOutputPath Condition="'$(LocalBinOutputPath)' == ''">bin</LocalBinOutputPath>
+  </PropertyGroup>
+
+ <Choose>
+    <When Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+      <PropertyGroup>
+        <Platforms>x64</Platforms>
+        <OutputPath>$(LocalBinOutputPath)\Release\</OutputPath>
+      </PropertyGroup>
+    </When>
+    <When Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+      <PropertyGroup>
+        <Platforms>x64</Platforms>
+        <OutputPath>$(LocalBinOutputPath)\Debug\</OutputPath>
+      </PropertyGroup>
+    </When>
+    <When Condition="$(Configuration.Contains('ReleaseUnixOS'))">
+      <PropertyGroup>
+        <DefineConstants>$(DefineConstants);UNIX</DefineConstants>
+        <OutputPath>$(LocalBinOutputPath)\ReleaseUnixOS</OutputPath>
+      </PropertyGroup>
+    </When>
+    <When Condition="$(Configuration.Contains('DebugUnixOS'))">
+      <PropertyGroup>
+        <DefineConstants>$(DefineConstants);UNIX</DefineConstants>
+        <OutputPath>$(LocalBinOutputPath)\DebugUnixOS</OutputPath>
+      </PropertyGroup>
+    </When>
+  </Choose>
+
+  <PropertyGroup>
+    <TAAssemblyVersion Condition="'$(TAAssemblyVersion)' == ''">1.0.0</TAAssemblyVersion>
+    <TAAssemblyInformationalVersion Condition="'$(TAAssemblyInformationalVersion)' == ''">$(TAAssemblyVersion)</TAAssemblyInformationalVersion>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <FileVersion>$(TAAssemblyVersion)</FileVersion>
+    <AssemblyVersion>$(TAAssemblyVersion)</AssemblyVersion>
+    <InformationalVersion>$(TAAssemblyInformationalVersion)</InformationalVersion>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.0.0" />
+    <PackageReference Include="System.Data.DataSetExtensions" Version="4.5.0" />
+    <PackageReference Include="System.Configuration.ConfigurationManager" Version="5.0.0" />
+    <PackageReference Include="Microsoft.TestPlatform.ObjectModel" Version="17.0.0" />
+    <PackageReference Include="YamlDotNet" Version="11.2.1" />
+  </ItemGroup>
+
+</Project>

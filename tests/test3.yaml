@@ -20,6 +20,15 @@
 - name: test ai chat
   command: ai chat --question "Why is the sky blue, what's it called" --index-name @none
   expect: Rayleigh
+  tags: 
+    recordable: true
+    _sanitize:
+      - headers:
+        - name: api-key
+          value: 00000000-0000-0000-0000-000000000000
+      - uri:
+        - regex: https://(?<host>[^/]+)/
+          value: https://fakeendpoint
 
 - name: dev new environment
   command: ai dev new .env
