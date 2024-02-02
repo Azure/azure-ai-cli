@@ -65,7 +65,9 @@ namespace Azure.AI.Details.Common.CLI.TestRunner
             if (run)
             {
                 var reporter = new YamlTestFrameworkConsoleReporter();
+                // tests = tests.Where(x => x.FullyQualifiedName.Contains("c#")).ToList();
                 YamlTestFramework.RunTests(tests, reporter);
+                reporter.WriteResultFile();
             }
             
             // TODO: return non zero if test failed
