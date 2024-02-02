@@ -1,7 +1,31 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
-  <Product Id="*" Name="Azure AI CLI" Language="1033" Version="1.0.0.0" Manufacturer="Microsoft" UpgradeCode="436172626F6E20697320636F6F6C2121">
-    <Package InstallerVersion="200" Compressed="yes" InstallScope="perMachine" />
+
+  <Product Id="*" Name="Azure AI CLI" Language="1033" Version="$(var.productVersion)" Manufacturer="Microsoft" UpgradeCode="F1CDBA9C-E353-4039-9A20-059A1E587E73">
+    <Package InstallerVersion="500" Compressed="yes" InstallScope="perMachine" Platform="$(var.targetPlatform)" />
+    <!--
+    To prevent problems with bundle upgrades, use MajorUpgrade element here and ProductSearch in the bundle .wxs.
+    -->
+    <MajorUpgrade AllowDowngrades="no" DowngradeErrorMessage="A newer version is already installed."/>
+
+    <!--
+    Below can be used to control upgrades on a single MSI-only (non-bundle) installation.
+    -->
+    <!--
+    <Upgrade Id="F1CDBA9C-E353-4039-9A20-059A1E587E73">
+      <UpgradeVersion OnlyDetect="yes" Property="SELFFOUND"
+        Minimum="$(var.productVersion)" IncludeMinimum="yes"
+        Maximum="$(var.productVersion)" IncludeMaximum="yes" />
+      <UpgradeVersion OnlyDetect="yes" Property="NEWERFOUND"
+        Minimum="$(var.productVersion)" IncludeMinimum="no" />
+      <UpgradeVersion OnlyDetect="no" Property="PREVIOUSFOUND"
+        Minimum="1.0.0" IncludeMinimum="yes"
+        Maximum="$(var.productVersion)" IncludeMaximum="no" />
+    </Upgrade>
+
+    <CustomAction Id="AlreadyUpdated" Error="This version is already installed." />
+    <CustomAction Id="NoDowngrade" Error="A newer version is already installed." />
+    -->
 
     <Media Id="1" Cabinet="media1.cab" EmbedCab="yes" />
 
@@ -11,21 +35,59 @@
       </Directory>
     </Directory>
 
-    <CustomAction Id="RunInstallBatchScript" FileKey="InstallBatchScript" ExeCommand="" Execute="immediate" Return="check"/>
+    <!--
+    Below would check errors from the installation script and log the output. Didn't work in a clean Win11 environment.
+    -->
+    <!--
+    <Property Id="CLI_PACKAGE_VERSION" Value="$(var.packageVersion)" />
+    <Property Id="CLI_INSTALL_ERROR" Secure="yes" />
+    <CustomAction Id="RunInstallBatchScript"
+              Script="vbscript"
+              Execute="immediate">
+      <![CDATA[
+        On Error Resume Next
+        Dim objShell, intReturnCode, logFile
+        Set objShell = CreateObject("WScript.Shell")
+        logFile = objShell.ExpandEnvironmentStrings("%TEMP%") & "\InstallCLI.log"
+        intReturnCode = objShell.Run("$(sys.SOURCEFILEDIR)\InstallCLI.cmd " & Session.Property("CLI_PACKAGE_VERSION") & " >" & logFile & " 2>&1", 0, True)
+        If intReturnCode <> 0 Then
+            Set fso = CreateObject("Scripting.FileSystemObject")
+            Set file = fso.OpenTextFile(logFile, 1)
+            text = file.ReadAll
+            file.Close
+            Session.Property("CLI_INSTALL_ERROR") = "Error installing AI CLI: " & text
+        End If
+      ]]>
+    </CustomAction>
+    -->
+    <CustomAction Id="RunInstallBatchScript" FileKey="InstallBatchScript" ExeCommand="$(var.packageVersion)" Execute="immediate" Return="ignore"/>
     <CustomAction Id="RunUninstallBatchScript" FileKey="UninstallBatchScript" ExeCommand="" Execute="immediate" Return="ignore"/>
+    <!--
+    <CustomAction Id="RunUninstallOnInstallFailureBatchScript" FileKey="UninstallBatchScript" ExeCommand="" Execute="immediate" Return="ignore"/>
+    -->
 
     <ComponentGroup Id="ProductComponents" Directory="INSTALLFOLDER">
-      <Component Id="InstallBatchScriptComponent" Guid="436172626F6E20697320636F6F6C2120">
+      <Component Id="InstallBatchScriptComponent" Guid="9343B67B-61D6-4F7C-9B82-E6CA30C30038">
         <File Id="InstallBatchScript" Source="$(sys.SOURCEFILEDIR)\InstallCLI.cmd" KeyPath="yes"/>
       </Component>
-      <Component Id="UninstallBatchScriptComponent" Guid="436172626F6E20697320636F6F6C2122">
+      <Component Id="UninstallBatchScriptComponent" Guid="A05CBC7F-D9F0-46BC-A9CC-FEAAFB0A4502">
         <File Id="UninstallBatchScript" Source="$(sys.SOURCEFILEDIR)\UninstallCLI.cmd" KeyPath="yes"/>
       </Component>
     </ComponentGroup>
 
     <InstallExecuteSequence>
-      <Custom Action="RunInstallBatchScript" After="InstallFinalize">NOT Installed</Custom>
-      <Custom Action="RunUninstallBatchScript" Before="RemoveFiles">Installed</Custom>
+      <!--
+      <Custom Action="AlreadyUpdated" After="FindRelatedProducts">SELFFOUND</Custom>
+      <Custom Action="NoDowngrade" After="FindRelatedProducts">NEWERFOUND</Custom>
+      -->
+      <Custom Action="RunInstallBatchScript" After="InstallFinalize">NOT Installed OR REINSTALL OR UPGRADINGPRODUCTCODE</Custom>
+      <Custom Action="RunUninstallBatchScript" Before="RemoveFiles">Installed AND NOT REINSTALL AND NOT UPGRADINGPRODUCTCODE</Custom>
+      <!--
+      Ensure INSTALLFOLDER is cleared if installation fails.
+      -->
+      <!--
+      <Custom Action="RunUninstallOnInstallFailureBatchScript" After="RunInstallBatchScript">NOT Installed AND CLI_INSTALL_ERROR</Custom>
+      -->
     </InstallExecuteSequence>
 
     <Feature Id="MainFeature" Title="Main Feature" Level="1">
