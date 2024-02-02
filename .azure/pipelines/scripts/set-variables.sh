@@ -18,35 +18,38 @@ MAJOR_VERSION="1"
 MINOR_VERSION="0"
 BUILD_VERSION="0"
 
+# Parse Build.BuildNumber for build date and run.
 if [ ! -z "$1" ]; then
-    # e.g. "20240120.2" -> BuildYear 2024, BuildMonth 01, BuildDay 20, BuildRun 2
-    BuildYear=$(echo "$1" | sed 's/^\([0-9]\{4\}\)[0-9]\{4\}\.[0-9]*$/\1/')
-    BuildMonth=$(echo "$1" | sed 's/^[0-9]\{4\}\([0-9]\{2\}\)[0-9]\{2\}\.[0-9]*$/\1/')
-    BuildDay=$(echo "$1" | sed 's/^[0-9]\{6\}\([0-9]\{2\}\)\.[0-9]*$/\1/')
-    BuildRun=$(echo "$1" | sed 's/^[0-9]\{8\}\.\([0-9]*$\)/\1/')
+    # e.g. "20240120.2" -> build year 2024, month 01, day 20, (daily build) run 2
+    BUILD_YEAR=$(echo "$1" | sed 's/^\([0-9]\{4\}\)[0-9]\{4\}\.[0-9]*$/\1/')
+    BUILD_MONTH=$(echo "$1" | sed 's/^[0-9]\{4\}\([0-9]\{2\}\)[0-9]\{2\}\.[0-9]*$/\1/')
+    BUILD_DAY=$(echo "$1" | sed 's/^[0-9]\{6\}\([0-9]\{2\}\)\.[0-9]*$/\1/')
+    BUILD_RUN=$(echo "$1" | sed 's/^[0-9]\{8\}\.\([0-9]*$\)/\1/')
 
-    if [ ! -z "$BuildMonth" -a $BuildMonth -ge 1 -a $BuildMonth -le 12 -a \
-         ! -z "$BuildDay"   -a $BuildDay   -ge 1 -a $BuildDay   -le 31 -a \
-         ! -z "$BuildRun"   -a $BuildRun   -ge 1 -a $BuildRun   -le 99 ]
+    if [ ! -z "$BUILD_MONTH" -a $BUILD_MONTH -ge 1 -a $BUILD_MONTH -le 12 -a \
+         ! -z "$BUILD_DAY"   -a $BUILD_DAY   -ge 1 -a $BUILD_DAY   -le 31 -a \
+         ! -z "$BUILD_RUN"   -a $BUILD_RUN   -ge 1 -a $BUILD_RUN   -le 99 ]
     then
-        let DayOfYear="($BuildMonth - 1) * 31 + $BuildDay" # estimate using max days/month
-        if [ $BuildRun -lt 10 ]; then
-            BUILD_VERSION="${DayOfYear}0${BuildRun}"
+        let DayOfYear="($BUILD_MONTH - 1) * 31 + $BUILD_DAY" # estimate using max days/month
+        if [ $BUILD_RUN -lt 10 ]; then
+            BUILD_VERSION="${DayOfYear}0${BUILD_RUN}"
         else
-            BUILD_VERSION="${DayOfYear}${BuildRun}"
+            BUILD_VERSION="${DayOfYear}${BUILD_RUN}"
         fi
     else
         >&2 echo "Ignored invalid argument: BuildNumber $1"
     fi
 fi
+
 PRODUCT_VERSION="${MAJOR_VERSION}.${MINOR_VERSION}.${BUILD_VERSION}"
 echo "Product version: $PRODUCT_VERSION"
 
+# Append Build.BuildId to version string.
 if [ ! -z "$2" ]; then
-    BuildId=$2
-    DEV_VERSION="${PRODUCT_VERSION}-dev${BuildYear}.${BuildId}"
+    BUILD_ID=$2
+    DEV_VERSION="${PRODUCT_VERSION}-dev${BUILD_YEAR}.${BUILD_ID}"
 else
-    DEV_VERSION="${PRODUCT_VERSION}-dev${BuildYear}"
+    DEV_VERSION="${PRODUCT_VERSION}-dev${BUILD_YEAR}"
 fi
 
 # If the build was triggered from a tag, use the tag as the version. Otherwise, set the version to dev.
