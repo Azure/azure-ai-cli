@@ -2,6 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Windows.Markup;
+using YamlDotNet.Core.Tokens;
 using YamlDotNet.RepresentationModel;
 
 namespace Azure.AI.Details.Common.CLI.TestFramework
@@ -89,16 +91,29 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
             }
         }
 
-        private static void AddOptionalNameValueTags(Dictionary<string, List<string>> tags, YamlMappingNode mapping)
+        private static void AddOptionalNameValueTags(Dictionary<string, List<string>> tags, YamlMappingNode mapping, string keyPrefix = "")
         {
             var children = mapping?.Children;
             if (children == null) return;
 
             foreach (var child in children)
             {
-                var key = (child.Key as YamlScalarNode)?.Value;
-                var value = (child.Value as YamlScalarNode)?.Value;
-                AddOptionalTag(tags, key, value);
+                var key = keyPrefix + (child.Key as YamlScalarNode)?.Value;
+
+                if (child.Value is YamlScalarNode)
+                {
+                    var value = (child.Value as YamlScalarNode)?.Value;
+                    AddOptionalTag(tags, key, value);
+                }
+                else if (child.Value is YamlSequenceNode || child.Value is YamlMappingNode)
+                {
+                    var value = child.Value.ToJsonString();
+                    AddOptionalTag(tags, key, value);
+                }
+                else if(child.Value is YamlMappingNode)
+                {
+                    AddOptionalNameValueTags(tags, child.Value as YamlMappingNode, $"{key}.");
+                }
             }
         }
 

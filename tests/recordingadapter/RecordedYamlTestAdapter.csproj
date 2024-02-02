@@ -1,0 +1,13 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+  </PropertyGroup>
+
+  <Import Project="RecordedYamlTestAdapterCommon.targets" />
+
+  <ItemGroup>
+    <ProjectReference Include="..\testframework\YamlTestFramework.csproj" />
+  </ItemGroup>
+
+</Project>
