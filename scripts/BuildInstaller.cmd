@@ -1,13 +1,6 @@
 @echo off
 setlocal
 
-REM Dependencies
-set AZURE_CLI_VERSION=2.56.0
-set DOTNET_VERSION=7.0.405
-set DOTNET_URL=https://download.visualstudio.microsoft.com/download/pr/febc46ff-cc68-4bee-83d2-c34786b5ca68/524ef9b25d29dc90efdb0fba0f589779/dotnet-sdk-%DOTNET_VERSION%-win-%TARGET_PLATFORM%.exe
-set DOTNET_SIZE=229741072
-set DOTNET_SHA1=8d40790ae79bfc6f29f1ab280801e6c019ae5633
-
 REM Azure AI CLI package version (e.g. 1.0.0 or 1.0.0-preview-20231214.1)
 if "%~1"=="" (
   echo Error: Azure AI CLI package version is not set. 1>&2
@@ -27,6 +20,13 @@ set PACKAGE_VERSION=%~1
 set PRODUCT_VERSION=%~2
 set TARGET_PLATFORM=x64
 set INSTALLER_FILE=Setup-%TARGET_PLATFORM%.exe
+
+REM Dependencies
+set AZURE_CLI_VERSION=2.56.0
+set DOTNET_VERSION=7.0.405
+set DOTNET_URL=https://download.visualstudio.microsoft.com/download/pr/febc46ff-cc68-4bee-83d2-c34786b5ca68/524ef9b25d29dc90efdb0fba0f589779/dotnet-sdk-%DOTNET_VERSION%-win-%TARGET_PLATFORM%.exe
+set DOTNET_SIZE=229741072
+set DOTNET_SHA1=8d40790ae79bfc6f29f1ab280801e6c019ae5633
 
 REM Check for WiX toolset
 where candle.exe >nul 2>&1
