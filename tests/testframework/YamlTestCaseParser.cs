@@ -16,7 +16,7 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
         {
             var area = GetRootArea(file);
             var parsed = YamlHelpers.ParseYamlStream(file.FullName);
-            return TestCasesFromYamlStream(source, file, area, parsed);
+            return TestCasesFromYamlStream(source, file, area, parsed).ToList();
         }
 
         #region private methods

@@ -16,9 +16,11 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
     {
         public static IEnumerable<TestCase> FilterTestCases(IEnumerable<TestCase> tests, IRunContext runContext)
         {
+            tests = tests.ToList(); // force enumeration
+            
             var names = GetSupportedFilterableNames(tests);
             var filter = runContext.GetTestCaseFilter(names, null);
-            return tests.Where(test => filter == null || filter.MatchTestCase(test, name => GetPropertyValue(test, name)));
+            return tests.Where(test => filter == null || filter.MatchTestCase(test, name => GetPropertyValue(test, name))).ToList();
         }
 
         private static HashSet<string> GetSupportedFilterableNames(IEnumerable<TestCase> tests)

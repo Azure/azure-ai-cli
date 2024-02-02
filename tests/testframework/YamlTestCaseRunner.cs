@@ -17,7 +17,7 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
 {
     public class YamlTestCaseRunner
     {
-        public static TestOutcome RunAndRecordTestCase(TestCase test, IYamlTestFrameworkReporter reporter)
+        public static TestOutcome RunAndRecordTestCase(TestCase test, IYamlTestFrameworkHost reporter)
         {
             TestCaseStart(test, reporter);
             TestCaseRun(test, reporter, out TestOutcome outcome);
@@ -27,13 +27,13 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
 
         #region private methods
 
-        private static void TestCaseStart(TestCase test, IYamlTestFrameworkReporter reporter)
+        private static void TestCaseStart(TestCase test, IYamlTestFrameworkHost reporter)
         {
             Logger.Log($"YamlTestCaseRunner.TestCaseStart({test.DisplayName})");
             reporter.RecordStart(test);
         }
 
-        private static TestOutcome TestCaseRun(TestCase test, IYamlTestFrameworkReporter reporter, out TestOutcome outcome) 
+        private static TestOutcome TestCaseRun(TestCase test, IYamlTestFrameworkHost reporter, out TestOutcome outcome) 
         {
             Logger.Log($"YamlTestCaseRunner.TestCaseRun({test.DisplayName})");
             
@@ -751,7 +751,7 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
             return outcome;
         }
 
-        private static void TestCaseStop(TestCase test, IYamlTestFrameworkReporter reporter, TestOutcome outcome)
+        private static void TestCaseStop(TestCase test, IYamlTestFrameworkHost reporter, TestOutcome outcome)
         {
             Logger.Log($"YamlTestCaseRunner.TestCaseStop({test.DisplayName})");
             reporter.RecordEnd(test, outcome);

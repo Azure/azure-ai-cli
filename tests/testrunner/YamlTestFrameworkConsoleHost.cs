@@ -1,15 +1,16 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Xml;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Adapter;
 
 namespace Azure.AI.Details.Common.CLI.TestFramework
 {
-    public class YamlTestFrameworkConsoleReporter : IYamlTestFrameworkReporter
+    public class YamlTestFrameworkConsoleHost : IYamlTestFrameworkHost
     {
-        public YamlTestFrameworkConsoleReporter()
+        public YamlTestFrameworkConsoleHost()
         {
         }
 
@@ -17,7 +18,7 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
         {
             _startTime ??= DateTime.Now;
             _testCases.Add(testCase);
-            _testToExecutionMap[testCase.Id] = Guid.NewGuid();
+            SetExecutionId(testCase, Guid.NewGuid());
 
             Console.WriteLine("Starting test: " + testCase.FullyQualifiedName);
         }
@@ -48,7 +49,7 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
 
         public void WriteResultFile()
         {
-            var assembly = typeof(YamlTestFrameworkConsoleReporter).Assembly;
+            var assembly = typeof(YamlTestFrameworkConsoleHost).Assembly;
             var assemblyPath = assembly.Location;
 
             _startTime ??= DateTime.Now;
@@ -87,7 +88,13 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
             writer.WriteStartElement("Results");
             foreach (var testResult in _testResults)
             {
-                var executionId = _testToExecutionMap[testResult.TestCase.Id].ToString();
+                var executionId = GetExecutionId(testResult.TestCase).ToString();
+                var stdout = testResult.Messages.First(x => x.Category == TestResultMessage.StandardOutCategory).Text
+                    .Replace("\u001b", string.Empty);
+
+                var debugTrace = testResult.Messages.First(x => x.Category == TestResultMessage.DebugTraceCategory).Text;
+                var message = testResult.Messages.First(x => x.Category == TestResultMessage.AdditionalInfoCategory).Text;
+
                 writer.WriteStartElement("UnitTestResult");
                 writer.WriteAttributeString("executionId", executionId);
                 writer.WriteAttributeString("testId", testResult.TestCase.Id.ToString());
@@ -101,15 +108,15 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
                 writer.WriteAttributeString("testListId", testListId);
                 writer.WriteAttributeString("relativeResultsDirectory", Guid.NewGuid().ToString());
                 writer.WriteStartElement("Output");
-                writer.WriteElementString("StdOut", testResult.Messages.First(x => x.Category == TestResultMessage.StandardOutCategory).Text);
-                writer.WriteElementString("DebugTrace", testResult.Messages.First(x => x.Category == TestResultMessage.DebugTraceCategory).Text);
+                writer.WriteElementString("StdOut", stdout);
+                writer.WriteElementString("DebugTrace", debugTrace);
                 writer.WriteStartElement("ErrorInfo");
                 writer.WriteElementString("Message", testResult.ErrorMessage);
                 writer.WriteElementString("StackTrace", testResult.ErrorStackTrace);
                 writer.WriteEndElement();
                 writer.WriteStartElement("TextMessages");
 
-                writer.WriteElementString("Message", testResult.Messages.First(x => x.Category == TestResultMessage.AdditionalInfoCategory).Text);
+                writer.WriteElementString("Message", message);
                 writer.WriteEndElement();
                 writer.WriteEndElement();
                 writer.WriteEndElement();
@@ -119,7 +126,7 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
             writer.WriteStartElement("TestDefinitions");
             foreach (var testCase in _testCases)
             {
-                var executionId = _testToExecutionMap[testCase.Id].ToString();
+                var executionId = GetExecutionId(testCase).ToString();
                 var qualifiedParts = testCase.FullyQualifiedName.Split('.');
                 var className = string.Join(".", qualifiedParts.Take(qualifiedParts.Length - 1));
                 var name = qualifiedParts.Last();
@@ -143,7 +150,7 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
             writer.WriteStartElement("TestEntries");
             foreach (var testCase in _testCases)
             {
-                var executionId = _testToExecutionMap[testCase.Id].ToString();
+                var executionId = GetExecutionId(testCase).ToString();
                 writer.WriteStartElement("TestEntry");
                 writer.WriteAttributeString("testId", testCase.Id.ToString());
                 writer.WriteAttributeString("executionId", executionId);
@@ -260,6 +267,22 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
         {
             return false;
             // return r.Outcome == TestOutcome.Warning;
+        }
+
+        private void SetExecutionId(TestCase testCase, Guid guid)
+        {
+            lock (_testToExecutionMap)
+            {
+                _testToExecutionMap[testCase.Id] = guid;
+            }
+        }
+
+        private Guid GetExecutionId(TestCase testCase)
+        {
+            lock (_testToExecutionMap)
+            {
+                return _testToExecutionMap[testCase.Id];
+            }
         }
 
         private DateTime? _startTime;

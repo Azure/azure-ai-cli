@@ -20,39 +20,37 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
             Logger.Log($"YamlTestFramework.GetTestsFromDirectory('{source}', '{directory.FullName}'): ENTER");
 
             directory = YamlTagHelpers.GetYamlDefaultTagsFullFileName(directory)?.Directory ?? directory;
-            foreach (var file in FindFiles(directory))
-            {
-                foreach (var test in GetTestsFromYaml(source, file))
-                {
-                    yield return test;
-                }
-            }
+            var files = FindFiles(directory);
+            var tests = files.SelectMany(file => GetTestsFromYaml(source, file));
+
            Logger.Log($"YamlTestFramework.GetTestsFromDirectory('{source}', '{directory.FullName}'): EXIT");
+           return tests.ToList();
         }
 
         public static IEnumerable<TestCase> GetTestsFromYaml(string source, FileInfo file)
         {
             Logger.Log($"YamlTestFramework.GetTestsFromYaml('{source}', '{file.FullName}'): ENTER");
-            foreach (var test in YamlTestCaseParser.TestCasesFromYaml(source, file))
-            {
-                yield return test;
-            }
+            var tests = YamlTestCaseParser.TestCasesFromYaml(source, file);
+
             Logger.Log($"YamlTestFramework.GetTestsFromYaml('{source}', '{file.FullName}'): EXIT");
+            return tests;
         }
 
-        public static void RunTests(IEnumerable<TestCase> tests, IYamlTestFrameworkReporter reporter)
+        public static void RunTests(IEnumerable<TestCase> tests, IYamlTestFrameworkHost reporter)
         {
+            tests = tests.ToList(); // force enumeration
+
             var grouped = GroupTestCasesByPriority(tests);
             foreach (var priorityGroup in grouped)
             {
-                if (!priorityGroup.Any()) continue;
+                if (priorityGroup.Count == 0) continue;
                 RunAndRecordTests(reporter, priorityGroup);
             }
         }
 
         #region private methods
 
-        private static void RunAndRecordTests(IYamlTestFrameworkReporter reporter, IEnumerable<TestCase> tests)
+        private static void RunAndRecordTests(IYamlTestFrameworkHost reporter, IEnumerable<TestCase> tests)
         {
             InitRunAndRecordTestCaseMaps(tests, out var testFromIdMap, out var completionFromIdMap);
             RunAndRecordParallelizedTestCases(reporter, testFromIdMap, completionFromIdMap, tests);
@@ -71,9 +69,9 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
             }
         }
 
-        private static void RunAndRecordParallelizedTestCases(IYamlTestFrameworkReporter reporter, Dictionary<string, TestCase> testFromIdMap, Dictionary<string, TaskCompletionSource<TestOutcome>> completionFromIdMap, IEnumerable<TestCase> tests)
+        private static void RunAndRecordParallelizedTestCases(IYamlTestFrameworkHost reporter, Dictionary<string, TestCase> testFromIdMap, Dictionary<string, TaskCompletionSource<TestOutcome>> completionFromIdMap, IEnumerable<TestCase> tests)
         {
-            var parallelTestSet = tests.Where(test => YamlTestProperties.Get(test, "parallelize") == "true");
+            var parallelTestSet = tests.Where(test => YamlTestProperties.Get(test, "parallelize") == "true").ToList();
             foreach (var test in parallelTestSet)
             {
                 ThreadPool.QueueUserWorkItem(state =>
@@ -129,7 +127,7 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
             Logger.Log($"YamlTestFramework.RunTests() ==> All parallel tests complete");
         }
 
-        private static void RunAndRecordRemainingTestCases(IYamlTestFrameworkReporter reporter, Dictionary<string, TestCase> testFromIdMap, Dictionary<string, TaskCompletionSource<TestOutcome>> completionFromIdMap)
+        private static void RunAndRecordRemainingTestCases(IYamlTestFrameworkHost reporter, Dictionary<string, TestCase> testFromIdMap, Dictionary<string, TaskCompletionSource<TestOutcome>> completionFromIdMap)
         {
             var remainingTests = completionFromIdMap
                 .Where(x => x.Value.Task.Status != TaskStatus.RanToCompletion)
@@ -152,7 +150,7 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
             return trait.Name == check || trait.Value == check;
         }
 
-        private static IEnumerable<IEnumerable<TestCase>> GroupTestCasesByPriority(IEnumerable<TestCase> tests)
+        private static List<List<TestCase>> GroupTestCasesByPriority(IEnumerable<TestCase> tests)
         {
             Logger.Log($"YamlTestFramework.GroupTestCasesByPriority()");
 
@@ -160,13 +158,16 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
             var after = tests.Where(test => test.Traits.Count(x => IsTrait(x, "after")) > 0);
             var middle = tests.Where(test => !before.Contains(test) && !after.Contains(test));
 
-            var testsList = new List<IEnumerable<TestCase>> { before, middle, after };
+            var testsList = new List<List<TestCase>>();
+            testsList.Add(before.ToList());
+            testsList.Add(middle.ToList());
+            testsList.Add(after.ToList());
             Logger.Log("YamlTestFramework.GroupTestCasesByPriority() ==> {string.Join('\n', tests.Select(x => x.Name))}");
 
             return testsList;
         }
 
-        private static TestOutcome RunAndRecordTestCase(TestCase test, IYamlTestFrameworkReporter reporter)
+        private static TestOutcome RunAndRecordTestCase(TestCase test, IYamlTestFrameworkHost reporter)
         {
             Logger.Log($"YamlTestFramework.TestRunAndRecord({test.DisplayName})");
             return YamlTestCaseRunner.RunAndRecordTestCase(test, reporter);
