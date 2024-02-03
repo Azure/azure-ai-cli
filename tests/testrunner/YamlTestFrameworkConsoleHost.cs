@@ -62,7 +62,7 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
             var userName = Environment.UserName;
             var machineName = Environment.MachineName;
             var userAtMachine = userName.Split('\\', '/').Last() + "@" + machineName;
-            var testRunName = userAtMachine + _endTime.Value.ToString("yyyy-MM-dd HH:mm:ss");
+            var testRunName = userAtMachine + " " + _endTime.Value.ToString("yyyy-MM-dd HH:mm:ss");
 
             XmlWriterSettings settings = new XmlWriterSettings();
             settings.Indent = true;
@@ -104,7 +104,7 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
                 writer.WriteAttributeString("startTime", testResult.StartTime.DateTime.ToString("o"));
                 writer.WriteAttributeString("endTime", testResult.EndTime.DateTime.ToString("o"));
                 writer.WriteAttributeString("testType", testType);
-                writer.WriteAttributeString("outcome", testResult.Outcome.ToString());
+                writer.WriteAttributeString("outcome", OutcomeToString(testResult.Outcome));
                 writer.WriteAttributeString("testListId", testListId);
                 writer.WriteAttributeString("relativeResultsDirectory", Guid.NewGuid().ToString());
                 writer.WriteStartElement("Output");
@@ -203,6 +203,18 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
 
             writer.Close();
             writer.Dispose();
+        }
+
+        private static string OutcomeToString(TestOutcome outcome)
+        {
+            return outcome switch {
+                TestOutcome.None => "None",
+                TestOutcome.Passed => "Passed",
+                TestOutcome.Failed => "Failed",
+                TestOutcome.Skipped => "NotExecuted",
+                TestOutcome.NotFound => "NotFound",
+                _ => "None",
+            };
         }
 
         private bool IsExecuted(TestResult r)
