@@ -18,7 +18,7 @@
       interactive: false
 
 - name: test ai chat
-  command: ai chat --question "Why is the sky blue" --index-name @none
+  command: ai chat --question "Why is the sky blue, what's it called" --index-name @none
   expect: Rayleigh
 
 - name: dev new environment
