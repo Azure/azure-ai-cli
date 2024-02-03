@@ -175,7 +175,7 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
 
             writer.WriteStartElement("Counters");
             writer.WriteAttributeString("total", _testResults.Count.ToString());
-            writer.WriteAttributeString("executed", _testResults.Count.ToString());
+            writer.WriteAttributeString("executed", _testResults.Count(r => IsExecuted(r)).ToString());
             writer.WriteAttributeString("passed", _testResults.Count(r => IsPassed(r)).ToString());
             writer.WriteAttributeString("failed", _testResults.Count(r => IsFailed(r)).ToString());
             writer.WriteAttributeString("error", _testResults.Count(r => IsError(r)).ToString());
@@ -203,6 +203,11 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
 
             writer.Close();
             writer.Dispose();
+        }
+
+        private bool IsExecuted(TestResult r)
+        {
+            return IsPassed(r) || IsFailed(r);
         }
 
         private static bool IsPassed(TestResult r)
