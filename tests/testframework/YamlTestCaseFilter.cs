@@ -52,6 +52,7 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
                 case "cli": return YamlTestProperties.Get(test, "cli");
                 case "command": return YamlTestProperties.Get(test, "command");
                 case "script": return YamlTestProperties.Get(test, "script");
+                case "bash": return YamlTestProperties.Get(test, "bash");
 
                 case "foreach": return YamlTestProperties.Get(test, "foreach");
                 case "arguments": return YamlTestProperties.Get(test, "arguments");
@@ -75,6 +76,6 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
             return tags.Select(x => x.Value).ToArray();
         }
 
-        private static readonly string[] supportedFilterProperties = { "DisplayName", "FullyQualifiedName", "Category", "cli", "command", "script", "foreach", "arguments", "input", "expect", "expect-gpt", "not-expect", "parallelize", "simulate", "skipOnFailure" };
+        private static readonly string[] supportedFilterProperties = { "DisplayName", "FullyQualifiedName", "Category", "cli", "command", "script", "bash", "foreach", "arguments", "input", "expect", "expect-gpt", "not-expect", "parallelize", "simulate", "skipOnFailure" };
     }
 }

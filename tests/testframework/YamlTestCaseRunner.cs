@@ -63,6 +63,14 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
             var cli = YamlTestProperties.Get(test, "cli") ?? "";
             var command = YamlTestProperties.Get(test, "command");
             var script = YamlTestProperties.Get(test, "script");
+            var bash = YamlTestProperties.Get(test, "bash");
+
+            var scriptIsBash = !string.IsNullOrEmpty(bash);
+            if (scriptIsBash) script = bash;
+
+            var isWindows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
+            if (!isWindows) scriptIsBash = true;
+
             var @foreach = YamlTestProperties.Get(test, "foreach");
             var arguments = YamlTestProperties.Get(test, "arguments");
             var input = YamlTestProperties.Get(test, "input");
@@ -87,8 +95,8 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
                 var start = DateTime.Now;
 
                 var outcome = string.IsNullOrEmpty(simulate)
-                    ? RunTestCase(test, skipOnFailure, cli, command, script, foreachItem, arguments, input, expect, expectGpt, notExpect, workingDirectory, timeout, out string stdOut, out string stdErr, out string errorMessage, out string stackTrace, out string additional, out string debugTrace)
-                    : SimulateTestCase(test, simulate, cli, command, script, foreachItem, arguments, input, expect, expectGpt, notExpect, workingDirectory, out stdOut, out stdErr, out errorMessage, out stackTrace, out additional, out debugTrace);
+                    ? RunTestCase(test, skipOnFailure, cli, command, script, scriptIsBash, foreachItem, arguments, input, expect, expectGpt, notExpect, workingDirectory, timeout, out string stdOut, out string stdErr, out string errorMessage, out string stackTrace, out string additional, out string debugTrace)
+                    : SimulateTestCase(test, simulate, cli, command, script, scriptIsBash, foreachItem, arguments, input, expect, expectGpt, notExpect, workingDirectory, out stdOut, out stdErr, out errorMessage, out stackTrace, out additional, out debugTrace);
 
                 #if DEBUG
                 additional += outcome == TestOutcome.Failed ? $"\nEXTRA: {ExtraDebugInfo()}" : "";
@@ -207,7 +215,7 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
             return dup;
         }
 
-        private static TestOutcome RunTestCase(TestCase test, bool skipOnFailure, string cli, string command, string script, string @foreach, string arguments, string input, string expect, string expectGpt, string notExpect, string workingDirectory, int timeout, out string stdOut, out string stdErr, out string errorMessage, out string stackTrace, out string additional, out string debugTrace)
+        private static TestOutcome RunTestCase(TestCase test, bool skipOnFailure, string cli, string command, string script, bool scriptIsBash, string @foreach, string arguments, string input, string expect, string expectGpt, string notExpect, string workingDirectory, int timeout, out string stdOut, out string stdErr, out string errorMessage, out string stackTrace, out string additional, out string debugTrace)
         {
             var outcome = TestOutcome.None;
 
@@ -223,8 +231,8 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
 
             try
             {
-                var isWindows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
-                script = WriteTextToTempFile(script, isWindows ? "cmd" : null);
+                var useCmd = !scriptIsBash;
+                script = WriteTextToTempFile(script, useCmd ? "cmd" : null);
 
                 expect = WriteTextToTempFile(expect);
                 notExpect = WriteTextToTempFile(notExpect);
@@ -233,8 +241,8 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
                 kvs.AddRange(KeyValuePairsFromJson(@foreach, false));
                 kvs = ConvertValuesToAtArgs(kvs, ref filesToDelete);
 
-                var startArgs = GetStartInfo(out string startProcess, cli, command, script, kvs, expect, notExpect, ref filesToDelete);
-                stackTrace = stackTrace ?? $"{startProcess} {startArgs}";
+                var startArgs = GetStartInfo(out string startProcess, cli, command, script, scriptIsBash, kvs, expect, notExpect, ref filesToDelete);
+                stackTrace = $"{startProcess} {startArgs}\n{stackTrace ?? string.Empty}";
 
                 Logger.Log($"Process.Start('{startProcess} {startArgs}')");
                 var startInfo = new ProcessStartInfo(startProcess, startArgs)
@@ -636,7 +644,7 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
             return completed;
         }
 
-        private static string GetStartInfo(out string startProcess, string cli, string command, string script, List<KeyValuePair<string, string>> kvs, string expect, string notExpect, ref List<string> files)
+        private static string GetStartInfo(out string startProcess, string cli, string command, string script, bool scriptIsBash, List<KeyValuePair<string, string>> kvs, string expect, string notExpect, ref List<string> files)
         {
             startProcess = FindCacheCli(cli);
 
@@ -655,10 +663,14 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
                 return $"quiet run --command @{command} {GetAtArgs(expect, notExpect)}";
             }
 
-            var isWindows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
-            return isWindows
-                ? $"quiet run --cmd --script {script} {GetKeyValueArgs(kvs)} {GetAtArgs(expect, notExpect)}"
-                : $"quiet run --process /bin/bash --pre.script -l --script {script} {GetKeyValueArgs(kvs)} {GetAtArgs(expect, notExpect)}";
+            if (scriptIsBash)
+            {
+                var isWindows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
+                var bash = isWindows ? FileHelpers.FindFileInOsPath("bash.exe") : "/bin/bash";
+                return $"quiet run --process \"{bash}\" --pre.script -l --script \"{script}\" {GetKeyValueArgs(kvs)} {GetAtArgs(expect, notExpect)}";
+            }
+
+            return $"quiet run --cmd --script \"{script}\" {GetKeyValueArgs(kvs)} {GetAtArgs(expect, notExpect)}";
         }
 
         private static string GetAtArgs(string expect, string notExpect)
@@ -699,12 +711,13 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
             return args.ToString().TrimEnd();
         }
 
-        private static TestOutcome SimulateTestCase(TestCase test, string simulate, string cli, string command, string script, string @foreach, string arguments, string input, string expect, string expectGpt, string notExpect, string workingDirectory, out string stdOut, out string stdErr, out string errorMessage, out string stackTrace, out string additional, out string debugTrace)
+        private static TestOutcome SimulateTestCase(TestCase test, string simulate, string cli, string command, string script, bool scriptIsBash, string @foreach, string arguments, string input, string expect, string expectGpt, string notExpect, string workingDirectory, out string stdOut, out string stdErr, out string errorMessage, out string stackTrace, out string additional, out string debugTrace)
         {
             var sb = new StringBuilder();
             sb.AppendLine($"cli='{cli?.Replace("\n", "\\n")}'");
             sb.AppendLine($"command='{command?.Replace("\n", "\\n")}'");
             sb.AppendLine($"script='{script?.Replace("\n", "\\n")}'");
+            sb.AppendLine($"scriptIsBash='{scriptIsBash}'");
             sb.AppendLine($"foreach='{@foreach?.Replace("\n", "\\n")}'");
             sb.AppendLine($"arguments='{arguments?.Replace("\n", "\\n")}'");
             sb.AppendLine($"input='{input?.Replace("\n", "\\n")}'");

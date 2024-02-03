@@ -86,17 +86,18 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
             string simulate = GetScalarString(mapping, "simulate");
             string command = GetScalarString(mapping, "command");
             string script = GetScalarString(mapping, "script");
+            string bash = GetScalarString(mapping, "bash");
 
-            string fullyQualifiedName = command == null && script == null
+            string fullyQualifiedName = command == null && script == null && bash == null
                 ? GetFullyQualifiedNameAndCommandFromShortForm(mapping, area, @class, ref command, stepNumber)
                 : GetFullyQualifiedName(mapping, area, @class, stepNumber);
             fullyQualifiedName ??= GetFullyQualifiedName(area, @class, $"Expected YAML node ('name') at {file.FullName}({mapping.Start.Line})", 0);
 
             var simulating = !string.IsNullOrEmpty(simulate);
-            var neitherOrBoth = (command == null) == (script == null);
+            var neitherOrBoth = (command == null) == (script == null && bash == null);
             if (neitherOrBoth && !simulating)
             {
-                var message = $"Error parsing YAML: expected/unexpected key ('name', 'command', 'script', 'arguments') at {file.FullName}({mapping.Start.Line})";
+                var message = $"Error parsing YAML: expected/unexpected key ('name', 'command', 'script', 'bash', 'arguments') at {file.FullName}({mapping.Start.Line})";
                 Logger.LogError(message);
                 Logger.TraceError(message);
                 return null;
@@ -112,6 +113,7 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
             SetTestCaseProperty(test, "cli", cli);
             SetTestCaseProperty(test, "command", command);
             SetTestCaseProperty(test, "script", script);
+            SetTestCaseProperty(test, "bash", bash);
             SetTestCaseProperty(test, "simulate", simulate);
             SetTestCaseProperty(test, "parallelize", parallelize);
             SetTestCaseProperty(test, "skipOnFailure", skipOnFailure);
@@ -202,7 +204,7 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
 
         private static bool IsValidTestCaseNode(string value)
         {
-            return ";area;class;name;cli;command;script;timeout;foreach;arguments;input;expect;expect-gpt;not-expect;parallelize;simulate;skipOnFailure;tag;tags;workingDirectory;".IndexOf($";{value};") >= 0;
+            return ";area;class;name;cli;command;script;bash;timeout;foreach;arguments;input;expect;expect-gpt;not-expect;parallelize;simulate;skipOnFailure;tag;tags;workingDirectory;".IndexOf($";{value};") >= 0;
         }
 
         private static void SetTestCaseProperty(TestCase test, string propertyName, YamlMappingNode mapping, string mappingName)

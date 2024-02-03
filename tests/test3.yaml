@@ -29,7 +29,7 @@
   - name: generate template
     command: ai dev new helper-functions
   - name: build template
-    script: |
+    bash: |
       cd helper-functions
       dotnet build
   - name: run template
@@ -47,7 +47,7 @@
     - name: generate template
       command: ai dev new openai-chat --cs
     - name: build template
-      script: |
+      bash: |
         cd openai-chat-cs
         dotnet build
     - name: run template
@@ -64,9 +64,10 @@
     - name: generate template
       command: ai dev new openai-chat --go
     - name: build template
-      script: |
+      bash: |
         cd openai-chat-go
-        go mod tidy && go build
+        go mod tidy
+        go build
     - name: run template
       command: ai dev shell --run "openai-chat-go\openai_chat_completions_hello_world"
       input: |-
@@ -79,11 +80,11 @@
     - name: generate template
       command: ai dev new openai-chat --java
     - name: restore packages
-      script: |
+      bash: |
         cd openai-chat-java
         mvn clean package
     - name: build template
-      script: |
+      bash: |
         cd openai-chat-java
         javac -cp "target/lib/*" src/OpenAIChatCompletionsClass.java src/Main.java -d out
     - name: run template
@@ -98,7 +99,7 @@
     - name: generate template
       command: ai dev new openai-chat --javascript
     - name: build template
-      script: |
+      bash: |
         cd openai-chat-js
         npm install
     - name: run template
@@ -113,7 +114,7 @@
     - name: generate template
       command: ai dev new openai-chat --python
     - name: build template
-      script: |
+      bash: |
         cd openai-chat-py
         pip install -r requirements.txt
     - name: run template
@@ -131,7 +132,7 @@
     - name: generate template
       command: ai dev new openai-chat-streaming --cs
     - name: build template
-      script: |
+      bash: |
         cd openai-chat-streaming-cs
         dotnet build
     - name: run template
@@ -146,9 +147,10 @@
     - name: generate template
       command: ai dev new openai-chat-streaming --go
     - name: build template
-      script: |
+      bash: |
         cd openai-chat-streaming-go
-        go mod tidy && go build
+        go mod tidy
+        go build
     - name: run template
       command: ai dev shell --run "openai-chat-streaming-go\openai_chat_completions_streaming_hello_world"
       input: |-
@@ -161,11 +163,11 @@
     - name: generate template
       command: ai dev new openai-chat-streaming --java
     - name: restore packages
-      script: |
+      bash: |
         cd openai-chat-streaming-java
         mvn clean package
     - name: build template
-      script: |
+      bash: |
         cd openai-chat-streaming-java
         javac -cp "target/lib/*" src/OpenAIChatCompletionsStreamingClass.java src/Main.java -d out
     - name: run template
@@ -182,7 +184,7 @@
     - name: generate template
       command: ai dev new openai-chat-streaming --javascript
     - name: build template
-      script: |
+      bash: |
         cd openai-chat-streaming-js
         npm install
     - name: run template
@@ -197,7 +199,7 @@
     - name: generate template
       command: ai dev new openai-chat-streaming --python
     - name: build template
-      script: |
+      bash: |
         cd openai-chat-streaming-py
         pip install -r requirements.txt
     - name: run template
@@ -215,7 +217,7 @@
     - name: generate template
       command: ai dev new openai-chat-streaming-with-data --cs
     - name: build template
-      script: |
+      bash: |
         cd openai-chat-streaming-with-data-cs
         dotnet build
     - name: run template
@@ -229,7 +231,7 @@
     - name: generate template
       command: ai dev new openai-chat-streaming-with-data --javascript
     - name: build template
-      script: |
+      bash: |
         cd openai-chat-streaming-with-data-js
         npm install
     - name: run template
@@ -243,7 +245,7 @@
     - name: generate template
       command: ai dev new openai-chat-streaming-with-data --python
     - name: build template
-      script: |
+      bash: |
         cd openai-chat-streaming-with-data-py
         pip install -r requirements.txt
     - name: run template
@@ -260,7 +262,7 @@
     - name: generate template
       command: ai dev new openai-chat-streaming-with-functions --cs
     - name: build template
-      script: |
+      bash: |
         cd openai-chat-streaming-with-functions-cs
         dotnet build
     - name: run template
@@ -275,9 +277,10 @@
     - name: generate template
       command: ai dev new openai-chat-streaming-with-functions --go
     - name: build template
-      script: |
+      bash: |
         cd openai-chat-streaming-with-functions-go
-        go mod tidy && go build
+        go mod tidy
+        go build
     - name: run template
       command: ai dev shell --run "cd openai-chat-streaming-with-functions-go && openai_chat_completions_functions_streaming_hello_world"
       input: |-
@@ -290,7 +293,7 @@
     - name: generate template
       command: ai dev new openai-chat-streaming-with-functions --javascript
     - name: build template
-      script: |
+      bash: |
         cd openai-chat-streaming-with-functions-js
         npm install
     - name: run template
@@ -305,7 +308,7 @@
     - name: generate template
       command: ai dev new openai-chat-streaming-with-functions --python
     - name: build template
-      script: |
+      bash: |
         cd openai-chat-streaming-with-functions-py
         pip install -r requirements.txt
     - name: run template
@@ -323,11 +326,11 @@
     - name: generate template
       command: ai dev new openai-webpage --javascript
     - name: build template
-      script: |
+      bash: |
         cd openai-webpage-js
         npm install
     - name: pack template
-      script: |
+      bash: |
         cd openai-webpage-js
         npx webpack
 
@@ -336,11 +339,11 @@
     - name: generate template
       command: ai dev new openai-webpage --typescript
     - name: build template
-      script: |
+      bash: |
         cd openai-webpage-ts
         npm install
     - name: pack template
-      script: |
+      bash: |
         cd openai-webpage-ts
         npx webpack
 
@@ -352,11 +355,11 @@
     - name: generate template
       command: ai dev new openai-webpage-with-functions --javascript  
     - name: build template  
-      script: |
+      bash: |
         cd openai-webpage-with-functions-js
         npm install
     - name: pack template 
-      script: |
+      bash: |
         cd openai-webpage-with-functions-js
         npx webpack
 
@@ -365,11 +368,11 @@
     - name: generate template
       command: ai dev new openai-webpage-with-functions --typescript
     - name: build template
-      script: |
+      bash: |
         cd openai-webpage-with-functions-ts
         npm install
     - name: pack template
-      script: |
+      bash: |
         cd openai-webpage-with-functions-ts
         npx webpack
     
