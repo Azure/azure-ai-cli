@@ -45,7 +45,7 @@ namespace Azure.AI.Details.Common.CLI
 
         private void DoCommand(string command)
         {
-            CheckPath();
+            StartCommand();
 
             switch (command)
             {
@@ -57,6 +57,10 @@ namespace Azure.AI.Details.Common.CLI
                     _values.AddThrowError("WARNING:", $"'{command.Replace('.', ' ')}' NOT YET IMPLEMENTED!!");
                     break;
             }
+
+            StopCommand();
+            DisposeAfterStop();
+            DeleteTemporaryFiles();
         }
 
         private void DoNew()
@@ -185,6 +189,32 @@ namespace Azure.AI.Details.Common.CLI
             }
         }
 
+        private void StartCommand()
+        {
+            CheckPath();
+            LogHelpers.EnsureStartLogFile(_values);
+
+            // _display = new DisplayHelper(_values);
+
+            // _output = new OutputHelper(_values);
+            // _output.StartOutput();
+
+            _lock = new SpinLock();
+            _lock.StartLock();
+        }
+
+        private void StopCommand()
+        {
+            _lock.StopLock(5000);
+
+            // LogHelpers.EnsureStopLogFile(_values);
+            // _output.CheckOutput();
+            // _output.StopOutput();
+
+            _stopEvent.Set();
+        }
+
+        private SpinLock _lock = null;
         private readonly bool _quiet;
         private readonly bool _verbose;
     }

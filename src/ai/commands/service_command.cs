@@ -52,7 +52,6 @@ namespace Azure.AI.Details.Common.CLI
         private void DoCommand(string command)
         {
             StartCommand();
-            CheckPath();
 
             switch (command)
             {
