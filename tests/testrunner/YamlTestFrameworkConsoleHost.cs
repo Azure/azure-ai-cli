@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Xml;
@@ -20,31 +21,90 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
             _testCases.Add(testCase);
             SetExecutionId(testCase, Guid.NewGuid());
 
-            Console.WriteLine("Starting test: " + testCase.FullyQualifiedName);
+            lock (this)
+            {
+                Console.ForegroundColor = ConsoleColor.DarkGray;
+                Console.WriteLine("Starting test: " + testCase.FullyQualifiedName);
+                Console.ResetColor();
+            }
         }
 
         public void RecordResult(TestResult testResult)
         {
             _testResults.Add(testResult);
-            
-            Console.WriteLine("Test: " + testResult.TestCase.DisplayName);
-            Console.WriteLine("Result: " + testResult.Outcome);
-            Console.WriteLine("Duration: " + testResult.Duration.TotalMilliseconds + "ms");
-            if (testResult.Outcome != TestOutcome.Passed)
-            {
-                Console.WriteLine("ErrorMessage: " + testResult.ErrorMessage);
-                Console.WriteLine("ErrorStackTrace: " + testResult.ErrorStackTrace);
-            }
-            Console.WriteLine();
+            PrintResult(testResult);
         }
 
         public void RecordEnd(TestCase testCase, TestOutcome outcome)
         {
             _endTime = DateTime.Now;
-            if (outcome != TestOutcome.Passed)
+        }
+
+        public bool Finish(IDictionary<string, IList<TestResult>> resultsByTestCaseId)
+        {
+            var allResults = resultsByTestCaseId.Values.SelectMany(x => x);
+            var failedResults = allResults.Where(x => x.Outcome == TestOutcome.Failed).ToList();
+            var passedResults = allResults.Where(x => x.Outcome == TestOutcome.Passed).ToList();
+            var skippedResults = allResults.Where(x => x.Outcome == TestOutcome.Skipped).ToList();
+            var passed = failedResults.Count == 0;
+
+            if (failedResults.Count > 0)
             {
-                Console.WriteLine("FAILED " + testCase.FullyQualifiedName);
+                Console.ResetColor();
+                Console.WriteLine();
+                Console.BackgroundColor = ConsoleColor.Red;
+                Console.ForegroundColor = ConsoleColor.White;
+                Console.Write("FAILURE SUMMARY:");
+                Console.ResetColor();
+                Console.WriteLine();
+                failedResults.ForEach(r => PrintResult(r));
             }
+
+            var count = allResults.Count();
+            var duration = FormattedDuration((_endTime.Value - _startTime.Value).TotalMilliseconds);
+            Console.BackgroundColor = ConsoleColor.Blue;
+            Console.ForegroundColor = ConsoleColor.White;
+            Console.Write("TEST RESULT SUMMARY:");
+            Console.ResetColor();
+            Console.Write("\nTests: ");
+            Console.ForegroundColor = ConsoleColor.Blue;
+            Console.Write($"{count}");
+            Console.ForegroundColor = ConsoleColor.DarkGray;
+            Console.WriteLine($" ({duration})");
+
+            var resultsFile = WriteResultFile();
+
+            var fi = new FileInfo(resultsFile);
+            Console.ResetColor();
+            Console.Write("Results: ");
+            Console.ForegroundColor = ConsoleColor.Blue;
+            Console.Write(fi.FullName);
+            Console.ResetColor();
+            Console.WriteLine("\n");
+
+            Console.ForegroundColor = ConsoleColor.Green;
+            Console.Write($"Passed: {passedResults.Count}");
+
+            if (failedResults.Count > 0)
+            {
+                Console.ForegroundColor = ConsoleColor.DarkGray;
+                Console.Write(", ");
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.Write($"Failed: {failedResults.Count}");
+            }
+
+            if (skippedResults.Count > 0)
+            {
+                Console.ForegroundColor = ConsoleColor.DarkGray;
+                Console.Write(", ");
+                Console.ForegroundColor = ConsoleColor.Yellow;
+                Console.Write($"Skipped: {skippedResults.Count}");
+            }
+
+            Console.ResetColor();
+            Console.WriteLine("\n");
+
+            return passed;
         }
 
         public string WriteResultFile()
@@ -205,6 +265,41 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
             writer.Dispose();
 
             return resultFile;
+        }
+
+        private void PrintResult(TestResult testResult)
+        {
+            lock (this)
+            {
+                Console.ForegroundColor = ConsoleColor.DarkGray;
+                if (testResult.Outcome == TestOutcome.Passed) Console.ForegroundColor = ConsoleColor.Green;
+                if (testResult.Outcome == TestOutcome.Skipped) Console.ForegroundColor = ConsoleColor.Yellow;
+                if (testResult.Outcome == TestOutcome.Failed) Console.ForegroundColor = ConsoleColor.Red;
+
+                var duration = FormattedDuration(testResult.Duration.TotalMilliseconds);
+                Console.WriteLine($"{testResult.Outcome} ({duration}): {testResult.TestCase.FullyQualifiedName}");
+                Console.ResetColor();
+
+                if (testResult.Outcome == TestOutcome.Failed)
+                {
+                    var hasStack = !string.IsNullOrEmpty(testResult.ErrorStackTrace);
+                    if (hasStack) Console.WriteLine(testResult.ErrorStackTrace.Trim('\r', '\n'));
+
+                    var hasErr = !string.IsNullOrEmpty(testResult.ErrorMessage);
+                    if (hasErr) Console.WriteLine(testResult.ErrorMessage.Trim('\r', '\n'));
+
+                    if (hasErr || hasStack) Console.WriteLine();
+                }
+            }
+        }
+
+        private static string FormattedDuration(double ms)
+        {
+            var secs = ms / 1000;
+            var duration = ms >= 1000
+                ? secs.ToString("0.00") + " seconds"
+                : ms.ToString("0") + " ms";
+            return duration;
         }
 
         private static string OutcomeToString(TestOutcome outcome)

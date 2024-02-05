@@ -15,14 +15,18 @@ using YamlDotNet.RepresentationModel;
 
 namespace Azure.AI.Details.Common.CLI.TestFramework
 {
+
     public class YamlTestCaseRunner
     {
-        public static TestOutcome RunAndRecordTestCase(TestCase test, IYamlTestFrameworkHost host)
+        public static IList<TestResult> RunAndRecordTestCase(TestCase test, IYamlTestFrameworkHost host)
         {
             TestCaseStart(test, host);
-            TestCaseRun(test, host, out TestOutcome outcome);
+            var results = TestCaseRun(test, host);
+
+            var outcome = TestResultHelpers.TestOutcomeFromResults(results);
             TestCaseStop(test, host, outcome);
-            return outcome;
+
+            return results;
         }
 
         #region private methods
@@ -33,10 +37,10 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
             host.RecordStart(test);
         }
 
-        private static TestOutcome TestCaseRun(TestCase test, IYamlTestFrameworkHost host, out TestOutcome outcome) 
+        private static IList<TestResult> TestCaseRun(TestCase test, IYamlTestFrameworkHost host)
         {
             Logger.Log($"YamlTestCaseRunner.TestCaseRun({test.DisplayName})");
-            
+
             // run the test case, getting all the results, prior to recording any of those results
             // (not doing this in this order seems to, for some reason, cause "foreach" test cases to run 5 times!?)
             var results = TestCaseGetResults(test).ToList();
@@ -45,15 +49,7 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
                 host.RecordResult(result);
             }
 
-            var failed = results.Count(x => x.Outcome == TestOutcome.Failed) > 0;
-            var skipped = results.Count(x => x.Outcome == TestOutcome.Skipped) > 0;
-            var notFound = results.Count(x => x.Outcome == TestOutcome.NotFound) > 0 || results.Count() == 0;
-
-            return outcome =
-                failed ? TestOutcome.Failed
-                : skipped ? TestOutcome.Skipped
-                : notFound ? TestOutcome.NotFound
-                : TestOutcome.Passed;
+            return results;
         }
 
         private static IEnumerable<TestResult> TestCaseGetResults(TestCase test)

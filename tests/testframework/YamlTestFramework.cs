@@ -36,36 +36,71 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
             return tests;
         }
 
-        public static void RunTests(IEnumerable<TestCase> tests, IYamlTestFrameworkHost host)
+        public static IDictionary<string, IList<TestResult>> RunTests(IEnumerable<TestCase> tests, IYamlTestFrameworkHost host)
         {
-            tests = tests.ToList(); // force enumeration
+            var resultsByTestCaseId = new Dictionary<string, IList<TestResult>>();
 
-            var grouped = GroupTestCasesByPriority(tests);
-            foreach (var priorityGroup in grouped)
+            tests = tests.ToList(); // force enumeration
+            var groupedByPriority = GroupTestCasesByPriority(tests);
+
+            foreach (var priorityGroup in groupedByPriority)
             {
                 if (priorityGroup.Count == 0) continue;
-                RunAndRecordTests(host, priorityGroup);
+
+                var resultsByTestCaseIdForGroup = RunAndRecordTests(host, priorityGroup);
+                foreach (var resultsForTestCase in resultsByTestCaseIdForGroup)
+                {
+                    var testCaseId = resultsForTestCase.Key;
+                    var testResults = resultsForTestCase.Value;
+                    resultsByTestCaseId[testCaseId] = testResults;
+                }
             }
+
+            return resultsByTestCaseId;
         }
 
         #region private methods
 
-        private static void RunAndRecordTests(IYamlTestFrameworkHost host, IEnumerable<TestCase> tests)
+        private static IDictionary<string, IList<TestResult>> RunAndRecordTests(IYamlTestFrameworkHost host, IEnumerable<TestCase> tests)
         {
-            var testFromIdMap = new Dictionary<string, TestCase>();
-            var completionFromIdMap = new Dictionary<string, TaskCompletionSource<TestOutcome>>();
+            InitRunAndRecordTestCaseMaps(tests, out var testFromIdMap, out var completionFromIdMap);
+
+            RunAndRecordParallelizedTestCases(host, testFromIdMap, completionFromIdMap);
+            RunAndRecordRemainingTestCases(host, testFromIdMap, completionFromIdMap);
+
+            return GetRunAndRecordTestResultsMap(completionFromIdMap);
+        }
+
+        private static void InitRunAndRecordTestCaseMaps(IEnumerable<TestCase> tests, out Dictionary<string, TestCase> testFromIdMap, out Dictionary<string, TaskCompletionSource<IList<TestResult>>> completionFromIdMap)
+        {
+            testFromIdMap = new Dictionary<string, TestCase>();
+            completionFromIdMap = new Dictionary<string, TaskCompletionSource<IList<TestResult>>>();
             foreach (var test in tests)
             {
                 var id = test.Id.ToString();
                 testFromIdMap[id] = test;
-                completionFromIdMap[id] = new TaskCompletionSource<TestOutcome>();
+                completionFromIdMap[id] = new TaskCompletionSource<IList<TestResult>>();
             }
-
-            RunAndRecordParallelizedTestCases(host, testFromIdMap, completionFromIdMap);
-            RunAndRecordRemainingTestCases(host, testFromIdMap, completionFromIdMap);
         }
 
-        private static void RunAndRecordParallelizedTestCases(IYamlTestFrameworkHost host, Dictionary<string, TestCase> testFromIdMap, Dictionary<string, TaskCompletionSource<TestOutcome>> completionFromIdMap)
+        private static IDictionary<string, IList<TestResult>> GetRunAndRecordTestResultsMap(Dictionary<string, TaskCompletionSource<IList<TestResult>>> completionFromIdMap)
+        {
+            var resultsPerTestCase = completionFromIdMap.Select(x => x.Value.Task.Result);
+
+            var resultsMap = new Dictionary<string, IList<TestResult>>();
+            foreach (var resultsForCase in resultsPerTestCase)
+            {
+                var test = resultsForCase.FirstOrDefault()?.TestCase;
+                if (test == null) continue;
+
+                var id = test.Id.ToString();
+                resultsMap[id] = resultsForCase;
+            }
+
+            return resultsMap;
+        }
+
+        private static void RunAndRecordParallelizedTestCases(IYamlTestFrameworkHost host, Dictionary<string, TestCase> testFromIdMap, Dictionary<string, TaskCompletionSource<IList<TestResult>>> completionFromIdMap)
         {
             var parallelTests = testFromIdMap
                 .Select(x => x.Value)
@@ -89,11 +124,12 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
             Logger.Log($"YamlTestFramework.RunAndRecordParallelizedTestCases() ==> All parallel tests complete");
         }
 
-        private static void RunAndRecordTestCaseSteps(IYamlTestFrameworkHost host, Dictionary<string, TestCase> testFromIdMap, Dictionary<string, TaskCompletionSource<TestOutcome>> completionFromIdMap, string firstTestId)
+        private static void RunAndRecordTestCaseSteps(IYamlTestFrameworkHost host, Dictionary<string, TestCase> testFromIdMap, Dictionary<string, TaskCompletionSource<IList<TestResult>>> completionFromIdMap, string firstTestId)
         {
             var firstTest = testFromIdMap[firstTestId];
-            var firstTestOutcome = RunAndRecordTestCase(firstTest, host);
-            // defer setting completion outcome until all steps are complete
+            var firstTestResults = RunAndRecordTestCase(firstTest, host);
+            var firstTestOutcome = TestResultHelpers.TestOutcomeFromResults(firstTestResults);
+            // defer setting completion until all steps are complete
 
             var checkTest = firstTest;
             while (true)
@@ -119,19 +155,20 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
                     break;
                 }
 
-                var stepOutcome = RunAndRecordTestCase(stepTest, host);
+                var stepResults = RunAndRecordTestCase(stepTest, host);
+                var stepOutcome = TestResultHelpers.TestOutcomeFromResults(stepResults);
                 Logger.Log($"YamlTestFramework.RunAndRecordTestCaseSteps() ==> Setting completion outcome for {stepTest.DisplayName} to {stepOutcome}");
-                completionFromIdMap[nextStepId].SetResult(stepOutcome);
+                completionFromIdMap[nextStepId].SetResult(stepResults);
 
                 checkTest = stepTest;
             }
 
             // now that all steps are complete, set the completion outcome
-            completionFromIdMap[firstTestId].SetResult(firstTestOutcome);
-            Logger.Log($"YamlTestFramework.RunAndRecordTestCaseSteps() ==> Setting completion outcome for {firstTest.DisplayName} to {firstTestOutcome}");
+            completionFromIdMap[firstTestId].SetResult(firstTestResults);
+            Logger.Log($"YamlTestFramework.RunAndRecordTestCaseSteps() ==> Setting completion; outcome for {firstTest.DisplayName}: {firstTestOutcome}");
         }
 
-        private static void RunAndRecordRemainingTestCases(IYamlTestFrameworkHost host, Dictionary<string, TestCase> testFromIdMap, Dictionary<string, TaskCompletionSource<TestOutcome>> completionFromIdMap)
+        private static void RunAndRecordRemainingTestCases(IYamlTestFrameworkHost host, Dictionary<string, TestCase> testFromIdMap, Dictionary<string, TaskCompletionSource<IList<TestResult>>> completionFromIdMap)
         {
             var remainingTests = completionFromIdMap
                 .Where(x => x.Value.Task.Status != TaskStatus.RanToCompletion)
@@ -171,7 +208,7 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
             return testsList;
         }
 
-        private static TestOutcome RunAndRecordTestCase(TestCase test, IYamlTestFrameworkHost host)
+        private static IList<TestResult> RunAndRecordTestCase(TestCase test, IYamlTestFrameworkHost host)
         {
             Logger.Log($"YamlTestFramework.TestRunAndRecord({test.DisplayName})");
             return YamlTestCaseRunner.RunAndRecordTestCase(test, host);

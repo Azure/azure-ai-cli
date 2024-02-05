@@ -13,6 +13,7 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 using Azure.AI.Details.Common.CLI.TestFramework;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
 namespace Azure.AI.Details.Common.CLI.TestRunner
 {
@@ -54,25 +55,28 @@ namespace Azure.AI.Details.Common.CLI.TestRunner
             }
 
             var tests = YamlTestFramework.GetTestsFromDirectory("TestRunner", testDirectory);
-            if (list)
+
+            if (list) return DoListTests(tests) ? 0 : 1;
+            if (run) return DoRunTests(tests) ? 0 : 1;
+
+            return 1;
+        }
+
+        private static bool DoListTests(IEnumerable<TestCase> tests)
+        {
+            foreach (var test in tests)
             {
-                foreach (var test in tests)
-                {
-                    Console.WriteLine(test.FullyQualifiedName);
-                }
+                Console.WriteLine(test.FullyQualifiedName);
             }
 
-            if (run)
-            {
-                var host = new YamlTestFrameworkConsoleHost();
-                YamlTestFramework.RunTests(tests, host);
+            return true;
+        }
 
-                var fileName = host.WriteResultFile();
-                Console.WriteLine($"Results written to {fileName}");
-            }
-            
-            // TODO: return non zero if test failed
-            return 0;
+        private static bool DoRunTests(IEnumerable<TestCase> tests)
+        {
+            var consoleHost = new YamlTestFrameworkConsoleHost();
+            var resultsByTestCaseId = YamlTestFramework.RunTests(tests, consoleHost);
+            return consoleHost.Finish(resultsByTestCaseId);
         }
     }
 }
