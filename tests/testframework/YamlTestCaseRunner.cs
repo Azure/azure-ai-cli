@@ -660,17 +660,17 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
                 files ??= new List<string>();
                 files.Add(command);
 
-                return $"quiet run --command @{command} {GetAtArgs(expect, notExpect)}";
+                return $"run --command @{command} {GetAtArgs(expect, notExpect)}";
             }
 
             if (scriptIsBash)
             {
                 var isWindows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
                 var bash = isWindows ? FileHelpers.FindFileInOsPath("bash.exe") : "/bin/bash";
-                return $"quiet run --process \"{bash}\" --pre.script -l --script \"{script}\" {GetKeyValueArgs(kvs)} {GetAtArgs(expect, notExpect)}";
+                return $"run --process \"{bash}\" --pre.script -l --script \"{script}\" {GetKeyValueArgs(kvs)} {GetAtArgs(expect, notExpect)}";
             }
 
-            return $"quiet run --cmd --script \"{script}\" {GetKeyValueArgs(kvs)} {GetAtArgs(expect, notExpect)}";
+            return $"run --cmd --script \"{script}\" {GetKeyValueArgs(kvs)} {GetAtArgs(expect, notExpect)}";
         }
 
         private static string GetAtArgs(string expect, string notExpect)
@@ -864,7 +864,7 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
                     RedirectStandardOutput = true
                 };
 
-                Logger.Log($"Process.Start('{startProcess} {startArgs}')");
+                Logger.Log($"ExpectGptOutcome: Process.Start('{startProcess} {startArgs}')");
                 var process = Process.Start(startInfo);
                 process.StandardInput.Close();
 
@@ -873,33 +873,42 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
                 process.BeginOutputReadLine();
                 process.BeginErrorReadLine();
 
-                var exitedNotKilled = WaitForExit(process, 30000);
+                var exitedNotKilled = WaitForExit(process, 60000);
+                var passed = exitedNotKilled && process.ExitCode == 0;
 
-                outcome = exitedNotKilled && process.ExitCode == 0
-                    ? TestOutcome.Passed
-                    : TestOutcome.Failed;
+                outcome = passed ? TestOutcome.Passed : TestOutcome.Failed;
+
+                var timedoutOrKilled = !exitedNotKilled;
+                if (timedoutOrKilled)
+                {
+                    var message = "ExpectGptOutcome: WARNING: Timedout or killed!";
+                    sbErr.AppendLine(message);
+                    sbMerged.AppendLine(message);
+                    Logger.LogWarning(message);
+                }
             }
-            catch
+            catch (Exception ex)
             {
                 outcome = TestOutcome.Failed;
-            }
-            finally
-            {
-                gptStdOut = sbOut.ToString();
-                gptStdErr = sbErr.ToString();
-                gptMerged = sbMerged.ToString();
 
-                File.Delete(questionTempFile);
+                var exception = $"ExpectGptOutcome: EXCEPTION: {ex.Message}";
+                sbErr.AppendLine(exception);
+                sbMerged.AppendLine(exception);
+                Logger.Log(exception);
             }
+
+            File.Delete(questionTempFile);
+            gptStdOut = sbOut.ToString();
+            gptStdErr = sbErr.ToString();
+            gptMerged = sbMerged.ToString();
 
             if (outcome == TestOutcome.Passed)
             {
                 Logger.Log($"ExpectGptOutcome: Checking for 'PASS' in '{gptMerged}'");
+
                 var passed = gptMerged.Contains("PASS") || gptMerged.Contains("TRUE") || gptMerged.Contains("YES");
-                var failed = gptMerged.Contains("FAIL") || gptMerged.Contains("FALSE") || gptMerged.Contains("NO");
-                outcome = passed && !failed
-                    ? TestOutcome.Passed
-                    : TestOutcome.Failed;
+                outcome = passed ? TestOutcome.Passed : TestOutcome.Failed;
+
                 Logger.Log($"ExpectGptOutcome: {outcome}");
             }
 

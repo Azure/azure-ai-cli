@@ -113,59 +113,19 @@ namespace Azure.AI.Details.Common.CLI
             Console.WriteLine();
 
             var runCommand = RunCommandToken.Data().GetOrDefault(_values);
-            UpdateFileNameArguments(runCommand, ref fileName, ref arguments, out var deleteWhenDone);
+            var processOutput = string.IsNullOrEmpty(runCommand)
+                ? ProcessHelpers.RunShellCommandAsync(fileName, arguments, env, null, null, null, false).Result
+                : ProcessHelpers.RunShellCommandAsync(runCommand, env, null, null, null, false).Result;
 
-            var process = ProcessHelpers.StartProcess(fileName, arguments, env, false);
-            process.WaitForExit();
-
-            if (!string.IsNullOrEmpty(deleteWhenDone))
-            {
-                File.Delete(deleteWhenDone);
-            }
-
-            if (process.ExitCode != 0)
+            var exitCode = processOutput.ExitCode;
+            if (exitCode != 0)
             {
                 Console.WriteLine("\n(ai dev shell) FAILED!\n");
-                _values.AddThrowError("ERROR:", $"Shell exited with code {process.ExitCode}");
+                _values.AddThrowError("ERROR:", $"Shell exited with code {exitCode}");
             }
             else
             {
                 Console.WriteLine("\n(ai dev shell) exited successfully");
-            }
-        }
-
-        private static void UpdateFileNameArguments(string runCommand, ref string fileName, ref string arguments, out string? deleteTempFileWhenDone)
-        {
-            deleteTempFileWhenDone = null;
-
-            if (!string.IsNullOrEmpty(runCommand))
-            {
-                var isSingleLine = !runCommand.Contains('\n') && !runCommand.Contains('\r');
-                if (isSingleLine)
-                {
-                    var parts = runCommand.Split(new char[] { ' ' }, 2);
-                    var inPath = FileHelpers.FileExistsInOsPath(parts[0]) || (OS.IsWindows() && FileHelpers.FileExistsInOsPath(parts[0] + ".exe"));
-
-                    var filePart = parts[0];
-                    var argsPart = parts.Length == 2 ? parts[1] : null;
-
-                    fileName = inPath ? filePart : fileName;
-                    arguments = inPath ? argsPart : (OS.IsLinux()
-                        ? $"-lic \"{runCommand}\""
-                        : $"/c \"{runCommand}\"");
-
-                    Console.WriteLine($"Running command: {runCommand}\n");
-                }
-                else
-                {
-                    deleteTempFileWhenDone = Path.GetTempFileName() + (OS.IsWindows() ? ".cmd" : ".sh");
-                    File.WriteAllText(deleteTempFileWhenDone, runCommand);
-
-                    fileName = OS.IsLinux() ? "bash" : "cmd.exe";
-                    arguments = OS.IsLinux() ? $"-lic \"{deleteTempFileWhenDone}\"" : $"/c \"{deleteTempFileWhenDone}\"";
-
-                    Console.WriteLine($"Running script:\n\n{runCommand}\n");
-                }
             }
         }
 
