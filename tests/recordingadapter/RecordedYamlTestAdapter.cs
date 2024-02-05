@@ -54,7 +54,10 @@ namespace Azure.AI.Details.Common.CLI.RecordedTestAdapter
             {
                 YamlTestProperties.Set(test, "parallelize", "false");
             }
-            YamlTestFramework.RunTests(filtered, new YamlTestFrameworkHandleReporter(frameworkHandle));
+            Environment.SetEnvironmentVariable("HTTPS_PROXY", "localhost:5004");
+            YamlTestFramework.RunTests(filtered, new RecordedTestObservor( new YamlTestFrameworkHandleReporter(frameworkHandle)));
+            Environment.SetEnvironmentVariable("HTTPS_PROXY", null);
+
         }
 
         #region private methods
