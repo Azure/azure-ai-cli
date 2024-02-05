@@ -51,6 +51,15 @@ namespace Azure.AI.Details.Common.CLI.TestRunner
             Console.WriteLine("  FILTERS");
             Console.WriteLine("    --filter FILTER");
             Console.WriteLine("    --filters FILTER1 [FILTER2 [...]]");
+            Console.WriteLine();
+            Console.WriteLine("EXAMPLES");
+            Console.WriteLine();
+            Console.WriteLine("  ait list");
+            Console.WriteLine("  ait list --files test1.yaml test2.yaml --filter +chat -skip");
+            Console.WriteLine();
+            Console.WriteLine("  ait run");
+            Console.WriteLine("  ait run --filters +nightly -skip");
+            Console.WriteLine("  ait run --files ../tests/**/*.yaml --filter +\"best shoes\" -skip");
             return 1;
         }
 
