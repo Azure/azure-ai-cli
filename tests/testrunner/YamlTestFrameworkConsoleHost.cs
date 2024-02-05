@@ -59,6 +59,10 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
                 Console.WriteLine();
                 failedResults.ForEach(r => PrintResult(r));
             }
+            else
+            {
+                Console.WriteLine();
+            }
 
             var count = allResults.Count();
             var duration = FormattedDuration((_endTime.Value - _startTime.Value).TotalMilliseconds);
