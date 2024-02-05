@@ -66,7 +66,9 @@ namespace Azure.AI.Details.Common.CLI.TestRunner
             {
                 var host = new YamlTestFrameworkConsoleHost();
                 YamlTestFramework.RunTests(tests, host);
-                host.WriteResultFile();
+
+                var fileName = host.WriteResultFile();
+                Console.WriteLine($"Results written to {fileName}");
             }
             
             // TODO: return non zero if test failed

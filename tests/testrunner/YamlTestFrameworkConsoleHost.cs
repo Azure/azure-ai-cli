@@ -47,7 +47,7 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
             }
         }
 
-        public void WriteResultFile()
+        public string WriteResultFile()
         {
             var assembly = typeof(YamlTestFrameworkConsoleHost).Assembly;
             var assemblyPath = assembly.Location;
@@ -203,6 +203,8 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
 
             writer.Close();
             writer.Dispose();
+
+            return resultFile;
         }
 
         private static string OutcomeToString(TestOutcome outcome)

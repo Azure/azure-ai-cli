@@ -36,7 +36,7 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
             return tests;
         }
 
-        public static void RunTests(IEnumerable<TestCase> tests, IYamlTestFrameworkHost reporter)
+        public static void RunTests(IEnumerable<TestCase> tests, IYamlTestFrameworkHost host)
         {
             tests = tests.ToList(); // force enumeration
 
@@ -44,97 +44,101 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
             foreach (var priorityGroup in grouped)
             {
                 if (priorityGroup.Count == 0) continue;
-                RunAndRecordTests(reporter, priorityGroup);
+                RunAndRecordTests(host, priorityGroup);
             }
         }
 
         #region private methods
 
-        private static void RunAndRecordTests(IYamlTestFrameworkHost reporter, IEnumerable<TestCase> tests)
+        private static void RunAndRecordTests(IYamlTestFrameworkHost host, IEnumerable<TestCase> tests)
         {
-            InitRunAndRecordTestCaseMaps(tests, out var testFromIdMap, out var completionFromIdMap);
-            RunAndRecordParallelizedTestCases(reporter, testFromIdMap, completionFromIdMap, tests);
-            RunAndRecordRemainingTestCases(reporter, testFromIdMap, completionFromIdMap);
-        }
-
-        private static void InitRunAndRecordTestCaseMaps(IEnumerable<TestCase> tests, out Dictionary<string, TestCase> testFromIdMap, out Dictionary<string, TaskCompletionSource<TestOutcome>> completionFromIdMap)
-        {
-            testFromIdMap = new Dictionary<string, TestCase>();
-            completionFromIdMap = new Dictionary<string, TaskCompletionSource<TestOutcome>>();
+            var testFromIdMap = new Dictionary<string, TestCase>();
+            var completionFromIdMap = new Dictionary<string, TaskCompletionSource<TestOutcome>>();
             foreach (var test in tests)
             {
                 var id = test.Id.ToString();
                 testFromIdMap[id] = test;
                 completionFromIdMap[id] = new TaskCompletionSource<TestOutcome>();
             }
+
+            RunAndRecordParallelizedTestCases(host, testFromIdMap, completionFromIdMap);
+            RunAndRecordRemainingTestCases(host, testFromIdMap, completionFromIdMap);
         }
 
-        private static void RunAndRecordParallelizedTestCases(IYamlTestFrameworkHost reporter, Dictionary<string, TestCase> testFromIdMap, Dictionary<string, TaskCompletionSource<TestOutcome>> completionFromIdMap, IEnumerable<TestCase> tests)
+        private static void RunAndRecordParallelizedTestCases(IYamlTestFrameworkHost host, Dictionary<string, TestCase> testFromIdMap, Dictionary<string, TaskCompletionSource<TestOutcome>> completionFromIdMap)
         {
-            var parallelTestSet = tests.Where(test => YamlTestProperties.Get(test, "parallelize") == "true").ToList();
-            foreach (var test in parallelTestSet)
+            var parallelTests = testFromIdMap
+                .Select(x => x.Value)
+                .Where(test => YamlTestProperties.Get(test, "parallelize") == "true")
+                .ToList();
+
+            foreach (var test in parallelTests)
             {
                 ThreadPool.QueueUserWorkItem(state =>
                 {
                     var parallelTestId = test.Id.ToString();
-                    var parallelTest = testFromIdMap[parallelTestId];
-                    var parallelTestOutcome = RunAndRecordTestCase(parallelTest, reporter);
-                    // defer setting completion outcome until all steps are complete
-
-                    var checkTest = parallelTest;
-                    while (true)
-                    {
-                        var nextStepId = YamlTestProperties.Get(checkTest, "nextStepId");
-                        if (string.IsNullOrEmpty(nextStepId))
-                        {
-                            Logger.LogInfo($"YamlTestFramework.RunTests() ==> No nextStepId for test '{checkTest.DisplayName}'");
-                            break;
-                        }
-
-                        var stepTest = testFromIdMap.ContainsKey(nextStepId) ? testFromIdMap[nextStepId] : null;
-                        if (stepTest == null)
-                        {
-                            Logger.LogError($"YamlTestFramework.RunTests() ==> ERROR: nextStepId '{nextStepId}' not found for test '{checkTest.DisplayName}'");
-                            break;
-                        }
-
-                        var stepCompletion = completionFromIdMap.ContainsKey(nextStepId) ? completionFromIdMap[nextStepId] : null;
-                        if (stepCompletion == null)
-                        {
-                            Logger.LogError($"YamlTestFramework.RunTests() ==> ERROR: nextStepId '{nextStepId}' completion not found for test '{checkTest.DisplayName}'");
-                            break;
-                        }
-
-                        var stepOutcome = RunAndRecordTestCase(stepTest, reporter);
-                        Logger.Log($"YamlTestFramework.RunTests() ==> Setting completion outcome for {stepTest.DisplayName} to {stepOutcome}");
-                        completionFromIdMap[nextStepId].SetResult(stepOutcome);
-
-                        checkTest = stepTest;
-                    }
-
-                    // now that all steps are complete, set the completion outcome
-                    completionFromIdMap[parallelTestId].SetResult(parallelTestOutcome);
-                    Logger.Log($"YamlTestFramework.RunTests() ==> Setting completion outcome for {parallelTest.DisplayName} to {parallelTestOutcome}");
-
-                }, test.Id);
+                    RunAndRecordTestCaseSteps(host, testFromIdMap, completionFromIdMap, parallelTestId);
+                });
             }
 
-            Logger.Log($"YamlTestFramework.RunTests() ==> Waiting for parallel tests to complete");
+            Logger.Log($"YamlTestFramework.RunAndRecordParallelizedTestCases() ==> Waiting for parallel tests to complete");
             var parallelCompletions = completionFromIdMap
-                .Where(x => parallelTestSet.Any(y => y.Id.ToString() == x.Key))
+                .Where(x => parallelTests.Any(y => y.Id.ToString() == x.Key))
                 .Select(x => x.Value.Task);
             Task.WaitAll(parallelCompletions.ToArray());
-            Logger.Log($"YamlTestFramework.RunTests() ==> All parallel tests complete");
+            Logger.Log($"YamlTestFramework.RunAndRecordParallelizedTestCases() ==> All parallel tests complete");
         }
 
-        private static void RunAndRecordRemainingTestCases(IYamlTestFrameworkHost reporter, Dictionary<string, TestCase> testFromIdMap, Dictionary<string, TaskCompletionSource<TestOutcome>> completionFromIdMap)
+        private static void RunAndRecordTestCaseSteps(IYamlTestFrameworkHost host, Dictionary<string, TestCase> testFromIdMap, Dictionary<string, TaskCompletionSource<TestOutcome>> completionFromIdMap, string firstTestId)
+        {
+            var firstTest = testFromIdMap[firstTestId];
+            var firstTestOutcome = RunAndRecordTestCase(firstTest, host);
+            // defer setting completion outcome until all steps are complete
+
+            var checkTest = firstTest;
+            while (true)
+            {
+                var nextStepId = YamlTestProperties.Get(checkTest, "nextStepId");
+                if (string.IsNullOrEmpty(nextStepId))
+                {
+                    Logger.LogInfo($"YamlTestFramework.RunAndRecordTestCaseSteps() ==> No nextStepId for test '{checkTest.DisplayName}'");
+                    break;
+                }
+
+                var stepTest = testFromIdMap.ContainsKey(nextStepId) ? testFromIdMap[nextStepId] : null;
+                if (stepTest == null)
+                {
+                    Logger.LogError($"YamlTestFramework.RunAndRecordTestCaseSteps() ==> ERROR: nextStepId '{nextStepId}' not found for test '{checkTest.DisplayName}'");
+                    break;
+                }
+
+                var stepCompletion = completionFromIdMap.ContainsKey(nextStepId) ? completionFromIdMap[nextStepId] : null;
+                if (stepCompletion == null)
+                {
+                    Logger.LogError($"YamlTestFramework.RunAndRecordTestCaseSteps() ==> ERROR: nextStepId '{nextStepId}' completion not found for test '{checkTest.DisplayName}'");
+                    break;
+                }
+
+                var stepOutcome = RunAndRecordTestCase(stepTest, host);
+                Logger.Log($"YamlTestFramework.RunAndRecordTestCaseSteps() ==> Setting completion outcome for {stepTest.DisplayName} to {stepOutcome}");
+                completionFromIdMap[nextStepId].SetResult(stepOutcome);
+
+                checkTest = stepTest;
+            }
+
+            // now that all steps are complete, set the completion outcome
+            completionFromIdMap[firstTestId].SetResult(firstTestOutcome);
+            Logger.Log($"YamlTestFramework.RunAndRecordTestCaseSteps() ==> Setting completion outcome for {firstTest.DisplayName} to {firstTestOutcome}");
+        }
+
+        private static void RunAndRecordRemainingTestCases(IYamlTestFrameworkHost host, Dictionary<string, TestCase> testFromIdMap, Dictionary<string, TaskCompletionSource<TestOutcome>> completionFromIdMap)
         {
             var remainingTests = completionFromIdMap
                 .Where(x => x.Value.Task.Status != TaskStatus.RanToCompletion)
                 .Select(x => testFromIdMap[x.Key]);
             foreach (var test in remainingTests)
             {
-                var outcome = RunAndRecordTestCase(test, reporter);
+                var outcome = RunAndRecordTestCase(test, host);
                 completionFromIdMap[test.Id.ToString()].SetResult(outcome);
             }
         }
@@ -167,10 +171,10 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
             return testsList;
         }
 
-        private static TestOutcome RunAndRecordTestCase(TestCase test, IYamlTestFrameworkHost reporter)
+        private static TestOutcome RunAndRecordTestCase(TestCase test, IYamlTestFrameworkHost host)
         {
             Logger.Log($"YamlTestFramework.TestRunAndRecord({test.DisplayName})");
-            return YamlTestCaseRunner.RunAndRecordTestCase(test, reporter);
+            return YamlTestCaseRunner.RunAndRecordTestCase(test, host);
         }
 
         #endregion

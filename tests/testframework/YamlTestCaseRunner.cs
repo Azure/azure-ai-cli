@@ -17,23 +17,23 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
 {
     public class YamlTestCaseRunner
     {
-        public static TestOutcome RunAndRecordTestCase(TestCase test, IYamlTestFrameworkHost reporter)
+        public static TestOutcome RunAndRecordTestCase(TestCase test, IYamlTestFrameworkHost host)
         {
-            TestCaseStart(test, reporter);
-            TestCaseRun(test, reporter, out TestOutcome outcome);
-            TestCaseStop(test, reporter, outcome);
+            TestCaseStart(test, host);
+            TestCaseRun(test, host, out TestOutcome outcome);
+            TestCaseStop(test, host, outcome);
             return outcome;
         }
 
         #region private methods
 
-        private static void TestCaseStart(TestCase test, IYamlTestFrameworkHost reporter)
+        private static void TestCaseStart(TestCase test, IYamlTestFrameworkHost host)
         {
             Logger.Log($"YamlTestCaseRunner.TestCaseStart({test.DisplayName})");
-            reporter.RecordStart(test);
+            host.RecordStart(test);
         }
 
-        private static TestOutcome TestCaseRun(TestCase test, IYamlTestFrameworkHost reporter, out TestOutcome outcome) 
+        private static TestOutcome TestCaseRun(TestCase test, IYamlTestFrameworkHost host, out TestOutcome outcome) 
         {
             Logger.Log($"YamlTestCaseRunner.TestCaseRun({test.DisplayName})");
             
@@ -42,7 +42,7 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
             var results = TestCaseGetResults(test).ToList();
             foreach (var result in results)
             {
-                reporter.RecordResult(result);
+                host.RecordResult(result);
             }
 
             var failed = results.Count(x => x.Outcome == TestOutcome.Failed) > 0;
@@ -764,10 +764,10 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
             return outcome;
         }
 
-        private static void TestCaseStop(TestCase test, IYamlTestFrameworkHost reporter, TestOutcome outcome)
+        private static void TestCaseStop(TestCase test, IYamlTestFrameworkHost host, TestOutcome outcome)
         {
             Logger.Log($"YamlTestCaseRunner.TestCaseStop({test.DisplayName})");
-            reporter.RecordEnd(test, outcome);
+            host.RecordEnd(test, outcome);
         }
 
         private static TestResult CreateTestResult(TestCase test, DateTime start, DateTime stop, string stdOut, string stdErr, string errorMessage, string stackTrace, string additional, string debugTrace, TestOutcome outcome)
