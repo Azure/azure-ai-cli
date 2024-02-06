@@ -38,6 +38,7 @@
       What is my name?
     expect: |
       assistant-function: GetUsersName\({}\) = 
+      assistant-function: GetUsersName\({}\) =
 
 - area: ai dev new openai-chat
   tests:
@@ -253,6 +254,19 @@
       input: |-
         What parameter should i use to select my resources?
       tag: skip
+  - class: dev new openai-chat-streaming-with-data (go)
+    steps:
+    - name: generate template
+      command: ai dev new openai-chat-streaming-with-data --go
+    - name: build template
+      script: |
+        cd openai-chat-streaming-with-data-go
+        go mod tidy
+    - name: run template
+      command: ai dev shell --run "cd openai-chat-streaming-with-data-go && go run .\main.go .\openai_chat_completions_streaming_with_data_hello_world.go"
+      input: |-
+        What parameter should i use to initialize?
+      tag: skip
 
 - area: ai dev new openai-chat-streaming-with-functions
   tests:
@@ -375,4 +389,3 @@
       bash: |
         cd openai-webpage-with-functions-ts
         npx webpack
-    
