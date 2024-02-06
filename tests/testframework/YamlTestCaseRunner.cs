@@ -6,6 +6,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Runtime.InteropServices;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Adapter;
@@ -255,8 +256,10 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
                 process.StandardInput.WriteLine(input ?? string.Empty);
                 process.StandardInput.Close();
 
-                process.OutputDataReceived += (sender, e) => { if (e.Data != null) { sbOut.AppendLine(e.Data); sbMerged.AppendLine(e.Data); } };
-                process.ErrorDataReceived += (sender, e) => { if (e.Data != null) { sbErr.AppendLine(e.Data); sbMerged.AppendLine(e.Data); } };
+                var outDoneSignal = new ManualResetEvent(false);
+                var errDoneSignal = new ManualResetEvent(false);
+                process.OutputDataReceived += (sender, e) => AppendLineOrSignal(e.Data, sbOut, sbMerged, outDoneSignal);
+                process.ErrorDataReceived += (sender, e) => AppendLineOrSignal(e.Data, sbErr, sbMerged, errDoneSignal);
                 process.BeginOutputReadLine();
                 process.BeginErrorReadLine();
 
@@ -266,6 +269,12 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
                     : skipOnFailure
                         ? TestOutcome.Skipped
                         : TestOutcome.Failed;
+
+                if (exitedNotKilled)
+                {
+                    outDoneSignal.WaitOne();
+                    errDoneSignal.WaitOne();
+                }
 
                 var exitCode = exitedNotKilled
                     ? process.ExitCode.ToString()
@@ -864,14 +873,21 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
                 var process = Process.Start(startInfo);
                 process.StandardInput.Close();
 
-                process.OutputDataReceived += (sender, e) => { if (e.Data != null) { sbOut.AppendLine(e.Data); sbMerged.AppendLine(e.Data); } };
-                process.ErrorDataReceived += (sender, e) => { if (e.Data != null) { sbErr.AppendLine(e.Data); sbMerged.AppendLine(e.Data); } };
+                var outDoneSignal = new ManualResetEvent(false);
+                var errDoneSignal = new ManualResetEvent(false);
+                process.OutputDataReceived += (sender, e) => AppendLineOrSignal(e.Data, sbOut, sbMerged, outDoneSignal);
+                process.ErrorDataReceived += (sender, e) => AppendLineOrSignal(e.Data, sbErr, sbMerged, errDoneSignal);
                 process.BeginOutputReadLine();
                 process.BeginErrorReadLine();
 
                 var exitedNotKilled = WaitForExit(process, 60000);
-                var passed = exitedNotKilled && process.ExitCode == 0;
+                if (exitedNotKilled)
+                {
+                    outDoneSignal.WaitOne();
+                    errDoneSignal.WaitOne();
+                }
 
+                var passed = exitedNotKilled && process.ExitCode == 0;
                 outcome = passed ? TestOutcome.Passed : TestOutcome.Failed;
 
                 var timedoutOrKilled = !exitedNotKilled;
@@ -909,6 +925,19 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
             }
 
             return outcome;
+        }
+
+        private static void AppendLineOrSignal(string? text, StringBuilder sb1, StringBuilder sb2, ManualResetEvent signal)
+        {
+            if (text != null)
+            {
+                sb1.AppendLine(text);
+                sb2.AppendLine(text);
+            }
+            else
+            {
+                signal.Set();
+            }
         }
 
         #endregion

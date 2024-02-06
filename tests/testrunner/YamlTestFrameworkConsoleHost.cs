@@ -175,8 +175,8 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
                 if (!string.IsNullOrEmpty(stdout))
                 {
                     writer.WriteStartElement("StdOut");
-                    writer.WriteRaw(stdout
-                        .Replace("\u001b", string.Empty)
+                    writer.WriteRaw(System.Security.SecurityElement
+                        .Escape(stdout.Replace("\u001b", string.Empty))
                         .Replace("\r\n", "&#xD;\n"));
                     writer.WriteEndElement();
                 }
@@ -184,8 +184,8 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
                 if (!string.IsNullOrEmpty(stderr))
                 {
                     writer.WriteStartElement("StdErr");
-                    writer.WriteRaw(stderr
-                        .Replace("\u001b", string.Empty)
+                    writer.WriteRaw(System.Security.SecurityElement
+                        .Escape(stderr.Replace("\u001b", string.Empty))
                         .Replace("\r\n", "&#xD;\n"));
                     writer.WriteEndElement();
                 }

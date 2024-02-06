@@ -80,25 +80,36 @@ namespace Azure.AI.Details.Common.CLI
 
             var redirectOutput = captureOutput || stdOutHandler != null || stdErrHandler != null || mergedOutputHandler != null;
 
-            var stdOut = new StringBuilder();
-            var stdErr = new StringBuilder();
-            var mergedOutput = new StringBuilder();
+            var outDoneSignal = new ManualResetEvent(false);
+            var errDoneSignal = new ManualResetEvent(false);
+            var sbOut = new StringBuilder();
+            var sbErr = new StringBuilder();
+            var sbMerged = new StringBuilder();
+
             var stdOutReceived = (string data) => {
                 if (data != null)
                 {
-                    stdOut.AppendLine(data);
-                    mergedOutput.AppendLine(data);
+                    sbOut.AppendLine(data);
+                    sbMerged.AppendLine(data);
                     if (stdOutHandler != null) stdOutHandler(data);
                     if (mergedOutputHandler != null) mergedOutputHandler(data);
+                }
+                else
+                {
+                    outDoneSignal.Set();
                 }
             };
             var stdErrReceived = (string data) => {
                 if (data != null)
                 {
-                    stdErr.AppendLine(data);
-                    mergedOutput.AppendLine(data);
+                    sbErr.AppendLine(data);
+                    sbMerged.AppendLine(data);
                     if (stdErrHandler != null) stdErrHandler(data);
                     if (mergedOutputHandler != null) mergedOutputHandler(data);
+                }
+                else
+                {
+                    errDoneSignal.Set();
                 }
             };
 
@@ -119,10 +130,16 @@ namespace Azure.AI.Details.Common.CLI
 
             await process.WaitForExitAsync();
 
+            if (redirectOutput)
+            {
+                outDoneSignal.WaitOne();
+                errDoneSignal.WaitOne();
+            }
+
             var output = new ProcessOutput();
-            output.StdOutput = process != null ? stdOut.ToString().Trim(' ', '\r', '\n') : "";
-            output.StdError = process != null ? stdErr.ToString().Trim(' ', '\r', '\n') : processException.ToString();
-            output.MergedOutput = process != null ? mergedOutput.ToString().Trim(' ', '\r', '\n') : "";
+            output.StdOutput = process != null ? sbOut.ToString().Trim(' ', '\r', '\n') : "";
+            output.StdError = process != null ? sbErr.ToString().Trim(' ', '\r', '\n') : processException.ToString();
+            output.MergedOutput = process != null ? sbMerged.ToString().Trim(' ', '\r', '\n') : "";
             output.ExitCode = process != null ? process.ExitCode : -1;
 
             if (!string.IsNullOrEmpty(output.StdOutput)) SHELL_DEBUG_TRACE($"---\nSTDOUT\n---\n{output.StdOutput}");
