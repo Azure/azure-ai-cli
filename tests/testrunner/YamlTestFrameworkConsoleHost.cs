@@ -153,10 +153,10 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
             foreach (var testResult in _testResults)
             {
                 var executionId = GetExecutionId(testResult.TestCase).ToString();
-                var stdout = testResult.Messages.First(x => x.Category == TestResultMessage.StandardOutCategory).Text;
-                var stderr = testResult.Messages.First(x => x.Category == TestResultMessage.StandardErrorCategory).Text;
-                var debugTrace = testResult.Messages.First(x => x.Category == TestResultMessage.DebugTraceCategory).Text;
-                var message = testResult.Messages.First(x => x.Category == TestResultMessage.AdditionalInfoCategory).Text;
+                var stdout = testResult.Messages.FirstOrDefault(x => x.Category == TestResultMessage.StandardOutCategory)?.Text;
+                var stderr = testResult.Messages.FirstOrDefault(x => x.Category == TestResultMessage.StandardErrorCategory)?.Text;
+                var debugTrace = testResult.Messages.FirstOrDefault(x => x.Category == TestResultMessage.DebugTraceCategory)?.Text;
+                var message = testResult.Messages.FirstOrDefault(x => x.Category == TestResultMessage.AdditionalInfoCategory)?.Text;
 
                 writer.WriteStartElement("UnitTestResult");
                 writer.WriteAttributeString("executionId", executionId);
@@ -172,28 +172,39 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
                 writer.WriteAttributeString("relativeResultsDirectory", Guid.NewGuid().ToString());
                 writer.WriteStartElement("Output");
 
-                writer.WriteStartElement("StdOut");
-                var sanitized = stdout
-                    .Replace("\u001b", string.Empty)
-                    .Replace("\r\n", "&#xD;\n");
-                writer.WriteRaw(sanitized);
-                writer.WriteEndElement();
+                if (!string.IsNullOrEmpty(stdout))
+                {
+                    writer.WriteStartElement("StdOut");
+                    writer.WriteRaw(stdout
+                        .Replace("\u001b", string.Empty)
+                        .Replace("\r\n", "&#xD;\n"));
+                    writer.WriteEndElement();
+                }
 
-                writer.WriteStartElement("StdErr");
-                sanitized = stderr
-                    .Replace("\u001b", string.Empty)
-                    .Replace("\r\n", "&#xD;\n");
-                writer.WriteRaw(sanitized);
-                writer.WriteEndElement();
+                if (!string.IsNullOrEmpty(stderr))
+                {
+                    writer.WriteStartElement("StdErr");
+                    writer.WriteRaw(stderr
+                        .Replace("\u001b", string.Empty)
+                        .Replace("\r\n", "&#xD;\n"));
+                    writer.WriteEndElement();
+                }
 
-                writer.WriteElementString("DebugTrace", debugTrace);
+                if (!string.IsNullOrEmpty(debugTrace))
+                {
+                    writer.WriteElementString("DebugTrace", debugTrace);
+                }
+
                 writer.WriteStartElement("ErrorInfo");
                 writer.WriteElementString("Message", testResult.ErrorMessage);
                 writer.WriteElementString("StackTrace", testResult.ErrorStackTrace);
                 writer.WriteEndElement();
                 writer.WriteStartElement("TextMessages");
 
-                writer.WriteElementString("Message", message);
+                if (!string.IsNullOrEmpty(message))
+                {
+                    writer.WriteElementString("Message", message);
+                }
                 writer.WriteEndElement();
                 writer.WriteEndElement();
                 writer.WriteEndElement();
