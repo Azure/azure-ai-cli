@@ -58,15 +58,15 @@ namespace Azure.AI.Details.Common.CLI.TestRunner
             Console.WriteLine();
             Console.WriteLine("EXAMPLES");
             Console.WriteLine();
-            Console.WriteLine("  EXAMPLE 1: List tests from two files, that contains both 'nightly' and 'java', but not 'skip'");
+            Console.WriteLine("  EXAMPLE 1: List tests from two files, that contain both 'nightly' and 'java', but not 'skip'");
             Console.WriteLine();
             Console.WriteLine("    ait list --files test1.yaml test2.yaml --contains nightly java --remove skip");
             Console.WriteLine();
-            Console.WriteLine("  EXAMPLE 2: Run tests that contain 'setup' or 'nightly', and 'java', but not 'skip'");
+            Console.WriteLine("  EXAMPLE 2: Run tests from files under current directory, that contain 'setup' or 'nightly', and 'java', but not 'skip'");
             Console.WriteLine();
             Console.WriteLine("    ait run --tests setup nightly --contains java --remove skip");
             Console.WriteLine();
-            Console.WriteLine("  EXAMPLE 3: Run tests from all files under tests directory, that contains 'test3', but not 'skip'");
+            Console.WriteLine("  EXAMPLE 3: Run tests from files under 'tests' directory, that contain 'test3', but not 'skip'");
             Console.WriteLine();
             Console.WriteLine("    ait run --files ../tests/**/*.yaml --contains test3 --remove skip");
 
