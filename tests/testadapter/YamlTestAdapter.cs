@@ -40,14 +40,14 @@ namespace Azure.AI.Details.Common.CLI.TestAdapter
            Logger.Log($"YamlTestAdapter.GetTestsFromFile('{source}'): Extension={file.Extension}");
 
             return file.Extension.Trim('.') == YamlTestFramework.YamlFileExtension.Trim('.')
-                ? YamlTestFramework.GetTestsFromYaml(source, file)
-                : GetTestsFromTestAdapterOrReferenceDirectory(source, file);
+                ? YamlTestFramework.GetTestsFromYaml(source, file).ToList()
+                : GetTestsFromTestAdapterOrReferenceDirectory(source, file).ToList();
         }
 
         public static void RunTests(IEnumerable<TestCase> tests, IRunContext runContext, IFrameworkHandle frameworkHandle)
         {
             var filtered = YamlTestCaseFilter.FilterTestCases(tests, runContext);
-            YamlTestFramework.RunTests(filtered, new YamlTestFrameworkHandleReporter(frameworkHandle));
+            YamlTestFramework.RunTests(filtered, new YamlTestFrameworkHandleHost(frameworkHandle));
         }
 
         #region private methods

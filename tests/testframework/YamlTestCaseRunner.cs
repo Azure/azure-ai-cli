@@ -15,45 +15,41 @@ using YamlDotNet.RepresentationModel;
 
 namespace Azure.AI.Details.Common.CLI.TestFramework
 {
+
     public class YamlTestCaseRunner
     {
-        public static TestOutcome RunAndRecordTestCase(TestCase test, IYamlTestFrameworkReporter reporter)
+        public static IList<TestResult> RunAndRecordTestCase(TestCase test, IYamlTestFrameworkHost host)
         {
-            TestCaseStart(test, reporter);
-            TestCaseRun(test, reporter, out TestOutcome outcome);
-            TestCaseStop(test, reporter, outcome);
-            return outcome;
+            TestCaseStart(test, host);
+            var results = TestCaseRun(test, host);
+
+            var outcome = TestResultHelpers.TestOutcomeFromResults(results);
+            TestCaseStop(test, host, outcome);
+
+            return results;
         }
 
         #region private methods
 
-        private static void TestCaseStart(TestCase test, IYamlTestFrameworkReporter reporter)
+        private static void TestCaseStart(TestCase test, IYamlTestFrameworkHost host)
         {
             Logger.Log($"YamlTestCaseRunner.TestCaseStart({test.DisplayName})");
-            reporter.RecordStart(test);
+            host.RecordStart(test);
         }
 
-        private static TestOutcome TestCaseRun(TestCase test, IYamlTestFrameworkReporter reporter, out TestOutcome outcome) 
+        private static IList<TestResult> TestCaseRun(TestCase test, IYamlTestFrameworkHost host)
         {
             Logger.Log($"YamlTestCaseRunner.TestCaseRun({test.DisplayName})");
-            
+
             // run the test case, getting all the results, prior to recording any of those results
             // (not doing this in this order seems to, for some reason, cause "foreach" test cases to run 5 times!?)
             var results = TestCaseGetResults(test).ToList();
             foreach (var result in results)
             {
-                reporter.RecordResult(result);
+                host.RecordResult(result);
             }
 
-            var failed = results.Count(x => x.Outcome == TestOutcome.Failed) > 0;
-            var skipped = results.Count(x => x.Outcome == TestOutcome.Skipped) > 0;
-            var notFound = results.Count(x => x.Outcome == TestOutcome.NotFound) > 0 || results.Count() == 0;
-
-            return outcome =
-                failed ? TestOutcome.Failed
-                : skipped ? TestOutcome.Skipped
-                : notFound ? TestOutcome.NotFound
-                : TestOutcome.Passed;
+            return results;
         }
 
         private static IEnumerable<TestResult> TestCaseGetResults(TestCase test)
@@ -63,6 +59,14 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
             var cli = YamlTestProperties.Get(test, "cli") ?? "";
             var command = YamlTestProperties.Get(test, "command");
             var script = YamlTestProperties.Get(test, "script");
+            var bash = YamlTestProperties.Get(test, "bash");
+
+            var scriptIsBash = !string.IsNullOrEmpty(bash);
+            if (scriptIsBash) script = bash;
+
+            var isWindows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
+            if (!isWindows) scriptIsBash = true;
+
             var @foreach = YamlTestProperties.Get(test, "foreach");
             var arguments = YamlTestProperties.Get(test, "arguments");
             var input = YamlTestProperties.Get(test, "input");
@@ -87,8 +91,8 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
                 var start = DateTime.Now;
 
                 var outcome = string.IsNullOrEmpty(simulate)
-                    ? RunTestCase(test, skipOnFailure, cli, command, script, foreachItem, arguments, input, expect, expectGpt, notExpect, workingDirectory, timeout, out string stdOut, out string stdErr, out string errorMessage, out string stackTrace, out string additional, out string debugTrace)
-                    : SimulateTestCase(test, simulate, cli, command, script, foreachItem, arguments, input, expect, expectGpt, notExpect, workingDirectory, out stdOut, out stdErr, out errorMessage, out stackTrace, out additional, out debugTrace);
+                    ? RunTestCase(test, skipOnFailure, cli, command, script, scriptIsBash, foreachItem, arguments, input, expect, expectGpt, notExpect, workingDirectory, timeout, out string stdOut, out string stdErr, out string errorMessage, out string stackTrace, out string additional, out string debugTrace)
+                    : SimulateTestCase(test, simulate, cli, command, script, scriptIsBash, foreachItem, arguments, input, expect, expectGpt, notExpect, workingDirectory, out stdOut, out stdErr, out errorMessage, out stackTrace, out additional, out debugTrace);
 
                 #if DEBUG
                 additional += outcome == TestOutcome.Failed ? $"\nEXTRA: {ExtraDebugInfo()}" : "";
@@ -207,7 +211,7 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
             return dup;
         }
 
-        private static TestOutcome RunTestCase(TestCase test, bool skipOnFailure, string cli, string command, string script, string @foreach, string arguments, string input, string expect, string expectGpt, string notExpect, string workingDirectory, int timeout, out string stdOut, out string stdErr, out string errorMessage, out string stackTrace, out string additional, out string debugTrace)
+        private static TestOutcome RunTestCase(TestCase test, bool skipOnFailure, string cli, string command, string script, bool scriptIsBash, string @foreach, string arguments, string input, string expect, string expectGpt, string notExpect, string workingDirectory, int timeout, out string stdOut, out string stdErr, out string errorMessage, out string stackTrace, out string additional, out string debugTrace)
         {
             var outcome = TestOutcome.None;
 
@@ -223,8 +227,8 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
 
             try
             {
-                var isWindows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
-                script = WriteTextToTempFile(script, isWindows ? "cmd" : null);
+                var useCmd = !scriptIsBash;
+                script = WriteTextToTempFile(script, useCmd ? "cmd" : null);
 
                 expect = WriteTextToTempFile(expect);
                 notExpect = WriteTextToTempFile(notExpect);
@@ -233,8 +237,8 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
                 kvs.AddRange(KeyValuePairsFromJson(@foreach, false));
                 kvs = ConvertValuesToAtArgs(kvs, ref filesToDelete);
 
-                var startArgs = GetStartInfo(out string startProcess, cli, command, script, kvs, expect, notExpect, ref filesToDelete);
-                stackTrace = stackTrace ?? $"{startProcess} {startArgs}";
+                var startArgs = GetStartInfo(out string startProcess, cli, command, script, scriptIsBash, kvs, expect, notExpect, ref filesToDelete);
+                stackTrace = $"{startProcess} {startArgs}\n{stackTrace ?? string.Empty}";
 
                 Logger.Log($"Process.Start('{startProcess} {startArgs}')");
                 var startInfo = new ProcessStartInfo(startProcess, startArgs)
@@ -636,7 +640,7 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
             return completed;
         }
 
-        private static string GetStartInfo(out string startProcess, string cli, string command, string script, List<KeyValuePair<string, string>> kvs, string expect, string notExpect, ref List<string> files)
+        private static string GetStartInfo(out string startProcess, string cli, string command, string script, bool scriptIsBash, List<KeyValuePair<string, string>> kvs, string expect, string notExpect, ref List<string> files)
         {
             startProcess = FindCacheCli(cli);
 
@@ -652,13 +656,17 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
                 files ??= new List<string>();
                 files.Add(command);
 
-                return $"quiet run --command @{command} {GetAtArgs(expect, notExpect)}";
+                return $"run --command @{command} {GetAtArgs(expect, notExpect)}";
             }
 
-            var isWindows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
-            return isWindows
-                ? $"quiet run --cmd --script {script} {GetKeyValueArgs(kvs)} {GetAtArgs(expect, notExpect)}"
-                : $"quiet run --process /bin/bash --pre.script -l --script {script} {GetKeyValueArgs(kvs)} {GetAtArgs(expect, notExpect)}";
+            if (scriptIsBash)
+            {
+                var isWindows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
+                var bash = isWindows ? FileHelpers.FindFileInOsPath("bash.exe") : "/bin/bash";
+                return $"run --process \"{bash}\" --pre.script -l --script \"{script}\" {GetKeyValueArgs(kvs)} {GetAtArgs(expect, notExpect)}";
+            }
+
+            return $"run --cmd --script \"{script}\" {GetKeyValueArgs(kvs)} {GetAtArgs(expect, notExpect)}";
         }
 
         private static string GetAtArgs(string expect, string notExpect)
@@ -699,12 +707,13 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
             return args.ToString().TrimEnd();
         }
 
-        private static TestOutcome SimulateTestCase(TestCase test, string simulate, string cli, string command, string script, string @foreach, string arguments, string input, string expect, string expectGpt, string notExpect, string workingDirectory, out string stdOut, out string stdErr, out string errorMessage, out string stackTrace, out string additional, out string debugTrace)
+        private static TestOutcome SimulateTestCase(TestCase test, string simulate, string cli, string command, string script, bool scriptIsBash, string @foreach, string arguments, string input, string expect, string expectGpt, string notExpect, string workingDirectory, out string stdOut, out string stdErr, out string errorMessage, out string stackTrace, out string additional, out string debugTrace)
         {
             var sb = new StringBuilder();
             sb.AppendLine($"cli='{cli?.Replace("\n", "\\n")}'");
             sb.AppendLine($"command='{command?.Replace("\n", "\\n")}'");
             sb.AppendLine($"script='{script?.Replace("\n", "\\n")}'");
+            sb.AppendLine($"scriptIsBash='{scriptIsBash}'");
             sb.AppendLine($"foreach='{@foreach?.Replace("\n", "\\n")}'");
             sb.AppendLine($"arguments='{arguments?.Replace("\n", "\\n")}'");
             sb.AppendLine($"input='{input?.Replace("\n", "\\n")}'");
@@ -751,10 +760,10 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
             return outcome;
         }
 
-        private static void TestCaseStop(TestCase test, IYamlTestFrameworkReporter reporter, TestOutcome outcome)
+        private static void TestCaseStop(TestCase test, IYamlTestFrameworkHost host, TestOutcome outcome)
         {
             Logger.Log($"YamlTestCaseRunner.TestCaseStop({test.DisplayName})");
-            reporter.RecordEnd(test, outcome);
+            host.RecordEnd(test, outcome);
         }
 
         private static TestResult CreateTestResult(TestCase test, DateTime start, DateTime stop, string stdOut, string stdErr, string errorMessage, string stackTrace, string additional, string debugTrace, TestOutcome outcome)
@@ -851,7 +860,7 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
                     RedirectStandardOutput = true
                 };
 
-                Logger.Log($"Process.Start('{startProcess} {startArgs}')");
+                Logger.Log($"ExpectGptOutcome: Process.Start('{startProcess} {startArgs}')");
                 var process = Process.Start(startInfo);
                 process.StandardInput.Close();
 
@@ -860,33 +869,42 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
                 process.BeginOutputReadLine();
                 process.BeginErrorReadLine();
 
-                var exitedNotKilled = WaitForExit(process, 30000);
+                var exitedNotKilled = WaitForExit(process, 60000);
+                var passed = exitedNotKilled && process.ExitCode == 0;
 
-                outcome = exitedNotKilled && process.ExitCode == 0
-                    ? TestOutcome.Passed
-                    : TestOutcome.Failed;
+                outcome = passed ? TestOutcome.Passed : TestOutcome.Failed;
+
+                var timedoutOrKilled = !exitedNotKilled;
+                if (timedoutOrKilled)
+                {
+                    var message = "ExpectGptOutcome: WARNING: Timedout or killed!";
+                    sbErr.AppendLine(message);
+                    sbMerged.AppendLine(message);
+                    Logger.LogWarning(message);
+                }
             }
-            catch
+            catch (Exception ex)
             {
                 outcome = TestOutcome.Failed;
-            }
-            finally
-            {
-                gptStdOut = sbOut.ToString();
-                gptStdErr = sbErr.ToString();
-                gptMerged = sbMerged.ToString();
 
-                File.Delete(questionTempFile);
+                var exception = $"ExpectGptOutcome: EXCEPTION: {ex.Message}";
+                sbErr.AppendLine(exception);
+                sbMerged.AppendLine(exception);
+                Logger.Log(exception);
             }
+
+            File.Delete(questionTempFile);
+            gptStdOut = sbOut.ToString();
+            gptStdErr = sbErr.ToString();
+            gptMerged = sbMerged.ToString();
 
             if (outcome == TestOutcome.Passed)
             {
                 Logger.Log($"ExpectGptOutcome: Checking for 'PASS' in '{gptMerged}'");
+
                 var passed = gptMerged.Contains("PASS") || gptMerged.Contains("TRUE") || gptMerged.Contains("YES");
-                var failed = gptMerged.Contains("FAIL") || gptMerged.Contains("FALSE") || gptMerged.Contains("NO");
-                outcome = passed && !failed
-                    ? TestOutcome.Passed
-                    : TestOutcome.Failed;
+                outcome = passed ? TestOutcome.Passed : TestOutcome.Failed;
+
                 Logger.Log($"ExpectGptOutcome: {outcome}");
             }
 

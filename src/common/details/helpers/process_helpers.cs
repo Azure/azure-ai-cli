@@ -66,9 +66,19 @@ namespace Azure.AI.Details.Common.CLI
             return Process.Start(start);
         }
 
-        public static async Task<ProcessOutput> RunShellCommandAsync(string command, string arguments, Dictionary<string, string> addToEnvironment = null, Action<string> stdOutHandler = null, Action<string> stdErrHandler = null, Action<string> mergedOutputHandler = null)
+        public static async Task<ProcessOutput> RunShellCommandAsync(string commandLine, Dictionary<string, string> addToEnvironment = null, Action<string> stdOutHandler = null, Action<string> stdErrHandler = null, Action<string> mergedOutputHandler = null, bool captureOutput = true)
+        {
+            var isWindows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
+            var command =  isWindows ? "cmd" : "bash";
+            var arguments = isWindows ? $"/c \"{commandLine}\"" : $"-li \"{commandLine}\"";
+            return await RunShellCommandAsync(command, arguments, addToEnvironment, stdOutHandler, stdErrHandler, mergedOutputHandler, captureOutput);
+        }
+
+        public static async Task<ProcessOutput> RunShellCommandAsync(string command, string arguments, Dictionary<string, string> addToEnvironment = null, Action<string> stdOutHandler = null, Action<string> stdErrHandler = null, Action<string> mergedOutputHandler = null, bool captureOutput = true)
         {
             SHELL_DEBUG_TRACE($"COMMAND: {command} {arguments} {DictionaryToString(addToEnvironment)}");
+
+            var redirectOutput = captureOutput || stdOutHandler != null || stdErrHandler != null || mergedOutputHandler != null;
 
             var stdOut = new StringBuilder();
             var stdErr = new StringBuilder();
@@ -92,16 +102,20 @@ namespace Azure.AI.Details.Common.CLI
                 }
             };
 
-            var process = TryCatchHelpers.TryCatchNoThrow<Process>(() => StartShellCommandProcess(command, arguments, addToEnvironment), null, out Exception processException);
+            var process = TryCatchHelpers.TryCatchNoThrow<Process>(() => StartShellCommandProcess(command, arguments, addToEnvironment, redirectOutput), null, out Exception processException);
             if (process == null)
             {
                 SHELL_DEBUG_TRACE($"ERROR: {processException}");
                 return new ProcessOutput() { StdError = processException.ToString() };
             }
-            process.OutputDataReceived += (sender, e) => stdOutReceived(e.Data);
-            process.ErrorDataReceived += (sender, e) => stdErrReceived(e.Data);
-            process.BeginOutputReadLine();
-            process.BeginErrorReadLine();
+
+            if (redirectOutput)
+            {
+                process.OutputDataReceived += (sender, e) => stdOutReceived(e.Data);
+                process.ErrorDataReceived += (sender, e) => stdErrReceived(e.Data);
+                process.BeginOutputReadLine();
+                process.BeginErrorReadLine();
+            }
 
             await process.WaitForExitAsync();
 
@@ -130,12 +144,12 @@ namespace Azure.AI.Details.Common.CLI
             return x;
         }
 
-        private static Process StartShellCommandProcess(string command, string arguments, Dictionary<string, string> addToEnvironment = null)
+        private static Process StartShellCommandProcess(string command, string arguments, Dictionary<string, string> addToEnvironment = null, bool captureOutput = true)
         {
             var isWindows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
             return  isWindows
-                ? StartProcess("cmd", $"/c {command} {arguments}", addToEnvironment)
-                : StartProcess(command,  arguments, addToEnvironment);
+                ? StartProcess("cmd", $"/c {command} {arguments}", addToEnvironment, captureOutput)
+                : StartProcess(command,  arguments, addToEnvironment, captureOutput);
         }
 
         private static void SHELL_DEBUG_TRACE(string message,[CallerLineNumber] int line = 0, [CallerMemberName] string? caller = null, [CallerFilePath] string? file = null)

@@ -1,15 +1,17 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Xml;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Adapter;
 
 namespace Azure.AI.Details.Common.CLI.TestFramework
 {
-    public class YamlTestFrameworkConsoleReporter : IYamlTestFrameworkReporter
+    public class YamlTestFrameworkConsoleHost : IYamlTestFrameworkHost
     {
-        public YamlTestFrameworkConsoleReporter()
+        public YamlTestFrameworkConsoleHost()
         {
         }
 
@@ -17,38 +19,101 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
         {
             _startTime ??= DateTime.Now;
             _testCases.Add(testCase);
-            _testToExecutionMap[testCase.Id] = Guid.NewGuid();
+            SetExecutionId(testCase, Guid.NewGuid());
 
-            Console.WriteLine("Starting test: " + testCase.FullyQualifiedName);
+            lock (this)
+            {
+                Console.ForegroundColor = ConsoleColor.DarkGray;
+                Console.WriteLine("Starting test: " + testCase.FullyQualifiedName);
+                Console.ResetColor();
+            }
         }
 
         public void RecordResult(TestResult testResult)
         {
             _testResults.Add(testResult);
-            
-            Console.WriteLine("Test: " + testResult.TestCase.DisplayName);
-            Console.WriteLine("Result: " + testResult.Outcome);
-            Console.WriteLine("Duration: " + testResult.Duration.TotalMilliseconds + "ms");
-            if (testResult.Outcome != TestOutcome.Passed)
-            {
-                Console.WriteLine("ErrorMessage: " + testResult.ErrorMessage);
-                Console.WriteLine("ErrorStackTrace: " + testResult.ErrorStackTrace);
-            }
-            Console.WriteLine();
+            PrintResult(testResult);
         }
 
         public void RecordEnd(TestCase testCase, TestOutcome outcome)
         {
             _endTime = DateTime.Now;
-            if (outcome != TestOutcome.Passed)
-            {
-                Console.WriteLine("FAILED " + testCase.FullyQualifiedName);
-            }
         }
 
-        public void WriteResultFile()
+        public bool Finish(IDictionary<string, IList<TestResult>> resultsByTestCaseId)
         {
-            var assembly = typeof(YamlTestFrameworkConsoleReporter).Assembly;
+            var allResults = resultsByTestCaseId.Values.SelectMany(x => x);
+            var failedResults = allResults.Where(x => x.Outcome == TestOutcome.Failed).ToList();
+            var passedResults = allResults.Where(x => x.Outcome == TestOutcome.Passed).ToList();
+            var skippedResults = allResults.Where(x => x.Outcome == TestOutcome.Skipped).ToList();
+            var passed = failedResults.Count == 0;
+
+            if (failedResults.Count > 0)
+            {
+                Console.ResetColor();
+                Console.WriteLine();
+                Console.BackgroundColor = ConsoleColor.Red;
+                Console.ForegroundColor = ConsoleColor.White;
+                Console.Write("FAILURE SUMMARY:");
+                Console.ResetColor();
+                Console.WriteLine();
+                failedResults.ForEach(r => PrintResult(r));
+            }
+            else
+            {
+                Console.WriteLine();
+            }
+
+            var count = allResults.Count();
+            var duration = FormattedDuration((_endTime.Value - _startTime.Value).TotalMilliseconds);
+            Console.BackgroundColor = ConsoleColor.Blue;
+            Console.ForegroundColor = ConsoleColor.White;
+            Console.Write("TEST RESULT SUMMARY:");
+            Console.ResetColor();
+            Console.Write("\nTests: ");
+            Console.ForegroundColor = ConsoleColor.Blue;
+            Console.Write($"{count}");
+            Console.ForegroundColor = ConsoleColor.DarkGray;
+            Console.WriteLine($" ({duration})");
+
+            var resultsFile = WriteResultFile();
+
+            var fi = new FileInfo(resultsFile);
+            Console.ResetColor();
+            Console.Write("Results: ");
+            Console.ForegroundColor = ConsoleColor.Blue;
+            Console.Write(fi.FullName);
+            Console.ResetColor();
+            Console.WriteLine("\n");
+
+            Console.ForegroundColor = ConsoleColor.Green;
+            Console.Write($"Passed: {passedResults.Count}");
+
+            if (failedResults.Count > 0)
+            {
+                Console.ForegroundColor = ConsoleColor.DarkGray;
+                Console.Write(", ");
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.Write($"Failed: {failedResults.Count}");
+            }
+
+            if (skippedResults.Count > 0)
+            {
+                Console.ForegroundColor = ConsoleColor.DarkGray;
+                Console.Write(", ");
+                Console.ForegroundColor = ConsoleColor.Yellow;
+                Console.Write($"Skipped: {skippedResults.Count}");
+            }
+
+            Console.ResetColor();
+            Console.WriteLine("\n");
+
+            return passed;
+        }
+
+        public string WriteResultFile()
+        {
+            var assembly = typeof(YamlTestFrameworkConsoleHost).Assembly;
             var assemblyPath = assembly.Location;
 
             _startTime ??= DateTime.Now;
@@ -61,7 +126,7 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
             var userName = Environment.UserName;
             var machineName = Environment.MachineName;
             var userAtMachine = userName.Split('\\', '/').Last() + "@" + machineName;
-            var testRunName = userAtMachine + _endTime.Value.ToString("yyyy-MM-dd HH:mm:ss");
+            var testRunName = userAtMachine + " " + _endTime.Value.ToString("yyyy-MM-dd HH:mm:ss");
 
             XmlWriterSettings settings = new XmlWriterSettings();
             settings.Indent = true;
@@ -87,7 +152,13 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
             writer.WriteStartElement("Results");
             foreach (var testResult in _testResults)
             {
-                var executionId = _testToExecutionMap[testResult.TestCase.Id].ToString();
+                var executionId = GetExecutionId(testResult.TestCase).ToString();
+                var stdout = testResult.Messages.First(x => x.Category == TestResultMessage.StandardOutCategory).Text
+                    .Replace("\u001b", string.Empty);
+
+                var debugTrace = testResult.Messages.First(x => x.Category == TestResultMessage.DebugTraceCategory).Text;
+                var message = testResult.Messages.First(x => x.Category == TestResultMessage.AdditionalInfoCategory).Text;
+
                 writer.WriteStartElement("UnitTestResult");
                 writer.WriteAttributeString("executionId", executionId);
                 writer.WriteAttributeString("testId", testResult.TestCase.Id.ToString());
@@ -97,19 +168,19 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
                 writer.WriteAttributeString("startTime", testResult.StartTime.DateTime.ToString("o"));
                 writer.WriteAttributeString("endTime", testResult.EndTime.DateTime.ToString("o"));
                 writer.WriteAttributeString("testType", testType);
-                writer.WriteAttributeString("outcome", testResult.Outcome.ToString());
+                writer.WriteAttributeString("outcome", OutcomeToString(testResult.Outcome));
                 writer.WriteAttributeString("testListId", testListId);
                 writer.WriteAttributeString("relativeResultsDirectory", Guid.NewGuid().ToString());
                 writer.WriteStartElement("Output");
-                writer.WriteElementString("StdOut", testResult.Messages.First(x => x.Category == TestResultMessage.StandardOutCategory).Text);
-                writer.WriteElementString("DebugTrace", testResult.Messages.First(x => x.Category == TestResultMessage.DebugTraceCategory).Text);
+                writer.WriteElementString("StdOut", stdout);
+                writer.WriteElementString("DebugTrace", debugTrace);
                 writer.WriteStartElement("ErrorInfo");
                 writer.WriteElementString("Message", testResult.ErrorMessage);
                 writer.WriteElementString("StackTrace", testResult.ErrorStackTrace);
                 writer.WriteEndElement();
                 writer.WriteStartElement("TextMessages");
 
-                writer.WriteElementString("Message", testResult.Messages.First(x => x.Category == TestResultMessage.AdditionalInfoCategory).Text);
+                writer.WriteElementString("Message", message);
                 writer.WriteEndElement();
                 writer.WriteEndElement();
                 writer.WriteEndElement();
@@ -119,7 +190,7 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
             writer.WriteStartElement("TestDefinitions");
             foreach (var testCase in _testCases)
             {
-                var executionId = _testToExecutionMap[testCase.Id].ToString();
+                var executionId = GetExecutionId(testCase).ToString();
                 var qualifiedParts = testCase.FullyQualifiedName.Split('.');
                 var className = string.Join(".", qualifiedParts.Take(qualifiedParts.Length - 1));
                 var name = qualifiedParts.Last();
@@ -143,7 +214,7 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
             writer.WriteStartElement("TestEntries");
             foreach (var testCase in _testCases)
             {
-                var executionId = _testToExecutionMap[testCase.Id].ToString();
+                var executionId = GetExecutionId(testCase).ToString();
                 writer.WriteStartElement("TestEntry");
                 writer.WriteAttributeString("testId", testCase.Id.ToString());
                 writer.WriteAttributeString("executionId", executionId);
@@ -168,7 +239,7 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
 
             writer.WriteStartElement("Counters");
             writer.WriteAttributeString("total", _testResults.Count.ToString());
-            writer.WriteAttributeString("executed", _testResults.Count.ToString());
+            writer.WriteAttributeString("executed", _testResults.Count(r => IsExecuted(r)).ToString());
             writer.WriteAttributeString("passed", _testResults.Count(r => IsPassed(r)).ToString());
             writer.WriteAttributeString("failed", _testResults.Count(r => IsFailed(r)).ToString());
             writer.WriteAttributeString("error", _testResults.Count(r => IsError(r)).ToString());
@@ -196,6 +267,60 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
 
             writer.Close();
             writer.Dispose();
+
+            return resultFile;
+        }
+
+        private void PrintResult(TestResult testResult)
+        {
+            lock (this)
+            {
+                Console.ForegroundColor = ConsoleColor.DarkGray;
+                if (testResult.Outcome == TestOutcome.Passed) Console.ForegroundColor = ConsoleColor.Green;
+                if (testResult.Outcome == TestOutcome.Skipped) Console.ForegroundColor = ConsoleColor.Yellow;
+                if (testResult.Outcome == TestOutcome.Failed) Console.ForegroundColor = ConsoleColor.Red;
+
+                var duration = FormattedDuration(testResult.Duration.TotalMilliseconds);
+                Console.WriteLine($"{testResult.Outcome} ({duration}): {testResult.TestCase.FullyQualifiedName}");
+                Console.ResetColor();
+
+                if (testResult.Outcome == TestOutcome.Failed)
+                {
+                    var hasStack = !string.IsNullOrEmpty(testResult.ErrorStackTrace);
+                    if (hasStack) Console.WriteLine(testResult.ErrorStackTrace.Trim('\r', '\n'));
+
+                    var hasErr = !string.IsNullOrEmpty(testResult.ErrorMessage);
+                    if (hasErr) Console.WriteLine(testResult.ErrorMessage.Trim('\r', '\n'));
+
+                    if (hasErr || hasStack) Console.WriteLine();
+                }
+            }
+        }
+
+        private static string FormattedDuration(double ms)
+        {
+            var secs = ms / 1000;
+            var duration = ms >= 1000
+                ? secs.ToString("0.00") + " seconds"
+                : ms.ToString("0") + " ms";
+            return duration;
+        }
+
+        private static string OutcomeToString(TestOutcome outcome)
+        {
+            return outcome switch {
+                TestOutcome.None => "None",
+                TestOutcome.Passed => "Passed",
+                TestOutcome.Failed => "Failed",
+                TestOutcome.Skipped => "NotExecuted",
+                TestOutcome.NotFound => "NotFound",
+                _ => "None",
+            };
+        }
+
+        private bool IsExecuted(TestResult r)
+        {
+            return IsPassed(r) || IsFailed(r);
         }
 
         private static bool IsPassed(TestResult r)
@@ -260,6 +385,22 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
         {
             return false;
             // return r.Outcome == TestOutcome.Warning;
+        }
+
+        private void SetExecutionId(TestCase testCase, Guid guid)
+        {
+            lock (_testToExecutionMap)
+            {
+                _testToExecutionMap[testCase.Id] = guid;
+            }
+        }
+
+        private Guid GetExecutionId(TestCase testCase)
+        {
+            lock (_testToExecutionMap)
+            {
+                return _testToExecutionMap[testCase.Id];
+            }
         }
 
         private DateTime? _startTime;

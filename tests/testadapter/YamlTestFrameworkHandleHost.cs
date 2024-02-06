@@ -3,11 +3,11 @@ using Microsoft.VisualStudio.TestPlatform.ObjectModel.Adapter;
 
 namespace Azure.AI.Details.Common.CLI.TestFramework
 {
-    public class YamlTestFrameworkHandleReporter : IYamlTestFrameworkReporter
+    public class YamlTestFrameworkHandleHost : IYamlTestFrameworkHost
     {
         private readonly IFrameworkHandle _frameworkHandle;
 
-        public YamlTestFrameworkHandleReporter(IFrameworkHandle frameworkHandle)
+        public YamlTestFrameworkHandleHost(IFrameworkHandle frameworkHandle)
         {
             _frameworkHandle = frameworkHandle;
         }
