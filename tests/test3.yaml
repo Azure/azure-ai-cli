@@ -37,7 +37,6 @@
     input: |
       What is my name?
     expect: |
-      assistant-function: GetUsersName\({}\) = 
       assistant-function: GetUsersName\({}\) =
 
 - area: ai dev new openai-chat
