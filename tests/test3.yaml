@@ -1,4 +1,27 @@
-﻿- name: dev new environment
+﻿- area: ai init
+  tags: [before]
+  tests:
+  - name: ai init openai
+    command: ai init openai
+    arguments:
+      subscription: e72e5254-f265-4e95-9bd2-9ee8e7329051
+      name: robch-oai-eastus2
+      chat-deployment-name: gpt-4-32k-0613
+      embeddings-deployment-name: text-embedding-ada-002-2
+      evaluation-deployment-name: gpt-4-32k-0613
+      interactive: false
+  - name: ai init speech
+    command: ai init speech
+    arguments:
+      subscription: e72e5254-f265-4e95-9bd2-9ee8e7329051
+      name: robch-cranky-red-koala-ais
+      interactive: false
+
+- name: test ai chat
+  command: ai chat --question "Why is the sky blue" --index-name @none
+  expect: Rayleigh
+
+- name: dev new environment
   command: ai dev new .env
 
 - class: dev new helper-functions
@@ -33,6 +56,8 @@
       input: |-
         Tell me a joke
         Tell me another joke
+      expect-gpt: |
+        The output should contain exactly two jokes.
       tag: skip
 
   - class: dev new openai-chat (go)
