@@ -49,17 +49,30 @@ namespace Azure.AI.Details.Common.CLI.TestRunner
             Console.WriteLine("    --files PATTERN1 [PATTERN2 [...]]");
             Console.WriteLine();
             Console.WriteLine("  FILTERS");
-            Console.WriteLine("    --filter FILTER");
-            Console.WriteLine("    --filters FILTER1 [FILTER2 [...]]");
+            Console.WriteLine("    --filter [+/-]CRITERIA");
+            Console.WriteLine("    --filters [+/-]CRITERIA1 [+/-]CRITERIA2 [...]");
+            Console.WriteLine();
+            Console.WriteLine("  TEST SELECTION/FILTERING CRITERIA");
+            Console.WriteLine();
+            Console.WriteLine("    (1) Tests are selected when matching ONE or more criteria specified with +");
+            Console.WriteLine("        When zero +CRITERIA specified, all tests are selected");
+            Console.WriteLine();
+            Console.WriteLine("    (2) Tests are filtered OUT when matching ANY ONE criteria specified with -");
+            Console.WriteLine("        When zero -CRITERIA specified, no tests are filtered OUT");
+            Console.WriteLine();
+            Console.WriteLine("    (3) Tests are kept IN when matching ALL criteria specified with CRITERIA (no + or -)");
+            Console.WriteLine("        When zero CRITERIA specified, all tests are kept IN after applying + and - criteria");
+
             Console.WriteLine();
             Console.WriteLine("EXAMPLES");
             Console.WriteLine();
             Console.WriteLine("  ait list");
-            Console.WriteLine("  ait list --files test1.yaml test2.yaml --filter +chat -skip");
+            Console.WriteLine("  ait list --files test1.yaml test2.yaml --filter +prompt1.txt +prompt2.txt");
             Console.WriteLine();
             Console.WriteLine("  ait run");
-            Console.WriteLine("  ait run --filters +nightly -skip");
-            Console.WriteLine("  ait run --files ../tests/**/*.yaml --filter +\"best shoes\" -skip");
+            Console.WriteLine("  ait run --filters nightly -skip");
+            Console.WriteLine("  ait run --files ../tests/**/*.yaml --filter test3 -skip");
+
             return 1;
         }
 
