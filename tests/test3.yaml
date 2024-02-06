@@ -223,7 +223,7 @@
     - name: run template
       command: ai dev shell --run "openai-chat-streaming-with-data-cs\bin\Debug\net7.0\OpenAIChatCompletionsWithDataStreaming"
       input: |-
-        What parameter should i use to initialize?
+        What parameter should i use to select my resources?
       tag: skip
 
   - class: dev new openai-chat-streaming-with-data (javascript)
@@ -237,7 +237,7 @@
     - name: run template
       command: ai dev shell --run "cd openai-chat-streaming-with-data-js && node main.js"
       input: |-
-        What parameter should i use to initialize?
+        What parameter should i use to select my resources?
       tag: skip
 
   - class: dev new openai-chat-streaming-with-data (python)
@@ -251,7 +251,7 @@
     - name: run template
       command: ai dev shell --run "cd openai-chat-streaming-with-data-py && python main.py"
       input: |-
-        What parameter should i use to initialize?
+        What parameter should i use to select my resources?
       tag: skip
 
 - area: ai dev new openai-chat-streaming-with-functions

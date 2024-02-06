@@ -48,30 +48,27 @@ namespace Azure.AI.Details.Common.CLI.TestRunner
             Console.WriteLine("    --files FILE1 [FILE2 [...]]");
             Console.WriteLine("    --files PATTERN1 [PATTERN2 [...]]");
             Console.WriteLine();
-            Console.WriteLine("  FILTERS");
-            Console.WriteLine("    --filter [+/-]CRITERIA");
-            Console.WriteLine("    --filters [+/-]CRITERIA1 [+/-]CRITERIA2 [...]");
+            Console.WriteLine("  TESTS");
+            Console.WriteLine("    --test TEXT");
+            Console.WriteLine("    --tests TEXT1 [TEXT2 [...]]");
             Console.WriteLine();
-            Console.WriteLine("  TEST SELECTION/FILTERING CRITERIA");
-            Console.WriteLine();
-            Console.WriteLine("    (1) Tests are selected when matching ONE or more criteria specified with +");
-            Console.WriteLine("        When zero +CRITERIA specified, all tests are selected");
-            Console.WriteLine();
-            Console.WriteLine("    (2) Tests are filtered OUT when matching ANY ONE criteria specified with -");
-            Console.WriteLine("        When zero -CRITERIA specified, no tests are filtered OUT");
-            Console.WriteLine();
-            Console.WriteLine("    (3) Tests are kept IN when matching ALL criteria specified with CRITERIA (no + or -)");
-            Console.WriteLine("        When zero CRITERIA specified, all tests are kept IN after applying + and - criteria");
-
+            Console.WriteLine("  FILTERING");
+            Console.WriteLine("    --contains TEXT1 [TEXT2 [...]]");
+            Console.WriteLine("    --remove TEXT1 [TEXT2 [...]]");
             Console.WriteLine();
             Console.WriteLine("EXAMPLES");
             Console.WriteLine();
-            Console.WriteLine("  ait list");
-            Console.WriteLine("  ait list --files test1.yaml test2.yaml --filter +prompt1.txt +prompt2.txt");
+            Console.WriteLine("  EXAMPLE 1: List tests from two files, that contains both 'nightly' and 'java', but not 'skip'");
             Console.WriteLine();
-            Console.WriteLine("  ait run");
-            Console.WriteLine("  ait run --filters nightly -skip");
-            Console.WriteLine("  ait run --files ../tests/**/*.yaml --filter test3 -skip");
+            Console.WriteLine("    ait list --files test1.yaml test2.yaml --contains nightly java --remove skip");
+            Console.WriteLine();
+            Console.WriteLine("  EXAMPLE 2: Run tests that contain 'setup' or 'nightly', and 'java', but not 'skip'");
+            Console.WriteLine();
+            Console.WriteLine("    ait run --tests setup nightly --contains java --remove skip");
+            Console.WriteLine();
+            Console.WriteLine("  EXAMPLE 3: Run tests from all files under tests directory, that contains 'test3', but not 'skip'");
+            Console.WriteLine();
+            Console.WriteLine("    ait run --files ../tests/**/*.yaml --contains test3 --remove skip");
 
             return 1;
         }
@@ -131,11 +128,11 @@ namespace Azure.AI.Details.Common.CLI.TestRunner
                     }
                     while (i + 1 < args.Length && !args[i + 1].StartsWith("--"));
                 }
-                else if (args[i] == "--filter" || args[i] == "--filters")
+                else if (args[i] == "--search")
                 {
                     if (i + 1 >= args.Length || args[i + 1].StartsWith("--"))
                     {
-                        Console.WriteLine($"Expected a filter after '{args[i]}'.");
+                        Console.WriteLine($"Expected text after '{args[i]}'.");
                         return false;
                     }
 
@@ -143,6 +140,51 @@ namespace Azure.AI.Details.Common.CLI.TestRunner
                     {
                         i++;
                         filters.Add(args[i]);
+                    }
+                    while (i + 1 < args.Length && !args[i + 1].StartsWith("--"));
+                }
+                else if (args[i] == "--test" || args[i] == "--tests")
+                {
+                    if (i + 1 >= args.Length || args[i + 1].StartsWith("--"))
+                    {
+                        Console.WriteLine($"Expected text after '{args[i]}'.");
+                        return false;
+                    }
+
+                    do
+                    {
+                        i++;
+                        filters.Add(args[i]);
+                    }
+                    while (i + 1 < args.Length && !args[i + 1].StartsWith("--"));
+                }
+                else if (args[i] == "--contains")
+                {
+                    if (i + 1 >= args.Length || args[i + 1].StartsWith("--"))
+                    {
+                        Console.WriteLine($"Expected text after '{args[i]}'.");
+                        return false;
+                    }
+
+                    do
+                    {
+                        i++;
+                        filters.Add($"+{args[i]}"); // `+` means MUST contain text
+                    }
+                    while (i + 1 < args.Length && !args[i + 1].StartsWith("--"));
+                }
+                else if (args[i] == "--remove")
+                {
+                    if (i + 1 >= args.Length || args[i + 1].StartsWith("--"))
+                    {
+                        Console.WriteLine($"Expected text after '{args[i]}'.");
+                        return false;
+                    }
+
+                    do
+                    {
+                        i++;
+                        filters.Add($"-{args[i]}"); // `-` means MUST NOT contain text
                     }
                     while (i + 1 < args.Length && !args[i + 1].StartsWith("--"));
                 }

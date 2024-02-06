@@ -16,24 +16,25 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
     {
         public static IEnumerable<TestCase> FilterTestCases(IEnumerable<TestCase> tests, IEnumerable<string> criteria)
         {
-            // example 1: "ai" "init" "openai" -skip -nightly
-            // > test must contain "ai", "init", and "openai", in any order, in any field/property
+            // example 1: "ai init openai" "ai init speech" -skip -nightly
+            // > test must contain either:
+            // >   * "ai", "init", and "openai" in EXACTLY that order in any one single field/property, or
+            // >   * "ai", "init", and "speech" in EXACTLY that order in any one single field/property
             // > test must not contain "skip" in any field/property
             // > test must not contain "nightly" in any field/property
 
-            // example 2: +"ai init openai" +"ai init speech" -skip -nightly
-            // > tests must contain, either:
-            // >   * "ai", "init", and "openai" in that order in any one single field/property, or
-            // >   * "ai", "init", and "speech" in that order in any one single field/property
+            // example 2: +ai +init +openai -skip -nightly
+            // > test must contain ALL three of "ai", "init", and "openai" in any field/property
+            // >   * they do NOT need to be in the same field/property
             // > test must not contain "skip" in any field/property
             // > test must not contain "nightly" in any field/property
 
-            // example 3: +"ai dev new" +"ai init speech" "java" build -skip
-            // > tests must contain, either:
-            // >   * "ai", "init", and "openai" in that order in any one single field/property, or
-            // >   * "ai", "init", and "speech" in that order in any one single field/property
-            // > tests must contain "java" in any field/property
-            // > tests must contain "build" in any field/property
+            // example 3: "ai dev new" "ai init speech" +java +build -skip
+            // > test must contain, either:
+            // >   * "ai", "init", and "openai" in EXACTLY that order in any one single field/property, or
+            // >   * "ai", "init", and "speech" in EXACTLY that order in any one single field/property
+            // > test must contain "java" in any field/property
+            // > test must contain "build" in any field/property
             // > test must not contain "skip" in any field/property
 
             var sourceCriteria = new List<string>();
@@ -42,12 +43,12 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
 
             foreach (var criterion in criteria)
             {
-                var isSource = criterion.StartsWith("+");
+                var isMustMatch = criterion.StartsWith("+");
                 var isMustNotMatch = criterion.StartsWith("-");
-                var isMustMatch = !isSource && !isMustNotMatch;
+                var isSource = !isMustMatch && !isMustNotMatch;
 
-                if (isSource) sourceCriteria.Add(criterion.Substring(1));
-                if (isMustMatch) mustMatchCriteria.Add(criterion);
+                if (isSource) sourceCriteria.Add(criterion);
+                if (isMustMatch) mustMatchCriteria.Add(criterion.Substring(1));
                 if (isMustNotMatch) mustNotMatchCriteria.Add(criterion.Substring(1));
             }
 
