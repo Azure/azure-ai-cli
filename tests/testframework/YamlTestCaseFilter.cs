@@ -28,8 +28,10 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
             // > test must not contain "skip" in any field/property
             // > test must not contain "nightly" in any field/property
 
-            // example 3: +"ai dev new" +" "java" build -skip
-            // > tests must contain "ai", "dev", and "new" in that order in any one single field/property
+            // example 3: +"ai dev new" +"ai init speech" "java" build -skip
+            // > tests must contain, either:
+            // >   * "ai", "init", and "openai" in that order in any one single field/property, or
+            // >   * "ai", "init", and "speech" in that order in any one single field/property
             // > tests must contain "java" in any field/property
             // > tests must contain "build" in any field/property
             // > test must not contain "skip" in any field/property
@@ -50,17 +52,23 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
             }
 
             var unfiltered = sourceCriteria.Count > 0
-                ? tests.Where(test => sourceCriteria.Any(criterion => TestContainsText(test, criterion)))
+                ? tests.Where(test =>
+                    sourceCriteria.Any(criterion =>
+                        TestContainsText(test, criterion)))
                 : tests;
 
             if (mustMatchCriteria.Count > 0)
             {
-                unfiltered = unfiltered.Where(test => mustMatchCriteria.All(criterion => TestContainsText(test, criterion)));
+                unfiltered = unfiltered.Where(test =>
+                    mustMatchCriteria.All(criterion =>
+                        TestContainsText(test, criterion)));
             }
 
             if (mustNotMatchCriteria.Count > 0)
             {
-                unfiltered = unfiltered.Where(test => mustNotMatchCriteria.All(criterion => !TestContainsText(test, criterion)));
+                unfiltered = unfiltered.Where(test =>
+                    mustNotMatchCriteria.All(criterion =>
+                        !TestContainsText(test, criterion)));
             }
 
             return unfiltered;
