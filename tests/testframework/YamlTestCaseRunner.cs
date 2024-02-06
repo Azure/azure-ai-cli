@@ -418,7 +418,6 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
             return null;
         }
 
-
         private static string FindCacheCli(string cli)
         {
             if (_cliCache.ContainsKey(cli))
@@ -670,12 +669,43 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
 
             if (scriptIsBash)
             {
-                var isWindows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
-                var bash = isWindows ? FileHelpers.FindFileInOsPath("bash.exe") : "/bin/bash";
+                var bash = RuntimeInformation.IsOSPlatform(OSPlatform.Windows) 
+                    ? EnsureFindCacheGetBashExe()
+                    : "/bin/bash";
                 return $"run --process \"{bash}\" --pre.script -l --script \"{script}\" {GetKeyValueArgs(kvs)} {GetAtArgs(expect, notExpect)}";
             }
 
             return $"run --cmd --script \"{script}\" {GetKeyValueArgs(kvs)} {GetAtArgs(expect, notExpect)}";
+        }
+
+        private static string EnsureFindCacheGetBashExe()
+        {
+            var gitBash = FindCacheGitBashExe();
+            if (gitBash == null || gitBash == "bash.exe")
+            {
+                throw new Exception("Could not Git for Windows bash.exe in PATH!");
+            }
+            return gitBash;
+        }
+
+        private static string FindCacheGitBashExe()
+        {
+            var bashExe = "bash.exe";
+            if (_cliCache.ContainsKey(bashExe))
+            {
+                return _cliCache[bashExe];
+            }
+
+            var found = FindGitBashExe();
+            _cliCache[bashExe] = found;
+
+            return found;
+        }
+
+        private static string FindGitBashExe()
+        {
+            var found = FileHelpers.FindFilesInOsPath("bash.exe");
+            return found.Where(x => x.ToLower().Contains("git")).FirstOrDefault() ?? "bash.exe";
         }
 
         private static string GetAtArgs(string expect, string notExpect)

@@ -65,7 +65,7 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
             }
 
             var count = allResults.Count();
-            var duration = FormattedDuration((_endTime.Value - _startTime.Value).TotalMilliseconds);
+            var duration = _endTime != null && _startTime != null ? FormattedDuration((_endTime.Value - _startTime.Value).TotalMilliseconds) : "0 ms";
             Console.BackgroundColor = ConsoleColor.Blue;
             Console.ForegroundColor = ConsoleColor.White;
             Console.Write("TEST RESULT SUMMARY:");
