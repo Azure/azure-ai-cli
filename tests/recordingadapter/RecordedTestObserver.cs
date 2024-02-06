@@ -29,19 +29,19 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
         public void RecordStart(TestCase testCase)
         {
             _wrappedReporter?.RecordStart(testCase);
-            
-            switch(_mode)
+
+            TestProxyClient.AddUriSinatizer("https://(?<host>[^/]+)/", "https://FakeEndpont/").Wait();
+            TestProxyClient.AddHeaderSanitizer("api-key", "KEY").Wait();
+
+            _id = _mode switch
             {
-                case RecordedTestMode.Record:
-                    _id = TestProxyClient.StartRecording(testCase.FullyQualifiedName).Result;
-                    break;
-                case RecordedTestMode.Playback:
-                    _id = TestProxyClient.StartPlayback(testCase.FullyQualifiedName).Result;
-                    break;
-                case RecordedTestMode.Live:
-                    // Live test
-                    break;
-            }
+                RecordedTestMode.Record => TestProxyClient.StartRecording(testCase.FullyQualifiedName).Result,
+                RecordedTestMode.Playback => TestProxyClient.StartPlayback(testCase.FullyQualifiedName).Result,
+                RecordedTestMode.Live => null,
+                _ => throw new InvalidOperationException("Invalid mode")
+            };
+
+            Console.WriteLine("ID: " + _id);
         }
 
         public void RecordResult(TestResult testResult)
@@ -64,6 +64,8 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
                     // Live test
                     break;
             }
+
+            TestProxyClient.ClearSanatizers().Wait();
         }
     }
 }

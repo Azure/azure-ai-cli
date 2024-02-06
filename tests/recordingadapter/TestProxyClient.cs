@@ -18,24 +18,31 @@ namespace YamlTestAdapter
             ServerCertificateCustomValidationCallback = (message, cert, chain, errors) => true
         });
 
-        /*
-            private static async Task Record()
-            {
-                var recordingId = await StartRecording();
-                await SendRequest(recordingId, "record");
-                await Task.Delay(TimeSpan.FromSeconds(2));
-                await SendRequest(recordingId, "record");
-                await StopRecording(recordingId);
-            }
+        public enum SanatizeLocation
+        {
+            Header,
+            Body,
+            Uri
+        }
 
-            private static async Task Playback()
-            {
-                var recordingId = await StartPlayback();
-                await SendRequest(recordingId, "playback");
-                await SendRequest(recordingId, "playback");
-                await StopPlayback(recordingId);
-            }
-        */
+        /*
+   private static async Task Record()
+   {
+       var recordingId = await StartRecording();
+       await SendRequest(recordingId, "record");
+       await Task.Delay(TimeSpan.FromSeconds(2));
+       await SendRequest(recordingId, "record");
+       await StopRecording(recordingId);
+   }
+
+   private static async Task Playback()
+   {
+       var recordingId = await StartPlayback();
+       await SendRequest(recordingId, "playback");
+       await SendRequest(recordingId, "playback");
+       await StopPlayback(recordingId);
+   }
+*/
 
         public static Process InvokeProxy()
         {
@@ -111,6 +118,35 @@ namespace YamlTestAdapter
             message.Headers.Add("x-recording-save", bool.TrueString);
 
             await _httpClient.SendAsync(message);
+        }
+
+        public static Task AddUriSinatizer(string regexToMatch, string replaceValue) => AddSanitizer("UriRegexSanitizer", $"{{\"value\": \"{replaceValue}\",\"regex\": \"{regexToMatch}\"}}");
+        
+        public static Task AddHeaderSanitizer(string key, string value) => AddSanitizer("HeaderRegexSanitizer", $"{{\"value\": \"{value}\",\"key\": \"{key}\"}}");
+
+        private static async Task AddSanitizer(string headerName, string json)
+        {
+            var url = "/admin/addsanitizer";
+            var message = new HttpRequestMessage(HttpMethod.Post, _proxy + url);
+            message.Headers.Add("x-abstraction-identifier", headerName);
+            message.Content = new StringContent(json, Encoding.UTF8, "application/json");
+            var result = await _httpClient.SendAsync(message);
+            if(result.StatusCode != HttpStatusCode.OK)
+            {
+                throw new Exception("Failed to add sanitizer");
+            }
+        }
+
+        public static async Task ClearSanatizers()
+        {
+            var url = "/admin/reset";
+            var message = new HttpRequestMessage(HttpMethod.Post, _proxy + url);
+            var result = await _httpClient.SendAsync(message);
+
+            if(result.StatusCode != HttpStatusCode.OK)
+            {
+                throw new Exception("Failed to clear sanitizers");
+            }
         }
         /*
             public static async Task SendRequest(string recordingId, string mode)
