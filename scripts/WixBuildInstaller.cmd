@@ -20,13 +20,15 @@ set PACKAGE_VERSION=%~1
 set PRODUCT_VERSION=%~2
 set TARGET_PLATFORM=x64
 set INSTALLER_FILE=Setup-%TARGET_PLATFORM%.exe
+set PACKAGE_URL=https://csspeechstorage.blob.core.windows.net/drop/private/ai/Azure.AI.CLI.%PACKAGE_VERSION%.nupkg
 
 REM Dependencies
-set AZURE_CLI_VERSION=2.56.0
+set AZURE_CLI_VERSION=2.57.0
+set AZURE_CLI_INSTALLER=azure-cli-%AZURE_CLI_VERSION%-%TARGET_PLATFORM%.msi
+set AZURE_CLI_URL=https://azcliprod.blob.core.windows.net/msi/%AZURE_CLI_INSTALLER%
 set DOTNET_VERSION=7.0.405
-set DOTNET_URL=https://download.visualstudio.microsoft.com/download/pr/febc46ff-cc68-4bee-83d2-c34786b5ca68/524ef9b25d29dc90efdb0fba0f589779/dotnet-sdk-%DOTNET_VERSION%-win-%TARGET_PLATFORM%.exe
-set DOTNET_SIZE=229741072
-set DOTNET_SHA1=8d40790ae79bfc6f29f1ab280801e6c019ae5633
+set DOTNET_INSTALLER=dotnet-sdk-%DOTNET_VERSION%-win-%TARGET_PLATFORM%.exe
+set DOTNET_URL=https://dotnetcli.azureedge.net/dotnet/Sdk/%DOTNET_VERSION%/%DOTNET_INSTALLER%
 
 REM Check for WiX toolset
 where candle.exe >nul 2>&1
@@ -34,18 +36,39 @@ if %ERRORLEVEL% neq 0 set PATH=%PATH%;C:\Program Files (x86)\WiX Toolset v3.11\b
 where candle.exe >nul 2>&1
 if %ERRORLEVEL% neq 0 (
   echo Error: Install WiX v3.14 Toolset from https://wixtoolset.org/docs/v3/releases/v3-14-0-6526/ 1>&2
-  exit /b 1
+  exit /b 3
+)
+
+REM Check for curl.exe (https://techcommunity.microsoft.com/t5/containers/tar-and-curl-come-to-windows/ba-p/382409)
+where curl.exe >nul 2>&1
+if %ERRORLEVEL% neq 0 (
+  echo Error: curl.exe not found 1>&2
+  exit /b 4
+)
+
+REM Download Azure CLI installer
+curl.exe --output %AZURE_CLI_INSTALLER% --silent --url %AZURE_CLI_URL%
+if %ERRORLEVEL% neq 0 (
+  echo Error while downloading Azure CLI installer 1>&2
+  exit /b 5
+)
+
+REM Download .NET SDK installer
+curl.exe --output %DOTNET_INSTALLER% --silent --url %DOTNET_URL%
+if %ERRORLEVEL% neq 0 (
+  echo Error while downloading .NET SDK installer 1>&2
+  exit /b 6
 )
 
 REM Build AI CLI installer .msi
-candle.exe Azure-AI-CLI.wxs -dproductVersion=%PRODUCT_VERSION% -dpackageVersion=%PACKAGE_VERSION% -dtargetPlatform=%TARGET_PLATFORM%
+candle.exe Azure-AI-CLI.wxs -dproductVersion=%PRODUCT_VERSION% -dpackageVersion=%PACKAGE_VERSION% -dpackageUrl=%PACKAGE_URL% -dtargetPlatform=%TARGET_PLATFORM%
 if %ERRORLEVEL% neq 0 (
   set EXITCODE=%ERRORLEVEL%
   echo Error from candle.exe [%EXITCODE%] 1>&2
   exit /b %EXITCODE%
 )
 
-light.exe Azure-AI-CLI.wixobj -ext WixUIExtension
+light.exe Azure-AI-CLI.wixobj -ext WixUIExtension -ext WixUtilExtension
 if %ERRORLEVEL% neq 0 (
   set EXITCODE=%ERRORLEVEL%
   echo Error from light.exe [%EXITCODE%] 1>&2
@@ -54,8 +77,9 @@ if %ERRORLEVEL% neq 0 (
 
 REM Build installation bundle .exe
 candle.exe Azure-AI-CLI-Bundle.wxs -ext WixBalExtension -ext WixUtilExtension ^
-  -dproductVersion=%PRODUCT_VERSION% -dtargetPlatform=%TARGET_PLATFORM% -dazureCliVersion=%AZURE_CLI_VERSION% ^
-  -ddotNetVersion=%DOTNET_VERSION% -ddotNetUrl=%DOTNET_URL% -ddotNetSize=%DOTNET_SIZE% -ddotNetSha1=%DOTNET_SHA1%
+  -dproductVersion=%PRODUCT_VERSION% -dtargetPlatform=%TARGET_PLATFORM% ^
+  -dazureCliVersion=%AZURE_CLI_VERSION% -dazureCliUrl=%AZURE_CLI_URL% ^
+  -ddotNetVersion=%DOTNET_VERSION% -ddotNetUrl=%DOTNET_URL%
 if %ERRORLEVEL% neq 0 (
   set EXITCODE=%ERRORLEVEL%
   echo Error from candle.exe [%EXITCODE%] 1>&2
