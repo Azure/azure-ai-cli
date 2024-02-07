@@ -26,7 +26,7 @@
   expect: |
     (?# ---------- BANNER)
     AI - Azure AI CLI, Version [01]\.[0-9].[0-9]
-    Copyright \(c\) 2023 Microsoft Corporation\. All Rights Reserved\.
+    Copyright \(c\) 2024 Microsoft Corporation\. All Rights Reserved\.
 
     This PUBLIC PREVIEW version may change at any time\.
     See: https://aka\.ms/azure-ai-cli-public-preview
