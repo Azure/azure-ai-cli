@@ -26,12 +26,12 @@ From fresh clone (one step, CLI):
 OR ... [Build](#BUILD) first, then w/CLI:
 * DEBUG:
   ```dotnetcli
-  cd tests\testadapter\bin\Debug\net7.0
+  cd tests\testadapter\bin\Debug\net8.0
   dotnet test Azure.AI.CLI.TestAdapter.dll --logger:trx
   ```
 * RELEASE:
   ```dotnetcli
-  cd tests\testadapter\bin\Release\net7.0
+  cd tests\testadapter\bin\Release\net8.0
   dotnet test Azure.AI.CLI.TestAdapter.dll --logger:trx --logger:console;verbosity=normal
   ```
 
@@ -39,12 +39,12 @@ OR ... [Build](#BUILD) first, then w/CLI:
 OR ... [Build](#BUILD) first, then w/CLI:
 * DEBUG:
   ```dotnetcli
-  cd tests\testadapter\bin\Debug\net7.0
+  cd tests\testadapter\bin\Debug\net8.0
   dotnet vstest Azure.AI.CLI.TestAdapter.dll --logger:trx
   ```
 * RELEASE:
   ```dotnetcli
-  cd tests\testadapter\bin\Release\net7.0
+  cd tests\testadapter\bin\Release\net8.0
   dotnet vstest Azure.AI.CLI.TestAdapter.dll --logger:trx --logger:console;verbosity=normal
   ```
 
@@ -70,12 +70,12 @@ From fresh clone (one step, CLI):
 OR ... [Build](#BUILD) first, then w/CLI:
 * DEBUG:
   ```dotnetcli
-  cd tests\testadapter\bin\Debug\net7.0
+  cd tests\testadapter\bin\Debug\net8.0
   dotnet test Azure.AI.CLI.TestAdapter.dll -t
   ```
 * RELEASE:
   ```dotnetcli
-  cd tests\testadapter\bin\Release\net7.0
+  cd tests\testadapter\bin\Release\net8.0
   dotnet test Azure.AI.CLI.TestAdapter.dll -t
   ```
 
@@ -83,12 +83,12 @@ OR ... [Build](#BUILD) first, then w/CLI:
 OR ... [Build](#BUILD) first, then w/CLI:
 * DEBUG:
   ```dotnetcli
-  cd tests\testadapter\bin\Debug\net7.0
+  cd tests\testadapter\bin\Debug\net8.0
   dotnet vstest Azure.AI.CLI.TestAdapter.dll -lt
   ```
 * RELEASE:
   ```dotnetcli
-  cd tests\testadapter\bin\Release\net7.0
+  cd tests\testadapter\bin\Release\net8.0
   dotnet vstest Azure.AI.CLI.TestAdapter.dll -lt
   ```
 
@@ -110,12 +110,12 @@ OR ... [Build](#BUILD) first, then w/CLI:
 
 * DEBUG:
   ```dotnetcli
-  cd tests\testadapter\bin\Debug\net7.0
+  cd tests\testadapter\bin\Debug\net8.0
   dotnet test --filter:name~PARTIAL_NAME Azure.AI.CLI.TestAdapter.dll
   ```
 * RELEASE:
   ```dotnetcli
-  cd tests\testadapter\bin\Release\net7.0
+  cd tests\testadapter\bin\Release\net8.0
   dotnet test --filter:name~PARTIAL_NAME Azure.AI.CLI.TestAdapter.dll
   ```
 
@@ -123,12 +123,12 @@ OR ... [Build](#BUILD) first, then w/CLI:
 OR ... [Build](#BUILD) first, then w/CLI:
 * DEBUG:
   ```dotnetcli
-  cd tests\testadapter\bin\Debug\net7.0
+  cd tests\testadapter\bin\Debug\net8.0
   dotnet vstest Azure.AI.CLI.TestAdapter.dll --logger:trx --testcasefilter:name~PARTIAL_NAME
   ```
 * RELEASE:
   ```dotnetcli
-  cd tests\testadapter\bin\Release\net7.0
+  cd tests\testadapter\bin\Release\net8.0
   dotnet vstest Azure.AI.CLI.TestAdapter.dll --logger:trx --testcasefilter:name~PARTIAL_NAME
   ```
 

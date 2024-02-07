@@ -32,7 +32,7 @@ if ! command -v az &> /dev/null; then
     fi
 fi
 
-# Check if dotnet 7.0 is installed
+# Check if dotnet 8.0 is installed
 if ! command -v dotnet &> /dev/null; then
   echo "dotnet is not installed."
   dotnet_version=0
@@ -40,11 +40,11 @@ else
   dotnet_version=$(dotnet --version | cut -d. -f1)
 fi
 
-if [ "$dotnet_version" -eq "7" ]; then
+if [ "$dotnet_version" -eq "8" ]; then
     dotnet_version=$(dotnet --version)
     echo "dotnet $dotnet_version is already installed."
 else
-    echo "Installing dotnet 7.0..."
+    echo "Installing dotnet 8.0..."
 
     # Update the package list
     sudo apt-get update
@@ -96,13 +96,13 @@ else
         exit 1
     fi
     
-    # Install dotnet 7.0 runtime
+    # Install dotnet 8.0 runtime
     sudo apt-get update
-    sudo apt-get install -y dotnet-sdk-7.0
+    sudo apt-get install -y dotnet-sdk-8.0
     
     # Check if the installation was successful
     if [ $? -ne 0 ]; then
-        echo "Failed to install Dotnet 7.0."
+        echo "Failed to install Dotnet 8.0."
         exit 1
     fi
 fi
