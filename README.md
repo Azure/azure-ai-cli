@@ -1,9 +1,9 @@
-Status: Draft in Progress  
+Status: Draft in Progress
 Owner: Rob Chambers
 
 # Using the Azure AI CLI
 
-The Azure `AI` Command-Line Interface (CLI) is a cross-platform command-line tool to connect to Azure AI services and execute control-plane and data-plane operations without having to write any code. The CLI allows the execution of commands through a terminal using interactive command-line prompts or via script. 
+The Azure `AI` Command-Line Interface (CLI) is a cross-platform command-line tool to connect to Azure AI services and execute control-plane and data-plane operations without having to write any code. The CLI allows the execution of commands through a terminal using interactive command-line prompts or via script.
 
 You can easily use the `AI` CLI to experiment with key Azure AI service features and see how they work with your use cases. Within minutes, you can setup all the required Azure resources needed, and build a customized Copilot using OpenAI's chat completions APIs and your own data. You can try it out interactively, or script larger processes to automate your own workflows and evaluations as part of your CI/CD system.
 
@@ -11,7 +11,7 @@ In the future, you'll even be able to use the `AI` CLI to dynamically create cod
 
 ## **STEP 1**: Setup your development environment
 
-You can install the Azure `AI` CLI locally on Linux, Mac, or Windows computers, or use it thru an internet browser or Docker container. 
+You can install the Azure `AI` CLI locally on Linux, Mac, or Windows computers, or use it thru an internet browser or Docker container.
 
 During this public preview, we recommend using the Azure `AI` CLI thru GitHub Codespaces. This will allow you to quickly get started without having to install anything locally.
 
@@ -82,12 +82,12 @@ ai chat --system @prompt.txt --user "Tell me about Azure AI Studio"
 ```
 USAGE: ai chat [...]
 
-  CONNECTION                            (see: ai help connection)    
+  CONNECTION                            (see: ai help connection)
     --deployment DEPLOYMENT             (see: ai help chat deployment)
-    --endpoint ENDPOINT                 (see: ai help chat endpoint) 
-    --key KEY                           (see: ai help chat key)      
+    --endpoint ENDPOINT                 (see: ai help chat endpoint)
+    --key KEY                           (see: ai help chat key)
 
-  INPUT                                 (see: ai help chat input)    
+  INPUT                                 (see: ai help chat input)
     --interactive                       (see: ai help chat interactive)
     --system PROMPT                     (see: ai help chat system prompt)
   * --file FILE                         (see: ai help chat history file)
