@@ -53,7 +53,13 @@ def search_index_update(
     )
 
     openaiConnection = client.get_default_aoai_connection()
-    openaiConnection.set_current_environment()
+    # openaiConnection.set_current_environment()
+
+    # This is a workaround for build_index(), as it has nested logic depending on openai 0.x environment variables.
+    # This sets environment variables in openai 0.x fashion.
+    openaiConnection._set_current_environment_old()
+    # This sets environment variables in openai 1.x fashion.
+    openaiConnection._set_current_environment_new()
     searchConnection = client.connections.get("AzureAISearch")
     searchConnection.set_current_environment()
 

@@ -44,8 +44,10 @@ namespace TestAdapterTest
             { "arguments", RegisterTestCaseProperty("Arguments") },
             { "input", RegisterTestCaseProperty("Input")},
             { "expect", RegisterTestCaseProperty("Expect") },
+            { "expect-gpt", RegisterTestCaseProperty("ExpectGpt") },
             { "not-expect", RegisterTestCaseProperty("NotExpect") },
             { "simulate", RegisterTestCaseProperty("Simulate") },
+            { "skipOnFailure", RegisterTestCaseProperty("SkipOnFailure") },
             { "timeout", RegisterTestCaseProperty("Timeout") },
             { "working-directory", RegisterTestCaseProperty("WorkingDirectory") }
         };

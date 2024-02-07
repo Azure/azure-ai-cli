@@ -78,6 +78,7 @@ namespace TestAdapterTest
         {
             string cli = GetScalarString(mapping, tags, "cli");
             string parallelize = GetScalarString(mapping, tags, "parallelize");
+            string skipOnFailure = GetScalarString(mapping, tags, "skipOnFailure");
 
             string simulate = GetScalarString(mapping, "simulate");
             string command = GetScalarString(mapping, "command");
@@ -110,6 +111,7 @@ namespace TestAdapterTest
             SetTestCaseProperty(test, "script", script);
             SetTestCaseProperty(test, "simulate", simulate);
             SetTestCaseProperty(test, "parallelize", parallelize);
+            SetTestCaseProperty(test, "skipOnFailure", skipOnFailure);
 
             var timeout = GetScalarString(mapping, tags, "timeout", YamlTestAdapter.DefaultTimeout);
             SetTestCaseProperty(test, "timeout", timeout);
@@ -122,6 +124,7 @@ namespace TestAdapterTest
             SetTestCasePropertyMap(test, "input", mapping, "input", workingDirectory);
 
             SetTestCaseProperty(test, "expect", mapping, "expect");
+            SetTestCaseProperty(test, "expect-gpt", mapping, "expect-gpt");
             SetTestCaseProperty(test, "not-expect", mapping, "not-expect");
 
             SetTestCaseTagsAsTraits(test, YamlTagHelpers.UpdateCopyTags(tags, mapping));
@@ -193,7 +196,7 @@ namespace TestAdapterTest
 
         private static bool IsValidTestCaseNode(string value)
         {
-            return ";area;class;name;cli;command;script;timeout;foreach;arguments;input;expect;not-expect;parallelize;simulate;tag;tags;workingDirectory;".IndexOf($";{value};") >= 0;
+            return ";area;class;name;cli;command;script;timeout;foreach;arguments;input;expect;expect-gpt;not-expect;parallelize;simulate;skipOnFailure;tag;tags;workingDirectory;".IndexOf($";{value};") >= 0;
         }
 
         private static void SetTestCaseProperty(TestCase test, string propertyName, YamlMappingNode mapping, string mappingName)

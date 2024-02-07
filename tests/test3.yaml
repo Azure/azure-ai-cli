@@ -1,4 +1,27 @@
-﻿- name: dev new environment
+﻿- area: ai init
+  tags: [before]
+  tests:
+  - name: ai init openai
+    command: ai init openai
+    arguments:
+      subscription: e72e5254-f265-4e95-9bd2-9ee8e7329051
+      name: robch-oai-eastus2
+      chat-deployment-name: gpt-4-32k-0613
+      embeddings-deployment-name: text-embedding-ada-002-2
+      evaluation-deployment-name: gpt-4-32k-0613
+      interactive: false
+  - name: ai init speech
+    command: ai init speech
+    arguments:
+      subscription: e72e5254-f265-4e95-9bd2-9ee8e7329051
+      name: robch-cranky-red-koala-ais
+      interactive: false
+
+- name: test ai chat
+  command: ai chat --question "Why is the sky blue" --index-name @none
+  expect: Rayleigh
+
+- name: dev new environment
   command: ai dev new .env
 
 - class: dev new helper-functions
@@ -14,7 +37,7 @@
     input: |
       What is my name?
     expect: |
-      assistant-function: GetUsersName\({}\) = 
+      assistant-function: GetUsersName\({}\) =
     tag: skip
 
 - area: ai dev new openai-chat
@@ -33,6 +56,8 @@
       input: |-
         Tell me a joke
         Tell me another joke
+      expect-gpt: |
+        The output should contain exactly two jokes.
       tag: skip
 
   - class: dev new openai-chat (go)
@@ -227,6 +252,19 @@
       input: |-
         What parameter should i use to initialize?
       tag: skip
+  - class: dev new openai-chat-streaming-with-data (go)
+    steps:
+    - name: generate template
+      command: ai dev new openai-chat-streaming-with-data --go
+    - name: build template
+      script: |
+        cd openai-chat-streaming-with-data-go
+        go mod tidy
+    - name: run template
+      command: ai dev shell --run "cd openai-chat-streaming-with-data-go && go run .\main.go .\openai_chat_completions_streaming_with_data_hello_world.go"
+      input: |-
+        What parameter should i use to initialize?
+      tag: skip
 
 - area: ai dev new openai-chat-streaming-with-functions
   tests:
@@ -326,12 +364,12 @@
   - class: dev new openai-webpage-with-functions (javascript)
     steps:
     - name: generate template
-      command: ai dev new openai-webpage-with-functions --javascript  
-    - name: build template  
+      command: ai dev new openai-webpage-with-functions --javascript
+    - name: build template
       script: |
         cd openai-webpage-with-functions-js
         npm install
-    - name: pack template 
+    - name: pack template
       script: |
         cd openai-webpage-with-functions-js
         npx webpack
@@ -348,4 +386,3 @@
       script: |
         cd openai-webpage-with-functions-ts
         npx webpack
-    

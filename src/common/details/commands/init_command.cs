@@ -59,7 +59,6 @@ namespace Azure.AI.Details.Common.CLI
             CheckPath();
 
             var interactive = _values.GetOrDefault("init.service.interactive", true);
-            if (!interactive) ThrowInteractiveNotSupportedApplicationException(); // POST-IGNITE: TODO: Add back non-interactive mode support
 
             switch (command)
             {
@@ -94,6 +93,7 @@ namespace Azure.AI.Details.Common.CLI
         private async Task DoInitRootAsync()
         {
             var interactive = _values.GetOrDefault("init.service.interactive", true);
+            if (!interactive) ThrowInteractiveNotSupportedApplicationException(); // POST-IGNITE: TODO: Add back non-interactive mode support
 
             ConsoleHelpers.WriteLineWithHighlight("`AI INIT`\n\n  Initializes (creates, selects, or attaches to) AI Projects and services.\n");
 
@@ -347,6 +347,8 @@ namespace Azure.AI.Details.Common.CLI
 
         private async Task DoInitRootHubResource(bool interactive)
         {
+            if (!interactive) ThrowInteractiveNotSupportedApplicationException(); // POST-IGNITE: TODO: Add back non-interactive mode support
+
             await DoInitSubscriptionId(interactive);
             await DoInitHubResource(interactive);
         }
@@ -359,6 +361,8 @@ namespace Azure.AI.Details.Common.CLI
 
         private async Task DoInitRootProject(bool interactive, bool allowCreate = true, bool allowPick = true)
         {
+            if (!interactive) ThrowInteractiveNotSupportedApplicationException(); // POST-IGNITE: TODO: Add back non-interactive mode support
+
             await DoInitSubscriptionId(interactive);
             await DoInitProject(interactive, allowCreate, allowPick);
         }
@@ -401,7 +405,11 @@ namespace Azure.AI.Details.Common.CLI
             var sku = _values.GetOrDefault("init.service.cognitiveservices.resource.sku", Program.CognitiveServiceResourceSku);
             var yes = _values.GetOrDefault("init.service.cognitiveservices.terms.agree", false);
 
-            var resource = await AzCliConsoleGui.PickOrCreateAndConfigCognitiveServicesOpenAiKindResource(interactive, allowSkipDeployments, subscriptionId, regionFilter, groupFilter, resourceFilter, kind, sku, yes);
+            var chatDeploymentFilter = _values.GetOrDefault("init.chat.model.deployment.name", "");
+            var embeddingsDeploymentFilter = _values.GetOrDefault("init.embeddings.model.deployment.name", "");
+            var evaluationsDeploymentFilter = _values.GetOrDefault("init.evaluation.model.deployment.name", "");
+
+            var resource = await AzCliConsoleGui.PickOrCreateAndConfigCognitiveServicesOpenAiKindResource(interactive, allowSkipDeployments, subscriptionId, regionFilter, groupFilter, resourceFilter, kind, sku, yes, chatDeploymentFilter, embeddingsDeploymentFilter, evaluationsDeploymentFilter);
             _values.Reset("service.openai.deployments.picked", "true");
 
             SubscriptionToken.Data().Set(_values, subscriptionId);
@@ -416,6 +424,8 @@ namespace Azure.AI.Details.Common.CLI
 
         private async Task DoInitRootCognitiveServicesAIServicesKind(bool interactive)
         {
+            if (!interactive) ThrowInteractiveNotSupportedApplicationException(); // POST-IGNITE: TODO: Add back non-interactive mode support
+
             await DoInitSubscriptionId(interactive);
             await DoInitCognitiveServicesAIServicesKind(interactive);
         }
@@ -444,6 +454,8 @@ namespace Azure.AI.Details.Common.CLI
 
         private async Task DoInitRootCognitiveServicesCognitiveServicesKind(bool interactive)
         {
+            if (!interactive) ThrowInteractiveNotSupportedApplicationException(); // POST-IGNITE: TODO: Add back non-interactive mode support
+
             await DoInitSubscriptionId(interactive);
             await DoInitCognitiveServicesCognitiveServicesKind(interactive);
         }
@@ -470,6 +482,8 @@ namespace Azure.AI.Details.Common.CLI
 
         private async Task DoInitRootSearch(bool interactive)
         {
+            if (!interactive) ThrowInteractiveNotSupportedApplicationException(); // POST-IGNITE: TODO: Add back non-interactive mode support
+
             await DoInitSubscriptionId(interactive);
             await DoInitSearch(interactive, false);
         }
