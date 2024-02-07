@@ -217,7 +217,23 @@ namespace Azure.AI.Details.Common.CLI
             return !string.IsNullOrEmpty(subscription) && !string.IsNullOrEmpty(groupName) && !string.IsNullOrEmpty(projectName);
         }
 
-        private async Task DoInitRootMenuPick()
+        private struct Options
+        {
+            public Options(string displayName, string option, string telemetryValue)
+            {
+                DisplayName = displayName;
+                Option = option;
+                TelemetryValue = telemetryValue;
+            }
+
+            public string DisplayName { get; init; }
+            public string Option { get; init; }
+            public string TelemetryValue { get; init; }
+
+            public override string ToString() => DisplayName ?? string.Empty;
+        }
+
+        private async ValueTask DoInitRootMenuPick()
         {
             var interactive = true;
 
@@ -226,38 +242,46 @@ namespace Azure.AI.Details.Common.CLI
             Console.WriteLine("  - Standalone resources: Recommended when building simple solutions connecting to a single AI service.");
             Console.WriteLine();
 
-            var label = "  Initialize";
-            Console.Write($"{label}: ");
-            var choiceToPart = new Dictionary<string, string>
-            {
-                // ["AI Project"] = "init-root-project-select-or-create",
-                ["New AI Project"] = "init-root-project-create",
-                ["Existing AI Project"] = "init-root-project-select",
-                ["Standalone resources"] = "init-root-standalone-select-or-create",
-            };
-            var partToLabelDisplay = new Dictionary<string, string>()
-            {
-                // ["init-root-project-select-or-create"] = "AI Project",
-                ["init-root-project-create"] = "New AI Project",
-                ["init-root-project-select"] = "Existing AI Project",
-                ["init-root-standalone-select-or-create"] = null
-            };
+            Options selected = default;
+            var outcome = Program.Telemetry.WrapWithTelemetry(
+                () =>
+                {
+                    var label = "  Initialize";
+                    Console.Write($"{label}: ");
 
-            var choices = choiceToPart.Keys.ToArray();
-            var picked = ListBoxPicker.PickIndexOf(choices.ToArray());
-            if (picked < 0)
+                    var choices = new[]
+                    {
+                        new Options("New AI Project",       "init-root-project-create",              "new"),
+                        new Options("Existing AI Project",  "init-root-project-select",              "existing"),
+                        new Options("Standalone resources", "init-root-standalone-select-or-create", "standalone")
+                    };
+
+                    var picked = ListBoxPicker.PickIndexOf(choices.Select(o => o.DisplayName).ToArray());
+                    if (picked < 0)
+                    {
+                        Console.WriteLine($"\r{label}: CANCELED (no selection)");
+                        return Outcome.Canceled;
+                    }
+
+                    selected = choices[picked];
+                    Console.Write($"\r{label.Trim()}: {selected.DisplayName}\n");
+                    return Outcome.Success;
+                },
+                (outcome, ex, timeTaken) => new InitTelemetryEvent(InitStage.Initial)
+                {
+                    Outcome = outcome,
+                    Selected = selected.TelemetryValue,
+                    RunId = _values.GetOrDefault("init.run_id", null),
+                    DurationInMs = timeTaken.TotalMilliseconds,
+                    Error  = ex?.Message
+                },
+                CancellationToken.None);
+
+            if (outcome == Outcome.Success)
             {
-                Console.WriteLine($"\r{label}: CANCELED (no selection)");
-                return;
+                await DoInitServiceParts(interactive, selected.Option)
+                    .ConfigureAwait(false);
             }
-
-            var part = choiceToPart[choices[picked]];
-            var display = partToLabelDisplay[part];
-
-            Console.Write(display == null
-                ? new string(' ', label.Length + 2) + "\r"
-                : $"\r{label.Trim()}: {display}\n");
-            await DoInitServiceParts(interactive, part.Split(';').ToArray());
         }
 
         private async Task DoInitStandaloneResources(bool interactive)
@@ -397,7 +421,8 @@ namespace Azure.AI.Details.Common.CLI
         {
             if (allowCreate)
             {
-                await DoInitHubResource(interactive);
+                await DoInitHubResource(interactive)
+                    .ConfigureAwait(false);
             }
 
             await Program.Telemetry.WrapWithTelemetryAsync(
