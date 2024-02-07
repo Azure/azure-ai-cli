@@ -1,6 +1,7 @@
 #!/bin/bash
 
 define_variable () {
+    echo "Setting $1=$2"
     echo "##vso[task.setvariable variable=$1;isOutput=true]$2"
 }
 
