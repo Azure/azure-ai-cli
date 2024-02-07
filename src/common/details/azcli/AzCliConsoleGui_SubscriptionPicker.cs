@@ -104,12 +104,16 @@ namespace Azure.AI.Details.Common.CLI
                     cancelLogin = picked < 0 || picked == choices.Count() - 1;
                     useDeviceCode = picked == choices.Count() - 2;
                 }
+                else
+                {
+                    throw new ApplicationException("Login required");
+                }
 
                 if (cancelLogin)
                 {
                     Console.Write($"\r{subscriptionLabel}: ");
                     ConsoleHelpers.WriteLineError("*** Please run `az login` and try again ***");
-                    return null;
+                    throw new OperationCanceledException("Login was canceled");
                 }
 
                 Console.Write($"\r{subscriptionLabel}: *** Launching `az login` (interactive) ***");
@@ -124,10 +128,11 @@ namespace Azure.AI.Details.Common.CLI
 
             if (subscriptions.Count() == 0)
             {
-                ConsoleHelpers.WriteLineError(response.Payload.Count() > 0
-                    ? "*** No matching subscriptions found ***"
-                    : "*** No subscriptions found ***");
-                return null;
+                string error = response.Payload.Count() > 0
+                    ? "No matching subscriptions found"
+                    : "No subscriptions found";
+                ConsoleHelpers.WriteLineError($"*** {error} ***");
+                throw new ApplicationException(error);
             }
             else if (subscriptions.Count() == 1)
             {
@@ -138,10 +143,11 @@ namespace Azure.AI.Details.Common.CLI
             }
             else if (!allowInteractivePickSubscription)
             {
-                ConsoleHelpers.WriteLineError("*** More than 1 subscription found ***");
+                string error = "More than 1 subscription found";
+                ConsoleHelpers.WriteLineError($"*** { error } ***");
                 Console.WriteLine();
                 DisplaySubscriptions(subscriptions, "  ");
-                return null;
+                throw new ApplicationException(error);
             }
 
             return ListBoxPickSubscription(subscriptions);
@@ -155,7 +161,7 @@ namespace Azure.AI.Details.Common.CLI
             var picked = ListBoxPicker.PickIndexOf(list, defaultIndex);
             if (picked < 0)
             {
-                return null;
+                throw new OperationCanceledException("User canceled");
             }
 
             var subscription = subscriptions[picked];

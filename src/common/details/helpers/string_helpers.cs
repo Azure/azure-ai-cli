@@ -120,5 +120,10 @@ namespace Azure.AI.Details.Common.CLI
         {
             return s.IfTrimStartsWith(value, action).IfTrimEndsWith(value, action);
         }
+
+        public static IList<string> AsLines(this string str)
+            => str == null
+                ? Array.Empty<string>()
+                : str.Split(new[] { "\r\n", "\r", "\n" }, StringSplitOptions.None);
     }
 }

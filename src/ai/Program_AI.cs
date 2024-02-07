@@ -3,12 +3,11 @@
 // Licensed under the MIT license. See LICENSE.md file in the project root for full license information.
 //
 
-using Azure.AI.Details.Common.CLI.Telemetry;
 using System;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
-// using Azure.AI.OpenAI;
+using Azure.AI.Details.Common.CLI.Telemetry;
+
 
 namespace Azure.AI.Details.Common.CLI
 {
@@ -31,18 +30,13 @@ namespace Azure.AI.Details.Common.CLI
 
     public class AiProgramData : IProgramData
     {
-        private Lazy<ITelemetry> _telemetry;
+        private readonly Lazy<ITelemetry> _telemetry;
 
         public AiProgramData()
         {
-            _telemetry = new Lazy<ITelemetry>(() =>
-            {
-                // TODO get telemetry type from config
-                // TODO get telemetry configuration (e.g. TenantID) from config
-                return new AriaTelemetry(
-                    Encoding.UTF8.GetString(Convert.FromBase64String("MGMxZTEzMjc4OWQwNDcxZmEyMTg1ZDVkOThmNTcyNTAtZDIwOTE0YzQtMDYyNS00NDZmLWI0NDQtMzZhZmMzYzY4ZWFiLTcyOTM=")),
-                    this);
-            }, System.Threading.LazyThreadSafetyMode.ExecutionAndPublication);
+            _telemetry = new Lazy<ITelemetry>(
+                () => TelemetryHelpers.InstantiateFromConfig(this),
+                System.Threading.LazyThreadSafetyMode.ExecutionAndPublication);
         }
 
         #region name data

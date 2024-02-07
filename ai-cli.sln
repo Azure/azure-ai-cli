@@ -15,7 +15,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "test_helper_functions_exten
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "template_extension", "src\extensions\template_extension\template_extension.csproj", "{023B4F9C-E2B3-4CCD-A993-87E337C16EDE}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "telemetry", "src\telemetry\telemetry.csproj", "{306A3CD6-91C2-450B-9995-79701CE63FE2}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "telemetry.aria", "src\telemetry\telemetry.aria.csproj", "{306A3CD6-91C2-450B-9995-79701CE63FE2}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{68834003-CCC2-44D7-9EA4-F9B6C65CFC99}"
 	ProjectSection(SolutionItems) = preProject

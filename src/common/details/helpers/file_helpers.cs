@@ -1063,16 +1063,8 @@ namespace Azure.AI.Details.Common.CLI
 
         private static string ReadAllResourceText(string fileName, Encoding encoding)
         {
-            var stream = GetResourceStream(fileName);
-            var length = stream.Length;
-
-            byte[] buffer = new byte[length];
-            string text = stream.Read(buffer, 0, (int)length) != 0
-                ? encoding.GetString(buffer)
-                : "";
-
-            stream.Dispose();
-            return text;
+            using var reader = new StreamReader(GetResourceStream(fileName), encoding);
+            return reader.ReadToEnd();
         }
 
         private static byte[] ReadAllResourceBytes(string fileName)
@@ -1266,7 +1258,7 @@ namespace Azure.AI.Details.Common.CLI
         private static string ExpandConfigPath(string path0, string paths)
         {
             var sb = new StringBuilder();
-            foreach (var path in paths.Split(";".ToCharArray(), StringSplitOptions.RemoveEmptyEntries))
+            foreach (var path in paths.Split(';', StringSplitOptions.RemoveEmptyEntries))
             {
                 if (Program.Debug) Console.WriteLine($"  CONFIG DATASTORE: '{path}'");
                 sb.Append($"{path}data/;{path}config/;{path};");
@@ -1366,7 +1358,7 @@ namespace Azure.AI.Details.Common.CLI
             return CheckDotDirectory(GetAppDataDir(), mustExist, createIfDoesnt);
         }
 
-        private static string GetUserConfigDotDir(bool mustExist = true, bool createIfDoesnt = false)
+        internal static string GetUserConfigDotDir(bool mustExist = true, bool createIfDoesnt = false)
         {
             return CheckDotDirectory(GetAppUserDir(), mustExist, createIfDoesnt);
         }

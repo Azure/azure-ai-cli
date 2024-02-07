@@ -5,7 +5,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <RootNamespace>Azure.AI.Details.Common.CLI.Telemetry</RootNamespace>
-    <AssemblyName>Azure.AI.CLI.Common.AriaTelemetry</AssemblyName>
+    <AssemblyName>Azure.AI.CLI.Common.Telemetry.Aria</AssemblyName>
   </PropertyGroup>
 
   <ItemGroup>

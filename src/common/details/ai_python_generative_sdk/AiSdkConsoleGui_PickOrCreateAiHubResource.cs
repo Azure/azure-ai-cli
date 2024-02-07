@@ -70,7 +70,7 @@ namespace Azure.AI.Details.Common.CLI
             var picked = ListBoxPicker.PickIndexOf(choices.ToArray());
             if (picked < 0)
             {
-                throw new ApplicationException($"CANCELED: No resource selected");
+                throw new OperationCanceledException($"CANCELED: No resource selected");
             }
 
             Console.WriteLine($"\rName: {choices[picked]}");

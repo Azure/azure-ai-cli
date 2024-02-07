@@ -16,6 +16,8 @@ using System.Collections.Generic;
 using System.Net;
 using Newtonsoft.Json.Linq;
 using Azure.AI.Details.Common.CLI.ConsoleGui;
+using Azure.AI.Details.Common.CLI.Telemetry;
+using Azure.AI.Details.Common.CLI.Telemetry.Events;
 
 namespace Azure.AI.Details.Common.CLI
 {
@@ -59,6 +61,8 @@ namespace Azure.AI.Details.Common.CLI
             CheckPath();
 
             var interactive = _values.GetOrDefault("init.service.interactive", true);
+            var runId = _values.GetOrSet("init.run_id", Guid.NewGuid);
+
             if (!interactive) ThrowInteractiveNotSupportedApplicationException(); // POST-IGNITE: TODO: Add back non-interactive mode support
 
             switch (command)
@@ -338,11 +342,24 @@ namespace Azure.AI.Details.Common.CLI
             }
         }
 
-        private async Task DoInitSubscriptionId(bool interactive)
+        private Task DoInitSubscriptionId(bool interactive)
         {
-            var subscriptionFilter = SubscriptionToken.Data().GetOrDefault(_values, "");
-            var subscriptionId = await AzCliConsoleGui.PickSubscriptionIdAsync(interactive, interactive, subscriptionFilter);
-            SubscriptionToken.Data().Set(_values, subscriptionId);
+            return Program.Telemetry.WrapWithTelemetryAsync(
+                async token =>
+                {
+                    var subscriptionFilter = SubscriptionToken.Data().GetOrDefault(_values, "");
+                    var subscriptionId = await AzCliConsoleGui.PickSubscriptionIdAsync(interactive, interactive, subscriptionFilter);
+                    SubscriptionToken.Data().Set(_values, subscriptionId);
+                },
+                (outcome, ex, timeTaken) => new InitTelemetryEvent(InitStage.Subscription)
+                {
+                    Outcome = outcome,
+                    //Selected = selected.TelemetryValue, // TODO capture subscription ID in a PII way?
+                    RunId = _values.GetOrDefault("init.run_id", null),
+                    DurationInMs = timeTaken.TotalMilliseconds,
+                    Error = ex?.Message
+                },
+                CancellationToken.None);
         }
 
         private async Task DoInitRootHubResource(bool interactive)
@@ -351,10 +368,23 @@ namespace Azure.AI.Details.Common.CLI
             await DoInitHubResource(interactive);
         }
 
-        private async Task DoInitHubResource(bool interactive)
+        private Task DoInitHubResource(bool interactive)
         {
-            var subscription = SubscriptionToken.Data().GetOrDefault(_values, "");
-            var aiHubResource = await AiSdkConsoleGui.PickOrCreateAiHubResource(_values, subscription);
+            return Program.Telemetry.WrapWithTelemetryAsync(
+                async token =>
+                {
+                    var subscription = SubscriptionToken.Data().GetOrDefault(_values, "");
+                    var aiHubResource = await AiSdkConsoleGui.PickOrCreateAiHubResource(_values, subscription);
+                },
+                (outcome, ex, timeTaken) => new InitTelemetryEvent(InitStage.Resource)
+                {
+                    Outcome = outcome,
+                    //Selected = "", // TODO capture the resource ID in a PII way?
+                    RunId = _values.GetOrDefault("init.run_id", null),
+                    DurationInMs = timeTaken.TotalMilliseconds,
+                    Error = ex?.Message
+                },
+                CancellationToken.None);
         }
 
         private async Task DoInitRootProject(bool interactive, bool allowCreate = true, bool allowPick = true)
@@ -370,19 +400,33 @@ namespace Azure.AI.Details.Common.CLI
                 await DoInitHubResource(interactive);
             }
 
-            var subscription = SubscriptionToken.Data().GetOrDefault(_values, "");
-            var resourceId = ResourceIdToken.Data().GetOrDefault(_values, null);
-            var groupName = ResourceGroupNameToken.Data().GetOrDefault(_values);
+            await Program.Telemetry.WrapWithTelemetryAsync(
+                async token =>
+                {
+                    var subscription = SubscriptionToken.Data().GetOrDefault(_values, "");
+                    var resourceId = ResourceIdToken.Data().GetOrDefault(_values, null);
+                    var groupName = ResourceGroupNameToken.Data().GetOrDefault(_values);
 
-            var openAiEndpoint = _values.GetOrDefault("service.openai.endpoint", null);
-            var openAiKey = _values.GetOrDefault("service.openai.key", null);
-            var searchEndpoint = _values.GetOrDefault("service.search.endpoint", null);
-            var searchKey = _values.GetOrDefault("service.search.key", null);
+                    var openAiEndpoint = _values.GetOrDefault("service.openai.endpoint", null);
+                    var openAiKey = _values.GetOrDefault("service.openai.key", null);
+                    var searchEndpoint = _values.GetOrDefault("service.search.endpoint", null);
+                    var searchKey = _values.GetOrDefault("service.search.key", null);
 
-            var project = await AiSdkConsoleGui.PickOrCreateAndConfigAiHubProject(allowCreate, allowPick, allowSkipDeployments, allowSkipSearch, _values, subscription, resourceId, groupName, openAiEndpoint, openAiKey, searchEndpoint, searchKey);
+                    var project = await AiSdkConsoleGui.PickOrCreateAndConfigAiHubProject(allowCreate, allowPick, allowSkipDeployments, allowSkipSearch, _values, subscription, resourceId, groupName, openAiEndpoint, openAiKey, searchEndpoint, searchKey);
 
-            ProjectNameToken.Data().Set(_values, project.Name);
-            _values.Reset("service.project.id", project.Id);
+                    ProjectNameToken.Data().Set(_values, project.Name);
+                    _values.Reset("service.project.id", project.Id);
+                },
+                (outcome, ex, timeTaken) => new InitTelemetryEvent(InitStage.Project)
+                {
+                    Outcome = outcome,
+                    //Selected = "", // TODO capture the project ID in a PII way?
+                    RunId = _values.GetOrDefault("init.run_id", null),
+                    DurationInMs = timeTaken.TotalMilliseconds,
+                    Error = ex?.Message
+                },
+                CancellationToken.None)
+            .ConfigureAwait(false);
         }
 
         private async Task DoInitRootOpenAi(bool interactive)

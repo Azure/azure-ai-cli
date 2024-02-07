@@ -16,44 +16,58 @@ namespace Azure.AI.Details.Common.CLI
 
         public static int Main(IProgramData data, string[] mainArgs)
         {
-            _data = data;
+            int exitCode = int.MinValue;
 
-            var screen = ConsoleGui.Screen.Current;
-            Console.OutputEncoding = Encoding.UTF8;
-            Console.CancelKeyPress += (s, e) =>
+            try
             {
-                e.Cancel = true;
-                screen.SetCursorVisible(true);
-                screen.ResetColors();
-                Console.WriteLine("<ctrl-c> received... terminating ... ");
-                Environment.Exit(1);
-            };
+                _data = data;
 
-            ICommandValues values = new CommandValues();
-            INamedValueTokens tokens = new CmdLineTokenSource(mainArgs, values);
+                var _ = _data.Telemetry.LogEventAsync(new LaunchedTelemetryEvent());
 
-            var exitCode = ParseCommand(tokens, values);
-            if (exitCode == 0 && !values.DisplayHelpRequested())
-            {
-                DisplayBanner(values);
-                DisplayParsedValues(values);
-                exitCode = RunCommand(values) ? 0 : 1;
+                var screen = ConsoleGui.Screen.Current;
+                Console.OutputEncoding = Encoding.UTF8;
+                Console.CancelKeyPress += (s, e) =>
+                {
+                    e.Cancel = true;
+                    screen.SetCursorVisible(true);
+                    screen.ResetColors();
+                    Console.WriteLine("<ctrl-c> received... terminating ... ");
+                    Environment.Exit(1);
+                };
+
+                ICommandValues values = new CommandValues();
+                INamedValueTokens tokens = new CmdLineTokenSource(mainArgs, values);
+
+                exitCode = ParseCommand(tokens, values);
+                if (exitCode == 0 && !values.DisplayHelpRequested())
+                {
+                    DisplayBanner(values);
+                    DisplayParsedValues(values);
+                    exitCode = RunCommand(values) ? 0 : 1;
+                }
+
+                if (values.GetOrDefault("x.pause", false))
+                {
+                    Console.Write("Press ENTER to exit... ");
+                    Console.ReadLine();
+                }
+
+                var dumpArgs = string.Join(" ", mainArgs);
+                DebugDumpCommandLineArgs(dumpArgs);
+
+                if (OS.IsLinux()) Console.WriteLine();
+
+                AI.DBG_TRACE_INFO($"Command line was: {dumpArgs}");
+                AI.DBG_TRACE_INFO($"Exit code: {exitCode}");
+                return exitCode;
             }
-
-            if (values.GetOrDefault("x.pause", false))
+            finally
             {
-                Console.Write("Press ENTER to exit... ");
-                Console.ReadLine();
+                var _ = _data?.Telemetry.LogEventAsync(new ExitedTelemetryEvent()
+                {
+                    ExitCode = exitCode
+                });
             }
-
-            var dumpArgs = string.Join(" ", mainArgs);
-            DebugDumpCommandLineArgs(dumpArgs);
-
-            if (OS.IsLinux()) Console.WriteLine();
-
-            AI.DBG_TRACE_INFO($"Command line was: {dumpArgs}");
-            AI.DBG_TRACE_INFO($"Exit code: {exitCode}");
-            return exitCode;
         }
 
         public static int RunInternal(params string[] mainArgs)
@@ -373,5 +387,7 @@ namespace Azure.AI.Details.Common.CLI
         public static bool DisplayKnownErrors(ICommandValues values, Exception ex) => _data.DisplayKnownErrors(values, ex);
 
         public static IEventLoggerHelpers EventLoggerHelpers => _data.EventLoggerHelpers;
+
+        public static ITelemetry Telemetry => _data.Telemetry;
     }
 }

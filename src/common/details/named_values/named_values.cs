@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.IO;
+using System.ComponentModel;
 
 namespace Azure.AI.Details.Common.CLI
 {
@@ -54,6 +55,25 @@ namespace Azure.AI.Details.Common.CLI
                 throw new Exception(values["error"]);
             }
             return value;
+        }
+
+        public static TVal GetOrSet<TVal>(this INamedValues values, string name, Func<TVal> creator)
+        {
+            var converter = TypeDescriptor.GetConverter(typeof(TVal));
+
+            // TODO Should we have a TryGet pattern instead to avoid double lookups?
+            if (values.Contains(name, true))
+            {
+                string stringValue = values[name];
+                return (TVal)converter.ConvertFromInvariantString(stringValue);
+            }
+            else
+            {
+                TVal val = creator();
+                string stringValue = converter.ConvertToInvariantString(val);
+                values.Add(name, stringValue);
+                return val;
+            }
         }
 
         public static string ReplaceValues(this string s, INamedValues values)
@@ -192,16 +212,7 @@ namespace Azure.AI.Details.Common.CLI
     {
         public void Add(string name, string value)
         {
-            var exists = _values.ContainsKey(name);
-            var current = exists ? _values[name] : null;
-
-            var matches = exists && current == value;
-            if (matches) return;
-
-            var remove = exists && string.IsNullOrWhiteSpace(current);
-            if (remove) _values.Remove(name);
-
-            _values.Add(name, value);
+            _values[name] = value;
         }
 
         public bool Contains(string name, bool checkDefault = true)
@@ -211,7 +222,9 @@ namespace Azure.AI.Details.Common.CLI
 
         public string Get(string name, bool checkDefault = true)
         {
-            return Contains(name, checkDefault) ? _values[name] : null;
+            return _values.TryGetValue(name, out var value)
+                ? value
+                : null;
         }
 
         public void Reset(string name, string value = null)
