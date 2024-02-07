@@ -60,11 +60,10 @@ else
             sudo dpkg -i packages-microsoft-prod.deb
             rm packages-microsoft-prod.deb
         elif [[ "$CHECK_VERSION" == "22.04" ]]; then
-            # We don't need to install the Microsoft package signing key for Ubuntu 22.04; in fact, if we do, `dotnet tool` doesn't work
-            echo "Ubuntu 22.04 detected. Skipping Microsoft package signing key installation."
-            # wget https://packages.microsoft.com/config/ubuntu/22.04/packages-microsoft-prod.deb -O packages-microsoft-prod.deb
-            # sudo dpkg -i packages-microsoft-prod.deb
-            # rm packages-microsoft-prod.deb
+            # Install the Microsoft package signing key for Ubuntu 20.04
+            wget https://packages.microsoft.com/config/ubuntu/22.04/packages-microsoft-prod.deb -O packages-microsoft-prod.deb
+            sudo dpkg -i packages-microsoft-prod.deb
+            rm packages-microsoft-prod.deb
         else
             echo "Unsupported Ubuntu version: $CHECK_VERSION"
             exit 1
