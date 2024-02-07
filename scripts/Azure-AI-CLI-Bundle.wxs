@@ -10,7 +10,11 @@
             DisableModify="yes">
 
         <BootstrapperApplicationRef Id="WixStandardBootstrapperApplication.RtfLicense">
-            <bal:WixStandardBootstrapperApplication LicenseFile="CLI_License.rtf" SuppressOptionsUI="yes" SuppressRepair="yes"/>
+            <bal:WixStandardBootstrapperApplication
+                LicenseFile="CLI_License.rtf"
+                LogoFile="WindowsInstaller.png"
+                SuppressOptionsUI="yes"
+                SuppressRepair="yes" />
         </BootstrapperApplicationRef>
 
         <!--
@@ -32,7 +36,7 @@
             <PackageGroupRef Id="DotNetSdk"/>
             <PackageGroupRef Id="AzureCLI"/>
 
-            <MsiPackage Id="AzureAI_CLI" SourceFile="Azure-AI-CLI.msi" Vital="yes"/>
+            <MsiPackage SourceFile="Azure-AI-CLI.msi" Vital="yes"/>
         </Chain>
     </Bundle>
 
@@ -44,21 +48,14 @@
                               Variable="DOTNET_SDK_INSTALLED"/>
 
         <PackageGroup Id="DotNetSdk">
-            <ExePackage Id="DotNetSdk"
-                        Name="dotnet-sdk-$(var.dotNetVersion)-win-$(var.targetPlatform).exe"
-                        Compressed="no"
+            <ExePackage Compressed="no"
                         DetectCondition="DOTNET_SDK_INSTALLED"
                         DownloadUrl="$(var.dotNetUrl)"
-                        InstallCommand="/passive /norestart"
+                        InstallCommand="/quiet /norestart"
                         PerMachine="yes"
                         Permanent="yes"
-                        Vital="yes">
-                <RemotePayload Description=".NET SDK"
-                               ProductName=".NET SDK"
-                               Version="$(var.dotNetVersion).0"
-                               Size="$(var.dotNetSize)"
-                               Hash="$(var.dotNetSha1)"/>
-            </ExePackage>
+                        SourceFile="dotnet-sdk-$(var.dotNetVersion)-win-$(var.targetPlatform).exe"
+                        Vital="yes" />
         </PackageGroup>
 
         <!-- Azure CLI -->
@@ -68,18 +65,15 @@
                               Variable="AZURE_CLI_INSTALLED"/>
 
         <PackageGroup Id="AzureCLI">
-            <!--
-            Workaround for RemotePayload not supported on MsiPackage.
-            -->
-            <ExePackage Id="AzureCLI"
-                        Name="InstallAzureCLI.cmd"
-                        Compressed="yes"
-                        DetectCondition="AZURE_CLI_INSTALLED"
-                        SourceFile="InstallAzureCLI.cmd"
-                        InstallCommand="$(var.azureCliVersion) $(var.targetPlatform)"
-                        PerMachine="yes"
+            <MsiPackage Compressed="no"
+                        DisplayInternalUI="no"
+                        DownloadUrl="$(var.azureCliUrl)"
+                        ForcePerMachine="yes"
+                        InstallCondition="NOT AZURE_CLI_INSTALLED"
                         Permanent="yes"
-                        Vital="yes"/>
+                        SourceFile="azure-cli-$(var.azureCliVersion)-$(var.targetPlatform).msi"
+                        Visible="yes"
+                        Vital="yes" />
         </PackageGroup>
     </Fragment>
 </Wix>
