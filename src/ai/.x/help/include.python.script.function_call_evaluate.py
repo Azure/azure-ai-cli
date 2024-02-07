@@ -215,13 +215,10 @@ def run_evaluate_part(subscription_id, resource_group_name, project_name, run_re
         user_agent="ai-cli 0.0.1"
     )
 
-    def dont_call_this_method(kwargs):
-        raise Exception("This method should not be called.")
-
     from azure.ai.generative.evaluate import evaluate
     eval_results = evaluate(
         evaluation_name=name,
-        target=dont_call_this_method,
+        target=None,
         data=run_results,
         truth_data="truth",
         prediction_data="answer",
