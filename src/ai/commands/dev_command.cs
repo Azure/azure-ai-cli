@@ -116,7 +116,7 @@ namespace Azure.AI.Details.Common.CLI
             ConfigEnvironmentHelpers.SetEnvironment(env);
             Console.WriteLine();
 
-            var runCommand = RunCommandToken.Data().GetOrDefault(_values);
+            var runCommand = RunCommandScriptToken.Data().GetOrDefault(_values);
             var processOutput = string.IsNullOrEmpty(runCommand)
                 ? ProcessHelpers.RunShellCommandAsync(fileName, arguments, env, null, null, null, false).Result
                 : ProcessHelpers.RunShellCommandAsync(runCommand, env, null, null, null, false).Result;
