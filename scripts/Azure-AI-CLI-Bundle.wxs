@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi"
+     xmlns:bal="http://schemas.microsoft.com/wix/BalExtension"
+     xmlns:util="http://schemas.microsoft.com/wix/UtilExtension">
+
+    <Bundle Name="Azure AI CLI"
+            Version="$(var.productVersion)"
+            Manufacturer="Microsoft"
+            UpgradeCode="BF9A65EF-7D5A-4DC4-90E4-CDC44F042E96"
+            DisableModify="yes">
+
+        <BootstrapperApplicationRef Id="WixStandardBootstrapperApplication.RtfLicense">
+            <bal:WixStandardBootstrapperApplication
+                LicenseFile="CLI_License.rtf"
+                LogoFile="WindowsInstaller.png"
+                SuppressOptionsUI="yes"
+                SuppressRepair="yes" />
+        </BootstrapperApplicationRef>
+
+        <!--
+        Check the version of existing Azure AI CLI .msi installation.
+        -->
+        <util:ProductSearch Variable="AlreadyInstalledVersion"
+                            UpgradeCode="F1CDBA9C-E353-4039-9A20-059A1E587E73"
+                            Id="AlreadyInstalledVersionSearch"
+                            Result="version"/>
+        <!--
+        Workaround for https://github.com/wixtoolset/issues/issues/3746 (note: WixBundleAction 5 = Uninstall).
+        -->
+        <bal:Condition Message="The same or newer version [AlreadyInstalledVersion] is already installed.">
+        NOT WixBundleAction = 5 OR NOT AlreadyInstalledVersion &gt;= v$(var.productVersion)
+        </bal:Condition>
+
+        <Chain>
+            <!-- Dependencies -->
+            <PackageGroupRef Id="DotNetSdk"/>
+            <PackageGroupRef Id="AzureCLI"/>
+
+            <MsiPackage SourceFile="Azure-AI-CLI.msi" Vital="yes"/>
+        </Chain>
+    </Bundle>
+
+    <Fragment>
+        <!-- .NET SDK -->
+        <util:DirectorySearch Id="DotNetDirectory"
+                              Path="[ProgramFiles64Folder]dotnet\sdk\$(var.dotNetVersion)"
+                              Result="exists"
+                              Variable="DOTNET_SDK_INSTALLED"/>
+
+        <PackageGroup Id="DotNetSdk">
+            <ExePackage Compressed="no"
+                        DetectCondition="DOTNET_SDK_INSTALLED"
+                        DownloadUrl="$(var.dotNetUrl)"
+                        InstallCommand="/quiet /norestart"
+                        PerMachine="yes"
+                        Permanent="yes"
+                        SourceFile="dotnet-sdk-$(var.dotNetVersion)-win-$(var.targetPlatform).exe"
+                        Vital="yes" />
+        </PackageGroup>
+
+        <!-- Azure CLI -->
+        <util:DirectorySearch Id="AzureCLIDirectory"
+                              Path="[ProgramFiles64Folder]Microsoft SDKs\Azure\CLI2"
+                              Result="exists"
+                              Variable="AZURE_CLI_INSTALLED"/>
+
+        <PackageGroup Id="AzureCLI">
+            <MsiPackage Compressed="no"
+                        DisplayInternalUI="no"
+                        DownloadUrl="$(var.azureCliUrl)"
+                        ForcePerMachine="yes"
+                        InstallCondition="NOT AZURE_CLI_INSTALLED"
+                        Permanent="yes"
+                        SourceFile="azure-cli-$(var.azureCliVersion)-$(var.targetPlatform).msi"
+                        Visible="yes"
+                        Vital="yes" />
+        </PackageGroup>
+    </Fragment>
+</Wix>
