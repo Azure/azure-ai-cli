@@ -3,12 +3,10 @@
 
   <PropertyGroup>
     <TargetFramework>net7.0</TargetFramework>
-    <OutputType>Library</OutputType>
-    <AssemblyName>Azure.AI.CLI.TestAdapter</AssemblyName>
+    <AssemblyName>ait</AssemblyName>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
     <ApplicationIcon />
     <StartupObject />
-    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
     <PackageVersion>1.1.0</PackageVersion>
   </PropertyGroup>
 
@@ -45,24 +43,14 @@
   </Choose>
 
   <PropertyGroup>
-    <TAAssemblyVersion Condition="'$(TAAssemblyVersion)' == ''">1.0.0</TAAssemblyVersion>
-    <TAAssemblyInformationalVersion Condition="'$(TAAssemblyInformationalVersion)' == ''">$(TAAssemblyVersion)</TAAssemblyInformationalVersion>
+    <TFAssemblyVersion Condition="'$(TFAssemblyVersion)' == ''">1.0.0</TFAssemblyVersion>
+    <TFAssemblyInformationalVersion Condition="'$(TFAssemblyInformationalVersion)' == ''">$(TFAssemblyVersion)</TFAssemblyInformationalVersion>
   </PropertyGroup>
 
   <PropertyGroup>
-    <FileVersion>$(TAAssemblyVersion)</FileVersion>
-    <AssemblyVersion>$(TAAssemblyVersion)</AssemblyVersion>
-    <InformationalVersion>$(TAAssemblyInformationalVersion)</InformationalVersion>
+    <FileVersion>$(TFAssemblyVersion)</FileVersion>
+    <AssemblyVersion>$(TFAssemblyVersion)</AssemblyVersion>
+    <InformationalVersion>$(TFAssemblyInformationalVersion)</InformationalVersion>
   </PropertyGroup>
-
-  <ItemGroup>
-    <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
-    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.0.0" />
-    <PackageReference Include="System.Data.DataSetExtensions" Version="4.5.0" />
-    <PackageReference Include="System.Configuration.ConfigurationManager" Version="5.0.0" />
-    <PackageReference Include="Microsoft.TestPlatform.ObjectModel" Version="17.0.0" />
-    <PackageReference Include="YamlDotNet" Version="11.2.1" />
-  </ItemGroup>
 
 </Project>

@@ -56,8 +56,6 @@ namespace Azure.AI.Details.Common.CLI
 
             DisplayInitServiceBanner();
 
-            CheckPath();
-
             var interactive = _values.GetOrDefault("init.service.interactive", true);
 
             switch (command)

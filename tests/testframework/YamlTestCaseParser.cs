@@ -8,7 +8,7 @@ using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using YamlDotNet.Helpers;
 using YamlDotNet.RepresentationModel;
 
-namespace TestAdapterTest
+namespace Azure.AI.Details.Common.CLI.TestFramework
 {
     public class YamlTestCaseParser
     {
@@ -16,7 +16,7 @@ namespace TestAdapterTest
         {
             var area = GetRootArea(file);
             var parsed = YamlHelpers.ParseYamlStream(file.FullName);
-            return TestCasesFromYamlStream(source, file, area, parsed);
+            return TestCasesFromYamlStream(source, file, area, parsed).ToList();
         }
 
         #region private methods
@@ -28,7 +28,10 @@ namespace TestAdapterTest
             foreach (var document in parsed?.Documents)
             {
                 var fromDocument = TestCasesFromYamlDocumentRootNode(source, file, document.RootNode, area, defaultClassName, defaultTags);
-                tests.AddRange(fromDocument);
+                if (fromDocument != null)
+                {
+                    tests.AddRange(fromDocument);
+                }
             }
             return tests;
         }
@@ -83,24 +86,25 @@ namespace TestAdapterTest
             string simulate = GetScalarString(mapping, "simulate");
             string command = GetScalarString(mapping, "command");
             string script = GetScalarString(mapping, "script");
+            string bash = GetScalarString(mapping, "bash");
 
-            string fullyQualifiedName = command == null && script == null
+            string fullyQualifiedName = command == null && script == null && bash == null
                 ? GetFullyQualifiedNameAndCommandFromShortForm(mapping, area, @class, ref command, stepNumber)
                 : GetFullyQualifiedName(mapping, area, @class, stepNumber);
             fullyQualifiedName ??= GetFullyQualifiedName(area, @class, $"Expected YAML node ('name') at {file.FullName}({mapping.Start.Line})", 0);
 
             var simulating = !string.IsNullOrEmpty(simulate);
-            var neitherOrBoth = (command == null) == (script == null);
+            var neitherOrBoth = (command == null) == (script == null && bash == null);
             if (neitherOrBoth && !simulating)
             {
-                var message = $"Error parsing YAML: expected/unexpected key ('name', 'command', 'script', 'arguments') at {file.FullName}({mapping.Start.Line})";
+                var message = $"Error parsing YAML: expected/unexpected key ('name', 'command', 'script', 'bash', 'arguments') at {file.FullName}({mapping.Start.Line})";
                 Logger.LogError(message);
                 Logger.TraceError(message);
                 return null;
             }
 
             Logger.Log($"YamlTestCaseParser.GetTests(): new TestCase('{fullyQualifiedName}')");
-            var test = new TestCase(fullyQualifiedName, new Uri(YamlTestAdapter.Executor), source)
+            var test = new TestCase(fullyQualifiedName, new Uri(YamlTestFramework.FakeExecutor), source)
             {
                 CodeFilePath = file.FullName,
                 LineNumber = mapping.Start.Line
@@ -109,11 +113,12 @@ namespace TestAdapterTest
             SetTestCaseProperty(test, "cli", cli);
             SetTestCaseProperty(test, "command", command);
             SetTestCaseProperty(test, "script", script);
+            SetTestCaseProperty(test, "bash", bash);
             SetTestCaseProperty(test, "simulate", simulate);
             SetTestCaseProperty(test, "parallelize", parallelize);
             SetTestCaseProperty(test, "skipOnFailure", skipOnFailure);
 
-            var timeout = GetScalarString(mapping, tags, "timeout", YamlTestAdapter.DefaultTimeout);
+            var timeout = GetScalarString(mapping, tags, "timeout", YamlTestFramework.DefaultTimeout);
             SetTestCaseProperty(test, "timeout", timeout);
 
             var workingDirectory = GetScalarString(mapping, tags, "workingDirectory", file.Directory.FullName);
@@ -163,7 +168,10 @@ namespace TestAdapterTest
             {
                 var mapping = sequence.Children[i] as YamlMappingNode;
                 var test = GetTestFromNode(source, file, mapping, area, @class, tags, i + 1);
-                tests.Add(test);
+                if (test != null)
+                {
+                    tests.Add(test);
+                }
             }
 
             if (tests.Count > 0)
@@ -196,7 +204,7 @@ namespace TestAdapterTest
 
         private static bool IsValidTestCaseNode(string value)
         {
-            return ";area;class;name;cli;command;script;timeout;foreach;arguments;input;expect;expect-gpt;not-expect;parallelize;simulate;skipOnFailure;tag;tags;workingDirectory;".IndexOf($";{value};") >= 0;
+            return ";area;class;name;cli;command;script;bash;timeout;foreach;arguments;input;expect;expect-gpt;not-expect;parallelize;simulate;skipOnFailure;tag;tags;workingDirectory;".IndexOf($";{value};") >= 0;
         }
 
         private static void SetTestCaseProperty(TestCase test, string propertyName, YamlMappingNode mapping, string mappingName)
