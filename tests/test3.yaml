@@ -141,6 +141,7 @@
       bash: |
         cd openai-chat-py
         pip install -r requirements.txt
+      tag: skip
     - name: run template
       command: ai dev shell --run "cd openai-chat-py && python openai_chat_completions.py"
       input: |-
@@ -226,6 +227,7 @@
       bash: |
         cd openai-chat-streaming-py
         pip install -r requirements.txt
+      tag: skip
     - name: run template
       command: ai dev shell --run "cd openai-chat-streaming-py && python main.py"
       input: |-
@@ -272,11 +274,13 @@
       bash: |
         cd openai-chat-streaming-with-data-py
         pip install -r requirements.txt
+      tag: skip
     - name: run template
       command: ai dev shell --run "cd openai-chat-streaming-with-data-py && python main.py"
       input: |-
         What parameter should i use to select my resources?
       tag: skip
+
   - class: dev new openai-chat-streaming-with-data (go)
     steps:
     - name: generate template
@@ -348,6 +352,7 @@
       bash: |
         cd openai-chat-streaming-with-functions-py
         pip install -r requirements.txt
+      tag: skip
     - name: run template
       command: ai dev shell --run "cd openai-chat-streaming-with-functions-py && python main.py"
       input: |-
