@@ -9,14 +9,17 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Azure.AI.Details.Common.CLI.TestFramework;
 
-namespace TestAdapterTest
+namespace Azure.AI.Details.Common.CLI.TestAdapter
 {
     [ExtensionUri(YamlTestAdapter.Executor)]
     public class TextExecutor : ITestExecutor
     {
         public void RunTests(IEnumerable<TestCase> tests, IRunContext runContext, IFrameworkHandle frameworkHandle)
         {
+            tests = tests.ToList(); // force enumeration
+
             Logger.Log(frameworkHandle);
             Logger.Log($"TextExecutor.RunTests(IEnumerable<TestCase>(): ENTER");
             Logger.Log($"TextExecutor.RunTests(IEnumerable<TestCase>(): count={tests.Count()}");
@@ -26,6 +29,8 @@ namespace TestAdapterTest
 
         public void RunTests(IEnumerable<string> sources, IRunContext runContext, IFrameworkHandle frameworkHandle)
         {
+            sources = sources.ToList(); // force enumeration
+            
             Logger.Log(frameworkHandle);
             Logger.Log($"TextExecutor.RunTests(IEnumerable<string>(): ENTER");
             Logger.Log($"TextExecutor.RunTests(IEnumerable<string>(): count={sources.Count()}");

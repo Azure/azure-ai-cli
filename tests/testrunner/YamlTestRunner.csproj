@@ -1,0 +1,14 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net7.0</TargetFramework>
+    <OutputType>Exe</OutputType>
+  </PropertyGroup>
+
+  <Import Project="YamlTestRunnerCommon.targets" />
+
+  <ItemGroup>
+    <ProjectReference Include="..\testframework\YamlTestFramework.csproj" />
+  </ItemGroup>
+
+</Project>

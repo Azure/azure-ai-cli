@@ -10,7 +10,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace TestAdapterTest
+namespace Azure.AI.Details.Common.CLI.TestFramework
 {
     public class Logger
     {
@@ -114,7 +114,7 @@ namespace TestAdapterTest
         {
             var pid = Process.GetCurrentProcess().Id.ToString();
             var time = DateTime.Now.ToFileTime().ToString();
-            return $"log-test-adatper-{time}-{pid}.log";
+            return $"log-ai-cli-test-framework-{time}-{pid}.log";
         }
  
         private static IMessageLogger logger = null;

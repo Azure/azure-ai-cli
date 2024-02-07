@@ -4,13 +4,13 @@ using System.IO;
 using System.Linq;
 using YamlDotNet.RepresentationModel;
 
-namespace TestAdapterTest
+namespace Azure.AI.Details.Common.CLI.TestFramework
 {
     public class YamlTagHelpers
     {
         public static FileInfo GetYamlDefaultTagsFullFileName(DirectoryInfo directory)
         {
-            var found = directory.GetFiles(YamlTestAdapter.YamlDefaultTagsFileName);
+            var found = directory.GetFiles(YamlTestFramework.YamlDefaultTagsFileName);
             return found.Length == 1
                 ? found[0]
                 : directory.Parent != null

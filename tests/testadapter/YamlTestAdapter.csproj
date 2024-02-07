@@ -6,4 +6,8 @@
 
   <Import Project="YamlTestAdapterCommon.targets" />
 
+  <ItemGroup>
+    <ProjectReference Include="..\testframework\YamlTestFramework.csproj" />
+  </ItemGroup>
+
 </Project>

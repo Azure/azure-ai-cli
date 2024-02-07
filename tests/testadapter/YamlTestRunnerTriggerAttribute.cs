@@ -10,7 +10,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace TestAdapterTest
+namespace Azure.AI.Details.Common.CLI.TestAdapter
 {
     public class YamlTestRunnerTriggerAttribute : Attribute
     {

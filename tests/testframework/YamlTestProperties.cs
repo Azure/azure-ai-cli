@@ -7,7 +7,7 @@ using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Adapter;
 using YamlDotNet.RepresentationModel;
 
-namespace TestAdapterTest
+namespace Azure.AI.Details.Common.CLI.TestFramework
 {
     public class YamlTestProperties
     {
@@ -38,6 +38,7 @@ namespace TestAdapterTest
             { "cli", RegisterTestCaseProperty("CLI") },
             { "command", RegisterTestCaseProperty("Command") },
             { "script", RegisterTestCaseProperty("Script") },
+            { "bash", RegisterTestCaseProperty("Bash") },
             { "parallelize", RegisterTestCaseProperty("Parallelize") },
             { "nextStepId", RegisterTestCaseProperty("nextStepId") },
             { "foreach", RegisterTestCaseProperty("ForEach") },

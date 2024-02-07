@@ -9,11 +9,12 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Azure.AI.Details.Common.CLI.TestFramework;
 
-namespace TestAdapterTest
+namespace Azure.AI.Details.Common.CLI.TestAdapter
 {
-    [FileExtension(YamlTestAdapter.FileExtensionYaml)]
-    [FileExtension(YamlTestAdapter.FileExtensionDll)]
+    [FileExtension(YamlTestFramework.YamlFileExtension)]
+    [FileExtension(YamlTestAdapter.DllFileExtension)]
     [DefaultExecutorUri(YamlTestAdapter.Executor)]
     public class TestDiscoverer : ITestDiscoverer
     {
@@ -26,6 +27,7 @@ namespace TestAdapterTest
                 Logger.Log($"TestDiscoverer.DiscoverTests(): count={sources.Count()}");
                 foreach (var test in YamlTestAdapter.GetTestsFromFiles(sources))
                 {
+                    test.ExecutorUri = new Uri(YamlTestAdapter.Executor);
                     discoverySink.SendTestCase(test);
                 }
                 Logger.Log($"TestDiscoverer.DiscoverTests(): EXIT");
