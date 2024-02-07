@@ -10,7 +10,11 @@
             DisableModify="yes">
 
         <BootstrapperApplicationRef Id="WixStandardBootstrapperApplication.RtfLicense">
-            <bal:WixStandardBootstrapperApplication LicenseFile="CLI_License.rtf" SuppressOptionsUI="yes" SuppressRepair="yes"/>
+            <bal:WixStandardBootstrapperApplication
+                LicenseFile="CLI_License.rtf"
+                LogoFile="WindowsInstaller.png"
+                SuppressOptionsUI="yes"
+                SuppressRepair="yes" />
         </BootstrapperApplicationRef>
 
         <!--
