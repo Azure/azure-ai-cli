@@ -105,7 +105,7 @@
                   Return="ignore"/>
 
     <ComponentGroup Id="ProductComponents" Directory="INSTALLFOLDER">
-        <Component Id="LicenseDoc" Guid="9343B67B-61D6-4F7C-9B82-E6CA30C30038">
+        <Component Id="LicenseDoc" Guid="9343B67B-61D6-4F7C-9B82-E6CA30C30038" Win64="yes">
             <File Id="License.rtf" Source="$(sys.SOURCEFILEDIR)\CLI_License.rtf" KeyPath="yes"/>
         </Component>
     </ComponentGroup>
