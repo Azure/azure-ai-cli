@@ -5,7 +5,7 @@
 
     <Bundle Name="Azure AI CLI"
             Version="$(var.productVersion)"
-            Manufacturer="Microsoft"
+            Manufacturer="Microsoft Corporation"
             UpgradeCode="BF9A65EF-7D5A-4DC4-90E4-CDC44F042E96"
             DisableModify="yes">
 
@@ -14,7 +14,7 @@
                 LicenseFile="CLI_License.rtf"
                 LogoFile="WindowsInstaller.png"
                 SuppressOptionsUI="yes"
-                SuppressRepair="yes" />
+                SuppressRepair="yes"/>
         </BootstrapperApplicationRef>
 
         <!--
@@ -35,7 +35,7 @@
             <!-- Dependencies -->
             <PackageGroupRef Id="DotNetSdk"/>
             <PackageGroupRef Id="AzureCLI"/>
-
+            <!-- AI CLI package -->
             <MsiPackage SourceFile="Azure-AI-CLI.msi" Vital="yes"/>
         </Chain>
     </Bundle>
@@ -55,7 +55,7 @@
                         PerMachine="yes"
                         Permanent="yes"
                         SourceFile="dotnet-sdk-$(var.dotNetVersion)-win-$(var.targetPlatform).exe"
-                        Vital="yes" />
+                        Vital="yes"/>
         </PackageGroup>
 
         <!-- Azure CLI -->
@@ -73,7 +73,7 @@
                         Permanent="yes"
                         SourceFile="azure-cli-$(var.azureCliVersion)-$(var.targetPlatform).msi"
                         Visible="yes"
-                        Vital="yes" />
+                        Vital="yes"/>
         </PackageGroup>
     </Fragment>
 </Wix>

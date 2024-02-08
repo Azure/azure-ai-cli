@@ -26,6 +26,10 @@ if [ ! -z "$1" ]; then
     BUILD_MONTH=$(echo "$1" | sed 's/^[0-9]\{4\}\([0-9]\{2\}\)[0-9]\{2\}\.[0-9]*$/\1/')
     BUILD_DAY=$(echo "$1" | sed 's/^[0-9]\{6\}\([0-9]\{2\}\)\.[0-9]*$/\1/')
     BUILD_RUN=$(echo "$1" | sed 's/^[0-9]\{8\}\.\([0-9]*$\)/\1/')
+    # Remove a potential leading zero to avoid interpretation as an octal number.
+    BUILD_MONTH=${BUILD_MONTH#0}
+    BUILD_DAY=${BUILD_DAY#0}
+    BUILD_RUN=${BUILD_RUN#0}
 
     if [ ! -z "$BUILD_MONTH" -a $BUILD_MONTH -ge 1 -a $BUILD_MONTH -le 12 -a \
          ! -z "$BUILD_DAY"   -a $BUILD_DAY   -ge 1 -a $BUILD_DAY   -le 31 -a \
