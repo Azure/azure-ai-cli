@@ -35,8 +35,23 @@
       </Directory>
     </Directory>
 
+    <?define basename="Azure.AI.CLI.$(var.packageVersion)" ?>
+
+    <!-- Create a unique temp folder. -->
+    <SetProperty Id="RunMakeTempDirCmd"
+                 Value="&quot;cmd.exe&quot; /c mkdir &quot;[%TEMP]\$(var.basename)&quot;"
+                 Sequence="execute"
+                 Before="LaunchConditions" />
+    <CustomAction Id="RunMakeTempDirCmd"
+                  BinaryKey="WixCA"
+                  DllEntry="WixQuietExec"
+                  Execute="deferred"
+                  Impersonate="no"
+                  Return="ignore" />
+
+    <!-- Download the AI CLI package from blob storage. -->
     <SetProperty Id="RunDownloadCmd"
-                 Value="&quot;curl.exe&quot; --output &quot;[%TEMP]\Azure.AI.CLI.$(var.packageVersion).nupkg&quot; --url $(var.packageUrl)"
+                 Value="&quot;curl.exe&quot; --output &quot;[%TEMP]\$(var.basename)\$(var.basename).nupkg&quot; --url $(var.packageUrl)"
                  Sequence="execute"
                  Before="LaunchConditions" />
     <CustomAction Id="RunDownloadCmd"
@@ -46,8 +61,9 @@
                   Impersonate="no"
                   Return="check" />
 
+    <!-- Install the AI CLI package as a .NET tool. -->
     <SetProperty Id="RunInstallCmd"
-                 Value="&quot;dotnet.exe&quot; tool update --global --add-source &quot;[%TEMP]&quot; Azure.AI.CLI --version $(var.packageVersion)"
+                 Value="&quot;dotnet.exe&quot; tool update --global --add-source &quot;[%TEMP]\$(var.basename)&quot; Azure.AI.CLI --version $(var.packageVersion)"
                  Sequence="execute"
                  Before="LaunchConditions" />
     <CustomAction Id="RunInstallCmd"
@@ -57,6 +73,7 @@
                   Impersonate="no"
                   Return="check" />
 
+    <!-- Uninstall the AI CLI .NET tool. -->
     <SetProperty Id="RunUninstallCmd"
                  Value="&quot;dotnet.exe&quot; tool uninstall --global Azure.AI.CLI"
                  Sequence="execute"
@@ -66,7 +83,7 @@
                   DllEntry="WixQuietExec"
                   Execute="deferred"
                   Impersonate="no"
-                  Return="check" />
+                  Return="ignore" />
 
     <ComponentGroup Id="ProductComponents" Directory="INSTALLFOLDER">
       <Component Id="LicenseDoc" Guid="9343B67B-61D6-4F7C-9B82-E6CA30C30038">
@@ -79,7 +96,8 @@
       <Custom Action="AlreadyUpdated" After="FindRelatedProducts">SELFFOUND</Custom>
       <Custom Action="NoDowngrade" After="FindRelatedProducts">NEWERFOUND</Custom>
       -->
-      <Custom Action="RunDownloadCmd" Before="InstallFinalize">NOT Installed OR REINSTALL OR UPGRADINGPRODUCTCODE</Custom>
+      <Custom Action="RunMakeTempDirCmd" Before="InstallFinalize">NOT Installed OR REINSTALL OR UPGRADINGPRODUCTCODE</Custom>
+      <Custom Action="RunDownloadCmd" After="RunMakeTempDirCmd">NOT Installed OR REINSTALL OR UPGRADINGPRODUCTCODE</Custom>
       <Custom Action="RunInstallCmd" After="RunDownloadCmd">NOT Installed OR REINSTALL OR UPGRADINGPRODUCTCODE</Custom>
       <Custom Action="RunUninstallCmd" Before="RemoveFiles">Installed AND NOT REINSTALL AND NOT UPGRADINGPRODUCTCODE</Custom>
     </InstallExecuteSequence>
