@@ -45,9 +45,8 @@ REM Detach engine from the package bundle installer.
 if "%ACTION%"=="detach" (
   insignia -ib %UNSIGNED_BUNDLE% -o %BUNDLE_ENGINE%
   if %ERRORLEVEL% neq 0 (
-    set EXITCODE=%ERRORLEVEL%
-    echo Error from insignia.exe while detaching engine [%EXITCODE%] 1>&2
-    exit /b %EXITCODE%
+    echo Error from insignia.exe while detaching engine. 1>&2
+    exit /b 6
   )
   echo Detached %BUNDLE_ENGINE% from %UNSIGNED_BUNDLE%
   goto end
@@ -59,13 +58,12 @@ REM (Re)attach engine to the package bundle installer.
 if "%ACTION%"=="attach" (
   if not exist %BUNDLE_ENGINE% (
     echo Error: %BUNDLE_ENGINE% not found. 1>&2
-    exit /b 6
+    exit /b 7
   )
   insignia -ab %BUNDLE_ENGINE% %UNSIGNED_BUNDLE% -o %SIGNED_BUNDLE%
   if %ERRORLEVEL% neq 0 (
-    set EXITCODE=%ERRORLEVEL%
-    echo Error from insignia.exe while attaching engine [%EXITCODE%] 1>&2
-    exit /b %EXITCODE%
+    echo Error from insignia.exe while attaching engine. 1>&2
+    exit /b 8
   )
   echo Attached %BUNDLE_ENGINE% to %SIGNED_BUNDLE%
   goto end

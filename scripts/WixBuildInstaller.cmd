@@ -63,16 +63,14 @@ if %ERRORLEVEL% neq 0 (
 REM Build AI CLI installer .msi
 candle.exe Azure-AI-CLI.wxs -dproductVersion=%PRODUCT_VERSION% -dpackageVersion=%PACKAGE_VERSION% -dpackageUrl=%PACKAGE_URL% -dtargetPlatform=%TARGET_PLATFORM%
 if %ERRORLEVEL% neq 0 (
-  set EXITCODE=%ERRORLEVEL%
-  echo Error from candle.exe [%EXITCODE%] 1>&2
-  exit /b %EXITCODE%
+  echo Error from candle.exe 1>&2
+  exit /b 7
 )
 
 light.exe Azure-AI-CLI.wixobj -ext WixUIExtension -ext WixUtilExtension
 if %ERRORLEVEL% neq 0 (
-  set EXITCODE=%ERRORLEVEL%
-  echo Error from light.exe [%EXITCODE%] 1>&2
-  exit /b %EXITCODE%
+  echo Error from light.exe 1>&2
+  exit /b 8
 )
 
 REM Build installation bundle .exe
@@ -81,16 +79,14 @@ candle.exe Azure-AI-CLI-Bundle.wxs -ext WixBalExtension -ext WixUtilExtension ^
   -dazureCliVersion=%AZURE_CLI_VERSION% -dazureCliUrl=%AZURE_CLI_URL% ^
   -ddotNetVersion=%DOTNET_VERSION% -ddotNetUrl=%DOTNET_URL%
 if %ERRORLEVEL% neq 0 (
-  set EXITCODE=%ERRORLEVEL%
-  echo Error from candle.exe [%EXITCODE%] 1>&2
-  exit /b %EXITCODE%
+  echo Error from candle.exe 1>&2
+  exit /b 9
 )
 
 light.exe Azure-AI-CLI-Bundle.wixobj -ext WixBalExtension -ext WixUtilExtension -out %INSTALLER_FILE%
 if %ERRORLEVEL% neq 0 (
-  set EXITCODE=%ERRORLEVEL%
-  echo Error from light.exe [%EXITCODE%] 1>&2
-  exit /b %EXITCODE%
+  echo Error from light.exe 1>&2
+  exit /b 10
 )
 
 :end
