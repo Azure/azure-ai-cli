@@ -1,11 +1,11 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net7.0</TargetFramework>
+    <TargetFramework>net8.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <EnableDefaultCompileItems>true</EnableDefaultCompileItems>
-    <AICLIExtensionReferencePath Condition="'$(AICLIExtensionReferencePath)' == ''">D:\src\ai-cli\src\ai\bin\Debug\net7.0</AICLIExtensionReferencePath>
+    <AICLIExtensionReferencePath Condition="'$(AICLIExtensionReferencePath)' == ''">D:\src\ai-cli\src\ai\bin\Debug\net8.0</AICLIExtensionReferencePath>
   </PropertyGroup>
 
   <ItemGroup>

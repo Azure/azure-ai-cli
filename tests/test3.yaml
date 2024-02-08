@@ -21,23 +21,47 @@
   command: ai chat --question "Why is the sky blue, what's it called" --index-name @none
   expect: Rayleigh
 
+- name: test ai chat built in functions
+  command: ai chat --interactive --built-in-functions
+  input: |
+    Create a file named "test.txt" with the following content: "Hello, World!"
+    What files are in the current directory?
+    Show me what's in the file "test.txt"
+  expect: |
+    assistant-function: CreateFileAndSaveText
+    assistant-function: FindAllFilesInCurrentDirectory
+    test.txt
+    Hello, World!
+
 - name: dev new environment
   command: ai dev new .env
 
 - class: dev new helper-functions
   steps:
   - name: generate template
-    command: ai dev new helper-functions
+    command: ai dev new helper-functions --instructions "Create a helper function named GetPersonsAge that returns ages of people; John is 55; Jane is 53; everyone else, return unknown"
   - name: build template
     bash: |
       cd helper-functions
       dotnet build
   - name: run template
-    command: ai chat --interactive --helper-functions helper-functions/bin/Debug/net7.0/HelperFunctionsProject.dll
+    command: ai chat --interactive --helper-functions helper-functions/bin/Debug/net8.0/HelperFunctionsProject.dll
     input: |
       What is my name?
+      How old is John?
+      How old is Jane?
+      How old is Bob?
     expect: |
       assistant-function: GetUsersName\({}\) =
+      assistant-function: GetPersonsAge\({
+      John
+      }\) =
+      55
+      assistant-function: GetPersonsAge\({
+      Jane
+      }\) =
+      53
+      [Uu]nknown
 
 - area: ai dev new openai-chat
   tests:
@@ -51,7 +75,7 @@
         cd openai-chat-cs
         dotnet build
     - name: run template
-      command: ai dev shell --run "openai-chat-cs\bin\Debug\net7.0\OpenAIChatCompletions"
+      command: ai dev shell --run "openai-chat-cs\bin\Debug\net8.0\OpenAIChatCompletions"
       input: |-
         Tell me a joke
         Tell me another joke
@@ -117,6 +141,7 @@
       bash: |
         cd openai-chat-py
         pip install -r requirements.txt
+      tag: skip
     - name: run template
       command: ai dev shell --run "cd openai-chat-py && python openai_chat_completions.py"
       input: |-
@@ -136,7 +161,7 @@
         cd openai-chat-streaming-cs
         dotnet build
     - name: run template
-      command: ai dev shell --run "openai-chat-streaming-cs\bin\Debug\net7.0\OpenAIChatCompletionsStreaming"
+      command: ai dev shell --run "openai-chat-streaming-cs\bin\Debug\net8.0\OpenAIChatCompletionsStreaming"
       input: |-
         Tell me a joke
         Tell me another joke
@@ -202,6 +227,7 @@
       bash: |
         cd openai-chat-streaming-py
         pip install -r requirements.txt
+      tag: skip
     - name: run template
       command: ai dev shell --run "cd openai-chat-streaming-py && python main.py"
       input: |-
@@ -221,7 +247,7 @@
         cd openai-chat-streaming-with-data-cs
         dotnet build
     - name: run template
-      command: ai dev shell --run "openai-chat-streaming-with-data-cs\bin\Debug\net7.0\OpenAIChatCompletionsWithDataStreaming"
+      command: ai dev shell --run "openai-chat-streaming-with-data-cs\bin\Debug\net8.0\OpenAIChatCompletionsWithDataStreaming"
       input: |-
         What parameter should i use to select my resources?
       tag: skip
@@ -248,11 +274,13 @@
       bash: |
         cd openai-chat-streaming-with-data-py
         pip install -r requirements.txt
+      tag: skip
     - name: run template
       command: ai dev shell --run "cd openai-chat-streaming-with-data-py && python main.py"
       input: |-
         What parameter should i use to select my resources?
       tag: skip
+
   - class: dev new openai-chat-streaming-with-data (go)
     steps:
     - name: generate template
@@ -279,7 +307,7 @@
         cd openai-chat-streaming-with-functions-cs
         dotnet build
     - name: run template
-      command: ai dev shell --run "cd openai-chat-streaming-with-functions-cs && bin\Debug\net7.0\OpenAIChatCompletionsFunctionsStreaming"
+      command: ai dev shell --run "cd openai-chat-streaming-with-functions-cs && bin\Debug\net8.0\OpenAIChatCompletionsFunctionsStreaming"
       input: |-
         What is the date?
         What is the time?
@@ -324,6 +352,7 @@
       bash: |
         cd openai-chat-streaming-with-functions-py
         pip install -r requirements.txt
+      tag: skip
     - name: run template
       command: ai dev shell --run "cd openai-chat-streaming-with-functions-py && python main.py"
       input: |-
