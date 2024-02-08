@@ -1,31 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
-
-  <Product Id="*" Name="Azure AI CLI" Language="1033" Version="$(var.productVersion)" Manufacturer="Microsoft" UpgradeCode="F1CDBA9C-E353-4039-9A20-059A1E587E73">
-    <Package InstallerVersion="500" Compressed="yes" InstallScope="perMachine" Platform="$(var.targetPlatform)" />
-    <!--
-    To prevent problems with bundle upgrades, use MajorUpgrade element here and ProductSearch in the bundle wxs.
-    -->
-    <MajorUpgrade AllowDowngrades="no" DowngradeErrorMessage="A newer version is already installed." />
-
-    <!--
-    Below can be used to control upgrades on a single MSI-only (non-bundle) installation.
-    -->
-    <!--
-    <Upgrade Id="F1CDBA9C-E353-4039-9A20-059A1E587E73">
-      <UpgradeVersion OnlyDetect="yes" Property="SELFFOUND"
-        Minimum="$(var.productVersion)" IncludeMinimum="yes"
-        Maximum="$(var.productVersion)" IncludeMaximum="yes" />
-      <UpgradeVersion OnlyDetect="yes" Property="NEWERFOUND"
-        Minimum="$(var.productVersion)" IncludeMinimum="no" />
-      <UpgradeVersion OnlyDetect="no" Property="PREVIOUSFOUND"
-        Minimum="1.0.0" IncludeMinimum="yes"
-        Maximum="$(var.productVersion)" IncludeMaximum="no" />
-    </Upgrade>
-
-    <CustomAction Id="AlreadyUpdated" Error="This version is already installed." />
-    <CustomAction Id="NoDowngrade" Error="A newer version is already installed." />
-    -->
+  <Product Id="*" Name="Azure AI CLI" Language="1033" Version="1.0.0.0" Manufacturer="Microsoft" UpgradeCode="436172626F6E20697320636F6F6C2121">
+    <Package InstallerVersion="200" Compressed="yes" InstallScope="perMachine" />
 
     <Media Id="1" Cabinet="media1.cab" EmbedCab="yes" />
 
@@ -35,60 +11,28 @@
       </Directory>
     </Directory>
 
-    <SetProperty Id="RunDownloadCmd"
-                 Value="&quot;curl.exe&quot; --output &quot;[%TEMP]\Azure.AI.CLI.$(var.packageVersion).nupkg&quot; --url $(var.packageUrl)"
-                 Sequence="execute"
-                 Before="LaunchConditions" />
-    <CustomAction Id="RunDownloadCmd"
-                  BinaryKey="WixCA"
-                  DllEntry="WixQuietExec"
-                  Execute="deferred"
-                  Impersonate="no"
-                  Return="check" />
-
-    <SetProperty Id="RunInstallCmd"
-                 Value="&quot;dotnet.exe&quot; tool update --global --add-source &quot;[%TEMP]&quot; Azure.AI.CLI --version $(var.packageVersion)"
-                 Sequence="execute"
-                 Before="LaunchConditions" />
-    <CustomAction Id="RunInstallCmd"
-                  BinaryKey="WixCA"
-                  DllEntry="WixQuietExec"
-                  Execute="deferred"
-                  Impersonate="no"
-                  Return="check" />
-
-    <SetProperty Id="RunUninstallCmd"
-                 Value="&quot;dotnet.exe&quot; tool uninstall --global Azure.AI.CLI"
-                 Sequence="execute"
-                 Before="LaunchConditions" />
-    <CustomAction Id="RunUninstallCmd"
-                  BinaryKey="WixCA"
-                  DllEntry="WixQuietExec"
-                  Execute="deferred"
-                  Impersonate="no"
-                  Return="check" />
+    <CustomAction Id="RunInstallBatchScript" FileKey="InstallBatchScript" ExeCommand="" Execute="immediate" Return="check"/>
+    <CustomAction Id="RunUninstallBatchScript" FileKey="UninstallBatchScript" ExeCommand="" Execute="immediate" Return="ignore"/>
 
     <ComponentGroup Id="ProductComponents" Directory="INSTALLFOLDER">
-      <Component Id="LicenseDoc" Guid="9343B67B-61D6-4F7C-9B82-E6CA30C30038">
-        <File Id="License.rtf" Source="$(sys.SOURCEFILEDIR)\CLI_License.rtf" KeyPath="yes" />
+      <Component Id="InstallBatchScriptComponent" Guid="436172626F6E20697320636F6F6C2120">
+        <File Id="InstallBatchScript" Source="$(sys.SOURCEFILEDIR)\InstallCLI.cmd" KeyPath="yes"/>
+      </Component>
+      <Component Id="UninstallBatchScriptComponent" Guid="436172626F6E20697320636F6F6C2122">
+        <File Id="UninstallBatchScript" Source="$(sys.SOURCEFILEDIR)\UninstallCLI.cmd" KeyPath="yes"/>
       </Component>
     </ComponentGroup>
 
     <InstallExecuteSequence>
-      <!--
-      <Custom Action="AlreadyUpdated" After="FindRelatedProducts">SELFFOUND</Custom>
-      <Custom Action="NoDowngrade" After="FindRelatedProducts">NEWERFOUND</Custom>
-      -->
-      <Custom Action="RunDownloadCmd" Before="InstallFinalize">NOT Installed OR REINSTALL OR UPGRADINGPRODUCTCODE</Custom>
-      <Custom Action="RunInstallCmd" After="RunDownloadCmd">NOT Installed OR REINSTALL OR UPGRADINGPRODUCTCODE</Custom>
-      <Custom Action="RunUninstallCmd" Before="RemoveFiles">Installed AND NOT REINSTALL AND NOT UPGRADINGPRODUCTCODE</Custom>
+      <Custom Action="RunInstallBatchScript" After="InstallFinalize">NOT Installed</Custom>
+      <Custom Action="RunUninstallBatchScript" Before="RemoveFiles">Installed</Custom>
     </InstallExecuteSequence>
 
     <Feature Id="MainFeature" Title="Main Feature" Level="1">
       <ComponentGroupRef Id="ProductComponents" />
     </Feature>
 
-    <WixVariable Id="WixUILicenseRtf" Value="$(sys.SOURCEFILEDIR)\CLI_License.rtf" />
+    <WixVariable Id="WixUILicenseRtf" Value="$(sys.SOURCEFILEDIR)\CLI_License.rtf"/>
     <UIRef Id="WixUI_Minimal" />
 
   </Product>
