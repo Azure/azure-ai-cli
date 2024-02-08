@@ -1,0 +1,6 @@
+inventory:
+- source: DirectOwners
+  isProduction: false 
+  items:
+  - id: robch@microsoft.com
+  - id: cdev@microsoft.com
