@@ -2,7 +2,7 @@
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
 
   <PropertyGroup>
-    <TargetFramework>net7.0</TargetFramework>
+    <TargetFramework>net8.0</TargetFramework>
     <OutputType>Library</OutputType>
     <AssemblyName>Azure.AI.CLI.TestAdapter</AssemblyName>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>

@@ -36,7 +36,7 @@ namespace Azure.AI.Details.Common.CLI.Extensions.Templates
             var groups = GetFilteredTemplateGroups(templateFilter, languageFilter);
             if (groups.Count == 0)
             {
-                Console.WriteLine($"No matching templates found\n");
+                ConsoleHelpers.WriteLineError($"No matching templates found\n");
                 groups = GetTemplateGroups();
             }
 
