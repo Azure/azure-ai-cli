@@ -4,5 +4,6 @@
 **/bin/*/net6.0/*
 **/bin/*/net7.0/*
 **/obj/*
+**/Properties/launchSettings.json
 ideas/website/node_modules/**
 *.user
