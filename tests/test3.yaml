@@ -27,6 +27,7 @@
     Create a file named "test.txt" with the following content: "Hello, World!"
     What files are in the current directory?
     Show me what's in the file "test.txt"
+    exit
   expect: |
     assistant-function: CreateFileAndSaveText
     assistant-function: FindAllFilesInCurrentDirectory
@@ -51,6 +52,7 @@
       How old is John?
       How old is Jane?
       How old is Bob?
+      exit
     expect: |
       assistant-function: GetUsersName\({}\) =
       assistant-function: GetPersonsAge\({
@@ -79,6 +81,7 @@
       input: |-
         Tell me a joke
         Tell me another joke
+        exit
       expect-gpt: |
         The output should contain exactly two jokes.
       tag: skip
@@ -97,6 +100,7 @@
       input: |-
         Tell me a joke
         Tell me another joke
+        exit
       tag: skip
 
   - class: dev new openai-chat (java)
@@ -116,6 +120,7 @@
       input: |-
         Tell me a joke
         Tell me another joke
+        exit
       tag: skip
 
   - class: dev new openai-chat (javascript)
@@ -131,6 +136,7 @@
       input: |-
         Tell me a joke
         Tell me another joke
+        exit
       tag: skip
 
   - class: dev new openai-chat (python)
@@ -142,10 +148,11 @@
         cd openai-chat-py
         pip install -r requirements.txt
     - name: run template
-      command: ai dev shell --bash "cd openai-chat-py;py openai_chat_completions.py"
+      command: ai dev shell --bash "cd openai-chat-py;python3 openai_chat_completions.py"
       input: |-
         Tell me a joke
         Tell me another joke
+        exit
       tag: skip
 
 - area: ai dev new openai-chat-streaming
@@ -164,6 +171,7 @@
       input: |-
         Tell me a joke
         Tell me another joke
+        exit
       tag: skip
 
   - class: dev new openai-chat-streaming (go)
@@ -180,6 +188,7 @@
       input: |-
         Tell me a joke
         Tell me another joke
+        exit
       tag: skip
 
   - class: dev new openai-chat-streaming (java)
@@ -199,6 +208,7 @@
       input: |-
         Tell me a joke
         Tell me another joke
+        exit
       tag: skip
 
     command: ai dev new openai-chat-streaming --java
@@ -216,6 +226,7 @@
       input: |-
         Tell me a joke
         Tell me another joke
+        exit
       tag: skip
 
   - class: dev new openai-chat-streaming (python)
@@ -227,10 +238,11 @@
         cd openai-chat-streaming-py
         pip install -r requirements.txt
     - name: run template
-      command: ai dev shell --bash "cd openai-chat-streaming-py;py main.py"
+      command: ai dev shell --bash "cd openai-chat-streaming-py;python3 main.py"
       input: |-
         Tell me a joke
         Tell me another joke
+        exit
       tag: skip
 
 - area: ai dev new openai-chat-streaming-with-data
@@ -248,6 +260,7 @@
       command: ai dev shell --bash "openai-chat-streaming-with-data-cs/bin/Debug/net8.0/OpenAIChatCompletionsWithDataStreaming"
       input: |-
         What parameter should i use to select my resources?
+        exit
       tag: skip
 
   - class: dev new openai-chat-streaming-with-data (javascript)
@@ -262,6 +275,7 @@
       command: ai dev shell --bash "cd openai-chat-streaming-with-data-js;node main.js"
       input: |-
         What parameter should i use to select my resources?
+        exit
       tag: skip
 
   - class: dev new openai-chat-streaming-with-data (python)
@@ -273,9 +287,10 @@
         cd openai-chat-streaming-with-data-py
         pip install -r requirements.txt
     - name: run template
-      command: ai dev shell --bash "cd openai-chat-streaming-with-data-py;py main.py"
+      command: ai dev shell --bash "cd openai-chat-streaming-with-data-py;python3 main.py"
       input: |-
         What parameter should i use to select my resources?
+        exit
       tag: skip
 
   - class: dev new openai-chat-streaming-with-data (go)
@@ -290,6 +305,7 @@
       command: ai dev shell --bash "cd openai-chat-streaming-with-data-go;go run ./main.go ./openai_chat_completions_streaming_with_data_hello_world.go"
       input: |-
         What parameter should i use to initialize?
+        exit
       tag: skip
 
 - area: ai dev new openai-chat-streaming-with-functions
@@ -308,6 +324,7 @@
       input: |-
         What is the date?
         What is the time?
+        exit
       tag: skip
 
   - class: dev new openai-chat-streaming-with-functions (go)
@@ -324,6 +341,7 @@
       input: |-
         What is the date?
         What is the time?
+        exit
       tag: skip
 
   - class: dev new openai-chat-streaming-with-functions (javascript)
@@ -339,6 +357,7 @@
       input: |-
         What is the date?
         What is the time?
+        exit
       tag: skip
 
   - class: dev new openai-chat-streaming-with-functions (python)
@@ -350,10 +369,11 @@
         cd openai-chat-streaming-with-functions-py
         pip install -r requirements.txt
     - name: run template
-      command: ai dev shell --bash "cd openai-chat-streaming-with-functions-py;py main.py"
+      command: ai dev shell --bash "cd openai-chat-streaming-with-functions-py;python3 main.py"
       input: |-
         What is the date?
         What is the time?
+        exit
       tag: skip
 
 - area: ai dev new openai-webpage

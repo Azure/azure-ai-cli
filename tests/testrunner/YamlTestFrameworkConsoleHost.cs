@@ -310,13 +310,35 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
 
                 if (testResult.Outcome == TestOutcome.Failed)
                 {
+                    var codeFilePath = testResult.TestCase.CodeFilePath;
+                    var hasCodeFilePath = !string.IsNullOrEmpty(codeFilePath);
+                    if (hasCodeFilePath)
+                    {
+                        Console.ForegroundColor = ConsoleColor.Yellow;
+                        Console.WriteLine($"{codeFilePath}({testResult.TestCase.LineNumber})");
+                    }
+
                     var hasStack = !string.IsNullOrEmpty(testResult.ErrorStackTrace);
-                    if (hasStack) Console.WriteLine(testResult.ErrorStackTrace.Trim('\r', '\n'));
+                    if (hasStack)
+                    {
+                        var indent = "          ";
+                        var stack = testResult.ErrorStackTrace.Replace("\n", $"\n{indent}");
+                        Console.WriteLine($"{indent}{stack.Trim('\r', '\n', ' ')}");
+                    }
+
+                    var stdErr = testResult.Messages.FirstOrDefault(x => x.Category == TestResultMessage.StandardErrorCategory)?.Text;
+                    var hasStdErr = !string.IsNullOrEmpty(stdErr);
+                    if (hasStdErr)
+                    {
+                        var indent = "  ";
+                        stdErr = stdErr.Replace("\n", $"\n{indent}");
+                        Console.WriteLine($"{indent}{stdErr.TrimEnd('\r', '\n', ' ')}");
+                    }
 
                     var hasErr = !string.IsNullOrEmpty(testResult.ErrorMessage);
                     if (hasErr) Console.WriteLine(testResult.ErrorMessage.Trim('\r', '\n'));
 
-                    if (hasErr || hasStack) Console.WriteLine();
+                    if (hasStack || hasStdErr || hasErr || hasCodeFilePath) Console.WriteLine();
                 }
             }
         }

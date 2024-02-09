@@ -66,22 +66,26 @@ namespace Azure.AI.Details.Common.CLI
             return Process.Start(start);
         }
 
-        public static async Task<ProcessOutput> RunShellCommandAsync(string scriptOrFileName, bool scriptIsBash = false, Dictionary<string, string> addToEnvironment = null, Action<string> stdOutHandler = null, Action<string> stdErrHandler = null, Action<string> mergedOutputHandler = null, bool captureOutput = true)
+        public static async Task<ProcessOutput> RunShellScriptAsync(string inlineScriptOrFileName, bool scriptIsBash = false, Dictionary<string, string> addToEnvironment = null, Action<string> stdOutHandler = null, Action<string> stdErrHandler = null, Action<string> mergedOutputHandler = null, bool captureOutput = true, bool interactive = false)
         {
             ProcessOutput processOutput;
             var useBinBash = !RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
             if (useBinBash)
             {
-                var binBashArguments = $"-lic \"{scriptOrFileName}\"";
+                var binBashArguments = interactive
+                    ? $"-lic \"{inlineScriptOrFileName}\""
+                    : $"-lc \"{inlineScriptOrFileName}\"";
                 processOutput = await RunShellCommandAsync("/bin/bash", binBashArguments, addToEnvironment, stdOutHandler, stdErrHandler, mergedOutputHandler, captureOutput);
             }
             else if (scriptIsBash)
             {
                 var cmdFile = Path.GetTempFileName() + ".cmd";
-                File.WriteAllText(cmdFile, scriptOrFileName);
+                File.WriteAllText(cmdFile, inlineScriptOrFileName);
 
                 var git = FindCacheGitBashExe();
-                var gitBashCommand = $"@\"{git}\" -li \"{cmdFile}\"";
+                var gitBashCommand = interactive
+                    ? $"@\"{git}\" -li \"{cmdFile}\""
+                    : $"@\"{git}\" -l \"{cmdFile}\"";
                 var gitBashCmdFile = Path.GetTempFileName() + ".cmd";
                 File.WriteAllText(gitBashCmdFile, gitBashCommand);
 
@@ -92,13 +96,21 @@ namespace Azure.AI.Details.Common.CLI
             else
             {
                 var cmdFile = Path.GetTempFileName() + ".cmd";
-                File.WriteAllText(cmdFile, scriptOrFileName);
+                File.WriteAllText(cmdFile, inlineScriptOrFileName);
 
                 processOutput = await RunShellCommandAsync(cmdFile, "", addToEnvironment, stdOutHandler, stdErrHandler, mergedOutputHandler, captureOutput);
                 File.Delete(cmdFile);
             }
 
             return processOutput;
+        }
+
+        public static async Task<ProcessOutput> RunShellInteractiveAsync(Dictionary<string, string> addToEnvironment = null, Action<string> stdOutHandler = null, Action<string> stdErrHandler = null, Action<string> mergedOutputHandler = null, bool captureOutput = true)
+        {
+            var interactiveShellFileName = !OS.IsWindows() ? "bash" : "cmd.exe";
+            var interactiveShellArguments = !OS.IsWindows() ? "-li" : "/k PROMPT (ai dev shell) %PROMPT%& title (ai dev shell)";
+
+            return await RunShellCommandAsync(interactiveShellFileName, interactiveShellArguments, addToEnvironment, stdOutHandler, stdErrHandler, mergedOutputHandler, captureOutput);
         }
 
         public static async Task<ProcessOutput> RunShellCommandAsync(string command, string arguments, Dictionary<string, string> addToEnvironment = null, Action<string> stdOutHandler = null, Action<string> stdErrHandler = null, Action<string> mergedOutputHandler = null, bool captureOutput = true)

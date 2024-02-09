@@ -109,10 +109,9 @@ namespace Azure.AI.Details.Common.CLI
 
             var genericScriptOk = !string.IsNullOrEmpty(genericScript) ;
             var bashScriptOk = !string.IsNullOrEmpty(bashScript);
-            var runScript = genericScriptOk || bashScriptOk;
 
-            var runBothScripts = genericScriptOk && bashScriptOk;
-            if (runBothScripts)
+            var providedBothScripts = genericScriptOk && bashScriptOk;
+            if (providedBothScripts)
             {
                 _values.AddThrowError("ERROR:", "Cannot specify both --script and --bash");
             }
@@ -124,26 +123,14 @@ namespace Azure.AI.Details.Common.CLI
             ConfigEnvironmentHelpers.PrintEnvironment(env);
             Console.WriteLine();
 
-            var runScriptFunc = () => {
-                var script = genericScriptOk ? genericScript : bashScript;
-                var scriptIsBash = bashScriptOk;
+            var runScript = genericScriptOk || bashScriptOk;
+            var script = genericScriptOk ? genericScript : bashScript;
 
-                var processOutput = ProcessHelpers.RunShellCommandAsync(script, scriptIsBash, env, null, null, null, false).Result;
-                return processOutput.ExitCode;
-            };
+            var task = runScript
+                ? ProcessHelpers.RunShellScriptAsync(script, scriptIsBash: bashScriptOk, env, null, null, null, false)
+                : ProcessHelpers.RunShellInteractiveAsync(env, null, null, null, false);
 
-            var runInteractiveShellFunc = () => {
-                var interactiveShellFileName = !OS.IsWindows() ? "bash" : "cmd.exe";
-                var interactiveShellArguments = !OS.IsWindows() ? "-li" : "/k PROMPT (ai dev shell) %PROMPT%& title (ai dev shell)";
-
-                var processOutput = ProcessHelpers.RunShellCommandAsync(interactiveShellFileName, interactiveShellArguments, env, null, null, null, false).Result;
-                return processOutput.ExitCode;
-            };
-
-            var exitCode = runScript
-                ? runScriptFunc()
-                : runInteractiveShellFunc();
-
+            var exitCode = task.Result.ExitCode;
             if (exitCode != 0)
             {
                 Console.WriteLine("\n(ai dev shell) FAILED!\n");

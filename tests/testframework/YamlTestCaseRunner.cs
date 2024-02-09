@@ -238,7 +238,7 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
                 kvs.AddRange(KeyValuePairsFromJson(@foreach, false));
                 kvs = ConvertValuesToAtArgs(kvs, ref filesToDelete);
 
-                var startArgs = GetStartInfo(out string startProcess, cli, command, script, scriptIsBash, kvs, expect, notExpect, ref filesToDelete);
+                GetStartInfoArgs(out var startProcess, out var startArgs, cli, command, script, scriptIsBash, kvs, expect, notExpect, ref filesToDelete);
                 stackTrace = $"{startProcess} {startArgs}\n{stackTrace ?? string.Empty}";
 
                 Logger.Log($"Process.Start('{startProcess} {startArgs}')");
@@ -648,7 +648,7 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
             return completed;
         }
 
-        private static string GetStartInfo(out string startProcess, string cli, string command, string script, bool scriptIsBash, List<KeyValuePair<string, string>> kvs, string expect, string notExpect, ref List<string> files)
+        private static void GetStartInfoArgs(out string startProcess, out string startArgs,string cli, string command, string script, bool scriptIsBash, List<KeyValuePair<string, string>> kvs, string expect, string notExpect, ref List<string> files)
         {
             startProcess = FindCacheCli(cli);
 
@@ -657,14 +657,19 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
             {
                 command = $"{command} {GetKeyValueArgs(kvs)}";
 
-                var expectLess = string.IsNullOrEmpty(expect) && string.IsNullOrEmpty(notExpect);
-                if (expectLess) return command;
+                var hasExpectations = !string.IsNullOrEmpty(expect) || !string.IsNullOrEmpty(notExpect);
+                if (hasExpectations) 
+                {
+                    command = WriteTextToTempFile(command);
+                    files ??= new List<string>();
+                    files.Add(command);
 
-                command = WriteTextToTempFile(command);
-                files ??= new List<string>();
-                files.Add(command);
+                    startArgs = $"run --command @{command} {GetAtArgs(expect, notExpect)}";
+                    return;
+                }
 
-                return $"run --command @{command} {GetAtArgs(expect, notExpect)}";
+                startArgs = command;
+                return;
             }
 
             if (scriptIsBash)
@@ -672,10 +677,12 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
                 var bash = RuntimeInformation.IsOSPlatform(OSPlatform.Windows) 
                     ? EnsureFindCacheGetBashExe()
                     : "/bin/bash";
-                return $"run --process \"{bash}\" --pre.script -l --script \"{script}\" {GetKeyValueArgs(kvs)} {GetAtArgs(expect, notExpect)}";
+                startArgs = $"run --process \"{bash}\" --pre.script -l --script \"{script}\" {GetKeyValueArgs(kvs)} {GetAtArgs(expect, notExpect)}";
+                return;
             }
 
-            return $"run --cmd --script \"{script}\" {GetKeyValueArgs(kvs)} {GetAtArgs(expect, notExpect)}";
+            startArgs = $"run --cmd --script \"{script}\" {GetKeyValueArgs(kvs)} {GetAtArgs(expect, notExpect)}";
+            return;
         }
 
         private static string EnsureFindCacheGetBashExe()
@@ -873,6 +880,8 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
 
         private static TestOutcome ExpectGptOutcome(string output, string expect, out string gptStdOut, out string gptStdErr, out string gptMerged)
         {
+            Logger.Log($"ExpectGptOutcome: Checking for {expect} in '{output}'");
+
             var outcome = TestOutcome.None;
 
             var sbOut = new StringBuilder();
