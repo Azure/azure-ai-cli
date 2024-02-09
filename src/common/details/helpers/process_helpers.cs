@@ -47,12 +47,13 @@ namespace Azure.AI.Details.Common.CLI
                         : null;
         }
 
-        public static Process StartProcess(string fileName, string arguments, Dictionary<string, string> addToEnvironment = null, bool redirect = true)
+        public static Process StartProcess(string fileName, string arguments, Dictionary<string, string> addToEnvironment = null, bool redirectOutput = true, bool redirectInput = false)
         {
             var start = new ProcessStartInfo(fileName, arguments);
             start.UseShellExecute = false;
-            start.RedirectStandardOutput = redirect;
-            start.RedirectStandardError = redirect;
+            start.RedirectStandardOutput = redirectOutput;
+            start.RedirectStandardError = redirectOutput;
+            start.RedirectStandardInput = redirectInput;
 
             if (addToEnvironment != null)
             {
@@ -65,49 +66,80 @@ namespace Azure.AI.Details.Common.CLI
             return Process.Start(start);
         }
 
-        public static async Task<ProcessOutput> RunShellCommandAsync(string command, string arguments, Dictionary<string, string> addToEnvironment = null, Action<string> stdOutHandler = null, Action<string> stdErrHandler = null, Action<string> mergedOutputHandler = null)
+        public static async Task<ProcessOutput> RunShellCommandAsync(string commandLine, Dictionary<string, string> addToEnvironment = null, Action<string> stdOutHandler = null, Action<string> stdErrHandler = null, Action<string> mergedOutputHandler = null, bool captureOutput = true)
+        {
+            var isWindows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
+            var command =  isWindows ? "cmd" : "bash";
+            var arguments = isWindows ? $"/c \"{commandLine}\"" : $"-li \"{commandLine}\"";
+            return await RunShellCommandAsync(command, arguments, addToEnvironment, stdOutHandler, stdErrHandler, mergedOutputHandler, captureOutput);
+        }
+
+        public static async Task<ProcessOutput> RunShellCommandAsync(string command, string arguments, Dictionary<string, string> addToEnvironment = null, Action<string> stdOutHandler = null, Action<string> stdErrHandler = null, Action<string> mergedOutputHandler = null, bool captureOutput = true)
         {
             SHELL_DEBUG_TRACE($"COMMAND: {command} {arguments} {DictionaryToString(addToEnvironment)}");
 
-            var stdOut = new StringBuilder();
-            var stdErr = new StringBuilder();
-            var mergedOutput = new StringBuilder();
+            var redirectOutput = captureOutput || stdOutHandler != null || stdErrHandler != null || mergedOutputHandler != null;
+
+            var outDoneSignal = new ManualResetEvent(false);
+            var errDoneSignal = new ManualResetEvent(false);
+            var sbOut = new StringBuilder();
+            var sbErr = new StringBuilder();
+            var sbMerged = new StringBuilder();
+
             var stdOutReceived = (string data) => {
                 if (data != null)
                 {
-                    stdOut.AppendLine(data);
-                    mergedOutput.AppendLine(data);
+                    sbOut.AppendLine(data);
+                    sbMerged.AppendLine(data);
                     if (stdOutHandler != null) stdOutHandler(data);
                     if (mergedOutputHandler != null) mergedOutputHandler(data);
+                }
+                else
+                {
+                    outDoneSignal.Set();
                 }
             };
             var stdErrReceived = (string data) => {
                 if (data != null)
                 {
-                    stdErr.AppendLine(data);
-                    mergedOutput.AppendLine(data);
+                    sbErr.AppendLine(data);
+                    sbMerged.AppendLine(data);
                     if (stdErrHandler != null) stdErrHandler(data);
                     if (mergedOutputHandler != null) mergedOutputHandler(data);
                 }
+                else
+                {
+                    errDoneSignal.Set();
+                }
             };
 
-            var process = TryCatchHelpers.TryCatchNoThrow<Process>(() => StartShellCommandProcess(command, arguments, addToEnvironment), null, out Exception processException);
+            var process = TryCatchHelpers.TryCatchNoThrow<Process>(() => StartShellCommandProcess(command, arguments, addToEnvironment, redirectOutput), null, out Exception processException);
             if (process == null)
             {
                 SHELL_DEBUG_TRACE($"ERROR: {processException}");
                 return new ProcessOutput() { StdError = processException.ToString() };
             }
-            process.OutputDataReceived += (sender, e) => stdOutReceived(e.Data);
-            process.ErrorDataReceived += (sender, e) => stdErrReceived(e.Data);
-            process.BeginOutputReadLine();
-            process.BeginErrorReadLine();
+
+            if (redirectOutput)
+            {
+                process.OutputDataReceived += (sender, e) => stdOutReceived(e.Data);
+                process.ErrorDataReceived += (sender, e) => stdErrReceived(e.Data);
+                process.BeginOutputReadLine();
+                process.BeginErrorReadLine();
+            }
 
             await process.WaitForExitAsync();
 
+            if (redirectOutput)
+            {
+                outDoneSignal.WaitOne();
+                errDoneSignal.WaitOne();
+            }
+
             var output = new ProcessOutput();
-            output.StdOutput = process != null ? stdOut.ToString().Trim(' ', '\r', '\n') : "";
-            output.StdError = process != null ? stdErr.ToString().Trim(' ', '\r', '\n') : processException.ToString();
-            output.MergedOutput = process != null ? mergedOutput.ToString().Trim(' ', '\r', '\n') : "";
+            output.StdOutput = process != null ? sbOut.ToString().Trim(' ', '\r', '\n') : "";
+            output.StdError = process != null ? sbErr.ToString().Trim(' ', '\r', '\n') : processException.ToString();
+            output.MergedOutput = process != null ? sbMerged.ToString().Trim(' ', '\r', '\n') : "";
             output.ExitCode = process != null ? process.ExitCode : -1;
 
             if (!string.IsNullOrEmpty(output.StdOutput)) SHELL_DEBUG_TRACE($"---\nSTDOUT\n---\n{output.StdOutput}");
@@ -129,12 +161,12 @@ namespace Azure.AI.Details.Common.CLI
             return x;
         }
 
-        private static Process StartShellCommandProcess(string command, string arguments, Dictionary<string, string> addToEnvironment = null)
+        private static Process StartShellCommandProcess(string command, string arguments, Dictionary<string, string> addToEnvironment = null, bool captureOutput = true)
         {
             var isWindows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
             return  isWindows
-                ? StartProcess("cmd", $"/c {command} {arguments}", addToEnvironment)
-                : StartProcess(command,  arguments, addToEnvironment);
+                ? StartProcess("cmd", $"/c {command} {arguments}", addToEnvironment, captureOutput)
+                : StartProcess(command,  arguments, addToEnvironment, captureOutput);
         }
 
         private static void SHELL_DEBUG_TRACE(string message,[CallerLineNumber] int line = 0, [CallerMemberName] string? caller = null, [CallerFilePath] string? file = null)

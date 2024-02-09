@@ -32,7 +32,7 @@ if ! command -v az &> /dev/null; then
     fi
 fi
 
-# Check if dotnet 7.0 is installed
+# Check if dotnet 8.0 is installed
 if ! command -v dotnet &> /dev/null; then
   echo "dotnet is not installed."
   dotnet_version=0
@@ -40,11 +40,11 @@ else
   dotnet_version=$(dotnet --version | cut -d. -f1)
 fi
 
-if [ "$dotnet_version" -eq "7" ]; then
+if [ "$dotnet_version" -eq "8" ]; then
     dotnet_version=$(dotnet --version)
     echo "dotnet $dotnet_version is already installed."
 else
-    echo "Installing dotnet 7.0..."
+    echo "Installing dotnet 8.0..."
 
     # Update the package list
     sudo apt-get update
@@ -60,11 +60,10 @@ else
             sudo dpkg -i packages-microsoft-prod.deb
             rm packages-microsoft-prod.deb
         elif [[ "$CHECK_VERSION" == "22.04" ]]; then
-            # We don't need to install the Microsoft package signing key for Ubuntu 22.04; in fact, if we do, `dotnet tool` doesn't work
-            echo "Ubuntu 22.04 detected. Skipping Microsoft package signing key installation."
-            # wget https://packages.microsoft.com/config/ubuntu/22.04/packages-microsoft-prod.deb -O packages-microsoft-prod.deb
-            # sudo dpkg -i packages-microsoft-prod.deb
-            # rm packages-microsoft-prod.deb
+            # Install the Microsoft package signing key for Ubuntu 20.04
+            wget https://packages.microsoft.com/config/ubuntu/22.04/packages-microsoft-prod.deb -O packages-microsoft-prod.deb
+            sudo dpkg -i packages-microsoft-prod.deb
+            rm packages-microsoft-prod.deb
         else
             echo "Unsupported Ubuntu version: $CHECK_VERSION"
             exit 1
@@ -96,13 +95,13 @@ else
         exit 1
     fi
     
-    # Install dotnet 7.0 runtime
+    # Install dotnet 8.0 runtime
     sudo apt-get update
-    sudo apt-get install -y dotnet-sdk-7.0
+    sudo apt-get install -y dotnet-sdk-8.0
     
     # Check if the installation was successful
     if [ $? -ne 0 ]; then
-        echo "Failed to install Dotnet 7.0."
+        echo "Failed to install Dotnet 8.0."
         exit 1
     fi
 fi

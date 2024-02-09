@@ -1,0 +1,16 @@
+﻿- name: simple help test
+  script: |
+    ai help
+    ai dev
+    ai dev new
+    ai dev new --help
+    
+  expect: |
+    AI
+    USAGE
+    COMMANDS
+    EXAMPLES
+    ADDITIONAL TOPICS
+
+- name: simple chat example
+  command: chat --question "tell me a joke" --save chat.job

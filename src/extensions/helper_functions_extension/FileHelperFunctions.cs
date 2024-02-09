@@ -42,15 +42,20 @@ namespace Azure.AI.Details.Common.CLI.Extensions.HelperFunctions
             return true;
         }
 
-
-        [HelperFunctionDescription("List files; lists all files regardless of name")]
-        public static string FindAllFiles()
+        [HelperFunctionDescription("List files; lists all files regardless of name; only in current directory")]
+        public static string FindAllFilesInCurrentDirectory()
         {
-            return FindFilesMatchingPattern("**/*");
+            return FindAllFilesMatchingPattern("*");
         }
 
-        [HelperFunctionDescription("List files; lists files matching pattern")]
-        public static string FindFilesMatchingPattern([HelperFunctionParameterDescription("The pattern to search for; use '**/*.ext' to search sub-directories")] string pattern)
+        [HelperFunctionDescription("List files; lists all files regardless of name; searches current directory and all sub-directories")]
+        public static string FindAllFilesRecursively()
+        {
+            return FindAllFilesMatchingPattern("**/*");
+        }
+
+        [HelperFunctionDescription("List files; lists all files matching pattern; searches current directory, and if pattern includes '**', all sub-directories")]
+        public static string FindAllFilesMatchingPattern([HelperFunctionParameterDescription("The pattern to search for; use '**/*.ext' to search sub-directories")] string pattern)
         {
             var files = FileHelpers.FindFiles(".", pattern);
             return string.Join("\n", files);

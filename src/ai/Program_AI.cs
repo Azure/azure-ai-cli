@@ -4,27 +4,84 @@
 //
 
 using System;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using Azure.AI.Details.Common.CLI.Telemetry;
+using Azure.AI.Details.Common.CLI.Telemetry.Events;
 
 
 namespace Azure.AI.Details.Common.CLI
 {
     public class AiProgram
     {
-        static async Task Main(string[] args)
+        static async Task<int> Main(string[] args)
         {
-            IProgramData data = new AiProgramData();
-            int exitCode = Program.Main(data, args);
+            IProgramData data = null;
+            Stopwatch stopwatch = new Stopwatch();
+            int exitCode = int.MinValue;
 
-            if (data.Telemetry != null)
+            try
             {
-                await data.Telemetry.DisposeAsync()
-                    .ConfigureAwait(false);
-            }
+                bool isDebug = args.Length > 0 && args[0] == "debug";
+                if (isDebug)
+                {
+                    Console.WriteLine($"StopWatch: Started at {DateTime.Now}");
+                }
 
-            Environment.Exit(exitCode);
+                stopwatch.Start();
+
+                data = new AiProgramData();
+                exitCode = Program.Main(data, args);
+                stopwatch.Stop();
+
+                if (isDebug)
+                {
+                    Console.WriteLine($"StopWatch: Stopped at {DateTime.Now} ({GetStopWatchElapsedAsString(stopwatch.Elapsed)})");
+                }
+
+                if (data.Telemetry != null)
+                {
+                    await data.Telemetry.DisposeAsync()
+                        .ConfigureAwait(false);
+                }
+
+                return exitCode;
+            }
+            catch (Exception)
+            {
+                exitCode = -1;
+                throw;
+            }
+            finally
+            {
+                if (data?.Telemetry != null)
+                {
+                    await data.Telemetry.LogEventAsync(new ExitedTelemetryEvent()
+                    {
+                        ExitCode = exitCode,
+                        Elapsed = stopwatch.Elapsed
+                    }).ConfigureAwait(false);
+
+                    await data.Telemetry.DisposeAsync()
+                        .ConfigureAwait(false);
+                }
+            }
+        }
+
+        static string GetStopWatchElapsedAsString(TimeSpan elapsed)
+        {
+            var elapsedMilliseconds = elapsed.TotalMilliseconds;
+            var elapsedSeconds = elapsed.TotalSeconds;
+            var elapsedMinutes = elapsed.TotalMinutes;
+            var elapsedHours = elapsed.TotalHours;
+
+            var elapsedString = elapsedSeconds < 1 ? $"{elapsedMilliseconds} ms"
+                              : elapsedMinutes < 1 ? $"{elapsedSeconds:0.00} sec"
+                              : elapsedHours < 1 ? $"{elapsedMinutes:0.00} min"
+                              : $"{elapsedHours:0.00} hr";
+
+            return elapsedString;
         }
     }
 
@@ -62,11 +119,11 @@ namespace Azure.AI.Details.Common.CLI
         #endregion
 
         #region help command data
-        public string HelpCommandTokens => "wizard;dev;init;config;chat;flow;speech;vision;language;search;service;tool;samples;code;eval;run";
+        public string HelpCommandTokens => "wizard;dev;init;config;chat;flow;speech;vision;language;search;service;tool;samples;eval;run";
         #endregion
 
         #region config command data
-        public string ConfigScopeTokens => $"wizard;dev;init;chat;flow;speech;vision;language;search;service;tool;samples;code;eval;run;*";
+        public string ConfigScopeTokens => $"wizard;dev;init;chat;flow;speech;vision;language;search;service;tool;samples;eval;run;*";
         #endregion
 
         #region zip option data
@@ -127,8 +184,6 @@ namespace Azure.AI.Details.Common.CLI
                 "search" => (new SearchCommand(values)).RunCommand(),
                 "service" => (new ServiceCommand(values)).RunCommand(),
                 "tool" => (new ToolCommand(values)).RunCommand(),
-                "samples" => (new SamplesCommand(values)).RunCommand(),
-                "code" => (new CodeCommand(values)).RunCommand(),
                 "eval" => (new EvalCommand(values)).RunCommand(),
                 "wizard" => (new ScenarioWizardCommand(values)).RunCommand(),
                 "dev" => (new DevCommand(values)).RunCommand(),
@@ -156,8 +211,6 @@ namespace Azure.AI.Details.Common.CLI
                 "search" => SearchCommandParser.ParseCommand(tokens, values),
                 "service" => ServiceCommandParser.ParseCommand(tokens, values),
                 "tool" => ToolCommandParser.ParseCommand(tokens, values),
-                "samples" => SamplesCommandParser.ParseCommand(tokens, values),
-                "code" => CodeCommandParser.ParseCommand(tokens, values),
                 "wizard" => ScenarioWizardCommandParser.ParseCommand(tokens, values),
                 "dev" => DevCommandParser.ParseCommand(tokens, values),
                 "run" => RunJobCommandParser.ParseCommand(tokens, values),
@@ -181,9 +234,6 @@ namespace Azure.AI.Details.Common.CLI
                 "search" => SearchCommandParser.ParseCommandValues(tokens, values),
                 "service" => ServiceCommandParser.ParseCommandValues(tokens, values),
                 "tool" => ToolCommandParser.ParseCommandValues(tokens, values),
-                "samples" => SamplesCommandParser.ParseCommandValues(tokens, values),
-                "code" => CodeCommandParser.ParseCommandValues(tokens, values),
-                "complete" => CompleteCommandParser.ParseCommandValues(tokens, values),
                 "wizard" => ScenarioWizardCommandParser.ParseCommandValues(tokens, values),
                 "dev" => DevCommandParser.ParseCommandValues(tokens, values),
                 "run" => RunJobCommandParser.ParseCommandValues(tokens, values),

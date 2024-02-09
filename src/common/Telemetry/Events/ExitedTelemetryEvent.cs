@@ -11,5 +11,7 @@ namespace Azure.AI.Details.Common.CLI.Telemetry.Events
         public string Name => "exited";
 
         public int ExitCode { get; init; }
+
+        public TimeSpan? Elapsed { get; init; }
     }
 }

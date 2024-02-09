@@ -55,7 +55,11 @@ namespace Azure.AI.Details.Common.CLI
 
         public static string NormalizePath(string outputDirectory)
         {
-            return new DirectoryInfo(outputDirectory).FullName;
+            var normalized = new DirectoryInfo(outputDirectory).FullName;
+            var cwd = Directory.GetCurrentDirectory();
+            return normalized.StartsWith(cwd) && normalized.Length > cwd.Length + 1
+                ? normalized.Substring(cwd.Length + 1)
+                : normalized;
         }
     }
 
@@ -78,26 +82,32 @@ namespace Azure.AI.Details.Common.CLI
             return Path.Combine(file.DirectoryName, $"{Path.GetFileNameWithoutExtension(file.FullName)}{appendBeforeExtension}{file.Extension}{appendAfterExtension}");
         }
 
-        public static IEnumerable<string> FindFiles(string path, string pattern, INamedValues values = null)
+        public static IEnumerable<string> FindFiles(string path, string pattern, INamedValues values = null, bool checkOverrides = true, bool checkResources = true)
         {
-            return FindFiles(PathHelpers.Combine(path, pattern), values);
+            return FindFiles(PathHelpers.Combine(path, pattern), values, checkOverrides, checkResources);
         }
 
-        public static IEnumerable<string> FindFiles(string fileNames, INamedValues values = null)
+        public static IEnumerable<string> FindFiles(string fileNames, INamedValues values = null, bool checkOverrides = true, bool checkResources = true)
         {
             var currentDir = Directory.GetCurrentDirectory();
             foreach (var item in fileNames.Split(new char[] { ';', '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries))
             {
-                var overrides = FindOverrides(item);
-                foreach (var name in overrides)
+                if (checkOverrides)
                 {
-                    yield return name;
+                    var overrides = FindOverrides(item);
+                    foreach (var name in overrides)
+                    {
+                        yield return name;
+                    }
                 }
 
-                var resources = FindResources(item);
-                foreach (var resource in resources)
+                if (checkResources)
                 {
-                    yield return resource;
+                    var resources = FindResources(item);
+                    foreach (var resource in resources)
+                    {
+                        yield return resource;
+                    }
                 }
 
                 if (IsResource(item) || IsOverride(item)) continue;
@@ -943,7 +953,7 @@ namespace Azure.AI.Details.Common.CLI
 
         public static bool IsResource(string fileName)
         {
-            return !string.IsNullOrEmpty(fileName) && fileName.StartsWith(Program.Exe);
+            return !string.IsNullOrEmpty(fileName) && !string.IsNullOrEmpty(Program.Exe) && fileName.StartsWith(Program.Exe);
         }
 
         private static string ResourceNameFromFileName(string fileName)
@@ -1427,7 +1437,7 @@ namespace Azure.AI.Details.Common.CLI
         }
 
         private const string resourcePrefix = "Azure.AI.Details.Common.CLI.resources";
-        private static readonly string overridePrefix = $"${Program.Name.ToUpper()}";
+        private static readonly string overridePrefix = $"${Program.Name?.ToUpper()}";
 
         private const string defaultDataPath = @";./;../;../../;../../../;../../../../;{config.path};";
         

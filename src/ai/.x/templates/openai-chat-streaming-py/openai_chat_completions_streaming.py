@@ -1,56 +1,47 @@
 <#@ template hostspecific="true" #>
 <#@ output extension=".py" encoding="utf-8" #>
-<#@ parameter type="System.String" name="OPENAI_ENDPOINT" #>
-<#@ parameter type="System.String" name="OPENAI_API_KEY" #>
-<#@ parameter type="System.String" name="OPENAI_API_VERSION" #>
-<#@ parameter type="System.String" name="AZURE_OPENAI_CHAT_DEPLOYMENT" #>
-<#@ parameter type="System.String" name="AZURE_OPENAI_SYSTEM_PROMPT" #>
-import os
-import openai
+<#@ parameter type="System.String" name="ClassName" #>
+from openai import AzureOpenAI
 
-openai.api_type = "azure"
-openai.api_base = os.getenv("OPENAI_ENDPOINT") or "<#= OPENAI_ENDPOINT #>"
-openai.api_key = os.getenv("OPENAI_API_KEY") or "<#= OPENAI_API_KEY #>"
-openai.api_version = os.getenv("OPENAI_API_VERSION") or "<#= OPENAI_API_VERSION #>"
+class <#= ClassName #>:
+    def __init__(self, openai_api_version, openai_endpoint, openai_key, openai_chat_deployment_name, openai_system_prompt):
+        self.openai_system_prompt = openai_system_prompt
+        self.openai_chat_deployment_name = openai_chat_deployment_name
+        self.client = AzureOpenAI(
+            api_key=openai_key,
+            api_version=openai_api_version,
+            azure_endpoint = openai_endpoint
+            )
+        self.clear_conversation()
 
-deploymentName = os.getenv("AZURE_OPENAI_CHAT_DEPLOYMENT") or "<#= AZURE_OPENAI_CHAT_DEPLOYMENT #>"
-systemPrompt = os.getenv("AZURE_OPENAI_SYSTEM_PROMPT") or "<#= AZURE_OPENAI_SYSTEM_PROMPT #>"
+    def clear_conversation(self):
+        self.messages = [
+            {'role': 'system', 'content': self.openai_system_prompt}
+        ]
 
-messages=[
-    {"role": "system", "content": systemPrompt},
-]
+    def get_chat_completions(self, user_input, callback):
+        self.messages.append({'role': 'user', 'content': user_input})
 
-def getChatStreamingCompletions() -> str:
-    messages.append({"role": "user", "content": userPrompt})
+        complete_content = ''
+        response = self.client.chat.completions.create(
+            model=self.openai_chat_deployment_name,
+            messages=self.messages,
+            stream=True)
 
-    response_content = ""
-    response = openai.ChatCompletion.create(
-        engine=deploymentName,
-        messages=messages,
-        stream=True)
+        for chunk in response:
 
-    for update in response:
+            choice0 = chunk.choices[0] if hasattr(chunk, 'choices') and chunk.choices else None
+            delta = choice0.delta if choice0 and hasattr(choice0, 'delta') else None
+            content = delta.content if delta and hasattr(delta, 'content') else ''
 
-        choices = update["choices"] if "choices" in update else []
-        choice0 = choices[0] if len(choices) > 0 else {}
-        delta = choice0["delta"] if "delta" in choice0 else {}
+            finish_reason = choice0.finish_reason if choice0 and hasattr(choice0, 'finish_reason') else None
+            if finish_reason == 'length':
+                content += f"{content}\nERROR: Exceeded max token length!"
 
-        content = delta["content"] if "content" in delta else ""
-        response_content += content
-        print(content, end="")
+            if content is None: continue
 
-        finish_reason = choice0["finish_reason"] if "finish_reason" in choice0 else ""
-        if finish_reason == "length":
-            content += f"{content}\nERROR: Exceeded max token length!"
+            complete_content += content
+            callback(content)
 
-    messages.append({"role": "assistant", "content": response_content})
-    return response_content
-
-while True:
-    userPrompt = input("User: ")
-    if userPrompt == "" or userPrompt == "exit":
-        break
-
-    print("\nAssistant: ", end="")
-    response_content = getChatStreamingCompletions()
-    print("\n")
+        self.messages.append({'role': 'assistant', 'content': complete_content})
+        return complete_content

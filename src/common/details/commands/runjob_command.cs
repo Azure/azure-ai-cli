@@ -66,6 +66,8 @@ namespace Azure.AI.Details.Common.CLI
             var itemArgs = _values.GetOrDefault("run.input.post.item.args", "").Replace(';', ' ');
             var preItemArgs = _values.GetOrDefault("run.input.pre.item.args", "").Replace(';', ' ');
 
+            var inputPath = _values.GetOrDefault("x.input.path", Directory.GetCurrentDirectory());
+
             var processOk = !string.IsNullOrEmpty(process);
             var commandOk = !string.IsNullOrEmpty(command);
             var scriptOk = !string.IsNullOrEmpty(script);
@@ -75,7 +77,7 @@ namespace Azure.AI.Details.Common.CLI
             var app = processOk && process == Program.Name;
             if (app && jobOk && !job.StartsWith("@")) job = $"@{job}";
 
-            var startPath = UpdateJobStartPath(ref job, _values.GetOrDefault("x.input.path", Directory.GetCurrentDirectory()));
+            var startPath = UpdateJobStartPath(ref job, inputPath);
 
             if (!processOk && scriptOk) processOk = UpdateProcessIfFileNotExist(script, ref process);
             if (!processOk && commandOk) processOk = UpdateProcessIfFileNotExist(command, ref process);

@@ -16,58 +16,46 @@ namespace Azure.AI.Details.Common.CLI
 
         public static int Main(IProgramData data, string[] mainArgs)
         {
-            int exitCode = int.MinValue;
+            _data = data;
 
-            try
+            var _ = _data.Telemetry.LogEventAsync(new LaunchedTelemetryEvent());
+
+            var screen = ConsoleGui.Screen.Current;
+            Console.OutputEncoding = Encoding.UTF8;
+            Console.CancelKeyPress += (s, e) =>
             {
-                _data = data;
+                e.Cancel = true;
+                screen.SetCursorVisible(true);
+                screen.ResetColors();
+                Console.WriteLine("<ctrl-c> received... terminating ... ");
+                Environment.Exit(1);
+            };
 
-                var _ = _data.Telemetry.LogEventAsync(new LaunchedTelemetryEvent());
+            ICommandValues values = new CommandValues();
+            INamedValueTokens tokens = new CmdLineTokenSource(mainArgs, values);
 
-                var screen = ConsoleGui.Screen.Current;
-                Console.OutputEncoding = Encoding.UTF8;
-                Console.CancelKeyPress += (s, e) =>
-                {
-                    e.Cancel = true;
-                    screen.SetCursorVisible(true);
-                    screen.ResetColors();
-                    Console.WriteLine("<ctrl-c> received... terminating ... ");
-                    Environment.Exit(1);
-                };
-
-                ICommandValues values = new CommandValues();
-                INamedValueTokens tokens = new CmdLineTokenSource(mainArgs, values);
-
-                exitCode = ParseCommand(tokens, values);
-                if (exitCode == 0 && !values.DisplayHelpRequested())
-                {
-                    DisplayBanner(values);
-                    DisplayParsedValues(values);
-                    exitCode = RunCommand(values) ? 0 : 1;
-                }
-
-                if (values.GetOrDefault("x.pause", false))
-                {
-                    Console.Write("Press ENTER to exit... ");
-                    Console.ReadLine();
-                }
-
-                var dumpArgs = string.Join(" ", mainArgs);
-                DebugDumpCommandLineArgs(dumpArgs);
-
-                if (OS.IsLinux()) Console.WriteLine();
-
-                AI.DBG_TRACE_INFO($"Command line was: {dumpArgs}");
-                AI.DBG_TRACE_INFO($"Exit code: {exitCode}");
-                return exitCode;
-            }
-            finally
+            int exitCode = ParseCommand(tokens, values);
+            if (exitCode == 0 && !values.DisplayHelpRequested())
             {
-                var _ = _data?.Telemetry.LogEventAsync(new ExitedTelemetryEvent()
-                {
-                    ExitCode = exitCode
-                });
+                DisplayBanner(values);
+                DisplayParsedValues(values);
+                exitCode = RunCommand(values) ? 0 : 1;
             }
+
+            if (values.GetOrDefault("x.pause", false))
+            {
+                Console.Write("Press ENTER to exit... ");
+                Console.ReadLine();
+            }
+
+            var dumpArgs = string.Join(" ", mainArgs);
+            DebugDumpCommandLineArgs(dumpArgs);
+
+            if (OS.IsLinux()) Console.WriteLine();
+
+            AI.DBG_TRACE_INFO($"Command line was: {dumpArgs}");
+            AI.DBG_TRACE_INFO($"Exit code: {exitCode}");
+            return exitCode;
         }
 
         public static int RunInternal(params string[] mainArgs)
@@ -136,7 +124,7 @@ namespace Azure.AI.Details.Common.CLI
             if (values.GetOrDefault("x.cls", false)) Console.Clear();
 
             Console.WriteLine(GetDisplayBannerText());
-            Console.WriteLine("Copyright (c) 2023 Microsoft Corporation. All Rights Reserved.");
+            Console.WriteLine("Copyright (c) 2024 Microsoft Corporation. All Rights Reserved.");
             Console.WriteLine("");
 
             var warning = Program.WarningBanner;
@@ -347,46 +335,46 @@ namespace Azure.AI.Details.Common.CLI
 
         private static IProgramData _data;
 
-        public static string Name => _data.Name;
+        public static string Name => _data?.Name;
 
-        public static string DisplayName => _data.DisplayName;
+        public static string DisplayName => _data?.DisplayName;
 
-        public static string WarningBanner => _data.WarningBanner;
+        public static string WarningBanner => _data?.WarningBanner;
 
-        public static string TelemetryUserAgent => _data.TelemetryUserAgent;
+        public static string TelemetryUserAgent => _data?.TelemetryUserAgent;
 
-        public static string Exe => _data.Exe;
+        public static string Exe => _data?.Exe;
 
-        public static string Dll => _data.Dll;
+        public static string Dll => _data?.Dll;
 
-        public static Type ResourceAssemblyType => _data.ResourceAssemblyType;
+        public static Type ResourceAssemblyType => _data?.ResourceAssemblyType;
 
-        public static Assembly ResourceAssembly => _data.ResourceAssemblyType.Assembly;
+        public static Assembly ResourceAssembly => _data?.ResourceAssemblyType.Assembly;
 
-        public static Type BindingAssemblySdkType => _data.BindingAssemblySdkType;
+        public static Type BindingAssemblySdkType => _data?.BindingAssemblySdkType;
 
-        public static string SERVICE_RESOURCE_DISPLAY_NAME_ALL_CAPS => _data.SERVICE_RESOURCE_DISPLAY_NAME_ALL_CAPS;
+        public static string SERVICE_RESOURCE_DISPLAY_NAME_ALL_CAPS => _data?.SERVICE_RESOURCE_DISPLAY_NAME_ALL_CAPS;
 
-        public static string CognitiveServiceResourceKind => _data.CognitiveServiceResourceKind;
+        public static string CognitiveServiceResourceKind => _data?.CognitiveServiceResourceKind;
 
-        public static string CognitiveServiceResourceSku => _data.CognitiveServiceResourceSku;
+        public static string CognitiveServiceResourceSku => _data?.CognitiveServiceResourceSku;
 
-        public static bool InitConfigsEndpoint => _data.InitConfigsEndpoint;
+        public static bool InitConfigsEndpoint => _data != null && _data.InitConfigsEndpoint;
 
-        public static bool InitConfigsSubscription => _data.InitConfigsSubscription;
+        public static bool InitConfigsSubscription => _data != null && _data.InitConfigsSubscription;
 
-        public static string HelpCommandTokens => _data.HelpCommandTokens;
+        public static string HelpCommandTokens => _data?.HelpCommandTokens;
 
-        public static string ConfigScopeTokens => _data.ConfigScopeTokens;
+        public static string ConfigScopeTokens => _data?.ConfigScopeTokens;
 
-        public static string[] ZipIncludes => _data.ZipIncludes;
+        public static string[] ZipIncludes => _data?.ZipIncludes;
 
-        public static bool DispatchRunCommand(ICommandValues values) => _data.DispatchRunCommand(values);
-        public static bool DispatchParseCommand(INamedValueTokens tokens, ICommandValues values) => _data.DispatchParseCommand(tokens, values);
-        public static bool DispatchParseCommandValues(INamedValueTokens tokens, ICommandValues values) => _data.DispatchParseCommandValues(tokens, values);
-        public static bool DisplayKnownErrors(ICommandValues values, Exception ex) => _data.DisplayKnownErrors(values, ex);
+        public static bool DispatchRunCommand(ICommandValues values) => _data != null && _data.DispatchRunCommand(values);
+        public static bool DispatchParseCommand(INamedValueTokens tokens, ICommandValues values) => _data != null && _data.DispatchParseCommand(tokens, values);
+        public static bool DispatchParseCommandValues(INamedValueTokens tokens, ICommandValues values) => _data != null && _data.DispatchParseCommandValues(tokens, values);
+        public static bool DisplayKnownErrors(ICommandValues values, Exception ex) => _data != null && _data.DisplayKnownErrors(values, ex);
 
-        public static IEventLoggerHelpers EventLoggerHelpers => _data.EventLoggerHelpers;
+        public static IEventLoggerHelpers EventLoggerHelpers => _data?.EventLoggerHelpers;
 
         public static ITelemetry Telemetry => _data.Telemetry;
     }

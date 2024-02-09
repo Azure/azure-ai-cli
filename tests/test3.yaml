@@ -1,0 +1,419 @@
+﻿- area: ai init
+  tags: [before]
+  tests:
+  - name: ai init openai
+    command: ai init openai
+    arguments:
+      subscription: e72e5254-f265-4e95-9bd2-9ee8e7329051
+      name: robch-oai-eastus2
+      chat-deployment-name: gpt-4-32k-0613
+      embeddings-deployment-name: text-embedding-ada-002-2
+      evaluation-deployment-name: gpt-4-32k-0613
+      interactive: false
+  - name: ai init speech
+    command: ai init speech
+    arguments:
+      subscription: e72e5254-f265-4e95-9bd2-9ee8e7329051
+      name: robch-cranky-red-koala-ais
+      interactive: false
+
+- name: test ai chat
+  command: ai chat --question "Why is the sky blue, what's it called" --index-name @none
+  expect: Rayleigh
+
+- name: test ai chat built in functions
+  command: ai chat --interactive --built-in-functions
+  input: |
+    Create a file named "test.txt" with the following content: "Hello, World!"
+    What files are in the current directory?
+    Show me what's in the file "test.txt"
+  expect: |
+    assistant-function: CreateFileAndSaveText
+    assistant-function: FindAllFilesInCurrentDirectory
+    test.txt
+    Hello, World!
+
+- name: dev new environment
+  command: ai dev new .env
+
+- class: dev new helper-functions
+  steps:
+  - name: generate template
+    command: ai dev new helper-functions --instructions "Create a helper function named GetPersonsAge that returns ages of people; John is 55; Jane is 53; everyone else, return unknown"
+  - name: build template
+    bash: |
+      cd helper-functions
+      dotnet build
+  - name: run template
+    command: ai chat --interactive --helper-functions helper-functions/bin/Debug/net8.0/HelperFunctionsProject.dll
+    input: |
+      What is my name?
+      How old is John?
+      How old is Jane?
+      How old is Bob?
+    expect: |
+      assistant-function: GetUsersName\({}\) =
+      assistant-function: GetPersonsAge\({
+      John
+      }\) =
+      55
+      assistant-function: GetPersonsAge\({
+      Jane
+      }\) =
+      53
+      [Uu]nknown
+
+- area: ai dev new openai-chat
+  tests:
+
+  - class: dev new openai-chat (c#)
+    steps:
+    - name: generate template
+      command: ai dev new openai-chat --cs
+    - name: build template
+      bash: |
+        cd openai-chat-cs
+        dotnet build
+    - name: run template
+      command: ai dev shell --run "openai-chat-cs\bin\Debug\net8.0\OpenAIChatCompletions"
+      input: |-
+        Tell me a joke
+        Tell me another joke
+      expect-gpt: |
+        The output should contain exactly two jokes.
+      tag: skip
+
+  - class: dev new openai-chat (go)
+    steps:
+    - name: generate template
+      command: ai dev new openai-chat --go
+    - name: build template
+      bash: |
+        cd openai-chat-go
+        go mod tidy
+        go build
+    - name: run template
+      command: ai dev shell --run "openai-chat-go\openai_chat_completions_hello_world"
+      input: |-
+        Tell me a joke
+        Tell me another joke
+      tag: skip
+
+  - class: dev new openai-chat (java)
+    steps:
+    - name: generate template
+      command: ai dev new openai-chat --java
+    - name: restore packages
+      bash: |
+        cd openai-chat-java
+        mvn clean package
+    - name: build template
+      bash: |
+        cd openai-chat-java
+        javac -cp "target/lib/*" src/OpenAIChatCompletionsClass.java src/Main.java -d out
+    - name: run template
+      command: ai dev shell --run "cd openai-chat-java && java -cp \"out;target/lib/*\" Main"
+      input: |-
+        Tell me a joke
+        Tell me another joke
+      tag: skip
+
+  - class: dev new openai-chat (javascript)
+    steps:
+    - name: generate template
+      command: ai dev new openai-chat --javascript
+    - name: build template
+      bash: |
+        cd openai-chat-js
+        npm install
+    - name: run template
+      command: ai dev shell --run "cd openai-chat-js && node main.js"
+      input: |-
+        Tell me a joke
+        Tell me another joke
+      tag: skip
+
+  - class: dev new openai-chat (python)
+    steps:
+    - name: generate template
+      command: ai dev new openai-chat --python
+    - name: build template
+      bash: |
+        cd openai-chat-py
+        pip install -r requirements.txt
+      tag: skip
+    - name: run template
+      command: ai dev shell --run "cd openai-chat-py && python openai_chat_completions.py"
+      input: |-
+        Tell me a joke
+        Tell me another joke
+      tag: skip
+
+- area: ai dev new openai-chat-streaming
+  tests:
+
+  - class: dev new openai-chat-streaming (c#)
+    steps:
+    - name: generate template
+      command: ai dev new openai-chat-streaming --cs
+    - name: build template
+      bash: |
+        cd openai-chat-streaming-cs
+        dotnet build
+    - name: run template
+      command: ai dev shell --run "openai-chat-streaming-cs\bin\Debug\net8.0\OpenAIChatCompletionsStreaming"
+      input: |-
+        Tell me a joke
+        Tell me another joke
+      tag: skip
+
+  - class: dev new openai-chat-streaming (go)
+    steps:
+    - name: generate template
+      command: ai dev new openai-chat-streaming --go
+    - name: build template
+      bash: |
+        cd openai-chat-streaming-go
+        go mod tidy
+        go build
+    - name: run template
+      command: ai dev shell --run "openai-chat-streaming-go\openai_chat_completions_streaming_hello_world"
+      input: |-
+        Tell me a joke
+        Tell me another joke
+      tag: skip
+
+  - class: dev new openai-chat-streaming (java)
+    steps:
+    - name: generate template
+      command: ai dev new openai-chat-streaming --java
+    - name: restore packages
+      bash: |
+        cd openai-chat-streaming-java
+        mvn clean package
+    - name: build template
+      bash: |
+        cd openai-chat-streaming-java
+        javac -cp "target/lib/*" src/OpenAIChatCompletionsStreamingClass.java src/Main.java -d out
+    - name: run template
+      command: ai dev shell --run "cd openai-chat-streaming-java && java -cp \"out;target/lib/*\" Main"
+      input: |-
+        Tell me a joke
+        Tell me another joke
+      tag: skip
+
+    command: ai dev new openai-chat-streaming --java
+
+  - class: dev new openai-chat-streaming (javascript)
+    steps:
+    - name: generate template
+      command: ai dev new openai-chat-streaming --javascript
+    - name: build template
+      bash: |
+        cd openai-chat-streaming-js
+        npm install
+    - name: run template
+      command: ai dev shell --run "cd openai-chat-streaming-js && node main.js"
+      input: |-
+        Tell me a joke
+        Tell me another joke
+      tag: skip
+
+  - class: dev new openai-chat-streaming (python)
+    steps:
+    - name: generate template
+      command: ai dev new openai-chat-streaming --python
+    - name: build template
+      bash: |
+        cd openai-chat-streaming-py
+        pip install -r requirements.txt
+      tag: skip
+    - name: run template
+      command: ai dev shell --run "cd openai-chat-streaming-py && python main.py"
+      input: |-
+        Tell me a joke
+        Tell me another joke
+      tag: skip
+
+- area: ai dev new openai-chat-streaming-with-data
+  tests:
+
+  - class: dev new openai-chat-streaming-with-data (c#)
+    steps:
+    - name: generate template
+      command: ai dev new openai-chat-streaming-with-data --cs
+    - name: build template
+      bash: |
+        cd openai-chat-streaming-with-data-cs
+        dotnet build
+    - name: run template
+      command: ai dev shell --run "openai-chat-streaming-with-data-cs\bin\Debug\net8.0\OpenAIChatCompletionsWithDataStreaming"
+      input: |-
+        What parameter should i use to select my resources?
+      tag: skip
+
+  - class: dev new openai-chat-streaming-with-data (javascript)
+    steps:
+    - name: generate template
+      command: ai dev new openai-chat-streaming-with-data --javascript
+    - name: build template
+      bash: |
+        cd openai-chat-streaming-with-data-js
+        npm install
+    - name: run template
+      command: ai dev shell --run "cd openai-chat-streaming-with-data-js && node main.js"
+      input: |-
+        What parameter should i use to select my resources?
+      tag: skip
+
+  - class: dev new openai-chat-streaming-with-data (python)
+    steps:
+    - name: generate template
+      command: ai dev new openai-chat-streaming-with-data --python
+    - name: build template
+      bash: |
+        cd openai-chat-streaming-with-data-py
+        pip install -r requirements.txt
+      tag: skip
+    - name: run template
+      command: ai dev shell --run "cd openai-chat-streaming-with-data-py && python main.py"
+      input: |-
+        What parameter should i use to select my resources?
+      tag: skip
+
+  - class: dev new openai-chat-streaming-with-data (go)
+    steps:
+    - name: generate template
+      command: ai dev new openai-chat-streaming-with-data --go
+    - name: build template
+      script: |
+        cd openai-chat-streaming-with-data-go
+        go mod tidy
+    - name: run template
+      command: ai dev shell --run "cd openai-chat-streaming-with-data-go && go run .\main.go .\openai_chat_completions_streaming_with_data_hello_world.go"
+      input: |-
+        What parameter should i use to initialize?
+      tag: skip
+
+- area: ai dev new openai-chat-streaming-with-functions
+  tests:
+
+  - class: dev new openai-chat-streaming-with-functions (c#)
+    steps:
+    - name: generate template
+      command: ai dev new openai-chat-streaming-with-functions --cs
+    - name: build template
+      bash: |
+        cd openai-chat-streaming-with-functions-cs
+        dotnet build
+    - name: run template
+      command: ai dev shell --run "cd openai-chat-streaming-with-functions-cs && bin\Debug\net8.0\OpenAIChatCompletionsFunctionsStreaming"
+      input: |-
+        What is the date?
+        What is the time?
+      tag: skip
+
+  - class: dev new openai-chat-streaming-with-functions (go)
+    steps:
+    - name: generate template
+      command: ai dev new openai-chat-streaming-with-functions --go
+    - name: build template
+      bash: |
+        cd openai-chat-streaming-with-functions-go
+        go mod tidy
+        go build
+    - name: run template
+      command: ai dev shell --run "cd openai-chat-streaming-with-functions-go && openai_chat_completions_functions_streaming_hello_world"
+      input: |-
+        What is the date?
+        What is the time?
+      tag: skip
+
+  - class: dev new openai-chat-streaming-with-functions (javascript)
+    steps:
+    - name: generate template
+      command: ai dev new openai-chat-streaming-with-functions --javascript
+    - name: build template
+      bash: |
+        cd openai-chat-streaming-with-functions-js
+        npm install
+    - name: run template
+      command: ai dev shell --run "cd openai-chat-streaming-with-functions-js && node main.js"
+      input: |-
+        What is the date?
+        What is the time?
+      tag: skip
+
+  - class: dev new openai-chat-streaming-with-functions (python)
+    steps:
+    - name: generate template
+      command: ai dev new openai-chat-streaming-with-functions --python
+    - name: build template
+      bash: |
+        cd openai-chat-streaming-with-functions-py
+        pip install -r requirements.txt
+      tag: skip
+    - name: run template
+      command: ai dev shell --run "cd openai-chat-streaming-with-functions-py && python main.py"
+      input: |-
+        What is the date?
+        What is the time?
+      tag: skip
+
+- area: ai dev new openai-webpage
+  tests:
+
+  - class: dev new openai-webpage (javascript)
+    steps:
+    - name: generate template
+      command: ai dev new openai-webpage --javascript
+    - name: build template
+      bash: |
+        cd openai-webpage-js
+        npm install
+    - name: pack template
+      bash: |
+        cd openai-webpage-js
+        npx webpack
+
+  - class: dev new openai-webpage (typescript)
+    steps:
+    - name: generate template
+      command: ai dev new openai-webpage --typescript
+    - name: build template
+      bash: |
+        cd openai-webpage-ts
+        npm install
+    - name: pack template
+      bash: |
+        cd openai-webpage-ts
+        npx webpack
+
+- area: ai dev new openai-webpage-with-functions
+  tests:
+
+  - class: dev new openai-webpage-with-functions (javascript)
+    steps:
+    - name: generate template
+      command: ai dev new openai-webpage-with-functions --javascript  
+    - name: build template  
+      bash: |
+        cd openai-webpage-with-functions-js
+        npm install
+    - name: pack template 
+      bash: |
+        cd openai-webpage-with-functions-js
+        npx webpack
+
+  - class: dev new openai-webpage-with-functions (typescript)
+    steps:
+    - name: generate template
+      command: ai dev new openai-webpage-with-functions --typescript
+    - name: build template
+      bash: |
+        cd openai-webpage-with-functions-ts
+        npm install
+    - name: pack template
+      bash: |
+        cd openai-webpage-with-functions-ts
+        npx webpack

@@ -79,11 +79,12 @@ namespace Azure.AI.Details.Common.CLI
             new CommonDevNamedValueTokenParsers(),
             ArgXToken.Parser(),
             InstructionsToken.Parser(),
+            ProgrammingLanguageToken.Parser(),
         };
 
         private static INamedValueTokenParser[] _devShellParsers = {
             new CommonDevNamedValueTokenParsers(),
-            RunCommandToken.Parser()
+            RunCommandScriptToken.Parser()
         };
     }
 }

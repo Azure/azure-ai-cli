@@ -328,11 +328,23 @@ namespace Azure.AI.Details.Common.CLI.ConsoleGui
             return new Colors(Console.ForegroundColor, Console.BackgroundColor);
         }
 
+        private static int TryCatchNoThrow(Func<int> function, int defaultResult)
+        {
+            try
+            {
+                return function();
+            }
+            catch (Exception)
+            {
+                return defaultResult;
+            }
+        }
+
         private static Screen _current = new Screen();
-        private int _initialWidth = Console.WindowWidth;
-        private int _initialHeight = Console.WindowHeight;
-        private int _initialTop = Console.CursorTop; // Console.WindowTop;
-        private int _initialLeft = Console.WindowLeft;
+        private int _initialWidth = TryCatchNoThrow(() => Console.WindowWidth, 200);
+        private int _initialHeight = TryCatchNoThrow(() => Console.WindowHeight, 50);
+        private int _initialTop = TryCatchNoThrow(() => Console.CursorTop, 0);
+        private int _initialLeft = TryCatchNoThrow(() => Console.WindowLeft, 0);
         private bool _initialCursorVisible = GetCursorVisible();
         private Colors _initialColors = GetColorsNow();
         private int _biggestYSoFar = 0;

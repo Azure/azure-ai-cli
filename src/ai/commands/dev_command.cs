@@ -45,7 +45,7 @@ namespace Azure.AI.Details.Common.CLI
 
         private void DoCommand(string command)
         {
-            CheckPath();
+            StartCommand();
 
             switch (command)
             {
@@ -57,15 +57,20 @@ namespace Azure.AI.Details.Common.CLI
                     _values.AddThrowError("WARNING:", $"'{command.Replace('.', ' ')}' NOT YET IMPLEMENTED!!");
                     break;
             }
+
+            StopCommand();
+            DisposeAfterStop();
+            DeleteTemporaryFiles();
         }
 
         private void DoNew()
         {
             var newWhat = string.Join(" ", ArgXToken.GetArgs(_values));
+            var language = ProgrammingLanguageToken.Data().GetOrDefault(_values);
             switch (newWhat)
             {
                 case ".env": DoNewEnv(); break;
-                default: DoNewTemplate(newWhat); break;
+                default: DoNewTemplate(newWhat, language); break;
             }
         }
 
@@ -80,23 +85,21 @@ namespace Azure.AI.Details.Common.CLI
             ConfigEnvironmentHelpers.PrintEnvironment(env);
         }
 
-        private void DoNewTemplate(string templateName)
+        private void DoNewTemplate(string templateName, string language)
         {
-            var filesInDirAlready = FileHelpers.FindFiles(".", "*").Count() > 0;
-            var outputDirectory = !filesInDirAlready ? "." : templateName;
+            var outputDirectory = templateName + ProgrammingLanguageToken.GetSuffix(language);
             var instructions = InstructionsToken.Data().GetOrDefault(_values);
 
-            if (!TemplateFactory.GenerateTemplateFiles(templateName, instructions, outputDirectory, _quiet, _verbose))
-            {
-                _values.AddThrowError("WARNING:", $"Template '{templateName}' not found",
-                                                   "",
-                                          "TRY:", $"{Program.Name} dev new list");
-            }
+            var found = TemplateFactory.GenerateTemplateFiles(templateName, language, instructions, outputDirectory, _quiet, _verbose);
+            CheckGenerateTemplateFileWarnings(templateName, language, found);
         }
 
         private void DoNewList()
         {
-            TemplateFactory.ListTemplates();
+            var newWhat = string.Join(" ", ArgXToken.GetArgs(_values));
+            var language = ProgrammingLanguageToken.Data().GetOrDefault(_values);
+
+            TemplateFactory.ListTemplates(newWhat, language);
         }
 
         private void DoDevShell()
@@ -113,16 +116,29 @@ namespace Azure.AI.Details.Common.CLI
             ConfigEnvironmentHelpers.SetEnvironment(env);
             Console.WriteLine();
 
-            var runCommand = RunCommandToken.Data().GetOrDefault(_values);
-            UpdateFileNameArguments(runCommand, ref fileName, ref arguments);
+            var runCommand = RunCommandScriptToken.Data().GetOrDefault(_values);
+
+            // var processOutput = string.IsNullOrEmpty(runCommand)
+            //     ? ProcessHelpers.RunShellCommandAsync(fileName, arguments, env, null, null, null, false).Result
+            //     : ProcessHelpers.RunShellCommandAsync(runCommand, env, null, null, null, false).Result;
+
+            // var exitCode = processOutput.ExitCode;
+
+            UpdateFileNameArguments(runCommand, ref fileName, ref arguments, out var deleteWhenDone);
 
             var process = ProcessHelpers.StartProcess(fileName, arguments, env, false);
             process.WaitForExit();
 
-            if (process.ExitCode != 0)
+            if (!string.IsNullOrEmpty(deleteWhenDone))
+            {
+                File.Delete(deleteWhenDone);
+            }
+
+            var exitCode = process.ExitCode;
+            if (exitCode != 0)
             {
                 Console.WriteLine("\n(ai dev shell) FAILED!\n");
-                _values.AddThrowError("ERROR:", $"Shell exited with code {process.ExitCode}");
+                _values.AddThrowError("ERROR:", $"Shell exited with code {exitCode}");
             }
             else
             {
@@ -130,22 +146,38 @@ namespace Azure.AI.Details.Common.CLI
             }
         }
 
-        private static void UpdateFileNameArguments(string runCommand, ref string fileName, ref string arguments)
+        private static void UpdateFileNameArguments(string runCommand, ref string fileName, ref string arguments, out string? deleteTempFileWhenDone)
         {
+            deleteTempFileWhenDone = null;
+
             if (!string.IsNullOrEmpty(runCommand))
             {
-                var parts = runCommand.Split(new char[] { ' ' }, 2);
-                var inPath = FileHelpers.FileExistsInOsPath(parts[0]) || (OS.IsWindows() && FileHelpers.FileExistsInOsPath(parts[0] + ".exe"));
+                var isSingleLine = !runCommand.Contains('\n') && !runCommand.Contains('\r');
+                if (isSingleLine)
+                {
+                    var parts = runCommand.Split(new char[] { ' ' }, 2);
+                    var inPath = FileHelpers.FileExistsInOsPath(parts[0]) || (OS.IsWindows() && FileHelpers.FileExistsInOsPath(parts[0] + ".exe"));
 
-                var filePart = parts[0];
-                var argsPart = parts.Length == 2 ? parts[1] : null;
+                    var filePart = parts[0];
+                    var argsPart = parts.Length == 2 ? parts[1] : null;
 
-                fileName = inPath ? filePart : fileName;
-                arguments = inPath ? argsPart : (OS.IsLinux()
-                    ? $"-lic \"{runCommand}\""
-                    : $"/c \"{runCommand}\"");
+                    fileName = inPath ? filePart : fileName;
+                    arguments = inPath ? argsPart : (OS.IsLinux()
+                        ? $"-lic \"{runCommand}\""
+                        : $"/c \"{runCommand}\"");
 
-                Console.WriteLine($"Running command: {runCommand}\n");
+                    Console.WriteLine($"Running command: {runCommand}\n");
+                }
+                else
+                {
+                    deleteTempFileWhenDone = Path.GetTempFileName() + (OS.IsWindows() ? ".cmd" : ".sh");
+                    File.WriteAllText(deleteTempFileWhenDone, runCommand);
+
+                    fileName = OS.IsLinux() ? "bash" : "cmd.exe";
+                    arguments = OS.IsLinux() ? $"-lic \"{deleteTempFileWhenDone}\"" : $"/c \"{deleteTempFileWhenDone}\"";
+
+                    Console.WriteLine($"Running script:\n\n{runCommand}\n");
+                }
             }
         }
 
@@ -161,6 +193,76 @@ namespace Azure.AI.Details.Common.CLI
             }
         }
 
+        private void CheckGenerateTemplateFileWarnings(string templateName, string language, object check)
+        {
+            if (check != null && check is TemplateFactory.Group)
+            {
+                var group = check as TemplateFactory.Group;
+                var groupHasZeroLanguages = string.IsNullOrEmpty(group.Languages);
+                var groupHasMultipleLanguages = group.Languages.Contains(',');
+                var groupHasOneLanguage = !groupHasZeroLanguages && !groupHasMultipleLanguages;
+
+                var languageSupplied = !string.IsNullOrEmpty(language);
+                if (languageSupplied)
+                {
+                    if (groupHasZeroLanguages || groupHasOneLanguage)
+                    {
+                        _values.AddThrowError("WARNING:", $"Template '{templateName}' does not support language '{language}'.",
+                                                          "",
+                                                  "TRY:", $"{Program.Name} dev new {templateName}");
+                    }
+                    else
+                    {
+                        _values.AddThrowError("WARNING:", $"Template '{templateName}' doesn't support language '{language}'.",
+                                                          "",
+                                                  "TRY:", $"{Program.Name} dev new {templateName} --LANGUAGE",
+                                                          "",
+                                                  "WHERE:", $"LANGUAGE is one of {group.Languages}");
+                    }
+                }
+                else
+                {
+                    _values.AddThrowError("WARNING:", $"Template '{templateName}' supports multiple languages.",
+                                                      "",
+                                              "TRY:", $"{Program.Name} dev new {templateName} --LANGUAGE",
+                                                      "",
+                                            "WHERE:", $"LANGUAGE is one of {group.Languages}");
+                }
+            }
+            if (check == null)
+            {
+                _values.AddThrowError("WARNING:", $"Template '{templateName}' not found.",
+                                                    "",
+                                            "TRY:", $"{Program.Name} dev new list");
+            }
+        }
+
+        private void StartCommand()
+        {
+            CheckPath();
+            LogHelpers.EnsureStartLogFile(_values);
+
+            // _display = new DisplayHelper(_values);
+
+            // _output = new OutputHelper(_values);
+            // _output.StartOutput();
+
+            _lock = new SpinLock();
+            _lock.StartLock();
+        }
+
+        private void StopCommand()
+        {
+            _lock.StopLock(5000);
+
+            // LogHelpers.EnsureStopLogFile(_values);
+            // _output.CheckOutput();
+            // _output.StopOutput();
+
+            _stopEvent.Set();
+        }
+
+        private SpinLock _lock = null;
         private readonly bool _quiet;
         private readonly bool _verbose;
     }
