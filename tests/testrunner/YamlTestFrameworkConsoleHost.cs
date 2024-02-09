@@ -315,29 +315,34 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
                     if (hasCodeFilePath)
                     {
                         Console.ForegroundColor = ConsoleColor.Yellow;
-                        Console.WriteLine($"{codeFilePath}({testResult.TestCase.LineNumber})");
+                        Console.WriteLine($"at {codeFilePath}({testResult.TestCase.LineNumber})");
                     }
 
-                    var hasStack = !string.IsNullOrEmpty(testResult.ErrorStackTrace);
+                    var stack = testResult.ErrorStackTrace;
+                    var hasStack = !string.IsNullOrEmpty(stack);
                     if (hasStack)
                     {
-                        var indent = "          ";
-                        var stack = testResult.ErrorStackTrace.Replace("\n", $"\n{indent}");
-                        Console.WriteLine($"{indent}{stack.Trim('\r', '\n', ' ')}");
+                        Console.ForegroundColor = ConsoleColor.DarkGray;
+                        Console.WriteLine(stack.TrimEnd('\r', '\n', ' '));
                     }
 
                     var stdErr = testResult.Messages.FirstOrDefault(x => x.Category == TestResultMessage.StandardErrorCategory)?.Text;
                     var hasStdErr = !string.IsNullOrEmpty(stdErr);
                     if (hasStdErr)
                     {
-                        var indent = "  ";
-                        stdErr = stdErr.Replace("\n", $"\n{indent}");
-                        Console.WriteLine($"{indent}{stdErr.TrimEnd('\r', '\n', ' ')}");
+                        Console.ForegroundColor = ConsoleColor.DarkGray;
+                        Console.WriteLine(stdErr.TrimEnd('\r', '\n', ' '));
                     }
 
-                    var hasErr = !string.IsNullOrEmpty(testResult.ErrorMessage);
-                    if (hasErr) Console.WriteLine(testResult.ErrorMessage.Trim('\r', '\n'));
+                    var err = testResult.ErrorMessage;
+                    var hasErr = !string.IsNullOrEmpty(err);
+                    if (hasErr)
+                    {
+                        Console.ResetColor();
+                        Console.WriteLine(err.TrimEnd('\r', '\n', ' '));
+                    }
 
+                    Console.ResetColor();
                     if (hasStack || hasStdErr || hasErr || hasCodeFilePath) Console.WriteLine();
                 }
             }
