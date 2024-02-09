@@ -66,22 +66,37 @@ namespace Azure.AI.Details.Common.CLI
             return Process.Start(start);
         }
 
-        public static async Task<ProcessOutput> RunShellCommandAsync(string script, bool scriptIsBash = false, Dictionary<string, string> addToEnvironment = null, Action<string> stdOutHandler = null, Action<string> stdErrHandler = null, Action<string> mergedOutputHandler = null, bool captureOutput = true)
+        public static async Task<ProcessOutput> RunShellCommandAsync(string scriptOrFileName, bool scriptIsBash = false, Dictionary<string, string> addToEnvironment = null, Action<string> stdOutHandler = null, Action<string> stdErrHandler = null, Action<string> mergedOutputHandler = null, bool captureOutput = true)
         {
-            var isWindows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
-            var temporaryScriptFile = Path.GetTempFileName() + (isWindows ? ".cmd" : ".sh");
-            File.WriteAllText(temporaryScriptFile, script);
+            ProcessOutput processOutput;
+            var useBinBash = !RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
+            if (useBinBash)
+            {
+                var binBashArguments = $"-li \"{scriptOrFileName}\"";
+                processOutput = await RunShellCommandAsync("/bin/bash", binBashArguments, addToEnvironment, stdOutHandler, stdErrHandler, mergedOutputHandler, captureOutput);
+            }
+            else if (scriptIsBash)
+            {
+                var cmdFile = Path.GetTempFileName() + ".cmd";
+                File.WriteAllText(cmdFile, scriptOrFileName);
 
-            var useCmd = isWindows && !scriptIsBash;
-            var command = !isWindows
-                ? "/bin/bash"
-                : scriptIsBash // && isWindows
-                    ? FindCacheGitBashExe()
-                    : "cmd"; // useCmd
-            var arguments = useCmd ? $"/c \"{temporaryScriptFile}\"" : $"-li \"{temporaryScriptFile}\"";
+                var git = FindCacheGitBashExe();
+                var gitBashCommand = $"@\"{git}\" -li \"{cmdFile}\"";
+                var gitBashCmdFile = Path.GetTempFileName() + ".cmd";
+                File.WriteAllText(gitBashCmdFile, gitBashCommand);
 
-            var processOutput = await RunShellCommandAsync(command, arguments, addToEnvironment, stdOutHandler, stdErrHandler, mergedOutputHandler, captureOutput);
-            //File.Delete(temporaryScriptFile);
+                processOutput = await RunShellCommandAsync(gitBashCmdFile, "", addToEnvironment, stdOutHandler, stdErrHandler, mergedOutputHandler, captureOutput);
+                File.Delete(gitBashCmdFile);
+                File.Delete(cmdFile);
+            }
+            else
+            {
+                var cmdFile = Path.GetTempFileName() + ".cmd";
+                File.WriteAllText(cmdFile, scriptOrFileName);
+
+                processOutput = await RunShellCommandAsync(cmdFile, "", addToEnvironment, stdOutHandler, stdErrHandler, mergedOutputHandler, captureOutput);
+                File.Delete(cmdFile);
+            }
 
             return processOutput;
         }
