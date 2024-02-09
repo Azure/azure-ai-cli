@@ -142,7 +142,7 @@
         cd openai-chat-py
         pip install -r requirements.txt
     - name: run template
-      command: ai dev shell --bash "cd openai-chat-py;python3 openai_chat_completions.py"
+      command: ai dev shell --bash "cd openai-chat-py;py openai_chat_completions.py"
       input: |-
         Tell me a joke
         Tell me another joke
@@ -227,7 +227,7 @@
         cd openai-chat-streaming-py
         pip install -r requirements.txt
     - name: run template
-      command: ai dev shell --bash "cd openai-chat-streaming-py;python3 main.py"
+      command: ai dev shell --bash "cd openai-chat-streaming-py;py main.py"
       input: |-
         Tell me a joke
         Tell me another joke
@@ -273,7 +273,7 @@
         cd openai-chat-streaming-with-data-py
         pip install -r requirements.txt
     - name: run template
-      command: ai dev shell --bash "cd openai-chat-streaming-with-data-py;python3 main.py"
+      command: ai dev shell --bash "cd openai-chat-streaming-with-data-py;py main.py"
       input: |-
         What parameter should i use to select my resources?
       tag: skip
@@ -350,7 +350,7 @@
         cd openai-chat-streaming-with-functions-py
         pip install -r requirements.txt
     - name: run template
-      command: ai dev shell --bash "cd openai-chat-streaming-with-functions-py;python3 main.py"
+      command: ai dev shell --bash "cd openai-chat-streaming-with-functions-py;py main.py"
       input: |-
         What is the date?
         What is the time?

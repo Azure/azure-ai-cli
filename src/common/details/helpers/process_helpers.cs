@@ -72,7 +72,7 @@ namespace Azure.AI.Details.Common.CLI
             var useBinBash = !RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
             if (useBinBash)
             {
-                var binBashArguments = $"-li \"{scriptOrFileName}\"";
+                var binBashArguments = $"-lic \"{scriptOrFileName}\"";
                 processOutput = await RunShellCommandAsync("/bin/bash", binBashArguments, addToEnvironment, stdOutHandler, stdErrHandler, mergedOutputHandler, captureOutput);
             }
             else if (scriptIsBash)
