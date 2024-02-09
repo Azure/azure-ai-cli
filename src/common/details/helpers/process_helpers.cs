@@ -192,7 +192,7 @@ namespace Azure.AI.Details.Common.CLI
         {
             var isWindows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
             return  isWindows
-                ? StartProcess("cmd", $"/c \"{command}\" {arguments}", addToEnvironment, captureOutput)
+                ? StartProcess("cmd", $"/c {command} {arguments}", addToEnvironment, captureOutput)
                 : StartProcess(command,  arguments, addToEnvironment, captureOutput);
         }
 
