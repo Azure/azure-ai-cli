@@ -66,12 +66,24 @@ namespace Azure.AI.Details.Common.CLI
             return Process.Start(start);
         }
 
-        public static async Task<ProcessOutput> RunShellCommandAsync(string commandLine, Dictionary<string, string> addToEnvironment = null, Action<string> stdOutHandler = null, Action<string> stdErrHandler = null, Action<string> mergedOutputHandler = null, bool captureOutput = true)
+        public static async Task<ProcessOutput> RunShellCommandAsync(string script, bool scriptIsBash = false, Dictionary<string, string> addToEnvironment = null, Action<string> stdOutHandler = null, Action<string> stdErrHandler = null, Action<string> mergedOutputHandler = null, bool captureOutput = true)
         {
             var isWindows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
-            var command =  isWindows ? "cmd" : "bash";
-            var arguments = isWindows ? $"/c \"{commandLine}\"" : $"-li \"{commandLine}\"";
-            return await RunShellCommandAsync(command, arguments, addToEnvironment, stdOutHandler, stdErrHandler, mergedOutputHandler, captureOutput);
+            var temporaryScriptFile = Path.GetTempFileName() + (isWindows ? ".cmd" : ".sh");
+            File.WriteAllText(temporaryScriptFile, script);
+
+            var useCmd = isWindows && !scriptIsBash;
+            var command = !isWindows
+                ? "/bin/bash"
+                : scriptIsBash // && isWindows
+                    ? FindCacheGitBashExe()
+                    : "cmd"; // useCmd
+            var arguments = useCmd ? $"/c \"{temporaryScriptFile}\"" : $"-li \"{temporaryScriptFile}\"";
+
+            var processOutput = await RunShellCommandAsync(command, arguments, addToEnvironment, stdOutHandler, stdErrHandler, mergedOutputHandler, captureOutput);
+            //File.Delete(temporaryScriptFile);
+
+            return processOutput;
         }
 
         public static async Task<ProcessOutput> RunShellCommandAsync(string command, string arguments, Dictionary<string, string> addToEnvironment = null, Action<string> stdOutHandler = null, Action<string> stdErrHandler = null, Action<string> mergedOutputHandler = null, bool captureOutput = true)
@@ -165,7 +177,7 @@ namespace Azure.AI.Details.Common.CLI
         {
             var isWindows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
             return  isWindows
-                ? StartProcess("cmd", $"/c {command} {arguments}", addToEnvironment, captureOutput)
+                ? StartProcess("cmd", $"/c \"{command}\" {arguments}", addToEnvironment, captureOutput)
                 : StartProcess(command,  arguments, addToEnvironment, captureOutput);
         }
 
@@ -189,5 +201,37 @@ namespace Azure.AI.Details.Common.CLI
             }
             return string.Join(' ', kvps);
         }
+
+        private static string EnsureFindCacheGetBashExe()
+        {
+            var gitBash = FindCacheGitBashExe();
+            if (gitBash == null || gitBash == "bash.exe")
+            {
+                throw new Exception("Could not Git for Windows bash.exe in PATH!");
+            }
+            return gitBash;
+        }
+
+        private static string FindCacheGitBashExe()
+        {
+            var bashExe = "bash.exe";
+            if (_cliCache.ContainsKey(bashExe))
+            {
+                return _cliCache[bashExe];
+            }
+
+            var found = FindGitBashExe();
+            _cliCache[bashExe] = found;
+
+            return found;
+        }
+
+        private static string FindGitBashExe()
+        {
+            var found = FileHelpers.FindFilesInOsPath("bash.exe");
+            return found.Where(x => x.ToLower().Contains("git")).FirstOrDefault() ?? "bash.exe";
+        }
+
+        private static Dictionary<string, string> _cliCache = new Dictionary<string, string>();
     }
 }
