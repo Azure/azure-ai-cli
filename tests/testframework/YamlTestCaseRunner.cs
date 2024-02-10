@@ -307,7 +307,7 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
             stdErr = sbErr.ToString();
 
             return outcome == TestOutcome.Passed && !string.IsNullOrEmpty(expectGpt)
-                ? CheckExpectGptOutcome(sbMerged.ToString(), expectGpt, ref stdOut, ref stdErr)
+                ? CheckExpectGptOutcome(sbMerged.ToString(), expectGpt, workingDirectory, ref stdOut, ref stdErr)
                 : outcome;
         }
 
@@ -871,9 +871,9 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
             return sb.ToString();
         }
 
-        private static TestOutcome CheckExpectGptOutcome(string output, string expectGpt, ref string stdOut, ref string stdErr)
+        private static TestOutcome CheckExpectGptOutcome(string output, string expectGpt, string workingDirectory, ref string stdOut, ref string stdErr)
         {
-            var outcome = ExpectGptOutcome(output, expectGpt, out var gptStdOut, out var gptStdErr, out var gptMerged);
+            var outcome = ExpectGptOutcome(output, expectGpt, workingDirectory, out var gptStdOut, out var gptStdErr, out var gptMerged);
             if (outcome == TestOutcome.Failed)
             {
                 if (!string.IsNullOrEmpty(gptStdOut)) stdOut = $"{stdOut}\n--expect-gpt--\n{gptStdOut}\n".Trim('\n');
@@ -882,7 +882,7 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
             return outcome;
         }
 
-        private static TestOutcome ExpectGptOutcome(string output, string expect, out string gptStdOut, out string gptStdErr, out string gptMerged)
+        private static TestOutcome ExpectGptOutcome(string output, string expect, string workingDirectory, out string gptStdOut, out string gptStdErr, out string gptMerged)
         {
             Logger.Log($"ExpectGptOutcome: Checking for {expect} in '{output}'");
 
@@ -909,7 +909,8 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
                     UseShellExecute = false,
                     RedirectStandardInput = true,
                     RedirectStandardError = true,
-                    RedirectStandardOutput = true
+                    RedirectStandardOutput = true,
+                    WorkingDirectory = workingDirectory
                 };
 
                 Logger.Log($"ExpectGptOutcome: Process.Start('{startProcess} {startArgs}')");
