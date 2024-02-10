@@ -137,7 +137,7 @@
         cd openai-chat-js
         npm install
     - name: run template
-      command: ai dev shell --bash "cd openai-chat-js;node main.js"
+      command: ai dev shell --bash "cd openai-chat-js;node Main.js"
       input: |-
         Tell me a joke
         Tell me another joke
@@ -238,7 +238,7 @@
         cd openai-chat-streaming-js
         npm install
     - name: run template
-      command: ai dev shell --bash "cd openai-chat-streaming-js;node main.js"
+      command: ai dev shell --bash "cd openai-chat-streaming-js;node Main.js"
       input: |-
         Tell me a joke
         Tell me another joke
@@ -294,7 +294,7 @@
         cd openai-chat-streaming-with-data-js
         npm install
     - name: run template
-      command: ai dev shell --bash "cd openai-chat-streaming-with-data-js;node main.js"
+      command: ai dev shell --bash "cd openai-chat-streaming-with-data-js;node Main.js"
       input: |-
         What parameter should i use to select my resources?
         exit
@@ -381,7 +381,7 @@
         cd openai-chat-streaming-with-functions-js
         npm install
     - name: run template
-      command: ai dev shell --bash "cd openai-chat-streaming-with-functions-js;node main.js"
+      command: ai dev shell --bash "cd openai-chat-streaming-with-functions-js;node Main.js"
       input: |-
         What is the date?
         What is the time?
