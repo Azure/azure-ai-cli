@@ -320,7 +320,7 @@
         cd openai-chat-streaming-with-functions-cs
         dotnet build
     - name: run template
-      command: ai dev shell --bash "cd openai-chat-streaming-with-functions-cs;bin/Debug/net8.0/OpenAIChatCompletionsFunctionsStreaming"
+      command: ai dev shell --bash "cd openai-chat-streaming-with-functions-cs;./bin/Debug/net8.0/OpenAIChatCompletionsFunctionsStreaming"
       input: |-
         What is the date?
         What is the time?
@@ -337,7 +337,7 @@
         go mod tidy
         go build
     - name: run template
-      command: ai dev shell --bash "cd openai-chat-streaming-with-functions-go;openai_chat_completions_functions_streaming_hello_world"
+      command: ai dev shell --bash "cd openai-chat-streaming-with-functions-go;./openai_chat_completions_functions_streaming_hello_world"
       input: |-
         What is the date?
         What is the time?
