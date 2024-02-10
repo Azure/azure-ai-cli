@@ -17,9 +17,9 @@ import com.azure.ai.openai.models.ChatCompletions;
 public class Main {
 
     public static void main(String[] args) {
-        String openAIKey = (System.getenv("AZURE_OPENAI_KEY") != null) ? System.getenv("AZURE_OPENAI_KEY") : "<insert your OpenAI API key here>";
-        String openAIEndpoint = (System.getenv("AZURE_OPENAI_ENDPOINT") != null) ? System.getenv("AZURE_OPENAI_ENDPOINT") : "<insert your OpenAI endpoint here>";
-        String openAIChatDeployment = (System.getenv("AZURE_OPENAI_CHAT_DEPLOYMENT") != null) ? System.getenv("AZURE_OPENAI_CHAT_DEPLOYMENT") : "<insert your OpenAI chat deployment name here>";
+        String openAIKey = (System.getenv("AZURE_OPENAI_KEY") != null) ? System.getenv("AZURE_OPENAI_KEY") : "<insert your Azure OpenAI API key here>";
+        String openAIEndpoint = (System.getenv("AZURE_OPENAI_ENDPOINT") != null) ? System.getenv("AZURE_OPENAI_ENDPOINT") : "<insert your Azure OpenAI endpoint here>";
+        String openAIChatDeployment = (System.getenv("AZURE_OPENAI_CHAT_DEPLOYMENT") != null) ? System.getenv("AZURE_OPENAI_CHAT_DEPLOYMENT") : "<insert your Azure OpenAI chat deployment name here>";
         String openAISystemPrompt = (System.getenv("AZURE_OPENAI_SYSTEM_PROMPT") != null) ? System.getenv("AZURE_OPENAI_SYSTEM_PROMPT") : "You are a helpful AI assistant.";
 
         String openAIApiVersion = System.getenv("AZURE_OPENAI_API_VERSION") != null ? System.getenv("AZURE_OPENAI_API_VERSION") : "<#= AZURE_OPENAI_API_VERSION #>";
