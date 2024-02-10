@@ -330,6 +330,14 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
                     var hasStdErr = !string.IsNullOrEmpty(stdErr);
                     if (hasStdErr)
                     {
+                        var lines = stdErr.Split('\n');
+                        if (lines.Length > 10)
+                        {
+                            var first5 = lines.Take(5);
+                            var last5 = lines.Skip(lines.Length - 5);
+                            lines = first5.Concat(new[] { $"[ ******* ------- TRIMMED +{lines.Length - 10} LINE(s) ------- ******* ]" }).Concat(last5).ToArray();
+                            stdErr = string.Join("\n", lines) + "\n...";
+                        }
                         Console.ForegroundColor = ConsoleColor.DarkGray;
                         Console.WriteLine(stdErr.TrimEnd('\r', '\n', ' '));
                     }
