@@ -1,6 +1,6 @@
 SERVICE RESOURCE CREATE
 
-  The `ai service create` command creates an AI service resource.
+  The `ai service resource create` command creates an Azure AI hub resource.
 
 USAGE: ai service resource create [...]
 
@@ -20,7 +20,7 @@ USAGE: ai service resource create [...]
 
 EXAMPLE
 
-  ai service resource create --location westus2 --group MyResourceGroup --name MyAiResource
+  ai service resource create --location westus2 --group MyResourceGroup --name MyAIHub
 
 SEE ALSO
 

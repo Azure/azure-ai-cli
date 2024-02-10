@@ -1,6 +1,6 @@
 SERVICE RESOURCE LIST
 
-  The `ai service resource list` command lists AI service resources.
+  The `ai service resource list` command lists Azure AI hub resources.
 
 USAGE: ai service resource list [...]
 
