@@ -1,6 +1,6 @@
 SERVICE PROJECT CREATE
 
-  The `ai service project delete` command deletes an AI resource project.
+  The `ai service project delete` command deletes an AI project.
 
 USAGE: ai service project delete [...]
 

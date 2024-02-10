@@ -34,7 +34,7 @@ namespace Azure.AI.Details.Common.CLI
 
         private static async Task<AiHubResourceInfo> PickOrCreateAiHubResource(bool allowCreate, ICommandValues values, string subscription)
         {
-            ConsoleHelpers.WriteLineWithHighlight($"\n`AZURE AI RESOURCE`");
+            ConsoleHelpers.WriteLineWithHighlight($"\n`AZURE AI HUB`");
             Console.Write("\rName: *** Loading choices ***");
 
             var json = PythonSDKWrapper.ListResources(values, subscription);
@@ -57,8 +57,8 @@ namespace Azure.AI.Details.Common.CLI
 
             if (allowCreate)
             {
-                choices.Insert(0, "(Create w/ integrated Open AI + AI Services)");
-                choices.Insert(1, "(Create w/ standalone Open AI resource)");
+                choices.Insert(0, "(Create w/ integrated Azure OpenAI + AI services)");
+                choices.Insert(1, "(Create w/ standalone Azure OpenAI resource)");
             }
 
             if (choices.Count == 0)
@@ -145,7 +145,7 @@ namespace Azure.AI.Details.Common.CLI
 
         private static async Task<JToken> TryCreateAiHubResourceInteractive(ICommandValues values, string subscription, string locationName, string groupName, string displayName, string description, string openAiResourceId, string openAiResourceKind, string smartName = null, string smartNameKind = null)
         {
-            var sectionHeader = $"\n`CREATE AZURE AI RESOURCE`";
+            var sectionHeader = $"\n`CREATE AZURE AI HUB`";
             ConsoleHelpers.WriteLineWithHighlight(sectionHeader);
 
             var groupOk = !string.IsNullOrEmpty(groupName);

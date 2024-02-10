@@ -1,6 +1,6 @@
 SERVICE PROJECT CREATE
 
-  The `ai service project create` command creates an AI resource project.
+  The `ai service project create` command creates an AI project.
 
 USAGE: ai service project create [...]
 

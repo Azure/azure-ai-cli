@@ -1,6 +1,6 @@
   The `ai init` command allows interactive and non-interactive selection
   or creation of Azure AI Services resources.
 
-  When an AI resource is selected or created using this command, the
+  When an AI hub is selected or created using this command, the
   associated resource keys and region are retrieved and automatically
   stored in the local AI configuration datastore.

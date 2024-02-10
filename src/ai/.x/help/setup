@@ -10,7 +10,7 @@ SETUP OVERVIEW
 
 @include.the.azure.ai.service.long
 
-  To select or create an Azure AI Resource, and automatically store the associated
+  To select or create an Azure AI hub, and automatically store the associated
   KEY and REGION in the AI configuration datastore:
 
     ai init

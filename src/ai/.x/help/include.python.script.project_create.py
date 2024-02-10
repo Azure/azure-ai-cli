@@ -30,7 +30,7 @@ def main():
     """Parse command line arguments and print created project."""
     parser = argparse.ArgumentParser(description="Create Azure AI project")
     parser.add_argument("--subscription", required=True, help="Azure subscription ID")
-    parser.add_argument("--resource-id", required=True, help="Azure AI resource ID")
+    parser.add_argument("--resource-id", required=True, help="Azure AI hub ID")
     parser.add_argument("--group", required=True, help="Azure resource group name")
     parser.add_argument("--name", required=True, help="Azure AI project display name. This is non-unique within the resource group.")
     parser.add_argument("--location", required=True, help="The location in which to create the AI project.")

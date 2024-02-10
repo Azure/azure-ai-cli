@@ -5,7 +5,7 @@ Owner: Rob Chambers
 
 The Azure `AI` Command-Line Interface (CLI) is a cross-platform command-line tool to connect to Azure AI services and execute control-plane and data-plane operations without having to write any code. The CLI allows the execution of commands through a terminal using interactive command-line prompts or via script.
 
-You can easily use the `AI` CLI to experiment with key Azure AI service features and see how they work with your use cases. Within minutes, you can setup all the required Azure resources needed, and build a customized Copilot using OpenAI's chat completions APIs and your own data. You can try it out interactively, or script larger processes to automate your own workflows and evaluations as part of your CI/CD system.
+You can easily use the `AI` CLI to experiment with key Azure AI service features and see how they work with your use cases. Within minutes, you can setup all the required Azure resources needed, and build a customized Copilot using Azure OpenAI's chat completions APIs and your own data. You can try it out interactively, or script larger processes to automate your own workflows and evaluations as part of your CI/CD system.
 
 In the future, you'll even be able to use the `AI` CLI to dynamically create code in the programming language of your choice to integrate with your own applications.
 
@@ -33,7 +33,7 @@ You can run the Azure `AI` CLI in a Docker container using VS Code Dev Container
     git clone https://github.com/Azure/azure-ai-cli
     code azure-ai-cli
     ```
-3. Click the button "Reopen in Dev Containers", if it does not appear open the command pallete (`Ctrl+Shift+P` on Windows/Linux, `Cmd+Shift+P` on Mac) and run the `Dev Containers: Reopen in Container` command
+3. Click the button "Reopen in Dev Containers", if it does not appear open the command pallete (`Ctrl+Shift+P` on Windows/Linux, `Cmd+Shift+P` on macOS) and run the `Dev Containers: Reopen in Container` command
 
 </div><div class="content" id="content3">
 

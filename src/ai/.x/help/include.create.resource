@@ -1,2 +1,2 @@
-  To use the Azure AI Service, you must first create a AI Resource using
+  To use the Azure AI service, you must first create a AI hub using
   the Azure Portal (https://portal.azure.com) or the `ai init` command.

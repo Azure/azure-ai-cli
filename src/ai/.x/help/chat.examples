@@ -1,6 +1,6 @@
 CHAT EXAMPLES
 
-  `EXAMPLE 1`: Create or select OpenAI resource and model deployments
+  `EXAMPLE 1`: Create or select Azure OpenAI resource and model deployments
 
     ai init
 

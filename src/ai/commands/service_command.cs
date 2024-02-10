@@ -77,7 +77,7 @@ namespace Azure.AI.Details.Common.CLI
 
         private void DoCreateResource()
         {
-            var action = "Creating AI resource";
+            var action = "Creating Azure resource";
             var command = "service resource create";
             var subscription = SubscriptionToken.Data().Demand(_values, action, command, checkConfig: "subscription");
             var location = RegionLocationToken.Data().Demand(_values, action, command);
@@ -150,7 +150,7 @@ namespace Azure.AI.Details.Common.CLI
 
         private void DoListResources()
         {
-            var action = "Listing AI resources";
+            var action = "Listing Azure resources";
             var command = "service resource list";
             var subscription = SubscriptionToken.Data().Demand(_values, action, command, checkConfig: "subscription");
 
@@ -200,7 +200,7 @@ namespace Azure.AI.Details.Common.CLI
 
         private void DoDeleteResource()
         {
-            var action = "Deleting AI resource";
+            var action = "Deleting Azure resource";
             var command = "service resource delete";
 
             var subscription = SubscriptionToken.Data().Demand(_values, action, command, checkConfig: "subscription");

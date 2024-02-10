@@ -1,6 +1,6 @@
 SERVICE RESOURCE CREATE
 
-  The `ai service resource delete` command deletes an AI resource.
+  The `ai service resource delete` command deletes an Azure resource.
 
 USAGE: ai service resource delete [...]
 

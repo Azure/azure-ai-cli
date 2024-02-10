@@ -1,9 +1,9 @@
-# Create AI Resource Deployment
+# Create AI LLM deployment
 
-After [selecting or creating an AI resource](flow-sub-1.1-ai-select-or-create-resource.md), choose a model for the deployment
+After [selecting or creating an AI hub](flow-sub-1.1-ai-select-or-create-hub.md), choose a model for the deployment
 
 ```markdown
-# CREATE AI RESOURCE DEPLOYMENT
+# CREATE AI LLM DEPLOYMENT
 Model: *** Loading choices ***
 ```
 
@@ -12,7 +12,7 @@ Model: *** Loading choices ***
 Pick model
 
 ```markdown
-# CREATE AI RESOURCE DEPLOYMENT
+# CREATE AI LLM DEPLOYMENT
 Model: ---------------------
        | gpt35-turbo            <== intelligent default selection
        | (...)
@@ -25,7 +25,7 @@ Model: ---------------------
 Display choice
 
 ```markdown
-# CREATE AI RESOURCE DEPLOYMENT
+# CREATE AI LLM DEPLOYMENT
 Model: gpt-35-turbo
 ```
 
@@ -34,7 +34,7 @@ Model: gpt-35-turbo
 Enter name
 
 ```markdown
-# CREATE AI RESOURCE DEPLOYMENT
+# CREATE AI LLM DEPLOYMENT
 Model: gpt-35-turbo
 Name: _
 ```
@@ -42,7 +42,7 @@ Name: _
 ==>
 
 ```markdown
-# CREATE AI RESOURCE DEPLOYMENT
+# CREATE AI LLM DEPLOYMENT
 Model: gpt-35-turbo
 Name: happy-edison-gpt35-turbo
 ```

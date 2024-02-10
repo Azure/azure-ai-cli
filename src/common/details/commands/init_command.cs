@@ -147,7 +147,7 @@ namespace Azure.AI.Details.Common.CLI
 
         private async Task DoInitRootConfirmVerifiedProjectResources(bool interactive, string subscription, string projectName, string resourceName, AzCli.CognitiveServicesResourceInfo openaiResource, AzCli.CognitiveSearchResourceInfo searchResource)
         {
-            ConsoleHelpers.WriteLineWithHighlight($"    AI RESOURCE: {resourceName}");
+            ConsoleHelpers.WriteLineWithHighlight($"   AI HUB: {resourceName}");
             ConsoleHelpers.WriteLineWithHighlight($"    AI SEARCH RESOURCE: {searchResource.Name}");
             // Console.WriteLine();
             ConsoleHelpers.WriteLineWithHighlight($"    AZURE OPENAI RESOURCE: {openaiResource.Name}");

@@ -1,6 +1,6 @@
 INIT EXAMPLES
 
-  `EXAMPLE 1`: interactively select or create an Azure AI resource
+  `EXAMPLE 1`: interactively select or create an Azure AI hub
 
     ai init
 

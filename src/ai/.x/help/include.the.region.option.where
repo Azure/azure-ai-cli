@@ -1,4 +1,4 @@
-  WHERE: REGION is the region for the AI resource
+  WHERE: REGION is the region for the Azure resource
      OR: FILENAME is a single line text file containing the REGION
      OR: CONFIG-FILENAME is a single line text file in the following form:
 

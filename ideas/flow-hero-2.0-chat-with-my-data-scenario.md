@@ -13,18 +13,18 @@ Subscription: Speech Services - DEV - SDK (rob) (e72e5254-f265-4e95-9bd2-9ee8e73
 Project: (Create new) 🗔CONFIRM/PICK⏎
 Name: happy-edison-ai 🗔GENERATED/ENTRY⏎
 
-# AI RESOURCE
+# AI HUB
 Name: (Create new) 🗔CONFIRM/PICK⏎
 
 # CREATE RESOURCE GROUP
 Region: West US 2 (westus2) 🗔PICK⏎
 Name: happy-edison-ai-rg 🗔GENERATED/ENTRY⏎
 
-# CREATE AI RESOURCE
+# CREATE AI HUB
 Region: West US 2 (westus2) 🗔CONFIRM/PICK⏎
-Name: happy-edison-ai 🗔GENERATED/ENTRY⏎
+Name: happy-edison-hub 🗔GENERATED/ENTRY⏎
 
-# CREATE AI RESOURCE DEPLOYMENT
+# CREATE AI LLM DEPLOYMENT
 Model: gpt35-turbo 🗔CONFIRM/PICK⏎
 Name: happy-edison-gpt35-turbo 🗔GENERATED/ENTRY⏎
 

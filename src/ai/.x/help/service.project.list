@@ -1,6 +1,6 @@
 SERVICE PROJECT LIST
 
-  The `ai service project list` command lists AI resource projects.
+  The `ai service project list` command lists AI  projects.
 
 USAGE: ai service project list [...]
 
