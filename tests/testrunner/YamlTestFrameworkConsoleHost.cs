@@ -69,6 +69,31 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
             Console.BackgroundColor = ConsoleColor.Blue;
             Console.ForegroundColor = ConsoleColor.White;
             Console.Write("TEST RESULT SUMMARY:");
+
+            Console.ResetColor();
+            Console.WriteLine();
+
+            Console.ForegroundColor = ConsoleColor.Green;
+            Console.Write($"\nPassed: {passedResults.Count}");
+            Console.ForegroundColor = ConsoleColor.DarkGray;
+            Console.WriteLine($" ({100f * passedResults.Count / count:0.0}%)");
+
+            if (failedResults.Count > 0)
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.Write($"Failed: {failedResults.Count}");
+                Console.ForegroundColor = ConsoleColor.DarkGray;
+                Console.WriteLine($" ({100f * failedResults.Count / count:0.0}%)");
+            }
+
+            if (skippedResults.Count > 0)
+            {
+                Console.ForegroundColor = ConsoleColor.Yellow;
+                Console.Write($"Skipped: {skippedResults.Count}");
+                Console.ForegroundColor = ConsoleColor.DarkGray;
+                Console.WriteLine($" ({100f * skippedResults.Count / count:0.0}%)");
+            }
+
             Console.ResetColor();
             Console.Write("\nTests: ");
             Console.ForegroundColor = ConsoleColor.Blue;
@@ -84,29 +109,7 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
             Console.ForegroundColor = ConsoleColor.Blue;
             Console.Write(fi.FullName);
             Console.ResetColor();
-            Console.WriteLine("\n");
-
-            Console.ForegroundColor = ConsoleColor.Green;
-            Console.Write($"Passed: {passedResults.Count}");
-
-            if (failedResults.Count > 0)
-            {
-                Console.ForegroundColor = ConsoleColor.DarkGray;
-                Console.Write(", ");
-                Console.ForegroundColor = ConsoleColor.Red;
-                Console.Write($"Failed: {failedResults.Count}");
-            }
-
-            if (skippedResults.Count > 0)
-            {
-                Console.ForegroundColor = ConsoleColor.DarkGray;
-                Console.Write(", ");
-                Console.ForegroundColor = ConsoleColor.Yellow;
-                Console.Write($"Skipped: {skippedResults.Count}");
-            }
-
-            Console.ResetColor();
-            Console.WriteLine("\n");
+            Console.WriteLine();
 
             return passed;
         }
