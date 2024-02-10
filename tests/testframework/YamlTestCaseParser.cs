@@ -99,7 +99,6 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
             {
                 var message = $"Error parsing YAML: expected/unexpected key ('name', 'command', 'script', 'bash', 'arguments') at {file.FullName}({mapping.Start.Line})";
                 Logger.LogError(message);
-                Logger.TraceError(message);
                 return null;
             }
 
@@ -197,7 +196,6 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
                     var error = $"Error parsing YAML: Unexpected YAML key/value ('{key.Value}', '{test.DisplayName}') in {file.FullName}({mapping[key].Start.Line})";
                     test.DisplayName = error;
                     Logger.LogError(error);
-                    Logger.TraceError(error);
                 }
             }
         }

@@ -507,7 +507,6 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
         {
             var message = $"CliNotFound: CLI specified ({cli}); tried searching PATH and working directory; not found; using {cli}";
             Logger.LogWarning(message);
-            // Logger.TraceWarning(message);
             return cli;
         }
 
@@ -530,7 +529,6 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
             var message = string.Join(" or ", clis.Select(cli => $"`cli: {cli}`"));
             message = $"PickCli: CLI not specified; please create/update {YamlTestFramework.YamlDefaultTagsFileName} with one of: {message}";
             Logger.LogWarning(message);
-            Logger.TraceWarning(message);
         }
 
         private static string PickCliFound(IEnumerable<string> clis, string cli)
@@ -539,7 +537,6 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
 
             var message = $"PickCliFound: CLI not specified; found 1 CLI; using {cli}";
             Logger.LogInfo(message);
-            Logger.TraceInfo(message);
             return cli;
         }
 
@@ -549,7 +546,6 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
 
             var message = $"PickCliNotFound: CLI not specified; tried searching PATH and working directory; found 0 or >1 CLIs; using {cli}";
             Logger.LogInfo(message);
-            Logger.TraceInfo(message);
             return cli;
         }
 
@@ -624,24 +620,32 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
                 var name = process.ProcessName;
                 var message = $"Timedout! Stopping process ({name})...";
                 Logger.LogWarning(message);
-                Logger.TraceWarning(message);
 
-                process.StandardInput.WriteLine("\x3"); // try ctrl-c first
-                process.StandardInput.Close();
-                completed = process.WaitForExit(200);
+                var softKillFunc = new Func<bool>(() => {
+                    var message = $"Timedout! Sending <ctrl-c> ...";
+                    Logger.LogWarning(message);
+
+                    process.StandardInput.WriteLine("\x3"); // try ctrl-c first
+                    process.StandardInput.Close();
+
+                    Logger.LogWarning($"{message} Sent!");
+
+                    return process.WaitForExit(200);
+                });
+                completed = TryCatchHelpers.TryCatchNoThrow<bool>(softKillFunc, false, out var _);
 
                 message = "Timedout! Sent <ctrl-c>" + (completed ? "; stopped" : "; trying Kill()");
                 Logger.LogWarning(message);
-                Logger.TraceWarning(message);
 
                 if (!completed)
                 {
-                    process.Kill();
-                    var killed = process.HasExited ? "Done." : "Failed!";
-
-                    message = $"Timedout! Killing process ({name})... {killed}";
+                    message = $"Timedout! Killing process ({name})...";
                     Logger.LogWarning(message);
-                    Logger.TraceWarning(message);
+
+                    process.Kill();
+
+                    message = process.HasExited ? $"{message} Done." : $"{message} Failed!";
+                    Logger.LogWarning(message);
                 }
             }
 
