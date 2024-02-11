@@ -51,18 +51,18 @@ tests:
     ai config chat @model
   expect: |
     (?# ---------- CHAT KEY)
-    chat.key \(found at '.*[/\\].ai[/\\]data'\)
+    chat.key \(found at '.*[/\\]\.ai[/\\]data'\)
     [a-z0-9]{32}
 
     (?# ---------- CHAT ENDPOINT)
-    chat.endpoint \(found at '.*[/\\].ai[/\\]data'\)
+    chat.endpoint \(found at '.*[/\\]\.ai[/\\]data'\)
     https://.*openai.azure.com/
 
     (?# ---------- CHAT DEPLOYMENT)
-    chat.deployment \(found at '.*[/\\].ai[/\\]data'\)
+    chat.deployment \(found at '.*[/\\]\.ai[/\\]data'\)
 
     (?# ---------- CHAT MODEL)
-    chat.model \(found at '.*[/\\].ai[/\\]data'\)
+    chat.model \(found at '.*[/\\]\.ai[/\\]data'\)
     (gpt-4|gpt-35)
   tag: skip
 
@@ -71,7 +71,7 @@ tests:
   expect: |
     Updating search index 'product-info' ...
     Updating search index 'product-info' ... Done!
-    search.index.name \(saved at .*/.ai/data\)
+    search.index.name \(saved at .*[/\\]\.ai[/\\]data[/\\]?\)
       product-info
   tag: skip
 
@@ -83,7 +83,7 @@ tests:
 - name: test ai dev new .env
   command: ai dev new .env
   expect: |
-    dev.new.env \(saved at .*[/\\]\.ai[/\\]data[/\\]\)
+    .env \(saved at .*aistudio-copilot-sample.*\)
       AZURE_AI_SEARCH_ENDPOINT = 
       AZURE_AI_SEARCH_INDEX_NAME = 
       AZURE_AI_SEARCH_KEY = 
@@ -137,27 +137,21 @@ tests:
   arguments:
     run: python src/run.py --evaluate --implementation aisdk
   expect: |
-    {
     ('(gpt_coherence|gpt_groundedness|gpt_relevance)': .*){3}
-    }
   tag: skip
 
 - name: test ai chat evaluate --input-data src/tests/evaluation_dataset.jsonl
   command: ai chat evaluate --input-data src/tests/evaluation_dataset.jsonl
   expect: |
     Evaluating chats ...
-    {
     ('(gpt_coherence|gpt_groundedness|gpt_relevance)': .*){3}
-    }
   tag: skip
 
 - name: test ai chat evaluate --input-data src/tests/evaluation_dataset.jsonl --function src/copilot_aisdk/chat:chat_completion
   command: ai chat evaluate --input-data src/tests/evaluation_dataset.jsonl --function src/copilot_aisdk/chat:chat_completion
   expect: |
     Evaluating chats ...
-    {
-    ('(gpt_coherence|gpt_groundedness|gpt_relevance)': .*){3}
-    }
+    ("(gpt_coherence|gpt_groundedness|gpt_relevance)": .*){3}
   tag: skip
 
 - name: test pytest
