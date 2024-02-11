@@ -1,7 +1,7 @@
 ﻿workingDirectory: aistudio-copilot-sample
 tests:
 
-- area: ai init
+- area: setup
   tags: [before]
   tests:
   - name: clone the aistudio-copilot-sample repo
@@ -144,14 +144,18 @@ tests:
   command: ai chat evaluate --input-data src/tests/evaluation_dataset.jsonl
   expect: |
     Evaluating chats ...
-    ('(gpt_coherence|gpt_groundedness|gpt_relevance)': .*){3}
+    ("(gpt_coherence|gpt_groundedness|gpt_relevance)": .*){1}
+    ("(gpt_coherence|gpt_groundedness|gpt_relevance)": .*){1}
+    ("(gpt_coherence|gpt_groundedness|gpt_relevance)": .*){1}
   tag: skip
 
 - name: test ai chat evaluate --input-data src/tests/evaluation_dataset.jsonl --function src/copilot_aisdk/chat:chat_completion
   command: ai chat evaluate --input-data src/tests/evaluation_dataset.jsonl --function src/copilot_aisdk/chat:chat_completion
   expect: |
     Evaluating chats ...
-    ("(gpt_coherence|gpt_groundedness|gpt_relevance)": .*){3}
+    ("(gpt_coherence|gpt_groundedness|gpt_relevance)": .*){1}
+    ("(gpt_coherence|gpt_groundedness|gpt_relevance)": .*){1}
+    ("(gpt_coherence|gpt_groundedness|gpt_relevance)": .*){1}
   tag: skip
 
 - name: test pytest

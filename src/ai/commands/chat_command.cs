@@ -972,6 +972,7 @@ namespace Azure.AI.Details.Common.CLI
                 var system = message as ChatRequestSystemMessage;
                 var assistant = message as ChatRequestAssistantMessage;
                 var content = system?.Content ?? user?.Content ?? assistant?.Content;
+                content = content.Replace("\\", "\u005C").Replace("\"", "");
 
                 var ok = !string.IsNullOrEmpty(content);
                 if (!ok) continue;
