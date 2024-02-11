@@ -8,7 +8,7 @@ PREVIEW NOTE
     Supported regions: centralus, eastasia
     Supported languages: en-US, zh-CN
 
-OPTIONs
+OPTIONS
 
   CONNECTION                      (see: ai help speech transcribe connection)
     --key KEY                     (see: ai help speech transcribe key)

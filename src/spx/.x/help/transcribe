@@ -8,7 +8,7 @@ PREVIEW NOTE
     Supported regions: centralus, eastasia
     Supported languages: en-US, zh-CN
 
-OPTIONs
+OPTIONS
 
   CONNECTION                      (see: spx help transcribe connection)
     --key KEY                     (see: spx help transcribe key)

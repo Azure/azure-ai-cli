@@ -4,13 +4,13 @@ CONFIG
 
 USAGE: vz config [HIVE] [COMMAND] [@FILE] [...]
 
-  OPTIONs
+  OPTIONS
     --set [NAME=]VALUE            (see: vz help config set)
     --add [NAME=]VALUE            (see: vz help config add)
     --find NAME                   (see: vz help config find)
     --clear [NAME]                (see: vz help config clear)
 
-  ADANCED
+  ADVANCED
     --hive HIVE                   (see: vz help config hive)
     --region REGION               (see: vz help config region)
     --command COMMAND             (see: vz help config command)

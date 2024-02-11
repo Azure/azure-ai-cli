@@ -4,13 +4,13 @@ CONFIG
 
 USAGE: ai config [HIVE] [COMMAND] [@FILE] [...]
 
-  OPTIONs
+  OPTIONS
     --set [NAME=]VALUE            (see: ai help config set)
     --add [NAME=]VALUE            (see: ai help config add)
     --find NAME                   (see: ai help config find)
     --clear [NAME]                (see: ai help config clear)
 
-  ADANCED
+  ADVANCED
     --hive HIVE                   (see: ai help config hive)
     --region REGION               (see: ai help config region)
     --command COMMAND             (see: ai help config command)

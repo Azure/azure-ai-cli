@@ -4,13 +4,13 @@ CONFIG
 
 USAGE: spx config [HIVE] [COMMAND] [@FILE] [...]
 
-  OPTIONs
+  OPTIONS
     --set [NAME=]VALUE            (see: spx help config set)
     --add [NAME=]VALUE            (see: spx help config add)
     --find NAME                   (see: spx help config find)
     --clear [NAME]                (see: spx help config clear)
 
-  ADANCED
+  ADVANCED
     --hive HIVE                   (see: spx help config hive)
     --region REGION               (see: spx help config region)
     --command COMMAND             (see: spx help config command)

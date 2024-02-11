@@ -72,7 +72,7 @@ def main():
     parser.add_argument("--group", required=False, help="Azure resource group name")
     parser.add_argument("--project-name", required=True, help="Azure AI project project name.")
     parser.add_argument("--connection-name", required=True, help="Azure AI project connection name.")
-    parser.add_argument("--connection-type", required=True, help="Azure AI project connection type. Accepted types are 'azure-open-ai', 'cognitive-search', and 'cognitive-service'.")
+    parser.add_argument("--connection-type", required=True, help="Azure AI project connection type. Accepted types are 'azure_open_ai', 'cognitive_search', and 'cognitive_service'.")
     parser.add_argument("--endpoint", required=True, help="Azure AI Project connection endpoint.")
     parser.add_argument("--key", required=True, help="Azure AI Project connection key.")
     parser.add_argument("--api-version", required=False, help="The expected api version of the service this connection will link to.", default="unset")
