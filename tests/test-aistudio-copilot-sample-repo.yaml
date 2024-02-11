@@ -1,20 +1,38 @@
-﻿# - area: ai init
-#   tags: [before]
-#   tests:
-#   - name: ai init openai
-#     command: ai init openai
-#     arguments:
-#       subscription: e72e5254-f265-4e95-9bd2-9ee8e7329051
-#       name: robch-oai-eastus2
-#       chat-deployment-name: gpt-4-32k-0613
-#       embeddings-deployment-name: text-embedding-ada-002-2
-#       evaluation-deployment-name: gpt-4-32k-0613
-#       interactive: false
+﻿workingDirectory: aistudio-copilot-sample
+tests:
+
+- area: ai init
+  tags: [before]
+  tests:
+  - name: clone the aistudio-copilot-sample repo
+    bash: |
+      if [ ! -d ".git/" ]; then
+        echo "Cloning the aistudio-copilot-sample repo..."
+        git clone https://github.com/Azure/aistudio-copilot-sample.git  --depth 1 --no-single-branch .
+      else
+        echo "Pulling the latest changes from the aistudio-copilot-sample repo..."
+        git pull
+      fi
+      ls -la
+      git log -n 1
+
+  - name: install python dependencies
+    bash: pip install -r requirements.txt
+
+  - name: ai init openai
+    command: ai init openai
+    arguments:
+      subscription: e72e5254-f265-4e95-9bd2-9ee8e7329051
+      name: robch-oai-eastus2
+      chat-deployment-name: gpt-4-32k-0613
+      embeddings-deployment-name: text-embedding-ada-002-2
+      evaluation-deployment-name: gpt-4-32k-0613
+      interactive: false
 
 - name: check cli is installed
   command: ai
   expect: |
-    ^AI - Azure AI CLI, Version 1\.0\..*\r?$\n
+    ^AI - Azure AI CLI, Version [01]\.0\..*\r?$\n
     ^Copyright \(c\) 2024 Microsoft Corporation\. All Rights Reserved\.\r?$\n
   tag: skip
 
@@ -33,19 +51,19 @@
     ai config chat @model
   expect: |
     (?# ---------- CHAT KEY)
-    chat.key \(found at '.*/.ai/data'\)
+    chat.key \(found at '.*[/\\].ai[/\\]data'\)
     [a-z0-9]{32}
 
     (?# ---------- CHAT ENDPOINT)
-    chat.endpoint \(found at '.*/.ai/data'\)
+    chat.endpoint \(found at '.*[/\\].ai[/\\]data'\)
     https://.*openai.azure.com/
 
     (?# ---------- CHAT DEPLOYMENT)
-    chat.deployment \(found at '.*/.ai/data'\)
+    chat.deployment \(found at '.*[/\\].ai[/\\]data'\)
 
     (?# ---------- CHAT MODEL)
-    chat.model \(found at '.*/.ai/data'\)
-    (gpt4|gpt-35)
+    chat.model \(found at '.*[/\\].ai[/\\]data'\)
+    (gpt-4|gpt-35)
   tag: skip
 
 - name: test ai search index update
@@ -65,7 +83,7 @@
 - name: test ai dev new .env
   command: ai dev new .env
   expect: |
-    dev.new.env \(saved at .*/.ai/data\)
+    dev.new.env \(saved at .*[/\\]\.ai[/\\]data[/\\]\)
       AZURE_AI_SEARCH_ENDPOINT = 
       AZURE_AI_SEARCH_INDEX_NAME = 
       AZURE_AI_SEARCH_KEY = 
