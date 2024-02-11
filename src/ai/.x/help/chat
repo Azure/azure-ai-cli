@@ -38,7 +38,7 @@ USAGE: ai chat [...]
     ai chat run [...]                   (see: ai help chat run)
     ai chat evaluate [...]              (see: ai help chat evaluate)
 
-EXAMPLEs
+EXAMPLES
 
   ai chat --system @prompt.txt --interactive
   ai chat --system @prompt.txt --user "What can you do?"

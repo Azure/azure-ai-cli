@@ -1,4 +1,4 @@
-RECOGNIZE PHRASEs
+RECOGNIZE PHRASES
 
 @speech.include.the.recognize.command
 
@@ -12,7 +12,7 @@ USAGE: ai speech recognize [...] --phrases "PHRASE1;"
 
   WHERE: PHRASE represents one or more words that might appear in the audio
      OR: PHRASELIST.txt is a multi-line text file containing one or more
-         ... PHRASEs, listed individually, each on separate lines
+         ... PHRASES, listed individually, each on separate lines
      
 EXAMPLES
 

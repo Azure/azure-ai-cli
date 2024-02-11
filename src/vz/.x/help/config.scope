@@ -2,16 +2,16 @@ CONFIG SCOPE
 
 @include.the.config.command
 
-  @files can exist at multiple SCOPEs of use, across two kinds of SCOPEs:
-  (1) REGION specific SCOPEs
+  @files can exist at multiple SCOPES of use, across two kinds of SCOPES:
+  (1) REGION specific SCOPES
   (2) COMMAND specific
 
-  REGION specific SCOPEs enables VZ configuration data to vary based on
+  REGION specific SCOPES enables VZ configuration data to vary based on
   what REGION is specified for each vz command. For example, you likely use
   different subscription keys dependent upon what REGION in which your Azure
   Vision Service is running.
 
-  COMMAND specific SCOPEs enable VZ configuration data to vary based on
+  COMMAND specific SCOPES enable VZ configuration data to vary based on
   what COMMAND is being used. For example, for `va image analyze` commands you may
   want to use one specific ENDPOINT, whereas, for `va image read` commands you may
   want to use a different ENDPOINT with a PROXY.

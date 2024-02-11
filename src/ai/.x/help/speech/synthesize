@@ -8,7 +8,7 @@ USAGE: ai speech synthesize [...]
     --key KEY                     (see: ai help speech synthesize key)
     --region REGION               (see: ai help speech synthesize region)
 
-  VOICEs
+  VOICES
     --voice NAME                  (see: ai help speech synthesize voice)
     --voices                      (see: ai help speech synthesize list voices)
 

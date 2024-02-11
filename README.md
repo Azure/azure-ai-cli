@@ -141,7 +141,7 @@ USAGE: ai index update [...]
   DATA
     --text TEXT                             (see: ai help search index text)
     --file FILE                             (see: ai help search index file)
-    --files FILEs                           (see: ai help search index files)
+    --files FILES                           (see: ai help search index files)
     --url URL                               (see: ai help search index url)
     --urls URLs                             (see: ai help search index urls)
 

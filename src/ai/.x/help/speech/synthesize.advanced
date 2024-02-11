@@ -14,7 +14,7 @@ USAGE: ai speech synthesize [...]
     --traffic type test           (see: ai help speech traffic type)
     --query string name=value     (see: ai help speech query string)
 
-  VOICEs
+  VOICES
     --voice NAME                  (see: ai help speech synthesize voice)
     --voices                      (see: ai help speech synthesize list voices)
 

@@ -30,7 +30,7 @@ USAGE: ai index update [...]
 
   DATA
     --file FILE                             (see: ai help search index file)
-    --files FILEs                           (see: ai help search index files)
+    --files FILES                           (see: ai help search index files)
     --external-source                       (see: ai help search index external source)
 
 EXAMPLE

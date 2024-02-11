@@ -8,7 +8,7 @@ USAGE: spx synthesize [...]
     --key KEY                     (see: spx help synthesize key)
     --region REGION               (see: spx help synthesize region)
 
-  VOICEs
+  VOICES
     --voice NAME                  (see: spx help synthesize voice)
     --voices                      (see: spx help synthesize list voices)
 

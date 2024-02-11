@@ -2,16 +2,16 @@ CONFIG SCOPE
 
 @include.the.config.command
 
-  @files can exist at multiple SCOPEs of use, across two kinds of SCOPEs:
-  (1) REGION specific SCOPEs
+  @files can exist at multiple SCOPES of use, across two kinds of SCOPES:
+  (1) REGION specific SCOPES
   (2) COMMAND specific
 
-  REGION specific SCOPEs enables AI configuration data to vary based on
+  REGION specific SCOPES enables AI configuration data to vary based on
   what REGION is specified for each ai command. For example, you likely use
   different subscription keys dependent upon what REGION in which your Azure
   AI Service is running.
 
-  COMMAND specific SCOPEs enable AI configuration data to vary based on
+  COMMAND specific SCOPES enable AI configuration data to vary based on
   what COMMAND is being used. For example, for `ai chat` commands you may
   want to use one specific ENDPOINT, whereas, for `ai complete` commands you may
   want to use a different ENDPOINT with a PROXY.

@@ -21,12 +21,12 @@ EXAMPLES
   spx intent --patterns "Start {app};Open {app}" --output app entity
   spx intent --patterns "START=Start {app};START=Open {app}" --output intentid --output app entity
 
-  spx config @EXAMPLEs --clear
-  spx config @EXAMPLEs --add "START=Start {app}"
-  spx config @EXAMPLEs --add "START=Open {app}"
-  spx config @EXAMPLEs --add "START=Launch {app}"
-  spx config @EXAMPLEs --add "CLOSE=Close {app}"
-  spx intent --patterns @EXAMPLEs --output intentid --output app entity
+  spx config @EXAMPLES --clear
+  spx config @EXAMPLES --add "START=Start {app}"
+  spx config @EXAMPLES --add "START=Open {app}"
+  spx config @EXAMPLES --add "START=Launch {app}"
+  spx config @EXAMPLES --add "CLOSE=Close {app}"
+  spx intent --patterns @EXAMPLES --output intentid --output app entity
 
 SEE ALSO
 

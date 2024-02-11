@@ -14,7 +14,7 @@ USAGE: spx synthesize [...]
     --traffic type test           (see: spx help traffic type)
     --query string name=value     (see: spx help query string)
 
-  VOICEs
+  VOICES
     --voice NAME                  (see: spx help synthesize voice)
     --voices                      (see: spx help synthesize list voices)
 

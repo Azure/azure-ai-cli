@@ -21,12 +21,12 @@ EXAMPLES
   ai speech intent --patterns "Start {app};Open {app}" --output app entity
   ai speech intent --patterns "START=Start {app};START=Open {app}" --output intentid --output app entity
 
-  ai config @EXAMPLEs --clear
-  ai config @EXAMPLEs --add "START=Start {app}"
-  ai config @EXAMPLEs --add "START=Open {app}"
-  ai config @EXAMPLEs --add "START=Launch {app}"
-  ai config @EXAMPLEs --add "CLOSE=Close {app}"
-  ai speech intent --patterns @EXAMPLEs --output intentid --output app entity
+  ai config @EXAMPLES --clear
+  ai config @EXAMPLES --add "START=Start {app}"
+  ai config @EXAMPLES --add "START=Open {app}"
+  ai config @EXAMPLES --add "START=Launch {app}"
+  ai config @EXAMPLES --add "CLOSE=Close {app}"
+  ai speech intent --patterns @EXAMPLES --output intentid --output app entity
 
 SEE ALSO
 
