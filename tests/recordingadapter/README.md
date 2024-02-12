@@ -1,206 +1,101 @@
-# `ai` CLI Yaml Test Adapter
+# `ai` CLI Yaml Recording Test Adapter
 
-PRE-REQUISITES:
-* `ai` must be accessible in `PATH`
-* `ai` must be configured as required for tests (run `ai init`, or use `ai config --set KEY=VALUE` for all required information)
-- see: https://crbn.us/searchdocs?ai
-- OR ...
-  ```dotnetcli
-  dotnet tool install --global Azure.AI.CLI
-  ai init
+In addition to the capabilities of the [Yaml Test Adapter](https://github.com/Azure/azure-ai-cli/tree/main/tests/testadapter), this adapter adds in the capability to record ai.exe <-> service traffic and replay it enabling CI/CD testing without service interaction.
+
+The test yaml format and "how tos" are well covered in the Yaml Test Adapter pages, so you should become familiar with that as a first step.
+
+## Marking a test as being recordable
+
+Recordable tests are marked with a tag "Recordable" that should be set to true:
+```
+- name: test ai chat
+  command: ai chat --question "Why is the sky blue, what's it called" --index-name @none
+  expect: Rayleigh
+  tags: 
+    recordable: true
+```
+
+The "Recordable" tag can be applied to a test, area, or class.
+
+## Recording Tests
+
+Test recording is done by setting the proxy the ai cli will use to a local nginx container that will route all traffic through the [Azure SDK's test-proxy](https://github.com/Azure/azure-sdk-tools/blob/main/tools/test-proxy/Azure.Sdk.Tools.TestProxy/README.md) and use it to record REST traffic.
+
+### Setup
+
+* [Install the Azure SDK Test Proxy](https://github.com/Azure/azure-sdk-tools/blob/main/tools/test-proxy/Azure.Sdk.Tools.TestProxy/README.md#installation)
+```
+dotnet tool update azure.sdk.tools.testproxy --global --add-source https://pkgs.dev.azure.com/azure-sdk/public/_packaging/azure-sdk-for-net/nuget/v3/index.json --version "1.0.0-dev*" --ignore-failed-sources
+```
+* Start the SDK Test Proxy
+  * Point it's storage at your recordings directory.
+  ```
+  test-proxy -l \git\azure-ai-cli\tests\recordings
   ```
 
-## Run ALL tests
+* [Run the script](../recordproxy/dev_insall.cmd) to build the local nginx proxy container.
+This will:
+  * Pull the base nginx container from the acrbn container registry.
+  *  Build a local container and generate new TLS keys for itself.
+  * Create and start a container instance with the correct port mappings. (5004:5004)
+  * Install the containers Certificate Authority key in your local trusted root store. This is done because the proxy will need to intercept and decrypt the content before forwarding it on to the service.
 
-**dotnet test**  
-From fresh clone (one step, CLI):
-* DEBUG:
-  ```dotnetcli
-  dotnet test --logger:trx
-  ```
-* RELEASE:
-  ```dotnetcli
-  dotnet test --configuration release --logger:trx
-  ```
+* Start the proxy container
+```
+docker start nginx
+```
+* Set a TEST_MODE environment variable to "Recording"
+```
+set TEST_MODE=Record
+```
+If "TEST_MODE" is not set, the test cases will be run against the live services.
 
-OR ... [Build](#BUILD) first, then w/CLI:
-* DEBUG:
-  ```dotnetcli
-  cd tests\testadapter\bin\Debug\net7.0
-  dotnet test Azure.AI.CLI.TestAdapter.dll --logger:trx
-  ```
-* RELEASE:
-  ```dotnetcli
-  cd tests\testadapter\bin\Release\net7.0
-  dotnet test Azure.AI.CLI.TestAdapter.dll --logger:trx --logger:console;verbosity=normal
-  ```
+* If the AI feature you're testing will use the az cli, it needs an additional environment variable to accept the proxy certificates:
+```
+set REQUESTS_CA_BUNDLE=%TEMP%\ca.crt
+```
+(%TEMP%\ca.crt is where the dev_install.cmd script above left a copy of the proxy certificate.)
 
-**dotnet vstest**  
-OR ... [Build](#BUILD) first, then w/CLI:
-* DEBUG:
-  ```dotnetcli
-  cd tests\testadapter\bin\Debug\net7.0
-  dotnet vstest Azure.AI.CLI.TestAdapter.dll --logger:trx
-  ```
-* RELEASE:
-  ```dotnetcli
-  cd tests\testadapter\bin\Release\net7.0
-  dotnet vstest Azure.AI.CLI.TestAdapter.dll --logger:trx --logger:console;verbosity=normal
-  ```
+### Run the tests you want to record
+```
+dotnet test D:\git\azure-ai-cli\tests\recordingadapter\bin\Debug\net8.0\Azure.AI.CLI.RecordedTestAdapter.dll
+```
 
-**VS 2019+**  
-OR ... [Build](#BUILD) first, then w/Visual Studio 2019+:
-* Open Test Explorer (`<ctrl-E>T`)
-* Run all tests (`<ctrl-R>V`)
+### Inspect the results for secrets and other PII
+Having recorded all client <-> service traffic means that some secrets, such as keys or tokens, or PII was likely recorded. You must inspect the .json files in the recordings directory to ensure that no inappropriate information is committed to the repository.
 
----
-## LIST tests
+Once you've identified content that should not be committed, you can modify your test case to auto-sanitize the content.
 
-**dotnet test**  
-From fresh clone (one step, CLI):
-* DEBUG:
-  ```dotnetcli
-  dotnet test -t
-  ```
-* RELEASE:
-  ```dotnetcli
-  dotnet test --configuration release -t
-  ```
+To do so, add a _sanitize tag to your yaml:
 
-OR ... [Build](#BUILD) first, then w/CLI:
-* DEBUG:
-  ```dotnetcli
-  cd tests\testadapter\bin\Debug\net7.0
-  dotnet test Azure.AI.CLI.TestAdapter.dll -t
-  ```
-* RELEASE:
-  ```dotnetcli
-  cd tests\testadapter\bin\Release\net7.0
-  dotnet test Azure.AI.CLI.TestAdapter.dll -t
-  ```
+```
+- name: test ai chat
+  command: ai chat --question "Why is the sky blue, what's it called" --index-name @none
+  expect: Rayleigh
+  tags: 
+    recordable: true
+    _sanitize:
+      - headers:
+        - name: api-key
+          value: 00000000-0000-0000-0000-000000000000
+      - uri:
+        - regex: https://(?<host>[^/]+)/
+          value: https://fakeendpoint/
+      - body:
+        - regex: "\\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Z|a-z]{2,}\\b"
+          value: "email@domain.com"
+```
+Supported sanitizers can search:
+- The body of a request or response with a regular expression and replace matches with specified static content. 
+- The URL of the request.
+- A header with a given key and an optional regular expression for the value.
 
-**dotnet vstest**  
-OR ... [Build](#BUILD) first, then w/CLI:
-* DEBUG:
-  ```dotnetcli
-  cd tests\testadapter\bin\Debug\net7.0
-  dotnet vstest Azure.AI.CLI.TestAdapter.dll -lt
-  ```
-* RELEASE:
-  ```dotnetcli
-  cd tests\testadapter\bin\Release\net7.0
-  dotnet vstest Azure.AI.CLI.TestAdapter.dll -lt
-  ```
+It is *important* to remember that the substituted values must retain any formatting, such as not breaking JSON syntax.
 
----
-## Run SOME tests
+### Playback
+Do the same setup as for recording, but instead of Record, set TEST_MODE to Playback.
+```
+set TEST_MODE=Record
+```
+### Commit the test case and the test\recordings directory.
 
-**dotnet test**  
-From fresh clone (one step, CLI):
-* DEBUG:
-  ```dotnetcli
-  dotnet test --filter:name~PARTIAL_NAME
-  ```
-* RELEASE:
-  ```dotnetcli
-  dotnet test --configuration release --filter:name~PARTIAL_NAME
-  ```
-
-OR ... [Build](#BUILD) first, then w/CLI:
-
-* DEBUG:
-  ```dotnetcli
-  cd tests\testadapter\bin\Debug\net7.0
-  dotnet test --filter:name~PARTIAL_NAME Azure.AI.CLI.TestAdapter.dll
-  ```
-* RELEASE:
-  ```dotnetcli
-  cd tests\testadapter\bin\Release\net7.0
-  dotnet test --filter:name~PARTIAL_NAME Azure.AI.CLI.TestAdapter.dll
-  ```
-
-**dotnet vstest**  
-OR ... [Build](#BUILD) first, then w/CLI:
-* DEBUG:
-  ```dotnetcli
-  cd tests\testadapter\bin\Debug\net7.0
-  dotnet vstest Azure.AI.CLI.TestAdapter.dll --logger:trx --testcasefilter:name~PARTIAL_NAME
-  ```
-* RELEASE:
-  ```dotnetcli
-  cd tests\testadapter\bin\Release\net7.0
-  dotnet vstest Azure.AI.CLI.TestAdapter.dll --logger:trx --testcasefilter:name~PARTIAL_NAME
-  ```
-
-**VS 2019+**  
-OR ... [Build](#BUILD) first, then w/Visual Studio 2019+:
-* Open Test Explorer (`<ctrl-E>T`)
-- Select tests (w/ mouse: `Left-click`, extend w/`Shift-left-click` and/or `Ctrl-left-click`)
-- OR ... `<ctrl-E>`, enter search criteria, press `<ENTER>`
-* Run selected tests (w/ mouse: `Right-click`, click on `Run`)
-
-**Additional CLI test case filters**
-
-`<property>Operator<value>[|&<Expression>]`
-
-Where Operator is one of `=`, `!=` or `~` (Operator ~ has 'contains'
-semantics and is applicable for string properties like DisplayName).
-
-Parenthesis () can be used to group sub-expressions.
-
-| property | aliases | example |
-|-|-|-|
-| Name | DisplayName | `Name=NAME`
-| | | `Name!=NAME`
-| | | `Name~PARTIAL`
-| fqn | FullyQualifiedName | `fqn=yaml.FILE.AREA.CLASS.NAME`
-| | | `fqn!=yaml.FILE.AREA.CLASS.NAME`
-| | | `fqn~PARTIAL`
-| command | | `command~recognize`
-| | | `command~synthesize`
-| | | `command~translate`
-| | | `command~weather`
-| | | `command~mp3`
-| script | | `script~echo`
-| | | `script~recognize`
-| | | `script~weather`
-| | | `script~mp3`
-| expect | | `expect~RECOGNIZED:`
-| not-expect | | `not-expect~ERROR`
-| log-expect | | `log-expect~path:`
-| log-not-expect | | `log-not-expect~ERROR`
-
----
-# BUILD
-
-**dotnet build**
-* DEBUG: `dotnet build`
-* RELEASE: `dotnet build --configuration release` 
-
-**VS 2019+**
-* Open `ai-cli.sln`
-* Select `Debug` or `Release`
-* Run (`<ctrl-shift-B>`)
-
----
-
-## ADDITIONAL OPTIONS
-
-**dotnet test**
-Console logging: `-v` or `--verbosity` followed one of:
-* `q[uiet]`
-* `m[inimal]`
-* `n[ormal]`
-* `d[etailed]`
-* `diag[nostic]`
-
-e.g. `dotnet test --configuration release --v n`
-
-**dotnet vstest**
-Console logging: `--logger:console`, optionally followed by one of:
-* `;verbosity=quiet`
-* `;verbosity=minimal`
-* `;verbosity=normal`
-* `;verbosity=detailed`
-
-e.g. `dotnet vstest Azure.AI.CLI.TestAdapter.dll --logger:trx --logger:console;verbosity=normal`

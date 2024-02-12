@@ -25,8 +25,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{C8AFF891
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RecordedYamlTestAdapter", "tests\recordingadapter\RecordedYamlTestAdapter.csproj", "{9499C018-FA08-4133-93B3-FC0F3863A6CC}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Recordings", "tests\Recordings\Recordings.vcxproj", "{2E585DF2-C425-4931-B549-27DBA696D579}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -145,18 +143,6 @@ Global
 		{9499C018-FA08-4133-93B3-FC0F3863A6CC}.Release|x64.Build.0 = Release|Any CPU
 		{9499C018-FA08-4133-93B3-FC0F3863A6CC}.Release|x86.ActiveCfg = Release|Any CPU
 		{9499C018-FA08-4133-93B3-FC0F3863A6CC}.Release|x86.Build.0 = Release|Any CPU
-		{2E585DF2-C425-4931-B549-27DBA696D579}.Debug|Any CPU.ActiveCfg = Debug|x64
-		{2E585DF2-C425-4931-B549-27DBA696D579}.Debug|Any CPU.Build.0 = Debug|x64
-		{2E585DF2-C425-4931-B549-27DBA696D579}.Debug|x64.ActiveCfg = Debug|x64
-		{2E585DF2-C425-4931-B549-27DBA696D579}.Debug|x64.Build.0 = Debug|x64
-		{2E585DF2-C425-4931-B549-27DBA696D579}.Debug|x86.ActiveCfg = Debug|Win32
-		{2E585DF2-C425-4931-B549-27DBA696D579}.Debug|x86.Build.0 = Debug|Win32
-		{2E585DF2-C425-4931-B549-27DBA696D579}.Release|Any CPU.ActiveCfg = Release|x64
-		{2E585DF2-C425-4931-B549-27DBA696D579}.Release|Any CPU.Build.0 = Release|x64
-		{2E585DF2-C425-4931-B549-27DBA696D579}.Release|x64.ActiveCfg = Release|x64
-		{2E585DF2-C425-4931-B549-27DBA696D579}.Release|x64.Build.0 = Release|x64
-		{2E585DF2-C425-4931-B549-27DBA696D579}.Release|x86.ActiveCfg = Release|Win32
-		{2E585DF2-C425-4931-B549-27DBA696D579}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -169,7 +155,6 @@ Global
 		{B0B3437F-1828-4A13-866F-1CF7C924015E} = {C8AFF891-D6AA-4B8F-BC21-10404DF4B355}
 		{39876475-2D98-40CF-8B08-CD423A5EB4E8} = {C8AFF891-D6AA-4B8F-BC21-10404DF4B355}
 		{9499C018-FA08-4133-93B3-FC0F3863A6CC} = {C8AFF891-D6AA-4B8F-BC21-10404DF4B355}
-		{2E585DF2-C425-4931-B549-27DBA696D579} = {C8AFF891-D6AA-4B8F-BC21-10404DF4B355}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {002655B1-E1E1-4F2A-8D53-C9CD55136AE2}

@@ -10,4 +10,11 @@
     <ProjectReference Include="..\testframework\YamlTestFramework.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+      <None Include="..\recordings\*.json">
+          <Link>Recordings\%(RecursiveDir)%(Filename)%(Extension)</Link>
+          <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+      </None>
+  </ItemGroup>
+
 </Project>
