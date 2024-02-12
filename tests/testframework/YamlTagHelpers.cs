@@ -2,8 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Windows.Markup;
-using YamlDotNet.Core.Tokens;
 using YamlDotNet.RepresentationModel;
 
 namespace Azure.AI.Details.Common.CLI.TestFramework

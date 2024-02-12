@@ -31,7 +31,6 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
             if (!string.IsNullOrEmpty(error))
             {
                 Logger.LogError(error);
-                
                 Logger.TraceError(error);
             }
 
