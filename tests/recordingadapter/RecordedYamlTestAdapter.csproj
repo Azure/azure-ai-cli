@@ -1,0 +1,20 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+  </PropertyGroup>
+
+  <Import Project="RecordedYamlTestAdapterCommon.targets" />
+
+  <ItemGroup>
+    <ProjectReference Include="..\testframework\YamlTestFramework.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+      <None Include="..\recordings\*.json">
+          <Link>Recordings\%(RecursiveDir)%(Filename)%(Extension)</Link>
+          <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+      </None>
+  </ItemGroup>
+
+</Project>
