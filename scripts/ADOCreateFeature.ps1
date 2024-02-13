@@ -20,7 +20,6 @@ param (
 
 # Define the URL for the REST API call
 $url = "https://dev.azure.com/$organization/$project/_apis/wit/workitems/`$$($workItemType)?api-version=7.1"
-Write-Host "URL: $url"
 
 $body = @(
    [ordered] @{  op = 'add';  path = '/fields/System.Title';  value = "$title"  }
@@ -31,7 +30,6 @@ $body = @(
 
 # Convert the body to JSON
 $bodyJson = ConvertTo-Json -InputObject $body
-Write-Host "Body: $bodyJson"
 
 $B64Pat = [Convert]::ToBase64String([System.Text.Encoding]::UTF8.GetBytes("`:$pat"))
 
