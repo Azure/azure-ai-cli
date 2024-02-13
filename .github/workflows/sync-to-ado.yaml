@@ -20,6 +20,6 @@ jobs:
         shell: pwsh
         run: |
           $adoWorkItemLink = pwsh -File ./scripts/ADOGetADOLinkNumber.ps1 "${{ github.event.issue.body }}"
-          if ($adoWorkItemLink -eq 0){
+          if ($adoWorkItemLink -ne 0){
             pwsh -File ./scripts/ADOUpdateFeature.ps1 -organization "msdata" -project "Vienna" -pat "${{ secrets.ADO_PERSONAL_ACCESS_TOKEN}}" -workItemId "$adoWorkItemLink" -newState "${{ github.event.issue.state }}"
           }
