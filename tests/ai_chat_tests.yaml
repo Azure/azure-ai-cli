@@ -1,0 +1,82 @@
+﻿- area: ai init
+  tags: 
+    before: true
+    recordable: true
+    _sanitize:
+      - headers:
+        - name: api-key
+          value: 00000000-0000-0000-0000-000000000000
+        - name: Set-Cookie
+          regex: (_gh_sess=.*?;)  
+          value: _gh_ses=GHTOKEN
+      - uri:
+        - regex: https://(?<host>[^/]+)/
+          value: https://fakeendpoint/
+      - body:
+        - regex: "refresh_token=([^&]+)"
+          value: "refresh_token=TOKEN"
+        - regex: "\\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Z|a-z]{2,}\\b"
+          value: "email@domain.com"
+        - regex: "(\"id_token\":\\s*\")(.*?)(\")"
+          value: "\"id_token\": \"ID_TOKEN\""
+        - regex: "(\"iKey\":\\s*\")(.*?)(\")"  
+          value: "\"iKey\": \"INSTRUMENTATION_KEY\""
+        - regex: "(\"(?:key1)\":\\s*\")(.*?)(\")"
+          value: "\"key1\": \"COGSVCSKey1\""
+        - regex: "(\"(?:key2)\":\\s*\")(.*?)(\")"
+          value: "\"key2\": \"COGSVCSKey2\""
+        - regex: "(\"time\":\\s*\")(.*?)(\")"
+          value: "\"time\": \"TIME\""   
+  tests:
+  - name: ai init openai
+    command: ai init openai
+    arguments:
+      subscription: e72e5254-f265-4e95-9bd2-9ee8e7329051
+      name: robch-oai-eastus2
+      chat-deployment-name: gpt-4-32k-0613
+      embeddings-deployment-name: text-embedding-ada-002-2
+      evaluation-deployment-name: gpt-4-32k-0613
+      interactive: false
+  - name: ai init speech
+    command: ai init speech
+    arguments:
+      subscription: e72e5254-f265-4e95-9bd2-9ee8e7329051
+      name: robch-cranky-red-koala-ais
+      interactive: false
+
+- name: test ai chat
+  command: ai chat --question "Why is the sky blue, what's it called" --index-name @none
+  expect: Rayleigh
+  tags: 
+    recordable: true
+    _sanitize:
+      - headers:
+        - name: api-key
+          value: 00000000-0000-0000-0000-000000000000
+      - uri:
+        - regex: https://(?<host>[^/]+)/
+          value: https://fakeendpoint/
+
+- name: test ai chat built in functions
+  command: ai chat --interactive --built-in-functions
+  tags:
+    recordable: true
+    _sanitize:
+      - headers:
+        - name: api-key
+          value: 00000000-0000-0000-0000-000000000000
+      - uri:
+        - regex: https://(?<host>[^/]+)/
+          value: https://fakeendpoint/
+      - body:
+        - regex: (?:\\\\|\\){1,2}test\.txt
+          value: /test.txt
+  input: |
+    Create a file named "test.txt" with the following content: "Hello, World!"
+    What files are in the current directory?
+    Show me what's in the file "test.txt"
+  expect: |
+    assistant-function: CreateFileAndSaveText
+    assistant-function: FindAllFilesInCurrentDirectory
+    test.txt
+    Hello, World!

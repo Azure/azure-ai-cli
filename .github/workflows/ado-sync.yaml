@@ -1,0 +1,33 @@
+name: Create ADO Work Item
+
+on:
+  issues:
+    types: [opened]
+
+jobs:
+  create-work-item:
+    if: ${{ !github.event.issue.pull_request }}
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Run PowerShell script
+      id: create_item
+      shell: pwsh
+      run: |
+        $itemExists = pwsh ./scripts/ADOCheckItemExists.ps1 -organization "msdata" -project "Vienna" -pat "${{ secrets.ADO_PERSONAL_ACCESS_TOKEN}}" -title "${{ github.event.issue.title }}" -areaPath "Vienna\\Experiences\\Core SDK\\AI CLI"
+        if ($itemExists -eq $true) {
+          echo "Work item already exists"
+          exit 0
+        }
+        $description = " "
+        if ("${{ github.event.issue.body }}") {
+          $description = "${{ github.event.issue.body }}"
+        }
+        $result = pwsh -File ./scripts/ADOCreateFeature.ps1 -pat "${{ secrets.ADO_PERSONAL_ACCESS_TOKEN }}" -title "${{ github.event.issue.title }}" -description "$description" -organization "msdata" -project "Vienna" -workItemType "Feature" -iterationPath "Vienna\\Backlog" -areaPath "Vienna\\Experiences\\Core SDK\\AI CLI"
+        $adoWorkItemLink = pwsh -File ./scripts/ADOGetADOLinkNumber.ps1 "${{ github.event.issue.body }}"
+        if ($adoWorkItemLink -eq 0){
+            pwsh -File ./scripts/GithubUpdateIssue.ps1 -token "${{ secrets.GH_PERSONAL_ACCESS_TOKEN}}" -owner "Azure" -repo "azure-ai-cli" -issueNumber ${{ github.event.issue.number }} -newDescription "${{ github.event.issue.body }}<br/>AB#$result"
+        }
