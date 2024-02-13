@@ -19,45 +19,32 @@ param (
 )
 
 # Define the URL for the REST API call
-$url = "https://dev.azure.com/$organization/$project/_apis/wit/workitems/`$$workItemType?api-version=6.0"
+$url = "https://dev.azure.com/$organization/$project/_apis/wit/workitems/`$$($workItemType)?api-version=7.1"
+Write-Host "URL: $url"
 
-# Define the body of the REST API call
-$body = @"
-[
-    {
-        "op": "add",
-        "path": "/fields/System.Title",
-        "value": "$title"
-    },
-    {
-        "op": "add",
-        "path": "/fields/System.Description",
-        "value": "$description"
-    },
-    {
-        "op": "add",
-        "path": "/fields/System.IterationPath",
-        "value": "$iterationPath"
-    },
-    {
-        "op": "add",
-        "path": "/fields/System.AreaPath",
-        "value": "$areaPath"
-    }
-]
-"@
+$body = @(
+   [ordered] @{  op = 'add';  path = '/fields/System.Title';  value = "$title"  }
+   [ordered] @{  op = 'add';  path = '/fields/System.Description';  value = "$description"  }
+   [ordered] @{  op = 'add';  path = '/fields/System.IterationPath';  value = $iterationPath  }
+   [ordered] @{  op = 'add';  path = '/fields/System.AreaPath';  value = $areaPath  }
+)
 
 # Convert the body to JSON
-$bodyJson = $body | ConvertTo-Json
+$bodyJson = ConvertTo-Json -InputObject $body
+Write-Host "Body: $bodyJson"
+
+$B64Pat = [Convert]::ToBase64String([System.Text.Encoding]::UTF8.GetBytes("`:$pat"))
 
 # Define the headers for the REST API call
 $headers = @{
     "Content-Type" = "application/json-patch+json"
-    "Authorization" = "Bearer $pat"
+    "Authorization" = "Basic $B64Pat"
 }
 
 # Make the REST API call to create the work item
 $response = Invoke-RestMethod -Uri $url -Method Post -Body $bodyJson -Headers $headers
+Write-Host "Work item created with response: $response"
+Write-Host "Work item created with ID: $($response.id)"
 
 # Output the ID of the new work item
-Write-Output "New work item ID: $($response.id)"
+$($response.id)
