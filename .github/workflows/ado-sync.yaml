@@ -23,7 +23,7 @@ jobs:
           exit 0
         }
         $description = " "
-        if (${{ github.event.issue.body }} -ne $null) {
+        if ("${{ github.event.issue.body }}") {
           $description = "${{ github.event.issue.body }}"
         }
         $result = pwsh -File ./scripts/ADOCreateFeature.ps1 -pat "${{ secrets.ADO_PERSONAL_ACCESS_TOKEN }}" -title "${{ github.event.issue.title }}" -description "$description" -organization "msdata" -project "Vienna" -workItemType "Feature" -iterationPath "Vienna\\Backlog" -areaPath "Vienna\\Experiences\\Core SDK\\AI CLI"
