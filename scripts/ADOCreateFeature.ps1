@@ -41,8 +41,6 @@ $headers = @{
 
 # Make the REST API call to create the work item
 $response = Invoke-RestMethod -Uri $url -Method Post -Body $bodyJson -Headers $headers
-Write-Host "Work item created with response: $response"
-Write-Host "Work item created with ID: $($response.id)"
 
 # Output the ID of the new work item
 $($response.id)
