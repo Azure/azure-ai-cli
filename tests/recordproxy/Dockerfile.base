@@ -1,0 +1,90 @@
+# Build stage  
+FROM mcr.microsoft.com/cbl-mariner/base/nginx:1.22 as builder  
+  
+# Install build dependencies  
+RUN tdnf update && \  
+    tdnf install -y tar build-essential pcre-devel openssl-devel zlib-devel dos2unix unzip && \  
+    rm -rf /var/lib/apt/lists/*  
+  
+RUN mkdir /OpenResty && \  
+    cd /OpenResty && \  
+    curl -L https://openresty.org/download/openresty-1.21.4.1.tar.gz | tar xz  
+  
+# Download and compile ngx_http_proxy_connect_module  
+RUN cd /OpenResty && \  
+    curl -L https://github.com/chobits/ngx_http_proxy_connect_module/archive/master.tar.gz | tar xz && \  
+    curl -L https://raw.githubusercontent.com/chobits/ngx_http_proxy_connect_module/master/patch/proxy_connect_rewrite_102101.patch -o proxy_connect_rewrite_102101.patch && \  
+    cd openresty-1.21.4.1 && \  
+    ./configure --with-luajit --add-module=../ngx_http_proxy_connect_module-master --with-debug --with-cc-opt=-DNGX_HAVE_RESOLVE_ON_LOCAL && \  
+    patch -d build/nginx-1.21.4/ -p 1 < ../proxy_connect_rewrite_102101.patch && \  
+    make && \  
+    make install && \  
+    rm -rf /OpenResty  
+  
+# Set up environment variables  
+ENV PATH="/usr/local/openresty/bin:/usr/local/openresty/luajit/bin:$PATH"  
+ENV LD_LIBRARY_PATH="/usr/local/openresty/luajit/lib:/usr/local/openresty/lib:$LD_LIBRARY_PATH"  
+  
+# Install LuaRocks  
+RUN mkdir /luarocks-src && cd /luarocks-src && \  
+    curl -L http://luarocks.github.io/luarocks/releases/luarocks-3.7.0.tar.gz | tar xz && \  
+    cd luarocks-3.7.0 && \  
+    ./configure --with-lua=/usr/local/openresty/luajit --lua-suffix=jit --with-lua-include=/usr/local/openresty/luajit/include/luajit-2.1 && \  
+    make build && \  
+    make install && \  
+    rm -rf /luarocks-src  
+  
+RUN luarocks install lua-resty-http  
+RUN luarocks install lua-resty-auto-ssl  
+  
+RUN mkdir /certs  
+COPY issue_cert.sh /certs/issue_cert.sh  
+# Set the script file as executable  
+RUN dos2unix /certs/issue_cert.sh && \  
+    chmod +x /certs/issue_cert.sh  
+  
+# Runtime stage  
+FROM mcr.microsoft.com/cbl-mariner/base/nginx:1.22  
+  
+# Copy necessary files from the builder stage  
+COPY --from=builder /usr/local/openresty /usr/local/openresty  
+COPY --from=builder /usr/local/bin /usr/local/bin  
+COPY --from=builder /usr/local/share/lua /usr/local/share/lua  
+  
+# Set up environment variables  
+ENV PATH="/usr/local/openresty/bin:/usr/local/openresty/luajit/bin:$PATH"  
+ENV LD_LIBRARY_PATH="/usr/local/openresty/luajit/lib:/usr/local/openresty/lib:$LD_LIBRARY_PATH"  
+  
+# Install LuaRocks to manage Lua packages  
+RUN mkdir -p /etc/resty-auto-ssl/storage/file && \  
+    chmod -R 777 /etc/resty-auto-ssl  
+  
+# Set up directories  
+RUN mkdir /certs /keys /logs /lua  
+COPY --from=builder /certs/issue_cert.sh /certs/issue_cert.sh  
+COPY nginx.conf /usr/local/openresty/nginx/conf/nginx.conf  
+COPY storage.lua /lua  
+COPY headers.lua /lua  
+  
+# Create the openssl-ca.conf file  
+COPY openssl-ca.conf /certs/openssl-ca.conf  
+RUN touch /certs/index.txt && \  
+    echo '1000' > /certs/ca.srl  
+  
+# Create required directories  
+ONBUILD WORKDIR /certs  
+  
+# Generate CA OpenSSL Cert & key  
+ONBUILD RUN openssl genrsa -out /keys/ca.key 4096  
+ONBUILD RUN openssl req -x509 -new -nodes -key /keys/ca.key -sha256 -days 3650 -subj "/C=US/ST=WA/L=Redmond/O=MSFT/OU=Test" -out /certs/ca.crt  
+  
+# Build a default cert for nginx to use  
+ONBUILD RUN openssl genrsa -out "test.key" 2048  
+ONBUILD RUN openssl req -new -key "test.key" -out "test.csr" -subj "/C=US/ST=SomeState/L=SomeCity/O=SomeOrganization/OU=SomeDepartment/CN=azure.example.com"  
+ONBUILD RUN openssl x509 -req -days 365 -in "test.csr" -CA "ca.crt" -CAkey "/keys/ca.key" -CAserial ca.srl -out "test.crt"  -extfile /certs/openssl-ca.conf -extensions server_cert_ext  
+  
+ONBUILD RUN openssl ca -gencrl -config /certs/openssl-ca.conf -out /certs/empty_crl.pem  
+ONBUILD RUN chown nobody /keys/ca.key && chown nobody /certs/ca.srl  
+  
+WORKDIR /  
+CMD openresty -g 'daemon off;' -c /usr/local/openresty/nginx/conf/nginx.conf  
