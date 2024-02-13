@@ -7,21 +7,22 @@ param(
 )
 
 # Map the GitHub issue state to an ADO work item state
-$adoState = if ($githubIssue.state -eq "open") { "New" }
-elseif ($githubIssue.state -eq "closed") { "Done" }
+$adoState = if ($newState -eq "open") { "New" }
+elseif ($newState -eq "closed") { "Done" }
 else {
-    Write-Host "Unknown GitHub issue state: $($githubIssue.state)"
+    Write-Host "Unknown GitHub issue state: $($newState)"
     exit 0
 }
 
-$base64AuthInfo = [Convert]::ToBase64String([Text.Encoding]::ASCII.GetBytes(":$($pat)"))
-$headers = @{Authorization=("Basic {0}" -f $base64AuthInfo)}
+$B64Pat = [Convert]::ToBase64String([System.Text.Encoding]::UTF8.GetBytes("`:$pat"))
+$headers = @{
+    "Authorization" = "Basic $B64Pat"
+}
 
-$body = @{
-    id = $adoWorkItemId
-    fields = @{
-        "System.State" = $adoState
-    }
-} | ConvertTo-Json
+$body = @(
+   [ordered] @{  op = 'add';  path = '/fields/System.State';  value = "$adoState"  }
+)
+# Convert the body to JSON
+$bodyJson = ConvertTo-Json -InputObject $body
 
-Invoke-RestMethod -Uri "https://dev.azure.com/$organization/$project/_apis/wit/workitems/$workItemId?api-version=6.0" -Method Patch -Body $body -ContentType "application/json-patch+json" -Headers $adoHeaders
+Invoke-RestMethod -Uri "https://dev.azure.com/$organization/$project/_apis/wit/workitems/$($workItemId)?api-version=7.1" -Method Patch -Body $bodyJson -ContentType "application/json-patch+json" -Headers $headers
