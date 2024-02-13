@@ -19,6 +19,20 @@ tests:
   - name: install python dependencies
     bash: pip install -r requirements.txt
 
+  - name: check cli is installed
+    command: ai
+    expect: |
+      ^AI - Azure AI CLI, Version [01]\.0\..*\r?$\n
+      ^Copyright \(c\) 2024 Microsoft Corporation\. All Rights Reserved\.\r?$\n
+    tag: skip
+
+  - name: check az is installed and we're logged in
+    bash: |
+      az account show
+    expect: |
+      "id": "[-a-z0-9-]{36}",
+    tag: skip
+
   - name: ai init openai
     command: ai init openai
     arguments:
@@ -29,42 +43,28 @@ tests:
       evaluation-deployment-name: gpt-4-32k-0613
       interactive: false
 
-- name: check cli is installed
-  command: ai
-  expect: |
-    ^AI - Azure AI CLI, Version [01]\.0\..*\r?$\n
-    ^Copyright \(c\) 2024 Microsoft Corporation\. All Rights Reserved\.\r?$\n
-  tag: skip
+  - name: check ai config for chat
+    bash: |
+      ai config chat @key
+      ai config chat @endpoint
+      ai config chat @deployment
+      ai config chat @model
+    expect: |
+      (?# ---------- CHAT KEY)
+      chat.key \(found at '.*[/\\]\.ai[/\\]data'\)
+      [a-z0-9]{32}
 
-- name: check az is installed and we're logged in
-  bash: |
-    az account show
-  expect: |
-    "id": "[-a-z0-9-]{36}",
-  tag: skip
+      (?# ---------- CHAT ENDPOINT)
+      chat.endpoint \(found at '.*[/\\]\.ai[/\\]data'\)
+      https://.*openai.azure.com/
 
-- name: check ai config for chat
-  bash: |
-    ai config chat @key
-    ai config chat @endpoint
-    ai config chat @deployment
-    ai config chat @model
-  expect: |
-    (?# ---------- CHAT KEY)
-    chat.key \(found at '.*[/\\]\.ai[/\\]data'\)
-    [a-z0-9]{32}
+      (?# ---------- CHAT DEPLOYMENT)
+      chat.deployment \(found at '.*[/\\]\.ai[/\\]data'\)
 
-    (?# ---------- CHAT ENDPOINT)
-    chat.endpoint \(found at '.*[/\\]\.ai[/\\]data'\)
-    https://.*openai.azure.com/
-
-    (?# ---------- CHAT DEPLOYMENT)
-    chat.deployment \(found at '.*[/\\]\.ai[/\\]data'\)
-
-    (?# ---------- CHAT MODEL)
-    chat.model \(found at '.*[/\\]\.ai[/\\]data'\)
-    (gpt-4|gpt-35)
-  tag: skip
+      (?# ---------- CHAT MODEL)
+      chat.model \(found at '.*[/\\]\.ai[/\\]data'\)
+      (gpt-4|gpt-35)
+    tag: skip
 
 - name: test ai search index update
   command: ai search index update --files "./data/3-product-info/*.md" --index-name "product-info"
