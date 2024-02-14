@@ -238,7 +238,7 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
                 kvs.AddRange(KeyValuePairsFromJson(@foreach, false));
                 kvs = ConvertValuesToAtArgs(kvs, ref filesToDelete);
 
-                var startArgs = GetStartInfo(out string startProcess, cli, command, script, scriptIsBash, kvs, expect, notExpect, ref filesToDelete);
+                GetStartInfoArgs(out var startProcess, out var startArgs, cli, command, script, scriptIsBash, kvs, expect, notExpect, ref filesToDelete);
                 stackTrace = $"{startProcess} {startArgs}\n{stackTrace ?? string.Empty}";
 
                 Logger.Log($"Process.Start('{startProcess} {startArgs}')");
@@ -307,7 +307,7 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
             stdErr = sbErr.ToString();
 
             return outcome == TestOutcome.Passed && !string.IsNullOrEmpty(expectGpt)
-                ? CheckExpectGptOutcome(sbMerged.ToString(), expectGpt, ref stdOut, ref stdErr)
+                ? CheckExpectGptOutcome(sbMerged.ToString(), expectGpt, workingDirectory, ref stdOut, ref stdErr)
                 : outcome;
         }
 
@@ -507,7 +507,6 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
         {
             var message = $"CliNotFound: CLI specified ({cli}); tried searching PATH and working directory; not found; using {cli}";
             Logger.LogWarning(message);
-            // Logger.TraceWarning(message);
             return cli;
         }
 
@@ -530,7 +529,6 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
             var message = string.Join(" or ", clis.Select(cli => $"`cli: {cli}`"));
             message = $"PickCli: CLI not specified; please create/update {YamlTestFramework.YamlDefaultTagsFileName} with one of: {message}";
             Logger.LogWarning(message);
-            Logger.TraceWarning(message);
         }
 
         private static string PickCliFound(IEnumerable<string> clis, string cli)
@@ -539,7 +537,6 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
 
             var message = $"PickCliFound: CLI not specified; found 1 CLI; using {cli}";
             Logger.LogInfo(message);
-            Logger.TraceInfo(message);
             return cli;
         }
 
@@ -549,7 +546,6 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
 
             var message = $"PickCliNotFound: CLI not specified; tried searching PATH and working directory; found 0 or >1 CLIs; using {cli}";
             Logger.LogInfo(message);
-            Logger.TraceInfo(message);
             return cli;
         }
 
@@ -624,31 +620,39 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
                 var name = process.ProcessName;
                 var message = $"Timedout! Stopping process ({name})...";
                 Logger.LogWarning(message);
-                Logger.TraceWarning(message);
 
-                process.StandardInput.WriteLine("\x3"); // try ctrl-c first
-                process.StandardInput.Close();
-                completed = process.WaitForExit(200);
+                var softKillFunc = new Func<bool>(() => {
+                    var message = $"Timedout! Sending <ctrl-c> ...";
+                    Logger.LogWarning(message);
+
+                    process.StandardInput.WriteLine("\x3"); // try ctrl-c first
+                    process.StandardInput.Close();
+
+                    Logger.LogWarning($"{message} Sent!");
+
+                    return process.WaitForExit(200);
+                });
+                completed = TryCatchHelpers.TryCatchNoThrow<bool>(softKillFunc, false, out var _);
 
                 message = "Timedout! Sent <ctrl-c>" + (completed ? "; stopped" : "; trying Kill()");
                 Logger.LogWarning(message);
-                Logger.TraceWarning(message);
 
                 if (!completed)
                 {
-                    process.Kill();
-                    var killed = process.HasExited ? "Done." : "Failed!";
-
-                    message = $"Timedout! Killing process ({name})... {killed}";
+                    message = $"Timedout! Killing process ({name})...";
                     Logger.LogWarning(message);
-                    Logger.TraceWarning(message);
+
+                    process.Kill();
+
+                    message = process.HasExited ? $"{message} Done." : $"{message} Failed!";
+                    Logger.LogWarning(message);
                 }
             }
 
             return completed;
         }
 
-        private static string GetStartInfo(out string startProcess, string cli, string command, string script, bool scriptIsBash, List<KeyValuePair<string, string>> kvs, string expect, string notExpect, ref List<string> files)
+        private static void GetStartInfoArgs(out string startProcess, out string startArgs,string cli, string command, string script, bool scriptIsBash, List<KeyValuePair<string, string>> kvs, string expect, string notExpect, ref List<string> files)
         {
             startProcess = FindCacheCli(cli);
 
@@ -657,14 +661,19 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
             {
                 command = $"{command} {GetKeyValueArgs(kvs)}";
 
-                var expectLess = string.IsNullOrEmpty(expect) && string.IsNullOrEmpty(notExpect);
-                if (expectLess) return command;
+                var hasExpectations = !string.IsNullOrEmpty(expect) || !string.IsNullOrEmpty(notExpect);
+                if (hasExpectations) 
+                {
+                    command = WriteTextToTempFile(command);
+                    files ??= new List<string>();
+                    files.Add(command);
 
-                command = WriteTextToTempFile(command);
-                files ??= new List<string>();
-                files.Add(command);
+                    startArgs = $"run --command @{command} {GetAtArgs(expect, notExpect)}";
+                    return;
+                }
 
-                return $"run --command @{command} {GetAtArgs(expect, notExpect)}";
+                startArgs = command;
+                return;
             }
 
             if (scriptIsBash)
@@ -672,10 +681,12 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
                 var bash = RuntimeInformation.IsOSPlatform(OSPlatform.Windows) 
                     ? EnsureFindCacheGetBashExe()
                     : "/bin/bash";
-                return $"run --process \"{bash}\" --pre.script -l --script \"{script}\" {GetKeyValueArgs(kvs)} {GetAtArgs(expect, notExpect)}";
+                startArgs = $"run --process \"{bash}\" --pre.script -l --script \"{script}\" {GetKeyValueArgs(kvs)} {GetAtArgs(expect, notExpect)}";
+                return;
             }
 
-            return $"run --cmd --script \"{script}\" {GetKeyValueArgs(kvs)} {GetAtArgs(expect, notExpect)}";
+            startArgs = $"run --cmd --script \"{script}\" {GetKeyValueArgs(kvs)} {GetAtArgs(expect, notExpect)}";
+            return;
         }
 
         private static string EnsureFindCacheGetBashExe()
@@ -860,9 +871,9 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
             return sb.ToString();
         }
 
-        private static TestOutcome CheckExpectGptOutcome(string output, string expectGpt, ref string stdOut, ref string stdErr)
+        private static TestOutcome CheckExpectGptOutcome(string output, string expectGpt, string workingDirectory, ref string stdOut, ref string stdErr)
         {
-            var outcome = ExpectGptOutcome(output, expectGpt, out var gptStdOut, out var gptStdErr, out var gptMerged);
+            var outcome = ExpectGptOutcome(output, expectGpt, workingDirectory, out var gptStdOut, out var gptStdErr, out var gptMerged);
             if (outcome == TestOutcome.Failed)
             {
                 if (!string.IsNullOrEmpty(gptStdOut)) stdOut = $"{stdOut}\n--expect-gpt--\n{gptStdOut}\n".Trim('\n');
@@ -871,8 +882,10 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
             return outcome;
         }
 
-        private static TestOutcome ExpectGptOutcome(string output, string expect, out string gptStdOut, out string gptStdErr, out string gptMerged)
+        private static TestOutcome ExpectGptOutcome(string output, string expect, string workingDirectory, out string gptStdOut, out string gptStdErr, out string gptMerged)
         {
+            Logger.Log($"ExpectGptOutcome: Checking for {expect} in '{output}'");
+
             var outcome = TestOutcome.None;
 
             var sbOut = new StringBuilder();
@@ -896,7 +909,8 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
                     UseShellExecute = false,
                     RedirectStandardInput = true,
                     RedirectStandardError = true,
-                    RedirectStandardOutput = true
+                    RedirectStandardOutput = true,
+                    WorkingDirectory = workingDirectory
                 };
 
                 Logger.Log($"ExpectGptOutcome: Process.Start('{startProcess} {startArgs}')");

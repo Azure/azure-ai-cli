@@ -71,7 +71,7 @@ namespace Azure.AI.Details.Common.CLI
             return DoGetConnectionViaPython(values, subscription, group, projectName, connectionName);
         }
 
-        static public string UpdateMLIndex(ICommandValues values, string subscription, string group, string projectName, string indexName, string embeddingModelDeployment, string embeddingModelName, string dataFiles, string externalSourceUrl)
+        static public string UpdateMLIndex(ICommandValues values, string subscription, string group, string projectName, string indexName, string embeddingModelDeployment, string embeddingModelName, string dataFiles, string externalSourceUrl, Dictionary<string, string> addToEnvironment)
         {
             Action<string> stdErrVerbose = x => Console.Error.WriteLine(x);
             Action<string> stdErrStandard = x => {
@@ -93,7 +93,7 @@ namespace Azure.AI.Details.Common.CLI
                     "--embedding-model-name", embeddingModelName,
                     "--data-files", dataFiles,
                     "--external-source-url", externalSourceUrl),
-                null, null, stdErr);
+                addToEnvironment, null, stdErr);
         }
 
         private static string DoCreateResourceViaPython(ICommandValues values, string subscription, string group, string name, string location, string displayName, string description, string openAiResourceId, string openAiResourceKind)

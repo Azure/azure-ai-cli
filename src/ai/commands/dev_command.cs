@@ -104,37 +104,33 @@ namespace Azure.AI.Details.Common.CLI
 
         private void DoDevShell()
         {
+            var genericScript = RunCommandScriptToken.Data().GetOrDefault(_values);
+            var bashScript = RunBashScriptToken.Data().GetOrDefault(_values);
+
+            var genericScriptOk = !string.IsNullOrEmpty(genericScript) ;
+            var bashScriptOk = !string.IsNullOrEmpty(bashScript);
+
+            var providedBothScripts = genericScriptOk && bashScriptOk;
+            if (providedBothScripts)
+            {
+                _values.AddThrowError("ERROR:", "Cannot specify both --script and --bash");
+            }
+
             DisplayBanner("dev.shell");
-
-            var fileName = !OS.IsWindows() ? "bash" : "cmd.exe";
-            var arguments = !OS.IsWindows() ? "-li" : "/k PROMPT (ai dev shell) %PROMPT%& title (ai dev shell)";
-
             Console.WriteLine("Environment populated:\n");
 
             var env = ConfigEnvironmentHelpers.GetEnvironment(_values);
             ConfigEnvironmentHelpers.PrintEnvironment(env);
-            ConfigEnvironmentHelpers.SetEnvironment(env);
             Console.WriteLine();
 
-            var runCommand = RunCommandScriptToken.Data().GetOrDefault(_values);
+            var runScript = genericScriptOk || bashScriptOk;
+            var script = genericScriptOk ? genericScript : bashScript;
 
-            // var processOutput = string.IsNullOrEmpty(runCommand)
-            //     ? ProcessHelpers.RunShellCommandAsync(fileName, arguments, env, null, null, null, false).Result
-            //     : ProcessHelpers.RunShellCommandAsync(runCommand, env, null, null, null, false).Result;
+            var task = runScript
+                ? ProcessHelpers.RunShellScriptAsync(script, scriptIsBash: bashScriptOk, env, null, null, null, false)
+                : ProcessHelpers.RunShellInteractiveAsync(env, null, null, null, false);
 
-            // var exitCode = processOutput.ExitCode;
-
-            UpdateFileNameArguments(runCommand, ref fileName, ref arguments, out var deleteWhenDone);
-
-            var process = ProcessHelpers.StartProcess(fileName, arguments, env, false);
-            process.WaitForExit();
-
-            if (!string.IsNullOrEmpty(deleteWhenDone))
-            {
-                File.Delete(deleteWhenDone);
-            }
-
-            var exitCode = process.ExitCode;
+            var exitCode = task.Result.ExitCode;
             if (exitCode != 0)
             {
                 Console.WriteLine("\n(ai dev shell) FAILED!\n");
@@ -143,41 +139,6 @@ namespace Azure.AI.Details.Common.CLI
             else
             {
                 Console.WriteLine("\n(ai dev shell) exited successfully");
-            }
-        }
-
-        private static void UpdateFileNameArguments(string runCommand, ref string fileName, ref string arguments, out string? deleteTempFileWhenDone)
-        {
-            deleteTempFileWhenDone = null;
-
-            if (!string.IsNullOrEmpty(runCommand))
-            {
-                var isSingleLine = !runCommand.Contains('\n') && !runCommand.Contains('\r');
-                if (isSingleLine)
-                {
-                    var parts = runCommand.Split(new char[] { ' ' }, 2);
-                    var inPath = FileHelpers.FileExistsInOsPath(parts[0]) || (OS.IsWindows() && FileHelpers.FileExistsInOsPath(parts[0] + ".exe"));
-
-                    var filePart = parts[0];
-                    var argsPart = parts.Length == 2 ? parts[1] : null;
-
-                    fileName = inPath ? filePart : fileName;
-                    arguments = inPath ? argsPart : (OS.IsLinux()
-                        ? $"-lic \"{runCommand}\""
-                        : $"/c \"{runCommand}\"");
-
-                    Console.WriteLine($"Running command: {runCommand}\n");
-                }
-                else
-                {
-                    deleteTempFileWhenDone = Path.GetTempFileName() + (OS.IsWindows() ? ".cmd" : ".sh");
-                    File.WriteAllText(deleteTempFileWhenDone, runCommand);
-
-                    fileName = OS.IsLinux() ? "bash" : "cmd.exe";
-                    arguments = OS.IsLinux() ? $"-lic \"{deleteTempFileWhenDone}\"" : $"/c \"{deleteTempFileWhenDone}\"";
-
-                    Console.WriteLine($"Running script:\n\n{runCommand}\n");
-                }
             }
         }
 
