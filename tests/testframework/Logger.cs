@@ -21,8 +21,18 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
 
         public static void Log(string text)
         {
-            LogInfo(text);
-            Logger.DbgTraceInfo(text);
+            var dt = $"{DateTime.Now}";
+            using (var mutex = new Mutex(false, "Logger Mutex"))
+            {
+                mutex.WaitOne();
+    
+#if DEBUG
+                logger?.SendMessage(TestMessageLevel.Informational, $"{dt}: {text}");
+#endif
+                File.AppendAllText(_logPath, $"{dt}: INFO: {text}\n");
+    
+                mutex.ReleaseMutex();
+            }
         }
 
         public static void LogIf(bool log, string text)
@@ -34,76 +44,44 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
 
         public static void LogInfo(string text)
         {
+            var dt = $"{DateTime.Now}";
             using (var mutex = new Mutex(false, "Logger Mutex"))
             {
                 mutex.WaitOne();
-                File.AppendAllText(_logPath, $"{DateTime.Now}: INFO: {text}\n");
+    
+                logger?.SendMessage(TestMessageLevel.Informational, $"{dt}: {text}");
+                File.AppendAllText(_logPath, $"{dt}: INFO: {text}\n");
+    
                 mutex.ReleaseMutex();
             }
         }
 
         public static void LogWarning(string text)
         {
+            var dt = $"{DateTime.Now}";
             using (var mutex = new Mutex(false, "Logger Mutex"))
             {
                 mutex.WaitOne();    
-                File.AppendAllText(_logPath, $"{DateTime.Now}: WARNING: {text}\n");
+
+                logger?.SendMessage(TestMessageLevel.Warning, $"{dt}: {text}");
+                File.AppendAllText(_logPath, $"{dt}: WARNING: {text}\n");
+
                 mutex.ReleaseMutex();
             }
         }
 
         public static void LogError(string text)
         {
+            var dt = $"{DateTime.Now}";
             using (var mutex = new Mutex(false, "Logger Mutex"))
             {
                 mutex.WaitOne();
-                File.AppendAllText(_logPath, $"{DateTime.Now}: ERROR: {text}\n");
+
+                logger?.SendMessage(TestMessageLevel.Error, $"{dt}: {text}");
+                File.AppendAllText(_logPath, $"{dt}: ERROR: {text}\n");
+
                 mutex.ReleaseMutex();
             }
-        }
-
-        #endregion
-
-        #region dbg trace methods
-
-        public static void DbgTraceInfo(string text)
-        {
-#if DEBUG
-            TraceInfo(text);
-#endif
-        }
-
-        public static void DbgTraceWarning(string text)
-        {
-#if DEBUG
-            TraceWarning(text);
-#endif
-        }
-
-        public static void DbgTraceError(string text)
-        {
-#if DEBUG
-            TraceError(text);
-#endif
-        }
-
-        #endregion
-
-        #region trace methods
-
-        public static void TraceInfo(string text)
-        {
-            logger?.SendMessage(TestMessageLevel.Informational, $"{DateTime.Now}: {text}");
-        }
-
-        public static void TraceWarning(string text)
-        {
-            logger?.SendMessage(TestMessageLevel.Warning, $"{DateTime.Now}: {text}");
-        }
-
-        public static void TraceError(string text)
-        {
-            logger?.SendMessage(TestMessageLevel.Error, $"{DateTime.Now}: {text}");
         }
 
         #endregion

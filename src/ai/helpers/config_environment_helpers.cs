@@ -24,6 +24,7 @@ namespace Azure.AI.Details.Common.CLI
 
             env.Add("AZURE_OPENAI_ENDPOINT", ReadConfig(values, "chat.endpoint"));
             env.Add("AZURE_OPENAI_KEY", ReadConfig(values, "chat.key"));
+            env.Add("AZURE_OPENAI_API_KEY", ReadConfig(values, "chat.key"));
             env.Add("AZURE_OPENAI_API_VERSION", ChatCommand.GetOpenAIClientVersionNumber());
 
             env.Add("AZURE_OPENAI_CHAT_DEPLOYMENT", ReadConfig(values, "chat.deployment"));

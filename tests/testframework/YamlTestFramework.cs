@@ -137,7 +137,7 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
                 var nextStepId = YamlTestProperties.Get(checkTest, "nextStepId");
                 if (string.IsNullOrEmpty(nextStepId))
                 {
-                    Logger.LogInfo($"YamlTestFramework.RunAndRecordTestCaseSteps() ==> No nextStepId for test '{checkTest.DisplayName}'");
+                    // Logger.LogInfo($"YamlTestFramework.RunAndRecordTestCaseSteps() ==> No nextStepId for test '{checkTest.DisplayName}'", trace: false);
                     break;
                 }
 

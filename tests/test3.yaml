@@ -27,6 +27,7 @@
     Create a file named "test.txt" with the following content: "Hello, World!"
     What files are in the current directory?
     Show me what's in the file "test.txt"
+    exit
   expect: |
     assistant-function: CreateFileAndSaveText
     assistant-function: FindAllFilesInCurrentDirectory
@@ -51,6 +52,7 @@
       How old is John?
       How old is Jane?
       How old is Bob?
+      exit
     expect: |
       assistant-function: GetUsersName\({}\) =
       assistant-function: GetPersonsAge\({
@@ -75,13 +77,13 @@
         cd openai-chat-cs
         dotnet build
     - name: run template
-      command: ai dev shell --run "openai-chat-cs\bin\Debug\net8.0\OpenAIChatCompletions"
+      command: ai dev shell --bash "openai-chat-cs/bin/Debug/net8.0/OpenAIChatCompletions"
       input: |-
         Tell me a joke
         Tell me another joke
+        exit
       expect-gpt: |
         The output should contain exactly two jokes.
-      tag: skip
 
   - class: dev new openai-chat (go)
     steps:
@@ -93,11 +95,11 @@
         go mod tidy
         go build
     - name: run template
-      command: ai dev shell --run "openai-chat-go\openai_chat_completions_hello_world"
+      command: ai dev shell --bash "openai-chat-go/openai_chat_completions_hello_world"
       input: |-
         Tell me a joke
         Tell me another joke
-      tag: skip
+        exit
 
   - class: dev new openai-chat (java)
     steps:
@@ -112,11 +114,19 @@
         cd openai-chat-java
         javac -cp "target/lib/*" src/OpenAIChatCompletionsClass.java src/Main.java -d out
     - name: run template
-      command: ai dev shell --run "cd openai-chat-java && java -cp \"out;target/lib/*\" Main"
+      command: ai dev shell
+      arguments:
+        bash: |
+          cd openai-chat-java
+          if [ -f /etc/os-release ]; then
+            java -cp "out:target/lib/*" Main
+          else
+            java -cp "out;target/lib/*" Main
+          fi
       input: |-
         Tell me a joke
         Tell me another joke
-      tag: skip
+        exit
 
   - class: dev new openai-chat (javascript)
     steps:
@@ -127,11 +137,11 @@
         cd openai-chat-js
         npm install
     - name: run template
-      command: ai dev shell --run "cd openai-chat-js && node main.js"
+      command: ai dev shell --bash "cd openai-chat-js;node Main.js"
       input: |-
         Tell me a joke
         Tell me another joke
-      tag: skip
+        exit
 
   - class: dev new openai-chat (python)
     steps:
@@ -141,13 +151,20 @@
       bash: |
         cd openai-chat-py
         pip install -r requirements.txt
-      tag: skip
     - name: run template
-      command: ai dev shell --run "cd openai-chat-py && python openai_chat_completions.py"
+      command: ai dev shell
+      arguments:
+        bash: |
+          cd openai-chat-py
+          if [ -f /etc/os-release ]; then
+            python3 openai_chat_completions.py
+          else
+            python openai_chat_completions.py
+          fi
       input: |-
         Tell me a joke
         Tell me another joke
-      tag: skip
+        exit
 
 - area: ai dev new openai-chat-streaming
   tests:
@@ -161,11 +178,11 @@
         cd openai-chat-streaming-cs
         dotnet build
     - name: run template
-      command: ai dev shell --run "openai-chat-streaming-cs\bin\Debug\net8.0\OpenAIChatCompletionsStreaming"
+      command: ai dev shell --bash "openai-chat-streaming-cs/bin/Debug/net8.0/OpenAIChatCompletionsStreaming"
       input: |-
         Tell me a joke
         Tell me another joke
-      tag: skip
+        exit
 
   - class: dev new openai-chat-streaming (go)
     steps:
@@ -177,11 +194,11 @@
         go mod tidy
         go build
     - name: run template
-      command: ai dev shell --run "openai-chat-streaming-go\openai_chat_completions_streaming_hello_world"
+      command: ai dev shell --bash "openai-chat-streaming-go/openai_chat_completions_streaming_hello_world"
       input: |-
         Tell me a joke
         Tell me another joke
-      tag: skip
+        exit
 
   - class: dev new openai-chat-streaming (java)
     steps:
@@ -196,11 +213,19 @@
         cd openai-chat-streaming-java
         javac -cp "target/lib/*" src/OpenAIChatCompletionsStreamingClass.java src/Main.java -d out
     - name: run template
-      command: ai dev shell --run "cd openai-chat-streaming-java && java -cp \"out;target/lib/*\" Main"
+      command: ai dev shell
+      arguments:
+        bash: |
+          cd openai-chat-streaming-java
+          if [ -f /etc/os-release ]; then
+            java -cp "out:target/lib/*" Main
+          else
+            java -cp "out;target/lib/*" Main
+          fi
       input: |-
         Tell me a joke
         Tell me another joke
-      tag: skip
+        exit
 
     command: ai dev new openai-chat-streaming --java
 
@@ -213,11 +238,11 @@
         cd openai-chat-streaming-js
         npm install
     - name: run template
-      command: ai dev shell --run "cd openai-chat-streaming-js && node main.js"
+      command: ai dev shell --bash "cd openai-chat-streaming-js;node Main.js"
       input: |-
         Tell me a joke
         Tell me another joke
-      tag: skip
+        exit
 
   - class: dev new openai-chat-streaming (python)
     steps:
@@ -227,13 +252,20 @@
       bash: |
         cd openai-chat-streaming-py
         pip install -r requirements.txt
-      tag: skip
     - name: run template
-      command: ai dev shell --run "cd openai-chat-streaming-py && python main.py"
+      command: ai dev shell
+      arguments:
+        bash: |
+          cd openai-chat-streaming-py
+          if [ -f /etc/os-release ]; then
+            python3 main.py
+          else
+            python main.py
+          fi
       input: |-
         Tell me a joke
         Tell me another joke
-      tag: skip
+        exit
 
 - area: ai dev new openai-chat-streaming-with-data
   tests:
@@ -247,9 +279,10 @@
         cd openai-chat-streaming-with-data-cs
         dotnet build
     - name: run template
-      command: ai dev shell --run "openai-chat-streaming-with-data-cs\bin\Debug\net8.0\OpenAIChatCompletionsWithDataStreaming"
+      command: ai dev shell --bash "openai-chat-streaming-with-data-cs/bin/Debug/net8.0/OpenAIChatCompletionsWithDataStreaming"
       input: |-
         What parameter should i use to select my resources?
+        exit
       tag: skip
 
   - class: dev new openai-chat-streaming-with-data (javascript)
@@ -261,9 +294,10 @@
         cd openai-chat-streaming-with-data-js
         npm install
     - name: run template
-      command: ai dev shell --run "cd openai-chat-streaming-with-data-js && node main.js"
+      command: ai dev shell --bash "cd openai-chat-streaming-with-data-js;node Main.js"
       input: |-
         What parameter should i use to select my resources?
+        exit
       tag: skip
 
   - class: dev new openai-chat-streaming-with-data (python)
@@ -274,11 +308,19 @@
       bash: |
         cd openai-chat-streaming-with-data-py
         pip install -r requirements.txt
-      tag: skip
     - name: run template
-      command: ai dev shell --run "cd openai-chat-streaming-with-data-py && python main.py"
+      command: ai dev shell
+      arguments:
+        bash: |
+          cd openai-chat-streaming-with-data-py
+          if [ -f /etc/os-release ]; then
+            python3 main.py
+          else
+            python main.py
+          fi
       input: |-
         What parameter should i use to select my resources?
+        exit
       tag: skip
 
   - class: dev new openai-chat-streaming-with-data (go)
@@ -290,9 +332,10 @@
         cd openai-chat-streaming-with-data-go
         go mod tidy
     - name: run template
-      command: ai dev shell --run "cd openai-chat-streaming-with-data-go && go run .\main.go .\openai_chat_completions_streaming_with_data_hello_world.go"
+      command: ai dev shell --bash "cd openai-chat-streaming-with-data-go;go run ./main.go ./openai_chat_completions_streaming_with_data_hello_world.go"
       input: |-
-        What parameter should i use to initialize?
+        What parameter should i use to select my resources?
+        exit
       tag: skip
 
 - area: ai dev new openai-chat-streaming-with-functions
@@ -307,11 +350,11 @@
         cd openai-chat-streaming-with-functions-cs
         dotnet build
     - name: run template
-      command: ai dev shell --run "cd openai-chat-streaming-with-functions-cs && bin\Debug\net8.0\OpenAIChatCompletionsFunctionsStreaming"
+      command: ai dev shell --bash "cd openai-chat-streaming-with-functions-cs;./bin/Debug/net8.0/OpenAIChatCompletionsFunctionsStreaming"
       input: |-
         What is the date?
         What is the time?
-      tag: skip
+        exit
 
   - class: dev new openai-chat-streaming-with-functions (go)
     steps:
@@ -323,11 +366,11 @@
         go mod tidy
         go build
     - name: run template
-      command: ai dev shell --run "cd openai-chat-streaming-with-functions-go && openai_chat_completions_functions_streaming_hello_world"
+      command: ai dev shell --bash "cd openai-chat-streaming-with-functions-go;./openai_chat_completions_functions_streaming_hello_world"
       input: |-
         What is the date?
         What is the time?
-      tag: skip
+        exit
 
   - class: dev new openai-chat-streaming-with-functions (javascript)
     steps:
@@ -338,11 +381,11 @@
         cd openai-chat-streaming-with-functions-js
         npm install
     - name: run template
-      command: ai dev shell --run "cd openai-chat-streaming-with-functions-js && node main.js"
+      command: ai dev shell --bash "cd openai-chat-streaming-with-functions-js;node Main.js"
       input: |-
         What is the date?
         What is the time?
-      tag: skip
+        exit
 
   - class: dev new openai-chat-streaming-with-functions (python)
     steps:
@@ -352,13 +395,20 @@
       bash: |
         cd openai-chat-streaming-with-functions-py
         pip install -r requirements.txt
-      tag: skip
     - name: run template
-      command: ai dev shell --run "cd openai-chat-streaming-with-functions-py && python main.py"
+      command: ai dev shell
+      arguments:
+        bash: |
+          cd openai-chat-streaming-with-functions-py
+          if [ -f /etc/os-release ]; then
+            python3 main.py
+          else
+            python main.py
+          fi
       input: |-
         What is the date?
         What is the time?
-      tag: skip
+        exit
 
 - area: ai dev new openai-webpage
   tests:
