@@ -26,7 +26,7 @@ REM Dependencies
 set AZURE_CLI_VERSION=2.57.0
 set AZURE_CLI_INSTALLER=azure-cli-%AZURE_CLI_VERSION%-%TARGET_PLATFORM%.msi
 set AZURE_CLI_URL=https://azcliprod.blob.core.windows.net/msi/%AZURE_CLI_INSTALLER%
-set DOTNET_VERSION=8.0.101
+set DOTNET_VERSION=8.0.200
 set DOTNET_INSTALLER=dotnet-sdk-%DOTNET_VERSION%-win-%TARGET_PLATFORM%.exe
 set DOTNET_URL=https://dotnetcli.azureedge.net/dotnet/Sdk/%DOTNET_VERSION%/%DOTNET_INSTALLER%
 
@@ -74,7 +74,7 @@ if %ERRORLEVEL% neq 0 (
 )
 
 REM Build installation bundle .exe
-candle.exe Azure-AI-CLI-Bundle.wxs -ext WixBalExtension -ext WixUtilExtension ^
+candle.exe Azure-AI-CLI-Setup.wxs -ext WixBalExtension -ext WixUtilExtension ^
   -dproductVersion=%PRODUCT_VERSION% -dtargetPlatform=%TARGET_PLATFORM% ^
   -dazureCliVersion=%AZURE_CLI_VERSION% -dazureCliUrl=%AZURE_CLI_URL% ^
   -ddotNetVersion=%DOTNET_VERSION% -ddotNetUrl=%DOTNET_URL%
@@ -83,7 +83,7 @@ if %ERRORLEVEL% neq 0 (
   exit /b 9
 )
 
-light.exe Azure-AI-CLI-Bundle.wixobj -ext WixBalExtension -ext WixUtilExtension -out %INSTALLER_FILE%
+light.exe Azure-AI-CLI-Setup.wixobj -ext WixBalExtension -ext WixUtilExtension -out %INSTALLER_FILE%
 if %ERRORLEVEL% neq 0 (
   echo Error from light.exe 1>&2
   exit /b 10
