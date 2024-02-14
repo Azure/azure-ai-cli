@@ -23,7 +23,7 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
 
             lock (this)
             {
-                Console.ForegroundColor = ConsoleColor.DarkGray;
+                Console.ForegroundColor = ColorHelpers.MapColor(ConsoleColor.DarkGray);
                 Console.WriteLine("Starting test: " + testCase.FullyQualifiedName);
                 Console.ResetColor();
             }
@@ -75,14 +75,14 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
 
             Console.ForegroundColor = ConsoleColor.Green;
             Console.Write($"\nPassed: {passedResults.Count}");
-            Console.ForegroundColor = ConsoleColor.DarkGray;
+            Console.ForegroundColor = ColorHelpers.MapColor(ConsoleColor.DarkGray);
             Console.WriteLine($" ({100f * passedResults.Count / count:0.0}%)");
 
             if (failedResults.Count > 0)
             {
                 Console.ForegroundColor = ConsoleColor.Red;
                 Console.Write($"Failed: {failedResults.Count}");
-                Console.ForegroundColor = ConsoleColor.DarkGray;
+                Console.ForegroundColor = ColorHelpers.MapColor(ConsoleColor.DarkGray);
                 Console.WriteLine($" ({100f * failedResults.Count / count:0.0}%)");
             }
 
@@ -90,7 +90,7 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
             {
                 Console.ForegroundColor = ConsoleColor.Yellow;
                 Console.Write($"Skipped: {skippedResults.Count}");
-                Console.ForegroundColor = ConsoleColor.DarkGray;
+                Console.ForegroundColor = ColorHelpers.MapColor(ConsoleColor.DarkGray);
                 Console.WriteLine($" ({100f * skippedResults.Count / count:0.0}%)");
             }
 
@@ -98,7 +98,7 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
             Console.Write("\nTests: ");
             Console.ForegroundColor = ConsoleColor.Blue;
             Console.Write($"{count}");
-            Console.ForegroundColor = ConsoleColor.DarkGray;
+            Console.ForegroundColor = ColorHelpers.MapColor(ConsoleColor.DarkGray);
             Console.WriteLine($" ({duration})");
 
             var resultsFile = WriteResultFile();
@@ -302,7 +302,7 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
         {
             lock (this)
             {
-                Console.ForegroundColor = ConsoleColor.DarkGray;
+                Console.ForegroundColor = ColorHelpers.MapColor(ConsoleColor.DarkGray);
                 if (testResult.Outcome == TestOutcome.Passed) Console.ForegroundColor = ConsoleColor.Green;
                 if (testResult.Outcome == TestOutcome.Skipped) Console.ForegroundColor = ConsoleColor.Yellow;
                 if (testResult.Outcome == TestOutcome.Failed) Console.ForegroundColor = ConsoleColor.Red;
@@ -325,7 +325,7 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
                     var hasStack = !string.IsNullOrEmpty(stack);
                     if (hasStack)
                     {
-                        Console.ForegroundColor = ConsoleColor.DarkGray;
+                        Console.ForegroundColor = ColorHelpers.MapColor(ConsoleColor.DarkGray);
                         Console.WriteLine(stack.TrimEnd('\r', '\n', ' '));
                     }
 
@@ -341,7 +341,7 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
                             lines = first5.Concat(new[] { $"[ ******* ------- TRIMMED +{lines.Length - 10} LINE(s) ------- ******* ]" }).Concat(last5).ToArray();
                             stdErr = string.Join("\n", lines) + "\n...";
                         }
-                        Console.ForegroundColor = ConsoleColor.DarkGray;
+                        Console.ForegroundColor = ColorHelpers.MapColor(ConsoleColor.DarkGray);
                         Console.WriteLine(stdErr.TrimEnd('\r', '\n', ' '));
                     }
 

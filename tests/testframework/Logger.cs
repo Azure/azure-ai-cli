@@ -19,7 +19,21 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
             Logger.logger = logger;
         }
 
-        public static void Log(string text) => LogInfo(text);
+        public static void Log(string text)
+        {
+            var dt = $"{DateTime.Now}";
+            using (var mutex = new Mutex(false, "Logger Mutex"))
+            {
+                mutex.WaitOne();
+    
+#if DEBUG
+                logger?.SendMessage(TestMessageLevel.Informational, $"{dt}: {text}");
+#endif
+                File.AppendAllText(_logPath, $"{dt}: INFO: {text}\n");
+    
+                mutex.ReleaseMutex();
+            }
+        }
 
         public static void LogIf(bool log, string text)
         {

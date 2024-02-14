@@ -111,13 +111,23 @@ tests:
 - name: test python src/run.py --question "which tent is the most waterproof?"
   command: ai dev shell
   arguments:
-    run: python src/run.py --question "which tent is the most waterproof?"
+    bash: |
+      if [ -f /etc/os-release ]; then
+        python3 src/run.py --question "which tent is the most waterproof?"
+      else
+        python src/run.py --question "which tent is the most waterproof?"
+      fi
   tag: skip
 
 - name: test python src/run.py --question "which tent is the most waterproof?" --implementation promptflow
   command: ai dev shell
   arguments:
-    run: python src/run.py --question "which tent is the most waterproof?" --implementation promptflow
+    bash: |
+      if [ -f /etc/os-release ]; then
+        python3 src/run.py --question "which tent is the most waterproof?" --implementation promptflow
+      else
+        python src/run.py --question "which tent is the most waterproof?" --implementation promptflow
+      fi
   tag: skip # doesn't work currently
 
 - name: test ai chat --interactive
@@ -135,7 +145,12 @@ tests:
 - name: test python src/run.py --evaluate --implementation aisdk
   command: ai dev shell
   arguments:
-    run: python src/run.py --evaluate --implementation aisdk
+    bash: |
+      if [ -f /etc/os-release ]; then
+        python3 src/run.py --evaluate --implementation aisdk
+      else
+        python src/run.py --evaluate --implementation aisdk
+      fi
   expect: |
     ('(gpt_coherence|gpt_groundedness|gpt_relevance)': .*){3}
   tag: skip
@@ -167,5 +182,10 @@ tests:
 - name: test python src/run.py --deploy
   command: ai dev shell
   arguments:
-    run: python src/run.py --deploy
+    bash: |
+      if [ -f /etc/os-release ]; then
+        python3 src/run.py --deploy
+      else
+        python src/run.py --deploy
+      fi
   tag: skip # doesn't work currently (returns exit code 1)
