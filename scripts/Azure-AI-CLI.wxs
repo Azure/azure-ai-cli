@@ -4,11 +4,6 @@
 <Product Id="*" Name="Azure AI CLI" Language="1033" Version="$(var.productVersion)" Manufacturer="Microsoft Corporation" UpgradeCode="F1CDBA9C-E353-4039-9A20-059A1E587E73">
     <Package InstallerVersion="500" Compressed="yes" InstallScope="perMachine" Platform="$(var.targetPlatform)"/>
     <!--
-    To prevent problems with bundle upgrades, use MajorUpgrade element here and ProductSearch in the bundle wxs.
-    -->
-    <MajorUpgrade AllowDowngrades="no" DowngradeErrorMessage="A newer version is already installed."/>
-
-    <!--
     Below can be used to control upgrades on a single MSI-only (non-bundle) installation.
     -->
     <!--
