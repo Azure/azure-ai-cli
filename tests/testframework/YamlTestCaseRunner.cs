@@ -694,7 +694,7 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
             var gitBash = FindCacheGitBashExe();
             if (gitBash == null || gitBash == "bash.exe")
             {
-                throw new Exception("Could not Git for Windows bash.exe in PATH!");
+                throw new Exception("Could not find Git for Windows bash.exe in PATH!");
             }
             return gitBash;
         }
