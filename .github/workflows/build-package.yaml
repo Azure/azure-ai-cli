@@ -18,7 +18,7 @@ jobs:
       - name: Set up .NET Core
         uses: actions/setup-dotnet@v2
         with:
-          dotnet-version: '7.0.x' # Set the desired .NET version
+          dotnet-version: '8.0.x' # Set the desired .NET version
 
       - name: Set up environment variables
         run: |

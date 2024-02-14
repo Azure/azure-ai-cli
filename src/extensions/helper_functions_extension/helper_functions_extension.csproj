@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <AssemblyName>Azure.AI.CLI.Extensions.HelperFunctions</AssemblyName>
-    <TargetFramework>net7.0</TargetFramework>
+    <TargetFramework>net8.0</TargetFramework>
     <RootNamespace>Azure.AI.Details.Common.CLI.Extensions.HelperFunctions</RootNamespace>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>

@@ -1,0 +1,25 @@
+name: Sync issue to Azure DevOps work item
+
+on:
+  issues:
+    types:
+      [opened, edited, deleted, closed, reopened, labeled, unlabeled, assigned]
+  issue_comment:
+    types: [created, edited, deleted]
+
+jobs:
+  alert:
+    if: ${{ !github.event.issue.pull_request }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Run PowerShell script
+        id: update_ADO_work_feature
+        shell: pwsh
+        run: |
+          $adoWorkItemLink = pwsh -File ./scripts/ADOGetADOLinkNumber.ps1 "${{ github.event.issue.body }}"
+          if ($adoWorkItemLink -ne 0){
+            pwsh -File ./scripts/ADOUpdateFeature.ps1 -organization "msdata" -project "Vienna" -pat "${{ secrets.ADO_PERSONAL_ACCESS_TOKEN}}" -workItemId "$adoWorkItemLink" -newState "${{ github.event.issue.state }}"
+          }

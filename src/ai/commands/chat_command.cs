@@ -483,7 +483,7 @@ namespace Azure.AI.Details.Common.CLI
         {
             Console.Write("\r");
             DisplayUserChatPromptLabel();
-            Console.ForegroundColor = ConsoleColor.DarkGray;
+            Console.ForegroundColor = ColorHelpers.MapColor(ConsoleColor.DarkGray);
 
             var text = "(listening)";
             Console.Write($"{text} ...");
@@ -495,7 +495,7 @@ namespace Azure.AI.Details.Common.CLI
             {
                 Console.Write("\r");
                 DisplayUserChatPromptLabel();
-                Console.ForegroundColor = ConsoleColor.DarkGray;
+                Console.ForegroundColor = ColorHelpers.MapColor(ConsoleColor.DarkGray);
 
                 Console.Write($"{e.Result.Text} ...");
                 if (e.Result.Text.Length < lastTextDisplayed.Length) Console.Write(new string(' ', lastTextDisplayed.Length - e.Result.Text.Length));
@@ -592,11 +592,11 @@ namespace Azure.AI.Details.Common.CLI
                 Console.Write("\rassistant-function");
                 Console.ForegroundColor = ConsoleColor.White;
                 Console.Write(": ");
-                Console.ForegroundColor = ConsoleColor.DarkGray;
+                Console.ForegroundColor = ColorHelpers.MapColor(ConsoleColor.DarkGray);
                 Console.WriteLine($"{context.FunctionName}({context.Arguments}) = {result}");
 
                 DisplayAssistantPromptLabel();
-                Console.ForegroundColor = ConsoleColor.Gray;
+                Console.ForegroundColor = ColorHelpers.MapColor(ConsoleColor.DarkGray);
             }
         }
 
@@ -1007,6 +1007,7 @@ namespace Azure.AI.Details.Common.CLI
                 var system = message as ChatRequestSystemMessage;
                 var assistant = message as ChatRequestAssistantMessage;
                 var content = system?.Content ?? user?.Content ?? assistant?.Content;
+                content = content.Replace("\\", "\u005C").Replace("\"", "");
 
                 var ok = !string.IsNullOrEmpty(content);
                 if (!ok) continue;
@@ -1168,10 +1169,9 @@ namespace Azure.AI.Details.Common.CLI
             }
 
             var result = i > 0 ? sb.ToString().Trim() : null;
-
-            // Console.ForegroundColor = ConsoleColor.DarkGray;
-            // Console.WriteLine("Relevant?\n" + result + "\n");
-            // Console.ResetColor();
+           // Console.ForegroundColor = ColorHelpers.MapColor(ConsoleColor.DarkGray);
+           // Console.WriteLine("Relevant?\n" + result + "\n");
+           // Console.ResetColor();
 
             return result;
         }

@@ -12,7 +12,7 @@ Customer Requirements:
 - Support Debian 10, 11, and 12
 - Support Ubunutu 20.04 and 22.04
 - Check and install Azure CLI if not present
-- Check and install dotnet 7.0 if not present
+- Check and install dotnet 8.0 if not present
 - Check and install Python azure.ai.generative SDK if not present
 - Update user's shell rc file (e.g. `$HOME/.bashrc` and/or `$HOME/.zshrc`)
 
