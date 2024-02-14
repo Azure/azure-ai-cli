@@ -161,9 +161,9 @@ namespace Azure.AI.Details.Common.CLI
 
         private string DoIndexUpdateWithGenAi(string subscription, string groupName, string projectName, string indexName, string embeddingModelDeployment, string embeddingModelName, string dataFiles, string externalSourceUrl)
         {
-            // work around issue with Py GenAI SDK needing this var to be set
+            // work around issue with Py GenAI SDK needing this var to be set; do not set any additional values... See Hanchi Wang for more info.
             var env = ConfigEnvironmentHelpers.GetEnvironment(_values);
-            env = new Dictionary<string, string>(env.Where(x => x.Key == "AZURE_OPENAI_API_KEY"));
+            env = new Dictionary<string, string>(env.Where(x => x.Key == "AZURE_OPENAI_KEY"));
             
             return PythonSDKWrapper.UpdateMLIndex(_values, subscription, groupName, projectName, indexName, embeddingModelDeployment, embeddingModelName, dataFiles, externalSourceUrl, env);
         }
