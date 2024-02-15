@@ -604,6 +604,7 @@ namespace Azure.AI.Details.Common.CLI
         {
             var requestMessage = new ChatRequestUserMessage(text);
             options.Messages.Add(requestMessage);
+            
             CheckWriteChatHistoryOutputFile(options);
             DisplayAssistantPromptLabel();
 
@@ -638,8 +639,9 @@ namespace Azure.AI.Details.Common.CLI
                 DisplayAssistantPromptTextStreamingDone();
                 CheckWriteChatAnswerOutputFile(contentComplete);
 
-                var responseMessage = new ChatRequestAssistantMessage(contentComplete);
-                options.Messages.Add(responseMessage);
+                var currentContent = new ChatRequestAssistantMessage(contentComplete);
+                options.Messages.Add(currentContent);
+                
                 CheckWriteChatHistoryOutputFile(options);
 
                 return response;
