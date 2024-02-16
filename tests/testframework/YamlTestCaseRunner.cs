@@ -228,15 +228,16 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
 
             try
             {
+                var kvs = KeyValuePairsFromJson(arguments, true);
+                kvs.AddRange(KeyValuePairsFromJson(@foreach, false));
+                stackTrace = UpdateStackTrace(stackTrace, command, kvs);
+                kvs = ConvertValuesToAtArgs(kvs, ref filesToDelete);
+
                 var useCmd = !scriptIsBash;
                 script = WriteTextToTempFile(script, useCmd ? "cmd" : null);
 
                 expect = WriteTextToTempFile(expect);
                 notExpect = WriteTextToTempFile(notExpect);
-
-                var kvs = KeyValuePairsFromJson(arguments, true);
-                kvs.AddRange(KeyValuePairsFromJson(@foreach, false));
-                kvs = ConvertValuesToAtArgs(kvs, ref filesToDelete);
 
                 GetStartInfoArgs(out var startProcess, out var startArgs, cli, command, script, scriptIsBash, kvs, expect, notExpect, ref filesToDelete);
                 stackTrace = $"{startProcess} {startArgs}\n{stackTrace ?? string.Empty}";
@@ -357,6 +358,33 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
                 }
             }
             return kvs;
+        }
+
+        private static string UpdateStackTrace(string stackTrace, string command, List<KeyValuePair<string, string>> kvs)
+        {
+            if (command?.EndsWith("dev shell") ?? false)
+            {
+                var devShellRunBashScriptArguments = string.Join("\n", kvs
+                    .Where(kv => kv.Key switch { "run" => true, "bash" => true, "script" => true, _ => false })
+                    .Select(kv => !string.IsNullOrEmpty(kv.Key)
+                        ? $"{kv.Key}:\n{kv.Value.Replace("\n", "\n  ")}"
+                        : kv.Value));
+                if (!string.IsNullOrEmpty(devShellRunBashScriptArguments))
+                {
+                    stackTrace = $"{stackTrace ?? string.Empty}\n{devShellRunBashScriptArguments}".Trim('\r', '\n', ' ');
+                }
+            }
+            else if (command != null)
+            {
+                var commandArguments = string.Join("\n", kvs
+                    .Where(kv => !string.IsNullOrEmpty(kv.Key))
+                    .Select(kv => $"{kv.Key}:\n{kv.Value.Replace("\n", "\n  ")}"));
+                stackTrace = !string.IsNullOrEmpty(commandArguments)
+                    ? $"{stackTrace ?? string.Empty}\nCOMMAND: {command}\n{commandArguments}".Trim('\r', '\n', ' ')
+                    : $"{stackTrace ?? string.Empty}\nCOMMAND: {command}".Trim('\r', '\n', ' ');
+            }
+
+            return stackTrace;
         }
 
         private static string WriteMultilineTsvToTempFile(string text, ref List<string> files)
