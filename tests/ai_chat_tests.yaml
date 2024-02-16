@@ -92,92 +92,101 @@
         - regex: https://(?<host>[^/]+)/
           value: https://fakeendpoint/
   steps:
-  - name: test ai chat history save
-    expect: The file is valid.
-    bash: |
-      #!/bin/bash  
-      rm chat-history.jsonl
+    - name: test ai chat history save
+      expect: The file is valid.
+      bash: |
+        #!/bin/bash  
+        rm chat-history.jsonl
 
-      ai chat --question "Why is the sky blue, what's it called" --output-chat-history-file chat-history.jsonl
+        ai chat --question "Why is the sky blue, what's it called" --output-chat-history-file chat-history.jsonl
       
-      # Read the jsonl file  
-      FILE="chat-history.jsonl"  
-      NUM_LINES=$(wc -l < "$FILE")  
-      ROLE_SYSTEM_COUNT=$(grep -c "\"role\":\"system\"" "$FILE")  
-      ROLE_USER_COUNT=$(grep -c "\"role\":\"user\"" "$FILE")  
-      ROLE_ASSISTANT_COUNT=$(grep -c "\"role\":\"assistant\"" "$FILE")  
+        # Read the jsonl file  
+        FILE="chat-history.jsonl"  
+        NUM_LINES=$(wc -l < "$FILE")  
+        ROLE_SYSTEM_COUNT=$(grep -c "\"role\":\"system\"" "$FILE")  
+        ROLE_USER_COUNT=$(grep -c "\"role\":\"user\"" "$FILE")  
+        ROLE_ASSISTANT_COUNT=$(grep -c "\"role\":\"assistant\"" "$FILE")  
         
-      # Validate if the file is correct jsonl  
-      jq -e ".[]" < "$FILE" > /dev/null 2>&1  
-      JSONL_VALID=$?  
+        # Validate if the file is correct jsonl  
+        jq -e ".[]" < "$FILE" > /dev/null 2>&1  
+        JSONL_VALID=$?  
         
-      # Check the conditions  
-      if [ $NUM_LINES -eq 3 ] && [ $ROLE_SYSTEM_COUNT -eq 1 ] && [ $ROLE_USER_COUNT -eq 1 ] && [ $ROLE_ASSISTANT_COUNT -eq 1 ] && [ $JSONL_VALID -eq 0 ]; then  
-          echo "The file is valid."  
-      else  
-          echo "The file is not valid."  
-          if [ $JSONL_VALID -ne 0 ]; then  
-              echo " - The file is not a valid JSONL."  
-          fi  
-          if [ $NUM_LINES -ne 3 ]; then  
-              echo " - There are not exactly 3 rows."  
-          fi  
-          if [ $ROLE_SYSTEM_COUNT -ne 1 ]; then  
-              echo " - There is no row with \"role\":\"system\" in it."  
-          fi  
-          if [ $ROLE_USER_COUNT -ne 1 ]; then  
-              echo " - The row with \"role\":\"user\" is not exactly as above."  
-          fi  
-          if [ $ROLE_ASSISTANT_COUNT -ne 1 ]; then  
-              echo " - There is no row with \"role\":\"assistant\" in it."  
-          fi  
-      fi  
-  - name: test ai chat history save with function calls
-    expect: The file is valid.
-    bash: |
-      #!/bin/bash  
-      FILE="chat-history.jsonl"  
+        # Check the conditions  
+        if [ $NUM_LINES -eq 3 ] && [ $ROLE_SYSTEM_COUNT -eq 1 ] && [ $ROLE_USER_COUNT -eq 1 ] && [ $ROLE_ASSISTANT_COUNT -eq 1 ] && [ $JSONL_VALID -eq 0 ]; then  
+            echo "The file is valid."  
+        else  
+            echo "The file is not valid."  
+            if [ $JSONL_VALID -ne 0 ]; then  
+                echo " - The file is not a valid JSONL."  
+            fi  
+            if [ $NUM_LINES -ne 3 ]; then  
+                echo " - There are not exactly 3 rows."  
+            fi  
+            if [ $ROLE_SYSTEM_COUNT -ne 1 ]; then  
+                echo " - There is no row with \"role\":\"system\" in it."  
+            fi  
+            if [ $ROLE_USER_COUNT -ne 1 ]; then  
+                echo " - The row with \"role\":\"user\" is not exactly as above."  
+            fi  
+            if [ $ROLE_ASSISTANT_COUNT -ne 1 ]; then  
+                echo " - There is no row with \"role\":\"assistant\" in it."  
+            fi  
+        fi  
+    - name: test ai chat history save with function calls
+      expect: The file is valid.
+      workingDirectory:
+      bash: |
+        #!/bin/bash  
+        FILE="chat-history-function.jsonl"  
       
-      rm ${FILE}
+        rm *
 
-      ai chat --question "What files are in the current directory?" --built-in-functions true --output-chat-history-file ${FILE}
+        ai chat --question "What files are in the current directory?" --built-in-functions true --output-chat-history-file ${FILE}
       
-      # Read the JSONL file  
-      NUM_LINES=$(wc -l < "$FILE")  
-      ROLE_SYSTEM_COUNT=$(grep -c "\"role\":\"system\"" "$FILE")  
-      ROLE_USER_COUNT=$(grep -c "\"role\":\"user\"" "$FILE")  
-      ROLE_ASSISTANT_COUNT=$(grep -c "\"role\":\"assistant\"" "$FILE")  
-      ROLE_FUNCTION_COUNT=$(grep -c "\"role\":\"function\"" "$FILE")  
-      FUNCTION_CALL_COUNT=$(grep -c "\"name\":\"FindAllFilesInCurrentDirectory\",\"arguments\":\"{}\"" "$FILE")  
+        # Read the JSONL file  
+        NUM_LINES=$(wc -l < "$FILE")  
+        ROLE_SYSTEM_COUNT=$(grep -c "\"role\":\"system\"" "$FILE")  
+        ROLE_USER_COUNT=$(grep -c "\"role\":\"user\"" "$FILE")  
+        ROLE_ASSISTANT_COUNT=$(grep -c "\"role\":\"assistant\"" "$FILE")  
+        ROLE_FUNCTION_COUNT=$(grep -c "\"role\":\"function\"" "$FILE")  
+        FUNCTION_CALL_COUNT=$(grep -c "\"name\":\"FindAllFilesInCurrentDirectory\",\"arguments\":\"{}\"" "$FILE")  
         
-      # Validate if the file is correct JSONL  
-      jq -e ".[]" < "$FILE" > /dev/null 2>&1  
-      JSONL_VALID=$?  
+        # Validate if the file is correct JSONL  
+        jq -e ".[]" < "$FILE" > /dev/null 2>&1  
+        JSONL_VALID=$?  
         
-      # Check the conditions  
-      if [ $NUM_LINES -eq 5 ] && [ $ROLE_SYSTEM_COUNT -eq 1 ] && [ $ROLE_USER_COUNT -eq 1 ] && [ $ROLE_ASSISTANT_COUNT -eq 2 ] && [ $ROLE_FUNCTION_COUNT -eq 1 ] && [ $FUNCTION_CALL_COUNT -eq 1 ] && [ $JSONL_VALID -eq 0 ]; then  
-          echo "The file is valid."  
-      else  
-          echo "The file is not valid."  
-          if [ $JSONL_VALID -ne 0 ]; then  
-              echo " - The file is not a valid JSONL."  
-          fi  
-          if [ $NUM_LINES -ne 5 ]; then  
-              echo " - There are not exactly 5 rows. The file has $NUM_LINES rows."  
-          fi  
-          if [ $ROLE_SYSTEM_COUNT -ne 1 ]; then  
-              echo " - There is no row with \"role\":\"system\" in it. The file has $ROLE_SYSTEM_COUNT rows."  
-          fi  
-          if [ $ROLE_USER_COUNT -ne 1 ]; then  
-              echo " - The row with \"role\":\"user\" is not exactly as above. The file has $ROLE_USER_COUNT rows."  
-          fi  
-          if [ $ROLE_ASSISTANT_COUNT -ne 2 ]; then  
-              echo " - There are not exactly 2 rows with \"role\":\"assistant\" in them. The file has $ROLE_ASSISTANT_COUNT rows."  
-          fi  
-          if [ $ROLE_FUNCTION_COUNT -ne 1 ]; then  
-              echo " - There is no row with \"role\":\"function\" in it. The file has $ROLE_FUNCTION_COUNT rows."  
-          fi  
-          if [ $FUNCTION_CALL_COUNT -ne 1 ]; then  
-              echo " - The function \"FindAllFilesInCurrentDirectory\" is not called. The file has $FUNCTION_CALL_COUNT rows."  
-          fi  
-      fi  
+        # Check the conditions  
+        if [ $NUM_LINES -eq 5 ] && [ $ROLE_SYSTEM_COUNT -eq 1 ] && [ $ROLE_USER_COUNT -eq 1 ] && [ $ROLE_ASSISTANT_COUNT -eq 2 ] && [ $ROLE_FUNCTION_COUNT -eq 1 ] && [ $FUNCTION_CALL_COUNT -eq 1 ] && [ $JSONL_VALID -eq 0 ]; then  
+            echo "The file is valid."  
+        else  
+            echo "The file is not valid."  
+            if [ $JSONL_VALID -ne 0 ]; then  
+                echo " - The file is not a valid JSONL."  
+            fi  
+            if [ $NUM_LINES -ne 5 ]; then  
+                echo " - There are not exactly 5 rows. The file has $NUM_LINES rows."  
+            fi  
+            if [ $ROLE_SYSTEM_COUNT -ne 1 ]; then  
+                echo " - There is no row with \"role\":\"system\" in it. The file has $ROLE_SYSTEM_COUNT rows."  
+            fi  
+            if [ $ROLE_USER_COUNT -ne 1 ]; then  
+                echo " - The row with \"role\":\"user\" is not exactly as above. The file has $ROLE_USER_COUNT rows."  
+            fi  
+            if [ $ROLE_ASSISTANT_COUNT -ne 2 ]; then  
+                echo " - There are not exactly 2 rows with \"role\":\"assistant\" in them. The file has $ROLE_ASSISTANT_COUNT rows."  
+            fi  
+            if [ $ROLE_FUNCTION_COUNT -ne 1 ]; then  
+                echo " - There is no row with \"role\":\"function\" in it. The file has $ROLE_FUNCTION_COUNT rows."  
+            fi  
+            if [ $FUNCTION_CALL_COUNT -ne 1 ]; then  
+                echo " - The function \"FindAllFilesInCurrentDirectory\" is not called. The file has $FUNCTION_CALL_COUNT rows."  
+            fi  
+        fi  
+    - name: Test AI Chat with restored history file (basic)
+      expect: sky
+      bash: |
+        ai chat --question "What would make it red?" --built-in-functions true --input-chat-history-file ../tests/chat-history-basic.jsonl
+    - name: Test AI Chat with restored history file (function calls)
+      expect: FindAllFilesInCurrentDirectory
+      bash: |
+        ai chat --question "What was the last function call you made using your allowed functions?" --input-chat-history-file ../tests/chat-history-function.jsonl
