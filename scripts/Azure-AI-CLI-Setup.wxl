@@ -33,9 +33,19 @@
   <String Id="ModifyUninstallButton">&amp;Uninstall</String>
   <String Id="ModifyCloseButton">&amp;Close</String>
   <String Id="SuccessRepairHeader">Repair Successfully Completed</String>
-  <String Id="SuccessUninstallHeader">Uninstall Successfully Completed</String>
-  <String Id="SuccessInstallHeader">Installation successfully completed. Please close and reopen any active terminal window to use Azure AI CLI. You can invoke the tool using the following command: ai</String> 
-  <String Id="SuccessHeader">Setup Successful</String>	
+  <String Id="SuccessUninstallHeader">Uninstall successfully completed. Please uninstall the following dependent packages separately if they are not used anymore:
+
+- Microsoft .NET SDK 8
+- Microsoft Azure CLI
+- Microsoft Visual C++ 2015-2022 Redistributable
+  </String>
+  <String Id="SuccessInstallHeader">Installation successfully completed.
+
+Please open a new terminal window to use Azure AI CLI.
+
+You can invoke the tool using the following command: ai
+  </String>
+  <String Id="SuccessHeader">Setup Successful</String>
   <String Id="SuccessLaunchButton">&amp;Launch</String>
   <String Id="SuccessRestartText">You must restart your computer before you can use the software.</String>
   <String Id="SuccessRestartButton">&amp;Restart</String>
@@ -43,7 +53,7 @@
   <String Id="FailureHeader">Setup Failed</String>
   <String Id="FailureInstallHeader">Setup Failed</String>
   <String Id="FailureUninstallHeader">Uninstall Failed</String>
-  <String Id="FailureRepairHeader">Repair Failed</String> 
+  <String Id="FailureRepairHeader">Repair Failed</String>
   <String Id="FailureHyperlinkLogText">One or more issues caused the setup to fail. Please fix the issues and then retry setup. For more information see the &lt;a href="#"&gt;log file&lt;/a&gt;.</String>
   <String Id="FailureRestartText">You must restart your computer to complete the rollback of the software.</String>
   <String Id="FailureRestartButton">&amp;Restart</String>
