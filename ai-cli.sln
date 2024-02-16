@@ -11,19 +11,19 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "helper_functions_extension"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Extensions", "Extensions", "{644B75F1-C768-4DB3-BAF2-C69A1F36DD28}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "test_helper_functions_extension", "src\extensions\test_helper_functions_extension\test_helper_functions_extension.csproj", "{7BD6EF67-BA75-478D-9721-C1B2AB6DE3FF}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "test_helper_functions_extension", "src\testing\samples\helper_functions_sample_project\test_helper_functions_extension.csproj", "{7BD6EF67-BA75-478D-9721-C1B2AB6DE3FF}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "template_extension", "src\extensions\template_extension\template_extension.csproj", "{023B4F9C-E2B3-4CCD-A993-87E337C16EDE}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "YamlTestAdapter", "tests\testadapter\YamlTestAdapter.csproj", "{7C3F1355-B679-487D-904D-7E5FEBA9E75C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "YamlTestAdapter", "src\testing\adapters\testadapter\YamlTestAdapter.csproj", "{7C3F1355-B679-487D-904D-7E5FEBA9E75C}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "YamlTestFramework", "tests\testframework\YamlTestFramework.csproj", "{B0B3437F-1828-4A13-866F-1CF7C924015E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "YamlTestFramework", "src\extensions\testframework\YamlTestFramework.csproj", "{B0B3437F-1828-4A13-866F-1CF7C924015E}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "YamlTestRunner", "tests\testrunner\YamlTestRunner.csproj", "{39876475-2D98-40CF-8B08-CD423A5EB4E8}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "YamlTestRunner", "src\testing\runner\YamlTestRunner.csproj", "{39876475-2D98-40CF-8B08-CD423A5EB4E8}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{C8AFF891-D6AA-4B8F-BC21-10404DF4B355}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RecordedYamlTestAdapter", "tests\recordingadapter\RecordedYamlTestAdapter.csproj", "{9499C018-FA08-4133-93B3-FC0F3863A6CC}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RecordedYamlTestAdapter", "src\testing\adapters\recordingadapter\RecordedYamlTestAdapter.csproj", "{9499C018-FA08-4133-93B3-FC0F3863A6CC}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

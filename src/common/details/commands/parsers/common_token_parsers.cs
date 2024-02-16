@@ -10,10 +10,40 @@ using Newtonsoft.Json;
 
 namespace Azure.AI.Details.Common.CLI
 {
-    public class OutputFileNamedValueTokenParser : NamedValueTokenParser
+    public enum FileDirection
+    {
+        input,
+        output
+    }
+
+    public class FileNamedValueTokenParser : NamedValueTokenParser
+    {
+        public FileNamedValueTokenParser(string fullName, FileDirection direction, string requiredParts, string defaultValue = "-") :
+            base(null, $"{direction}.{fullName}.file", $"1{requiredParts}0", "1;0", "@@", null, defaultValue)
+        {
+        }
+    }
+
+    public class InputFileNamedValueTokenParser : FileNamedValueTokenParser
+    {
+        public InputFileNamedValueTokenParser(string fullName, string requiredParts, string defaultValue = "-") :
+            base(fullName, FileDirection.input, requiredParts, defaultValue)
+        {
+        }
+    }
+
+    public class InputFileOptionalPrefixNamedValueTokenParser : InputFileNamedValueTokenParser
+    {
+        public InputFileOptionalPrefixNamedValueTokenParser(string optionalPrefix, string fullName, string fullNameRequiredParts, string defaultValue = "-") :
+            base($"{optionalPrefix}.{fullName}", $"{NotRequired(optionalPrefix)}{fullNameRequiredParts}", defaultValue)
+        {
+        }
+    }
+
+    public class OutputFileNamedValueTokenParser : FileNamedValueTokenParser
     {
         public OutputFileNamedValueTokenParser(string fullName, string requiredParts, string defaultValue = "-") :
-            base(null, $"output.{fullName}.file", $"1{requiredParts}0", "1;0", "@@", null, defaultValue)
+            base(fullName, FileDirection.output, requiredParts, defaultValue)
         {
         }
     }

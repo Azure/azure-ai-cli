@@ -4,10 +4,10 @@
     <TargetFramework>net8.0</TargetFramework>
   </PropertyGroup>
 
-  <Import Project="YamlTestAdapterCommon.targets" />
+  <Import Project="YamlTestFrameworkCommon.targets" />
 
   <ItemGroup>
-    <ProjectReference Include="..\testframework\YamlTestFramework.csproj" />
+    <ProjectReference Include="..\..\common\common.csproj" />
   </ItemGroup>
 
 </Project>
