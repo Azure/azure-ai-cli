@@ -10,10 +10,10 @@
         "CommandName": "cognitiveservices account list",
         "Connection": "close",
         "ParameterSetName": "--output --subscription --resource-group --query",
-        "User-Agent": "AZURECLI/2.57.0 (MSI) azsdk-python-mgmt-cognitiveservices/13.5.0 Python/3.11.7 (Windows-10-10.0.22621-SP0) ai-cli 0.0.1",
+        "User-Agent": "AZURECLI/2.57.0 (MSI) azsdk-python-mgmt-cognitiveservices/13.5.0 Python/3.11.7 (Windows-10-10.0.22631-SP0) ai-cli 0.0.1",
         "X-Forwarded-For": "127.0.0.1",
         "X-Forwarded-Proto": "https",
-        "x-ms-client-request-id": "3b9001c6-cc7a-11ee-88fd-001583f68670",
+        "x-ms-client-request-id": "d4c6da05-cc8c-11ee-82d1-c8d9d2049b34",
         "X-Real-IP": "127.0.0.1"
       },
       "RequestBody": null,
@@ -23,32 +23,32 @@
         "Connection": "close",
         "Content-Length": "769472",
         "Content-Type": "application/json; charset=utf-8",
-        "Date": "Fri, 16 Feb 2024 03:19:47 GMT",
+        "Date": "Fri, 16 Feb 2024 05:32:56 GMT",
         "Expires": "-1",
         "Pragma": "no-cache",
         "Strict-Transport-Security": "max-age=31536000; includeSubDomains",
         "X-Cache": "CONFIG_NOCACHE",
         "X-Content-Type-Options": "nosniff",
-        "x-ms-correlation-request-id": "051cc5cf-0d7d-44aa-907a-a2df8ff1b651",
+        "x-ms-correlation-request-id": "80bfe3af-b1de-469e-b9c8-b3f43550ff11",
         "x-ms-original-request-ids": [
-          "fc77139f-2597-49a3-9150-17313cf33a04",
-          "95072e9d-70e7-4b6b-a6e6-6ff54cfca208",
-          "51f23bfd-a904-4b22-bf94-d094d320e4d0",
-          "9a66dea3-0402-4ce6-b7ee-de6c0089af82",
-          "57cd769c-88b6-438f-87a2-8c98e8fe983d",
-          "f103227a-54d6-496b-b65a-82065fd77d0f",
-          "a342b40b-13b3-48ab-b4c4-3ccf8e5b6087",
-          "38b5ca09-f24a-412c-ad66-f05fd609c788",
-          "7c9c3199-e827-461d-ab09-47dddc654317",
-          "42bc5c21-eb30-4a75-8903-4dce4f3d89e2",
-          "58450e0f-2427-4fc7-9a39-92b3ee4f0dd8",
-          "fac22a71-5b8e-461c-bb07-7185243dbb06",
-          "e9c58cba-5957-4ce6-90c8-021deca6b6f3"
+          "c9786833-9745-45e1-a34b-35b591f49ba1",
+          "c0f48ab7-5fb8-4144-b670-cebe6c4ed5e4",
+          "2891442e-0b91-471c-9afd-92c9859febe3",
+          "c09f6983-4a88-4ed4-a767-48e938949341",
+          "b857020c-f299-4bb3-aacb-635555a004fe",
+          "0f4a7bb8-910b-424e-83e1-c8b50da27e76",
+          "824b76e0-fac8-4f03-ab30-9aa0c62243e0",
+          "60e74121-6da7-4491-a847-49c1e7b27b36",
+          "27369120-2723-4d65-9b12-6d5bb830464b",
+          "1038b6a7-86e9-4406-98b0-23de13a90aad",
+          "3c410446-3ea7-4ef7-adfc-9e14a3498369",
+          "f74566b4-2a59-4a08-93fe-041f47053cce",
+          "0685aa05-aa68-41b9-a94a-03bdc1a28ea0"
         ],
         "x-ms-ratelimit-remaining-subscription-reads": "11999",
-        "x-ms-request-id": "051cc5cf-0d7d-44aa-907a-a2df8ff1b651",
-        "x-ms-routing-request-id": "WESTUS2:20240216T031947Z:051cc5cf-0d7d-44aa-907a-a2df8ff1b651",
-        "X-MSEdge-Ref": "Ref A: F50EF40FC5F84AFAA71DC8D5B5F89EA9 Ref B: CO6AA3150219023 Ref C: 2024-02-16T03:19:46Z"
+        "x-ms-request-id": "80bfe3af-b1de-469e-b9c8-b3f43550ff11",
+        "x-ms-routing-request-id": "WESTUS2:20240216T053256Z:80bfe3af-b1de-469e-b9c8-b3f43550ff11",
+        "X-MSEdge-Ref": "Ref A: 53F10E4C864D4DCFB103ABF7B2F72D67 Ref B: CO6AA3150219051 Ref C: 2024-02-16T05:32:54Z"
       },
       "ResponseBody": {
         "value": [
@@ -42075,20 +42075,20 @@
         "Accept": "application/json",
         "Accept-Encoding": "identity",
         "Connection": "close",
-        "Content-Length": "3730",
+        "Content-Length": "3729",
         "Content-Type": "application/json; charset=utf-8",
         "User-Agent": "Python-urllib/3.11",
         "X-Forwarded-For": "127.0.0.1",
         "X-Forwarded-Proto": "https",
         "X-Real-IP": "127.0.0.1"
       },
-      "RequestBody": "[{\u0022ver\u0022: 1, \u0022name\u0022: \u0022Microsoft.ApplicationInsights.Event\u0022, \u0022time\u0022: \u0022TIME\u0022, \u0022sampleRate\u0022: 100.0, \u0022iKey\u0022: \u0022INSTRUMENTATION_KEY\u0022, \u0022tags\u0022: {\u0022ai.device.id\u0022: \u0022rhurey-dev3\u0022, \u0022ai.device.locale\u0022: \u0022en_US\u0022, \u0022ai.device.osVersion\u0022: \u002210.0.22621\u0022, \u0022ai.device.type\u0022: \u0022Other\u0022, \u0022ai.internal.sdkVersion\u0022: \u0022py3:0.11.9\u0022}, \u0022data\u0022: {\u0022baseType\u0022: \u0022EventData\u0022, \u0022baseData\u0022: {\u0022ver\u0022: 2, \u0022name\u0022: \u0022azurecli/command\u0022, \u0022properties\u0022: {\u0022Context.Default.AzureCLI.AllowBroker\u0022: \u0022False\u0022, \u0022Context.Default.AzureCLI.ClientRequestId\u0022: \u00223b9001c6-cc7a-11ee-88fd-001583f68670\u0022, \u0022Context.Default.AzureCLI.CloudName\u0022: \u0022AzureCloud\u0022, \u0022Context.Default.AzureCLI.CoreVersion\u0022: \u00222.57.0\u0022, \u0022Context.Default.AzureCLI.DefaultOutputType\u0022: \u0022unknown\u0022, \u0022Context.Default.AzureCLI.EndTime\u0022: \u00222024-02-16 03:19:47.932084\u0022, \u0022Context.Default.AzureCLI.EnvironmentVariables\u0022: \u0022[]\u0022, \u0022Context.Default.AzureCLI.InitTimeElapsed\u0022: \u00221.241857\u0022, \u0022Context.Default.AzureCLI.InstallationId\u0022: \u0022a266e037-bf65-11ec-9e79-b04f130ebd76\u0022, \u0022Context.Default.AzureCLI.Installer\u0022: \u0022MSI\u0022, \u0022Context.Default.AzureCLI.InvokeTimeElapsed\u0022: \u00222.694728\u0022, \u0022Context.Default.AzureCLI.Locale\u0022: \u0022English_United States,1252\u0022, \u0022Context.Default.AzureCLI.Mode\u0022: \u0022default\u0022, \u0022Context.Default.AzureCLI.OutputType\u0022: \u0022json\u0022, \u0022Context.Default.AzureCLI.Params\u0022: \u0022--output,--subscription,--resource-group,--query\u0022, \u0022Context.Default.AzureCLI.PollEndTime\u0022: \u0022None\u0022, \u0022Context.Default.AzureCLI.PollStartTime\u0022: \u0022None\u0022, \u0022Context.Default.AzureCLI.PythonVersion\u0022: \u00223.11.7\u0022, \u0022Context.Default.AzureCLI.RawCommand\u0022: \u0022cognitiveservices account list\u0022, \u0022Context.Default.AzureCLI.ShellType\u0022: \u0022cmd\u0022, \u0022Context.Default.AzureCLI.ShowSurveyMessage\u0022: \u0022False\u0022, \u0022Context.Default.AzureCLI.Source\u0022: \u0022az\u0022, \u0022Context.Default.AzureCLI.StartTime\u0022: \u00222024-02-16 03:19:45.237243\u0022, \u0022Context.Default.AzureCLI.TelemetryVersion\u0022: \u00222.0\u0022, \u0022Context.Default.AzureCLI.UserAzureId\u0022: \u00225f410ad1fc24a4547edd18a29584bf5c7572c48978dd5c8cd5fa93e771db858f\u0022, \u0022Context.Default.AzureCLI.UserAzureSubscriptionId\u0022: \u0022f7b4a5ce-d3bd-4a03-84fe-8bcad772c8c1\u0022, \u0022Context.Default.AzureCLI.debug_info\u0022: \u0022\u0022, \u0022Context.Default.AzureCLI.error_type\u0022: \u0022None\u0022, \u0022Context.Default.AzureCLI.exception_name\u0022: \u0022None\u0022, \u0022Context.Default.VS.Core.Distro.Id\u0022: \u0022\u0022, \u0022Context.Default.VS.Core.Distro.Name\u0022: \u0022\u0022, \u0022Context.Default.VS.Core.Distro.Version\u0022: \u0022\u0022, \u0022Context.Default.VS.Core.ExeName\u0022: \u0022azurecli\u0022, \u0022Context.Default.VS.Core.ExeVersion\u0022: \u00222.57.0@none\u0022, \u0022Context.Default.VS.Core.MacAddressHash\u0022: \u0022a58b788c9276a88bbf25dea9745d404b03302f29376b6239fdba11d5ffaf22e3\u0022, \u0022Context.Default.VS.Core.Machine.Id\u0022: \u0022a58b788c-9276-a88b-bf25-dea9745d404b\u0022, \u0022Context.Default.VS.Core.OS.Platform\u0022: \u0022windows-10-10.0.22621-sp0\u0022, \u0022Context.Default.VS.Core.OS.Type\u0022: \u0022windows\u0022, \u0022Context.Default.VS.Core.OS.Version\u0022: \u002210.0.22621\u0022, \u0022Context.Default.VS.Core.TelemetryApi.ProductVersion\u0022: \u0022azurecli@2.57.0\u0022, \u0022Context.Default.VS.Core.User.Id\u0022: \u0022a266e037-bf65-11ec-9e79-b04f130ebd76\u0022, \u0022Context.Default.VS.Core.User.IsMicrosoftInternal\u0022: \u0022False\u0022, \u0022Context.Default.VS.Core.User.IsOptedIn\u0022: \u0022True\u0022, \u0022Reserved.ChannelUsed\u0022: \u0022AI\u0022, \u0022Reserved.DataModel.Action.Result\u0022: \u0022Success\u0022, \u0022Reserved.DataModel.Action.Type\u0022: \u0022Atomic\u0022, \u0022Reserved.DataModel.CorrelationId\u0022: \u0022d8639d76-9cee-4a8b-b4dd-f37fbd05a25b\u0022, \u0022Reserved.DataModel.EntityName\u0022: \u0022cognitiveservices-account-list\u0022, \u0022Reserved.DataModel.EntityType\u0022: \u0022UserTask\u0022, \u0022Reserved.DataModel.FeatureName\u0022: \u0022command\u0022, \u0022Reserved.DataModel.ProductName\u0022: \u0022azurecli\u0022, \u0022Reserved.DataModel.Source\u0022: \u0022DataModelAPI\u0022, \u0022Reserved.EventId\u0022: \u0022c4d2322a-2eef-4993-baf2-3b3e95b5f12c\u0022, \u0022Reserved.SessionId\u0022: \u00226e8217d6c2c848995874524442efd861348722189e600f3673b2e0c9dfaccb29\u0022}, \u0022measurements\u0022: {\u0022Reserved.DataModel.EntitySchemaVersion\u0022: 4, \u0022Reserved.DataModel.Severity\u0022: 0, \u0022Reserved.SequenceNumber\u0022: 1, \u0022Reserved.TimeSinceSessionStart\u0022: 0}}}}]",
+      "RequestBody": "[{\u0022ver\u0022: 1, \u0022name\u0022: \u0022Microsoft.ApplicationInsights.Event\u0022, \u0022time\u0022: \u0022TIME\u0022, \u0022sampleRate\u0022: 100.0, \u0022iKey\u0022: \u0022INSTRUMENTATION_KEY\u0022, \u0022tags\u0022: {\u0022ai.device.id\u0022: \u0022rhurey-wfh\u0022, \u0022ai.device.locale\u0022: \u0022en_US\u0022, \u0022ai.device.osVersion\u0022: \u002210.0.22631\u0022, \u0022ai.device.type\u0022: \u0022Other\u0022, \u0022ai.internal.sdkVersion\u0022: \u0022py3:0.11.9\u0022}, \u0022data\u0022: {\u0022baseType\u0022: \u0022EventData\u0022, \u0022baseData\u0022: {\u0022ver\u0022: 2, \u0022name\u0022: \u0022azurecli/command\u0022, \u0022properties\u0022: {\u0022Context.Default.AzureCLI.AllowBroker\u0022: \u0022False\u0022, \u0022Context.Default.AzureCLI.ClientRequestId\u0022: \u0022d4c6da05-cc8c-11ee-82d1-c8d9d2049b34\u0022, \u0022Context.Default.AzureCLI.CloudName\u0022: \u0022AzureCloud\u0022, \u0022Context.Default.AzureCLI.CoreVersion\u0022: \u00222.57.0\u0022, \u0022Context.Default.AzureCLI.DefaultOutputType\u0022: \u0022unknown\u0022, \u0022Context.Default.AzureCLI.EndTime\u0022: \u00222024-02-16 05:32:56.732523\u0022, \u0022Context.Default.AzureCLI.EnvironmentVariables\u0022: \u0022[]\u0022, \u0022Context.Default.AzureCLI.InitTimeElapsed\u0022: \u00221.865511\u0022, \u0022Context.Default.AzureCLI.InstallationId\u0022: \u002255059476-d0fd-11ed-8796-c8d9d2049b34\u0022, \u0022Context.Default.AzureCLI.Installer\u0022: \u0022MSI\u0022, \u0022Context.Default.AzureCLI.InvokeTimeElapsed\u0022: \u00223.501072\u0022, \u0022Context.Default.AzureCLI.Locale\u0022: \u0022English_United States,1252\u0022, \u0022Context.Default.AzureCLI.Mode\u0022: \u0022default\u0022, \u0022Context.Default.AzureCLI.OutputType\u0022: \u0022json\u0022, \u0022Context.Default.AzureCLI.Params\u0022: \u0022--output,--subscription,--resource-group,--query\u0022, \u0022Context.Default.AzureCLI.PollEndTime\u0022: \u0022None\u0022, \u0022Context.Default.AzureCLI.PollStartTime\u0022: \u0022None\u0022, \u0022Context.Default.AzureCLI.PythonVersion\u0022: \u00223.11.7\u0022, \u0022Context.Default.AzureCLI.RawCommand\u0022: \u0022cognitiveservices account list\u0022, \u0022Context.Default.AzureCLI.ShellType\u0022: \u0022cmd\u0022, \u0022Context.Default.AzureCLI.ShowSurveyMessage\u0022: \u0022False\u0022, \u0022Context.Default.AzureCLI.Source\u0022: \u0022az\u0022, \u0022Context.Default.AzureCLI.StartTime\u0022: \u00222024-02-16 05:32:53.230352\u0022, \u0022Context.Default.AzureCLI.TelemetryVersion\u0022: \u00222.0\u0022, \u0022Context.Default.AzureCLI.UserAzureId\u0022: \u00225f410ad1fc24a4547edd18a29584bf5c7572c48978dd5c8cd5fa93e771db858f\u0022, \u0022Context.Default.AzureCLI.UserAzureSubscriptionId\u0022: \u0022f7b4a5ce-d3bd-4a03-84fe-8bcad772c8c1\u0022, \u0022Context.Default.AzureCLI.debug_info\u0022: \u0022\u0022, \u0022Context.Default.AzureCLI.error_type\u0022: \u0022None\u0022, \u0022Context.Default.AzureCLI.exception_name\u0022: \u0022None\u0022, \u0022Context.Default.VS.Core.Distro.Id\u0022: \u0022\u0022, \u0022Context.Default.VS.Core.Distro.Name\u0022: \u0022\u0022, \u0022Context.Default.VS.Core.Distro.Version\u0022: \u0022\u0022, \u0022Context.Default.VS.Core.ExeName\u0022: \u0022azurecli\u0022, \u0022Context.Default.VS.Core.ExeVersion\u0022: \u00222.57.0@none\u0022, \u0022Context.Default.VS.Core.MacAddressHash\u0022: \u0022a1a9745e6932c20d63d29c7e0eeb778b2420c595247a087002a4dd921b854b1e\u0022, \u0022Context.Default.VS.Core.Machine.Id\u0022: \u0022a1a9745e-6932-c20d-63d2-9c7e0eeb778b\u0022, \u0022Context.Default.VS.Core.OS.Platform\u0022: \u0022windows-10-10.0.22631-sp0\u0022, \u0022Context.Default.VS.Core.OS.Type\u0022: \u0022windows\u0022, \u0022Context.Default.VS.Core.OS.Version\u0022: \u002210.0.22631\u0022, \u0022Context.Default.VS.Core.TelemetryApi.ProductVersion\u0022: \u0022azurecli@2.57.0\u0022, \u0022Context.Default.VS.Core.User.Id\u0022: \u002255059476-d0fd-11ed-8796-c8d9d2049b34\u0022, \u0022Context.Default.VS.Core.User.IsMicrosoftInternal\u0022: \u0022False\u0022, \u0022Context.Default.VS.Core.User.IsOptedIn\u0022: \u0022True\u0022, \u0022Reserved.ChannelUsed\u0022: \u0022AI\u0022, \u0022Reserved.DataModel.Action.Result\u0022: \u0022Success\u0022, \u0022Reserved.DataModel.Action.Type\u0022: \u0022Atomic\u0022, \u0022Reserved.DataModel.CorrelationId\u0022: \u002269996efd-9113-42f6-a684-fe9bc8887084\u0022, \u0022Reserved.DataModel.EntityName\u0022: \u0022cognitiveservices-account-list\u0022, \u0022Reserved.DataModel.EntityType\u0022: \u0022UserTask\u0022, \u0022Reserved.DataModel.FeatureName\u0022: \u0022command\u0022, \u0022Reserved.DataModel.ProductName\u0022: \u0022azurecli\u0022, \u0022Reserved.DataModel.Source\u0022: \u0022DataModelAPI\u0022, \u0022Reserved.EventId\u0022: \u0022605d4bec-d483-47cf-af9c-1916b91b2512\u0022, \u0022Reserved.SessionId\u0022: \u00229e1d9f0610ae4f7866644a77d52b3e635d54e9e24526304d38b19f055141ecb8\u0022}, \u0022measurements\u0022: {\u0022Reserved.DataModel.EntitySchemaVersion\u0022: 4, \u0022Reserved.DataModel.Severity\u0022: 0, \u0022Reserved.SequenceNumber\u0022: 1, \u0022Reserved.TimeSinceSessionStart\u0022: 0}}}}]",
       "StatusCode": 200,
       "ResponseHeaders": {
         "Connection": "close",
         "Content-Length": "49",
         "Content-Type": "application/json; charset=utf-8",
-        "Date": "Fri, 16 Feb 2024 03:19:48 GMT",
+        "Date": "Fri, 16 Feb 2024 05:32:58 GMT",
         "Server": "Microsoft-HTTPAPI/2.0",
         "Strict-Transport-Security": "max-age=31536000",
         "X-Content-Type-Options": "nosniff"
@@ -42109,10 +42109,10 @@
         "CommandName": "cognitiveservices account deployment list",
         "Connection": "close",
         "ParameterSetName": "--output --subscription -g -n --query",
-        "User-Agent": "AZURECLI/2.57.0 (MSI) azsdk-python-mgmt-cognitiveservices/13.5.0 Python/3.11.7 (Windows-10-10.0.22621-SP0) ai-cli 0.0.1",
+        "User-Agent": "AZURECLI/2.57.0 (MSI) azsdk-python-mgmt-cognitiveservices/13.5.0 Python/3.11.7 (Windows-10-10.0.22631-SP0) ai-cli 0.0.1",
         "X-Forwarded-For": "127.0.0.1",
         "X-Forwarded-Proto": "https",
-        "x-ms-client-request-id": "3ddf9328-cc7a-11ee-9b40-001583f68670",
+        "x-ms-client-request-id": "d8607c0d-cc8c-11ee-a950-c8d9d2049b34",
         "X-Real-IP": "127.0.0.1"
       },
       "RequestBody": null,
@@ -42122,18 +42122,218 @@
         "Connection": "close",
         "Content-Length": "2827",
         "Content-Type": "application/json; charset=utf-8",
-        "Date": "Fri, 16 Feb 2024 03:19:50 GMT",
+        "Date": "Fri, 16 Feb 2024 05:33:00 GMT",
+        "Expires": "-1",
+        "Pragma": "no-cache",
+        "Strict-Transport-Security": "max-age=31536000; includeSubDomains",
+        "X-Cache": "CONFIG_NOCACHE",
+        "X-Content-Type-Options": "nosniff",
+        "x-envoy-upstream-service-time": "8",
+        "x-ms-correlation-request-id": "e61d8f2f-8e11-42c8-a926-f6b9f27e2951",
+        "x-ms-ratelimit-remaining-subscription-reads": "11999",
+        "x-ms-request-id": "fd84a7a7-6526-4313-aa26-96096a15fa89",
+        "x-ms-routing-request-id": "WESTUS2:20240216T053301Z:e61d8f2f-8e11-42c8-a926-f6b9f27e2951",
+        "X-MSEdge-Ref": "Ref A: CEE1691A33844453847016558BEC2EC8 Ref B: CO6AA3150219037 Ref C: 2024-02-16T05:33:00Z"
+      },
+      "ResponseBody": {
+        "value": [
+          {
+            "id": "/subscriptions/e72e5254-f265-4e95-9bd2-9ee8e7329051/resourceGroups/robch-eastus2-rg/providers/Microsoft.CognitiveServices/accounts/robch-oai-eastus2/deployments/gpt-4-32k-0613",
+            "type": "Microsoft.CognitiveServices/accounts/deployments",
+            "name": "gpt-4-32k-0613",
+            "sku": {
+              "name": "Standard",
+              "capacity": 50
+            },
+            "properties": {
+              "model": {
+                "format": "OpenAI",
+                "name": "gpt-4-32k",
+                "version": "0613"
+              },
+              "versionUpgradeOption": "OnceCurrentVersionExpired",
+              "capabilities": {
+                "chatCompletion": "true"
+              },
+              "raiPolicyName": "Microsoft.Default",
+              "provisioningState": "Succeeded",
+              "rateLimits": [
+                {
+                  "key": "request",
+                  "renewalPeriod": 10,
+                  "count": 50
+                },
+                {
+                  "key": "token",
+                  "renewalPeriod": 60,
+                  "count": 50000
+                }
+              ]
+            },
+            "systemData": {
+              "createdBy": "email@domain.com",
+              "createdByType": "User",
+              "createdAt": "2023-11-30T14:49:36.8999152Z",
+              "lastModifiedBy": "email@domain.com",
+              "lastModifiedByType": "User",
+              "lastModifiedAt": "2023-11-30T14:49:36.8999152Z"
+            },
+            "etag": "\u0022ff4a51c4-e5aa-421a-9230-ed570ff837a9\u0022"
+          },
+          {
+            "id": "/subscriptions/e72e5254-f265-4e95-9bd2-9ee8e7329051/resourceGroups/robch-eastus2-rg/providers/Microsoft.CognitiveServices/accounts/robch-oai-eastus2/deployments/text-embedding-ada-002-2",
+            "type": "Microsoft.CognitiveServices/accounts/deployments",
+            "name": "text-embedding-ada-002-2",
+            "sku": {
+              "name": "Standard",
+              "capacity": 120
+            },
+            "properties": {
+              "model": {
+                "format": "OpenAI",
+                "name": "text-embedding-ada-002",
+                "version": "2"
+              },
+              "versionUpgradeOption": "OnceNewDefaultVersionAvailable",
+              "capabilities": {
+                "embeddings": "true",
+                "embeddingsMaxInputs": "2048"
+              },
+              "provisioningState": "Succeeded",
+              "rateLimits": [
+                {
+                  "key": "request",
+                  "renewalPeriod": 10,
+                  "count": 120
+                },
+                {
+                  "key": "token",
+                  "renewalPeriod": 60,
+                  "count": 120000
+                }
+              ]
+            },
+            "systemData": {
+              "createdBy": "email@domain.com",
+              "createdByType": "User",
+              "createdAt": "2023-12-05T14:45:01.2344483Z",
+              "lastModifiedBy": "email@domain.com",
+              "lastModifiedByType": "User",
+              "lastModifiedAt": "2023-12-05T14:45:01.2344483Z"
+            },
+            "etag": "\u0022401953cf-f62f-46f3-af5b-fbb8d5fcf9b1\u0022"
+          },
+          {
+            "id": "/subscriptions/e72e5254-f265-4e95-9bd2-9ee8e7329051/resourceGroups/robch-eastus2-rg/providers/Microsoft.CognitiveServices/accounts/robch-oai-eastus2/deployments/gpt-35-turbo-16k-0613",
+            "type": "Microsoft.CognitiveServices/accounts/deployments",
+            "name": "gpt-35-turbo-16k-0613",
+            "sku": {
+              "name": "Standard",
+              "capacity": 120
+            },
+            "properties": {
+              "model": {
+                "format": "OpenAI",
+                "name": "gpt-35-turbo-16k",
+                "version": "0613"
+              },
+              "versionUpgradeOption": "OnceNewDefaultVersionAvailable",
+              "capabilities": {
+                "chatCompletion": "true"
+              },
+              "provisioningState": "Succeeded",
+              "rateLimits": [
+                {
+                  "key": "request",
+                  "renewalPeriod": 10,
+                  "count": 120
+                },
+                {
+                  "key": "token",
+                  "renewalPeriod": 60,
+                  "count": 120000
+                }
+              ]
+            },
+            "systemData": {
+              "createdBy": "email@domain.com",
+              "createdByType": "User",
+              "createdAt": "2023-12-11T17:56:47.2743282Z",
+              "lastModifiedBy": "email@domain.com",
+              "lastModifiedByType": "User",
+              "lastModifiedAt": "2023-12-11T17:56:47.2743282Z"
+            },
+            "etag": "\u002259030dbd-7418-41cc-ad13-45d76308c54d\u0022"
+          }
+        ]
+      }
+    },
+    {
+      "RequestUri": "https://fakeendpoint/v2/track",
+      "RequestMethod": "POST",
+      "RequestHeaders": {
+        "Accept": "application/json",
+        "Accept-Encoding": "identity",
+        "Connection": "close",
+        "Content-Length": "3740",
+        "Content-Type": "application/json; charset=utf-8",
+        "User-Agent": "Python-urllib/3.11",
+        "X-Forwarded-For": "127.0.0.1",
+        "X-Forwarded-Proto": "https",
+        "X-Real-IP": "127.0.0.1"
+      },
+      "RequestBody": "[{\u0022ver\u0022: 1, \u0022name\u0022: \u0022Microsoft.ApplicationInsights.Event\u0022, \u0022time\u0022: \u0022TIME\u0022, \u0022sampleRate\u0022: 100.0, \u0022iKey\u0022: \u0022INSTRUMENTATION_KEY\u0022, \u0022tags\u0022: {\u0022ai.device.id\u0022: \u0022rhurey-wfh\u0022, \u0022ai.device.locale\u0022: \u0022en_US\u0022, \u0022ai.device.osVersion\u0022: \u002210.0.22631\u0022, \u0022ai.device.type\u0022: \u0022Other\u0022, \u0022ai.internal.sdkVersion\u0022: \u0022py3:0.11.9\u0022}, \u0022data\u0022: {\u0022baseType\u0022: \u0022EventData\u0022, \u0022baseData\u0022: {\u0022ver\u0022: 2, \u0022name\u0022: \u0022azurecli/command\u0022, \u0022properties\u0022: {\u0022Context.Default.AzureCLI.AllowBroker\u0022: \u0022False\u0022, \u0022Context.Default.AzureCLI.ClientRequestId\u0022: \u0022d8607c0d-cc8c-11ee-a950-c8d9d2049b34\u0022, \u0022Context.Default.AzureCLI.CloudName\u0022: \u0022AzureCloud\u0022, \u0022Context.Default.AzureCLI.CoreVersion\u0022: \u00222.57.0\u0022, \u0022Context.Default.AzureCLI.DefaultOutputType\u0022: \u0022unknown\u0022, \u0022Context.Default.AzureCLI.EndTime\u0022: \u00222024-02-16 05:33:01.189189\u0022, \u0022Context.Default.AzureCLI.EnvironmentVariables\u0022: \u0022[]\u0022, \u0022Context.Default.AzureCLI.InitTimeElapsed\u0022: \u00221.773433\u0022, \u0022Context.Default.AzureCLI.InstallationId\u0022: \u002255059476-d0fd-11ed-8796-c8d9d2049b34\u0022, \u0022Context.Default.AzureCLI.Installer\u0022: \u0022MSI\u0022, \u0022Context.Default.AzureCLI.InvokeTimeElapsed\u0022: \u00221.917565\u0022, \u0022Context.Default.AzureCLI.Locale\u0022: \u0022English_United States,1252\u0022, \u0022Context.Default.AzureCLI.Mode\u0022: \u0022default\u0022, \u0022Context.Default.AzureCLI.OutputType\u0022: \u0022json\u0022, \u0022Context.Default.AzureCLI.Params\u0022: \u0022--output,--subscription,-g,-n,--query\u0022, \u0022Context.Default.AzureCLI.PollEndTime\u0022: \u0022None\u0022, \u0022Context.Default.AzureCLI.PollStartTime\u0022: \u0022None\u0022, \u0022Context.Default.AzureCLI.PythonVersion\u0022: \u00223.11.7\u0022, \u0022Context.Default.AzureCLI.RawCommand\u0022: \u0022cognitiveservices account deployment list\u0022, \u0022Context.Default.AzureCLI.ShellType\u0022: \u0022cmd\u0022, \u0022Context.Default.AzureCLI.ShowSurveyMessage\u0022: \u0022False\u0022, \u0022Context.Default.AzureCLI.Source\u0022: \u0022az\u0022, \u0022Context.Default.AzureCLI.StartTime\u0022: \u00222024-02-16 05:32:59.271363\u0022, \u0022Context.Default.AzureCLI.TelemetryVersion\u0022: \u00222.0\u0022, \u0022Context.Default.AzureCLI.UserAzureId\u0022: \u00225f410ad1fc24a4547edd18a29584bf5c7572c48978dd5c8cd5fa93e771db858f\u0022, \u0022Context.Default.AzureCLI.UserAzureSubscriptionId\u0022: \u0022f7b4a5ce-d3bd-4a03-84fe-8bcad772c8c1\u0022, \u0022Context.Default.AzureCLI.debug_info\u0022: \u0022\u0022, \u0022Context.Default.AzureCLI.error_type\u0022: \u0022None\u0022, \u0022Context.Default.AzureCLI.exception_name\u0022: \u0022None\u0022, \u0022Context.Default.VS.Core.Distro.Id\u0022: \u0022\u0022, \u0022Context.Default.VS.Core.Distro.Name\u0022: \u0022\u0022, \u0022Context.Default.VS.Core.Distro.Version\u0022: \u0022\u0022, \u0022Context.Default.VS.Core.ExeName\u0022: \u0022azurecli\u0022, \u0022Context.Default.VS.Core.ExeVersion\u0022: \u00222.57.0@none\u0022, \u0022Context.Default.VS.Core.MacAddressHash\u0022: \u0022a1a9745e6932c20d63d29c7e0eeb778b2420c595247a087002a4dd921b854b1e\u0022, \u0022Context.Default.VS.Core.Machine.Id\u0022: \u0022a1a9745e-6932-c20d-63d2-9c7e0eeb778b\u0022, \u0022Context.Default.VS.Core.OS.Platform\u0022: \u0022windows-10-10.0.22631-sp0\u0022, \u0022Context.Default.VS.Core.OS.Type\u0022: \u0022windows\u0022, \u0022Context.Default.VS.Core.OS.Version\u0022: \u002210.0.22631\u0022, \u0022Context.Default.VS.Core.TelemetryApi.ProductVersion\u0022: \u0022azurecli@2.57.0\u0022, \u0022Context.Default.VS.Core.User.Id\u0022: \u002255059476-d0fd-11ed-8796-c8d9d2049b34\u0022, \u0022Context.Default.VS.Core.User.IsMicrosoftInternal\u0022: \u0022False\u0022, \u0022Context.Default.VS.Core.User.IsOptedIn\u0022: \u0022True\u0022, \u0022Reserved.ChannelUsed\u0022: \u0022AI\u0022, \u0022Reserved.DataModel.Action.Result\u0022: \u0022Success\u0022, \u0022Reserved.DataModel.Action.Type\u0022: \u0022Atomic\u0022, \u0022Reserved.DataModel.CorrelationId\u0022: \u0022666ff474-eacf-42fe-bc3e-bb682bdb118c\u0022, \u0022Reserved.DataModel.EntityName\u0022: \u0022cognitiveservices-account-deployment-list\u0022, \u0022Reserved.DataModel.EntityType\u0022: \u0022UserTask\u0022, \u0022Reserved.DataModel.FeatureName\u0022: \u0022command\u0022, \u0022Reserved.DataModel.ProductName\u0022: \u0022azurecli\u0022, \u0022Reserved.DataModel.Source\u0022: \u0022DataModelAPI\u0022, \u0022Reserved.EventId\u0022: \u00225ecff245-6f4f-496b-ac13-516760832be6\u0022, \u0022Reserved.SessionId\u0022: \u0022bc3ab2d0e76fd341449acb4e8000d12b8a27508143b9f94dd9f2902859a5cc72\u0022}, \u0022measurements\u0022: {\u0022Reserved.DataModel.EntitySchemaVersion\u0022: 4, \u0022Reserved.DataModel.Severity\u0022: 0, \u0022Reserved.SequenceNumber\u0022: 1, \u0022Reserved.TimeSinceSessionStart\u0022: 0}}}}]",
+      "StatusCode": 200,
+      "ResponseHeaders": {
+        "Connection": "close",
+        "Content-Length": "49",
+        "Content-Type": "application/json; charset=utf-8",
+        "Date": "Fri, 16 Feb 2024 05:33:02 GMT",
+        "Server": "Microsoft-HTTPAPI/2.0",
+        "Strict-Transport-Security": "max-age=31536000",
+        "X-Content-Type-Options": "nosniff"
+      },
+      "ResponseBody": {
+        "itemsReceived": 1,
+        "itemsAccepted": 1,
+        "errors": []
+      }
+    },
+    {
+      "RequestUri": "https://fakeendpoint/subscriptions/e72e5254-f265-4e95-9bd2-9ee8e7329051/resourceGroups/robch-eastus2-rg/providers/Microsoft.CognitiveServices/accounts/robch-oai-eastus2/deployments?api-version=2023-05-01",
+      "RequestMethod": "GET",
+      "RequestHeaders": {
+        "Accept": "application/json",
+        "Accept-Encoding": "gzip, deflate",
+        "Authorization": "Sanitized",
+        "CommandName": "cognitiveservices account deployment list",
+        "Connection": "close",
+        "ParameterSetName": "--output --subscription -g -n --query",
+        "User-Agent": "AZURECLI/2.57.0 (MSI) azsdk-python-mgmt-cognitiveservices/13.5.0 Python/3.11.7 (Windows-10-10.0.22631-SP0) ai-cli 0.0.1",
+        "X-Forwarded-For": "127.0.0.1",
+        "X-Forwarded-Proto": "https",
+        "x-ms-client-request-id": "dad851c7-cc8c-11ee-8e5c-c8d9d2049b34",
+        "X-Real-IP": "127.0.0.1"
+      },
+      "RequestBody": null,
+      "StatusCode": 200,
+      "ResponseHeaders": {
+        "Cache-Control": "no-cache",
+        "Connection": "close",
+        "Content-Length": "2827",
+        "Content-Type": "application/json; charset=utf-8",
+        "Date": "Fri, 16 Feb 2024 05:33:05 GMT",
         "Expires": "-1",
         "Pragma": "no-cache",
         "Strict-Transport-Security": "max-age=31536000; includeSubDomains",
         "X-Cache": "CONFIG_NOCACHE",
         "X-Content-Type-Options": "nosniff",
         "x-envoy-upstream-service-time": "7",
-        "x-ms-correlation-request-id": "1f0816ff-c1e4-463f-9ca1-42f9ec6069e9",
+        "x-ms-correlation-request-id": "ee5beaea-02a7-4576-bfb8-ba4201205ddf",
         "x-ms-ratelimit-remaining-subscription-reads": "11999",
-        "x-ms-request-id": "bf59422b-eaa1-4ac8-9653-c50b56a666f7",
-        "x-ms-routing-request-id": "WESTUS2:20240216T031950Z:1f0816ff-c1e4-463f-9ca1-42f9ec6069e9",
-        "X-MSEdge-Ref": "Ref A: 48A66AA049694AED8F7D0BA3676CFEB1 Ref B: CO6AA3150219035 Ref C: 2024-02-16T03:19:49Z"
+        "x-ms-request-id": "800542c4-af91-4f30-8b85-256ab3656177",
+        "x-ms-routing-request-id": "WESTUS2:20240216T053305Z:ee5beaea-02a7-4576-bfb8-ba4201205ddf",
+        "X-MSEdge-Ref": "Ref A: CC0BCE3D18C64E4A8D325DD0D2362ADB Ref B: CO6AA3150218027 Ref C: 2024-02-16T05:33:04Z"
       },
       "ResponseBody": {
         "value": [
@@ -42275,20 +42475,20 @@
         "Accept": "application/json",
         "Accept-Encoding": "identity",
         "Connection": "close",
-        "Content-Length": "3741",
+        "Content-Length": "3740",
         "Content-Type": "application/json; charset=utf-8",
         "User-Agent": "Python-urllib/3.11",
         "X-Forwarded-For": "127.0.0.1",
         "X-Forwarded-Proto": "https",
         "X-Real-IP": "127.0.0.1"
       },
-      "RequestBody": "[{\u0022ver\u0022: 1, \u0022name\u0022: \u0022Microsoft.ApplicationInsights.Event\u0022, \u0022time\u0022: \u0022TIME\u0022, \u0022sampleRate\u0022: 100.0, \u0022iKey\u0022: \u0022INSTRUMENTATION_KEY\u0022, \u0022tags\u0022: {\u0022ai.device.id\u0022: \u0022rhurey-dev3\u0022, \u0022ai.device.locale\u0022: \u0022en_US\u0022, \u0022ai.device.osVersion\u0022: \u002210.0.22621\u0022, \u0022ai.device.type\u0022: \u0022Other\u0022, \u0022ai.internal.sdkVersion\u0022: \u0022py3:0.11.9\u0022}, \u0022data\u0022: {\u0022baseType\u0022: \u0022EventData\u0022, \u0022baseData\u0022: {\u0022ver\u0022: 2, \u0022name\u0022: \u0022azurecli/command\u0022, \u0022properties\u0022: {\u0022Context.Default.AzureCLI.AllowBroker\u0022: \u0022False\u0022, \u0022Context.Default.AzureCLI.ClientRequestId\u0022: \u00223ddf9328-cc7a-11ee-9b40-001583f68670\u0022, \u0022Context.Default.AzureCLI.CloudName\u0022: \u0022AzureCloud\u0022, \u0022Context.Default.AzureCLI.CoreVersion\u0022: \u00222.57.0\u0022, \u0022Context.Default.AzureCLI.DefaultOutputType\u0022: \u0022unknown\u0022, \u0022Context.Default.AzureCLI.EndTime\u0022: \u00222024-02-16 03:19:50.421195\u0022, \u0022Context.Default.AzureCLI.EnvironmentVariables\u0022: \u0022[]\u0022, \u0022Context.Default.AzureCLI.InitTimeElapsed\u0022: \u00220.747583\u0022, \u0022Context.Default.AzureCLI.InstallationId\u0022: \u0022a266e037-bf65-11ec-9e79-b04f130ebd76\u0022, \u0022Context.Default.AzureCLI.Installer\u0022: \u0022MSI\u0022, \u0022Context.Default.AzureCLI.InvokeTimeElapsed\u0022: \u00221.305592\u0022, \u0022Context.Default.AzureCLI.Locale\u0022: \u0022English_United States,1252\u0022, \u0022Context.Default.AzureCLI.Mode\u0022: \u0022default\u0022, \u0022Context.Default.AzureCLI.OutputType\u0022: \u0022json\u0022, \u0022Context.Default.AzureCLI.Params\u0022: \u0022--output,--subscription,-g,-n,--query\u0022, \u0022Context.Default.AzureCLI.PollEndTime\u0022: \u0022None\u0022, \u0022Context.Default.AzureCLI.PollStartTime\u0022: \u0022None\u0022, \u0022Context.Default.AzureCLI.PythonVersion\u0022: \u00223.11.7\u0022, \u0022Context.Default.AzureCLI.RawCommand\u0022: \u0022cognitiveservices account deployment list\u0022, \u0022Context.Default.AzureCLI.ShellType\u0022: \u0022cmd\u0022, \u0022Context.Default.AzureCLI.ShowSurveyMessage\u0022: \u0022False\u0022, \u0022Context.Default.AzureCLI.Source\u0022: \u0022az\u0022, \u0022Context.Default.AzureCLI.StartTime\u0022: \u00222024-02-16 03:19:49.115286\u0022, \u0022Context.Default.AzureCLI.TelemetryVersion\u0022: \u00222.0\u0022, \u0022Context.Default.AzureCLI.UserAzureId\u0022: \u00225f410ad1fc24a4547edd18a29584bf5c7572c48978dd5c8cd5fa93e771db858f\u0022, \u0022Context.Default.AzureCLI.UserAzureSubscriptionId\u0022: \u0022f7b4a5ce-d3bd-4a03-84fe-8bcad772c8c1\u0022, \u0022Context.Default.AzureCLI.debug_info\u0022: \u0022\u0022, \u0022Context.Default.AzureCLI.error_type\u0022: \u0022None\u0022, \u0022Context.Default.AzureCLI.exception_name\u0022: \u0022None\u0022, \u0022Context.Default.VS.Core.Distro.Id\u0022: \u0022\u0022, \u0022Context.Default.VS.Core.Distro.Name\u0022: \u0022\u0022, \u0022Context.Default.VS.Core.Distro.Version\u0022: \u0022\u0022, \u0022Context.Default.VS.Core.ExeName\u0022: \u0022azurecli\u0022, \u0022Context.Default.VS.Core.ExeVersion\u0022: \u00222.57.0@none\u0022, \u0022Context.Default.VS.Core.MacAddressHash\u0022: \u0022a58b788c9276a88bbf25dea9745d404b03302f29376b6239fdba11d5ffaf22e3\u0022, \u0022Context.Default.VS.Core.Machine.Id\u0022: \u0022a58b788c-9276-a88b-bf25-dea9745d404b\u0022, \u0022Context.Default.VS.Core.OS.Platform\u0022: \u0022windows-10-10.0.22621-sp0\u0022, \u0022Context.Default.VS.Core.OS.Type\u0022: \u0022windows\u0022, \u0022Context.Default.VS.Core.OS.Version\u0022: \u002210.0.22621\u0022, \u0022Context.Default.VS.Core.TelemetryApi.ProductVersion\u0022: \u0022azurecli@2.57.0\u0022, \u0022Context.Default.VS.Core.User.Id\u0022: \u0022a266e037-bf65-11ec-9e79-b04f130ebd76\u0022, \u0022Context.Default.VS.Core.User.IsMicrosoftInternal\u0022: \u0022False\u0022, \u0022Context.Default.VS.Core.User.IsOptedIn\u0022: \u0022True\u0022, \u0022Reserved.ChannelUsed\u0022: \u0022AI\u0022, \u0022Reserved.DataModel.Action.Result\u0022: \u0022Success\u0022, \u0022Reserved.DataModel.Action.Type\u0022: \u0022Atomic\u0022, \u0022Reserved.DataModel.CorrelationId\u0022: \u0022c1342d56-4996-4dfe-b7cf-1d80e66ad314\u0022, \u0022Reserved.DataModel.EntityName\u0022: \u0022cognitiveservices-account-deployment-list\u0022, \u0022Reserved.DataModel.EntityType\u0022: \u0022UserTask\u0022, \u0022Reserved.DataModel.FeatureName\u0022: \u0022command\u0022, \u0022Reserved.DataModel.ProductName\u0022: \u0022azurecli\u0022, \u0022Reserved.DataModel.Source\u0022: \u0022DataModelAPI\u0022, \u0022Reserved.EventId\u0022: \u00226e8b6e7c-82d0-4bbd-a6f0-982cdc509d2b\u0022, \u0022Reserved.SessionId\u0022: \u0022c58d6f0b36a03bad1fd11f6572fd15c238ce519044bc1c437253d54202cb00f6\u0022}, \u0022measurements\u0022: {\u0022Reserved.DataModel.EntitySchemaVersion\u0022: 4, \u0022Reserved.DataModel.Severity\u0022: 0, \u0022Reserved.SequenceNumber\u0022: 1, \u0022Reserved.TimeSinceSessionStart\u0022: 0}}}}]",
+      "RequestBody": "[{\u0022ver\u0022: 1, \u0022name\u0022: \u0022Microsoft.ApplicationInsights.Event\u0022, \u0022time\u0022: \u0022TIME\u0022, \u0022sampleRate\u0022: 100.0, \u0022iKey\u0022: \u0022INSTRUMENTATION_KEY\u0022, \u0022tags\u0022: {\u0022ai.device.id\u0022: \u0022rhurey-wfh\u0022, \u0022ai.device.locale\u0022: \u0022en_US\u0022, \u0022ai.device.osVersion\u0022: \u002210.0.22631\u0022, \u0022ai.device.type\u0022: \u0022Other\u0022, \u0022ai.internal.sdkVersion\u0022: \u0022py3:0.11.9\u0022}, \u0022data\u0022: {\u0022baseType\u0022: \u0022EventData\u0022, \u0022baseData\u0022: {\u0022ver\u0022: 2, \u0022name\u0022: \u0022azurecli/command\u0022, \u0022properties\u0022: {\u0022Context.Default.AzureCLI.AllowBroker\u0022: \u0022False\u0022, \u0022Context.Default.AzureCLI.ClientRequestId\u0022: \u0022dad851c7-cc8c-11ee-8e5c-c8d9d2049b34\u0022, \u0022Context.Default.AzureCLI.CloudName\u0022: \u0022AzureCloud\u0022, \u0022Context.Default.AzureCLI.CoreVersion\u0022: \u00222.57.0\u0022, \u0022Context.Default.AzureCLI.DefaultOutputType\u0022: \u0022unknown\u0022, \u0022Context.Default.AzureCLI.EndTime\u0022: \u00222024-02-16 05:33:05.214636\u0022, \u0022Context.Default.AzureCLI.EnvironmentVariables\u0022: \u0022[]\u0022, \u0022Context.Default.AzureCLI.InitTimeElapsed\u0022: \u00221.611585\u0022, \u0022Context.Default.AzureCLI.InstallationId\u0022: \u002255059476-d0fd-11ed-8796-c8d9d2049b34\u0022, \u0022Context.Default.AzureCLI.Installer\u0022: \u0022MSI\u0022, \u0022Context.Default.AzureCLI.InvokeTimeElapsed\u0022: \u00221.803361\u0022, \u0022Context.Default.AzureCLI.Locale\u0022: \u0022English_United States,1252\u0022, \u0022Context.Default.AzureCLI.Mode\u0022: \u0022default\u0022, \u0022Context.Default.AzureCLI.OutputType\u0022: \u0022json\u0022, \u0022Context.Default.AzureCLI.Params\u0022: \u0022--output,--subscription,-g,-n,--query\u0022, \u0022Context.Default.AzureCLI.PollEndTime\u0022: \u0022None\u0022, \u0022Context.Default.AzureCLI.PollStartTime\u0022: \u0022None\u0022, \u0022Context.Default.AzureCLI.PythonVersion\u0022: \u00223.11.7\u0022, \u0022Context.Default.AzureCLI.RawCommand\u0022: \u0022cognitiveservices account deployment list\u0022, \u0022Context.Default.AzureCLI.ShellType\u0022: \u0022cmd\u0022, \u0022Context.Default.AzureCLI.ShowSurveyMessage\u0022: \u0022False\u0022, \u0022Context.Default.AzureCLI.Source\u0022: \u0022az\u0022, \u0022Context.Default.AzureCLI.StartTime\u0022: \u00222024-02-16 05:33:03.411137\u0022, \u0022Context.Default.AzureCLI.TelemetryVersion\u0022: \u00222.0\u0022, \u0022Context.Default.AzureCLI.UserAzureId\u0022: \u00225f410ad1fc24a4547edd18a29584bf5c7572c48978dd5c8cd5fa93e771db858f\u0022, \u0022Context.Default.AzureCLI.UserAzureSubscriptionId\u0022: \u0022f7b4a5ce-d3bd-4a03-84fe-8bcad772c8c1\u0022, \u0022Context.Default.AzureCLI.debug_info\u0022: \u0022\u0022, \u0022Context.Default.AzureCLI.error_type\u0022: \u0022None\u0022, \u0022Context.Default.AzureCLI.exception_name\u0022: \u0022None\u0022, \u0022Context.Default.VS.Core.Distro.Id\u0022: \u0022\u0022, \u0022Context.Default.VS.Core.Distro.Name\u0022: \u0022\u0022, \u0022Context.Default.VS.Core.Distro.Version\u0022: \u0022\u0022, \u0022Context.Default.VS.Core.ExeName\u0022: \u0022azurecli\u0022, \u0022Context.Default.VS.Core.ExeVersion\u0022: \u00222.57.0@none\u0022, \u0022Context.Default.VS.Core.MacAddressHash\u0022: \u0022a1a9745e6932c20d63d29c7e0eeb778b2420c595247a087002a4dd921b854b1e\u0022, \u0022Context.Default.VS.Core.Machine.Id\u0022: \u0022a1a9745e-6932-c20d-63d2-9c7e0eeb778b\u0022, \u0022Context.Default.VS.Core.OS.Platform\u0022: \u0022windows-10-10.0.22631-sp0\u0022, \u0022Context.Default.VS.Core.OS.Type\u0022: \u0022windows\u0022, \u0022Context.Default.VS.Core.OS.Version\u0022: \u002210.0.22631\u0022, \u0022Context.Default.VS.Core.TelemetryApi.ProductVersion\u0022: \u0022azurecli@2.57.0\u0022, \u0022Context.Default.VS.Core.User.Id\u0022: \u002255059476-d0fd-11ed-8796-c8d9d2049b34\u0022, \u0022Context.Default.VS.Core.User.IsMicrosoftInternal\u0022: \u0022False\u0022, \u0022Context.Default.VS.Core.User.IsOptedIn\u0022: \u0022True\u0022, \u0022Reserved.ChannelUsed\u0022: \u0022AI\u0022, \u0022Reserved.DataModel.Action.Result\u0022: \u0022Success\u0022, \u0022Reserved.DataModel.Action.Type\u0022: \u0022Atomic\u0022, \u0022Reserved.DataModel.CorrelationId\u0022: \u002225c743f8-74c4-4d18-82cc-28590350766c\u0022, \u0022Reserved.DataModel.EntityName\u0022: \u0022cognitiveservices-account-deployment-list\u0022, \u0022Reserved.DataModel.EntityType\u0022: \u0022UserTask\u0022, \u0022Reserved.DataModel.FeatureName\u0022: \u0022command\u0022, \u0022Reserved.DataModel.ProductName\u0022: \u0022azurecli\u0022, \u0022Reserved.DataModel.Source\u0022: \u0022DataModelAPI\u0022, \u0022Reserved.EventId\u0022: \u0022628987e9-8368-4c5c-86b5-5a9be929354e\u0022, \u0022Reserved.SessionId\u0022: \u0022bc3ab2d0e76fd341449acb4e8000d12b8a27508143b9f94dd9f2902859a5cc72\u0022}, \u0022measurements\u0022: {\u0022Reserved.DataModel.EntitySchemaVersion\u0022: 4, \u0022Reserved.DataModel.Severity\u0022: 0, \u0022Reserved.SequenceNumber\u0022: 1, \u0022Reserved.TimeSinceSessionStart\u0022: 0}}}}]",
       "StatusCode": 200,
       "ResponseHeaders": {
         "Connection": "close",
         "Content-Length": "49",
         "Content-Type": "application/json; charset=utf-8",
-        "Date": "Fri, 16 Feb 2024 03:19:50 GMT",
+        "Date": "Fri, 16 Feb 2024 05:33:06 GMT",
         "Server": "Microsoft-HTTPAPI/2.0",
         "Strict-Transport-Security": "max-age=31536000",
         "X-Content-Type-Options": "nosniff"
@@ -42309,10 +42509,10 @@
         "CommandName": "cognitiveservices account deployment list",
         "Connection": "close",
         "ParameterSetName": "--output --subscription -g -n --query",
-        "User-Agent": "AZURECLI/2.57.0 (MSI) azsdk-python-mgmt-cognitiveservices/13.5.0 Python/3.11.7 (Windows-10-10.0.22621-SP0) ai-cli 0.0.1",
+        "User-Agent": "AZURECLI/2.57.0 (MSI) azsdk-python-mgmt-cognitiveservices/13.5.0 Python/3.11.7 (Windows-10-10.0.22631-SP0) ai-cli 0.0.1",
         "X-Forwarded-For": "127.0.0.1",
         "X-Forwarded-Proto": "https",
-        "x-ms-client-request-id": "3f32c177-cc7a-11ee-9d4b-001583f68670",
+        "x-ms-client-request-id": "dd441b89-cc8c-11ee-ab9e-c8d9d2049b34",
         "X-Real-IP": "127.0.0.1"
       },
       "RequestBody": null,
@@ -42322,18 +42522,18 @@
         "Connection": "close",
         "Content-Length": "2827",
         "Content-Type": "application/json; charset=utf-8",
-        "Date": "Fri, 16 Feb 2024 03:19:52 GMT",
+        "Date": "Fri, 16 Feb 2024 05:33:09 GMT",
         "Expires": "-1",
         "Pragma": "no-cache",
         "Strict-Transport-Security": "max-age=31536000; includeSubDomains",
         "X-Cache": "CONFIG_NOCACHE",
         "X-Content-Type-Options": "nosniff",
         "x-envoy-upstream-service-time": "7",
-        "x-ms-correlation-request-id": "70da89f0-8ce5-4354-825e-e3dbcb26a70e",
+        "x-ms-correlation-request-id": "645144ac-270b-4c44-9acc-598cba7b07e8",
         "x-ms-ratelimit-remaining-subscription-reads": "11999",
-        "x-ms-request-id": "01bdc516-17e2-47ec-80bf-af1891a0e8d5",
-        "x-ms-routing-request-id": "WESTUS2:20240216T031952Z:70da89f0-8ce5-4354-825e-e3dbcb26a70e",
-        "X-MSEdge-Ref": "Ref A: CC2F12809CB24209A5AB36B79E90A671 Ref B: CO6AA3150218011 Ref C: 2024-02-16T03:19:51Z"
+        "x-ms-request-id": "6ae9f39f-8aac-40ac-bb96-a0db719ba80d",
+        "x-ms-routing-request-id": "WESTUS2:20240216T053309Z:645144ac-270b-4c44-9acc-598cba7b07e8",
+        "X-MSEdge-Ref": "Ref A: D97A5283CE6249B38D6D36BF3E03D75D Ref B: CO6AA3150220051 Ref C: 2024-02-16T05:33:08Z"
       },
       "ResponseBody": {
         "value": [
@@ -42475,220 +42675,20 @@
         "Accept": "application/json",
         "Accept-Encoding": "identity",
         "Connection": "close",
-        "Content-Length": "3741",
+        "Content-Length": "3740",
         "Content-Type": "application/json; charset=utf-8",
         "User-Agent": "Python-urllib/3.11",
         "X-Forwarded-For": "127.0.0.1",
         "X-Forwarded-Proto": "https",
         "X-Real-IP": "127.0.0.1"
       },
-      "RequestBody": "[{\u0022ver\u0022: 1, \u0022name\u0022: \u0022Microsoft.ApplicationInsights.Event\u0022, \u0022time\u0022: \u0022TIME\u0022, \u0022sampleRate\u0022: 100.0, \u0022iKey\u0022: \u0022INSTRUMENTATION_KEY\u0022, \u0022tags\u0022: {\u0022ai.device.id\u0022: \u0022rhurey-dev3\u0022, \u0022ai.device.locale\u0022: \u0022en_US\u0022, \u0022ai.device.osVersion\u0022: \u002210.0.22621\u0022, \u0022ai.device.type\u0022: \u0022Other\u0022, \u0022ai.internal.sdkVersion\u0022: \u0022py3:0.11.9\u0022}, \u0022data\u0022: {\u0022baseType\u0022: \u0022EventData\u0022, \u0022baseData\u0022: {\u0022ver\u0022: 2, \u0022name\u0022: \u0022azurecli/command\u0022, \u0022properties\u0022: {\u0022Context.Default.AzureCLI.AllowBroker\u0022: \u0022False\u0022, \u0022Context.Default.AzureCLI.ClientRequestId\u0022: \u00223f32c177-cc7a-11ee-9d4b-001583f68670\u0022, \u0022Context.Default.AzureCLI.CloudName\u0022: \u0022AzureCloud\u0022, \u0022Context.Default.AzureCLI.CoreVersion\u0022: \u00222.57.0\u0022, \u0022Context.Default.AzureCLI.DefaultOutputType\u0022: \u0022unknown\u0022, \u0022Context.Default.AzureCLI.EndTime\u0022: \u00222024-02-16 03:19:52.648366\u0022, \u0022Context.Default.AzureCLI.EnvironmentVariables\u0022: \u0022[]\u0022, \u0022Context.Default.AzureCLI.InitTimeElapsed\u0022: \u00220.520895\u0022, \u0022Context.Default.AzureCLI.InstallationId\u0022: \u0022a266e037-bf65-11ec-9e79-b04f130ebd76\u0022, \u0022Context.Default.AzureCLI.Installer\u0022: \u0022MSI\u0022, \u0022Context.Default.AzureCLI.InvokeTimeElapsed\u0022: \u00221.306349\u0022, \u0022Context.Default.AzureCLI.Locale\u0022: \u0022English_United States,1252\u0022, \u0022Context.Default.AzureCLI.Mode\u0022: \u0022default\u0022, \u0022Context.Default.AzureCLI.OutputType\u0022: \u0022json\u0022, \u0022Context.Default.AzureCLI.Params\u0022: \u0022--output,--subscription,-g,-n,--query\u0022, \u0022Context.Default.AzureCLI.PollEndTime\u0022: \u0022None\u0022, \u0022Context.Default.AzureCLI.PollStartTime\u0022: \u0022None\u0022, \u0022Context.Default.AzureCLI.PythonVersion\u0022: \u00223.11.7\u0022, \u0022Context.Default.AzureCLI.RawCommand\u0022: \u0022cognitiveservices account deployment list\u0022, \u0022Context.Default.AzureCLI.ShellType\u0022: \u0022cmd\u0022, \u0022Context.Default.AzureCLI.ShowSurveyMessage\u0022: \u0022False\u0022, \u0022Context.Default.AzureCLI.Source\u0022: \u0022az\u0022, \u0022Context.Default.AzureCLI.StartTime\u0022: \u00222024-02-16 03:19:51.341138\u0022, \u0022Context.Default.AzureCLI.TelemetryVersion\u0022: \u00222.0\u0022, \u0022Context.Default.AzureCLI.UserAzureId\u0022: \u00225f410ad1fc24a4547edd18a29584bf5c7572c48978dd5c8cd5fa93e771db858f\u0022, \u0022Context.Default.AzureCLI.UserAzureSubscriptionId\u0022: \u0022f7b4a5ce-d3bd-4a03-84fe-8bcad772c8c1\u0022, \u0022Context.Default.AzureCLI.debug_info\u0022: \u0022\u0022, \u0022Context.Default.AzureCLI.error_type\u0022: \u0022None\u0022, \u0022Context.Default.AzureCLI.exception_name\u0022: \u0022None\u0022, \u0022Context.Default.VS.Core.Distro.Id\u0022: \u0022\u0022, \u0022Context.Default.VS.Core.Distro.Name\u0022: \u0022\u0022, \u0022Context.Default.VS.Core.Distro.Version\u0022: \u0022\u0022, \u0022Context.Default.VS.Core.ExeName\u0022: \u0022azurecli\u0022, \u0022Context.Default.VS.Core.ExeVersion\u0022: \u00222.57.0@none\u0022, \u0022Context.Default.VS.Core.MacAddressHash\u0022: \u0022a58b788c9276a88bbf25dea9745d404b03302f29376b6239fdba11d5ffaf22e3\u0022, \u0022Context.Default.VS.Core.Machine.Id\u0022: \u0022a58b788c-9276-a88b-bf25-dea9745d404b\u0022, \u0022Context.Default.VS.Core.OS.Platform\u0022: \u0022windows-10-10.0.22621-sp0\u0022, \u0022Context.Default.VS.Core.OS.Type\u0022: \u0022windows\u0022, \u0022Context.Default.VS.Core.OS.Version\u0022: \u002210.0.22621\u0022, \u0022Context.Default.VS.Core.TelemetryApi.ProductVersion\u0022: \u0022azurecli@2.57.0\u0022, \u0022Context.Default.VS.Core.User.Id\u0022: \u0022a266e037-bf65-11ec-9e79-b04f130ebd76\u0022, \u0022Context.Default.VS.Core.User.IsMicrosoftInternal\u0022: \u0022False\u0022, \u0022Context.Default.VS.Core.User.IsOptedIn\u0022: \u0022True\u0022, \u0022Reserved.ChannelUsed\u0022: \u0022AI\u0022, \u0022Reserved.DataModel.Action.Result\u0022: \u0022Success\u0022, \u0022Reserved.DataModel.Action.Type\u0022: \u0022Atomic\u0022, \u0022Reserved.DataModel.CorrelationId\u0022: \u00223acb383f-aff5-418e-84eb-a24efa81936e\u0022, \u0022Reserved.DataModel.EntityName\u0022: \u0022cognitiveservices-account-deployment-list\u0022, \u0022Reserved.DataModel.EntityType\u0022: \u0022UserTask\u0022, \u0022Reserved.DataModel.FeatureName\u0022: \u0022command\u0022, \u0022Reserved.DataModel.ProductName\u0022: \u0022azurecli\u0022, \u0022Reserved.DataModel.Source\u0022: \u0022DataModelAPI\u0022, \u0022Reserved.EventId\u0022: \u002211545de5-c734-4b18-ae88-7afed25ca829\u0022, \u0022Reserved.SessionId\u0022: \u0022c58d6f0b36a03bad1fd11f6572fd15c238ce519044bc1c437253d54202cb00f6\u0022}, \u0022measurements\u0022: {\u0022Reserved.DataModel.EntitySchemaVersion\u0022: 4, \u0022Reserved.DataModel.Severity\u0022: 0, \u0022Reserved.SequenceNumber\u0022: 1, \u0022Reserved.TimeSinceSessionStart\u0022: 0}}}}]",
+      "RequestBody": "[{\u0022ver\u0022: 1, \u0022name\u0022: \u0022Microsoft.ApplicationInsights.Event\u0022, \u0022time\u0022: \u0022TIME\u0022, \u0022sampleRate\u0022: 100.0, \u0022iKey\u0022: \u0022INSTRUMENTATION_KEY\u0022, \u0022tags\u0022: {\u0022ai.device.id\u0022: \u0022rhurey-wfh\u0022, \u0022ai.device.locale\u0022: \u0022en_US\u0022, \u0022ai.device.osVersion\u0022: \u002210.0.22631\u0022, \u0022ai.device.type\u0022: \u0022Other\u0022, \u0022ai.internal.sdkVersion\u0022: \u0022py3:0.11.9\u0022}, \u0022data\u0022: {\u0022baseType\u0022: \u0022EventData\u0022, \u0022baseData\u0022: {\u0022ver\u0022: 2, \u0022name\u0022: \u0022azurecli/command\u0022, \u0022properties\u0022: {\u0022Context.Default.AzureCLI.AllowBroker\u0022: \u0022False\u0022, \u0022Context.Default.AzureCLI.ClientRequestId\u0022: \u0022dd441b89-cc8c-11ee-ab9e-c8d9d2049b34\u0022, \u0022Context.Default.AzureCLI.CloudName\u0022: \u0022AzureCloud\u0022, \u0022Context.Default.AzureCLI.CoreVersion\u0022: \u00222.57.0\u0022, \u0022Context.Default.AzureCLI.DefaultOutputType\u0022: \u0022unknown\u0022, \u0022Context.Default.AzureCLI.EndTime\u0022: \u00222024-02-16 05:33:09.068743\u0022, \u0022Context.Default.AzureCLI.EnvironmentVariables\u0022: \u0022[]\u0022, \u0022Context.Default.AzureCLI.InitTimeElapsed\u0022: \u00221.701247\u0022, \u0022Context.Default.AzureCLI.InstallationId\u0022: \u002255059476-d0fd-11ed-8796-c8d9d2049b34\u0022, \u0022Context.Default.AzureCLI.Installer\u0022: \u0022MSI\u0022, \u0022Context.Default.AzureCLI.InvokeTimeElapsed\u0022: \u00221.594903\u0022, \u0022Context.Default.AzureCLI.Locale\u0022: \u0022English_United States,1252\u0022, \u0022Context.Default.AzureCLI.Mode\u0022: \u0022default\u0022, \u0022Context.Default.AzureCLI.OutputType\u0022: \u0022json\u0022, \u0022Context.Default.AzureCLI.Params\u0022: \u0022--output,--subscription,-g,-n,--query\u0022, \u0022Context.Default.AzureCLI.PollEndTime\u0022: \u0022None\u0022, \u0022Context.Default.AzureCLI.PollStartTime\u0022: \u0022None\u0022, \u0022Context.Default.AzureCLI.PythonVersion\u0022: \u00223.11.7\u0022, \u0022Context.Default.AzureCLI.RawCommand\u0022: \u0022cognitiveservices account deployment list\u0022, \u0022Context.Default.AzureCLI.ShellType\u0022: \u0022cmd\u0022, \u0022Context.Default.AzureCLI.ShowSurveyMessage\u0022: \u0022False\u0022, \u0022Context.Default.AzureCLI.Source\u0022: \u0022az\u0022, \u0022Context.Default.AzureCLI.StartTime\u0022: \u00222024-02-16 05:33:07.473991\u0022, \u0022Context.Default.AzureCLI.TelemetryVersion\u0022: \u00222.0\u0022, \u0022Context.Default.AzureCLI.UserAzureId\u0022: \u00225f410ad1fc24a4547edd18a29584bf5c7572c48978dd5c8cd5fa93e771db858f\u0022, \u0022Context.Default.AzureCLI.UserAzureSubscriptionId\u0022: \u0022f7b4a5ce-d3bd-4a03-84fe-8bcad772c8c1\u0022, \u0022Context.Default.AzureCLI.debug_info\u0022: \u0022\u0022, \u0022Context.Default.AzureCLI.error_type\u0022: \u0022None\u0022, \u0022Context.Default.AzureCLI.exception_name\u0022: \u0022None\u0022, \u0022Context.Default.VS.Core.Distro.Id\u0022: \u0022\u0022, \u0022Context.Default.VS.Core.Distro.Name\u0022: \u0022\u0022, \u0022Context.Default.VS.Core.Distro.Version\u0022: \u0022\u0022, \u0022Context.Default.VS.Core.ExeName\u0022: \u0022azurecli\u0022, \u0022Context.Default.VS.Core.ExeVersion\u0022: \u00222.57.0@none\u0022, \u0022Context.Default.VS.Core.MacAddressHash\u0022: \u0022a1a9745e6932c20d63d29c7e0eeb778b2420c595247a087002a4dd921b854b1e\u0022, \u0022Context.Default.VS.Core.Machine.Id\u0022: \u0022a1a9745e-6932-c20d-63d2-9c7e0eeb778b\u0022, \u0022Context.Default.VS.Core.OS.Platform\u0022: \u0022windows-10-10.0.22631-sp0\u0022, \u0022Context.Default.VS.Core.OS.Type\u0022: \u0022windows\u0022, \u0022Context.Default.VS.Core.OS.Version\u0022: \u002210.0.22631\u0022, \u0022Context.Default.VS.Core.TelemetryApi.ProductVersion\u0022: \u0022azurecli@2.57.0\u0022, \u0022Context.Default.VS.Core.User.Id\u0022: \u002255059476-d0fd-11ed-8796-c8d9d2049b34\u0022, \u0022Context.Default.VS.Core.User.IsMicrosoftInternal\u0022: \u0022False\u0022, \u0022Context.Default.VS.Core.User.IsOptedIn\u0022: \u0022True\u0022, \u0022Reserved.ChannelUsed\u0022: \u0022AI\u0022, \u0022Reserved.DataModel.Action.Result\u0022: \u0022Success\u0022, \u0022Reserved.DataModel.Action.Type\u0022: \u0022Atomic\u0022, \u0022Reserved.DataModel.CorrelationId\u0022: \u0022f07ace74-c10c-4b15-8ba1-7489bca29e2d\u0022, \u0022Reserved.DataModel.EntityName\u0022: \u0022cognitiveservices-account-deployment-list\u0022, \u0022Reserved.DataModel.EntityType\u0022: \u0022UserTask\u0022, \u0022Reserved.DataModel.FeatureName\u0022: \u0022command\u0022, \u0022Reserved.DataModel.ProductName\u0022: \u0022azurecli\u0022, \u0022Reserved.DataModel.Source\u0022: \u0022DataModelAPI\u0022, \u0022Reserved.EventId\u0022: \u0022221098e8-4b42-4675-baf6-23e3d00d0248\u0022, \u0022Reserved.SessionId\u0022: \u0022bc3ab2d0e76fd341449acb4e8000d12b8a27508143b9f94dd9f2902859a5cc72\u0022}, \u0022measurements\u0022: {\u0022Reserved.DataModel.EntitySchemaVersion\u0022: 4, \u0022Reserved.DataModel.Severity\u0022: 0, \u0022Reserved.SequenceNumber\u0022: 1, \u0022Reserved.TimeSinceSessionStart\u0022: 0}}}}]",
       "StatusCode": 200,
       "ResponseHeaders": {
         "Connection": "close",
         "Content-Length": "49",
         "Content-Type": "application/json; charset=utf-8",
-        "Date": "Fri, 16 Feb 2024 03:19:52 GMT",
-        "Server": "Microsoft-HTTPAPI/2.0",
-        "Strict-Transport-Security": "max-age=31536000",
-        "X-Content-Type-Options": "nosniff"
-      },
-      "ResponseBody": {
-        "itemsReceived": 1,
-        "itemsAccepted": 1,
-        "errors": []
-      }
-    },
-    {
-      "RequestUri": "https://fakeendpoint/subscriptions/e72e5254-f265-4e95-9bd2-9ee8e7329051/resourceGroups/robch-eastus2-rg/providers/Microsoft.CognitiveServices/accounts/robch-oai-eastus2/deployments?api-version=2023-05-01",
-      "RequestMethod": "GET",
-      "RequestHeaders": {
-        "Accept": "application/json",
-        "Accept-Encoding": "gzip, deflate",
-        "Authorization": "Sanitized",
-        "CommandName": "cognitiveservices account deployment list",
-        "Connection": "close",
-        "ParameterSetName": "--output --subscription -g -n --query",
-        "User-Agent": "AZURECLI/2.57.0 (MSI) azsdk-python-mgmt-cognitiveservices/13.5.0 Python/3.11.7 (Windows-10-10.0.22621-SP0) ai-cli 0.0.1",
-        "X-Forwarded-For": "127.0.0.1",
-        "X-Forwarded-Proto": "https",
-        "x-ms-client-request-id": "40a688b5-cc7a-11ee-b116-001583f68670",
-        "X-Real-IP": "127.0.0.1"
-      },
-      "RequestBody": null,
-      "StatusCode": 200,
-      "ResponseHeaders": {
-        "Cache-Control": "no-cache",
-        "Connection": "close",
-        "Content-Length": "2827",
-        "Content-Type": "application/json; charset=utf-8",
-        "Date": "Fri, 16 Feb 2024 03:19:54 GMT",
-        "Expires": "-1",
-        "Pragma": "no-cache",
-        "Strict-Transport-Security": "max-age=31536000; includeSubDomains",
-        "X-Cache": "CONFIG_NOCACHE",
-        "X-Content-Type-Options": "nosniff",
-        "x-envoy-upstream-service-time": "6",
-        "x-ms-correlation-request-id": "d8f012d4-04ff-4a67-9e88-ec47d8f53616",
-        "x-ms-ratelimit-remaining-subscription-reads": "11999",
-        "x-ms-request-id": "5da57964-db2e-4bab-963a-edb25f3f039d",
-        "x-ms-routing-request-id": "WESTUS2:20240216T031955Z:d8f012d4-04ff-4a67-9e88-ec47d8f53616",
-        "X-MSEdge-Ref": "Ref A: 6C822803CE31470B876B012FED3224C5 Ref B: CO6AA3150218025 Ref C: 2024-02-16T03:19:54Z"
-      },
-      "ResponseBody": {
-        "value": [
-          {
-            "id": "/subscriptions/e72e5254-f265-4e95-9bd2-9ee8e7329051/resourceGroups/robch-eastus2-rg/providers/Microsoft.CognitiveServices/accounts/robch-oai-eastus2/deployments/gpt-4-32k-0613",
-            "type": "Microsoft.CognitiveServices/accounts/deployments",
-            "name": "gpt-4-32k-0613",
-            "sku": {
-              "name": "Standard",
-              "capacity": 50
-            },
-            "properties": {
-              "model": {
-                "format": "OpenAI",
-                "name": "gpt-4-32k",
-                "version": "0613"
-              },
-              "versionUpgradeOption": "OnceCurrentVersionExpired",
-              "capabilities": {
-                "chatCompletion": "true"
-              },
-              "raiPolicyName": "Microsoft.Default",
-              "provisioningState": "Succeeded",
-              "rateLimits": [
-                {
-                  "key": "request",
-                  "renewalPeriod": 10,
-                  "count": 50
-                },
-                {
-                  "key": "token",
-                  "renewalPeriod": 60,
-                  "count": 50000
-                }
-              ]
-            },
-            "systemData": {
-              "createdBy": "email@domain.com",
-              "createdByType": "User",
-              "createdAt": "2023-11-30T14:49:36.8999152Z",
-              "lastModifiedBy": "email@domain.com",
-              "lastModifiedByType": "User",
-              "lastModifiedAt": "2023-11-30T14:49:36.8999152Z"
-            },
-            "etag": "\u0022ff4a51c4-e5aa-421a-9230-ed570ff837a9\u0022"
-          },
-          {
-            "id": "/subscriptions/e72e5254-f265-4e95-9bd2-9ee8e7329051/resourceGroups/robch-eastus2-rg/providers/Microsoft.CognitiveServices/accounts/robch-oai-eastus2/deployments/text-embedding-ada-002-2",
-            "type": "Microsoft.CognitiveServices/accounts/deployments",
-            "name": "text-embedding-ada-002-2",
-            "sku": {
-              "name": "Standard",
-              "capacity": 120
-            },
-            "properties": {
-              "model": {
-                "format": "OpenAI",
-                "name": "text-embedding-ada-002",
-                "version": "2"
-              },
-              "versionUpgradeOption": "OnceNewDefaultVersionAvailable",
-              "capabilities": {
-                "embeddings": "true",
-                "embeddingsMaxInputs": "2048"
-              },
-              "provisioningState": "Succeeded",
-              "rateLimits": [
-                {
-                  "key": "request",
-                  "renewalPeriod": 10,
-                  "count": 120
-                },
-                {
-                  "key": "token",
-                  "renewalPeriod": 60,
-                  "count": 120000
-                }
-              ]
-            },
-            "systemData": {
-              "createdBy": "email@domain.com",
-              "createdByType": "User",
-              "createdAt": "2023-12-05T14:45:01.2344483Z",
-              "lastModifiedBy": "email@domain.com",
-              "lastModifiedByType": "User",
-              "lastModifiedAt": "2023-12-05T14:45:01.2344483Z"
-            },
-            "etag": "\u0022401953cf-f62f-46f3-af5b-fbb8d5fcf9b1\u0022"
-          },
-          {
-            "id": "/subscriptions/e72e5254-f265-4e95-9bd2-9ee8e7329051/resourceGroups/robch-eastus2-rg/providers/Microsoft.CognitiveServices/accounts/robch-oai-eastus2/deployments/gpt-35-turbo-16k-0613",
-            "type": "Microsoft.CognitiveServices/accounts/deployments",
-            "name": "gpt-35-turbo-16k-0613",
-            "sku": {
-              "name": "Standard",
-              "capacity": 120
-            },
-            "properties": {
-              "model": {
-                "format": "OpenAI",
-                "name": "gpt-35-turbo-16k",
-                "version": "0613"
-              },
-              "versionUpgradeOption": "OnceNewDefaultVersionAvailable",
-              "capabilities": {
-                "chatCompletion": "true"
-              },
-              "provisioningState": "Succeeded",
-              "rateLimits": [
-                {
-                  "key": "request",
-                  "renewalPeriod": 10,
-                  "count": 120
-                },
-                {
-                  "key": "token",
-                  "renewalPeriod": 60,
-                  "count": 120000
-                }
-              ]
-            },
-            "systemData": {
-              "createdBy": "email@domain.com",
-              "createdByType": "User",
-              "createdAt": "2023-12-11T17:56:47.2743282Z",
-              "lastModifiedBy": "email@domain.com",
-              "lastModifiedByType": "User",
-              "lastModifiedAt": "2023-12-11T17:56:47.2743282Z"
-            },
-            "etag": "\u002259030dbd-7418-41cc-ad13-45d76308c54d\u0022"
-          }
-        ]
-      }
-    },
-    {
-      "RequestUri": "https://fakeendpoint/v2/track",
-      "RequestMethod": "POST",
-      "RequestHeaders": {
-        "Accept": "application/json",
-        "Accept-Encoding": "identity",
-        "Connection": "close",
-        "Content-Length": "3741",
-        "Content-Type": "application/json; charset=utf-8",
-        "User-Agent": "Python-urllib/3.11",
-        "X-Forwarded-For": "127.0.0.1",
-        "X-Forwarded-Proto": "https",
-        "X-Real-IP": "127.0.0.1"
-      },
-      "RequestBody": "[{\u0022ver\u0022: 1, \u0022name\u0022: \u0022Microsoft.ApplicationInsights.Event\u0022, \u0022time\u0022: \u0022TIME\u0022, \u0022sampleRate\u0022: 100.0, \u0022iKey\u0022: \u0022INSTRUMENTATION_KEY\u0022, \u0022tags\u0022: {\u0022ai.device.id\u0022: \u0022rhurey-dev3\u0022, \u0022ai.device.locale\u0022: \u0022en_US\u0022, \u0022ai.device.osVersion\u0022: \u002210.0.22621\u0022, \u0022ai.device.type\u0022: \u0022Other\u0022, \u0022ai.internal.sdkVersion\u0022: \u0022py3:0.11.9\u0022}, \u0022data\u0022: {\u0022baseType\u0022: \u0022EventData\u0022, \u0022baseData\u0022: {\u0022ver\u0022: 2, \u0022name\u0022: \u0022azurecli/command\u0022, \u0022properties\u0022: {\u0022Context.Default.AzureCLI.AllowBroker\u0022: \u0022False\u0022, \u0022Context.Default.AzureCLI.ClientRequestId\u0022: \u002240a688b5-cc7a-11ee-b116-001583f68670\u0022, \u0022Context.Default.AzureCLI.CloudName\u0022: \u0022AzureCloud\u0022, \u0022Context.Default.AzureCLI.CoreVersion\u0022: \u00222.57.0\u0022, \u0022Context.Default.AzureCLI.DefaultOutputType\u0022: \u0022unknown\u0022, \u0022Context.Default.AzureCLI.EndTime\u0022: \u00222024-02-16 03:19:55.053144\u0022, \u0022Context.Default.AzureCLI.EnvironmentVariables\u0022: \u0022[]\u0022, \u0022Context.Default.AzureCLI.InitTimeElapsed\u0022: \u00220.796848\u0022, \u0022Context.Default.AzureCLI.InstallationId\u0022: \u0022a266e037-bf65-11ec-9e79-b04f130ebd76\u0022, \u0022Context.Default.AzureCLI.Installer\u0022: \u0022MSI\u0022, \u0022Context.Default.AzureCLI.InvokeTimeElapsed\u0022: \u00221.277197\u0022, \u0022Context.Default.AzureCLI.Locale\u0022: \u0022English_United States,1252\u0022, \u0022Context.Default.AzureCLI.Mode\u0022: \u0022default\u0022, \u0022Context.Default.AzureCLI.OutputType\u0022: \u0022json\u0022, \u0022Context.Default.AzureCLI.Params\u0022: \u0022--output,--subscription,-g,-n,--query\u0022, \u0022Context.Default.AzureCLI.PollEndTime\u0022: \u0022None\u0022, \u0022Context.Default.AzureCLI.PollStartTime\u0022: \u0022None\u0022, \u0022Context.Default.AzureCLI.PythonVersion\u0022: \u00223.11.7\u0022, \u0022Context.Default.AzureCLI.RawCommand\u0022: \u0022cognitiveservices account deployment list\u0022, \u0022Context.Default.AzureCLI.ShellType\u0022: \u0022cmd\u0022, \u0022Context.Default.AzureCLI.ShowSurveyMessage\u0022: \u0022False\u0022, \u0022Context.Default.AzureCLI.Source\u0022: \u0022az\u0022, \u0022Context.Default.AzureCLI.StartTime\u0022: \u00222024-02-16 03:19:53.775624\u0022, \u0022Context.Default.AzureCLI.TelemetryVersion\u0022: \u00222.0\u0022, \u0022Context.Default.AzureCLI.UserAzureId\u0022: \u00225f410ad1fc24a4547edd18a29584bf5c7572c48978dd5c8cd5fa93e771db858f\u0022, \u0022Context.Default.AzureCLI.UserAzureSubscriptionId\u0022: \u0022f7b4a5ce-d3bd-4a03-84fe-8bcad772c8c1\u0022, \u0022Context.Default.AzureCLI.debug_info\u0022: \u0022\u0022, \u0022Context.Default.AzureCLI.error_type\u0022: \u0022None\u0022, \u0022Context.Default.AzureCLI.exception_name\u0022: \u0022None\u0022, \u0022Context.Default.VS.Core.Distro.Id\u0022: \u0022\u0022, \u0022Context.Default.VS.Core.Distro.Name\u0022: \u0022\u0022, \u0022Context.Default.VS.Core.Distro.Version\u0022: \u0022\u0022, \u0022Context.Default.VS.Core.ExeName\u0022: \u0022azurecli\u0022, \u0022Context.Default.VS.Core.ExeVersion\u0022: \u00222.57.0@none\u0022, \u0022Context.Default.VS.Core.MacAddressHash\u0022: \u0022a58b788c9276a88bbf25dea9745d404b03302f29376b6239fdba11d5ffaf22e3\u0022, \u0022Context.Default.VS.Core.Machine.Id\u0022: \u0022a58b788c-9276-a88b-bf25-dea9745d404b\u0022, \u0022Context.Default.VS.Core.OS.Platform\u0022: \u0022windows-10-10.0.22621-sp0\u0022, \u0022Context.Default.VS.Core.OS.Type\u0022: \u0022windows\u0022, \u0022Context.Default.VS.Core.OS.Version\u0022: \u002210.0.22621\u0022, \u0022Context.Default.VS.Core.TelemetryApi.ProductVersion\u0022: \u0022azurecli@2.57.0\u0022, \u0022Context.Default.VS.Core.User.Id\u0022: \u0022a266e037-bf65-11ec-9e79-b04f130ebd76\u0022, \u0022Context.Default.VS.Core.User.IsMicrosoftInternal\u0022: \u0022False\u0022, \u0022Context.Default.VS.Core.User.IsOptedIn\u0022: \u0022True\u0022, \u0022Reserved.ChannelUsed\u0022: \u0022AI\u0022, \u0022Reserved.DataModel.Action.Result\u0022: \u0022Success\u0022, \u0022Reserved.DataModel.Action.Type\u0022: \u0022Atomic\u0022, \u0022Reserved.DataModel.CorrelationId\u0022: \u0022a2ff3d75-f310-4c05-bdfe-c50ec877c951\u0022, \u0022Reserved.DataModel.EntityName\u0022: \u0022cognitiveservices-account-deployment-list\u0022, \u0022Reserved.DataModel.EntityType\u0022: \u0022UserTask\u0022, \u0022Reserved.DataModel.FeatureName\u0022: \u0022command\u0022, \u0022Reserved.DataModel.ProductName\u0022: \u0022azurecli\u0022, \u0022Reserved.DataModel.Source\u0022: \u0022DataModelAPI\u0022, \u0022Reserved.EventId\u0022: \u0022932c1403-6093-4994-8dc3-4246ce3eb6ca\u0022, \u0022Reserved.SessionId\u0022: \u0022c58d6f0b36a03bad1fd11f6572fd15c238ce519044bc1c437253d54202cb00f6\u0022}, \u0022measurements\u0022: {\u0022Reserved.DataModel.EntitySchemaVersion\u0022: 4, \u0022Reserved.DataModel.Severity\u0022: 0, \u0022Reserved.SequenceNumber\u0022: 1, \u0022Reserved.TimeSinceSessionStart\u0022: 0}}}}]",
-      "StatusCode": 200,
-      "ResponseHeaders": {
-        "Connection": "close",
-        "Content-Length": "49",
-        "Content-Type": "application/json; charset=utf-8",
-        "Date": "Fri, 16 Feb 2024 03:19:55 GMT",
+        "Date": "Fri, 16 Feb 2024 05:33:10 GMT",
         "Server": "Microsoft-HTTPAPI/2.0",
         "Strict-Transport-Security": "max-age=31536000",
         "X-Content-Type-Options": "nosniff"
@@ -42710,10 +42710,10 @@
         "Connection": "close",
         "Content-Length": "0",
         "ParameterSetName": "--output --subscription -g -n",
-        "User-Agent": "AZURECLI/2.57.0 (MSI) azsdk-python-mgmt-cognitiveservices/13.5.0 Python/3.11.7 (Windows-10-10.0.22621-SP0) ai-cli 0.0.1",
+        "User-Agent": "AZURECLI/2.57.0 (MSI) azsdk-python-mgmt-cognitiveservices/13.5.0 Python/3.11.7 (Windows-10-10.0.22631-SP0) ai-cli 0.0.1",
         "X-Forwarded-For": "127.0.0.1",
         "X-Forwarded-Proto": "https",
-        "x-ms-client-request-id": "4202c049-cc7a-11ee-87e6-001583f68670",
+        "x-ms-client-request-id": "df7d4197-cc8c-11ee-80d4-c8d9d2049b34",
         "X-Real-IP": "127.0.0.1"
       },
       "RequestBody": null,
@@ -42723,18 +42723,18 @@
         "Connection": "close",
         "Content-Length": "45",
         "Content-Type": "application/json; charset=utf-8",
-        "Date": "Fri, 16 Feb 2024 03:19:56 GMT",
+        "Date": "Fri, 16 Feb 2024 05:33:12 GMT",
         "Expires": "-1",
         "Pragma": "no-cache",
         "Strict-Transport-Security": "max-age=31536000; includeSubDomains",
         "X-Cache": "CONFIG_NOCACHE",
         "X-Content-Type-Options": "nosniff",
-        "x-envoy-upstream-service-time": "27",
-        "x-ms-correlation-request-id": "77dd00b0-e168-49cf-8fb8-17bb678f65f2",
+        "x-envoy-upstream-service-time": "20",
+        "x-ms-correlation-request-id": "6f869a97-5258-49c4-bc53-a242003aed45",
         "x-ms-ratelimit-remaining-subscription-writes": "1199",
-        "x-ms-request-id": "986019a6-8316-4485-a52f-109c5ea6b19e",
-        "x-ms-routing-request-id": "WESTUS2:20240216T031956Z:77dd00b0-e168-49cf-8fb8-17bb678f65f2",
-        "X-MSEdge-Ref": "Ref A: A8B14481E8844748BFC82B2DA16F053A Ref B: CO6AA3150217039 Ref C: 2024-02-16T03:19:56Z"
+        "x-ms-request-id": "dfd9e01f-87bf-441a-b899-f3fbed587d94",
+        "x-ms-routing-request-id": "WESTUS2:20240216T053313Z:6f869a97-5258-49c4-bc53-a242003aed45",
+        "X-MSEdge-Ref": "Ref A: 43DE79ABA50447F097148B2315B17D54 Ref B: CO6AA3150219035 Ref C: 2024-02-16T05:33:12Z"
       },
       "ResponseBody": {
         "key1": "COGSVCSKey1",

@@ -138,11 +138,9 @@
       workingDirectory:
       bash: |
         #!/bin/bash  
-        FILE="chat-history-function.jsonl"  
-      
-        rm *
+        FILE="chat-history-function.jsonl"
 
-        ai chat --question "What files are in the current directory?" --built-in-functions true --output-chat-history-file ${FILE}
+        ai chat --question "What is 12345 x 12345?" --built-in-functions true --output-chat-history-file ${FILE}
       
         # Read the JSONL file  
         NUM_LINES=$(wc -l < "$FILE")  
@@ -150,14 +148,14 @@
         ROLE_USER_COUNT=$(grep -c "\"role\":\"user\"" "$FILE")  
         ROLE_ASSISTANT_COUNT=$(grep -c "\"role\":\"assistant\"" "$FILE")  
         ROLE_FUNCTION_COUNT=$(grep -c "\"role\":\"function\"" "$FILE")  
-        FUNCTION_CALL_COUNT=$(grep -c "\"name\":\"FindAllFilesInCurrentDirectory\",\"arguments\":\"{}\"" "$FILE")  
+        FUNCTION_CALL_COUNT=$(grep -c "\"name\":\"MultiplyIntegers\"" "$FILE")  
         
         # Validate if the file is correct JSONL  
         jq -e ".[]" < "$FILE" > /dev/null 2>&1  
         JSONL_VALID=$?  
         
         # Check the conditions  
-        if [ $NUM_LINES -eq 5 ] && [ $ROLE_SYSTEM_COUNT -eq 1 ] && [ $ROLE_USER_COUNT -eq 1 ] && [ $ROLE_ASSISTANT_COUNT -eq 2 ] && [ $ROLE_FUNCTION_COUNT -eq 1 ] && [ $FUNCTION_CALL_COUNT -eq 1 ] && [ $JSONL_VALID -eq 0 ]; then  
+        if [ $NUM_LINES -eq 5 ] && [ $ROLE_SYSTEM_COUNT -eq 1 ] && [ $ROLE_USER_COUNT -eq 1 ] && [ $ROLE_ASSISTANT_COUNT -eq 2 ] && [ $ROLE_FUNCTION_COUNT -eq 1 ] && [ $FUNCTION_CALL_COUNT -eq 2 ] && [ $JSONL_VALID -eq 0 ]; then  
             echo "The file is valid."  
         else  
             echo "The file is not valid."  
@@ -179,8 +177,8 @@
             if [ $ROLE_FUNCTION_COUNT -ne 1 ]; then  
                 echo " - There is no row with \"role\":\"function\" in it. The file has $ROLE_FUNCTION_COUNT rows."  
             fi  
-            if [ $FUNCTION_CALL_COUNT -ne 1 ]; then  
-                echo " - The function \"FindAllFilesInCurrentDirectory\" is not called. The file has $FUNCTION_CALL_COUNT rows."  
+            if [ $FUNCTION_CALL_COUNT -ne 2 ]; then  
+                echo " - The function \"MultiplyIntegers\" is not called. The file has $FUNCTION_CALL_COUNT rows."  
             fi  
         fi  
         rm *
