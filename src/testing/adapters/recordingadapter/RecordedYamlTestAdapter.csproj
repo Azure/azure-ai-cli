@@ -15,6 +15,10 @@
           <Link>Recordings\%(RecursiveDir)%(Filename)%(Extension)</Link>
           <CopyToOutputDirectory>Never</CopyToOutputDirectory>
       </None>
+      <None Include="..\*.yaml">
+          <Link>Tests\%(RecursiveDir)%(Filename)%(Extension)</Link>
+          <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+      </None>
   </ItemGroup>
 
 </Project>
