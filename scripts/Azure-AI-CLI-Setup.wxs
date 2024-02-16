@@ -6,28 +6,27 @@
     <Bundle Name="Azure AI CLI"
             Version="$(var.productVersion)"
             Manufacturer="Microsoft Corporation"
-            UpgradeCode="BF9A65EF-7D5A-4DC4-90E4-CDC44F042E96"
-            DisableModify="yes">
+            UpgradeCode="BF9A65EF-7D5A-4DC4-90E4-CDC44F042E96">
 
         <BootstrapperApplicationRef Id="WixStandardBootstrapperApplication.RtfLicense">
             <bal:WixStandardBootstrapperApplication
                 LicenseFile="CLI_License.rtf"
+                LocalizationFile="Azure-AI-CLI-Setup.wxl"
                 LogoFile="WindowsInstaller.png"
                 SuppressOptionsUI="yes"
-                SuppressRepair="yes"/>
+                ThemeFile="Azure-AI-CLI-Setup.xml"/>
         </BootstrapperApplicationRef>
 
         <!--
-        Check the version of existing Azure AI CLI .msi installation.
+        Check the version of existing Azure AI CLI .msi installation. This is a workaround for
+        https://github.com/wixtoolset/issues/issues/3746 (note: WixBundleAction 5 = Uninstall).
         -->
         <util:ProductSearch Variable="AlreadyInstalledVersion"
                             UpgradeCode="F1CDBA9C-E353-4039-9A20-059A1E587E73"
                             Id="AlreadyInstalledVersionSearch"
                             Result="version"/>
-        <!--
-        Workaround for https://github.com/wixtoolset/issues/issues/3746 (note: WixBundleAction 5 = Uninstall).
-        -->
-        <bal:Condition Message="The same or newer version [AlreadyInstalledVersion] is already installed.">
+
+        <bal:Condition Message="The same or newer version is already installed.">
         NOT WixBundleAction = 5 OR NOT AlreadyInstalledVersion &gt;= v$(var.productVersion)
         </bal:Condition>
 

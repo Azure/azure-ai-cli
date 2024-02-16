@@ -7,12 +7,16 @@
   <Import Project="RecordedYamlTestAdapterCommon.targets" />
 
   <ItemGroup>
-    <ProjectReference Include="..\testframework\YamlTestFramework.csproj" />
+    <ProjectReference Include="..\..\..\extensions\testframework\YamlTestFramework.csproj" />
   </ItemGroup>
 
   <ItemGroup>
       <None Include="..\recordings\*.json">
           <Link>Recordings\%(RecursiveDir)%(Filename)%(Extension)</Link>
+          <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+      </None>
+      <None Include="..\*.yaml">
+          <Link>Tests\%(RecursiveDir)%(Filename)%(Extension)</Link>
           <CopyToOutputDirectory>Never</CopyToOutputDirectory>
       </None>
   </ItemGroup>

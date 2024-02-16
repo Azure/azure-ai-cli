@@ -15,6 +15,17 @@ namespace Azure.AI.Details.Common.CLI
 
     public class NamedValueTokenParser : INamedValueTokenParser
     {
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        /// <param name="name">The short name if you want --shortname</param>
+        /// <param name="fullName">The full name of this property.</param>
+        /// <param name="requiredParts">A string based bitmap for the fullName. i.e. 101 turns my.property.name into --myname</param>
+        /// <param name="valueCount">The number of values accepted from 1 instance of the argument on the command line.</param>
+        /// <param name="validValues">a semi-colon deliminated list of possible values</param>
+        /// <param name="valueKey">The long name my.property.name of the internal property to set from this argument. If unset fullName is used.</param>
+        /// <param name="pinnedValue">The default value, unless pinnedValueKey is non-null, then the value passed to a property with the name whose value is pinnedValueKey</param>
+        /// <param name="pinnedValueKey">The name of the property value pinnedValue will be set to.</param>
         public NamedValueTokenParser(
                     string name, string fullName, string requiredParts,
                     string valueCount, string validValues = null, string valueKey = null,

@@ -43,7 +43,7 @@ namespace Azure.AI.Details.Common.CLI
 
         private static int Interpolate(int cchPrefix, StringBuilder sb, int start, ICommandValues values, bool deleteUnresolved, int level = 0)
         {
-            if (sb[start] != '{') throw new InvalidOperationException($"Interpolate() '{{' not found; pos={start}");
+            if (sb[start + cchPrefix - 1] != '{') throw new InvalidOperationException($"Interpolate() '{{' not found; pos={start}");
 
             var i = cchPrefix;
 

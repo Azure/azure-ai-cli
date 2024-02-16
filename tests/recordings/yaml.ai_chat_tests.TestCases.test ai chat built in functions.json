@@ -9,10 +9,10 @@
         "Connection": "close",
         "Content-Length": "5611",
         "Content-Type": "application/json",
-        "User-Agent": "azsdk-net-AI.OpenAI/1.0.0-beta.12 (.NET 8.0.1; Microsoft Windows 10.0.22631)",
+        "User-Agent": "azsdk-net-AI.OpenAI/1.0.0-beta.13 (.NET 8.0.2; Microsoft Windows 10.0.22631)",
         "X-Forwarded-For": "127.0.0.1",
         "X-Forwarded-Proto": "https",
-        "x-ms-client-request-id": "1c8f6538-882e-491c-ab05-9f5f5769d7c2",
+        "x-ms-client-request-id": "6a37607f-3fa1-46d7-b460-f7dbc28d3b25",
         "x-ms-return-client-request-id": "true",
         "X-Real-IP": "127.0.0.1"
       },
@@ -414,512 +414,45 @@
       "StatusCode": 200,
       "ResponseHeaders": {
         "Access-Control-Allow-Origin": "*",
-        "apim-request-id": "b8db685e-328c-4bf3-805c-8c7718cfcad2",
-        "azureml-model-session": "d029-20240123045238",
+        "apim-request-id": "d76ae776-7ed2-4401-8d20-bf6ab3df7cd2",
+        "azureml-model-session": "d027-20240123024829",
         "Cache-Control": "must-revalidate, no-cache",
         "Connection": "close",
         "Content-Type": "text/event-stream",
-        "Date": "Mon, 12 Feb 2024 01:10:04 GMT",
+        "Date": "Fri, 16 Feb 2024 07:24:56 GMT",
         "Strict-Transport-Security": "max-age=31536000; includeSubDomains; preload",
         "Transfer-Encoding": "chunked",
         "x-accel-buffering": "no",
         "X-Content-Type-Options": "nosniff",
-        "x-ms-client-request-id": "1c8f6538-882e-491c-ab05-9f5f5769d7c2",
-        "x-ms-region": "East US 2",
-        "x-ratelimit-remaining-requests": "49",
-        "x-ratelimit-remaining-tokens": "49984",
-        "X-Request-ID": "42d832a0-6574-409f-acac-907b7770113b"
-      },
-      "ResponseBody": [
-        "data: {\u0022id\u0022:\u0022\u0022,\u0022object\u0022:\u0022\u0022,\u0022created\u0022:0,\u0022model\u0022:\u0022\u0022,\u0022prompt_filter_results\u0022:[{\u0022prompt_index\u0022:0,\u0022content_filter_results\u0022:{\u0022hate\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022self_harm\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022sexual\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022violence\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022}}}],\u0022choices\u0022:[]}\n\n",
-        "data: {\u0022id\u0022:\u0022chatcmpl-8rF7cvLb9U8kM1AtMCnacQzQoboHc\u0022,\u0022object\u0022:\u0022chat.completion.chunk\u0022,\u0022created\u0022:1707700204,\u0022model\u0022:\u0022gpt-4-32k\u0022,\u0022choices\u0022:[{\u0022finish_reason\u0022:null,\u0022index\u0022:0,\u0022delta\u0022:{\u0022role\u0022:\u0022assistant\u0022,\u0022function_call\u0022:{\u0022name\u0022:\u0022CreateFileAndSaveText\u0022}},\u0022content_filter_results\u0022:{}}]}\n\n",
-        "data: {\u0022id\u0022:\u0022chatcmpl-8rF7cvLb9U8kM1AtMCnacQzQoboHc\u0022,\u0022object\u0022:\u0022chat.completion.chunk\u0022,\u0022created\u0022:1707700204,\u0022model\u0022:\u0022gpt-4-32k\u0022,\u0022choices\u0022:[{\u0022finish_reason\u0022:null,\u0022index\u0022:0,\u0022delta\u0022:{\u0022function_call\u0022:{\u0022arguments\u0022:\u0022{\\n\u0022}},\u0022content_filter_results\u0022:{}}]}\n\n",
-        "data: {\u0022id\u0022:\u0022chatcmpl-8rF7cvLb9U8kM1AtMCnacQzQoboHc\u0022,\u0022object\u0022:\u0022chat.completion.chunk\u0022,\u0022created\u0022:1707700204,\u0022model\u0022:\u0022gpt-4-32k\u0022,\u0022choices\u0022:[{\u0022finish_reason\u0022:null,\u0022index\u0022:0,\u0022delta\u0022:{\u0022function_call\u0022:{\u0022arguments\u0022:\u0022\\\u0022\u0022}},\u0022content_filter_results\u0022:{}}]}\n\n",
-        "data: {\u0022id\u0022:\u0022chatcmpl-8rF7cvLb9U8kM1AtMCnacQzQoboHc\u0022,\u0022object\u0022:\u0022chat.completion.chunk\u0022,\u0022created\u0022:1707700204,\u0022model\u0022:\u0022gpt-4-32k\u0022,\u0022choices\u0022:[{\u0022finish_reason\u0022:null,\u0022index\u0022:0,\u0022delta\u0022:{\u0022function_call\u0022:{\u0022arguments\u0022:\u0022fileName\u0022}},\u0022content_filter_results\u0022:{}}]}\n\n",
-        "data: {\u0022id\u0022:\u0022chatcmpl-8rF7cvLb9U8kM1AtMCnacQzQoboHc\u0022,\u0022object\u0022:\u0022chat.completion.chunk\u0022,\u0022created\u0022:1707700204,\u0022model\u0022:\u0022gpt-4-32k\u0022,\u0022choices\u0022:[{\u0022finish_reason\u0022:null,\u0022index\u0022:0,\u0022delta\u0022:{\u0022function_call\u0022:{\u0022arguments\u0022:\u0022\\\u0022:\u0022}},\u0022content_filter_results\u0022:{}}]}\n\n",
-        "data: {\u0022id\u0022:\u0022chatcmpl-8rF7cvLb9U8kM1AtMCnacQzQoboHc\u0022,\u0022object\u0022:\u0022chat.completion.chunk\u0022,\u0022created\u0022:1707700204,\u0022model\u0022:\u0022gpt-4-32k\u0022,\u0022choices\u0022:[{\u0022finish_reason\u0022:null,\u0022index\u0022:0,\u0022delta\u0022:{\u0022function_call\u0022:{\u0022arguments\u0022:\u0022 \\\u0022\u0022}},\u0022content_filter_results\u0022:{}}]}\n\n",
-        "data: {\u0022id\u0022:\u0022chatcmpl-8rF7cvLb9U8kM1AtMCnacQzQoboHc\u0022,\u0022object\u0022:\u0022chat.completion.chunk\u0022,\u0022created\u0022:1707700204,\u0022model\u0022:\u0022gpt-4-32k\u0022,\u0022choices\u0022:[{\u0022finish_reason\u0022:null,\u0022index\u0022:0,\u0022delta\u0022:{\u0022function_call\u0022:{\u0022arguments\u0022:\u0022test\u0022}},\u0022content_filter_results\u0022:{}}]}\n\n",
-        "data: {\u0022id\u0022:\u0022chatcmpl-8rF7cvLb9U8kM1AtMCnacQzQoboHc\u0022,\u0022object\u0022:\u0022chat.completion.chunk\u0022,\u0022created\u0022:1707700204,\u0022model\u0022:\u0022gpt-4-32k\u0022,\u0022choices\u0022:[{\u0022finish_reason\u0022:null,\u0022index\u0022:0,\u0022delta\u0022:{\u0022function_call\u0022:{\u0022arguments\u0022:\u0022.txt\u0022}},\u0022content_filter_results\u0022:{}}]}\n\n",
-        "data: {\u0022id\u0022:\u0022chatcmpl-8rF7cvLb9U8kM1AtMCnacQzQoboHc\u0022,\u0022object\u0022:\u0022chat.completion.chunk\u0022,\u0022created\u0022:1707700204,\u0022model\u0022:\u0022gpt-4-32k\u0022,\u0022choices\u0022:[{\u0022finish_reason\u0022:null,\u0022index\u0022:0,\u0022delta\u0022:{\u0022function_call\u0022:{\u0022arguments\u0022:\u0022\\\u0022,\\n\u0022}},\u0022content_filter_results\u0022:{}}]}\n\n",
-        "data: {\u0022id\u0022:\u0022chatcmpl-8rF7cvLb9U8kM1AtMCnacQzQoboHc\u0022,\u0022object\u0022:\u0022chat.completion.chunk\u0022,\u0022created\u0022:1707700204,\u0022model\u0022:\u0022gpt-4-32k\u0022,\u0022choices\u0022:[{\u0022finish_reason\u0022:null,\u0022index\u0022:0,\u0022delta\u0022:{\u0022function_call\u0022:{\u0022arguments\u0022:\u0022\\\u0022text\u0022}},\u0022content_filter_results\u0022:{}}]}\n\n",
-        "data: {\u0022id\u0022:\u0022chatcmpl-8rF7cvLb9U8kM1AtMCnacQzQoboHc\u0022,\u0022object\u0022:\u0022chat.completion.chunk\u0022,\u0022created\u0022:1707700204,\u0022model\u0022:\u0022gpt-4-32k\u0022,\u0022choices\u0022:[{\u0022finish_reason\u0022:null,\u0022index\u0022:0,\u0022delta\u0022:{\u0022function_call\u0022:{\u0022arguments\u0022:\u0022\\\u0022:\u0022}},\u0022content_filter_results\u0022:{}}]}\n\n",
-        "data: {\u0022id\u0022:\u0022chatcmpl-8rF7cvLb9U8kM1AtMCnacQzQoboHc\u0022,\u0022object\u0022:\u0022chat.completion.chunk\u0022,\u0022created\u0022:1707700204,\u0022model\u0022:\u0022gpt-4-32k\u0022,\u0022choices\u0022:[{\u0022finish_reason\u0022:null,\u0022index\u0022:0,\u0022delta\u0022:{\u0022function_call\u0022:{\u0022arguments\u0022:\u0022 \\\u0022\u0022}},\u0022content_filter_results\u0022:{}}]}\n\n",
-        "data: {\u0022id\u0022:\u0022chatcmpl-8rF7cvLb9U8kM1AtMCnacQzQoboHc\u0022,\u0022object\u0022:\u0022chat.completion.chunk\u0022,\u0022created\u0022:1707700204,\u0022model\u0022:\u0022gpt-4-32k\u0022,\u0022choices\u0022:[{\u0022finish_reason\u0022:null,\u0022index\u0022:0,\u0022delta\u0022:{\u0022function_call\u0022:{\u0022arguments\u0022:\u0022Hello\u0022}},\u0022content_filter_results\u0022:{}}]}\n\n",
-        "data: {\u0022id\u0022:\u0022chatcmpl-8rF7cvLb9U8kM1AtMCnacQzQoboHc\u0022,\u0022object\u0022:\u0022chat.completion.chunk\u0022,\u0022created\u0022:1707700204,\u0022model\u0022:\u0022gpt-4-32k\u0022,\u0022choices\u0022:[{\u0022finish_reason\u0022:null,\u0022index\u0022:0,\u0022delta\u0022:{\u0022function_call\u0022:{\u0022arguments\u0022:\u0022,\u0022}},\u0022content_filter_results\u0022:{}}]}\n\n",
-        "data: {\u0022id\u0022:\u0022chatcmpl-8rF7cvLb9U8kM1AtMCnacQzQoboHc\u0022,\u0022object\u0022:\u0022chat.completion.chunk\u0022,\u0022created\u0022:1707700204,\u0022model\u0022:\u0022gpt-4-32k\u0022,\u0022choices\u0022:[{\u0022finish_reason\u0022:null,\u0022index\u0022:0,\u0022delta\u0022:{\u0022function_call\u0022:{\u0022arguments\u0022:\u0022 World\u0022}},\u0022content_filter_results\u0022:{}}]}\n\n",
-        "data: {\u0022id\u0022:\u0022chatcmpl-8rF7cvLb9U8kM1AtMCnacQzQoboHc\u0022,\u0022object\u0022:\u0022chat.completion.chunk\u0022,\u0022created\u0022:1707700204,\u0022model\u0022:\u0022gpt-4-32k\u0022,\u0022choices\u0022:[{\u0022finish_reason\u0022:null,\u0022index\u0022:0,\u0022delta\u0022:{\u0022function_call\u0022:{\u0022arguments\u0022:\u0022!\\\u0022\\n\u0022}},\u0022content_filter_results\u0022:{}}]}\n\n",
-        "data: {\u0022id\u0022:\u0022chatcmpl-8rF7cvLb9U8kM1AtMCnacQzQoboHc\u0022,\u0022object\u0022:\u0022chat.completion.chunk\u0022,\u0022created\u0022:1707700204,\u0022model\u0022:\u0022gpt-4-32k\u0022,\u0022choices\u0022:[{\u0022finish_reason\u0022:null,\u0022index\u0022:0,\u0022delta\u0022:{\u0022function_call\u0022:{\u0022arguments\u0022:\u0022}\u0022}},\u0022content_filter_results\u0022:{}}]}\n\n",
-        "data: {\u0022id\u0022:\u0022chatcmpl-8rF7cvLb9U8kM1AtMCnacQzQoboHc\u0022,\u0022object\u0022:\u0022chat.completion.chunk\u0022,\u0022created\u0022:1707700204,\u0022model\u0022:\u0022gpt-4-32k\u0022,\u0022choices\u0022:[{\u0022finish_reason\u0022:\u0022function_call\u0022,\u0022index\u0022:0,\u0022delta\u0022:{},\u0022content_filter_results\u0022:{}}]}\n\n",
-        "data: [DONE]\n\n"
-      ]
-    },
-    {
-      "RequestUri": "https://fakeendpoint/openai/deployments/gpt-4-32k-0613/chat/completions?api-version=2023-12-01-preview",
-      "RequestMethod": "POST",
-      "RequestHeaders": {
-        "Accept": "application/json",
-        "api-key": "00000000-0000-0000-0000-000000000000",
-        "Connection": "close",
-        "Content-Length": "5871",
-        "Content-Type": "application/json",
-        "User-Agent": "azsdk-net-AI.OpenAI/1.0.0-beta.12 (.NET 8.0.1; Microsoft Windows 10.0.22631)",
-        "X-Forwarded-For": "127.0.0.1",
-        "X-Forwarded-Proto": "https",
-        "x-ms-client-request-id": "4ab00b95-33a2-4106-807d-7818f0f8a8cf",
-        "x-ms-return-client-request-id": "true",
-        "X-Real-IP": "127.0.0.1"
-      },
-      "RequestBody": {
-        "messages": [
-          {
-            "content": "You are an AI assistant that helps people find information regarding Azure AI.",
-            "role": "system"
-          },
-          {
-            "content": "\u0022Create a file named \u0022test.txt\u0022 with the following content: \u0022Hello, World!\u0022",
-            "role": "user"
-          },
-          {
-            "content": "",
-            "function_call": {
-              "name": "CreateFileAndSaveText",
-              "arguments": "{\n\u0022fileName\u0022: \u0022test.txt\u0022,\n\u0022text\u0022: \u0022Hello, World!\u0022\n}"
-            },
-            "role": "assistant"
-          },
-          {
-            "name": "CreateFileAndSaveText",
-            "content": "True",
-            "role": "function"
-          }
-        ],
-        "functions": [
-          {
-            "name": "AddFloats",
-            "description": "Adds two floats",
-            "parameters": {
-              "type": "object",
-              "properties": {
-                "a": {
-                  "type": "number",
-                  "description": "The a parameter"
-                },
-                "b": {
-                  "type": "number",
-                  "description": "The b parameter"
-                }
-              },
-              "required": [
-                "a",
-                "b"
-              ]
-            }
-          },
-          {
-            "name": "SubtractFloats",
-            "description": "Subtracts two floats",
-            "parameters": {
-              "type": "object",
-              "properties": {
-                "a": {
-                  "type": "number",
-                  "description": "The a parameter"
-                },
-                "b": {
-                  "type": "number",
-                  "description": "The b parameter"
-                }
-              },
-              "required": [
-                "a",
-                "b"
-              ]
-            }
-          },
-          {
-            "name": "MultiplyFloats",
-            "description": "Multiplies two floats",
-            "parameters": {
-              "type": "object",
-              "properties": {
-                "a": {
-                  "type": "number",
-                  "description": "The a parameter"
-                },
-                "b": {
-                  "type": "number",
-                  "description": "The b parameter"
-                }
-              },
-              "required": [
-                "a",
-                "b"
-              ]
-            }
-          },
-          {
-            "name": "DivideFloats",
-            "description": "Divides two floats",
-            "parameters": {
-              "type": "object",
-              "properties": {
-                "a": {
-                  "type": "number",
-                  "description": "The a parameter"
-                },
-                "b": {
-                  "type": "number",
-                  "description": "The b parameter"
-                }
-              },
-              "required": [
-                "a",
-                "b"
-              ]
-            }
-          },
-          {
-            "name": "AddIntegers",
-            "description": "Adds two integers",
-            "parameters": {
-              "type": "object",
-              "properties": {
-                "a": {
-                  "type": "integer",
-                  "description": "The a parameter"
-                },
-                "b": {
-                  "type": "integer",
-                  "description": "The b parameter"
-                }
-              },
-              "required": [
-                "a",
-                "b"
-              ]
-            }
-          },
-          {
-            "name": "SubtractIntegers",
-            "description": "Subtracts two integers",
-            "parameters": {
-              "type": "object",
-              "properties": {
-                "a": {
-                  "type": "integer",
-                  "description": "The a parameter"
-                },
-                "b": {
-                  "type": "integer",
-                  "description": "The b parameter"
-                }
-              },
-              "required": [
-                "a",
-                "b"
-              ]
-            }
-          },
-          {
-            "name": "MultiplyIntegers",
-            "description": "Multiplies two integers",
-            "parameters": {
-              "type": "object",
-              "properties": {
-                "a": {
-                  "type": "integer",
-                  "description": "The a parameter"
-                },
-                "b": {
-                  "type": "integer",
-                  "description": "The b parameter"
-                }
-              },
-              "required": [
-                "a",
-                "b"
-              ]
-            }
-          },
-          {
-            "name": "DivideIntegers",
-            "description": "Divides two integers",
-            "parameters": {
-              "type": "object",
-              "properties": {
-                "a": {
-                  "type": "integer",
-                  "description": "The a parameter"
-                },
-                "b": {
-                  "type": "integer",
-                  "description": "The b parameter"
-                }
-              },
-              "required": [
-                "a",
-                "b"
-              ]
-            }
-          },
-          {
-            "name": "Average",
-            "description": "Calculates the average of a list of numbers",
-            "parameters": {
-              "type": "object",
-              "properties": {
-                "numbers": {
-                  "type": "array",
-                  "items": {
-                    "type": "number"
-                  },
-                  "description": "The numbers parameter"
-                }
-              },
-              "required": [
-                "numbers"
-              ]
-            }
-          },
-          {
-            "name": "StandardDeviation",
-            "description": "Calculates the standard deviation of a list of numbers",
-            "parameters": {
-              "type": "object",
-              "properties": {
-                "numbers": {
-                  "type": "array",
-                  "items": {
-                    "type": "number"
-                  },
-                  "description": "The numbers parameter"
-                }
-              },
-              "required": [
-                "numbers"
-              ]
-            }
-          },
-          {
-            "name": "GetCurrentDateTime",
-            "description": "Gets the current date and time",
-            "parameters": {
-              "type": "object",
-              "properties": {},
-              "required": []
-            }
-          },
-          {
-            "name": "FileExists",
-            "description": "Checks if file exists",
-            "parameters": {
-              "type": "object",
-              "properties": {
-                "fileName": {
-                  "type": "string",
-                  "description": "The fileName parameter"
-                }
-              },
-              "required": [
-                "fileName"
-              ]
-            }
-          },
-          {
-            "name": "ReadTextFromFile",
-            "description": "Reads text from a file; returns empty string if file does not exist",
-            "parameters": {
-              "type": "object",
-              "properties": {
-                "fileName": {
-                  "type": "string",
-                  "description": "The fileName parameter"
-                }
-              },
-              "required": [
-                "fileName"
-              ]
-            }
-          },
-          {
-            "name": "CreateFileAndSaveText",
-            "description": "Writes text into a file; if the file exists, it is overwritten",
-            "parameters": {
-              "type": "object",
-              "properties": {
-                "fileName": {
-                  "type": "string",
-                  "description": "The fileName parameter"
-                },
-                "text": {
-                  "type": "string",
-                  "description": "The text parameter"
-                }
-              },
-              "required": [
-                "fileName",
-                "text"
-              ]
-            }
-          },
-          {
-            "name": "AppendTextToFile",
-            "description": "Appends text to a file; if the file does not exist, it is created",
-            "parameters": {
-              "type": "object",
-              "properties": {
-                "fileName": {
-                  "type": "string",
-                  "description": "The fileName parameter"
-                },
-                "text": {
-                  "type": "string",
-                  "description": "The text parameter"
-                }
-              },
-              "required": [
-                "fileName",
-                "text"
-              ]
-            }
-          },
-          {
-            "name": "DirectoryCreate",
-            "description": "Creates a directory if it doesn\u0027t already exist",
-            "parameters": {
-              "type": "object",
-              "properties": {
-                "directoryName": {
-                  "type": "string",
-                  "description": "The directoryName parameter"
-                }
-              },
-              "required": [
-                "directoryName"
-              ]
-            }
-          },
-          {
-            "name": "FindAllFilesInCurrentDirectory",
-            "description": "List files; lists all files regardless of name; only in current directory",
-            "parameters": {
-              "type": "object",
-              "properties": {},
-              "required": []
-            }
-          },
-          {
-            "name": "FindAllFilesRecursively",
-            "description": "List files; lists all files regardless of name; searches current directory and all sub-directories",
-            "parameters": {
-              "type": "object",
-              "properties": {},
-              "required": []
-            }
-          },
-          {
-            "name": "FindAllFilesMatchingPattern",
-            "description": "List files; lists all files matching pattern; searches current directory, and if pattern includes \u0027**\u0027, all sub-directories",
-            "parameters": {
-              "type": "object",
-              "properties": {
-                "pattern": {
-                  "type": "string",
-                  "description": "The pattern to search for; use \u0027**/*.ext\u0027 to search sub-directories"
-                }
-              },
-              "required": [
-                "pattern"
-              ]
-            }
-          },
-          {
-            "name": "FindTextInAllFiles",
-            "description": "Find files containing text; searches all files",
-            "parameters": {
-              "type": "object",
-              "properties": {
-                "text": {
-                  "type": "string",
-                  "description": "The text to find"
-                }
-              },
-              "required": [
-                "text"
-              ]
-            }
-          },
-          {
-            "name": "FindTextInFilesMatchingPattern",
-            "description": "Find files containing text; searches files matching a pattern",
-            "parameters": {
-              "type": "object",
-              "properties": {
-                "text": {
-                  "type": "string",
-                  "description": "The text to find"
-                },
-                "pattern": {
-                  "type": "string",
-                  "description": "The pattern to search for; use \u0027**/*.ext\u0027 to search sub-directories"
-                }
-              },
-              "required": [
-                "text",
-                "pattern"
-              ]
-            }
-          }
-        ],
-        "temperature": 0.7,
-        "presence_penalty": 0,
-        "frequency_penalty": 0,
-        "stream": true,
-        "model": "gpt-4-32k-0613"
-      },
-      "StatusCode": 200,
-      "ResponseHeaders": {
-        "Access-Control-Allow-Origin": "*",
-        "apim-request-id": "643b814a-48df-4577-9809-514f79158795",
-        "azureml-model-session": "d029-20240123045238",
-        "Cache-Control": "must-revalidate, no-cache",
-        "Connection": "close",
-        "Content-Type": "text/event-stream",
-        "Date": "Mon, 12 Feb 2024 01:10:06 GMT",
-        "Strict-Transport-Security": "max-age=31536000; includeSubDomains; preload",
-        "Transfer-Encoding": "chunked",
-        "x-accel-buffering": "no",
-        "X-Content-Type-Options": "nosniff",
-        "x-ms-client-request-id": "4ab00b95-33a2-4106-807d-7818f0f8a8cf",
+        "x-ms-client-request-id": "6a37607f-3fa1-46d7-b460-f7dbc28d3b25",
         "x-ms-region": "East US 2",
         "x-ratelimit-remaining-requests": "48",
         "x-ratelimit-remaining-tokens": "49968",
-        "X-Request-ID": "ce7af39b-32e4-4c28-9abb-28dda3463237"
+        "X-Request-ID": "5bfeb8aa-4e5e-48ca-a789-ad5b5cb3dd26"
       },
       "ResponseBody": [
         "data: {\u0022id\u0022:\u0022\u0022,\u0022object\u0022:\u0022\u0022,\u0022created\u0022:0,\u0022model\u0022:\u0022\u0022,\u0022prompt_filter_results\u0022:[{\u0022prompt_index\u0022:0,\u0022content_filter_results\u0022:{\u0022hate\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022self_harm\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022sexual\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022violence\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022}}}],\u0022choices\u0022:[]}\n\n",
-        "data: {\u0022id\u0022:\u0022chatcmpl-8rF7ezW0CN1loi2QHeEHgMmvKkhx1\u0022,\u0022object\u0022:\u0022chat.completion.chunk\u0022,\u0022created\u0022:1707700206,\u0022model\u0022:\u0022gpt-4-32k\u0022,\u0022choices\u0022:[{\u0022finish_reason\u0022:null,\u0022index\u0022:0,\u0022delta\u0022:{\u0022role\u0022:\u0022assistant\u0022},\u0022content_filter_results\u0022:{}}]}\n\n",
-        "data: {\u0022id\u0022:\u0022chatcmpl-8rF7ezW0CN1loi2QHeEHgMmvKkhx1\u0022,\u0022object\u0022:\u0022chat.completion.chunk\u0022,\u0022created\u0022:1707700206,\u0022model\u0022:\u0022gpt-4-32k\u0022,\u0022choices\u0022:[{\u0022finish_reason\u0022:null,\u0022index\u0022:0,\u0022delta\u0022:{\u0022content\u0022:\u0022I\u0022},\u0022content_filter_results\u0022:{\u0022hate\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022self_harm\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022sexual\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022violence\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022}}}]}\n\n",
-        "data: {\u0022id\u0022:\u0022chatcmpl-8rF7ezW0CN1loi2QHeEHgMmvKkhx1\u0022,\u0022object\u0022:\u0022chat.completion.chunk\u0022,\u0022created\u0022:1707700206,\u0022model\u0022:\u0022gpt-4-32k\u0022,\u0022choices\u0022:[{\u0022finish_reason\u0022:null,\u0022index\u0022:0,\u0022delta\u0022:{\u0022content\u0022:\u0022 have\u0022},\u0022content_filter_results\u0022:{\u0022hate\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022self_harm\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022sexual\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022violence\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022}}}]}\n\n",
-        "data: {\u0022id\u0022:\u0022chatcmpl-8rF7ezW0CN1loi2QHeEHgMmvKkhx1\u0022,\u0022object\u0022:\u0022chat.completion.chunk\u0022,\u0022created\u0022:1707700206,\u0022model\u0022:\u0022gpt-4-32k\u0022,\u0022choices\u0022:[{\u0022finish_reason\u0022:null,\u0022index\u0022:0,\u0022delta\u0022:{\u0022content\u0022:\u0022 successfully\u0022},\u0022content_filter_results\u0022:{\u0022hate\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022self_harm\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022sexual\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022violence\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022}}}]}\n\n",
-        "data: {\u0022id\u0022:\u0022chatcmpl-8rF7ezW0CN1loi2QHeEHgMmvKkhx1\u0022,\u0022object\u0022:\u0022chat.completion.chunk\u0022,\u0022created\u0022:1707700206,\u0022model\u0022:\u0022gpt-4-32k\u0022,\u0022choices\u0022:[{\u0022finish_reason\u0022:null,\u0022index\u0022:0,\u0022delta\u0022:{\u0022content\u0022:\u0022 created\u0022},\u0022content_filter_results\u0022:{\u0022hate\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022self_harm\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022sexual\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022violence\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022}}}]}\n\n",
-        "data: {\u0022id\u0022:\u0022chatcmpl-8rF7ezW0CN1loi2QHeEHgMmvKkhx1\u0022,\u0022object\u0022:\u0022chat.completion.chunk\u0022,\u0022created\u0022:1707700206,\u0022model\u0022:\u0022gpt-4-32k\u0022,\u0022choices\u0022:[{\u0022finish_reason\u0022:null,\u0022index\u0022:0,\u0022delta\u0022:{\u0022content\u0022:\u0022 a\u0022},\u0022content_filter_results\u0022:{\u0022hate\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022self_harm\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022sexual\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022violence\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022}}}]}\n\n",
-        "data: {\u0022id\u0022:\u0022chatcmpl-8rF7ezW0CN1loi2QHeEHgMmvKkhx1\u0022,\u0022object\u0022:\u0022chat.completion.chunk\u0022,\u0022created\u0022:1707700206,\u0022model\u0022:\u0022gpt-4-32k\u0022,\u0022choices\u0022:[{\u0022finish_reason\u0022:null,\u0022index\u0022:0,\u0022delta\u0022:{\u0022content\u0022:\u0022 file\u0022},\u0022content_filter_results\u0022:{\u0022hate\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022self_harm\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022sexual\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022violence\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022}}}]}\n\n",
-        "data: {\u0022id\u0022:\u0022chatcmpl-8rF7ezW0CN1loi2QHeEHgMmvKkhx1\u0022,\u0022object\u0022:\u0022chat.completion.chunk\u0022,\u0022created\u0022:1707700206,\u0022model\u0022:\u0022gpt-4-32k\u0022,\u0022choices\u0022:[{\u0022finish_reason\u0022:null,\u0022index\u0022:0,\u0022delta\u0022:{\u0022content\u0022:\u0022 named\u0022},\u0022content_filter_results\u0022:{\u0022hate\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022self_harm\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022sexual\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022violence\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022}}}]}\n\n",
-        "data: {\u0022id\u0022:\u0022chatcmpl-8rF7ezW0CN1loi2QHeEHgMmvKkhx1\u0022,\u0022object\u0022:\u0022chat.completion.chunk\u0022,\u0022created\u0022:1707700206,\u0022model\u0022:\u0022gpt-4-32k\u0022,\u0022choices\u0022:[{\u0022finish_reason\u0022:null,\u0022index\u0022:0,\u0022delta\u0022:{\u0022content\u0022:\u0022 \\\u0022\u0022},\u0022content_filter_results\u0022:{\u0022hate\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022self_harm\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022sexual\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022violence\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022}}}]}\n\n",
-        "data: {\u0022id\u0022:\u0022chatcmpl-8rF7ezW0CN1loi2QHeEHgMmvKkhx1\u0022,\u0022object\u0022:\u0022chat.completion.chunk\u0022,\u0022created\u0022:1707700206,\u0022model\u0022:\u0022gpt-4-32k\u0022,\u0022choices\u0022:[{\u0022finish_reason\u0022:null,\u0022index\u0022:0,\u0022delta\u0022:{\u0022content\u0022:\u0022test\u0022},\u0022content_filter_results\u0022:{\u0022hate\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022self_harm\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022sexual\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022violence\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022}}}]}\n\n",
-        "data: {\u0022id\u0022:\u0022chatcmpl-8rF7ezW0CN1loi2QHeEHgMmvKkhx1\u0022,\u0022object\u0022:\u0022chat.completion.chunk\u0022,\u0022created\u0022:1707700206,\u0022model\u0022:\u0022gpt-4-32k\u0022,\u0022choices\u0022:[{\u0022finish_reason\u0022:null,\u0022index\u0022:0,\u0022delta\u0022:{\u0022content\u0022:\u0022.txt\u0022},\u0022content_filter_results\u0022:{\u0022hate\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022self_harm\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022sexual\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022violence\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022}}}]}\n\n",
-        "data: {\u0022id\u0022:\u0022chatcmpl-8rF7ezW0CN1loi2QHeEHgMmvKkhx1\u0022,\u0022object\u0022:\u0022chat.completion.chunk\u0022,\u0022created\u0022:1707700206,\u0022model\u0022:\u0022gpt-4-32k\u0022,\u0022choices\u0022:[{\u0022finish_reason\u0022:null,\u0022index\u0022:0,\u0022delta\u0022:{\u0022content\u0022:\u0022\\\u0022\u0022},\u0022content_filter_results\u0022:{\u0022hate\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022self_harm\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022sexual\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022violence\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022}}}]}\n\n",
-        "data: {\u0022id\u0022:\u0022chatcmpl-8rF7ezW0CN1loi2QHeEHgMmvKkhx1\u0022,\u0022object\u0022:\u0022chat.completion.chunk\u0022,\u0022created\u0022:1707700206,\u0022model\u0022:\u0022gpt-4-32k\u0022,\u0022choices\u0022:[{\u0022finish_reason\u0022:null,\u0022index\u0022:0,\u0022delta\u0022:{\u0022content\u0022:\u0022 with\u0022},\u0022content_filter_results\u0022:{\u0022hate\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022self_harm\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022sexual\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022violence\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022}}}]}\n\n",
-        "data: {\u0022id\u0022:\u0022chatcmpl-8rF7ezW0CN1loi2QHeEHgMmvKkhx1\u0022,\u0022object\u0022:\u0022chat.completion.chunk\u0022,\u0022created\u0022:1707700206,\u0022model\u0022:\u0022gpt-4-32k\u0022,\u0022choices\u0022:[{\u0022finish_reason\u0022:null,\u0022index\u0022:0,\u0022delta\u0022:{\u0022content\u0022:\u0022 the\u0022},\u0022content_filter_results\u0022:{\u0022hate\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022self_harm\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022sexual\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022violence\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022}}}]}\n\n",
-        "data: {\u0022id\u0022:\u0022chatcmpl-8rF7ezW0CN1loi2QHeEHgMmvKkhx1\u0022,\u0022object\u0022:\u0022chat.completion.chunk\u0022,\u0022created\u0022:1707700206,\u0022model\u0022:\u0022gpt-4-32k\u0022,\u0022choices\u0022:[{\u0022finish_reason\u0022:null,\u0022index\u0022:0,\u0022delta\u0022:{\u0022content\u0022:\u0022 content\u0022},\u0022content_filter_results\u0022:{\u0022hate\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022self_harm\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022sexual\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022violence\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022}}}]}\n\n",
-        "data: {\u0022id\u0022:\u0022chatcmpl-8rF7ezW0CN1loi2QHeEHgMmvKkhx1\u0022,\u0022object\u0022:\u0022chat.completion.chunk\u0022,\u0022created\u0022:1707700206,\u0022model\u0022:\u0022gpt-4-32k\u0022,\u0022choices\u0022:[{\u0022finish_reason\u0022:null,\u0022index\u0022:0,\u0022delta\u0022:{\u0022content\u0022:\u0022:\u0022},\u0022content_filter_results\u0022:{\u0022hate\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022self_harm\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022sexual\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022violence\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022}}}]}\n\n",
-        "data: {\u0022id\u0022:\u0022chatcmpl-8rF7ezW0CN1loi2QHeEHgMmvKkhx1\u0022,\u0022object\u0022:\u0022chat.completion.chunk\u0022,\u0022created\u0022:1707700206,\u0022model\u0022:\u0022gpt-4-32k\u0022,\u0022choices\u0022:[{\u0022finish_reason\u0022:null,\u0022index\u0022:0,\u0022delta\u0022:{\u0022content\u0022:\u0022 \\\u0022\u0022},\u0022content_filter_results\u0022:{\u0022hate\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022self_harm\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022sexual\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022violence\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022}}}]}\n\n",
-        "data: {\u0022id\u0022:\u0022chatcmpl-8rF7ezW0CN1loi2QHeEHgMmvKkhx1\u0022,\u0022object\u0022:\u0022chat.completion.chunk\u0022,\u0022created\u0022:1707700206,\u0022model\u0022:\u0022gpt-4-32k\u0022,\u0022choices\u0022:[{\u0022finish_reason\u0022:null,\u0022index\u0022:0,\u0022delta\u0022:{\u0022content\u0022:\u0022Hello\u0022},\u0022content_filter_results\u0022:{\u0022hate\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022self_harm\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022sexual\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022violence\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022}}}]}\n\n",
-        "data: {\u0022id\u0022:\u0022chatcmpl-8rF7ezW0CN1loi2QHeEHgMmvKkhx1\u0022,\u0022object\u0022:\u0022chat.completion.chunk\u0022,\u0022created\u0022:1707700206,\u0022model\u0022:\u0022gpt-4-32k\u0022,\u0022choices\u0022:[{\u0022finish_reason\u0022:null,\u0022index\u0022:0,\u0022delta\u0022:{\u0022content\u0022:\u0022,\u0022},\u0022content_filter_results\u0022:{\u0022hate\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022self_harm\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022sexual\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022violence\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022}}}]}\n\n",
-        "data: {\u0022id\u0022:\u0022chatcmpl-8rF7ezW0CN1loi2QHeEHgMmvKkhx1\u0022,\u0022object\u0022:\u0022chat.completion.chunk\u0022,\u0022created\u0022:1707700206,\u0022model\u0022:\u0022gpt-4-32k\u0022,\u0022choices\u0022:[{\u0022finish_reason\u0022:null,\u0022index\u0022:0,\u0022delta\u0022:{\u0022content\u0022:\u0022 World\u0022},\u0022content_filter_results\u0022:{\u0022hate\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022self_harm\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022sexual\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022violence\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022}}}]}\n\n",
-        "data: {\u0022id\u0022:\u0022chatcmpl-8rF7ezW0CN1loi2QHeEHgMmvKkhx1\u0022,\u0022object\u0022:\u0022chat.completion.chunk\u0022,\u0022created\u0022:1707700206,\u0022model\u0022:\u0022gpt-4-32k\u0022,\u0022choices\u0022:[{\u0022finish_reason\u0022:null,\u0022index\u0022:0,\u0022delta\u0022:{\u0022content\u0022:\u0022!\\\u0022.\u0022},\u0022content_filter_results\u0022:{\u0022hate\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022self_harm\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022sexual\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022violence\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022}}}]}\n\n",
-        "data: {\u0022id\u0022:\u0022chatcmpl-8rF7ezW0CN1loi2QHeEHgMmvKkhx1\u0022,\u0022object\u0022:\u0022chat.completion.chunk\u0022,\u0022created\u0022:1707700206,\u0022model\u0022:\u0022gpt-4-32k\u0022,\u0022choices\u0022:[{\u0022finish_reason\u0022:\u0022stop\u0022,\u0022index\u0022:0,\u0022delta\u0022:{},\u0022content_filter_results\u0022:{}}]}\n\n",
+        "data: {\u0022id\u0022:\u0022chatcmpl-8smsZOBdlS19LY96saHRHepv1p7X7\u0022,\u0022object\u0022:\u0022chat.completion.chunk\u0022,\u0022created\u0022:1708068295,\u0022model\u0022:\u0022gpt-4-32k\u0022,\u0022choices\u0022:[{\u0022finish_reason\u0022:null,\u0022index\u0022:0,\u0022delta\u0022:{\u0022role\u0022:\u0022assistant\u0022,\u0022function_call\u0022:{\u0022name\u0022:\u0022CreateFileAndSaveText\u0022}},\u0022content_filter_results\u0022:{}}]}\n\n",
+        "data: {\u0022id\u0022:\u0022chatcmpl-8smsZOBdlS19LY96saHRHepv1p7X7\u0022,\u0022object\u0022:\u0022chat.completion.chunk\u0022,\u0022created\u0022:1708068295,\u0022model\u0022:\u0022gpt-4-32k\u0022,\u0022choices\u0022:[{\u0022finish_reason\u0022:null,\u0022index\u0022:0,\u0022delta\u0022:{\u0022function_call\u0022:{\u0022arguments\u0022:\u0022{\\n\u0022}},\u0022content_filter_results\u0022:{}}]}\n\n",
+        "data: {\u0022id\u0022:\u0022chatcmpl-8smsZOBdlS19LY96saHRHepv1p7X7\u0022,\u0022object\u0022:\u0022chat.completion.chunk\u0022,\u0022created\u0022:1708068295,\u0022model\u0022:\u0022gpt-4-32k\u0022,\u0022choices\u0022:[{\u0022finish_reason\u0022:null,\u0022index\u0022:0,\u0022delta\u0022:{\u0022function_call\u0022:{\u0022arguments\u0022:\u0022 \u0022}},\u0022content_filter_results\u0022:{}}]}\n\n",
+        "data: {\u0022id\u0022:\u0022chatcmpl-8smsZOBdlS19LY96saHRHepv1p7X7\u0022,\u0022object\u0022:\u0022chat.completion.chunk\u0022,\u0022created\u0022:1708068295,\u0022model\u0022:\u0022gpt-4-32k\u0022,\u0022choices\u0022:[{\u0022finish_reason\u0022:null,\u0022index\u0022:0,\u0022delta\u0022:{\u0022function_call\u0022:{\u0022arguments\u0022:\u0022 \\\u0022\u0022}},\u0022content_filter_results\u0022:{}}]}\n\n",
+        "data: {\u0022id\u0022:\u0022chatcmpl-8smsZOBdlS19LY96saHRHepv1p7X7\u0022,\u0022object\u0022:\u0022chat.completion.chunk\u0022,\u0022created\u0022:1708068295,\u0022model\u0022:\u0022gpt-4-32k\u0022,\u0022choices\u0022:[{\u0022finish_reason\u0022:null,\u0022index\u0022:0,\u0022delta\u0022:{\u0022function_call\u0022:{\u0022arguments\u0022:\u0022fileName\u0022}},\u0022content_filter_results\u0022:{}}]}\n\n",
+        "data: {\u0022id\u0022:\u0022chatcmpl-8smsZOBdlS19LY96saHRHepv1p7X7\u0022,\u0022object\u0022:\u0022chat.completion.chunk\u0022,\u0022created\u0022:1708068295,\u0022model\u0022:\u0022gpt-4-32k\u0022,\u0022choices\u0022:[{\u0022finish_reason\u0022:null,\u0022index\u0022:0,\u0022delta\u0022:{\u0022function_call\u0022:{\u0022arguments\u0022:\u0022\\\u0022:\u0022}},\u0022content_filter_results\u0022:{}}]}\n\n",
+        "data: {\u0022id\u0022:\u0022chatcmpl-8smsZOBdlS19LY96saHRHepv1p7X7\u0022,\u0022object\u0022:\u0022chat.completion.chunk\u0022,\u0022created\u0022:1708068295,\u0022model\u0022:\u0022gpt-4-32k\u0022,\u0022choices\u0022:[{\u0022finish_reason\u0022:null,\u0022index\u0022:0,\u0022delta\u0022:{\u0022function_call\u0022:{\u0022arguments\u0022:\u0022 \\\u0022\u0022}},\u0022content_filter_results\u0022:{}}]}\n\n",
+        "data: {\u0022id\u0022:\u0022chatcmpl-8smsZOBdlS19LY96saHRHepv1p7X7\u0022,\u0022object\u0022:\u0022chat.completion.chunk\u0022,\u0022created\u0022:1708068295,\u0022model\u0022:\u0022gpt-4-32k\u0022,\u0022choices\u0022:[{\u0022finish_reason\u0022:null,\u0022index\u0022:0,\u0022delta\u0022:{\u0022function_call\u0022:{\u0022arguments\u0022:\u0022test\u0022}},\u0022content_filter_results\u0022:{}}]}\n\n",
+        "data: {\u0022id\u0022:\u0022chatcmpl-8smsZOBdlS19LY96saHRHepv1p7X7\u0022,\u0022object\u0022:\u0022chat.completion.chunk\u0022,\u0022created\u0022:1708068295,\u0022model\u0022:\u0022gpt-4-32k\u0022,\u0022choices\u0022:[{\u0022finish_reason\u0022:null,\u0022index\u0022:0,\u0022delta\u0022:{\u0022function_call\u0022:{\u0022arguments\u0022:\u0022.txt\u0022}},\u0022content_filter_results\u0022:{}}]}\n\n",
+        "data: {\u0022id\u0022:\u0022chatcmpl-8smsZOBdlS19LY96saHRHepv1p7X7\u0022,\u0022object\u0022:\u0022chat.completion.chunk\u0022,\u0022created\u0022:1708068295,\u0022model\u0022:\u0022gpt-4-32k\u0022,\u0022choices\u0022:[{\u0022finish_reason\u0022:null,\u0022index\u0022:0,\u0022delta\u0022:{\u0022function_call\u0022:{\u0022arguments\u0022:\u0022\\\u0022,\\n\u0022}},\u0022content_filter_results\u0022:{}}]}\n\n",
+        "data: {\u0022id\u0022:\u0022chatcmpl-8smsZOBdlS19LY96saHRHepv1p7X7\u0022,\u0022object\u0022:\u0022chat.completion.chunk\u0022,\u0022created\u0022:1708068295,\u0022model\u0022:\u0022gpt-4-32k\u0022,\u0022choices\u0022:[{\u0022finish_reason\u0022:null,\u0022index\u0022:0,\u0022delta\u0022:{\u0022function_call\u0022:{\u0022arguments\u0022:\u0022 \u0022}},\u0022content_filter_results\u0022:{}}]}\n\n",
+        "data: {\u0022id\u0022:\u0022chatcmpl-8smsZOBdlS19LY96saHRHepv1p7X7\u0022,\u0022object\u0022:\u0022chat.completion.chunk\u0022,\u0022created\u0022:1708068295,\u0022model\u0022:\u0022gpt-4-32k\u0022,\u0022choices\u0022:[{\u0022finish_reason\u0022:null,\u0022index\u0022:0,\u0022delta\u0022:{\u0022function_call\u0022:{\u0022arguments\u0022:\u0022 \\\u0022\u0022}},\u0022content_filter_results\u0022:{}}]}\n\n",
+        "data: {\u0022id\u0022:\u0022chatcmpl-8smsZOBdlS19LY96saHRHepv1p7X7\u0022,\u0022object\u0022:\u0022chat.completion.chunk\u0022,\u0022created\u0022:1708068295,\u0022model\u0022:\u0022gpt-4-32k\u0022,\u0022choices\u0022:[{\u0022finish_reason\u0022:null,\u0022index\u0022:0,\u0022delta\u0022:{\u0022function_call\u0022:{\u0022arguments\u0022:\u0022text\u0022}},\u0022content_filter_results\u0022:{}}]}\n\n",
+        "data: {\u0022id\u0022:\u0022chatcmpl-8smsZOBdlS19LY96saHRHepv1p7X7\u0022,\u0022object\u0022:\u0022chat.completion.chunk\u0022,\u0022created\u0022:1708068295,\u0022model\u0022:\u0022gpt-4-32k\u0022,\u0022choices\u0022:[{\u0022finish_reason\u0022:null,\u0022index\u0022:0,\u0022delta\u0022:{\u0022function_call\u0022:{\u0022arguments\u0022:\u0022\\\u0022:\u0022}},\u0022content_filter_results\u0022:{}}]}\n\n",
+        "data: {\u0022id\u0022:\u0022chatcmpl-8smsZOBdlS19LY96saHRHepv1p7X7\u0022,\u0022object\u0022:\u0022chat.completion.chunk\u0022,\u0022created\u0022:1708068295,\u0022model\u0022:\u0022gpt-4-32k\u0022,\u0022choices\u0022:[{\u0022finish_reason\u0022:null,\u0022index\u0022:0,\u0022delta\u0022:{\u0022function_call\u0022:{\u0022arguments\u0022:\u0022 \\\u0022\u0022}},\u0022content_filter_results\u0022:{}}]}\n\n",
+        "data: {\u0022id\u0022:\u0022chatcmpl-8smsZOBdlS19LY96saHRHepv1p7X7\u0022,\u0022object\u0022:\u0022chat.completion.chunk\u0022,\u0022created\u0022:1708068295,\u0022model\u0022:\u0022gpt-4-32k\u0022,\u0022choices\u0022:[{\u0022finish_reason\u0022:null,\u0022index\u0022:0,\u0022delta\u0022:{\u0022function_call\u0022:{\u0022arguments\u0022:\u0022Hello\u0022}},\u0022content_filter_results\u0022:{}}]}\n\n",
+        "data: {\u0022id\u0022:\u0022chatcmpl-8smsZOBdlS19LY96saHRHepv1p7X7\u0022,\u0022object\u0022:\u0022chat.completion.chunk\u0022,\u0022created\u0022:1708068295,\u0022model\u0022:\u0022gpt-4-32k\u0022,\u0022choices\u0022:[{\u0022finish_reason\u0022:null,\u0022index\u0022:0,\u0022delta\u0022:{\u0022function_call\u0022:{\u0022arguments\u0022:\u0022,\u0022}},\u0022content_filter_results\u0022:{}}]}\n\n",
+        "data: {\u0022id\u0022:\u0022chatcmpl-8smsZOBdlS19LY96saHRHepv1p7X7\u0022,\u0022object\u0022:\u0022chat.completion.chunk\u0022,\u0022created\u0022:1708068295,\u0022model\u0022:\u0022gpt-4-32k\u0022,\u0022choices\u0022:[{\u0022finish_reason\u0022:null,\u0022index\u0022:0,\u0022delta\u0022:{\u0022function_call\u0022:{\u0022arguments\u0022:\u0022 World\u0022}},\u0022content_filter_results\u0022:{}}]}\n\n",
+        "data: {\u0022id\u0022:\u0022chatcmpl-8smsZOBdlS19LY96saHRHepv1p7X7\u0022,\u0022object\u0022:\u0022chat.completion.chunk\u0022,\u0022created\u0022:1708068295,\u0022model\u0022:\u0022gpt-4-32k\u0022,\u0022choices\u0022:[{\u0022finish_reason\u0022:null,\u0022index\u0022:0,\u0022delta\u0022:{\u0022function_call\u0022:{\u0022arguments\u0022:\u0022!\\\u0022\\n\u0022}},\u0022content_filter_results\u0022:{}}]}\n\n",
+        "data: {\u0022id\u0022:\u0022chatcmpl-8smsZOBdlS19LY96saHRHepv1p7X7\u0022,\u0022object\u0022:\u0022chat.completion.chunk\u0022,\u0022created\u0022:1708068295,\u0022model\u0022:\u0022gpt-4-32k\u0022,\u0022choices\u0022:[{\u0022finish_reason\u0022:null,\u0022index\u0022:0,\u0022delta\u0022:{\u0022function_call\u0022:{\u0022arguments\u0022:\u0022}\u0022}},\u0022content_filter_results\u0022:{}}]}\n\n",
+        "data: {\u0022id\u0022:\u0022chatcmpl-8smsZOBdlS19LY96saHRHepv1p7X7\u0022,\u0022object\u0022:\u0022chat.completion.chunk\u0022,\u0022created\u0022:1708068295,\u0022model\u0022:\u0022gpt-4-32k\u0022,\u0022choices\u0022:[{\u0022finish_reason\u0022:\u0022function_call\u0022,\u0022index\u0022:0,\u0022delta\u0022:{},\u0022content_filter_results\u0022:{}}]}\n\n",
         "data: [DONE]\n\n"
       ]
     },
@@ -930,12 +463,12 @@
         "Accept": "application/json",
         "api-key": "00000000-0000-0000-0000-000000000000",
         "Connection": "close",
-        "Content-Length": "6080",
+        "Content-Length": "5875",
         "Content-Type": "application/json",
-        "User-Agent": "azsdk-net-AI.OpenAI/1.0.0-beta.12 (.NET 8.0.1; Microsoft Windows 10.0.22631)",
+        "User-Agent": "azsdk-net-AI.OpenAI/1.0.0-beta.13 (.NET 8.0.2; Microsoft Windows 10.0.22631)",
         "X-Forwarded-For": "127.0.0.1",
         "X-Forwarded-Proto": "https",
-        "x-ms-client-request-id": "4f24f85d-63c3-466f-8a93-e2c8d2f21ca1",
+        "x-ms-client-request-id": "8f6d6e3c-3bf7-4988-8391-bc59eb52d513",
         "x-ms-return-client-request-id": "true",
         "X-Real-IP": "127.0.0.1"
       },
@@ -953,7 +486,475 @@
             "content": "",
             "function_call": {
               "name": "CreateFileAndSaveText",
-              "arguments": "{\n\u0022fileName\u0022: \u0022test.txt\u0022,\n\u0022text\u0022: \u0022Hello, World!\u0022\n}"
+              "arguments": "{\n  \u0022fileName\u0022: \u0022test.txt\u0022,\n  \u0022text\u0022: \u0022Hello, World!\u0022\n}"
+            },
+            "role": "assistant"
+          },
+          {
+            "name": "CreateFileAndSaveText",
+            "content": "True",
+            "role": "function"
+          }
+        ],
+        "functions": [
+          {
+            "name": "AddFloats",
+            "description": "Adds two floats",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "a": {
+                  "type": "number",
+                  "description": "The a parameter"
+                },
+                "b": {
+                  "type": "number",
+                  "description": "The b parameter"
+                }
+              },
+              "required": [
+                "a",
+                "b"
+              ]
+            }
+          },
+          {
+            "name": "SubtractFloats",
+            "description": "Subtracts two floats",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "a": {
+                  "type": "number",
+                  "description": "The a parameter"
+                },
+                "b": {
+                  "type": "number",
+                  "description": "The b parameter"
+                }
+              },
+              "required": [
+                "a",
+                "b"
+              ]
+            }
+          },
+          {
+            "name": "MultiplyFloats",
+            "description": "Multiplies two floats",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "a": {
+                  "type": "number",
+                  "description": "The a parameter"
+                },
+                "b": {
+                  "type": "number",
+                  "description": "The b parameter"
+                }
+              },
+              "required": [
+                "a",
+                "b"
+              ]
+            }
+          },
+          {
+            "name": "DivideFloats",
+            "description": "Divides two floats",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "a": {
+                  "type": "number",
+                  "description": "The a parameter"
+                },
+                "b": {
+                  "type": "number",
+                  "description": "The b parameter"
+                }
+              },
+              "required": [
+                "a",
+                "b"
+              ]
+            }
+          },
+          {
+            "name": "AddIntegers",
+            "description": "Adds two integers",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "a": {
+                  "type": "integer",
+                  "description": "The a parameter"
+                },
+                "b": {
+                  "type": "integer",
+                  "description": "The b parameter"
+                }
+              },
+              "required": [
+                "a",
+                "b"
+              ]
+            }
+          },
+          {
+            "name": "SubtractIntegers",
+            "description": "Subtracts two integers",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "a": {
+                  "type": "integer",
+                  "description": "The a parameter"
+                },
+                "b": {
+                  "type": "integer",
+                  "description": "The b parameter"
+                }
+              },
+              "required": [
+                "a",
+                "b"
+              ]
+            }
+          },
+          {
+            "name": "MultiplyIntegers",
+            "description": "Multiplies two integers",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "a": {
+                  "type": "integer",
+                  "description": "The a parameter"
+                },
+                "b": {
+                  "type": "integer",
+                  "description": "The b parameter"
+                }
+              },
+              "required": [
+                "a",
+                "b"
+              ]
+            }
+          },
+          {
+            "name": "DivideIntegers",
+            "description": "Divides two integers",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "a": {
+                  "type": "integer",
+                  "description": "The a parameter"
+                },
+                "b": {
+                  "type": "integer",
+                  "description": "The b parameter"
+                }
+              },
+              "required": [
+                "a",
+                "b"
+              ]
+            }
+          },
+          {
+            "name": "Average",
+            "description": "Calculates the average of a list of numbers",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "numbers": {
+                  "type": "array",
+                  "items": {
+                    "type": "number"
+                  },
+                  "description": "The numbers parameter"
+                }
+              },
+              "required": [
+                "numbers"
+              ]
+            }
+          },
+          {
+            "name": "StandardDeviation",
+            "description": "Calculates the standard deviation of a list of numbers",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "numbers": {
+                  "type": "array",
+                  "items": {
+                    "type": "number"
+                  },
+                  "description": "The numbers parameter"
+                }
+              },
+              "required": [
+                "numbers"
+              ]
+            }
+          },
+          {
+            "name": "GetCurrentDateTime",
+            "description": "Gets the current date and time",
+            "parameters": {
+              "type": "object",
+              "properties": {},
+              "required": []
+            }
+          },
+          {
+            "name": "FileExists",
+            "description": "Checks if file exists",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "fileName": {
+                  "type": "string",
+                  "description": "The fileName parameter"
+                }
+              },
+              "required": [
+                "fileName"
+              ]
+            }
+          },
+          {
+            "name": "ReadTextFromFile",
+            "description": "Reads text from a file; returns empty string if file does not exist",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "fileName": {
+                  "type": "string",
+                  "description": "The fileName parameter"
+                }
+              },
+              "required": [
+                "fileName"
+              ]
+            }
+          },
+          {
+            "name": "CreateFileAndSaveText",
+            "description": "Writes text into a file; if the file exists, it is overwritten",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "fileName": {
+                  "type": "string",
+                  "description": "The fileName parameter"
+                },
+                "text": {
+                  "type": "string",
+                  "description": "The text parameter"
+                }
+              },
+              "required": [
+                "fileName",
+                "text"
+              ]
+            }
+          },
+          {
+            "name": "AppendTextToFile",
+            "description": "Appends text to a file; if the file does not exist, it is created",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "fileName": {
+                  "type": "string",
+                  "description": "The fileName parameter"
+                },
+                "text": {
+                  "type": "string",
+                  "description": "The text parameter"
+                }
+              },
+              "required": [
+                "fileName",
+                "text"
+              ]
+            }
+          },
+          {
+            "name": "DirectoryCreate",
+            "description": "Creates a directory if it doesn\u0027t already exist",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "directoryName": {
+                  "type": "string",
+                  "description": "The directoryName parameter"
+                }
+              },
+              "required": [
+                "directoryName"
+              ]
+            }
+          },
+          {
+            "name": "FindAllFilesInCurrentDirectory",
+            "description": "List files; lists all files regardless of name; only in current directory",
+            "parameters": {
+              "type": "object",
+              "properties": {},
+              "required": []
+            }
+          },
+          {
+            "name": "FindAllFilesRecursively",
+            "description": "List files; lists all files regardless of name; searches current directory and all sub-directories",
+            "parameters": {
+              "type": "object",
+              "properties": {},
+              "required": []
+            }
+          },
+          {
+            "name": "FindAllFilesMatchingPattern",
+            "description": "List files; lists all files matching pattern; searches current directory, and if pattern includes \u0027**\u0027, all sub-directories",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "pattern": {
+                  "type": "string",
+                  "description": "The pattern to search for; use \u0027**/*.ext\u0027 to search sub-directories"
+                }
+              },
+              "required": [
+                "pattern"
+              ]
+            }
+          },
+          {
+            "name": "FindTextInAllFiles",
+            "description": "Find files containing text; searches all files",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "text": {
+                  "type": "string",
+                  "description": "The text to find"
+                }
+              },
+              "required": [
+                "text"
+              ]
+            }
+          },
+          {
+            "name": "FindTextInFilesMatchingPattern",
+            "description": "Find files containing text; searches files matching a pattern",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "text": {
+                  "type": "string",
+                  "description": "The text to find"
+                },
+                "pattern": {
+                  "type": "string",
+                  "description": "The pattern to search for; use \u0027**/*.ext\u0027 to search sub-directories"
+                }
+              },
+              "required": [
+                "text",
+                "pattern"
+              ]
+            }
+          }
+        ],
+        "temperature": 0.7,
+        "presence_penalty": 0,
+        "frequency_penalty": 0,
+        "stream": true,
+        "model": "gpt-4-32k-0613"
+      },
+      "StatusCode": 200,
+      "ResponseHeaders": {
+        "Access-Control-Allow-Origin": "*",
+        "apim-request-id": "d9e04ab9-bba5-4657-9d41-cb7a0dca7b00",
+        "azureml-model-session": "d031-20240123065239",
+        "Cache-Control": "must-revalidate, no-cache",
+        "Connection": "close",
+        "Content-Type": "text/event-stream",
+        "Date": "Fri, 16 Feb 2024 07:24:58 GMT",
+        "Strict-Transport-Security": "max-age=31536000; includeSubDomains; preload",
+        "Transfer-Encoding": "chunked",
+        "x-accel-buffering": "no",
+        "X-Content-Type-Options": "nosniff",
+        "x-ms-client-request-id": "8f6d6e3c-3bf7-4988-8391-bc59eb52d513",
+        "x-ms-region": "East US 2",
+        "x-ratelimit-remaining-requests": "48",
+        "x-ratelimit-remaining-tokens": "49952",
+        "X-Request-ID": "9b6623e5-9bea-47dd-85a8-10957af2a75b"
+      },
+      "ResponseBody": [
+        "data: {\u0022id\u0022:\u0022\u0022,\u0022object\u0022:\u0022\u0022,\u0022created\u0022:0,\u0022model\u0022:\u0022\u0022,\u0022prompt_filter_results\u0022:[{\u0022prompt_index\u0022:0,\u0022content_filter_results\u0022:{\u0022hate\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022self_harm\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022sexual\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022violence\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022}}}],\u0022choices\u0022:[]}\n\n",
+        "data: {\u0022id\u0022:\u0022chatcmpl-8smsbzUcxUnIt2UYySOrl3L3Qw1e6\u0022,\u0022object\u0022:\u0022chat.completion.chunk\u0022,\u0022created\u0022:1708068297,\u0022model\u0022:\u0022gpt-4-32k\u0022,\u0022choices\u0022:[{\u0022finish_reason\u0022:null,\u0022index\u0022:0,\u0022delta\u0022:{\u0022role\u0022:\u0022assistant\u0022},\u0022content_filter_results\u0022:{}}]}\n\n",
+        "data: {\u0022id\u0022:\u0022chatcmpl-8smsbzUcxUnIt2UYySOrl3L3Qw1e6\u0022,\u0022object\u0022:\u0022chat.completion.chunk\u0022,\u0022created\u0022:1708068297,\u0022model\u0022:\u0022gpt-4-32k\u0022,\u0022choices\u0022:[{\u0022finish_reason\u0022:null,\u0022index\u0022:0,\u0022delta\u0022:{\u0022content\u0022:\u0022I\u0022},\u0022content_filter_results\u0022:{\u0022hate\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022self_harm\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022sexual\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022violence\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022}}}]}\n\n",
+        "data: {\u0022id\u0022:\u0022chatcmpl-8smsbzUcxUnIt2UYySOrl3L3Qw1e6\u0022,\u0022object\u0022:\u0022chat.completion.chunk\u0022,\u0022created\u0022:1708068297,\u0022model\u0022:\u0022gpt-4-32k\u0022,\u0022choices\u0022:[{\u0022finish_reason\u0022:null,\u0022index\u0022:0,\u0022delta\u0022:{\u0022content\u0022:\u0022 have\u0022},\u0022content_filter_results\u0022:{\u0022hate\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022self_harm\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022sexual\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022violence\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022}}}]}\n\n",
+        "data: {\u0022id\u0022:\u0022chatcmpl-8smsbzUcxUnIt2UYySOrl3L3Qw1e6\u0022,\u0022object\u0022:\u0022chat.completion.chunk\u0022,\u0022created\u0022:1708068297,\u0022model\u0022:\u0022gpt-4-32k\u0022,\u0022choices\u0022:[{\u0022finish_reason\u0022:null,\u0022index\u0022:0,\u0022delta\u0022:{\u0022content\u0022:\u0022 created\u0022},\u0022content_filter_results\u0022:{\u0022hate\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022self_harm\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022sexual\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022violence\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022}}}]}\n\n",
+        "data: {\u0022id\u0022:\u0022chatcmpl-8smsbzUcxUnIt2UYySOrl3L3Qw1e6\u0022,\u0022object\u0022:\u0022chat.completion.chunk\u0022,\u0022created\u0022:1708068297,\u0022model\u0022:\u0022gpt-4-32k\u0022,\u0022choices\u0022:[{\u0022finish_reason\u0022:null,\u0022index\u0022:0,\u0022delta\u0022:{\u0022content\u0022:\u0022 a\u0022},\u0022content_filter_results\u0022:{\u0022hate\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022self_harm\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022sexual\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022violence\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022}}}]}\n\n",
+        "data: {\u0022id\u0022:\u0022chatcmpl-8smsbzUcxUnIt2UYySOrl3L3Qw1e6\u0022,\u0022object\u0022:\u0022chat.completion.chunk\u0022,\u0022created\u0022:1708068297,\u0022model\u0022:\u0022gpt-4-32k\u0022,\u0022choices\u0022:[{\u0022finish_reason\u0022:null,\u0022index\u0022:0,\u0022delta\u0022:{\u0022content\u0022:\u0022 file\u0022},\u0022content_filter_results\u0022:{\u0022hate\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022self_harm\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022sexual\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022violence\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022}}}]}\n\n",
+        "data: {\u0022id\u0022:\u0022chatcmpl-8smsbzUcxUnIt2UYySOrl3L3Qw1e6\u0022,\u0022object\u0022:\u0022chat.completion.chunk\u0022,\u0022created\u0022:1708068297,\u0022model\u0022:\u0022gpt-4-32k\u0022,\u0022choices\u0022:[{\u0022finish_reason\u0022:null,\u0022index\u0022:0,\u0022delta\u0022:{\u0022content\u0022:\u0022 named\u0022},\u0022content_filter_results\u0022:{\u0022hate\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022self_harm\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022sexual\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022violence\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022}}}]}\n\n",
+        "data: {\u0022id\u0022:\u0022chatcmpl-8smsbzUcxUnIt2UYySOrl3L3Qw1e6\u0022,\u0022object\u0022:\u0022chat.completion.chunk\u0022,\u0022created\u0022:1708068297,\u0022model\u0022:\u0022gpt-4-32k\u0022,\u0022choices\u0022:[{\u0022finish_reason\u0022:null,\u0022index\u0022:0,\u0022delta\u0022:{\u0022content\u0022:\u0022 \\\u0022\u0022},\u0022content_filter_results\u0022:{\u0022hate\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022self_harm\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022sexual\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022violence\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022}}}]}\n\n",
+        "data: {\u0022id\u0022:\u0022chatcmpl-8smsbzUcxUnIt2UYySOrl3L3Qw1e6\u0022,\u0022object\u0022:\u0022chat.completion.chunk\u0022,\u0022created\u0022:1708068297,\u0022model\u0022:\u0022gpt-4-32k\u0022,\u0022choices\u0022:[{\u0022finish_reason\u0022:null,\u0022index\u0022:0,\u0022delta\u0022:{\u0022content\u0022:\u0022test\u0022},\u0022content_filter_results\u0022:{\u0022hate\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022self_harm\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022sexual\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022violence\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022}}}]}\n\n",
+        "data: {\u0022id\u0022:\u0022chatcmpl-8smsbzUcxUnIt2UYySOrl3L3Qw1e6\u0022,\u0022object\u0022:\u0022chat.completion.chunk\u0022,\u0022created\u0022:1708068297,\u0022model\u0022:\u0022gpt-4-32k\u0022,\u0022choices\u0022:[{\u0022finish_reason\u0022:null,\u0022index\u0022:0,\u0022delta\u0022:{\u0022content\u0022:\u0022.txt\u0022},\u0022content_filter_results\u0022:{\u0022hate\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022self_harm\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022sexual\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022violence\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022}}}]}\n\n",
+        "data: {\u0022id\u0022:\u0022chatcmpl-8smsbzUcxUnIt2UYySOrl3L3Qw1e6\u0022,\u0022object\u0022:\u0022chat.completion.chunk\u0022,\u0022created\u0022:1708068297,\u0022model\u0022:\u0022gpt-4-32k\u0022,\u0022choices\u0022:[{\u0022finish_reason\u0022:null,\u0022index\u0022:0,\u0022delta\u0022:{\u0022content\u0022:\u0022\\\u0022\u0022},\u0022content_filter_results\u0022:{\u0022hate\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022self_harm\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022sexual\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022violence\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022}}}]}\n\n",
+        "data: {\u0022id\u0022:\u0022chatcmpl-8smsbzUcxUnIt2UYySOrl3L3Qw1e6\u0022,\u0022object\u0022:\u0022chat.completion.chunk\u0022,\u0022created\u0022:1708068297,\u0022model\u0022:\u0022gpt-4-32k\u0022,\u0022choices\u0022:[{\u0022finish_reason\u0022:null,\u0022index\u0022:0,\u0022delta\u0022:{\u0022content\u0022:\u0022 with\u0022},\u0022content_filter_results\u0022:{\u0022hate\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022self_harm\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022sexual\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022violence\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022}}}]}\n\n",
+        "data: {\u0022id\u0022:\u0022chatcmpl-8smsbzUcxUnIt2UYySOrl3L3Qw1e6\u0022,\u0022object\u0022:\u0022chat.completion.chunk\u0022,\u0022created\u0022:1708068297,\u0022model\u0022:\u0022gpt-4-32k\u0022,\u0022choices\u0022:[{\u0022finish_reason\u0022:null,\u0022index\u0022:0,\u0022delta\u0022:{\u0022content\u0022:\u0022 the\u0022},\u0022content_filter_results\u0022:{\u0022hate\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022self_harm\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022sexual\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022violence\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022}}}]}\n\n",
+        "data: {\u0022id\u0022:\u0022chatcmpl-8smsbzUcxUnIt2UYySOrl3L3Qw1e6\u0022,\u0022object\u0022:\u0022chat.completion.chunk\u0022,\u0022created\u0022:1708068297,\u0022model\u0022:\u0022gpt-4-32k\u0022,\u0022choices\u0022:[{\u0022finish_reason\u0022:null,\u0022index\u0022:0,\u0022delta\u0022:{\u0022content\u0022:\u0022 content\u0022},\u0022content_filter_results\u0022:{\u0022hate\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022self_harm\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022sexual\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022violence\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022}}}]}\n\n",
+        "data: {\u0022id\u0022:\u0022chatcmpl-8smsbzUcxUnIt2UYySOrl3L3Qw1e6\u0022,\u0022object\u0022:\u0022chat.completion.chunk\u0022,\u0022created\u0022:1708068297,\u0022model\u0022:\u0022gpt-4-32k\u0022,\u0022choices\u0022:[{\u0022finish_reason\u0022:null,\u0022index\u0022:0,\u0022delta\u0022:{\u0022content\u0022:\u0022 \\\u0022\u0022},\u0022content_filter_results\u0022:{\u0022hate\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022self_harm\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022sexual\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022violence\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022}}}]}\n\n",
+        "data: {\u0022id\u0022:\u0022chatcmpl-8smsbzUcxUnIt2UYySOrl3L3Qw1e6\u0022,\u0022object\u0022:\u0022chat.completion.chunk\u0022,\u0022created\u0022:1708068297,\u0022model\u0022:\u0022gpt-4-32k\u0022,\u0022choices\u0022:[{\u0022finish_reason\u0022:null,\u0022index\u0022:0,\u0022delta\u0022:{\u0022content\u0022:\u0022Hello\u0022},\u0022content_filter_results\u0022:{\u0022hate\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022self_harm\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022sexual\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022violence\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022}}}]}\n\n",
+        "data: {\u0022id\u0022:\u0022chatcmpl-8smsbzUcxUnIt2UYySOrl3L3Qw1e6\u0022,\u0022object\u0022:\u0022chat.completion.chunk\u0022,\u0022created\u0022:1708068297,\u0022model\u0022:\u0022gpt-4-32k\u0022,\u0022choices\u0022:[{\u0022finish_reason\u0022:null,\u0022index\u0022:0,\u0022delta\u0022:{\u0022content\u0022:\u0022,\u0022},\u0022content_filter_results\u0022:{\u0022hate\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022self_harm\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022sexual\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022violence\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022}}}]}\n\n",
+        "data: {\u0022id\u0022:\u0022chatcmpl-8smsbzUcxUnIt2UYySOrl3L3Qw1e6\u0022,\u0022object\u0022:\u0022chat.completion.chunk\u0022,\u0022created\u0022:1708068297,\u0022model\u0022:\u0022gpt-4-32k\u0022,\u0022choices\u0022:[{\u0022finish_reason\u0022:null,\u0022index\u0022:0,\u0022delta\u0022:{\u0022content\u0022:\u0022 World\u0022},\u0022content_filter_results\u0022:{\u0022hate\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022self_harm\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022sexual\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022violence\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022}}}]}\n\n",
+        "data: {\u0022id\u0022:\u0022chatcmpl-8smsbzUcxUnIt2UYySOrl3L3Qw1e6\u0022,\u0022object\u0022:\u0022chat.completion.chunk\u0022,\u0022created\u0022:1708068297,\u0022model\u0022:\u0022gpt-4-32k\u0022,\u0022choices\u0022:[{\u0022finish_reason\u0022:null,\u0022index\u0022:0,\u0022delta\u0022:{\u0022content\u0022:\u0022!\\\u0022.\u0022},\u0022content_filter_results\u0022:{\u0022hate\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022self_harm\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022sexual\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022violence\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022}}}]}\n\n",
+        "data: {\u0022id\u0022:\u0022chatcmpl-8smsbzUcxUnIt2UYySOrl3L3Qw1e6\u0022,\u0022object\u0022:\u0022chat.completion.chunk\u0022,\u0022created\u0022:1708068297,\u0022model\u0022:\u0022gpt-4-32k\u0022,\u0022choices\u0022:[{\u0022finish_reason\u0022:\u0022stop\u0022,\u0022index\u0022:0,\u0022delta\u0022:{},\u0022content_filter_results\u0022:{}}]}\n\n",
+        "data: [DONE]\n\n"
+      ]
+    },
+    {
+      "RequestUri": "https://fakeendpoint/openai/deployments/gpt-4-32k-0613/chat/completions?api-version=2023-12-01-preview",
+      "RequestMethod": "POST",
+      "RequestHeaders": {
+        "Accept": "application/json",
+        "api-key": "00000000-0000-0000-0000-000000000000",
+        "Connection": "close",
+        "Content-Length": "6070",
+        "Content-Type": "application/json",
+        "User-Agent": "azsdk-net-AI.OpenAI/1.0.0-beta.13 (.NET 8.0.2; Microsoft Windows 10.0.22631)",
+        "X-Forwarded-For": "127.0.0.1",
+        "X-Forwarded-Proto": "https",
+        "x-ms-client-request-id": "1337ba00-c464-4bb4-8270-fabd726bf88c",
+        "x-ms-return-client-request-id": "true",
+        "X-Real-IP": "127.0.0.1"
+      },
+      "RequestBody": {
+        "messages": [
+          {
+            "content": "You are an AI assistant that helps people find information regarding Azure AI.",
+            "role": "system"
+          },
+          {
+            "content": "\u0022Create a file named \u0022test.txt\u0022 with the following content: \u0022Hello, World!\u0022",
+            "role": "user"
+          },
+          {
+            "content": "",
+            "function_call": {
+              "name": "CreateFileAndSaveText",
+              "arguments": "{\n  \u0022fileName\u0022: \u0022test.txt\u0022,\n  \u0022text\u0022: \u0022Hello, World!\u0022\n}"
             },
             "role": "assistant"
           },
@@ -963,7 +964,7 @@
             "role": "function"
           },
           {
-            "content": "I have successfully created a file named \u0022test.txt\u0022 with the content: \u0022Hello, World!\u0022.",
+            "content": "I have created a file named \u0022test.txt\u0022 with the content \u0022Hello, World!\u0022.",
             "role": "assistant"
           },
           {
@@ -1358,27 +1359,27 @@
       "StatusCode": 200,
       "ResponseHeaders": {
         "Access-Control-Allow-Origin": "*",
-        "apim-request-id": "857c90d0-0ff9-4912-8d96-c912d0b6e545",
-        "azureml-model-session": "d030-20240123055055",
+        "apim-request-id": "298d0078-3018-4c63-b05f-8dba7eda968b",
+        "azureml-model-session": "d032-20240123075009",
         "Cache-Control": "must-revalidate, no-cache",
         "Connection": "close",
         "Content-Type": "text/event-stream",
-        "Date": "Mon, 12 Feb 2024 01:10:07 GMT",
+        "Date": "Fri, 16 Feb 2024 07:24:59 GMT",
         "Strict-Transport-Security": "max-age=31536000; includeSubDomains; preload",
         "Transfer-Encoding": "chunked",
         "x-accel-buffering": "no",
         "X-Content-Type-Options": "nosniff",
-        "x-ms-client-request-id": "4f24f85d-63c3-466f-8a93-e2c8d2f21ca1",
+        "x-ms-client-request-id": "1337ba00-c464-4bb4-8270-fabd726bf88c",
         "x-ms-region": "East US 2",
         "x-ratelimit-remaining-requests": "47",
-        "x-ratelimit-remaining-tokens": "49952",
-        "X-Request-ID": "cf7f314a-60c3-4e77-920d-4188d2671610"
+        "x-ratelimit-remaining-tokens": "49936",
+        "X-Request-ID": "822a0ed0-e4f7-4525-b303-72137dfc91ad"
       },
       "ResponseBody": [
         "data: {\u0022id\u0022:\u0022\u0022,\u0022object\u0022:\u0022\u0022,\u0022created\u0022:0,\u0022model\u0022:\u0022\u0022,\u0022prompt_filter_results\u0022:[{\u0022prompt_index\u0022:0,\u0022content_filter_results\u0022:{\u0022hate\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022self_harm\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022sexual\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022violence\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022}}}],\u0022choices\u0022:[]}\n\n",
-        "data: {\u0022id\u0022:\u0022chatcmpl-8rF7feDnoDe2GVIUMVFv0KEUxSO2U\u0022,\u0022object\u0022:\u0022chat.completion.chunk\u0022,\u0022created\u0022:1707700207,\u0022model\u0022:\u0022gpt-4-32k\u0022,\u0022choices\u0022:[{\u0022finish_reason\u0022:null,\u0022index\u0022:0,\u0022delta\u0022:{\u0022role\u0022:\u0022assistant\u0022,\u0022function_call\u0022:{\u0022name\u0022:\u0022FindAllFilesInCurrentDirectory\u0022}},\u0022content_filter_results\u0022:{}}]}\n\n",
-        "data: {\u0022id\u0022:\u0022chatcmpl-8rF7feDnoDe2GVIUMVFv0KEUxSO2U\u0022,\u0022object\u0022:\u0022chat.completion.chunk\u0022,\u0022created\u0022:1707700207,\u0022model\u0022:\u0022gpt-4-32k\u0022,\u0022choices\u0022:[{\u0022finish_reason\u0022:null,\u0022index\u0022:0,\u0022delta\u0022:{\u0022function_call\u0022:{\u0022arguments\u0022:\u0022{}\u0022}},\u0022content_filter_results\u0022:{}}]}\n\n",
-        "data: {\u0022id\u0022:\u0022chatcmpl-8rF7feDnoDe2GVIUMVFv0KEUxSO2U\u0022,\u0022object\u0022:\u0022chat.completion.chunk\u0022,\u0022created\u0022:1707700207,\u0022model\u0022:\u0022gpt-4-32k\u0022,\u0022choices\u0022:[{\u0022finish_reason\u0022:\u0022function_call\u0022,\u0022index\u0022:0,\u0022delta\u0022:{},\u0022content_filter_results\u0022:{}}]}\n\n",
+        "data: {\u0022id\u0022:\u0022chatcmpl-8smsd3prB1yAKAF1GdANEEitkZAyY\u0022,\u0022object\u0022:\u0022chat.completion.chunk\u0022,\u0022created\u0022:1708068299,\u0022model\u0022:\u0022gpt-4-32k\u0022,\u0022choices\u0022:[{\u0022finish_reason\u0022:null,\u0022index\u0022:0,\u0022delta\u0022:{\u0022role\u0022:\u0022assistant\u0022,\u0022function_call\u0022:{\u0022name\u0022:\u0022FindAllFilesInCurrentDirectory\u0022}},\u0022content_filter_results\u0022:{}}]}\n\n",
+        "data: {\u0022id\u0022:\u0022chatcmpl-8smsd3prB1yAKAF1GdANEEitkZAyY\u0022,\u0022object\u0022:\u0022chat.completion.chunk\u0022,\u0022created\u0022:1708068299,\u0022model\u0022:\u0022gpt-4-32k\u0022,\u0022choices\u0022:[{\u0022finish_reason\u0022:null,\u0022index\u0022:0,\u0022delta\u0022:{\u0022function_call\u0022:{\u0022arguments\u0022:\u0022{}\u0022}},\u0022content_filter_results\u0022:{}}]}\n\n",
+        "data: {\u0022id\u0022:\u0022chatcmpl-8smsd3prB1yAKAF1GdANEEitkZAyY\u0022,\u0022object\u0022:\u0022chat.completion.chunk\u0022,\u0022created\u0022:1708068299,\u0022model\u0022:\u0022gpt-4-32k\u0022,\u0022choices\u0022:[{\u0022finish_reason\u0022:\u0022function_call\u0022,\u0022index\u0022:0,\u0022delta\u0022:{},\u0022content_filter_results\u0022:{}}]}\n\n",
         "data: [DONE]\n\n"
       ]
     },
@@ -1389,12 +1390,12 @@
         "Accept": "application/json",
         "api-key": "00000000-0000-0000-0000-000000000000",
         "Connection": "close",
-        "Content-Length": "6272",
+        "Content-Length": "6262",
         "Content-Type": "application/json",
-        "User-Agent": "azsdk-net-AI.OpenAI/1.0.0-beta.12 (.NET 8.0.1; Microsoft Windows 10.0.22631)",
+        "User-Agent": "azsdk-net-AI.OpenAI/1.0.0-beta.13 (.NET 8.0.2; Microsoft Windows 10.0.22631)",
         "X-Forwarded-For": "127.0.0.1",
         "X-Forwarded-Proto": "https",
-        "x-ms-client-request-id": "4c127a58-999b-4025-b339-2a42ba28d5d5",
+        "x-ms-client-request-id": "e0fca20c-940b-460b-b8e8-b408d197fe4c",
         "x-ms-return-client-request-id": "true",
         "X-Real-IP": "127.0.0.1"
       },
@@ -1412,7 +1413,7 @@
             "content": "",
             "function_call": {
               "name": "CreateFileAndSaveText",
-              "arguments": "{\n\u0022fileName\u0022: \u0022test.txt\u0022,\n\u0022text\u0022: \u0022Hello, World!\u0022\n}"
+              "arguments": "{\n  \u0022fileName\u0022: \u0022test.txt\u0022,\n  \u0022text\u0022: \u0022Hello, World!\u0022\n}"
             },
             "role": "assistant"
           },
@@ -1422,7 +1423,7 @@
             "role": "function"
           },
           {
-            "content": "I have successfully created a file named \u0022test.txt\u0022 with the content: \u0022Hello, World!\u0022.",
+            "content": "I have created a file named \u0022test.txt\u0022 with the content \u0022Hello, World!\u0022.",
             "role": "assistant"
           },
           {
@@ -1830,37 +1831,38 @@
       "StatusCode": 200,
       "ResponseHeaders": {
         "Access-Control-Allow-Origin": "*",
-        "apim-request-id": "0afb79f5-cc14-4040-bc35-4bd88714c0ba",
-        "azureml-model-session": "d026-20240123015022",
+        "apim-request-id": "24ba9fef-4493-4587-908d-10b79a391a73",
+        "azureml-model-session": "d027-20240123024829",
         "Cache-Control": "must-revalidate, no-cache",
         "Connection": "close",
         "Content-Type": "text/event-stream",
-        "Date": "Mon, 12 Feb 2024 01:10:08 GMT",
+        "Date": "Fri, 16 Feb 2024 07:25:00 GMT",
         "Strict-Transport-Security": "max-age=31536000; includeSubDomains; preload",
         "Transfer-Encoding": "chunked",
         "x-accel-buffering": "no",
         "X-Content-Type-Options": "nosniff",
-        "x-ms-client-request-id": "4c127a58-999b-4025-b339-2a42ba28d5d5",
+        "x-ms-client-request-id": "e0fca20c-940b-460b-b8e8-b408d197fe4c",
         "x-ms-region": "East US 2",
         "x-ratelimit-remaining-requests": "46",
-        "x-ratelimit-remaining-tokens": "49936",
-        "X-Request-ID": "1c14ef2a-eed9-4f11-b103-45c9cac6551d"
+        "x-ratelimit-remaining-tokens": "49920",
+        "X-Request-ID": "751270d6-a6ef-40f1-bd9b-76f07a9473fa"
       },
       "ResponseBody": [
         "data: {\u0022id\u0022:\u0022\u0022,\u0022object\u0022:\u0022\u0022,\u0022created\u0022:0,\u0022model\u0022:\u0022\u0022,\u0022prompt_filter_results\u0022:[{\u0022prompt_index\u0022:0,\u0022content_filter_results\u0022:{\u0022hate\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022self_harm\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022sexual\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022violence\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022}}}],\u0022choices\u0022:[]}\n\n",
-        "data: {\u0022id\u0022:\u0022chatcmpl-8rF7gr3Uj6kK8Ku04UpWuooGWuvgq\u0022,\u0022object\u0022:\u0022chat.completion.chunk\u0022,\u0022created\u0022:1707700208,\u0022model\u0022:\u0022gpt-4-32k\u0022,\u0022choices\u0022:[{\u0022finish_reason\u0022:null,\u0022index\u0022:0,\u0022delta\u0022:{\u0022role\u0022:\u0022assistant\u0022},\u0022content_filter_results\u0022:{}}]}\n\n",
-        "data: {\u0022id\u0022:\u0022chatcmpl-8rF7gr3Uj6kK8Ku04UpWuooGWuvgq\u0022,\u0022object\u0022:\u0022chat.completion.chunk\u0022,\u0022created\u0022:1707700208,\u0022model\u0022:\u0022gpt-4-32k\u0022,\u0022choices\u0022:[{\u0022finish_reason\u0022:null,\u0022index\u0022:0,\u0022delta\u0022:{\u0022content\u0022:\u0022The\u0022},\u0022content_filter_results\u0022:{\u0022hate\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022self_harm\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022sexual\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022violence\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022}}}]}\n\n",
-        "data: {\u0022id\u0022:\u0022chatcmpl-8rF7gr3Uj6kK8Ku04UpWuooGWuvgq\u0022,\u0022object\u0022:\u0022chat.completion.chunk\u0022,\u0022created\u0022:1707700208,\u0022model\u0022:\u0022gpt-4-32k\u0022,\u0022choices\u0022:[{\u0022finish_reason\u0022:null,\u0022index\u0022:0,\u0022delta\u0022:{\u0022content\u0022:\u0022 current\u0022},\u0022content_filter_results\u0022:{\u0022hate\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022self_harm\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022sexual\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022violence\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022}}}]}\n\n",
-        "data: {\u0022id\u0022:\u0022chatcmpl-8rF7gr3Uj6kK8Ku04UpWuooGWuvgq\u0022,\u0022object\u0022:\u0022chat.completion.chunk\u0022,\u0022created\u0022:1707700208,\u0022model\u0022:\u0022gpt-4-32k\u0022,\u0022choices\u0022:[{\u0022finish_reason\u0022:null,\u0022index\u0022:0,\u0022delta\u0022:{\u0022content\u0022:\u0022 directory\u0022},\u0022content_filter_results\u0022:{\u0022hate\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022self_harm\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022sexual\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022violence\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022}}}]}\n\n",
-        "data: {\u0022id\u0022:\u0022chatcmpl-8rF7gr3Uj6kK8Ku04UpWuooGWuvgq\u0022,\u0022object\u0022:\u0022chat.completion.chunk\u0022,\u0022created\u0022:1707700208,\u0022model\u0022:\u0022gpt-4-32k\u0022,\u0022choices\u0022:[{\u0022finish_reason\u0022:null,\u0022index\u0022:0,\u0022delta\u0022:{\u0022content\u0022:\u0022 contains\u0022},\u0022content_filter_results\u0022:{\u0022hate\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022self_harm\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022sexual\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022violence\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022}}}]}\n\n",
-        "data: {\u0022id\u0022:\u0022chatcmpl-8rF7gr3Uj6kK8Ku04UpWuooGWuvgq\u0022,\u0022object\u0022:\u0022chat.completion.chunk\u0022,\u0022created\u0022:1707700208,\u0022model\u0022:\u0022gpt-4-32k\u0022,\u0022choices\u0022:[{\u0022finish_reason\u0022:null,\u0022index\u0022:0,\u0022delta\u0022:{\u0022content\u0022:\u0022 the\u0022},\u0022content_filter_results\u0022:{\u0022hate\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022self_harm\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022sexual\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022violence\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022}}}]}\n\n",
-        "data: {\u0022id\u0022:\u0022chatcmpl-8rF7gr3Uj6kK8Ku04UpWuooGWuvgq\u0022,\u0022object\u0022:\u0022chat.completion.chunk\u0022,\u0022created\u0022:1707700208,\u0022model\u0022:\u0022gpt-4-32k\u0022,\u0022choices\u0022:[{\u0022finish_reason\u0022:null,\u0022index\u0022:0,\u0022delta\u0022:{\u0022content\u0022:\u0022 following\u0022},\u0022content_filter_results\u0022:{\u0022hate\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022self_harm\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022sexual\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022violence\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022}}}]}\n\n",
-        "data: {\u0022id\u0022:\u0022chatcmpl-8rF7gr3Uj6kK8Ku04UpWuooGWuvgq\u0022,\u0022object\u0022:\u0022chat.completion.chunk\u0022,\u0022created\u0022:1707700208,\u0022model\u0022:\u0022gpt-4-32k\u0022,\u0022choices\u0022:[{\u0022finish_reason\u0022:null,\u0022index\u0022:0,\u0022delta\u0022:{\u0022content\u0022:\u0022 file\u0022},\u0022content_filter_results\u0022:{\u0022hate\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022self_harm\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022sexual\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022violence\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022}}}]}\n\n",
-        "data: {\u0022id\u0022:\u0022chatcmpl-8rF7gr3Uj6kK8Ku04UpWuooGWuvgq\u0022,\u0022object\u0022:\u0022chat.completion.chunk\u0022,\u0022created\u0022:1707700208,\u0022model\u0022:\u0022gpt-4-32k\u0022,\u0022choices\u0022:[{\u0022finish_reason\u0022:null,\u0022index\u0022:0,\u0022delta\u0022:{\u0022content\u0022:\u0022:\\n\\n\u0022},\u0022content_filter_results\u0022:{\u0022hate\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022self_harm\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022sexual\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022violence\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022}}}]}\n\n",
-        "data: {\u0022id\u0022:\u0022chatcmpl-8rF7gr3Uj6kK8Ku04UpWuooGWuvgq\u0022,\u0022object\u0022:\u0022chat.completion.chunk\u0022,\u0022created\u0022:1707700208,\u0022model\u0022:\u0022gpt-4-32k\u0022,\u0022choices\u0022:[{\u0022finish_reason\u0022:null,\u0022index\u0022:0,\u0022delta\u0022:{\u0022content\u0022:\u0022-\u0022},\u0022content_filter_results\u0022:{\u0022hate\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022self_harm\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022sexual\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022violence\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022}}}]}\n\n",
-        "data: {\u0022id\u0022:\u0022chatcmpl-8rF7gr3Uj6kK8Ku04UpWuooGWuvgq\u0022,\u0022object\u0022:\u0022chat.completion.chunk\u0022,\u0022created\u0022:1707700208,\u0022model\u0022:\u0022gpt-4-32k\u0022,\u0022choices\u0022:[{\u0022finish_reason\u0022:null,\u0022index\u0022:0,\u0022delta\u0022:{\u0022content\u0022:\u0022 test\u0022},\u0022content_filter_results\u0022:{\u0022hate\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022self_harm\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022sexual\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022violence\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022}}}]}\n\n",
-        "data: {\u0022id\u0022:\u0022chatcmpl-8rF7gr3Uj6kK8Ku04UpWuooGWuvgq\u0022,\u0022object\u0022:\u0022chat.completion.chunk\u0022,\u0022created\u0022:1707700208,\u0022model\u0022:\u0022gpt-4-32k\u0022,\u0022choices\u0022:[{\u0022finish_reason\u0022:null,\u0022index\u0022:0,\u0022delta\u0022:{\u0022content\u0022:\u0022.txt\u0022},\u0022content_filter_results\u0022:{\u0022hate\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022self_harm\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022sexual\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022violence\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022}}}]}\n\n",
-        "data: {\u0022id\u0022:\u0022chatcmpl-8rF7gr3Uj6kK8Ku04UpWuooGWuvgq\u0022,\u0022object\u0022:\u0022chat.completion.chunk\u0022,\u0022created\u0022:1707700208,\u0022model\u0022:\u0022gpt-4-32k\u0022,\u0022choices\u0022:[{\u0022finish_reason\u0022:\u0022stop\u0022,\u0022index\u0022:0,\u0022delta\u0022:{},\u0022content_filter_results\u0022:{}}]}\n\n",
+        "data: {\u0022id\u0022:\u0022chatcmpl-8smsegq9o4mrlUgPrSO94xyb4GRdf\u0022,\u0022object\u0022:\u0022chat.completion.chunk\u0022,\u0022created\u0022:1708068300,\u0022model\u0022:\u0022gpt-4-32k\u0022,\u0022choices\u0022:[{\u0022finish_reason\u0022:null,\u0022index\u0022:0,\u0022delta\u0022:{\u0022role\u0022:\u0022assistant\u0022},\u0022content_filter_results\u0022:{}}]}\n\n",
+        "data: {\u0022id\u0022:\u0022chatcmpl-8smsegq9o4mrlUgPrSO94xyb4GRdf\u0022,\u0022object\u0022:\u0022chat.completion.chunk\u0022,\u0022created\u0022:1708068300,\u0022model\u0022:\u0022gpt-4-32k\u0022,\u0022choices\u0022:[{\u0022finish_reason\u0022:null,\u0022index\u0022:0,\u0022delta\u0022:{\u0022content\u0022:\u0022The\u0022},\u0022content_filter_results\u0022:{\u0022hate\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022self_harm\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022sexual\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022violence\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022}}}]}\n\n",
+        "data: {\u0022id\u0022:\u0022chatcmpl-8smsegq9o4mrlUgPrSO94xyb4GRdf\u0022,\u0022object\u0022:\u0022chat.completion.chunk\u0022,\u0022created\u0022:1708068300,\u0022model\u0022:\u0022gpt-4-32k\u0022,\u0022choices\u0022:[{\u0022finish_reason\u0022:null,\u0022index\u0022:0,\u0022delta\u0022:{\u0022content\u0022:\u0022 only\u0022},\u0022content_filter_results\u0022:{\u0022hate\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022self_harm\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022sexual\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022violence\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022}}}]}\n\n",
+        "data: {\u0022id\u0022:\u0022chatcmpl-8smsegq9o4mrlUgPrSO94xyb4GRdf\u0022,\u0022object\u0022:\u0022chat.completion.chunk\u0022,\u0022created\u0022:1708068300,\u0022model\u0022:\u0022gpt-4-32k\u0022,\u0022choices\u0022:[{\u0022finish_reason\u0022:null,\u0022index\u0022:0,\u0022delta\u0022:{\u0022content\u0022:\u0022 file\u0022},\u0022content_filter_results\u0022:{\u0022hate\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022self_harm\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022sexual\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022violence\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022}}}]}\n\n",
+        "data: {\u0022id\u0022:\u0022chatcmpl-8smsegq9o4mrlUgPrSO94xyb4GRdf\u0022,\u0022object\u0022:\u0022chat.completion.chunk\u0022,\u0022created\u0022:1708068300,\u0022model\u0022:\u0022gpt-4-32k\u0022,\u0022choices\u0022:[{\u0022finish_reason\u0022:null,\u0022index\u0022:0,\u0022delta\u0022:{\u0022content\u0022:\u0022 in\u0022},\u0022content_filter_results\u0022:{\u0022hate\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022self_harm\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022sexual\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022violence\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022}}}]}\n\n",
+        "data: {\u0022id\u0022:\u0022chatcmpl-8smsegq9o4mrlUgPrSO94xyb4GRdf\u0022,\u0022object\u0022:\u0022chat.completion.chunk\u0022,\u0022created\u0022:1708068300,\u0022model\u0022:\u0022gpt-4-32k\u0022,\u0022choices\u0022:[{\u0022finish_reason\u0022:null,\u0022index\u0022:0,\u0022delta\u0022:{\u0022content\u0022:\u0022 the\u0022},\u0022content_filter_results\u0022:{\u0022hate\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022self_harm\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022sexual\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022violence\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022}}}]}\n\n",
+        "data: {\u0022id\u0022:\u0022chatcmpl-8smsegq9o4mrlUgPrSO94xyb4GRdf\u0022,\u0022object\u0022:\u0022chat.completion.chunk\u0022,\u0022created\u0022:1708068300,\u0022model\u0022:\u0022gpt-4-32k\u0022,\u0022choices\u0022:[{\u0022finish_reason\u0022:null,\u0022index\u0022:0,\u0022delta\u0022:{\u0022content\u0022:\u0022 current\u0022},\u0022content_filter_results\u0022:{\u0022hate\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022self_harm\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022sexual\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022violence\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022}}}]}\n\n",
+        "data: {\u0022id\u0022:\u0022chatcmpl-8smsegq9o4mrlUgPrSO94xyb4GRdf\u0022,\u0022object\u0022:\u0022chat.completion.chunk\u0022,\u0022created\u0022:1708068300,\u0022model\u0022:\u0022gpt-4-32k\u0022,\u0022choices\u0022:[{\u0022finish_reason\u0022:null,\u0022index\u0022:0,\u0022delta\u0022:{\u0022content\u0022:\u0022 directory\u0022},\u0022content_filter_results\u0022:{\u0022hate\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022self_harm\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022sexual\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022violence\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022}}}]}\n\n",
+        "data: {\u0022id\u0022:\u0022chatcmpl-8smsegq9o4mrlUgPrSO94xyb4GRdf\u0022,\u0022object\u0022:\u0022chat.completion.chunk\u0022,\u0022created\u0022:1708068300,\u0022model\u0022:\u0022gpt-4-32k\u0022,\u0022choices\u0022:[{\u0022finish_reason\u0022:null,\u0022index\u0022:0,\u0022delta\u0022:{\u0022content\u0022:\u0022 is\u0022},\u0022content_filter_results\u0022:{\u0022hate\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022self_harm\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022sexual\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022violence\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022}}}]}\n\n",
+        "data: {\u0022id\u0022:\u0022chatcmpl-8smsegq9o4mrlUgPrSO94xyb4GRdf\u0022,\u0022object\u0022:\u0022chat.completion.chunk\u0022,\u0022created\u0022:1708068300,\u0022model\u0022:\u0022gpt-4-32k\u0022,\u0022choices\u0022:[{\u0022finish_reason\u0022:null,\u0022index\u0022:0,\u0022delta\u0022:{\u0022content\u0022:\u0022 \\\u0022\u0022},\u0022content_filter_results\u0022:{\u0022hate\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022self_harm\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022sexual\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022violence\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022}}}]}\n\n",
+        "data: {\u0022id\u0022:\u0022chatcmpl-8smsegq9o4mrlUgPrSO94xyb4GRdf\u0022,\u0022object\u0022:\u0022chat.completion.chunk\u0022,\u0022created\u0022:1708068300,\u0022model\u0022:\u0022gpt-4-32k\u0022,\u0022choices\u0022:[{\u0022finish_reason\u0022:null,\u0022index\u0022:0,\u0022delta\u0022:{\u0022content\u0022:\u0022test\u0022},\u0022content_filter_results\u0022:{\u0022hate\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022self_harm\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022sexual\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022violence\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022}}}]}\n\n",
+        "data: {\u0022id\u0022:\u0022chatcmpl-8smsegq9o4mrlUgPrSO94xyb4GRdf\u0022,\u0022object\u0022:\u0022chat.completion.chunk\u0022,\u0022created\u0022:1708068300,\u0022model\u0022:\u0022gpt-4-32k\u0022,\u0022choices\u0022:[{\u0022finish_reason\u0022:null,\u0022index\u0022:0,\u0022delta\u0022:{\u0022content\u0022:\u0022.txt\u0022},\u0022content_filter_results\u0022:{\u0022hate\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022self_harm\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022sexual\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022violence\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022}}}]}\n\n",
+        "data: {\u0022id\u0022:\u0022chatcmpl-8smsegq9o4mrlUgPrSO94xyb4GRdf\u0022,\u0022object\u0022:\u0022chat.completion.chunk\u0022,\u0022created\u0022:1708068300,\u0022model\u0022:\u0022gpt-4-32k\u0022,\u0022choices\u0022:[{\u0022finish_reason\u0022:null,\u0022index\u0022:0,\u0022delta\u0022:{\u0022content\u0022:\u0022\\\u0022.\u0022},\u0022content_filter_results\u0022:{\u0022hate\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022self_harm\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022sexual\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022violence\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022}}}]}\n\n",
+        "data: {\u0022id\u0022:\u0022chatcmpl-8smsegq9o4mrlUgPrSO94xyb4GRdf\u0022,\u0022object\u0022:\u0022chat.completion.chunk\u0022,\u0022created\u0022:1708068300,\u0022model\u0022:\u0022gpt-4-32k\u0022,\u0022choices\u0022:[{\u0022finish_reason\u0022:\u0022stop\u0022,\u0022index\u0022:0,\u0022delta\u0022:{},\u0022content_filter_results\u0022:{}}]}\n\n",
         "data: [DONE]\n\n"
       ]
     },
@@ -1871,12 +1873,12 @@
         "Accept": "application/json",
         "api-key": "00000000-0000-0000-0000-000000000000",
         "Connection": "close",
-        "Content-Length": "6451",
+        "Content-Length": "6440",
         "Content-Type": "application/json",
-        "User-Agent": "azsdk-net-AI.OpenAI/1.0.0-beta.12 (.NET 8.0.1; Microsoft Windows 10.0.22631)",
+        "User-Agent": "azsdk-net-AI.OpenAI/1.0.0-beta.13 (.NET 8.0.2; Microsoft Windows 10.0.22631)",
         "X-Forwarded-For": "127.0.0.1",
         "X-Forwarded-Proto": "https",
-        "x-ms-client-request-id": "0976aee5-4a3c-4bd0-b18e-ba7a0654f599",
+        "x-ms-client-request-id": "6087aa84-7e9e-477a-beca-83fcebbfca00",
         "x-ms-return-client-request-id": "true",
         "X-Real-IP": "127.0.0.1"
       },
@@ -1894,7 +1896,7 @@
             "content": "",
             "function_call": {
               "name": "CreateFileAndSaveText",
-              "arguments": "{\n\u0022fileName\u0022: \u0022test.txt\u0022,\n\u0022text\u0022: \u0022Hello, World!\u0022\n}"
+              "arguments": "{\n  \u0022fileName\u0022: \u0022test.txt\u0022,\n  \u0022text\u0022: \u0022Hello, World!\u0022\n}"
             },
             "role": "assistant"
           },
@@ -1904,7 +1906,7 @@
             "role": "function"
           },
           {
-            "content": "I have successfully created a file named \u0022test.txt\u0022 with the content: \u0022Hello, World!\u0022.",
+            "content": "I have created a file named \u0022test.txt\u0022 with the content \u0022Hello, World!\u0022.",
             "role": "assistant"
           },
           {
@@ -1925,7 +1927,7 @@
             "role": "function"
           },
           {
-            "content": "The current directory contains the following file:\n\n- test.txt",
+            "content": "The only file in the current directory is \u0022test.txt\u0022.",
             "role": "assistant"
           },
           {
@@ -2320,35 +2322,36 @@
       "StatusCode": 200,
       "ResponseHeaders": {
         "Access-Control-Allow-Origin": "*",
-        "apim-request-id": "12bc472d-3d78-4027-8c99-ddd1b99407e9",
-        "azureml-model-session": "d030-20240123055055",
+        "apim-request-id": "0b27c083-5de7-41cf-ab69-2326f6ffaa6a",
+        "azureml-model-session": "d033-20240123084552",
         "Cache-Control": "must-revalidate, no-cache",
         "Connection": "close",
         "Content-Type": "text/event-stream",
-        "Date": "Mon, 12 Feb 2024 01:10:10 GMT",
+        "Date": "Fri, 16 Feb 2024 07:25:01 GMT",
         "Strict-Transport-Security": "max-age=31536000; includeSubDomains; preload",
         "Transfer-Encoding": "chunked",
         "x-accel-buffering": "no",
         "X-Content-Type-Options": "nosniff",
-        "x-ms-client-request-id": "0976aee5-4a3c-4bd0-b18e-ba7a0654f599",
+        "x-ms-client-request-id": "6087aa84-7e9e-477a-beca-83fcebbfca00",
         "x-ms-region": "East US 2",
         "x-ratelimit-remaining-requests": "45",
-        "x-ratelimit-remaining-tokens": "49920",
-        "X-Request-ID": "da56421e-e3bb-4ee7-8b07-59f5fea91cfe"
+        "x-ratelimit-remaining-tokens": "49904",
+        "X-Request-ID": "8bd62cea-0767-4184-afd0-eb060c70b140"
       },
       "ResponseBody": [
         "data: {\u0022id\u0022:\u0022\u0022,\u0022object\u0022:\u0022\u0022,\u0022created\u0022:0,\u0022model\u0022:\u0022\u0022,\u0022prompt_filter_results\u0022:[{\u0022prompt_index\u0022:0,\u0022content_filter_results\u0022:{\u0022hate\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022self_harm\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022sexual\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022violence\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022}}}],\u0022choices\u0022:[]}\n\n",
-        "data: {\u0022id\u0022:\u0022chatcmpl-8rF7heVtrhjleky8wB2ToQqDA0CQ6\u0022,\u0022object\u0022:\u0022chat.completion.chunk\u0022,\u0022created\u0022:1707700209,\u0022model\u0022:\u0022gpt-4-32k\u0022,\u0022choices\u0022:[{\u0022finish_reason\u0022:null,\u0022index\u0022:0,\u0022delta\u0022:{\u0022role\u0022:\u0022assistant\u0022,\u0022function_call\u0022:{\u0022name\u0022:\u0022ReadTextFromFile\u0022}},\u0022content_filter_results\u0022:{}}]}\n\n",
-        "data: {\u0022id\u0022:\u0022chatcmpl-8rF7heVtrhjleky8wB2ToQqDA0CQ6\u0022,\u0022object\u0022:\u0022chat.completion.chunk\u0022,\u0022created\u0022:1707700209,\u0022model\u0022:\u0022gpt-4-32k\u0022,\u0022choices\u0022:[{\u0022finish_reason\u0022:null,\u0022index\u0022:0,\u0022delta\u0022:{\u0022function_call\u0022:{\u0022arguments\u0022:\u0022{\\n\u0022}},\u0022content_filter_results\u0022:{}}]}\n\n",
-        "data: {\u0022id\u0022:\u0022chatcmpl-8rF7heVtrhjleky8wB2ToQqDA0CQ6\u0022,\u0022object\u0022:\u0022chat.completion.chunk\u0022,\u0022created\u0022:1707700209,\u0022model\u0022:\u0022gpt-4-32k\u0022,\u0022choices\u0022:[{\u0022finish_reason\u0022:null,\u0022index\u0022:0,\u0022delta\u0022:{\u0022function_call\u0022:{\u0022arguments\u0022:\u0022\\\u0022\u0022}},\u0022content_filter_results\u0022:{}}]}\n\n",
-        "data: {\u0022id\u0022:\u0022chatcmpl-8rF7heVtrhjleky8wB2ToQqDA0CQ6\u0022,\u0022object\u0022:\u0022chat.completion.chunk\u0022,\u0022created\u0022:1707700209,\u0022model\u0022:\u0022gpt-4-32k\u0022,\u0022choices\u0022:[{\u0022finish_reason\u0022:null,\u0022index\u0022:0,\u0022delta\u0022:{\u0022function_call\u0022:{\u0022arguments\u0022:\u0022fileName\u0022}},\u0022content_filter_results\u0022:{}}]}\n\n",
-        "data: {\u0022id\u0022:\u0022chatcmpl-8rF7heVtrhjleky8wB2ToQqDA0CQ6\u0022,\u0022object\u0022:\u0022chat.completion.chunk\u0022,\u0022created\u0022:1707700209,\u0022model\u0022:\u0022gpt-4-32k\u0022,\u0022choices\u0022:[{\u0022finish_reason\u0022:null,\u0022index\u0022:0,\u0022delta\u0022:{\u0022function_call\u0022:{\u0022arguments\u0022:\u0022\\\u0022:\u0022}},\u0022content_filter_results\u0022:{}}]}\n\n",
-        "data: {\u0022id\u0022:\u0022chatcmpl-8rF7heVtrhjleky8wB2ToQqDA0CQ6\u0022,\u0022object\u0022:\u0022chat.completion.chunk\u0022,\u0022created\u0022:1707700209,\u0022model\u0022:\u0022gpt-4-32k\u0022,\u0022choices\u0022:[{\u0022finish_reason\u0022:null,\u0022index\u0022:0,\u0022delta\u0022:{\u0022function_call\u0022:{\u0022arguments\u0022:\u0022 \\\u0022\u0022}},\u0022content_filter_results\u0022:{}}]}\n\n",
-        "data: {\u0022id\u0022:\u0022chatcmpl-8rF7heVtrhjleky8wB2ToQqDA0CQ6\u0022,\u0022object\u0022:\u0022chat.completion.chunk\u0022,\u0022created\u0022:1707700209,\u0022model\u0022:\u0022gpt-4-32k\u0022,\u0022choices\u0022:[{\u0022finish_reason\u0022:null,\u0022index\u0022:0,\u0022delta\u0022:{\u0022function_call\u0022:{\u0022arguments\u0022:\u0022test\u0022}},\u0022content_filter_results\u0022:{}}]}\n\n",
-        "data: {\u0022id\u0022:\u0022chatcmpl-8rF7heVtrhjleky8wB2ToQqDA0CQ6\u0022,\u0022object\u0022:\u0022chat.completion.chunk\u0022,\u0022created\u0022:1707700209,\u0022model\u0022:\u0022gpt-4-32k\u0022,\u0022choices\u0022:[{\u0022finish_reason\u0022:null,\u0022index\u0022:0,\u0022delta\u0022:{\u0022function_call\u0022:{\u0022arguments\u0022:\u0022.txt\u0022}},\u0022content_filter_results\u0022:{}}]}\n\n",
-        "data: {\u0022id\u0022:\u0022chatcmpl-8rF7heVtrhjleky8wB2ToQqDA0CQ6\u0022,\u0022object\u0022:\u0022chat.completion.chunk\u0022,\u0022created\u0022:1707700209,\u0022model\u0022:\u0022gpt-4-32k\u0022,\u0022choices\u0022:[{\u0022finish_reason\u0022:null,\u0022index\u0022:0,\u0022delta\u0022:{\u0022function_call\u0022:{\u0022arguments\u0022:\u0022\\\u0022\\n\u0022}},\u0022content_filter_results\u0022:{}}]}\n\n",
-        "data: {\u0022id\u0022:\u0022chatcmpl-8rF7heVtrhjleky8wB2ToQqDA0CQ6\u0022,\u0022object\u0022:\u0022chat.completion.chunk\u0022,\u0022created\u0022:1707700209,\u0022model\u0022:\u0022gpt-4-32k\u0022,\u0022choices\u0022:[{\u0022finish_reason\u0022:null,\u0022index\u0022:0,\u0022delta\u0022:{\u0022function_call\u0022:{\u0022arguments\u0022:\u0022}\u0022}},\u0022content_filter_results\u0022:{}}]}\n\n",
-        "data: {\u0022id\u0022:\u0022chatcmpl-8rF7heVtrhjleky8wB2ToQqDA0CQ6\u0022,\u0022object\u0022:\u0022chat.completion.chunk\u0022,\u0022created\u0022:1707700209,\u0022model\u0022:\u0022gpt-4-32k\u0022,\u0022choices\u0022:[{\u0022finish_reason\u0022:\u0022function_call\u0022,\u0022index\u0022:0,\u0022delta\u0022:{},\u0022content_filter_results\u0022:{}}]}\n\n",
+        "data: {\u0022id\u0022:\u0022chatcmpl-8smsfgnG6D1BfPzDoIj3HHrCuKeZY\u0022,\u0022object\u0022:\u0022chat.completion.chunk\u0022,\u0022created\u0022:1708068301,\u0022model\u0022:\u0022gpt-4-32k\u0022,\u0022choices\u0022:[{\u0022finish_reason\u0022:null,\u0022index\u0022:0,\u0022delta\u0022:{\u0022role\u0022:\u0022assistant\u0022,\u0022function_call\u0022:{\u0022name\u0022:\u0022ReadTextFromFile\u0022}},\u0022content_filter_results\u0022:{}}]}\n\n",
+        "data: {\u0022id\u0022:\u0022chatcmpl-8smsfgnG6D1BfPzDoIj3HHrCuKeZY\u0022,\u0022object\u0022:\u0022chat.completion.chunk\u0022,\u0022created\u0022:1708068301,\u0022model\u0022:\u0022gpt-4-32k\u0022,\u0022choices\u0022:[{\u0022finish_reason\u0022:null,\u0022index\u0022:0,\u0022delta\u0022:{\u0022function_call\u0022:{\u0022arguments\u0022:\u0022{\\n\u0022}},\u0022content_filter_results\u0022:{}}]}\n\n",
+        "data: {\u0022id\u0022:\u0022chatcmpl-8smsfgnG6D1BfPzDoIj3HHrCuKeZY\u0022,\u0022object\u0022:\u0022chat.completion.chunk\u0022,\u0022created\u0022:1708068301,\u0022model\u0022:\u0022gpt-4-32k\u0022,\u0022choices\u0022:[{\u0022finish_reason\u0022:null,\u0022index\u0022:0,\u0022delta\u0022:{\u0022function_call\u0022:{\u0022arguments\u0022:\u0022 \u0022}},\u0022content_filter_results\u0022:{}}]}\n\n",
+        "data: {\u0022id\u0022:\u0022chatcmpl-8smsfgnG6D1BfPzDoIj3HHrCuKeZY\u0022,\u0022object\u0022:\u0022chat.completion.chunk\u0022,\u0022created\u0022:1708068301,\u0022model\u0022:\u0022gpt-4-32k\u0022,\u0022choices\u0022:[{\u0022finish_reason\u0022:null,\u0022index\u0022:0,\u0022delta\u0022:{\u0022function_call\u0022:{\u0022arguments\u0022:\u0022 \\\u0022\u0022}},\u0022content_filter_results\u0022:{}}]}\n\n",
+        "data: {\u0022id\u0022:\u0022chatcmpl-8smsfgnG6D1BfPzDoIj3HHrCuKeZY\u0022,\u0022object\u0022:\u0022chat.completion.chunk\u0022,\u0022created\u0022:1708068301,\u0022model\u0022:\u0022gpt-4-32k\u0022,\u0022choices\u0022:[{\u0022finish_reason\u0022:null,\u0022index\u0022:0,\u0022delta\u0022:{\u0022function_call\u0022:{\u0022arguments\u0022:\u0022fileName\u0022}},\u0022content_filter_results\u0022:{}}]}\n\n",
+        "data: {\u0022id\u0022:\u0022chatcmpl-8smsfgnG6D1BfPzDoIj3HHrCuKeZY\u0022,\u0022object\u0022:\u0022chat.completion.chunk\u0022,\u0022created\u0022:1708068301,\u0022model\u0022:\u0022gpt-4-32k\u0022,\u0022choices\u0022:[{\u0022finish_reason\u0022:null,\u0022index\u0022:0,\u0022delta\u0022:{\u0022function_call\u0022:{\u0022arguments\u0022:\u0022\\\u0022:\u0022}},\u0022content_filter_results\u0022:{}}]}\n\n",
+        "data: {\u0022id\u0022:\u0022chatcmpl-8smsfgnG6D1BfPzDoIj3HHrCuKeZY\u0022,\u0022object\u0022:\u0022chat.completion.chunk\u0022,\u0022created\u0022:1708068301,\u0022model\u0022:\u0022gpt-4-32k\u0022,\u0022choices\u0022:[{\u0022finish_reason\u0022:null,\u0022index\u0022:0,\u0022delta\u0022:{\u0022function_call\u0022:{\u0022arguments\u0022:\u0022 \\\u0022\u0022}},\u0022content_filter_results\u0022:{}}]}\n\n",
+        "data: {\u0022id\u0022:\u0022chatcmpl-8smsfgnG6D1BfPzDoIj3HHrCuKeZY\u0022,\u0022object\u0022:\u0022chat.completion.chunk\u0022,\u0022created\u0022:1708068301,\u0022model\u0022:\u0022gpt-4-32k\u0022,\u0022choices\u0022:[{\u0022finish_reason\u0022:null,\u0022index\u0022:0,\u0022delta\u0022:{\u0022function_call\u0022:{\u0022arguments\u0022:\u0022test\u0022}},\u0022content_filter_results\u0022:{}}]}\n\n",
+        "data: {\u0022id\u0022:\u0022chatcmpl-8smsfgnG6D1BfPzDoIj3HHrCuKeZY\u0022,\u0022object\u0022:\u0022chat.completion.chunk\u0022,\u0022created\u0022:1708068301,\u0022model\u0022:\u0022gpt-4-32k\u0022,\u0022choices\u0022:[{\u0022finish_reason\u0022:null,\u0022index\u0022:0,\u0022delta\u0022:{\u0022function_call\u0022:{\u0022arguments\u0022:\u0022.txt\u0022}},\u0022content_filter_results\u0022:{}}]}\n\n",
+        "data: {\u0022id\u0022:\u0022chatcmpl-8smsfgnG6D1BfPzDoIj3HHrCuKeZY\u0022,\u0022object\u0022:\u0022chat.completion.chunk\u0022,\u0022created\u0022:1708068301,\u0022model\u0022:\u0022gpt-4-32k\u0022,\u0022choices\u0022:[{\u0022finish_reason\u0022:null,\u0022index\u0022:0,\u0022delta\u0022:{\u0022function_call\u0022:{\u0022arguments\u0022:\u0022\\\u0022\\n\u0022}},\u0022content_filter_results\u0022:{}}]}\n\n",
+        "data: {\u0022id\u0022:\u0022chatcmpl-8smsfgnG6D1BfPzDoIj3HHrCuKeZY\u0022,\u0022object\u0022:\u0022chat.completion.chunk\u0022,\u0022created\u0022:1708068301,\u0022model\u0022:\u0022gpt-4-32k\u0022,\u0022choices\u0022:[{\u0022finish_reason\u0022:null,\u0022index\u0022:0,\u0022delta\u0022:{\u0022function_call\u0022:{\u0022arguments\u0022:\u0022}\u0022}},\u0022content_filter_results\u0022:{}}]}\n\n",
+        "data: {\u0022id\u0022:\u0022chatcmpl-8smsfgnG6D1BfPzDoIj3HHrCuKeZY\u0022,\u0022object\u0022:\u0022chat.completion.chunk\u0022,\u0022created\u0022:1708068301,\u0022model\u0022:\u0022gpt-4-32k\u0022,\u0022choices\u0022:[{\u0022finish_reason\u0022:\u0022function_call\u0022,\u0022index\u0022:0,\u0022delta\u0022:{},\u0022content_filter_results\u0022:{}}]}\n\n",
         "data: [DONE]\n\n"
       ]
     },
@@ -2359,12 +2362,12 @@
         "Accept": "application/json",
         "api-key": "00000000-0000-0000-0000-000000000000",
         "Connection": "close",
-        "Content-Length": "6664",
+        "Content-Length": "6655",
         "Content-Type": "application/json",
-        "User-Agent": "azsdk-net-AI.OpenAI/1.0.0-beta.12 (.NET 8.0.1; Microsoft Windows 10.0.22631)",
+        "User-Agent": "azsdk-net-AI.OpenAI/1.0.0-beta.13 (.NET 8.0.2; Microsoft Windows 10.0.22631)",
         "X-Forwarded-For": "127.0.0.1",
         "X-Forwarded-Proto": "https",
-        "x-ms-client-request-id": "ae086017-8c1a-4c2c-a282-9842542f75f0",
+        "x-ms-client-request-id": "175259e2-c460-42de-b360-2d0b49bb31d8",
         "x-ms-return-client-request-id": "true",
         "X-Real-IP": "127.0.0.1"
       },
@@ -2382,7 +2385,7 @@
             "content": "",
             "function_call": {
               "name": "CreateFileAndSaveText",
-              "arguments": "{\n\u0022fileName\u0022: \u0022test.txt\u0022,\n\u0022text\u0022: \u0022Hello, World!\u0022\n}"
+              "arguments": "{\n  \u0022fileName\u0022: \u0022test.txt\u0022,\n  \u0022text\u0022: \u0022Hello, World!\u0022\n}"
             },
             "role": "assistant"
           },
@@ -2392,7 +2395,7 @@
             "role": "function"
           },
           {
-            "content": "I have successfully created a file named \u0022test.txt\u0022 with the content: \u0022Hello, World!\u0022.",
+            "content": "I have created a file named \u0022test.txt\u0022 with the content \u0022Hello, World!\u0022.",
             "role": "assistant"
           },
           {
@@ -2413,7 +2416,7 @@
             "role": "function"
           },
           {
-            "content": "The current directory contains the following file:\n\n- test.txt",
+            "content": "The only file in the current directory is \u0022test.txt\u0022.",
             "role": "assistant"
           },
           {
@@ -2424,7 +2427,7 @@
             "content": "",
             "function_call": {
               "name": "ReadTextFromFile",
-              "arguments": "{\n\u0022fileName\u0022: \u0022test.txt\u0022\n}"
+              "arguments": "{\n  \u0022fileName\u0022: \u0022test.txt\u0022\n}"
             },
             "role": "assistant"
           },
@@ -2821,42 +2824,41 @@
       "StatusCode": 200,
       "ResponseHeaders": {
         "Access-Control-Allow-Origin": "*",
-        "apim-request-id": "5aae612f-a2d7-44ba-8a11-56711cea21dd",
-        "azureml-model-session": "d026-20240123015022",
+        "apim-request-id": "f464ea1a-136e-4fef-9d91-d4aaf4c2e6de",
+        "azureml-model-session": "d029-20240123045238",
         "Cache-Control": "must-revalidate, no-cache",
         "Connection": "close",
         "Content-Type": "text/event-stream",
-        "Date": "Mon, 12 Feb 2024 01:10:10 GMT",
+        "Date": "Fri, 16 Feb 2024 07:25:04 GMT",
         "Strict-Transport-Security": "max-age=31536000; includeSubDomains; preload",
         "Transfer-Encoding": "chunked",
         "x-accel-buffering": "no",
         "X-Content-Type-Options": "nosniff",
-        "x-ms-client-request-id": "ae086017-8c1a-4c2c-a282-9842542f75f0",
+        "x-ms-client-request-id": "175259e2-c460-42de-b360-2d0b49bb31d8",
         "x-ms-region": "East US 2",
         "x-ratelimit-remaining-requests": "44",
-        "x-ratelimit-remaining-tokens": "49904",
-        "X-Request-ID": "dceef7f6-2edb-426e-9000-42069f524faf"
+        "x-ratelimit-remaining-tokens": "49888",
+        "X-Request-ID": "e2bb4666-f74c-451d-ab21-6a11f45343f1"
       },
       "ResponseBody": [
         "data: {\u0022id\u0022:\u0022\u0022,\u0022object\u0022:\u0022\u0022,\u0022created\u0022:0,\u0022model\u0022:\u0022\u0022,\u0022prompt_filter_results\u0022:[{\u0022prompt_index\u0022:0,\u0022content_filter_results\u0022:{\u0022hate\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022self_harm\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022sexual\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022violence\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022}}}],\u0022choices\u0022:[]}\n\n",
-        "data: {\u0022id\u0022:\u0022chatcmpl-8rF7irTTyHsTrK6ysgGp6qcar2pt2\u0022,\u0022object\u0022:\u0022chat.completion.chunk\u0022,\u0022created\u0022:1707700210,\u0022model\u0022:\u0022gpt-4-32k\u0022,\u0022choices\u0022:[{\u0022finish_reason\u0022:null,\u0022index\u0022:0,\u0022delta\u0022:{\u0022role\u0022:\u0022assistant\u0022},\u0022content_filter_results\u0022:{}}]}\n\n",
-        "data: {\u0022id\u0022:\u0022chatcmpl-8rF7irTTyHsTrK6ysgGp6qcar2pt2\u0022,\u0022object\u0022:\u0022chat.completion.chunk\u0022,\u0022created\u0022:1707700210,\u0022model\u0022:\u0022gpt-4-32k\u0022,\u0022choices\u0022:[{\u0022finish_reason\u0022:null,\u0022index\u0022:0,\u0022delta\u0022:{\u0022content\u0022:\u0022The\u0022},\u0022content_filter_results\u0022:{\u0022hate\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022self_harm\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022sexual\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022violence\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022}}}]}\n\n",
-        "data: {\u0022id\u0022:\u0022chatcmpl-8rF7irTTyHsTrK6ysgGp6qcar2pt2\u0022,\u0022object\u0022:\u0022chat.completion.chunk\u0022,\u0022created\u0022:1707700210,\u0022model\u0022:\u0022gpt-4-32k\u0022,\u0022choices\u0022:[{\u0022finish_reason\u0022:null,\u0022index\u0022:0,\u0022delta\u0022:{\u0022content\u0022:\u0022 content\u0022},\u0022content_filter_results\u0022:{\u0022hate\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022self_harm\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022sexual\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022violence\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022}}}]}\n\n",
-        "data: {\u0022id\u0022:\u0022chatcmpl-8rF7irTTyHsTrK6ysgGp6qcar2pt2\u0022,\u0022object\u0022:\u0022chat.completion.chunk\u0022,\u0022created\u0022:1707700210,\u0022model\u0022:\u0022gpt-4-32k\u0022,\u0022choices\u0022:[{\u0022finish_reason\u0022:null,\u0022index\u0022:0,\u0022delta\u0022:{\u0022content\u0022:\u0022 of\u0022},\u0022content_filter_results\u0022:{\u0022hate\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022self_harm\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022sexual\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022violence\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022}}}]}\n\n",
-        "data: {\u0022id\u0022:\u0022chatcmpl-8rF7irTTyHsTrK6ysgGp6qcar2pt2\u0022,\u0022object\u0022:\u0022chat.completion.chunk\u0022,\u0022created\u0022:1707700210,\u0022model\u0022:\u0022gpt-4-32k\u0022,\u0022choices\u0022:[{\u0022finish_reason\u0022:null,\u0022index\u0022:0,\u0022delta\u0022:{\u0022content\u0022:\u0022 the\u0022},\u0022content_filter_results\u0022:{\u0022hate\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022self_harm\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022sexual\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022violence\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022}}}]}\n\n",
-        "data: {\u0022id\u0022:\u0022chatcmpl-8rF7irTTyHsTrK6ysgGp6qcar2pt2\u0022,\u0022object\u0022:\u0022chat.completion.chunk\u0022,\u0022created\u0022:1707700210,\u0022model\u0022:\u0022gpt-4-32k\u0022,\u0022choices\u0022:[{\u0022finish_reason\u0022:null,\u0022index\u0022:0,\u0022delta\u0022:{\u0022content\u0022:\u0022 file\u0022},\u0022content_filter_results\u0022:{\u0022hate\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022self_harm\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022sexual\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022violence\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022}}}]}\n\n",
-        "data: {\u0022id\u0022:\u0022chatcmpl-8rF7irTTyHsTrK6ysgGp6qcar2pt2\u0022,\u0022object\u0022:\u0022chat.completion.chunk\u0022,\u0022created\u0022:1707700210,\u0022model\u0022:\u0022gpt-4-32k\u0022,\u0022choices\u0022:[{\u0022finish_reason\u0022:null,\u0022index\u0022:0,\u0022delta\u0022:{\u0022content\u0022:\u0022 \\\u0022\u0022},\u0022content_filter_results\u0022:{\u0022hate\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022self_harm\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022sexual\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022violence\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022}}}]}\n\n",
-        "data: {\u0022id\u0022:\u0022chatcmpl-8rF7irTTyHsTrK6ysgGp6qcar2pt2\u0022,\u0022object\u0022:\u0022chat.completion.chunk\u0022,\u0022created\u0022:1707700210,\u0022model\u0022:\u0022gpt-4-32k\u0022,\u0022choices\u0022:[{\u0022finish_reason\u0022:null,\u0022index\u0022:0,\u0022delta\u0022:{\u0022content\u0022:\u0022test\u0022},\u0022content_filter_results\u0022:{\u0022hate\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022self_harm\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022sexual\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022violence\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022}}}]}\n\n",
-        "data: {\u0022id\u0022:\u0022chatcmpl-8rF7irTTyHsTrK6ysgGp6qcar2pt2\u0022,\u0022object\u0022:\u0022chat.completion.chunk\u0022,\u0022created\u0022:1707700210,\u0022model\u0022:\u0022gpt-4-32k\u0022,\u0022choices\u0022:[{\u0022finish_reason\u0022:null,\u0022index\u0022:0,\u0022delta\u0022:{\u0022content\u0022:\u0022.txt\u0022},\u0022content_filter_results\u0022:{\u0022hate\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022self_harm\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022sexual\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022violence\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022}}}]}\n\n",
-        "data: {\u0022id\u0022:\u0022chatcmpl-8rF7irTTyHsTrK6ysgGp6qcar2pt2\u0022,\u0022object\u0022:\u0022chat.completion.chunk\u0022,\u0022created\u0022:1707700210,\u0022model\u0022:\u0022gpt-4-32k\u0022,\u0022choices\u0022:[{\u0022finish_reason\u0022:null,\u0022index\u0022:0,\u0022delta\u0022:{\u0022content\u0022:\u0022\\\u0022\u0022},\u0022content_filter_results\u0022:{\u0022hate\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022self_harm\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022sexual\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022violence\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022}}}]}\n\n",
-        "data: {\u0022id\u0022:\u0022chatcmpl-8rF7irTTyHsTrK6ysgGp6qcar2pt2\u0022,\u0022object\u0022:\u0022chat.completion.chunk\u0022,\u0022created\u0022:1707700210,\u0022model\u0022:\u0022gpt-4-32k\u0022,\u0022choices\u0022:[{\u0022finish_reason\u0022:null,\u0022index\u0022:0,\u0022delta\u0022:{\u0022content\u0022:\u0022 is\u0022},\u0022content_filter_results\u0022:{\u0022hate\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022self_harm\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022sexual\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022violence\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022}}}]}\n\n",
-        "data: {\u0022id\u0022:\u0022chatcmpl-8rF7irTTyHsTrK6ysgGp6qcar2pt2\u0022,\u0022object\u0022:\u0022chat.completion.chunk\u0022,\u0022created\u0022:1707700210,\u0022model\u0022:\u0022gpt-4-32k\u0022,\u0022choices\u0022:[{\u0022finish_reason\u0022:null,\u0022index\u0022:0,\u0022delta\u0022:{\u0022content\u0022:\u0022:\\n\\n\u0022},\u0022content_filter_results\u0022:{\u0022hate\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022self_harm\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022sexual\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022violence\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022}}}]}\n\n",
-        "data: {\u0022id\u0022:\u0022chatcmpl-8rF7irTTyHsTrK6ysgGp6qcar2pt2\u0022,\u0022object\u0022:\u0022chat.completion.chunk\u0022,\u0022created\u0022:1707700210,\u0022model\u0022:\u0022gpt-4-32k\u0022,\u0022choices\u0022:[{\u0022finish_reason\u0022:null,\u0022index\u0022:0,\u0022delta\u0022:{\u0022content\u0022:\u0022\\\u0022\u0022},\u0022content_filter_results\u0022:{\u0022hate\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022self_harm\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022sexual\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022violence\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022}}}]}\n\n",
-        "data: {\u0022id\u0022:\u0022chatcmpl-8rF7irTTyHsTrK6ysgGp6qcar2pt2\u0022,\u0022object\u0022:\u0022chat.completion.chunk\u0022,\u0022created\u0022:1707700210,\u0022model\u0022:\u0022gpt-4-32k\u0022,\u0022choices\u0022:[{\u0022finish_reason\u0022:null,\u0022index\u0022:0,\u0022delta\u0022:{\u0022content\u0022:\u0022Hello\u0022},\u0022content_filter_results\u0022:{\u0022hate\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022self_harm\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022sexual\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022violence\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022}}}]}\n\n",
-        "data: {\u0022id\u0022:\u0022chatcmpl-8rF7irTTyHsTrK6ysgGp6qcar2pt2\u0022,\u0022object\u0022:\u0022chat.completion.chunk\u0022,\u0022created\u0022:1707700210,\u0022model\u0022:\u0022gpt-4-32k\u0022,\u0022choices\u0022:[{\u0022finish_reason\u0022:null,\u0022index\u0022:0,\u0022delta\u0022:{\u0022content\u0022:\u0022,\u0022},\u0022content_filter_results\u0022:{\u0022hate\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022self_harm\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022sexual\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022violence\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022}}}]}\n\n",
-        "data: {\u0022id\u0022:\u0022chatcmpl-8rF7irTTyHsTrK6ysgGp6qcar2pt2\u0022,\u0022object\u0022:\u0022chat.completion.chunk\u0022,\u0022created\u0022:1707700210,\u0022model\u0022:\u0022gpt-4-32k\u0022,\u0022choices\u0022:[{\u0022finish_reason\u0022:null,\u0022index\u0022:0,\u0022delta\u0022:{\u0022content\u0022:\u0022 World\u0022},\u0022content_filter_results\u0022:{\u0022hate\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022self_harm\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022sexual\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022violence\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022}}}]}\n\n",
-        "data: {\u0022id\u0022:\u0022chatcmpl-8rF7irTTyHsTrK6ysgGp6qcar2pt2\u0022,\u0022object\u0022:\u0022chat.completion.chunk\u0022,\u0022created\u0022:1707700210,\u0022model\u0022:\u0022gpt-4-32k\u0022,\u0022choices\u0022:[{\u0022finish_reason\u0022:null,\u0022index\u0022:0,\u0022delta\u0022:{\u0022content\u0022:\u0022!\\\u0022\u0022},\u0022content_filter_results\u0022:{\u0022hate\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022self_harm\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022sexual\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022violence\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022}}}]}\n\n",
-        "data: {\u0022id\u0022:\u0022chatcmpl-8rF7irTTyHsTrK6ysgGp6qcar2pt2\u0022,\u0022object\u0022:\u0022chat.completion.chunk\u0022,\u0022created\u0022:1707700210,\u0022model\u0022:\u0022gpt-4-32k\u0022,\u0022choices\u0022:[{\u0022finish_reason\u0022:\u0022stop\u0022,\u0022index\u0022:0,\u0022delta\u0022:{},\u0022content_filter_results\u0022:{}}]}\n\n",
+        "data: {\u0022id\u0022:\u0022chatcmpl-8smshKWJdtKLboay3Ey5fBpJcGaDd\u0022,\u0022object\u0022:\u0022chat.completion.chunk\u0022,\u0022created\u0022:1708068303,\u0022model\u0022:\u0022gpt-4-32k\u0022,\u0022choices\u0022:[{\u0022finish_reason\u0022:null,\u0022index\u0022:0,\u0022delta\u0022:{\u0022role\u0022:\u0022assistant\u0022},\u0022content_filter_results\u0022:{}}]}\n\n",
+        "data: {\u0022id\u0022:\u0022chatcmpl-8smshKWJdtKLboay3Ey5fBpJcGaDd\u0022,\u0022object\u0022:\u0022chat.completion.chunk\u0022,\u0022created\u0022:1708068303,\u0022model\u0022:\u0022gpt-4-32k\u0022,\u0022choices\u0022:[{\u0022finish_reason\u0022:null,\u0022index\u0022:0,\u0022delta\u0022:{\u0022content\u0022:\u0022The\u0022},\u0022content_filter_results\u0022:{\u0022hate\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022self_harm\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022sexual\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022violence\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022}}}]}\n\n",
+        "data: {\u0022id\u0022:\u0022chatcmpl-8smshKWJdtKLboay3Ey5fBpJcGaDd\u0022,\u0022object\u0022:\u0022chat.completion.chunk\u0022,\u0022created\u0022:1708068303,\u0022model\u0022:\u0022gpt-4-32k\u0022,\u0022choices\u0022:[{\u0022finish_reason\u0022:null,\u0022index\u0022:0,\u0022delta\u0022:{\u0022content\u0022:\u0022 content\u0022},\u0022content_filter_results\u0022:{\u0022hate\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022self_harm\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022sexual\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022violence\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022}}}]}\n\n",
+        "data: {\u0022id\u0022:\u0022chatcmpl-8smshKWJdtKLboay3Ey5fBpJcGaDd\u0022,\u0022object\u0022:\u0022chat.completion.chunk\u0022,\u0022created\u0022:1708068303,\u0022model\u0022:\u0022gpt-4-32k\u0022,\u0022choices\u0022:[{\u0022finish_reason\u0022:null,\u0022index\u0022:0,\u0022delta\u0022:{\u0022content\u0022:\u0022 of\u0022},\u0022content_filter_results\u0022:{\u0022hate\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022self_harm\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022sexual\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022violence\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022}}}]}\n\n",
+        "data: {\u0022id\u0022:\u0022chatcmpl-8smshKWJdtKLboay3Ey5fBpJcGaDd\u0022,\u0022object\u0022:\u0022chat.completion.chunk\u0022,\u0022created\u0022:1708068303,\u0022model\u0022:\u0022gpt-4-32k\u0022,\u0022choices\u0022:[{\u0022finish_reason\u0022:null,\u0022index\u0022:0,\u0022delta\u0022:{\u0022content\u0022:\u0022 the\u0022},\u0022content_filter_results\u0022:{\u0022hate\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022self_harm\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022sexual\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022violence\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022}}}]}\n\n",
+        "data: {\u0022id\u0022:\u0022chatcmpl-8smshKWJdtKLboay3Ey5fBpJcGaDd\u0022,\u0022object\u0022:\u0022chat.completion.chunk\u0022,\u0022created\u0022:1708068303,\u0022model\u0022:\u0022gpt-4-32k\u0022,\u0022choices\u0022:[{\u0022finish_reason\u0022:null,\u0022index\u0022:0,\u0022delta\u0022:{\u0022content\u0022:\u0022 file\u0022},\u0022content_filter_results\u0022:{\u0022hate\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022self_harm\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022sexual\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022violence\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022}}}]}\n\n",
+        "data: {\u0022id\u0022:\u0022chatcmpl-8smshKWJdtKLboay3Ey5fBpJcGaDd\u0022,\u0022object\u0022:\u0022chat.completion.chunk\u0022,\u0022created\u0022:1708068303,\u0022model\u0022:\u0022gpt-4-32k\u0022,\u0022choices\u0022:[{\u0022finish_reason\u0022:null,\u0022index\u0022:0,\u0022delta\u0022:{\u0022content\u0022:\u0022 \\\u0022\u0022},\u0022content_filter_results\u0022:{\u0022hate\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022self_harm\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022sexual\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022violence\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022}}}]}\n\n",
+        "data: {\u0022id\u0022:\u0022chatcmpl-8smshKWJdtKLboay3Ey5fBpJcGaDd\u0022,\u0022object\u0022:\u0022chat.completion.chunk\u0022,\u0022created\u0022:1708068303,\u0022model\u0022:\u0022gpt-4-32k\u0022,\u0022choices\u0022:[{\u0022finish_reason\u0022:null,\u0022index\u0022:0,\u0022delta\u0022:{\u0022content\u0022:\u0022test\u0022},\u0022content_filter_results\u0022:{\u0022hate\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022self_harm\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022sexual\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022violence\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022}}}]}\n\n",
+        "data: {\u0022id\u0022:\u0022chatcmpl-8smshKWJdtKLboay3Ey5fBpJcGaDd\u0022,\u0022object\u0022:\u0022chat.completion.chunk\u0022,\u0022created\u0022:1708068303,\u0022model\u0022:\u0022gpt-4-32k\u0022,\u0022choices\u0022:[{\u0022finish_reason\u0022:null,\u0022index\u0022:0,\u0022delta\u0022:{\u0022content\u0022:\u0022.txt\u0022},\u0022content_filter_results\u0022:{\u0022hate\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022self_harm\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022sexual\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022violence\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022}}}]}\n\n",
+        "data: {\u0022id\u0022:\u0022chatcmpl-8smshKWJdtKLboay3Ey5fBpJcGaDd\u0022,\u0022object\u0022:\u0022chat.completion.chunk\u0022,\u0022created\u0022:1708068303,\u0022model\u0022:\u0022gpt-4-32k\u0022,\u0022choices\u0022:[{\u0022finish_reason\u0022:null,\u0022index\u0022:0,\u0022delta\u0022:{\u0022content\u0022:\u0022\\\u0022\u0022},\u0022content_filter_results\u0022:{\u0022hate\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022self_harm\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022sexual\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022violence\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022}}}]}\n\n",
+        "data: {\u0022id\u0022:\u0022chatcmpl-8smshKWJdtKLboay3Ey5fBpJcGaDd\u0022,\u0022object\u0022:\u0022chat.completion.chunk\u0022,\u0022created\u0022:1708068303,\u0022model\u0022:\u0022gpt-4-32k\u0022,\u0022choices\u0022:[{\u0022finish_reason\u0022:null,\u0022index\u0022:0,\u0022delta\u0022:{\u0022content\u0022:\u0022 is\u0022},\u0022content_filter_results\u0022:{\u0022hate\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022self_harm\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022sexual\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022violence\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022}}}]}\n\n",
+        "data: {\u0022id\u0022:\u0022chatcmpl-8smshKWJdtKLboay3Ey5fBpJcGaDd\u0022,\u0022object\u0022:\u0022chat.completion.chunk\u0022,\u0022created\u0022:1708068303,\u0022model\u0022:\u0022gpt-4-32k\u0022,\u0022choices\u0022:[{\u0022finish_reason\u0022:null,\u0022index\u0022:0,\u0022delta\u0022:{\u0022content\u0022:\u0022 \\\u0022\u0022},\u0022content_filter_results\u0022:{\u0022hate\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022self_harm\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022sexual\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022violence\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022}}}]}\n\n",
+        "data: {\u0022id\u0022:\u0022chatcmpl-8smshKWJdtKLboay3Ey5fBpJcGaDd\u0022,\u0022object\u0022:\u0022chat.completion.chunk\u0022,\u0022created\u0022:1708068303,\u0022model\u0022:\u0022gpt-4-32k\u0022,\u0022choices\u0022:[{\u0022finish_reason\u0022:null,\u0022index\u0022:0,\u0022delta\u0022:{\u0022content\u0022:\u0022Hello\u0022},\u0022content_filter_results\u0022:{\u0022hate\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022self_harm\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022sexual\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022violence\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022}}}]}\n\n",
+        "data: {\u0022id\u0022:\u0022chatcmpl-8smshKWJdtKLboay3Ey5fBpJcGaDd\u0022,\u0022object\u0022:\u0022chat.completion.chunk\u0022,\u0022created\u0022:1708068303,\u0022model\u0022:\u0022gpt-4-32k\u0022,\u0022choices\u0022:[{\u0022finish_reason\u0022:null,\u0022index\u0022:0,\u0022delta\u0022:{\u0022content\u0022:\u0022,\u0022},\u0022content_filter_results\u0022:{\u0022hate\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022self_harm\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022sexual\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022violence\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022}}}]}\n\n",
+        "data: {\u0022id\u0022:\u0022chatcmpl-8smshKWJdtKLboay3Ey5fBpJcGaDd\u0022,\u0022object\u0022:\u0022chat.completion.chunk\u0022,\u0022created\u0022:1708068303,\u0022model\u0022:\u0022gpt-4-32k\u0022,\u0022choices\u0022:[{\u0022finish_reason\u0022:null,\u0022index\u0022:0,\u0022delta\u0022:{\u0022content\u0022:\u0022 World\u0022},\u0022content_filter_results\u0022:{\u0022hate\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022self_harm\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022sexual\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022violence\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022}}}]}\n\n",
+        "data: {\u0022id\u0022:\u0022chatcmpl-8smshKWJdtKLboay3Ey5fBpJcGaDd\u0022,\u0022object\u0022:\u0022chat.completion.chunk\u0022,\u0022created\u0022:1708068303,\u0022model\u0022:\u0022gpt-4-32k\u0022,\u0022choices\u0022:[{\u0022finish_reason\u0022:null,\u0022index\u0022:0,\u0022delta\u0022:{\u0022content\u0022:\u0022!\\\u0022.\u0022},\u0022content_filter_results\u0022:{\u0022hate\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022self_harm\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022sexual\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022violence\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022}}}]}\n\n",
+        "data: {\u0022id\u0022:\u0022chatcmpl-8smshKWJdtKLboay3Ey5fBpJcGaDd\u0022,\u0022object\u0022:\u0022chat.completion.chunk\u0022,\u0022created\u0022:1708068303,\u0022model\u0022:\u0022gpt-4-32k\u0022,\u0022choices\u0022:[{\u0022finish_reason\u0022:\u0022stop\u0022,\u0022index\u0022:0,\u0022delta\u0022:{},\u0022content_filter_results\u0022:{}}]}\n\n",
         "data: [DONE]\n\n"
       ]
     },
@@ -2867,12 +2869,12 @@
         "Accept": "application/json",
         "api-key": "00000000-0000-0000-0000-000000000000",
         "Connection": "close",
-        "Content-Length": "6810",
+        "Content-Length": "6798",
         "Content-Type": "application/json",
-        "User-Agent": "azsdk-net-AI.OpenAI/1.0.0-beta.12 (.NET 8.0.1; Microsoft Windows 10.0.22631)",
+        "User-Agent": "azsdk-net-AI.OpenAI/1.0.0-beta.13 (.NET 8.0.2; Microsoft Windows 10.0.22631)",
         "X-Forwarded-For": "127.0.0.1",
         "X-Forwarded-Proto": "https",
-        "x-ms-client-request-id": "f3a84544-ec93-44f4-86f6-efbca77b825a",
+        "x-ms-client-request-id": "b4a06586-5d86-4f9c-83b9-b1dbe5eb89df",
         "x-ms-return-client-request-id": "true",
         "X-Real-IP": "127.0.0.1"
       },
@@ -2890,7 +2892,7 @@
             "content": "",
             "function_call": {
               "name": "CreateFileAndSaveText",
-              "arguments": "{\n\u0022fileName\u0022: \u0022test.txt\u0022,\n\u0022text\u0022: \u0022Hello, World!\u0022\n}"
+              "arguments": "{\n  \u0022fileName\u0022: \u0022test.txt\u0022,\n  \u0022text\u0022: \u0022Hello, World!\u0022\n}"
             },
             "role": "assistant"
           },
@@ -2900,7 +2902,7 @@
             "role": "function"
           },
           {
-            "content": "I have successfully created a file named \u0022test.txt\u0022 with the content: \u0022Hello, World!\u0022.",
+            "content": "I have created a file named \u0022test.txt\u0022 with the content \u0022Hello, World!\u0022.",
             "role": "assistant"
           },
           {
@@ -2921,7 +2923,7 @@
             "role": "function"
           },
           {
-            "content": "The current directory contains the following file:\n\n- test.txt",
+            "content": "The only file in the current directory is \u0022test.txt\u0022.",
             "role": "assistant"
           },
           {
@@ -2932,7 +2934,7 @@
             "content": "",
             "function_call": {
               "name": "ReadTextFromFile",
-              "arguments": "{\n\u0022fileName\u0022: \u0022test.txt\u0022\n}"
+              "arguments": "{\n  \u0022fileName\u0022: \u0022test.txt\u0022\n}"
             },
             "role": "assistant"
           },
@@ -2942,7 +2944,7 @@
             "role": "function"
           },
           {
-            "content": "The content of the file \u0022test.txt\u0022 is:\n\n\u0022Hello, World!\u0022",
+            "content": "The content of the file \u0022test.txt\u0022 is \u0022Hello, World!\u0022.",
             "role": "assistant"
           },
           {
@@ -3337,33 +3339,35 @@
       "StatusCode": 200,
       "ResponseHeaders": {
         "Access-Control-Allow-Origin": "*",
-        "apim-request-id": "0cac8ba8-1acf-4cfe-a1ec-c31fb783d572",
-        "azureml-model-session": "d030-20240123055055",
+        "apim-request-id": "8130c8fc-122b-4371-9eaf-60b1e1b87405",
+        "azureml-model-session": "d034-20240123094448",
         "Cache-Control": "must-revalidate, no-cache",
         "Connection": "close",
         "Content-Type": "text/event-stream",
-        "Date": "Mon, 12 Feb 2024 01:10:11 GMT",
+        "Date": "Fri, 16 Feb 2024 07:25:05 GMT",
         "Strict-Transport-Security": "max-age=31536000; includeSubDomains; preload",
         "Transfer-Encoding": "chunked",
         "x-accel-buffering": "no",
         "X-Content-Type-Options": "nosniff",
-        "x-ms-client-request-id": "f3a84544-ec93-44f4-86f6-efbca77b825a",
+        "x-ms-client-request-id": "b4a06586-5d86-4f9c-83b9-b1dbe5eb89df",
         "x-ms-region": "East US 2",
         "x-ratelimit-remaining-requests": "43",
-        "x-ratelimit-remaining-tokens": "49888",
-        "X-Request-ID": "1aa76dea-fbe6-4cf4-bd32-509a2739e34a"
+        "x-ratelimit-remaining-tokens": "49872",
+        "X-Request-ID": "f292b865-8dd4-4e5b-bf5b-1e08e3b0e4c6"
       },
       "ResponseBody": [
         "data: {\u0022id\u0022:\u0022\u0022,\u0022object\u0022:\u0022\u0022,\u0022created\u0022:0,\u0022model\u0022:\u0022\u0022,\u0022prompt_filter_results\u0022:[{\u0022prompt_index\u0022:0,\u0022content_filter_results\u0022:{\u0022hate\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022self_harm\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022sexual\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022violence\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022}}}],\u0022choices\u0022:[]}\n\n",
-        "data: {\u0022id\u0022:\u0022chatcmpl-8rF7jXvoPTlkKDmAL0q7Icj9zTxcY\u0022,\u0022object\u0022:\u0022chat.completion.chunk\u0022,\u0022created\u0022:1707700211,\u0022model\u0022:\u0022gpt-4-32k\u0022,\u0022choices\u0022:[{\u0022finish_reason\u0022:null,\u0022index\u0022:0,\u0022delta\u0022:{\u0022role\u0022:\u0022assistant\u0022},\u0022content_filter_results\u0022:{}}]}\n\n",
-        "data: {\u0022id\u0022:\u0022chatcmpl-8rF7jXvoPTlkKDmAL0q7Icj9zTxcY\u0022,\u0022object\u0022:\u0022chat.completion.chunk\u0022,\u0022created\u0022:1707700211,\u0022model\u0022:\u0022gpt-4-32k\u0022,\u0022choices\u0022:[{\u0022finish_reason\u0022:null,\u0022index\u0022:0,\u0022delta\u0022:{\u0022content\u0022:\u0022How\u0022},\u0022content_filter_results\u0022:{\u0022hate\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022self_harm\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022sexual\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022violence\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022}}}]}\n\n",
-        "data: {\u0022id\u0022:\u0022chatcmpl-8rF7jXvoPTlkKDmAL0q7Icj9zTxcY\u0022,\u0022object\u0022:\u0022chat.completion.chunk\u0022,\u0022created\u0022:1707700211,\u0022model\u0022:\u0022gpt-4-32k\u0022,\u0022choices\u0022:[{\u0022finish_reason\u0022:null,\u0022index\u0022:0,\u0022delta\u0022:{\u0022content\u0022:\u0022 can\u0022},\u0022content_filter_results\u0022:{\u0022hate\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022self_harm\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022sexual\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022violence\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022}}}]}\n\n",
-        "data: {\u0022id\u0022:\u0022chatcmpl-8rF7jXvoPTlkKDmAL0q7Icj9zTxcY\u0022,\u0022object\u0022:\u0022chat.completion.chunk\u0022,\u0022created\u0022:1707700211,\u0022model\u0022:\u0022gpt-4-32k\u0022,\u0022choices\u0022:[{\u0022finish_reason\u0022:null,\u0022index\u0022:0,\u0022delta\u0022:{\u0022content\u0022:\u0022 I\u0022},\u0022content_filter_results\u0022:{\u0022hate\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022self_harm\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022sexual\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022violence\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022}}}]}\n\n",
-        "data: {\u0022id\u0022:\u0022chatcmpl-8rF7jXvoPTlkKDmAL0q7Icj9zTxcY\u0022,\u0022object\u0022:\u0022chat.completion.chunk\u0022,\u0022created\u0022:1707700211,\u0022model\u0022:\u0022gpt-4-32k\u0022,\u0022choices\u0022:[{\u0022finish_reason\u0022:null,\u0022index\u0022:0,\u0022delta\u0022:{\u0022content\u0022:\u0022 assist\u0022},\u0022content_filter_results\u0022:{\u0022hate\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022self_harm\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022sexual\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022violence\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022}}}]}\n\n",
-        "data: {\u0022id\u0022:\u0022chatcmpl-8rF7jXvoPTlkKDmAL0q7Icj9zTxcY\u0022,\u0022object\u0022:\u0022chat.completion.chunk\u0022,\u0022created\u0022:1707700211,\u0022model\u0022:\u0022gpt-4-32k\u0022,\u0022choices\u0022:[{\u0022finish_reason\u0022:null,\u0022index\u0022:0,\u0022delta\u0022:{\u0022content\u0022:\u0022 you\u0022},\u0022content_filter_results\u0022:{\u0022hate\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022self_harm\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022sexual\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022violence\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022}}}]}\n\n",
-        "data: {\u0022id\u0022:\u0022chatcmpl-8rF7jXvoPTlkKDmAL0q7Icj9zTxcY\u0022,\u0022object\u0022:\u0022chat.completion.chunk\u0022,\u0022created\u0022:1707700211,\u0022model\u0022:\u0022gpt-4-32k\u0022,\u0022choices\u0022:[{\u0022finish_reason\u0022:null,\u0022index\u0022:0,\u0022delta\u0022:{\u0022content\u0022:\u0022 further\u0022},\u0022content_filter_results\u0022:{\u0022hate\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022self_harm\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022sexual\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022violence\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022}}}]}\n\n",
-        "data: {\u0022id\u0022:\u0022chatcmpl-8rF7jXvoPTlkKDmAL0q7Icj9zTxcY\u0022,\u0022object\u0022:\u0022chat.completion.chunk\u0022,\u0022created\u0022:1707700211,\u0022model\u0022:\u0022gpt-4-32k\u0022,\u0022choices\u0022:[{\u0022finish_reason\u0022:null,\u0022index\u0022:0,\u0022delta\u0022:{\u0022content\u0022:\u0022?\u0022},\u0022content_filter_results\u0022:{\u0022hate\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022self_harm\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022sexual\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022violence\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022}}}]}\n\n",
-        "data: {\u0022id\u0022:\u0022chatcmpl-8rF7jXvoPTlkKDmAL0q7Icj9zTxcY\u0022,\u0022object\u0022:\u0022chat.completion.chunk\u0022,\u0022created\u0022:1707700211,\u0022model\u0022:\u0022gpt-4-32k\u0022,\u0022choices\u0022:[{\u0022finish_reason\u0022:\u0022stop\u0022,\u0022index\u0022:0,\u0022delta\u0022:{},\u0022content_filter_results\u0022:{}}]}\n\n",
+        "data: {\u0022id\u0022:\u0022chatcmpl-8smsjghwpRqrILNSOGUsH3tMJnBAx\u0022,\u0022object\u0022:\u0022chat.completion.chunk\u0022,\u0022created\u0022:1708068305,\u0022model\u0022:\u0022gpt-4-32k\u0022,\u0022choices\u0022:[{\u0022finish_reason\u0022:null,\u0022index\u0022:0,\u0022delta\u0022:{\u0022role\u0022:\u0022assistant\u0022},\u0022content_filter_results\u0022:{}}]}\n\n",
+        "data: {\u0022id\u0022:\u0022chatcmpl-8smsjghwpRqrILNSOGUsH3tMJnBAx\u0022,\u0022object\u0022:\u0022chat.completion.chunk\u0022,\u0022created\u0022:1708068305,\u0022model\u0022:\u0022gpt-4-32k\u0022,\u0022choices\u0022:[{\u0022finish_reason\u0022:null,\u0022index\u0022:0,\u0022delta\u0022:{\u0022content\u0022:\u0022Sure\u0022},\u0022content_filter_results\u0022:{\u0022hate\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022self_harm\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022sexual\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022violence\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022}}}]}\n\n",
+        "data: {\u0022id\u0022:\u0022chatcmpl-8smsjghwpRqrILNSOGUsH3tMJnBAx\u0022,\u0022object\u0022:\u0022chat.completion.chunk\u0022,\u0022created\u0022:1708068305,\u0022model\u0022:\u0022gpt-4-32k\u0022,\u0022choices\u0022:[{\u0022finish_reason\u0022:null,\u0022index\u0022:0,\u0022delta\u0022:{\u0022content\u0022:\u0022,\u0022},\u0022content_filter_results\u0022:{\u0022hate\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022self_harm\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022sexual\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022violence\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022}}}]}\n\n",
+        "data: {\u0022id\u0022:\u0022chatcmpl-8smsjghwpRqrILNSOGUsH3tMJnBAx\u0022,\u0022object\u0022:\u0022chat.completion.chunk\u0022,\u0022created\u0022:1708068305,\u0022model\u0022:\u0022gpt-4-32k\u0022,\u0022choices\u0022:[{\u0022finish_reason\u0022:null,\u0022index\u0022:0,\u0022delta\u0022:{\u0022content\u0022:\u0022 how\u0022},\u0022content_filter_results\u0022:{\u0022hate\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022self_harm\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022sexual\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022violence\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022}}}]}\n\n",
+        "data: {\u0022id\u0022:\u0022chatcmpl-8smsjghwpRqrILNSOGUsH3tMJnBAx\u0022,\u0022object\u0022:\u0022chat.completion.chunk\u0022,\u0022created\u0022:1708068305,\u0022model\u0022:\u0022gpt-4-32k\u0022,\u0022choices\u0022:[{\u0022finish_reason\u0022:null,\u0022index\u0022:0,\u0022delta\u0022:{\u0022content\u0022:\u0022 can\u0022},\u0022content_filter_results\u0022:{\u0022hate\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022self_harm\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022sexual\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022violence\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022}}}]}\n\n",
+        "data: {\u0022id\u0022:\u0022chatcmpl-8smsjghwpRqrILNSOGUsH3tMJnBAx\u0022,\u0022object\u0022:\u0022chat.completion.chunk\u0022,\u0022created\u0022:1708068305,\u0022model\u0022:\u0022gpt-4-32k\u0022,\u0022choices\u0022:[{\u0022finish_reason\u0022:null,\u0022index\u0022:0,\u0022delta\u0022:{\u0022content\u0022:\u0022 I\u0022},\u0022content_filter_results\u0022:{\u0022hate\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022self_harm\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022sexual\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022violence\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022}}}]}\n\n",
+        "data: {\u0022id\u0022:\u0022chatcmpl-8smsjghwpRqrILNSOGUsH3tMJnBAx\u0022,\u0022object\u0022:\u0022chat.completion.chunk\u0022,\u0022created\u0022:1708068305,\u0022model\u0022:\u0022gpt-4-32k\u0022,\u0022choices\u0022:[{\u0022finish_reason\u0022:null,\u0022index\u0022:0,\u0022delta\u0022:{\u0022content\u0022:\u0022 assist\u0022},\u0022content_filter_results\u0022:{\u0022hate\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022self_harm\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022sexual\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022violence\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022}}}]}\n\n",
+        "data: {\u0022id\u0022:\u0022chatcmpl-8smsjghwpRqrILNSOGUsH3tMJnBAx\u0022,\u0022object\u0022:\u0022chat.completion.chunk\u0022,\u0022created\u0022:1708068305,\u0022model\u0022:\u0022gpt-4-32k\u0022,\u0022choices\u0022:[{\u0022finish_reason\u0022:null,\u0022index\u0022:0,\u0022delta\u0022:{\u0022content\u0022:\u0022 you\u0022},\u0022content_filter_results\u0022:{\u0022hate\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022self_harm\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022sexual\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022violence\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022}}}]}\n\n",
+        "data: {\u0022id\u0022:\u0022chatcmpl-8smsjghwpRqrILNSOGUsH3tMJnBAx\u0022,\u0022object\u0022:\u0022chat.completion.chunk\u0022,\u0022created\u0022:1708068305,\u0022model\u0022:\u0022gpt-4-32k\u0022,\u0022choices\u0022:[{\u0022finish_reason\u0022:null,\u0022index\u0022:0,\u0022delta\u0022:{\u0022content\u0022:\u0022 further\u0022},\u0022content_filter_results\u0022:{\u0022hate\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022self_harm\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022sexual\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022violence\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022}}}]}\n\n",
+        "data: {\u0022id\u0022:\u0022chatcmpl-8smsjghwpRqrILNSOGUsH3tMJnBAx\u0022,\u0022object\u0022:\u0022chat.completion.chunk\u0022,\u0022created\u0022:1708068305,\u0022model\u0022:\u0022gpt-4-32k\u0022,\u0022choices\u0022:[{\u0022finish_reason\u0022:null,\u0022index\u0022:0,\u0022delta\u0022:{\u0022content\u0022:\u0022?\u0022},\u0022content_filter_results\u0022:{\u0022hate\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022self_harm\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022sexual\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022},\u0022violence\u0022:{\u0022filtered\u0022:false,\u0022severity\u0022:\u0022safe\u0022}}}]}\n\n",
+        "data: {\u0022id\u0022:\u0022chatcmpl-8smsjghwpRqrILNSOGUsH3tMJnBAx\u0022,\u0022object\u0022:\u0022chat.completion.chunk\u0022,\u0022created\u0022:1708068305,\u0022model\u0022:\u0022gpt-4-32k\u0022,\u0022choices\u0022:[{\u0022finish_reason\u0022:\u0022stop\u0022,\u0022index\u0022:0,\u0022delta\u0022:{},\u0022content_filter_results\u0022:{}}]}\n\n",
         "data: [DONE]\n\n"
       ]
     }

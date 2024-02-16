@@ -17,6 +17,11 @@ namespace Azure.AI.Details.Common.CLI
             Console.ResetColor();
         }
 
+        public static ConsoleColor MapColor(ConsoleColor color)
+        {
+            return colorMap[color];
+        }
+
         public static void SetHighlightColors()
         {
             Console.BackgroundColor = colors[0];
@@ -234,7 +239,37 @@ namespace Azure.AI.Details.Common.CLI
             return GetBestColors();
         }
 
+        private static Dictionary<ConsoleColor, ConsoleColor> InitColorMap()
+        {
+            var map = new Dictionary<ConsoleColor, ConsoleColor>();
+
+            var xterm = Environment.GetEnvironmentVariable("TERM");
+            var is256 = xterm != null && xterm.Contains("256");
+            var isWindows = OS.IsWindows();
+
+            map[ConsoleColor.Black] = ConsoleColor.Black;
+            map[ConsoleColor.DarkBlue] = ConsoleColor.DarkBlue;
+            map[ConsoleColor.DarkGreen] = ConsoleColor.DarkGreen;
+            map[ConsoleColor.DarkCyan] = ConsoleColor.DarkCyan;
+            map[ConsoleColor.DarkRed] = ConsoleColor.DarkRed;
+            map[ConsoleColor.DarkMagenta] = ConsoleColor.DarkMagenta;
+            map[ConsoleColor.DarkYellow] = ConsoleColor.DarkYellow;
+            map[ConsoleColor.Gray] = ConsoleColor.Gray;
+            map[ConsoleColor.DarkGray] = is256 || isWindows ? ConsoleColor.DarkGray : ConsoleColor.Gray;
+            map[ConsoleColor.Blue] = ConsoleColor.Blue;
+            map[ConsoleColor.Green] = ConsoleColor.Green;
+            map[ConsoleColor.Cyan] = ConsoleColor.Cyan;
+            map[ConsoleColor.Red] = ConsoleColor.Red;
+            map[ConsoleColor.Magenta] = ConsoleColor.Magenta;
+            map[ConsoleColor.Yellow] = ConsoleColor.Yellow;
+            map[ConsoleColor.White] = ConsoleColor.White;
+
+            return map;
+        }
+
         private static ConsoleColor[] colors = InitBestColors();
+
+        private static Dictionary<ConsoleColor, ConsoleColor> colorMap = InitColorMap();
 
     }
 }

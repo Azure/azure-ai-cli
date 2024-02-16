@@ -1,6 +1,37 @@
 {
   "Entries": [
     {
+      "RequestUri": "https://fakeendpoint/v2/track",
+      "RequestMethod": "POST",
+      "RequestHeaders": {
+        "Accept": "application/json",
+        "Accept-Encoding": "identity",
+        "Connection": "close",
+        "Content-Length": "3720",
+        "Content-Type": "application/json; charset=utf-8",
+        "User-Agent": "Python-urllib/3.11",
+        "X-Forwarded-For": "127.0.0.1",
+        "X-Forwarded-Proto": "https",
+        "X-Real-IP": "127.0.0.1"
+      },
+      "RequestBody": "[{\u0022ver\u0022: 1, \u0022name\u0022: \u0022Microsoft.ApplicationInsights.Event\u0022, \u0022time\u0022: \u0022TIME\u0022, \u0022sampleRate\u0022: 100.0, \u0022iKey\u0022: \u0022INSTRUMENTATION_KEY\u0022, \u0022tags\u0022: {\u0022ai.device.id\u0022: \u0022rhurey-wfh\u0022, \u0022ai.device.locale\u0022: \u0022en_US\u0022, \u0022ai.device.osVersion\u0022: \u002210.0.22631\u0022, \u0022ai.device.type\u0022: \u0022Other\u0022, \u0022ai.internal.sdkVersion\u0022: \u0022py3:0.11.9\u0022}, \u0022data\u0022: {\u0022baseType\u0022: \u0022EventData\u0022, \u0022baseData\u0022: {\u0022ver\u0022: 2, \u0022name\u0022: \u0022azurecli/command\u0022, \u0022properties\u0022: {\u0022Context.Default.AzureCLI.AllowBroker\u0022: \u0022False\u0022, \u0022Context.Default.AzureCLI.ClientRequestId\u0022: \u00226e553cb7-cc9c-11ee-8ec5-c8d9d2049b34\u0022, \u0022Context.Default.AzureCLI.CloudName\u0022: \u0022AzureCloud\u0022, \u0022Context.Default.AzureCLI.CoreVersion\u0022: \u00222.57.0\u0022, \u0022Context.Default.AzureCLI.DefaultOutputType\u0022: \u0022unknown\u0022, \u0022Context.Default.AzureCLI.EndTime\u0022: \u00222024-02-16 07:24:34.721386\u0022, \u0022Context.Default.AzureCLI.EnvironmentVariables\u0022: \u0022[]\u0022, \u0022Context.Default.AzureCLI.InitTimeElapsed\u0022: \u00221.713728\u0022, \u0022Context.Default.AzureCLI.InstallationId\u0022: \u002255059476-d0fd-11ed-8796-c8d9d2049b34\u0022, \u0022Context.Default.AzureCLI.Installer\u0022: \u0022MSI\u0022, \u0022Context.Default.AzureCLI.InvokeTimeElapsed\u0022: \u00221.411393\u0022, \u0022Context.Default.AzureCLI.Locale\u0022: \u0022English_United States,1252\u0022, \u0022Context.Default.AzureCLI.Mode\u0022: \u0022default\u0022, \u0022Context.Default.AzureCLI.OutputType\u0022: \u0022json\u0022, \u0022Context.Default.AzureCLI.Params\u0022: \u0022--output,--subscription,-g,-n\u0022, \u0022Context.Default.AzureCLI.PollEndTime\u0022: \u0022None\u0022, \u0022Context.Default.AzureCLI.PollStartTime\u0022: \u0022None\u0022, \u0022Context.Default.AzureCLI.PythonVersion\u0022: \u00223.11.7\u0022, \u0022Context.Default.AzureCLI.RawCommand\u0022: \u0022cognitiveservices account keys list\u0022, \u0022Context.Default.AzureCLI.ShellType\u0022: \u0022cmd\u0022, \u0022Context.Default.AzureCLI.ShowSurveyMessage\u0022: \u0022False\u0022, \u0022Context.Default.AzureCLI.Source\u0022: \u0022az\u0022, \u0022Context.Default.AzureCLI.StartTime\u0022: \u00222024-02-16 07:24:33.304791\u0022, \u0022Context.Default.AzureCLI.TelemetryVersion\u0022: \u00222.0\u0022, \u0022Context.Default.AzureCLI.UserAzureId\u0022: \u00225f410ad1fc24a4547edd18a29584bf5c7572c48978dd5c8cd5fa93e771db858f\u0022, \u0022Context.Default.AzureCLI.UserAzureSubscriptionId\u0022: \u0022f7b4a5ce-d3bd-4a03-84fe-8bcad772c8c1\u0022, \u0022Context.Default.AzureCLI.debug_info\u0022: \u0022\u0022, \u0022Context.Default.AzureCLI.error_type\u0022: \u0022None\u0022, \u0022Context.Default.AzureCLI.exception_name\u0022: \u0022None\u0022, \u0022Context.Default.VS.Core.Distro.Id\u0022: \u0022\u0022, \u0022Context.Default.VS.Core.Distro.Name\u0022: \u0022\u0022, \u0022Context.Default.VS.Core.Distro.Version\u0022: \u0022\u0022, \u0022Context.Default.VS.Core.ExeName\u0022: \u0022azurecli\u0022, \u0022Context.Default.VS.Core.ExeVersion\u0022: \u00222.57.0@none\u0022, \u0022Context.Default.VS.Core.MacAddressHash\u0022: \u0022a1a9745e6932c20d63d29c7e0eeb778b2420c595247a087002a4dd921b854b1e\u0022, \u0022Context.Default.VS.Core.Machine.Id\u0022: \u0022a1a9745e-6932-c20d-63d2-9c7e0eeb778b\u0022, \u0022Context.Default.VS.Core.OS.Platform\u0022: \u0022windows-10-10.0.22631-sp0\u0022, \u0022Context.Default.VS.Core.OS.Type\u0022: \u0022windows\u0022, \u0022Context.Default.VS.Core.OS.Version\u0022: \u002210.0.22631\u0022, \u0022Context.Default.VS.Core.TelemetryApi.ProductVersion\u0022: \u0022azurecli@2.57.0\u0022, \u0022Context.Default.VS.Core.User.Id\u0022: \u002255059476-d0fd-11ed-8796-c8d9d2049b34\u0022, \u0022Context.Default.VS.Core.User.IsMicrosoftInternal\u0022: \u0022False\u0022, \u0022Context.Default.VS.Core.User.IsOptedIn\u0022: \u0022True\u0022, \u0022Reserved.ChannelUsed\u0022: \u0022AI\u0022, \u0022Reserved.DataModel.Action.Result\u0022: \u0022Success\u0022, \u0022Reserved.DataModel.Action.Type\u0022: \u0022Atomic\u0022, \u0022Reserved.DataModel.CorrelationId\u0022: \u00223dc8e32b-6bfa-4e56-b04e-a115aa1e759f\u0022, \u0022Reserved.DataModel.EntityName\u0022: \u0022cognitiveservices-account-keys-list\u0022, \u0022Reserved.DataModel.EntityType\u0022: \u0022UserTask\u0022, \u0022Reserved.DataModel.FeatureName\u0022: \u0022command\u0022, \u0022Reserved.DataModel.ProductName\u0022: \u0022azurecli\u0022, \u0022Reserved.DataModel.Source\u0022: \u0022DataModelAPI\u0022, \u0022Reserved.EventId\u0022: \u0022c2d4ea9a-143c-41df-bcff-95ae6c03c879\u0022, \u0022Reserved.SessionId\u0022: \u002250d70b9512beb320a39cc0a907be49c66ea2c63da5103c33af06dbf1decf64ff\u0022}, \u0022measurements\u0022: {\u0022Reserved.DataModel.EntitySchemaVersion\u0022: 4, \u0022Reserved.DataModel.Severity\u0022: 0, \u0022Reserved.SequenceNumber\u0022: 1, \u0022Reserved.TimeSinceSessionStart\u0022: 0}}}}]",
+      "StatusCode": 200,
+      "ResponseHeaders": {
+        "Connection": "close",
+        "Content-Length": "49",
+        "Content-Type": "application/json; charset=utf-8",
+        "Date": "Fri, 16 Feb 2024 07:24:35 GMT",
+        "Server": "Microsoft-HTTPAPI/2.0",
+        "Strict-Transport-Security": "max-age=31536000",
+        "X-Content-Type-Options": "nosniff"
+      },
+      "ResponseBody": {
+        "itemsReceived": 1,
+        "itemsAccepted": 1,
+        "errors": []
+      }
+    },
+    {
       "RequestUri": "https://fakeendpoint/subscriptions/e72e5254-f265-4e95-9bd2-9ee8e7329051/providers/Microsoft.CognitiveServices/accounts?api-version=2023-05-01",
       "RequestMethod": "GET",
       "RequestHeaders": {
@@ -13,7 +44,7 @@
         "User-Agent": "AZURECLI/2.57.0 (MSI) azsdk-python-mgmt-cognitiveservices/13.5.0 Python/3.11.7 (Windows-10-10.0.22631-SP0) ai-cli 0.0.1",
         "X-Forwarded-For": "127.0.0.1",
         "X-Forwarded-Proto": "https",
-        "x-ms-client-request-id": "732b7035-c92f-11ee-8469-c8d9d2049b34",
+        "x-ms-client-request-id": "711cbf25-cc9c-11ee-8800-c8d9d2049b34",
         "X-Real-IP": "127.0.0.1"
       },
       "RequestBody": null,
@@ -23,32 +54,32 @@
         "Connection": "close",
         "Content-Length": "769472",
         "Content-Type": "application/json; charset=utf-8",
-        "Date": "Sun, 11 Feb 2024 22:46:54 GMT",
+        "Date": "Fri, 16 Feb 2024 07:24:39 GMT",
         "Expires": "-1",
         "Pragma": "no-cache",
         "Strict-Transport-Security": "max-age=31536000; includeSubDomains",
         "X-Cache": "CONFIG_NOCACHE",
         "X-Content-Type-Options": "nosniff",
-        "x-ms-correlation-request-id": "e5633092-136f-4a3c-8b24-e1064c20423d",
+        "x-ms-correlation-request-id": "7ac657ae-7743-4e8f-a8fe-6ac2c20a150b",
         "x-ms-original-request-ids": [
-          "948b00c7-d581-4e61-9ed3-e24d77dca6ad",
-          "9bb4dead-86e1-4d41-b043-1f42ff39bd31",
-          "63594dfd-5d4c-48d1-ae30-55d1975e33b4",
-          "bf35264a-f5b7-4152-ad2c-6b0042ff640b",
-          "47cff1dd-7da4-4f9f-8dc1-5d68cb346c40",
-          "17f70b7e-93ab-4159-b4f1-a8c84ae5d893",
-          "82e831bb-7d98-4692-a629-7741398a127e",
-          "156e3e97-b5a5-41b0-8653-93647bfed9ee",
-          "17f01be5-8a3c-4a2e-90e6-9d99b2c381a2",
-          "962a03a0-4a36-4866-9d97-b08fbc68cba5",
-          "95f72fc6-9250-45c5-8cad-7c938bffb689",
-          "60132a18-697e-4c67-8d12-3c072e9993b0",
-          "afcd278f-234b-488c-8f26-c256386454a3"
+          "81640393-3919-443c-92e5-8493864767d3",
+          "8a0cb3a0-f9ba-465c-8b11-d94eb5aa4c24",
+          "2f0d7f41-c7b9-4e5a-b43b-a1a745735d0f",
+          "5e941e5a-aa48-4aab-a67a-2b1511c374e8",
+          "dc24f613-0c2f-4036-8583-706dfdfa768d",
+          "fac14899-3935-4175-9c96-f9dac0f991e8",
+          "8fb2b6a6-e60d-4e2d-bb70-b1bae297bf72",
+          "56b3d4e6-116f-40cd-876b-f6be126e18c9",
+          "fb770104-4d05-42ac-a31c-b06827e14f00",
+          "57aeb97a-9fe3-45b3-a678-5c86735a03c2",
+          "098a1421-06f2-4874-87f0-498891f86190",
+          "2049b1ee-8178-464e-a30a-c21dcc35271b",
+          "6cdec814-a8dc-4c8e-b703-18bea1adbe68"
         ],
         "x-ms-ratelimit-remaining-subscription-reads": "11999",
-        "x-ms-request-id": "e5633092-136f-4a3c-8b24-e1064c20423d",
-        "x-ms-routing-request-id": "WESTUS2:20240211T224655Z:e5633092-136f-4a3c-8b24-e1064c20423d",
-        "X-MSEdge-Ref": "Ref A: B87D42A5B5274265B39B5C3D886D8D92 Ref B: CO6AA3150219053 Ref C: 2024-02-11T22:46:54Z"
+        "x-ms-request-id": "7ac657ae-7743-4e8f-a8fe-6ac2c20a150b",
+        "x-ms-routing-request-id": "WESTUS2:20240216T072440Z:7ac657ae-7743-4e8f-a8fe-6ac2c20a150b",
+        "X-MSEdge-Ref": "Ref A: 3212D732F8404DD3BFA30048E67FCD09 Ref B: CO6AA3150217029 Ref C: 2024-02-16T07:24:39Z"
       },
       "ResponseBody": {
         "value": [
@@ -4136,7 +4167,7 @@
                 },
                 {
                   "name": "MaxTrainingFileSize",
-                  "value": "100000000"
+                  "value": "512000000"
                 },
                 {
                   "name": "MaxUserFileImportDurationInHours",
@@ -4697,7 +4728,7 @@
                 },
                 {
                   "name": "MaxTrainingFileSize",
-                  "value": "100000000"
+                  "value": "512000000"
                 },
                 {
                   "name": "MaxUserFileImportDurationInHours",
@@ -4829,7 +4860,7 @@
                 },
                 {
                   "name": "MaxTrainingFileSize",
-                  "value": "100000000"
+                  "value": "512000000"
                 },
                 {
                   "name": "MaxUserFileImportDurationInHours",
@@ -17785,7 +17816,7 @@
                 },
                 {
                   "name": "MaxTrainingFileSize",
-                  "value": "100000000"
+                  "value": "512000000"
                 },
                 {
                   "name": "MaxUserFileImportDurationInHours",
@@ -17913,7 +17944,7 @@
                 },
                 {
                   "name": "MaxTrainingFileSize",
-                  "value": "100000000"
+                  "value": "512000000"
                 },
                 {
                   "name": "MaxUserFileImportDurationInHours",
@@ -22665,7 +22696,7 @@
                 },
                 {
                   "name": "MaxTrainingFileSize",
-                  "value": "100000000"
+                  "value": "512000000"
                 },
                 {
                   "name": "MaxUserFileImportDurationInHours",
@@ -22793,7 +22824,7 @@
                 },
                 {
                   "name": "MaxTrainingFileSize",
-                  "value": "100000000"
+                  "value": "512000000"
                 },
                 {
                   "name": "MaxUserFileImportDurationInHours",
@@ -23229,7 +23260,7 @@
             "id": "/subscriptions/e72e5254-f265-4e95-9bd2-9ee8e7329051/resourceGroups/ralphe-sthcntrls-oai-rg/providers/Microsoft.CognitiveServices/accounts/ralphe-sthcntrls-oai-ai-aiservices",
             "name": "ralphe-sthcntrls-oai-ai-aiservices",
             "type": "Microsoft.CognitiveServices/accounts",
-            "etag": "\u002240012ab0-0000-0500-0000-65a9ce690000\u0022",
+            "etag": "\u002220007f26-0000-0500-0000-65ce61480000\u0022",
             "location": "southcentralus",
             "sku": {
               "name": "S0"
@@ -25587,7 +25618,7 @@
                 },
                 {
                   "name": "MaxTrainingFileSize",
-                  "value": "100000000"
+                  "value": "512000000"
                 },
                 {
                   "name": "MaxUserFileImportDurationInHours",
@@ -25713,7 +25744,7 @@
                 },
                 {
                   "name": "MaxTrainingFileSize",
-                  "value": "100000000"
+                  "value": "512000000"
                 },
                 {
                   "name": "MaxUserFileImportDurationInHours",
@@ -25840,7 +25871,7 @@
                 },
                 {
                   "name": "MaxTrainingFileSize",
-                  "value": "100000000"
+                  "value": "512000000"
                 },
                 {
                   "name": "MaxUserFileImportDurationInHours",
@@ -25967,7 +25998,7 @@
                 },
                 {
                   "name": "MaxTrainingFileSize",
-                  "value": "100000000"
+                  "value": "512000000"
                 },
                 {
                   "name": "MaxUserFileImportDurationInHours",
@@ -26095,7 +26126,7 @@
                 },
                 {
                   "name": "MaxTrainingFileSize",
-                  "value": "100000000"
+                  "value": "512000000"
                 },
                 {
                   "name": "MaxUserFileImportDurationInHours",
@@ -26867,7 +26898,7 @@
                 },
                 {
                   "name": "MaxTrainingFileSize",
-                  "value": "100000000"
+                  "value": "512000000"
                 },
                 {
                   "name": "MaxUserFileImportDurationInHours",
@@ -31809,7 +31840,7 @@
                 },
                 {
                   "name": "MaxTrainingFileSize",
-                  "value": "100000000"
+                  "value": "512000000"
                 },
                 {
                   "name": "MaxUserFileImportDurationInHours",
@@ -33644,7 +33675,7 @@
                 },
                 {
                   "name": "MaxTrainingFileSize",
-                  "value": "100000000"
+                  "value": "512000000"
                 },
                 {
                   "name": "MaxUserFileImportDurationInHours",
@@ -33771,7 +33802,7 @@
                 },
                 {
                   "name": "MaxTrainingFileSize",
-                  "value": "100000000"
+                  "value": "512000000"
                 },
                 {
                   "name": "MaxUserFileImportDurationInHours",
@@ -33900,7 +33931,7 @@
                 },
                 {
                   "name": "MaxTrainingFileSize",
-                  "value": "100000000"
+                  "value": "512000000"
                 },
                 {
                   "name": "MaxUserFileImportDurationInHours",
@@ -34035,7 +34066,7 @@
                 },
                 {
                   "name": "MaxTrainingFileSize",
-                  "value": "100000000"
+                  "value": "512000000"
                 },
                 {
                   "name": "MaxUserFileImportDurationInHours",
@@ -35272,7 +35303,7 @@
                 },
                 {
                   "name": "MaxTrainingFileSize",
-                  "value": "100000000"
+                  "value": "512000000"
                 },
                 {
                   "name": "MaxUserFileImportDurationInHours",
@@ -35826,7 +35857,7 @@
                 },
                 {
                   "name": "MaxTrainingFileSize",
-                  "value": "100000000"
+                  "value": "512000000"
                 },
                 {
                   "name": "MaxUserFileImportDurationInHours",
@@ -35953,7 +35984,7 @@
                 },
                 {
                   "name": "MaxTrainingFileSize",
-                  "value": "100000000"
+                  "value": "512000000"
                 },
                 {
                   "name": "MaxUserFileImportDurationInHours",
@@ -35989,7 +36020,7 @@
             "id": "/subscriptions/e72e5254-f265-4e95-9bd2-9ee8e7329051/resourceGroups/ralphe-test-20230810/providers/Microsoft.CognitiveServices/accounts/ralphe-test-azure-ai-eastus2-aiservices",
             "name": "ralphe-test-azure-ai-eastus2-aiservices",
             "type": "Microsoft.CognitiveServices/accounts",
-            "etag": "\u00229d011ec5-0000-0200-0000-659e40670000\u0022",
+            "etag": "\u0022040028ac-0000-0200-0000-65ceb22a0000\u0022",
             "location": "eastus2",
             "sku": {
               "name": "S0"
@@ -36933,7 +36964,7 @@
                 },
                 {
                   "name": "MaxTrainingFileSize",
-                  "value": "100000000"
+                  "value": "512000000"
                 },
                 {
                   "name": "MaxUserFileImportDurationInHours",
@@ -39621,7 +39652,7 @@
                 },
                 {
                   "name": "MaxTrainingFileSize",
-                  "value": "100000000"
+                  "value": "512000000"
                 },
                 {
                   "name": "MaxUserFileImportDurationInHours",
@@ -39754,7 +39785,7 @@
                 },
                 {
                   "name": "MaxTrainingFileSize",
-                  "value": "100000000"
+                  "value": "512000000"
                 },
                 {
                   "name": "MaxUserFileImportDurationInHours",
@@ -40043,7 +40074,7 @@
             "id": "/subscriptions/e72e5254-f265-4e95-9bd2-9ee8e7329051/resourceGroups/openai-test-rg/providers/Microsoft.CognitiveServices/accounts/openai-sdk-test-automation-account-sweden-central",
             "name": "openai-sdk-test-automation-account-sweden-central",
             "type": "Microsoft.CognitiveServices/accounts",
-            "etag": "\u00220300d879-0000-4700-0000-65c3f8a80000\u0022",
+            "etag": "\u00221c0000e2-0000-4700-0000-65cadb790000\u0022",
             "location": "swedencentral",
             "sku": {
               "name": "S0"
@@ -40140,7 +40171,7 @@
                 },
                 {
                   "name": "MaxTrainingFileSize",
-                  "value": "100000000"
+                  "value": "512000000"
                 },
                 {
                   "name": "MaxUserFileImportDurationInHours",
@@ -40268,7 +40299,7 @@
                 },
                 {
                   "name": "MaxTrainingFileSize",
-                  "value": "100000000"
+                  "value": "512000000"
                 },
                 {
                   "name": "MaxUserFileImportDurationInHours",
@@ -40395,7 +40426,7 @@
                 },
                 {
                   "name": "MaxTrainingFileSize",
-                  "value": "100000000"
+                  "value": "512000000"
                 },
                 {
                   "name": "MaxUserFileImportDurationInHours",
@@ -41377,7 +41408,7 @@
                 },
                 {
                   "name": "MaxTrainingFileSize",
-                  "value": "100000000"
+                  "value": "512000000"
                 },
                 {
                   "name": "MaxUserFileImportDurationInHours",
@@ -42069,6 +42100,37 @@
       }
     },
     {
+      "RequestUri": "https://fakeendpoint/v2/track",
+      "RequestMethod": "POST",
+      "RequestHeaders": {
+        "Accept": "application/json",
+        "Accept-Encoding": "identity",
+        "Connection": "close",
+        "Content-Length": "3729",
+        "Content-Type": "application/json; charset=utf-8",
+        "User-Agent": "Python-urllib/3.11",
+        "X-Forwarded-For": "127.0.0.1",
+        "X-Forwarded-Proto": "https",
+        "X-Real-IP": "127.0.0.1"
+      },
+      "RequestBody": "[{\u0022ver\u0022: 1, \u0022name\u0022: \u0022Microsoft.ApplicationInsights.Event\u0022, \u0022time\u0022: \u0022TIME\u0022, \u0022sampleRate\u0022: 100.0, \u0022iKey\u0022: \u0022INSTRUMENTATION_KEY\u0022, \u0022tags\u0022: {\u0022ai.device.id\u0022: \u0022rhurey-wfh\u0022, \u0022ai.device.locale\u0022: \u0022en_US\u0022, \u0022ai.device.osVersion\u0022: \u002210.0.22631\u0022, \u0022ai.device.type\u0022: \u0022Other\u0022, \u0022ai.internal.sdkVersion\u0022: \u0022py3:0.11.9\u0022}, \u0022data\u0022: {\u0022baseType\u0022: \u0022EventData\u0022, \u0022baseData\u0022: {\u0022ver\u0022: 2, \u0022name\u0022: \u0022azurecli/command\u0022, \u0022properties\u0022: {\u0022Context.Default.AzureCLI.AllowBroker\u0022: \u0022False\u0022, \u0022Context.Default.AzureCLI.ClientRequestId\u0022: \u0022711cbf25-cc9c-11ee-8800-c8d9d2049b34\u0022, \u0022Context.Default.AzureCLI.CloudName\u0022: \u0022AzureCloud\u0022, \u0022Context.Default.AzureCLI.CoreVersion\u0022: \u00222.57.0\u0022, \u0022Context.Default.AzureCLI.DefaultOutputType\u0022: \u0022unknown\u0022, \u0022Context.Default.AzureCLI.EndTime\u0022: \u00222024-02-16 07:24:41.333204\u0022, \u0022Context.Default.AzureCLI.EnvironmentVariables\u0022: \u0022[]\u0022, \u0022Context.Default.AzureCLI.InitTimeElapsed\u0022: \u00221.769836\u0022, \u0022Context.Default.AzureCLI.InstallationId\u0022: \u002255059476-d0fd-11ed-8796-c8d9d2049b34\u0022, \u0022Context.Default.AzureCLI.Installer\u0022: \u0022MSI\u0022, \u0022Context.Default.AzureCLI.InvokeTimeElapsed\u0022: \u00223.356985\u0022, \u0022Context.Default.AzureCLI.Locale\u0022: \u0022English_United States,1252\u0022, \u0022Context.Default.AzureCLI.Mode\u0022: \u0022default\u0022, \u0022Context.Default.AzureCLI.OutputType\u0022: \u0022json\u0022, \u0022Context.Default.AzureCLI.Params\u0022: \u0022--output,--subscription,--resource-group,--query\u0022, \u0022Context.Default.AzureCLI.PollEndTime\u0022: \u0022None\u0022, \u0022Context.Default.AzureCLI.PollStartTime\u0022: \u0022None\u0022, \u0022Context.Default.AzureCLI.PythonVersion\u0022: \u00223.11.7\u0022, \u0022Context.Default.AzureCLI.RawCommand\u0022: \u0022cognitiveservices account list\u0022, \u0022Context.Default.AzureCLI.ShellType\u0022: \u0022cmd\u0022, \u0022Context.Default.AzureCLI.ShowSurveyMessage\u0022: \u0022False\u0022, \u0022Context.Default.AzureCLI.Source\u0022: \u0022az\u0022, \u0022Context.Default.AzureCLI.StartTime\u0022: \u00222024-02-16 07:24:37.973789\u0022, \u0022Context.Default.AzureCLI.TelemetryVersion\u0022: \u00222.0\u0022, \u0022Context.Default.AzureCLI.UserAzureId\u0022: \u00225f410ad1fc24a4547edd18a29584bf5c7572c48978dd5c8cd5fa93e771db858f\u0022, \u0022Context.Default.AzureCLI.UserAzureSubscriptionId\u0022: \u0022f7b4a5ce-d3bd-4a03-84fe-8bcad772c8c1\u0022, \u0022Context.Default.AzureCLI.debug_info\u0022: \u0022\u0022, \u0022Context.Default.AzureCLI.error_type\u0022: \u0022None\u0022, \u0022Context.Default.AzureCLI.exception_name\u0022: \u0022None\u0022, \u0022Context.Default.VS.Core.Distro.Id\u0022: \u0022\u0022, \u0022Context.Default.VS.Core.Distro.Name\u0022: \u0022\u0022, \u0022Context.Default.VS.Core.Distro.Version\u0022: \u0022\u0022, \u0022Context.Default.VS.Core.ExeName\u0022: \u0022azurecli\u0022, \u0022Context.Default.VS.Core.ExeVersion\u0022: \u00222.57.0@none\u0022, \u0022Context.Default.VS.Core.MacAddressHash\u0022: \u0022a1a9745e6932c20d63d29c7e0eeb778b2420c595247a087002a4dd921b854b1e\u0022, \u0022Context.Default.VS.Core.Machine.Id\u0022: \u0022a1a9745e-6932-c20d-63d2-9c7e0eeb778b\u0022, \u0022Context.Default.VS.Core.OS.Platform\u0022: \u0022windows-10-10.0.22631-sp0\u0022, \u0022Context.Default.VS.Core.OS.Type\u0022: \u0022windows\u0022, \u0022Context.Default.VS.Core.OS.Version\u0022: \u002210.0.22631\u0022, \u0022Context.Default.VS.Core.TelemetryApi.ProductVersion\u0022: \u0022azurecli@2.57.0\u0022, \u0022Context.Default.VS.Core.User.Id\u0022: \u002255059476-d0fd-11ed-8796-c8d9d2049b34\u0022, \u0022Context.Default.VS.Core.User.IsMicrosoftInternal\u0022: \u0022False\u0022, \u0022Context.Default.VS.Core.User.IsOptedIn\u0022: \u0022True\u0022, \u0022Reserved.ChannelUsed\u0022: \u0022AI\u0022, \u0022Reserved.DataModel.Action.Result\u0022: \u0022Success\u0022, \u0022Reserved.DataModel.Action.Type\u0022: \u0022Atomic\u0022, \u0022Reserved.DataModel.CorrelationId\u0022: \u0022fa307e03-bbd4-4736-98e2-2b8c20b25a56\u0022, \u0022Reserved.DataModel.EntityName\u0022: \u0022cognitiveservices-account-list\u0022, \u0022Reserved.DataModel.EntityType\u0022: \u0022UserTask\u0022, \u0022Reserved.DataModel.FeatureName\u0022: \u0022command\u0022, \u0022Reserved.DataModel.ProductName\u0022: \u0022azurecli\u0022, \u0022Reserved.DataModel.Source\u0022: \u0022DataModelAPI\u0022, \u0022Reserved.EventId\u0022: \u00221f70029d-1f02-4666-88bd-ed59e5281dd3\u0022, \u0022Reserved.SessionId\u0022: \u00228cc8aacb01982c9f2a6c84090277e579d2e59ec0abafd7ade56e3d3223ab715f\u0022}, \u0022measurements\u0022: {\u0022Reserved.DataModel.EntitySchemaVersion\u0022: 4, \u0022Reserved.DataModel.Severity\u0022: 0, \u0022Reserved.SequenceNumber\u0022: 1, \u0022Reserved.TimeSinceSessionStart\u0022: 0}}}}]",
+      "StatusCode": 200,
+      "ResponseHeaders": {
+        "Connection": "close",
+        "Content-Length": "49",
+        "Content-Type": "application/json; charset=utf-8",
+        "Date": "Fri, 16 Feb 2024 07:24:42 GMT",
+        "Server": "Microsoft-HTTPAPI/2.0",
+        "Strict-Transport-Security": "max-age=31536000",
+        "X-Content-Type-Options": "nosniff"
+      },
+      "ResponseBody": {
+        "itemsReceived": 1,
+        "itemsAccepted": 1,
+        "errors": []
+      }
+    },
+    {
       "RequestUri": "https://fakeendpoint/subscriptions/e72e5254-f265-4e95-9bd2-9ee8e7329051/resourceGroups/robch-cranky-red-koala-rg/providers/Microsoft.CognitiveServices/accounts/robch-cranky-red-koala-ais/listKeys?api-version=2023-05-01",
       "RequestMethod": "POST",
       "RequestHeaders": {
@@ -42082,7 +42144,7 @@
         "User-Agent": "AZURECLI/2.57.0 (MSI) azsdk-python-mgmt-cognitiveservices/13.5.0 Python/3.11.7 (Windows-10-10.0.22631-SP0) ai-cli 0.0.1",
         "X-Forwarded-For": "127.0.0.1",
         "X-Forwarded-Proto": "https",
-        "x-ms-client-request-id": "7601528b-c92f-11ee-9d0a-c8d9d2049b34",
+        "x-ms-client-request-id": "746b492f-cc9c-11ee-a5cb-c8d9d2049b34",
         "X-Real-IP": "127.0.0.1"
       },
       "RequestBody": null,
@@ -42092,18 +42154,18 @@
         "Connection": "close",
         "Content-Length": "45",
         "Content-Type": "application/json; charset=utf-8",
-        "Date": "Sun, 11 Feb 2024 22:46:59 GMT",
+        "Date": "Fri, 16 Feb 2024 07:24:44 GMT",
         "Expires": "-1",
         "Pragma": "no-cache",
         "Strict-Transport-Security": "max-age=31536000; includeSubDomains",
         "X-Cache": "CONFIG_NOCACHE",
         "X-Content-Type-Options": "nosniff",
-        "x-envoy-upstream-service-time": "23",
-        "x-ms-correlation-request-id": "d641eca2-9a76-4fbb-927a-45304e9965aa",
+        "x-envoy-upstream-service-time": "21",
+        "x-ms-correlation-request-id": "14bfcaf0-a067-453d-852f-cac83552239b",
         "x-ms-ratelimit-remaining-subscription-writes": "1199",
-        "x-ms-request-id": "430d4e42-c7a1-4b2f-8e5b-ac1cc02f6129",
-        "x-ms-routing-request-id": "WESTUS2:20240211T224659Z:d641eca2-9a76-4fbb-927a-45304e9965aa",
-        "X-MSEdge-Ref": "Ref A: 2F01AE03B8B44503A71467F93A2AB6F6 Ref B: CO6AA3150217025 Ref C: 2024-02-11T22:46:58Z"
+        "x-ms-request-id": "56773811-34ca-4b40-9b01-2ea7c014bbd2",
+        "x-ms-routing-request-id": "WESTUS2:20240216T072444Z:14bfcaf0-a067-453d-852f-cac83552239b",
+        "X-MSEdge-Ref": "Ref A: 6B1194F9A58D4FAFA849905A273A923E Ref B: CO6AA3150218053 Ref C: 2024-02-16T07:24:44Z"
       },
       "ResponseBody": {
         "key1": "COGSVCSKey1",
