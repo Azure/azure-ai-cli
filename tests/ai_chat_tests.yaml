@@ -96,7 +96,7 @@
       expect: The file is valid.
       bash: |
         #!/bin/bash  
-        rm chat-history.jsonl
+        rm *
 
         ai chat --question "Why is the sky blue, what's it called" --output-chat-history-file chat-history.jsonl
       
@@ -132,6 +132,7 @@
                 echo " - There is no row with \"role\":\"assistant\" in it."  
             fi  
         fi  
+        rm *
     - name: test ai chat history save with function calls
       expect: The file is valid.
       workingDirectory:
@@ -182,6 +183,7 @@
                 echo " - The function \"FindAllFilesInCurrentDirectory\" is not called. The file has $FUNCTION_CALL_COUNT rows."  
             fi  
         fi  
+        rm *
     - name: Test AI Chat with restored history file (basic)
       expect: sky
       bash: |
