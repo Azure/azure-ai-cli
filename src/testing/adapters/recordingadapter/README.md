@@ -1,6 +1,6 @@
 # `ai` CLI Yaml Recording Test Adapter
 
-In addition to the capabilities of the [Yaml Test Adapter](https://github.com/Azure/azure-ai-cli/tree/main/tests/testadapter), this adapter adds in the capability to record ai.exe <-> service traffic and replay it enabling CI/CD testing without service interaction.
+In addition to the capabilities of the [Yaml Test Adapter](https://github.com/Azure/azure-ai-cli/tree/main/src/testing/adapters/testadapter), this adapter adds in the capability to record ai.exe <-> service traffic and replay it enabling CI/CD testing without service interaction.
 
 The test yaml format and "how tos" are well covered in the Yaml Test Adapter pages, so you should become familiar with that as a first step.
 
@@ -58,7 +58,7 @@ set REQUESTS_CA_BUNDLE=%TEMP%\ca.crt
 
 ### Run the tests you want to record
 ```
-dotnet test D:\git\azure-ai-cli\tests\recordingadapter\bin\Debug\net8.0\Azure.AI.CLI.RecordedTestAdapter.dll
+dotnet test D:\git\azure-ai-cli\src\testing\adapters\recordingadapter\bin\Debug\net8.0\Azure.AI.CLI.RecordedTestAdapter.dll
 ```
 
 ### Inspect the results for secrets and other PII

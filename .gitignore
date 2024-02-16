@@ -1,4 +1,5 @@
 **/.ai/data/*
+**/.pyenv/**
 **/.vs/**
 **/.vscode/**
 **/bin/*/net6.0/*

@@ -8,7 +8,7 @@
   <Import Project="YamlTestRunnerCommon.targets" />
 
   <ItemGroup>
-    <ProjectReference Include="..\testframework\YamlTestFramework.csproj" />
+    <ProjectReference Include="..\..\extensions\testframework\YamlTestFramework.csproj" />
   </ItemGroup>
 
 </Project>
