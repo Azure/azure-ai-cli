@@ -25,29 +25,35 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
         public static DirectoryInfo GetTestDirectory(DirectoryInfo checkHereAndParents)
         {
             var file = FindTestConfigFile(checkHereAndParents);
-            var tags = file != null ? YamlTagHelpers.GetTagsFromFile(file.FullName) : null;
-            var testDirectory = tags?.ContainsKey("testDirectory") ?? false 
-                ? tags["testDirectory"].FirstOrDefault()
-                : null;
-
-            if (testDirectory != null)
+            if (file != null)
             {
-                testDirectory = PathHelpers.Combine(file.Directory.FullName, testDirectory);
-                Logger.Log($"YamlTestConfigHelpers.GetTestDirectory: Found test directory in config file at {testDirectory}");
-                return new DirectoryInfo(testDirectory);
+                var tags = YamlTagHelpers.GetTagsFromFile(file.FullName);
+                if (tags != null && tags.ContainsKey("testDirectory"))
+                {
+                    var testDirectory = tags["testDirectory"].FirstOrDefault();
+                    if (testDirectory != null)
+                    {
+                        testDirectory = PathHelpers.Combine(file.Directory.FullName, testDirectory);
+                        Logger.Log($"YamlTestConfigHelpers.GetTestDirectory: Found test directory in config file at {testDirectory}");
+                        return new DirectoryInfo(testDirectory);
+                    }
+                }
             }
 
             file = YamlTagHelpers.FindDefaultTagsFile(checkHereAndParents);
-            tags = file != null ? YamlTagHelpers.GetTagsFromFile(file.FullName) : null;
-            testDirectory = tags?.ContainsKey("testDirectory") ?? false
-                ? tags["testDirectory"].FirstOrDefault()
-                : null;
-
-            if (testDirectory != null)
+            if (file != null)
             {
-                testDirectory = PathHelpers.Combine(file.Directory.FullName, testDirectory);
-                Logger.Log($"YamlTestConfigHelpers.GetTestDirectory: Found test directory in default tags file at {testDirectory}");
-                return new DirectoryInfo(testDirectory);
+                var tags = YamlTagHelpers.GetTagsFromFile(file.FullName);
+                if (tags != null && tags.ContainsKey("testDirectory"))
+                {
+                    var testDirectory = tags["testDirectory"].FirstOrDefault();
+                    if (testDirectory != null)
+                    {
+                        testDirectory = PathHelpers.Combine(file.Directory.FullName, testDirectory);
+                        Logger.Log($"YamlTestConfigHelpers.GetTestDirectory: Found test directory in default tags file at {testDirectory}");
+                        return new DirectoryInfo(testDirectory);
+                    }
+                }
             }
 
             Logger.Log($"YamlTestConfigHelpers.GetTestDirectory: No test directory found; using {checkHereAndParents.FullName}");
