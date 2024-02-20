@@ -88,8 +88,7 @@ namespace Azure.AI.Details.Common.CLI
 
         private void DoVersion()
         {
-            var version = Program.GetVersionFromAssembly();
-            Console.WriteLine(version);
+            // Handled by adding "display.help" to values in parser
         }
     }
 }

@@ -147,6 +147,11 @@ namespace Azure.AI.Details.Common.CLI
             values.Add("display.help", "true");
         }
 
+        public static void AddDisplayVersionRequest(this INamedValues values)
+        {
+            values.Add("display.version", "true");
+        }
+
         public static void AddExpandHelpRequest(this INamedValues values, bool value = true)
         {
             values.Add("display.help.expand", value ? "true" : "false");

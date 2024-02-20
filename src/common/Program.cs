@@ -167,6 +167,11 @@ namespace Azure.AI.Details.Common.CLI
             HelpCommandParser.DisplayHelp(tokens, values);
         }
 
+        public static void DisplayVersion()
+        {
+            Console.Write(GetVersionFromAssembly()); 
+        }
+
         private static void DisplayParsedValues(INamedValues values)
         {
             if (values.GetOrDefault("x.quiet", true)) return;
@@ -184,6 +189,7 @@ namespace Azure.AI.Details.Common.CLI
             {
                 if (key == "error") continue;
                 if (key == "display.help") continue;
+                if (key == "display.version") continue;
 
                 var value = values[key];
                 var obfuscateValue = key.EndsWith(passwordPostfix) ||
@@ -260,6 +266,11 @@ namespace Azure.AI.Details.Common.CLI
                 if (displayBanner) DisplayBanner(values);
                 DisplayCommandHelp(tokens, values);
                 return values.GetOrDefault("display.help.exit.code", 0);
+            }
+            else if (values.DisplayVersionRequested())
+            {
+                DisplayVersion();
+                return 0;
             }
             else if (ex != null)
             {

@@ -45,6 +45,13 @@ namespace Azure.AI.Details.Common.CLI
                     values.AddDisplayHelpRequest();
                     break;
 
+                case "-v":
+                case "--v":
+                case "--version":
+                    values.AddDisplayVersionRequest();
+                    break;
+
+
                 default:
                     values.AddError("ERROR:", $"Unknown command: {command}");
                     values.AddDisplayHelpRequest();
