@@ -138,7 +138,7 @@ namespace Azure.AI.Details.Common.CLI
             }
         }
 
-        private static string GetVersionFromAssembly()
+        public static string GetVersionFromAssembly()
         {
             var sdkAssembly = Program.BindingAssemblySdkType?.Assembly;
             var sdkVersionAttribute = sdkAssembly?.GetCustomAttribute<AssemblyInformationalVersionAttribute>();

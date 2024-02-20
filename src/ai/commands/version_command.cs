@@ -5,23 +5,12 @@
 
 using Azure.AI.Details.Common.CLI.ConsoleGui;
 using Azure.AI.Details.Common.CLI.Extensions.HelperFunctions;
-using Azure.AI.OpenAI;
 using Azure.Core.Diagnostics;
-using Microsoft.CognitiveServices.Speech;
-using Microsoft.SemanticKernel;
-using Microsoft.SemanticKernel.Connectors.Memory.AzureCognitiveSearch;
-using Microsoft.SemanticKernel.Memory;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using System;
-using System.ClientModel.Primitives;
-using System.Collections.Generic;
 using System.Diagnostics.Tracing;
 using System.IO;
-using System.Linq;
 using System.Reflection;
 using System.Text;
-using System.Text.Json;
 using System.Threading.Tasks;
 
 namespace Azure.AI.Details.Common.CLI
@@ -99,7 +88,7 @@ namespace Azure.AI.Details.Common.CLI
 
         private void DoVersion()
         {
-            var version = Assembly.GetEntryAssembly().GetName().Version;
+            var version = Program.GetVersionFromAssembly();
             Console.WriteLine(version);
         }
     }

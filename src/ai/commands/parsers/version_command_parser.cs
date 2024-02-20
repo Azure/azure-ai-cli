@@ -5,7 +5,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace Azure.AI.Details.Common.CLI
 {
@@ -22,11 +21,10 @@ namespace Azure.AI.Details.Common.CLI
         }
 
         private static readonly (string name, bool valuesRequired)[] _commands =  {
-            ("version", true),
+            ("version", false),
         };
 
         private static readonly string[] _partialCommands = {
-            "version",
         };
 
         private static IEnumerable<INamedValueTokenParser> GetCommandParsers(ICommandValues values)
@@ -36,14 +34,6 @@ namespace Azure.AI.Details.Common.CLI
             switch (commandName)
             {
                 case "version": return _versionCommandParsers;
-            }
-
-            foreach (var command in _commands)
-            {
-                if (commandName == command.name)
-                {
-                    return _versionPlaceHolderParsers;
-                }
             }
 
             return null;
@@ -56,21 +46,18 @@ namespace Azure.AI.Details.Common.CLI
         {
             public CommonVersionNamedValueTokenParsers() : base(
 
-                    new NamedValueTokenParser(null, "x.command", "11", "1"),
+                    new NamedValueTokenParser(null, "x.command", "11", "1", "version"),
 
                     new ExpectOutputTokenParser(),
                     new DiagnosticLogTokenParser(),
                     new CommonNamedValueTokenParsers(),
 
                     new NamedValueTokenParser("--ini", "ini.file", "10", "1", "@"),
+                    new NamedValueTokenParser(null, "x.command.expand.file.name", "11111", "1")
                 )
             {
             }
         }
-
-        private static INamedValueTokenParser[] _versionPlaceHolderParsers = {
-            new CommonVersionNamedValueTokenParsers(),
-        };
 
         private static INamedValueTokenParser[] _versionCommandParsers = {
 
