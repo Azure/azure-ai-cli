@@ -81,7 +81,7 @@ namespace Azure.AI.Details.Common.CLI
         private readonly bool _quiet = false;
         private readonly bool _verbose = false;
 
-        private AzureEventSourceListener _azureEventSourceListener;
+        // private AzureEventSourceListener _azureEventSourceListener;
 
         // OutputHelper _output = null;
         // DisplayHelper _display = null;

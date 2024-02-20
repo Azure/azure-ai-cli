@@ -157,6 +157,11 @@ namespace Azure.AI.Details.Common.CLI
             values.Add("display.help.dump", value ? "true" : "false");
         }
 
+        public static bool DisplayVersionRequested(this INamedValues values)
+        {
+            return values.GetOrDefault("display.version", false);
+        }
+
         public static bool DisplayHelpRequested(this INamedValues values)
         {
             return values.GetOrDefault("display.help", false);

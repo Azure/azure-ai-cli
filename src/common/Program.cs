@@ -40,8 +40,11 @@ namespace Azure.AI.Details.Common.CLI
             var exitCode = ParseCommand(tokens, values);
             if (exitCode == 0 && !values.DisplayHelpRequested())
             {
-                DisplayBanner(values);
-                DisplayParsedValues(values);
+                if (!values.DisplayVersionRequested())
+                {
+                    DisplayBanner(values);
+                    DisplayParsedValues(values);
+                }
                 exitCode = RunCommand(values) ? 0 : 1;
             }
 

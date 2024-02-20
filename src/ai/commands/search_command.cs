@@ -494,6 +494,7 @@ namespace Azure.AI.Details.Common.CLI
             StoreMemoryAsync(kernel, searchIndexName, kvps).Wait();
         }
 
+#nullable enable
         private IKernel? CreateSemanticKernel(string searchEndpoint, string searchApiKey, string embeddingsEndpoint, string embeddingsDeployment, string embeddingsApiKey)
         {
             var store = new AzureCognitiveSearchMemoryStore(searchEndpoint, searchApiKey);
@@ -504,6 +505,7 @@ namespace Azure.AI.Details.Common.CLI
 
             return kernelWithACS;
         }
+#nullable disable
 
         private static async Task StoreMemoryAsync(IKernel kernel, string index, IEnumerable<KeyValuePair<string, string>> kvps)
         {

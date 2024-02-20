@@ -12,6 +12,7 @@ namespace Azure.AI.Details.Common.CLI
     {
         public static bool ParseCommand(INamedValueTokens tokens, ICommandValues values)
         {
+            values.Add("display.version", "true");
             return ParseCommands(_commands, _partialCommands, tokens, values, x => GetCommandParsers(x));
         }
 
