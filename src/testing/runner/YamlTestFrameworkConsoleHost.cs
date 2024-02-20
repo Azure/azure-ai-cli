@@ -100,8 +100,14 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
             Console.ForegroundColor = ColorHelpers.MapColor(ConsoleColor.DarkGray);
             Console.WriteLine($" ({duration})");
 
-            var resultsFile = TrxXmlTestReporter.WriteResultFile(_testRun);
+            PrintResultsFile(TrxXmlTestReporter.WriteResultFile(_testRun));
+            // PrintResultsFile(JunitXmlTestReporter.WriteResultFile(_testRun));
 
+            return passed;
+        }
+
+        private static void PrintResultsFile(string resultsFile)
+        {
             var fi = new FileInfo(resultsFile);
             Console.ResetColor();
             Console.Write("Results: ");
@@ -109,8 +115,6 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
             Console.Write(fi.FullName);
             Console.ResetColor();
             Console.WriteLine();
-
-            return passed;
         }
 
         private void PrintResult(TestResult testResult)
