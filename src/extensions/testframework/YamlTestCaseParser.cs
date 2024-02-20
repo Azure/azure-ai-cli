@@ -14,7 +14,7 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
     {
         public static IEnumerable<TestCase> TestCasesFromYaml(string source, FileInfo file)
         {
-            var defaultTags = YamlTagHelpers.GetDefaultTags(file.Directory);
+            var defaultTags = YamlTagHelpers.FindAndGetDefaultTags(file.Directory);
 
             var workingDirectory = GetScalarString(null, defaultTags, "workingDirectory");
             workingDirectory = UpdateWorkingDirectory(file.Directory.FullName, workingDirectory);

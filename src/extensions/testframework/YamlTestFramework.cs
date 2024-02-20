@@ -19,7 +19,8 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
         {
             Logger.Log($"YamlTestFramework.GetTestsFromDirectory('{source}', '{directory.FullName}'): ENTER");
 
-            directory = YamlTagHelpers.GetYamlDefaultTagsFullFileName(directory)?.Directory ?? directory;
+            directory = YamlTestConfigHelpers.GetTestDirectory(directory);
+
             var files = FindFiles(directory);
             var tests = files.SelectMany(file => GetTestsFromYaml(source, file));
 
@@ -144,14 +145,14 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
                 var stepTest = testFromIdMap.ContainsKey(nextStepId) ? testFromIdMap[nextStepId] : null;
                 if (stepTest == null)
                 {
-                    Logger.LogError($"YamlTestFramework.RunAndRecordTestCaseSteps() ==> ERROR: nextStepId '{nextStepId}' not found for test '{checkTest.DisplayName}'");
+                    // Logger.LogInfo($"YamlTestFramework.RunAndRecordTestCaseSteps() ==> nextStepId '{nextStepId}' not found for test '{checkTest.DisplayName}'");
                     break;
                 }
 
                 var stepCompletion = completionFromIdMap.ContainsKey(nextStepId) ? completionFromIdMap[nextStepId] : null;
                 if (stepCompletion == null)
                 {
-                    Logger.LogError($"YamlTestFramework.RunAndRecordTestCaseSteps() ==> ERROR: nextStepId '{nextStepId}' completion not found for test '{checkTest.DisplayName}'");
+                    // Logger.LogInfo($"YamlTestFramework.RunAndRecordTestCaseSteps() ==> nextStepId '{nextStepId}' completion not found for test '{checkTest.DisplayName}'");
                     break;
                 }
 
@@ -220,6 +221,8 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
         public const string YamlFileExtension = ".yaml";
         public const string FakeExecutor = "executor://ai/cli/TestFramework/v1";
         public const string YamlDefaultTagsFileName = "Azure-AI-CLI-TestFramework-Default-Tags.yaml";
+        public const string YamlTestsConfigDirectoryName = ".aitests";
+        public const string YamlTestsConfigFileName = "config";
         public const string DefaultTimeout = "600000";
         #endregion
     }
