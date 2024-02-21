@@ -1,0 +1,18 @@
+   ___ ____  ___  _____  ____________________
+  / _ /_  / / _ |/_  _/ /_  __/ __/ __/_  __/
+ / __ |/ /_/ __ |_/ /_   / / / _/_\ \  / /   
+/_/ |_/___/_/ |_/____/  /_/ /___/___/ /_/    
+
+USAGE: ai test <command> [...]
+
+  The `ai test` command manages CLI YAML tests.
+
+COMMANDS
+
+  ai test run [...]           (see: ai help test run)
+  ai test list [...]          (see: ai help test list)
+
+ADDITIONAL TOPICS
+
+  ai help test examples
+  ai help find topics test
