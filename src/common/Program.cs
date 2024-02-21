@@ -172,9 +172,27 @@ namespace Azure.AI.Details.Common.CLI
 
         public static void DisplayVersion()
         {
-            Console.WriteLine(GetVersionFromAssembly()); 
-            var latestVersion = GetLatestVersionInfo().GetAwaiter().GetResult();
-            Console.WriteLine($"Latest Version: {latestVersion}"); 
+            var currentVersion = GetVersionFromAssembly().Split("-")[0];
+            Console.WriteLine(currentVersion); 
+            var latestVersion = GetLatestVersionInfo()
+                .GetAwaiter()
+                .GetResult();
+            if (latestVersion != null)
+            {
+                var currentVersionNumbers = currentVersion.Split(".");
+                var latestVersionNumbers = latestVersion.Split("-")[0].Split(".");
+                if (updateNeeded(currentVersionNumbers, latestVersionNumbers))
+                {
+                    Console.WriteLine($"\nUpdate available, Latest Version: {latestVersion}"); 
+                }
+            }
+        }
+
+        private static bool updateNeeded(string[] current, string[] latest)
+        {
+            return Int32.Parse(current[0]) < Int32.Parse(latest[0])
+                || Int32.Parse(current[1]) < Int32.Parse(latest[1])
+                || Int32.Parse(current[2]) < Int32.Parse(latest[2]);
         }
 
         private static void DisplayParsedValues(INamedValues values)
