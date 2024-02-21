@@ -11,7 +11,10 @@ using System.Linq;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Text;
+using System.Text.Json;
+using System.Text.Json.Nodes;
 using System.Threading.Tasks;
+using System.Net.Http.Json;
 
 namespace Azure.AI.Details.Common.CLI
 {
@@ -169,7 +172,9 @@ namespace Azure.AI.Details.Common.CLI
 
         public static void DisplayVersion()
         {
-            Console.Write(GetVersionFromAssembly()); 
+            Console.WriteLine(GetVersionFromAssembly()); 
+            var latestVersion = GetLatestVersionInfo().GetAwaiter().GetResult();
+            Console.WriteLine($"Latest Version: {latestVersion}"); 
         }
 
         private static void DisplayParsedValues(INamedValues values)
@@ -334,6 +339,23 @@ namespace Azure.AI.Details.Common.CLI
             });
 
             return passed;
+        }
+
+        private static async Task<string> GetLatestVersionInfo()
+        {
+            try
+            {
+                var httpClient = new HttpClient();
+                var uri = "https://api.nuget.org/v3-flatcontainer/azure.ai.cli/index.json";
+                var info = await httpClient.GetFromJsonAsync<JsonObject>(uri);
+                var versionList = (JsonArray)info["versions"];
+                return versionList.Last().ToString();
+            }
+            catch (Exception)
+            {
+                // Report no exception, this is a non-critical operation
+            }
+            return null;
         }
 
         private static IProgramData _data;
