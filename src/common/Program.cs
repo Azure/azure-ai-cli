@@ -12,9 +12,7 @@ using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Text.Json;
-using System.Text.Json.Nodes;
 using System.Threading.Tasks;
-using System.Net.Http.Json;
 
 namespace Azure.AI.Details.Common.CLI
 {
@@ -170,13 +168,12 @@ namespace Azure.AI.Details.Common.CLI
             HelpCommandParser.DisplayHelp(tokens, values);
         }
 
-        public static void DisplayVersion()
+        public static void DisplayVersion(INamedValues values)
         {
             var currentVersion = GetVersionFromAssembly().Split("-")[0];
             Console.WriteLine(currentVersion); 
-            var latestVersion = GetLatestVersionInfo()
-                .GetAwaiter()
-                .GetResult();
+
+            var latestVersion = HttpHelpers.GetLatestVersionInfo(values, "version");
             if (latestVersion != null)
             {
                 var currentVersionNumbers = currentVersion.Split(".");
@@ -292,7 +289,7 @@ namespace Azure.AI.Details.Common.CLI
             }
             else if (values.DisplayVersionRequested())
             {
-                DisplayVersion();
+                DisplayVersion(values);
                 return 0;
             }
             else if (ex != null)
@@ -357,23 +354,6 @@ namespace Azure.AI.Details.Common.CLI
             });
 
             return passed;
-        }
-
-        private static async Task<string> GetLatestVersionInfo()
-        {
-            try
-            {
-                var httpClient = new HttpClient();
-                var uri = "https://api.nuget.org/v3-flatcontainer/azure.ai.cli/index.json";
-                var info = await httpClient.GetFromJsonAsync<JsonObject>(uri);
-                var versionList = (JsonArray)info["versions"];
-                return versionList.Last().ToString();
-            }
-            catch (Exception)
-            {
-                // Report no exception, this is a non-critical operation
-            }
-            return null;
         }
 
         private static IProgramData _data;

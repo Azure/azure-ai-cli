@@ -272,5 +272,26 @@ namespace Azure.AI.Details.Common.CLI
             return FileHelpers.ReadWriteAllStream(stream, fileName, message, returnAsText);
         }
 
+        public static string GetLatestVersionInfo(INamedValues values, string domain)
+        {
+            try
+            {
+                var uri = "https://api.nuget.org/v3-flatcontainer/azure.ai.cli/index.json";
+                var request = (HttpWebRequest)WebRequest.Create(uri);
+                request.Method = WebRequestMethods.Http.Get;
+                var response = HttpHelpers.GetWebResponse(request);
+                var json = HttpHelpers.ReadWriteJson(response, values, domain);
+                var info = JObject.Parse(json);
+                var versionList = (JArray)info["versions"];
+
+                return versionList.Last().ToString();
+            }
+            catch (Exception)
+            {
+                // Report no exception, this is a non-critical operation
+            }
+            return null;
+        }
+
     }
 }
