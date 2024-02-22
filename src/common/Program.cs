@@ -11,6 +11,7 @@ using System.Linq;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
 
 namespace Azure.AI.Details.Common.CLI
@@ -40,8 +41,11 @@ namespace Azure.AI.Details.Common.CLI
             var exitCode = ParseCommand(tokens, values);
             if (exitCode == 0 && !values.DisplayHelpRequested())
             {
-                DisplayBanner(values);
-                DisplayParsedValues(values);
+                if (!values.DisplayVersionRequested())
+                {
+                    DisplayBanner(values);
+                    DisplayParsedValues(values);
+                }
                 exitCode = RunCommand(values) ? 0 : 1;
             }
 
@@ -138,7 +142,7 @@ namespace Azure.AI.Details.Common.CLI
             }
         }
 
-        private static string GetVersionFromAssembly()
+        public static string GetVersionFromAssembly()
         {
             var sdkAssembly = Program.BindingAssemblySdkType?.Assembly;
             var sdkVersionAttribute = sdkAssembly?.GetCustomAttribute<AssemblyInformationalVersionAttribute>();
@@ -164,6 +168,30 @@ namespace Azure.AI.Details.Common.CLI
             HelpCommandParser.DisplayHelp(tokens, values);
         }
 
+        public static void DisplayVersion(INamedValues values)
+        {
+            var currentVersion = GetVersionFromAssembly().Split("-")[0];
+            Console.WriteLine(currentVersion); 
+
+            var latestVersion = HttpHelpers.GetLatestVersionInfo(values, "version");
+            if (latestVersion != null)
+            {
+                var currentVersionNumbers = currentVersion.Split(".");
+                var latestVersionNumbers = latestVersion.Split("-")[0].Split(".");
+                if (updateNeeded(currentVersionNumbers, latestVersionNumbers))
+                {
+                    Console.WriteLine($"\nUpdate available, Latest Version: {latestVersion}"); 
+                }
+            }
+        }
+
+        private static bool updateNeeded(string[] current, string[] latest)
+        {
+            return Int32.Parse(current[0]) < Int32.Parse(latest[0])
+                || Int32.Parse(current[1]) < Int32.Parse(latest[1])
+                || Int32.Parse(current[2]) < Int32.Parse(latest[2]);
+        }
+
         private static void DisplayParsedValues(INamedValues values)
         {
             if (values.GetOrDefault("x.quiet", true)) return;
@@ -181,6 +209,7 @@ namespace Azure.AI.Details.Common.CLI
             {
                 if (key == "error") continue;
                 if (key == "display.help") continue;
+                if (key == "display.version") continue;
 
                 var value = values[key];
                 var obfuscateValue = key.EndsWith(passwordPostfix) ||
@@ -257,6 +286,11 @@ namespace Azure.AI.Details.Common.CLI
                 if (displayBanner) DisplayBanner(values);
                 DisplayCommandHelp(tokens, values);
                 return values.GetOrDefault("display.help.exit.code", 0);
+            }
+            else if (values.DisplayVersionRequested())
+            {
+                DisplayVersion(values);
+                return 0;
             }
             else if (ex != null)
             {

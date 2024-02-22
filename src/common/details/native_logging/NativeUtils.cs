@@ -6,6 +6,7 @@ namespace Azure.AI.Details.Common.CLI
 {
     internal static class NativeUtils
     {
+        #nullable enable
         public static NativeMemory ToNativeNullTerminatedUtf8String(string? str)
         {
             if (str == null)
@@ -33,5 +34,6 @@ namespace Azure.AI.Details.Common.CLI
                 throw;
             }
         }
+        #nullable disable
     }
 }
