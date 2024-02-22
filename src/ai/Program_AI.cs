@@ -155,6 +155,7 @@ namespace Azure.AI.Details.Common.CLI
                 "dev" => (new DevCommand(values)).RunCommand(),
                 "run" => (new RunJobCommand(values)).RunCommand(),
                 "version" => (new VersionCommand(values)).RunCommand(),
+                "update" => (new VersionCommand(values)).RunCommand(),
                 _ => false
             };
         }
@@ -180,6 +181,7 @@ namespace Azure.AI.Details.Common.CLI
                 "tool" => ToolCommandParser.ParseCommand(tokens, values),
                 "wizard" => ScenarioWizardCommandParser.ParseCommand(tokens, values),
                 "version" => VersionCommandParser.ParseCommand(tokens, values),
+                "update" => UpdateCommandParser.ParseCommand(tokens, values),
                 "dev" => DevCommandParser.ParseCommand(tokens, values),
                 "run" => RunJobCommandParser.ParseCommand(tokens, values),
                 _ => false
@@ -206,6 +208,7 @@ namespace Azure.AI.Details.Common.CLI
                 "dev" => DevCommandParser.ParseCommandValues(tokens, values),
                 "run" => RunJobCommandParser.ParseCommandValues(tokens, values),
                 "version" => VersionCommandParser.ParseCommandValues(tokens, values),
+                "update" => UpdateCommandParser.ParseCommandValues(tokens, values),
                 _ => false
             };
         }

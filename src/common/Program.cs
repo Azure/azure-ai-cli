@@ -168,29 +168,32 @@ namespace Azure.AI.Details.Common.CLI
             HelpCommandParser.DisplayHelp(tokens, values);
         }
 
-        public static void DisplayVersion(INamedValues values)
+        public static void DisplayVersion(INamedValues values, bool showCurrentVersion = true)
         {
             var currentVersion = GetVersionFromAssembly().Split("-")[0];
-            Console.WriteLine(currentVersion); 
 
-            var latestVersion = HttpHelpers.GetLatestVersionInfo(values, "version");
+            Console.WriteLine(values.DisplayUpdateRequested() ? 
+                $"Current Version: {currentVersion}"
+                : currentVersion); 
+
+            var domain = values.DisplayUpdateRequested() ? "update" : "version";
+            var latestVersion = HttpHelpers.GetLatestVersionInfo(values, domain);
             if (latestVersion != null)
             {
                 var currentVersionNumbers = currentVersion.Split(".");
                 var latestVersionNumbers = latestVersion.Split("-")[0].Split(".");
-                if (updateNeeded(currentVersionNumbers, latestVersionNumbers))
+                if (StringHelpers.UpdateNeeded(currentVersionNumbers, latestVersionNumbers))
                 {
                     Console.WriteLine($"\nUpdate available, Latest Version: {latestVersion}"); 
+                    return;
                 }
+            }
+            if (values.DisplayUpdateRequested())
+            {
+                Console.WriteLine("No update available"); 
             }
         }
 
-        private static bool updateNeeded(string[] current, string[] latest)
-        {
-            return Int32.Parse(current[0]) < Int32.Parse(latest[0])
-                || Int32.Parse(current[1]) < Int32.Parse(latest[1])
-                || Int32.Parse(current[2]) < Int32.Parse(latest[2]);
-        }
 
         private static void DisplayParsedValues(INamedValues values)
         {
@@ -287,7 +290,7 @@ namespace Azure.AI.Details.Common.CLI
                 DisplayCommandHelp(tokens, values);
                 return values.GetOrDefault("display.help.exit.code", 0);
             }
-            else if (values.DisplayVersionRequested())
+            else if (values.DisplayVersionRequested() || values.DisplayUpdateRequested())
             {
                 DisplayVersion(values);
                 return 0;
