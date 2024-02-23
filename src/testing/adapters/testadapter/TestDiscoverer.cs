@@ -22,7 +22,7 @@ namespace Azure.AI.Details.Common.CLI.TestAdapter
         {
             try
             {
-                Logger.Log(logger);
+                Logger.Log(new YamlTestFrameworkTestAdapterMessageLogger(logger));
                 Logger.Log($"TestDiscoverer.DiscoverTests(): ENTER");
                 Logger.Log($"TestDiscoverer.DiscoverTests(): count={sources.Count()}");
                 foreach (var test in YamlTestAdapter.GetTestsFromFiles(sources))

@@ -197,6 +197,7 @@ namespace Azure.AI.Details.Common.CLI
         {
             CheckPath();
             LogHelpers.EnsureStartLogFile(_values);
+            Logger.Log(new AiCliTestFrameworkLogger());
 
             // _display = new DisplayHelper(_values);
 

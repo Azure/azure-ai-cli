@@ -20,7 +20,7 @@ namespace Azure.AI.Details.Common.CLI.TestAdapter
         {
             tests = tests.ToList(); // force enumeration
 
-            Logger.Log(frameworkHandle);
+            Logger.Log(new YamlTestFrameworkTestAdapterMessageLogger(frameworkHandle));
             Logger.Log($"TextExecutor.RunTests(IEnumerable<TestCase>(): ENTER");
             Logger.Log($"TextExecutor.RunTests(IEnumerable<TestCase>(): count={tests.Count()}");
             YamlTestAdapter.RunTests(tests, runContext, frameworkHandle);
@@ -31,7 +31,7 @@ namespace Azure.AI.Details.Common.CLI.TestAdapter
         {
             sources = sources.ToList(); // force enumeration
             
-            Logger.Log(frameworkHandle);
+            Logger.Log(new YamlTestFrameworkTestAdapterMessageLogger(frameworkHandle));
             Logger.Log($"TextExecutor.RunTests(IEnumerable<string>(): ENTER");
             Logger.Log($"TextExecutor.RunTests(IEnumerable<string>(): count={sources.Count()}");
             RunTests(YamlTestAdapter.GetTestsFromFiles(sources), runContext, frameworkHandle);

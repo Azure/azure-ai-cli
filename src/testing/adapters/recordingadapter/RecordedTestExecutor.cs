@@ -18,7 +18,7 @@ namespace Azure.AI.Details.Common.CLI.RecordedTestAdapter
     {
         public void RunTests(IEnumerable<TestCase> tests, IRunContext runContext, IFrameworkHandle frameworkHandle)
         {
-            Logger.Log(frameworkHandle);
+            Logger.Log(new YamlTestFrameworkTestAdapterMessageLogger(frameworkHandle));
             Logger.Log($"RecordingExecutor.RunTests(IEnumerable<TestCase>(): ENTER");
             Logger.Log($"RecordingExecutor.RunTests(IEnumerable<TestCase>(): count={tests.Count()}");
             RecordedTestAdapter.RunTests(tests, runContext, frameworkHandle);
@@ -27,7 +27,7 @@ namespace Azure.AI.Details.Common.CLI.RecordedTestAdapter
 
         public void RunTests(IEnumerable<string> sources, IRunContext runContext, IFrameworkHandle frameworkHandle)
         {
-            Logger.Log(frameworkHandle);
+            Logger.Log(new YamlTestFrameworkTestAdapterMessageLogger(frameworkHandle));
             Logger.Log($"RecordingExecutor.RunTests(IEnumerable<string>(): ENTER");
             Logger.Log($"RecordingExecutor.RunTests(IEnumerable<string>(): count={sources.Count()}");
             RunTests(RecordedTestAdapter.GetTestsFromFiles(sources), runContext, frameworkHandle);
