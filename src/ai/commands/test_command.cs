@@ -11,6 +11,7 @@ using System.Net;
 using System.Text;
 using Azure.AI.Details.Common.CLI.Extensions.Templates;
 using Azure.AI.Details.Common.CLI.TestFramework;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
 namespace Azure.AI.Details.Common.CLI
 {
@@ -65,19 +66,121 @@ namespace Azure.AI.Details.Common.CLI
 
         private void DoTestList()
         {
-            var tests = YamlTestFramework.GetTestsFromDirectory("ait", new DirectoryInfo(".")).ToList();
+            var tests = FindAndFilterTests();
+
+            Console.ForegroundColor = ColorHelpers.MapColor(ConsoleColor.DarkGray);
             foreach (var test in tests)
             {
                 Console.WriteLine(test.FullyQualifiedName);
             }
+
+            Console.ResetColor();
+            Console.WriteLine(tests.Count() == 1
+                ? $"\nFound {tests.Count()} test..."
+                : $"\nFound {tests.Count()} tests...");
         }
 
         private void DoTestRun()
         {
-            var tests = YamlTestFramework.GetTestsFromDirectory("ait", new DirectoryInfo(".")).ToList();
+            var tests = FindAndFilterTests();
+
             var consoleHost = new YamlTestFrameworkConsoleHost();
             var resultsByTestCaseId = YamlTestFramework.RunTests(tests, consoleHost);
             consoleHost.Finish(resultsByTestCaseId);
+        }
+
+        private IList<TestCase> FindAndFilterTests()
+        {
+            var files = FindTestFiles();
+            var filters = GetTestFilters();
+
+            var atLeastOneFileSpecified = files.Any();
+            var tests = atLeastOneFileSpecified
+                ? files.SelectMany(file => YamlTestFramework.GetTestsFromYaml(file.FullName, file))
+                : YamlTestFramework.GetTestsFromDirectory("ai test", new DirectoryInfo("."));
+
+            var filtered = YamlTestCaseFilter.FilterTestCases(tests, filters).ToList();
+
+            if (tests.Count() == 0)
+            {
+                _values.AddThrowError("WARNING:", !atLeastOneFileSpecified
+                    ? "No tests found"
+                    : files.Count() == 1
+                        ? $"No tests found in {files.Count()} file"
+                        : $"No tests found in {files.Count()} files");
+            }
+            
+            if (filtered.Count() == 0)
+            {
+                Console.WriteLine(atLeastOneFileSpecified
+                    ? $"Found {tests.Count()} tests in {files.Count()} files\n"
+                    : $"Found {tests.Count()} tests\n");
+
+                _values.AddThrowError("WARNING:", "No tests matching criteria.");
+            }
+
+            return filtered;
+        }
+
+        private List<string> GetTestFilters()
+        {
+            var filters = new List<string>();
+
+            var options = SearchOptionXToken.GetOptions(_values).ToList();
+            options.AddRange(TestOptionXToken.GetOptions(_values).ToList());
+            options.AddRange(TestsOptionXToken.GetOptions(_values));
+            foreach (var item in options)
+            {
+                filters.Add(item);
+            }
+
+            options = ContainsOptionXToken.GetOptions(_values).ToList();
+            foreach (var item in options)
+            {
+                filters.Add($"+{item}");
+            }
+
+            options = RemoveOptionXToken.GetOptions(_values).ToList();
+            foreach (var item in options)
+            {
+                filters.Add($"-{item}");
+            }
+
+            return filters;
+        }
+
+        private List<FileInfo> FindTestFiles()
+        {
+            var files = new List<FileInfo>();
+
+            var options = FileOptionXToken.GetOptions(_values).ToList();
+            options.AddRange(FilesOptionXToken.GetOptions(_values).ToList());
+            foreach (var item in options)
+            {
+                var patterns = item.Split(';', StringSplitOptions.RemoveEmptyEntries);
+                foreach (var pattern in patterns)
+                {
+                    AddFindFiles(files, pattern);
+                }
+            }
+
+            return files;
+        }
+
+        private void AddFindFiles(List<FileInfo> filesAsList, string pattern)
+        {
+            var found = FindFiles(pattern);
+            if (found.Count() == 0)
+            {
+                _values.AddThrowError("WARNING:", $"No files found: {pattern}");
+            }
+            filesAsList.AddRange(found);
+        }
+
+        private static IList<FileInfo> FindFiles(string pattern)
+        {
+            var files = FileHelpers.FindFiles(Directory.GetCurrentDirectory(), pattern, null, false, false);
+            return files.Select(x => new FileInfo(x)).ToList();
         }
 
         private void StartCommand()

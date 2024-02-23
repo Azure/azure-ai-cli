@@ -9,8 +9,8 @@ USAGE: ai test <command> [...]
 
 COMMANDS
 
-  ai test run [...]           (see: ai help test run)
   ai test list [...]          (see: ai help test list)
+  ai test run [...]           (see: ai help test run)
 
 ADDITIONAL TOPICS
 

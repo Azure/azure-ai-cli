@@ -61,8 +61,18 @@ namespace Azure.AI.Details.Common.CLI
 
                     new NamedValueTokenParser("--ini", "ini.file", "10", "1", "@"),
 
-                    new NamedValueTokenParser(null, "x.command.expand.file.name", "11111", "1")
+                    new NamedValueTokenParser(null, "x.command.expand.file.name", "11111", "1"),
 
+                    FileOptionXToken.Parser(),
+                    FilesOptionXToken.Parser(),
+
+                    TestOptionXToken.Parser(),
+                    TestsOptionXToken.Parser(),
+
+                    ContainsOptionXToken.Parser(),
+                    RemoveOptionXToken.Parser(),
+
+                    SearchOptionXToken.Parser()
                 )
             {
             }
