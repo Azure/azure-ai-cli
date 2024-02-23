@@ -8,32 +8,36 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
 {
     public class YamlTagHelpers
     {
-        public static FileInfo GetYamlDefaultTagsFullFileName(DirectoryInfo directory)
+        public static FileInfo FindDefaultTagsFile(DirectoryInfo directory)
         {
             var found = directory.GetFiles(YamlTestFramework.YamlDefaultTagsFileName);
             return found.Length == 1
                 ? found[0]
                 : directory.Parent != null
-                    ? GetYamlDefaultTagsFullFileName(directory.Parent)
+                    ? FindDefaultTagsFile(directory.Parent)
                     : null;
         }
 
-        public static Dictionary<string, List<string>> GetDefaultTags(DirectoryInfo directory)
+        public static Dictionary<string, List<string>> FindAndGetDefaultTags(DirectoryInfo directory)
+        {
+            var defaultsFile = FindDefaultTagsFile(directory)?.FullName;
+            return defaultsFile != null
+                ? GetTagsFromFile(defaultsFile)
+                : new Dictionary<string, List<string>>();
+        }
+
+        public static Dictionary<string, List<string>> GetTagsFromFile(string defaultsFile)
         {
             var defaultTags = new Dictionary<string, List<string>>();
 
-            var defaultsFile = GetYamlDefaultTagsFullFileName(directory)?.FullName;
-            if (defaultsFile != null)
+            Logger.Log($"Loading default tags from {defaultsFile}");
+            var parsed = YamlHelpers.ParseYamlStream(defaultsFile);
+            if (parsed.Documents.Count() > 0)
             {
-                Logger.Log($"Loading default tags from {defaultsFile}");
-                var parsed = YamlHelpers.ParseYamlStream(defaultsFile);
-                if (parsed.Documents.Count() > 0)
+                var tagsNode = parsed.Documents[0].RootNode;
+                if (tagsNode != null)
                 {
-                    var tagsNode = parsed.Documents[0].RootNode;
-                    if (tagsNode != null)
-                    {
-                        defaultTags = UpdateCopyTags(defaultTags, null, tagsNode);
-                    }
+                    defaultTags = UpdateCopyTags(defaultTags, null, tagsNode);
                 }
             }
 

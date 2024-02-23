@@ -26,12 +26,13 @@
                             Id="AlreadyInstalledVersionSearch"
                             Result="version"/>
 
-        <bal:Condition Message="The same or newer version is already installed.">
+        <bal:Condition Message="The same or newer version of this product is already installed.">
         NOT WixBundleAction = 5 OR NOT AlreadyInstalledVersion &gt;= v$(var.productVersion)
         </bal:Condition>
 
         <Chain>
             <!-- Dependencies -->
+            <PackageGroupRef Id="VcRuntime"/>
             <PackageGroupRef Id="DotNetSdk"/>
             <PackageGroupRef Id="AzureCLI"/>
             <!-- AI CLI package -->
@@ -72,6 +73,25 @@
                         Permanent="yes"
                         SourceFile="azure-cli-$(var.azureCliVersion)-$(var.targetPlatform).msi"
                         Visible="yes"
+                        Vital="yes"/>
+        </PackageGroup>
+
+        <!-- Visual C++ runtime -->
+        <util:RegistrySearch Id="VcRuntimeRegistry"
+                             Key="SOFTWARE\Wow6432Node\Microsoft\VisualStudio\14.0\VC\Runtimes\$(var.targetPlatform)"
+                             Result="exists"
+                             Root="HKLM"
+                             Variable="VCRT_INSTALLED"
+                             Win64="yes"/>
+
+        <PackageGroup Id="VcRuntime">
+            <ExePackage Compressed="no"
+                        DetectCondition="VCRT_INSTALLED"
+                        DownloadUrl="$(var.vcrtUrl)"
+                        InstallCommand="/quiet /norestart"
+                        PerMachine="yes"
+                        Permanent="yes"
+                        SourceFile="VC_redist.$(var.targetPlatform).exe"
                         Vital="yes"/>
         </PackageGroup>
     </Fragment>

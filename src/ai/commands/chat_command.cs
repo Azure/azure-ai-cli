@@ -1098,6 +1098,7 @@ namespace Azure.AI.Details.Common.CLI
         // OutputHelper _output = null;
         // DisplayHelper _display = null;
 
+#nullable enable
         private int? TryParse(string? s, int? defaultValue)
         {
             return !string.IsNullOrEmpty(s) && int.TryParse(s, out var parsed) ? parsed : defaultValue;
@@ -1137,6 +1138,7 @@ namespace Azure.AI.Details.Common.CLI
 
             return kernelWithACS;
         }
+#nullable disable
 
         private async Task StoreMemoryAsync(IKernel kernel, string index)
         {
@@ -1157,6 +1159,7 @@ namespace Azure.AI.Details.Common.CLI
             if (!_quiet) Console.WriteLine(". Done!\n");
         }
 
+#nullable enable
         private static async Task<string?> SearchMemoryAsync(IKernel? kernel, string collection, string text)
         {
             if (kernel == null) return null;
@@ -1177,6 +1180,7 @@ namespace Azure.AI.Details.Common.CLI
 
             return result;
         }
+#nullable disable
 
         private string UpdateUserInputWithSearchResultInfo(string input, string searchResults)
         {
