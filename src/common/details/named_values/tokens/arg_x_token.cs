@@ -5,7 +5,6 @@
 
 namespace Azure.AI.Details.Common.CLI
 {
-
     public class ArgXToken
     {
         public static INamedValueTokenParser Parser() => new ArgXTokenParser();

@@ -77,8 +77,16 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
             var tests = new List<TestCase>();
             if (sequence == null) return tests;
 
-            foreach (YamlMappingNode mapping in sequence.Children)
+            foreach (var node in sequence.Children)
             {
+                var mapping = node as YamlMappingNode;
+                if (mapping == null)
+                {
+                    var message = $"Error parsing YAML: expected mapping at {context.File.FullName}({node.Start.Line})";
+                    Logger.LogError(message);
+                    return null;
+                }
+
                 var fromMapping = TestCasesFromYamlMapping(context, mapping);
                 if (fromMapping != null)
                 {
