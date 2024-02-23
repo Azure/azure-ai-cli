@@ -41,7 +41,7 @@ namespace Azure.AI.Details.Common.CLI
             var exitCode = ParseCommand(tokens, values);
             if (exitCode == 0 && !values.DisplayHelpRequested())
             {
-                if (!values.DisplayVersionRequested())
+                if (!values.DisplayVersionRequested() && !values.DisplayUpdateRequested())
                 {
                     DisplayBanner(values);
                     DisplayParsedValues(values);
@@ -168,7 +168,7 @@ namespace Azure.AI.Details.Common.CLI
             HelpCommandParser.DisplayHelp(tokens, values);
         }
 
-        public static void DisplayVersion(INamedValues values, bool showCurrentVersion = true)
+        public static void DisplayVersion(INamedValues values)
         {
             var currentVersion = GetVersionFromAssembly().Split("-")[0];
 
@@ -184,7 +184,8 @@ namespace Azure.AI.Details.Common.CLI
                 var latestVersionNumbers = latestVersion.Split("-")[0].Split(".");
                 if (StringHelpers.UpdateNeeded(currentVersionNumbers, latestVersionNumbers))
                 {
-                    Console.WriteLine($"\nUpdate available, Latest Version: {latestVersion}"); 
+                    ConsoleHelpers.WriteLineWithHighlight($"\n`#e_;Update available, Latest Version: {latestVersion}`\n");
+                    ConsoleHelpers.WriteLineWithHighlight(@"Go to `#e0;https://aka.ms/azure-ai-cli-update` for more information."); 
                     return;
                 }
             }
