@@ -72,10 +72,7 @@ namespace Azure.AI.Details.Common.CLI
                     ContainsOptionXToken.Parser(),
                     RemoveOptionXToken.Parser(),
 
-                    SearchOptionXToken.Parser(),
-
-                    OutputResultsFormatToken.Parser(),
-                    OutputResultsFileToken.Parser()
+                    SearchOptionXToken.Parser()
                 )
             {
             }
@@ -86,16 +83,13 @@ namespace Azure.AI.Details.Common.CLI
         };
 
         private static INamedValueTokenParser[] _testListParsers = {
-            new CommonTestNamedValueTokenParsers(),
-            // ArgXToken.Parser(),
-            // InstructionsToken.Parser(),
-            // ProgrammingLanguageToken.Parser(),
+            new CommonTestNamedValueTokenParsers()
         };
 
         private static INamedValueTokenParser[] _testRunParsers = {
             new CommonTestNamedValueTokenParsers(),
-            // RunCommandScriptToken.Parser(),
-            // RunBashScriptToken.Parser()
+            OutputResultsFormatToken.Parser(),
+            OutputResultsFileToken.Parser()
         };
     }
 }

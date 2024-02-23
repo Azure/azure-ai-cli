@@ -17,6 +17,10 @@ USAGE: ai test run [...]
     --contains TEXT1 [TEXT2 [...]]
     --remove TEXT1 [TEXT2 [...]]
 
+  OUTPUT
+    --output-file FILE
+    --output-format trx|junit
+
 EXAMPLES
 
   EXAMPLE 1: Runs all available tests
