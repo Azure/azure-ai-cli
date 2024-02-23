@@ -96,7 +96,9 @@ namespace Azure.AI.Details.Common.CLI
 
             var consoleHost = new YamlTestFrameworkConsoleHost();
             var resultsByTestCaseId = YamlTestFramework.RunTests(tests, consoleHost);
-            consoleHost.Finish(resultsByTestCaseId);
+
+            GetOutputFileAndFormat(out var file, out var format);
+            consoleHost.Finish(resultsByTestCaseId, format, file);
         }
 
         private IList<TestCase> FindAndFilterTests()
@@ -191,6 +193,24 @@ namespace Azure.AI.Details.Common.CLI
         {
             var files = FileHelpers.FindFiles(Directory.GetCurrentDirectory(), pattern, null, false, false);
             return files.Select(x => new FileInfo(x)).ToList();
+        }
+
+        private void GetOutputFileAndFormat(out string file, out string format)
+        {
+            format = OutputResultsFormatToken.Data().GetOrDefault(_values, "trx");
+            var ext = format switch
+            {
+                "trx" => "trx",
+                "junit" => "xml",
+                _ => throw new Exception($"Unknown format: {format}")
+            };
+
+            file = OutputResultsFileToken.Data().GetOrDefault(_values, null);
+            file ??= $"test-results.{ext}";
+            if (!file.EndsWith($".{ext}"))
+            {
+                file += $".{ext}";
+            }
         }
 
         private void StartCommand()

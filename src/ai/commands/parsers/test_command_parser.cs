@@ -72,7 +72,10 @@ namespace Azure.AI.Details.Common.CLI
                     ContainsOptionXToken.Parser(),
                     RemoveOptionXToken.Parser(),
 
-                    SearchOptionXToken.Parser()
+                    SearchOptionXToken.Parser(),
+
+                    OutputResultsFormatToken.Parser(),
+                    OutputResultsFileToken.Parser()
                 )
             {
             }

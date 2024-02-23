@@ -7,7 +7,7 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
 {
     public static class TrxXmlTestReporter
     {
-        public static string WriteResultFile(TestRun testRun)
+        public static string WriteResultsFile(TestRun testRun, string resultsFile = "test-results.trx")
         {
             var testCases = testRun.TestCases;
             var testResults = testRun.TestResults;
@@ -17,7 +17,6 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
             var assembly = typeof(YamlTestFrameworkConsoleHost).Assembly;
             var assemblyPath = assembly.Location;
 
-            var resultFile = "test-results.trx";
             var testRunId = Guid.NewGuid().ToString();
             var testListId = "8c84fa94-04c1-424b-9868-57a2d4851a1d";
             var testType = "13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b";
@@ -33,7 +32,7 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
             settings.NewLineHandling = NewLineHandling.Replace;
             settings.OmitXmlDeclaration = false;
 
-            var writer = XmlWriter.Create(resultFile, settings);
+            var writer = XmlWriter.Create(resultsFile, settings);
             writer.WriteStartDocument();
             writer.WriteStartElement("", "TestRun", "http://microsoft.com/schemas/VisualStudio/TeamTest/2010");
             writer.WriteAttributeString("id", testRunId);
@@ -190,7 +189,7 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
             writer.Close();
             writer.Dispose();
 
-            return resultFile;
+            return resultsFile;
         }
 
         private static string OutcomeToString(TestOutcome outcome)

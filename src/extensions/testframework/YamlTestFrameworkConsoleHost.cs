@@ -37,7 +37,7 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
             _testRun.EndTest(testCase, outcome);
         }
 
-        public bool Finish(IDictionary<string, IList<TestResult>> resultsByTestCaseId)
+        public bool Finish(IDictionary<string, IList<TestResult>> resultsByTestCaseId, string outputResultsFormat = "trx", string outputResultsFile = null)
         {
             _testRun.EndRun();
 
@@ -100,8 +100,14 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
             Console.ForegroundColor = ColorHelpers.MapColor(ConsoleColor.DarkGray);
             Console.WriteLine($" ({duration})");
 
-            PrintResultsFile(TrxXmlTestReporter.WriteResultFile(_testRun));
-            // PrintResultsFile(JunitXmlTestReporter.WriteResultFile(_testRun));
+            if (outputResultsFormat == "trx")
+            {
+                PrintResultsFile(TrxXmlTestReporter.WriteResultsFile(_testRun, outputResultsFile));
+            }
+            else if (outputResultsFormat == "junit")
+            {
+                PrintResultsFile(JunitXmlTestReporter.WriteResultsFile(_testRun, outputResultsFile));
+            }
 
             return passed;
         }

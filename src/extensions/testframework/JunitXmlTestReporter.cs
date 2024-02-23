@@ -7,14 +7,12 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
 {
     public static class JunitXmlTestReporter
     {
-        public static string WriteResultFile(TestRun testRun)
+        public static string WriteResultsFile(TestRun testRun, string resultsFile = "test-results.xml")
         {
             var testCases = testRun.TestCases;
             var testResults = testRun.TestResults;
             var startTime = testRun.StartTime;
             var endTime = testRun.EndTime;
-
-            var resultFile = "test-results.xml";
 
             XmlWriterSettings settings = new XmlWriterSettings();
             settings.Indent = true;
@@ -23,7 +21,7 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
             settings.NewLineHandling = NewLineHandling.Replace;
             settings.OmitXmlDeclaration = false;
 
-            var writer = XmlWriter.Create(resultFile, settings);
+            var writer = XmlWriter.Create(resultsFile, settings);
             writer.WriteStartDocument();
             writer.WriteStartElement("testsuites");
 
@@ -78,7 +76,7 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
             writer.Close();
             writer.Dispose();
 
-            return resultFile;
+            return resultsFile;
         }
     }
 }
