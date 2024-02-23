@@ -73,16 +73,26 @@ namespace Azure.AI.Details.Common.CLI
             {
                 Console.WriteLine(test.FullyQualifiedName);
             }
-
             Console.ResetColor();
-            Console.WriteLine(tests.Count() == 1
-                ? $"\nFound {tests.Count()} test..."
-                : $"\nFound {tests.Count()} tests...");
+
+            if (!_quiet)
+            {
+                Console.WriteLine(tests.Count() == 1
+                    ? $"\nFound {tests.Count()} test..."
+                    : $"\nFound {tests.Count()} tests...");
+            }
         }
 
         private void DoTestRun()
         {
             var tests = FindAndFilterTests();
+
+            if (!_quiet)
+            {
+                Console.WriteLine(tests.Count() == 1
+                    ? $"Found {tests.Count()} test...\n"
+                    : $"Found {tests.Count()} tests...\n");
+            }
 
             var consoleHost = new YamlTestFrameworkConsoleHost();
             var resultsByTestCaseId = YamlTestFramework.RunTests(tests, consoleHost);
