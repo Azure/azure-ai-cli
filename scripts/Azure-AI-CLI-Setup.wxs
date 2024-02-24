@@ -42,14 +42,22 @@
 
     <Fragment>
         <!-- .NET SDK -->
-        <util:DirectorySearch Id="DotNetDirectory"
-                              Path="[ProgramFiles64Folder]dotnet\sdk\$(var.dotNetVersion)"
-                              Result="exists"
-                              Variable="DOTNET_SDK_INSTALLED"/>
+        <!--
+        There can be multiple SDK versions installed side by side on the system
+        and .NET provides no way of checking the highest or major version other
+        than by running the dotnet command and parsing the output, which is not
+        supported here. Thus need to check for each possible 8.x SDK folder and
+        if none is found then install the configured (highest) 8.x version.
+        -->
+        <util:DirectorySearch Id="DotNet80201" Path="[ProgramFiles64Folder]dotnet\sdk\8.0.201" Result="exists" Variable="NET_80201"/>
+        <util:DirectorySearch Id="DotNet80200" Path="[ProgramFiles64Folder]dotnet\sdk\8.0.200" Result="exists" Variable="NET_80200"/>
+        <util:DirectorySearch Id="DotNet80102" Path="[ProgramFiles64Folder]dotnet\sdk\8.0.102" Result="exists" Variable="NET_80102"/>
+        <util:DirectorySearch Id="DotNet80101" Path="[ProgramFiles64Folder]dotnet\sdk\8.0.101" Result="exists" Variable="NET_80101"/>
+        <util:DirectorySearch Id="DotNet80100" Path="[ProgramFiles64Folder]dotnet\sdk\8.0.100" Result="exists" Variable="NET_80100"/>
 
         <PackageGroup Id="DotNetSdk">
             <ExePackage Compressed="no"
-                        DetectCondition="DOTNET_SDK_INSTALLED"
+                        DetectCondition="NET_80201 OR NET_80200 OR NET_80102 OR NET_80101 OR NET_80100"
                         DownloadUrl="$(var.dotNetUrl)"
                         InstallCommand="/quiet /norestart"
                         PerMachine="yes"
