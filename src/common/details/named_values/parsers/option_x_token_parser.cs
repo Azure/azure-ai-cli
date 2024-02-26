@@ -27,10 +27,9 @@ namespace Azure.AI.Details.Common.CLI
                 NamedValueTokenParserHelpers.MatchFullName(_fullName, tokens, values, _partsRequired, out nameTokensMatched))
             {
                 var prefix = tokens.NamePrefixRequired();
-                if (prefix.Length > 0)
-                {
-                    return ParseValuesUntilNextTokenPrefixed(tokens, values, nameTokensMatched, prefix);
-                }
+                return prefix.Length > 0
+                    ? ParseValuesUntilNextTokenPrefixed(tokens, values, nameTokensMatched, prefix)
+                    : ParseOneIndexedValue(tokens, values, nameTokensMatched); // e.g. {_fullName}.{index}=value
             }
 
             return false;
@@ -58,7 +57,7 @@ namespace Azure.AI.Details.Common.CLI
             {
                 for (int i = 0; queue.Count() > 0; i++)
                 {
-                    var argName = $"{_fullName}{i}";
+                    var argName = $"{_fullName}.{i}";
                     if (values.Contains(argName)) continue;
 
                     values.Add(argName, queue.Dequeue());
@@ -72,6 +71,26 @@ namespace Azure.AI.Details.Common.CLI
             }
             
             return false;
+        }
+
+        private bool ParseOneIndexedValue(INamedValueTokens tokens, INamedValues values, int nameTokensMatched)
+        {
+            var peekToken = tokens.PeekNextToken(nameTokensMatched);
+            if (peekToken == null) return false;
+
+            var ok = int.TryParse(peekToken, out var index);
+            if (!ok) return false;
+
+            var argName = $"{_fullName}.{index}";
+            if (values.Contains(argName)) return false;
+
+            var value = tokens.PeekNextTokenValue(nameTokensMatched + 1, values);
+            if (value == null) return false;
+
+            values.Add(argName, value);
+            tokens.SkipTokens(nameTokensMatched + 2);
+
+            return true;
         }
     }
 }

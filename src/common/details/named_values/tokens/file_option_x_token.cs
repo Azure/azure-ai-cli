@@ -9,7 +9,7 @@ namespace Azure.AI.Details.Common.CLI
     {
         public static INamedValueTokenParser Parser() => new OptionXTokenParser(_optionName, _fullName, "1");
 
-        public static string GetOption(ICommandValues values, int x) => values.GetOrDefault(_fullName + x, null);
+        public static string GetOption(ICommandValues values, int x) => values.GetOrDefault($"{_fullName}.{x}", null);
 
         public static IEnumerable<string> GetOptions(ICommandValues values)
         {
