@@ -50,6 +50,7 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
             { "simulate", RegisterTestCaseProperty("Simulate") },
             { "skipOnFailure", RegisterTestCaseProperty("SkipOnFailure") },
             { "timeout", RegisterTestCaseProperty("Timeout") },
+            { "env", RegisterTestCaseProperty("Env") },
             { "working-directory", RegisterTestCaseProperty("WorkingDirectory") }
         };
 
