@@ -46,6 +46,7 @@ namespace Azure.AI.Details.Common.CLI
             {
                 if (!values.DisplayVersionRequested() && !values.DisplayUpdateRequested())
                 {
+                    _ = Task.Run(() => DisplayVersion(values, true));
                     DisplayBanner(values);
                     DisplayParsedValues(values);
                 }
@@ -53,7 +54,7 @@ namespace Azure.AI.Details.Common.CLI
                 var updateMessage = GetUpdateMessage();
                 if (!String.IsNullOrEmpty(updateMessage))
                 {
-                    Console.WriteLine(updateMessage);
+                    ConsoleHelpers.WriteLineWithHighlight(updateMessage);
                 }
             }
 
