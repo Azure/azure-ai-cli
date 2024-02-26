@@ -21,6 +21,7 @@ The test case YAML file contains a list of test cases. Each test case is a dicti
 
 * `name` (required): The name of the test case.
 * `command`, `script`, `bash` (required): The command or script to run.
+- `env` (optional): A dictionary of environment variables to set before running the command or script.
 - `input` (optional): The input to pass to the command or script.
 - `expect` (optional): A list of regular expressions that must be matched in the stdout/stderr output.
 - `expect-gpt` (optional): A string that instructs the LLM (e.g. GPT-4) to decide pass/fail based on stdout/stderr.
@@ -82,6 +83,19 @@ bash: |
   else 
     py script.py
   fi
+```
+
+## `env`
+
+Optional. Inherits from parent.
+
+When present, a dictionary of environment variables to set before running the command or script.
+
+Example:
+
+```yaml
+env:
+  JAVA_HOME: /path/to/java
 ```
 
 ## `input`
