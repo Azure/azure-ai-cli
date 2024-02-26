@@ -12,6 +12,7 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
         public string Class;
         public Dictionary<string, List<string>> Tags;
 
+        public Dictionary<string, string> Environment;
         public string WorkingDirectory;
     }
 }

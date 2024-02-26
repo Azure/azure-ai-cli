@@ -1,0 +1,43 @@
+env:
+  ENV1: VAL1
+  ENV2: VAL2
+
+tests:
+- name: test `env:` yaml element 1
+  bash: |
+    echo $ENV1
+    echo $ENV2
+  expect: |
+    VAL1
+    VAL2
+
+- name: test `env:` yaml element 2
+  env:
+    ENV1: VAL3
+  bash: |
+    echo $ENV1
+    echo $ENV2
+  expect: |
+    VAL3
+    VAL2
+
+- name: test `env:` yaml element 3
+  env:
+    ENV2: VAL4
+  bash: |
+    echo $ENV1
+    echo $ENV2
+  expect: |
+    VAL1
+    VAL4
+
+- name: test `env:` yaml element 4
+  env:
+    ENV2: '$(ENV1);$(ENV2);hello'
+  bash: |
+    echo $ENV1
+    echo $ENV2
+  expect: |
+    VAL1
+    VAL1;VAL2;hello
+    

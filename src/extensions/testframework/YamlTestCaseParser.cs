@@ -5,7 +5,6 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
-using YamlDotNet.Helpers;
 using YamlDotNet.RepresentationModel;
 
 namespace Azure.AI.Details.Common.CLI.TestFramework
@@ -25,6 +24,7 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
                 Area = GetRootArea(file),
                 Class = GetScalarString(null, defaultTags, "class", defaultClassName),
                 Tags = defaultTags,
+                Environment = YamlEnvHelpers.GetDefaultEnvironment(true, workingDirectory),
                 WorkingDirectory = workingDirectory
             };
 
@@ -143,6 +143,11 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
 
             SetTestCaseProperty(test, "working-directory", workingDirectory);
 
+            var processEnv = YamlEnvHelpers.GetCurrentProcessEnvironment();
+            var testEnv = YamlEnvHelpers.UpdateCopyEnvironment(context.Environment, mapping);
+            testEnv = YamlEnvHelpers.GetNewAndUpdatedEnvironmentVariables(processEnv, testEnv);
+            SetTestCasePropertyMap(test, "env", testEnv);
+
             SetTestCasePropertyMap(test, "foreach", mapping, "foreach", workingDirectory);
             SetTestCasePropertyMap(test, "arguments", mapping, "arguments", workingDirectory);
             SetTestCasePropertyMap(test, "input", mapping, "input", workingDirectory);
@@ -164,6 +169,7 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
                 context.Class = GetScalarString(mapping, "class", context.Class);
                 context.Area = UpdateArea(mapping, context.Area);
                 context.Tags = YamlTagHelpers.UpdateCopyTags(context.Tags, mapping);
+                context.Environment = YamlEnvHelpers.UpdateCopyEnvironment(context.Environment, mapping);
                 context.WorkingDirectory = UpdateWorkingDirectory(mapping, context.WorkingDirectory);
 
                 return TestCasesFromYamlSequenceOfSteps(context, stepsSequence);
@@ -174,6 +180,7 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
                 context.Class = GetScalarString(mapping, "class", context.Class);
                 context.Area = UpdateArea(mapping, context.Area);
                 context.Tags = YamlTagHelpers.UpdateCopyTags(context.Tags, mapping);
+                context.Environment = YamlEnvHelpers.UpdateCopyEnvironment(context.Environment, mapping);
                 context.WorkingDirectory = UpdateWorkingDirectory(mapping, context.WorkingDirectory);
 
                 return TestCasesFromYamlSequence(context, testsSequence).ToList();
@@ -224,7 +231,7 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
 
         private static bool IsValidTestCaseNode(string value)
         {
-            return ";area;class;name;cli;command;script;bash;timeout;foreach;arguments;input;expect;expect-gpt;not-expect;parallelize;simulate;skipOnFailure;tag;tags;workingDirectory;sanitize;".IndexOf($";{value};") >= 0;
+            return ";area;class;name;cli;command;script;bash;timeout;foreach;arguments;input;expect;expect-gpt;not-expect;parallelize;simulate;skipOnFailure;tag;tags;workingDirectory;env;sanitize;".IndexOf($";{value};") >= 0;
         }
 
         private static void SetTestCaseProperty(TestCase test, string propertyName, YamlMappingNode mapping, string mappingName)
@@ -239,6 +246,17 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
             {
                 YamlTestProperties.Set(test, propertyName, value);
             }
+        }
+
+        private static void SetTestCasePropertyMap(TestCase test, string propertyName, IDictionary<string, string> map)
+        {
+            var sb = new StringBuilder();
+            foreach (var key in map.Keys)
+            {
+                sb.Append($"{key}={map[key]}\n");
+            }
+
+            SetTestCaseProperty(test, propertyName, sb.ToString());
         }
 
         private static void SetTestCasePropertyMap(TestCase test, string propertyName, YamlMappingNode testNode, string mappingName, string workingDirectory)
@@ -470,6 +488,7 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
                 }
             }
         }
+
         private static string UpdateWorkingDirectory(YamlMappingNode mapping, string currentWorkingDirectory)
         {
             var workingDirectory = GetScalarString(mapping, "workingDirectory");
