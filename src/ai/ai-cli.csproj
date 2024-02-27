@@ -136,6 +136,15 @@
     <ProjectReference Include="..\extensions\template_extension\template_extension.csproj" />
   </ItemGroup>
 
+  <ItemGroup>  
+    <None Include="../../artifacts/Python_Win_x64/**/*.*" Pack="true" PackagePath="python/win-x64">
+      <LinkBase>Python/win_x64</LinkBase>
+    </None>
+    <None Include="../../artifacts/Python_linux_x64/**/*.*" Pack="true" PackagePath="python/linux-x64">
+      <LinkBase>Python/linux_x64</LinkBase>
+    </None>    
+  </ItemGroup>  
+
   <Import Project="BuildCommon.targets" />
 
 </Project>

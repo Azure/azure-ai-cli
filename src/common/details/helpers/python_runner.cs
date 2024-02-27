@@ -208,13 +208,26 @@ namespace Azure.AI.Details.Common.CLI
 
         private static string FindPython()
         {
-            var lastTry = FindPythonBinaryInOsPath();
+            var lastTry = FindPythonBinaryInToolPath() ?? FindPythonBinaryInOsPath();
+
             var process = ProcessHelpers.RunShellCommandAsync(lastTry, "--version").Result;
             if (process.ExitCode == 0 && process.MergedOutput.Contains("Python 3.")) return lastTry;
 
             return null;
         }
+        private static string FindPythonBinaryInToolPath()
+        {
+            var basePath = AppContext.BaseDirectory;
 
+            // Detect the OS type (Windows,  Linux, macOS) and the architecture (x86, x64, arm, arm64)
+            var rid = RuntimeInformation.RuntimeIdentifier;
+            
+            var possiblePython = Path.Combine(basePath, "python", rid, "python");
+
+            if (File.Exists(possiblePython)) return possiblePython;
+
+            return string.Empty;
+        }
         private static string? FindPythonBinaryInOsPath()
         {
             var search = OperatingSystem.IsWindows()
