@@ -261,7 +261,7 @@ namespace Azure.AI.Details.Common.CLI
 
         private static bool ExpectsDefaults(string commandName)
         {
-            return commandName != "config" && commandName != "help" && commandName != "version";
+            return commandName != "config" && commandName != "help" && commandName != "update" && commandName != "version";
         } 
 
         private static bool ParseAtFileToken(IEnumerable<INamedValueTokenParser> parsers, INamedValueTokens tokens, ICommandValues values)

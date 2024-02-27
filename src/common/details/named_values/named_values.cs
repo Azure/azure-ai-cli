@@ -167,6 +167,11 @@ namespace Azure.AI.Details.Common.CLI
             return values.GetOrDefault("display.version", false);
         }
 
+        public static bool DisplayUpdateRequested(this INamedValues values)
+        {
+            return values.GetOrDefault("display.update", false);
+        }
+
         public static bool DisplayHelpRequested(this INamedValues values)
         {
             return values.GetOrDefault("display.help", false);

@@ -92,6 +92,13 @@ namespace Azure.AI.Details.Common.CLI
             lastCharAt--;
             return lastCharAt >= 0;
         }
+
+        public static bool UpdateNeeded(string[] current, string[] latest)
+        {
+            return Int32.Parse(current[0]) < Int32.Parse(latest[0])
+                || Int32.Parse(current[1]) < Int32.Parse(latest[1])
+                || Int32.Parse(current[2]) < Int32.Parse(latest[2]);
+        }
     }
 
     public static class StringExtensions
