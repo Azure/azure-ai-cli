@@ -110,6 +110,11 @@ namespace Azure.AI.Details.Common.CLI
             synthesizer.Synthesizing += Synthesizing;
             synthesizer.SynthesisCompleted += SynthesisCompleted;
             synthesizer.SynthesisCanceled += SynthesisCanceled;
+            var wordboundary = _values["config.metadata.wordBoundaryEnabled"];
+            if (!string.IsNullOrWhiteSpace(wordboundary) && wordboundary == "true")
+            {
+                synthesizer.WordBoundary += SynthesisWordBoundary;
+            }
 
             while (true)
             {
@@ -151,6 +156,11 @@ namespace Azure.AI.Details.Common.CLI
             synthesizer.Synthesizing += Synthesizing;
             synthesizer.SynthesisCompleted += SynthesisCompleted;
             synthesizer.SynthesisCanceled += SynthesisCanceled;
+            var wordboundary = _values["config.metadata.wordBoundaryEnabled"];
+            if (!string.IsNullOrWhiteSpace(wordboundary) && wordboundary == "true")
+            {
+                synthesizer.WordBoundary += SynthesisWordBoundary;
+            }
 
             var task = synthesizer.SpeakTextAsync(text);
             WaitForStopOrCancel(synthesizer, task);
@@ -187,6 +197,11 @@ namespace Azure.AI.Details.Common.CLI
             synthesizer.Synthesizing += Synthesizing;
             synthesizer.SynthesisCompleted += SynthesisCompleted;
             synthesizer.SynthesisCanceled += SynthesisCanceled;
+            var wordboundary = _values["config.metadata.wordBoundaryEnabled"];
+            if (!string.IsNullOrWhiteSpace(wordboundary) && wordboundary == "true")
+            {
+                synthesizer.WordBoundary += SynthesisWordBoundary;
+            }
 
             var task = synthesizer.SpeakSsmlAsync(ssml);
             WaitForStopOrCancel(synthesizer, task);
@@ -519,6 +534,12 @@ namespace Azure.AI.Details.Common.CLI
             _display.DisplaySynthesisCanceled(e);
             _output.SynthesisCanceled(e);
             _canceledEvent.Set();
+        }
+
+        private void SynthesisWordBoundary(object sender, SpeechSynthesisWordBoundaryEventArgs e)
+        {
+            _display.DisplaySynthesisWordBoundary(e);
+            _output.SynthesisWordBoundary(e);
         }
 
         private void WaitForStopOrCancel(SpeechSynthesizer synthesizer, Task<SpeechSynthesisResult> task)

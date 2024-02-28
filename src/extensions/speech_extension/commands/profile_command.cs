@@ -95,7 +95,7 @@ namespace Azure.AI.Details.Common.CLI
               saveAs = FileHelpers.GetOutputDataFileName(saveAs, _values);
               var saveMessage = $"Saving as {saveAs} ...";
               if (!_quiet) Console.WriteLine(saveMessage);
-              FileHelpers.WriteAllText(saveAs, json, new UTF8Encoding(false))
+              FileHelpers.WriteAllText(saveAs, json, new UTF8Encoding(false));
               if (!_quiet) Console.WriteLine($"{saveMessage} Done!\n");
             } 
         }

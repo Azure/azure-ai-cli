@@ -157,6 +157,27 @@ namespace Azure.AI.Details.Common.CLI
             _lock.ExitReaderLock();
         }
 
+        public void Transcribing(MeetingTranscriptionEventArgs e)
+        {
+            _lock.EnterReaderLock();
+            OutputTranscribing(e);
+            _lock.ExitReaderLock();
+        }
+
+        public void Transcribed(MeetingTranscriptionEventArgs e)
+        {
+            _lock.EnterReaderLock();
+            OutputTranscribed(e);
+            _lock.ExitReaderLock();
+        }
+
+        public void Canceled(MeetingTranscriptionCanceledEventArgs e)
+        {
+            _lock.EnterReaderLock();
+            OutputCanceled(e);
+            _lock.ExitReaderLock();
+        }
+
         public void Transcribing(ConversationTranscriptionEventArgs e)
         {
             _lock.EnterReaderLock();
@@ -227,6 +248,13 @@ namespace Azure.AI.Details.Common.CLI
             _lock.ExitReaderLock();
         }
 
+        public void SynthesisWordBoundary(SpeechSynthesisWordBoundaryEventArgs e)
+        {
+            _lock.EnterReaderLock();
+            OutputWordBoundary(e);
+            _lock.ExitReaderLock();
+        }
+
         public void EnsureCachePropertyCollection(string name, PropertyCollection properties)
         {
             EnsureInitPropertyCollectionCache();
@@ -274,12 +302,22 @@ namespace Azure.AI.Details.Common.CLI
             if (ShouldCacheOutputResult()) CacheOutputResult(result);
         }
 
+        private void EnsureCacheOutputResult(MeetingTranscriptionResult result)
+        {
+            if (ShouldCacheOutputResult()) CacheOutputResult(result);
+        }
+
         private void EnsureCacheOutputResult(ConversationTranscriptionResult result)
         {
             if (ShouldCacheOutputResult()) CacheOutputResult(result);
         }
 
         private void EnsureCacheOutputResult(TranslationRecognitionResult result)
+        {
+            if (ShouldCacheOutputResult()) CacheOutputResult(result);
+        }
+
+        private void EnsureCacheOutputResult(SpeechSynthesisResult result)
         {
             if (ShouldCacheOutputResult()) CacheOutputResult(result);
         }
@@ -302,6 +340,12 @@ namespace Azure.AI.Details.Common.CLI
             _outputResultCache.Add(result);
         }
 
+        private void CacheOutputResult(MeetingTranscriptionResult result)
+        {
+            EnsureInitOutputResultCache();
+            _outputResultCache.Add(result);
+        }
+
         private void CacheOutputResult(ConversationTranscriptionResult result)
         {
             EnsureInitOutputResultCache();
@@ -309,6 +353,12 @@ namespace Azure.AI.Details.Common.CLI
         }
 
         private void CacheOutputResult(TranslationRecognitionResult result)
+        {
+            EnsureInitOutputResultCache();
+            _outputResultCache.Add(result);
+        }
+
+        private void CacheOutputResult(SpeechSynthesisResult result)
         {
             EnsureInitOutputResultCache();
             _outputResultCache.Add(result);
@@ -513,15 +563,18 @@ namespace Azure.AI.Details.Common.CLI
         {
             var resultSpeech = result as SpeechRecognitionResult;
             var resultTranslation = result as TranslationRecognitionResult;
-            var resultTranscription = result as ConversationTranscriptionResult;
+            var resultConversationTranscription = result as ConversationTranscriptionResult;
+            var resultMeetingTranscription = result as MeetingTranscriptionResult;
 
             var text = resultSpeech != null
                 ? resultSpeech.Properties.GetProperty(kind)
                 : resultTranslation != null
                     ? resultTranslation.Properties.GetProperty(kind)
-                    : resultTranscription != null
-                        ? resultTranscription.Properties.GetProperty(kind)
-                        : "";
+                    : resultConversationTranscription != null
+                        ? resultConversationTranscription.Properties.GetProperty(kind)
+                        : resultMeetingTranscription != null
+                            ? resultMeetingTranscription.Properties.GetProperty(kind)
+                            : "";
 
             return !string.IsNullOrEmpty(text)
                 ? text
@@ -529,9 +582,11 @@ namespace Azure.AI.Details.Common.CLI
                     ? resultSpeech.Text
                     : resultTranslation != null
                         ? resultTranslation.Text
-                        : resultTranscription != null
-                            ? resultTranscription.Text
-                            : "";
+                        : resultConversationTranscription != null
+                            ? resultConversationTranscription.Text
+                            : resultMeetingTranscription != null
+                                ? resultMeetingTranscription.Text
+                                : "";
         }
 
         private JArray GetBatchAudioFileSegments()
@@ -552,15 +607,18 @@ namespace Azure.AI.Details.Common.CLI
 
             var resultSpeech = result as SpeechRecognitionResult;
             var resultTranslation = result as TranslationRecognitionResult;
-            var resultTranscription = result as ConversationTranscriptionResult;
+            var resultConversationTranscription = result as ConversationTranscriptionResult;
+            var resultMeetingTranscription = result as MeetingTranscriptionResult;
 
             return resultSpeech != null
                 ? GetBatchAudioFileSegment(resultSpeech)
                 : resultTranslation != null
                     ? GetBatchAudioFileSegment(resultTranslation)
-                    : resultTranscription != null
-                        ? GetBatchAudioFileSegment(resultTranscription)
-                        : null;
+                    : resultConversationTranscription != null
+                        ? GetBatchAudioFileSegment(resultConversationTranscription)
+                        : resultMeetingTranscription != null
+                            ? GetBatchAudioFileSegment(resultMeetingTranscription)
+                            : null;
         }
 
         private JObject GetBatchAudioFileSegment(SpeechRecognitionResult result)
@@ -656,6 +714,37 @@ namespace Azure.AI.Details.Common.CLI
             return segment;
         }
 
+        private JObject GetBatchAudioFileSegment(MeetingTranscriptionResult result)
+        {
+            var segment = new JObject();
+
+            if (result.Reason == ResultReason.Canceled)
+            {
+                var cancelDetails = CancellationDetails.FromResult(result);
+                if (cancelDetails.Reason == CancellationReason.EndOfStream) return null;
+
+                segment.Add("ErrorDetails", cancelDetails.ErrorDetails);
+                segment.Add("ErrorCode", cancelDetails.ErrorCode.ToString());
+                return segment;
+            }
+
+            var json = result.Properties.GetProperty(PropertyId.SpeechServiceResponse_JsonResult);
+            var parsed = !string.IsNullOrEmpty(json) ? JToken.Parse(json) : null;
+
+            segment.Add("RecognitionStatus", parsed["RecognitionStatus"] ?? result.Reason.ToString());
+
+            segment.Add("ChannelNumber", "0");
+            segment.Add("SpeakerId", null);
+            segment.Add("Offset", result.OffsetInTicks);
+            segment.Add("Duration", (long)(result.Duration.TotalMilliseconds * 10000));
+            segment.Add("OffsetInSeconds", Math.Round(1.0 * result.OffsetInTicks / 10000 / 1000, 2));
+            segment.Add("DurationInSeconds", Math.Round(result.Duration.TotalSeconds, 2));
+
+            segment.Add("NBest", parsed["NBest"] ?? new JArray());
+
+            return segment;
+        }
+
         private double GetBatchAudioLengthInSeconds()
         {
             double length = 0;
@@ -673,22 +762,27 @@ namespace Azure.AI.Details.Common.CLI
         {
             var resultSpeech = result as SpeechRecognitionResult;
             var resultTranslation = result as TranslationRecognitionResult;
-            var resultTranscription = result as ConversationTranscriptionResult;
+            var resultConversationTranscription = result as ConversationTranscriptionResult;
+            var resultMeetingTranscription = result as MeetingTranscriptionResult;
 
             offset = (resultSpeech != null
                 ? resultSpeech.OffsetInTicks
                 : resultTranslation != null
                     ? resultTranslation.OffsetInTicks
-                    : resultTranscription != null
-                        ? resultTranscription.OffsetInTicks
-                        : 0) / 10000 / 1000;
+                    : resultConversationTranscription != null
+                        ? resultConversationTranscription.OffsetInTicks
+                        : resultMeetingTranscription != null
+                            ? resultMeetingTranscription.OffsetInTicks
+                            : 0) / 10000 / 1000;
             duration = (resultSpeech != null
                 ? resultSpeech.Duration.TotalSeconds
                 : resultTranslation != null
                     ? resultTranslation.Duration.TotalSeconds
-                    : resultTranscription != null
-                        ? resultTranscription.Duration.TotalSeconds
-                        : 0);
+                    : resultConversationTranscription != null
+                        ? resultConversationTranscription.Duration.TotalSeconds
+                        : resultMeetingTranscription != null
+                            ? resultMeetingTranscription.Duration.TotalSeconds
+                            : 0);
         }
 
         private bool ShouldOutputAll(string name)
@@ -1935,6 +2029,181 @@ namespace Azure.AI.Details.Common.CLI
             EnsureOutputEachProperty(namePrefix, result.Properties);
         }
 
+        private void OutputTranscribing(MeetingTranscriptionEventArgs e)
+        {
+            if (!_outputAll && !_outputEach) return;
+
+            var sessionid = e.SessionId;
+            var timestamp = this.CreateTimestamp();
+            EnsureCacheAll("recognizer.recognizing.sessionid", sessionid);
+            EnsureOutputEach("recognizer.recognizing.sessionid", sessionid);
+            EnsureCacheAll("recognizer.event.sessionid", sessionid);
+            EnsureOutputEach("recognizer.event.sessionid", sessionid);
+            EnsureCacheAll("event.sessionid", sessionid);
+            EnsureOutputEach("event.sessionid", sessionid);
+
+            EnsureCacheAll("recognizer.recognizing.timestamp", timestamp);
+            EnsureOutputEach("recognizer.recognizing.timestamp", timestamp);
+            EnsureCacheAll("recognizer.event.timestamp", timestamp);
+            EnsureOutputEach("recognizer.event.timestamp", timestamp);
+            EnsureCacheAll("event.timestamp", timestamp);
+            EnsureOutputEach("event.timestamp", timestamp);
+
+            EnsureOutputRecognizerProperties("recognizer.recognizing.recognizer");
+
+            var result = e.Result;
+            OutputResult("recognizer.recognizing.result", result, '\n');
+            OutputResult("result", result, '\n'); // Don't include this in global requests for results
+
+            var output = $"TRANSCRIBING";
+            EnsureCacheAll("recognizer.recognizing.events", output);
+            EnsureOutputEach("recognizer.recognizing.event", output);
+            EnsureCacheAll("recognizer.events", output);
+            EnsureOutputEach("recognizer.event", output);
+            EnsureCacheAll("events", output);
+            EnsureOutputEach("event", output);
+
+            FlushOutputEachCacheStage1();
+        }
+
+        private void OutputTranscribed(MeetingTranscriptionEventArgs e)
+        {
+            EnsureCacheOutputResult(e.Result);
+
+            if (!_outputAll && !_outputEach) return;
+
+            var sessionid = e.SessionId;
+            var timestamp = this.CreateTimestamp();
+            EnsureCacheAll("recognizer.recognized.sessionid", sessionid);
+            EnsureOutputEach("recognizer.recognized.sessionid", sessionid);
+            EnsureCacheAll("recognizer.event.sessionid", sessionid);
+            EnsureOutputEach("recognizer.event.sessionid", sessionid);
+            EnsureCacheAll("event.sessionid", sessionid);
+            EnsureOutputEach("event.sessionid", sessionid);
+
+            EnsureCacheAll("recognizer.recognized.timestamp", timestamp);
+            EnsureOutputEach("recognizer.recognized.timestamp", timestamp);
+            EnsureCacheAll("recognizer.event.timestamp", timestamp);
+            EnsureOutputEach("recognizer.event.timestamp", timestamp);
+            EnsureCacheAll("event.timestamp", timestamp);
+            EnsureOutputEach("event.timestamp", timestamp);
+
+            EnsureOutputRecognizerProperties("recognizer.recognized.recognizer");
+
+            var result = e.Result;
+            OutputResult("recognizer.recognized.result", result, ' ');
+            OutputResult("result", result, ' ');
+
+            var output = $"TRANSCRIBED";
+            EnsureCacheAll("recognizer.recognized.events", output);
+            EnsureOutputEach("recognizer.recognized.event", output);
+            EnsureCacheAll("recognizer.events", output);
+            EnsureOutputEach("recognizer.event", output);
+            EnsureCacheAll("events", output);
+            EnsureOutputEach("event", output);
+
+            FlushOutputEachCacheStage1();
+        }
+
+        private void OutputCanceled(MeetingTranscriptionCanceledEventArgs e)
+        {
+            EnsureCacheOutputResult(e.Result);
+
+            if (!_outputAll && !_outputEach) return;
+
+            var sessionid = e.SessionId;
+            var timestamp = this.CreateTimestamp();
+            EnsureCacheAll("recognizer.canceled.sessionid", sessionid);
+            EnsureOutputEach("recognizer.canceled.sessionid", sessionid);
+            EnsureCacheAll("recognizer.event.sessionid", sessionid);
+            EnsureOutputEach("recognizer.event.sessionid", sessionid);
+            EnsureCacheAll("event.sessionid", sessionid);
+            EnsureOutputEach("event.sessionid", sessionid);
+
+            EnsureCacheAll("recognizer.canceled.timestamp", timestamp);
+            EnsureOutputEach("recognizer.canceled.timestamp", timestamp);
+            EnsureCacheAll("recognizer.event.timestamp", timestamp);
+            EnsureOutputEach("recognizer.event.timestamp", timestamp);
+            EnsureCacheAll("event.timestamp", timestamp);
+            EnsureOutputEach("event.timestamp", timestamp);
+
+            var reason = e.Reason.ToString();
+            EnsureCacheAll("recognizer.canceled.reason", reason);
+            EnsureOutputEach("recognizer.canceled.reason", reason);
+
+            var code = (e.Reason == CancellationReason.Error) ? e.ErrorCode.ToString() : "0";
+            EnsureCacheAll("recognizer.canceled.error.code", code);
+            EnsureOutputEach("recognizer.canceled.error.code", code);
+            EnsureCacheAll("recognizer.canceled.error", code);
+            EnsureOutputEach("recognizer.canceled.error", code);
+
+            var details = (e.Reason == CancellationReason.Error) ? e.ErrorDetails : "";
+            EnsureCacheAll("recognizer.canceled.error.details", details);
+            EnsureOutputEach("recognizer.canceled.error.details", details);
+            EnsureCacheAll("recognizer.canceled.error", details);
+            EnsureOutputEach("recognizer.canceled.error", details);
+
+            EnsureOutputRecognizerProperties("recognizer.canceled.recognizer");
+
+            var result = e.Result;
+            OutputResult("recognizer.canceled.result", result, ' ');
+            OutputResult("result", result, ' ');
+
+            var output = $"CANCELED";
+            EnsureCacheAll("recognizer.session.events", output);
+            EnsureOutputEach("recognizer.session.event", output);
+            EnsureCacheAll("recognizer.canceled.events", output);
+            EnsureOutputEach("recognizer.canceled.event", output);
+            EnsureCacheAll("recognizer.events", output);
+            EnsureOutputEach("recognizer.event", output);
+            EnsureCacheAll("events", output);
+            EnsureOutputEach("event", output);
+
+            FlushOutputEachCacheStage1();
+        }
+
+        private void OutputResult(string namePrefix, MeetingTranscriptionResult result, char textSeparator)
+        {
+            var id = result.ResultId;
+            EnsureCacheAll(namePrefix + ".resultid", id);
+            EnsureOutputEach(namePrefix + ".resultid", id);
+
+            var reason = result.Reason.ToString();
+            EnsureCacheAll(namePrefix + ".reason", reason);
+            EnsureOutputEach(namePrefix + ".reason", reason);
+
+            var offset = result.OffsetInTicks.ToString();
+            EnsureCacheAll(namePrefix + ".offset", offset);
+            EnsureOutputEach(namePrefix + ".offset", offset);
+
+            var duration = (result.Duration.TotalMilliseconds * 10000).ToString();
+            EnsureCacheAll(namePrefix + ".duration", duration);
+            EnsureOutputEach(namePrefix + ".duration", duration);
+
+            var text = result.Text;
+            EnsureCacheAll(textSeparator, namePrefix + ".text", text);
+            EnsureOutputEach(namePrefix + ".text", text);
+
+            var itn = result.Properties.GetProperty("ITN");
+            EnsureCacheAll(textSeparator, namePrefix + ".itn.text", itn);
+            EnsureOutputEach(namePrefix + ".itn.text", itn);
+
+            var lexical = result.Properties.GetProperty("Lexical");
+            EnsureCacheAll(textSeparator, namePrefix + ".lexical.text", lexical);
+            EnsureOutputEach(namePrefix + ".lexical.text", lexical);
+
+            var latency = result.Properties.GetProperty(PropertyId.SpeechServiceResponse_RecognitionLatencyMs);
+            EnsureCacheAll(namePrefix + ".latency", latency);
+            EnsureOutputEach(namePrefix + ".latency", latency);
+
+            var json = result.Properties.GetProperty(PropertyId.SpeechServiceResponse_JsonResult);
+            EnsureCacheAll(namePrefix + ".json", json);
+            EnsureOutputEach(namePrefix + ".json", json);
+
+            EnsureOutputAllProperties(namePrefix, result.Properties);
+            EnsureOutputEachProperty(namePrefix, result.Properties);
+        }
+
         private void OutputRecognizing(TranslationRecognitionEventArgs e)
         {
             EnsureCacheOutputResult(e.Result);
@@ -2128,6 +2397,8 @@ namespace Azure.AI.Details.Common.CLI
 
         private void OutputSynthesisStarted(SpeechSynthesisEventArgs e)
         {
+            EnsureCacheOutputResult(e.Result);
+
             if (!_outputAll && !_outputEach) return;
 
             var output = $"SYNTHESIS STARTED";
@@ -2147,6 +2418,8 @@ namespace Azure.AI.Details.Common.CLI
 
         private void OutputSynthesizing(SpeechSynthesisEventArgs e)
         {
+            EnsureCacheOutputResult(e.Result);
+
             if (!_outputAll && !_outputEach) return;
 
             var output = $"SYNTHESIZING";
@@ -2166,6 +2439,8 @@ namespace Azure.AI.Details.Common.CLI
 
         private void OutputSynthesisCompleted(SpeechSynthesisEventArgs e)
         {
+            EnsureCacheOutputResult(e.Result);
+
             if (!_outputAll && !_outputEach) return;
 
             var output = $"SYNTHESIS COMPLETED";
@@ -2185,6 +2460,8 @@ namespace Azure.AI.Details.Common.CLI
 
         private void OutputSynthesisCanceled(SpeechSynthesisEventArgs e)
         {
+            EnsureCacheOutputResult(e.Result);
+
             if (!_outputAll && !_outputEach) return;
 
             var cancelDetails = SpeechSynthesisCancellationDetails.FromResult(e.Result);
@@ -2216,6 +2493,47 @@ namespace Azure.AI.Details.Common.CLI
             EnsureOutputEach("synthesizer.event", output);
             EnsureCacheAll("events", output);
             EnsureOutputEach("event", output);
+
+            FlushOutputEachCacheStage1();
+        }
+
+        private void OutputWordBoundary(SpeechSynthesisWordBoundaryEventArgs e)
+        {
+            if (!_outputAll && !_outputEach) return;
+
+            var output = $"WORD BOUNDARY";
+            const string synthesizer = "synthesizer";
+            const string wordBoundaryNamePrefix = synthesizer + ".wordboundary";
+            EnsureCacheAll(wordBoundaryNamePrefix + ".events", output);
+            EnsureOutputEach(wordBoundaryNamePrefix + ".event", output);
+            EnsureCacheAll(synthesizer + ".events", output);
+            EnsureOutputEach(synthesizer + ".event", output);
+
+            const string wordBoundaryResultNamePrefix = wordBoundaryNamePrefix + ".result";
+
+            //// These are almost always the same value and don't really lend much value. If you find that you
+            //// need them for some test scenario, uncomment this
+            ////EnsureCacheAll(wordBoundaryResultNamePrefix + ".resultid", e.ResultId);
+            ////EnsureOutputEach(wordBoundaryResultNamePrefix + ".resultid", e.ResultId);
+
+            var wordLength = e.WordLength.ToString();
+            EnsureCacheAll(wordBoundaryResultNamePrefix + ".wordlength", wordLength);
+            EnsureOutputEach(wordBoundaryResultNamePrefix + ".wordlength", wordLength);
+
+            EnsureCacheAll(wordBoundaryResultNamePrefix + ".text", e.Text);
+            EnsureOutputEach(wordBoundaryResultNamePrefix + ".text", e.Text);
+
+            var boundaryType = e.BoundaryType.ToString();
+            EnsureCacheAll(wordBoundaryResultNamePrefix + ".type", boundaryType);
+            EnsureOutputEach(wordBoundaryResultNamePrefix + ".type", boundaryType);
+
+            var boundaryOffset = e.AudioOffset.ToString();
+            EnsureCacheAll(wordBoundaryResultNamePrefix + ".offset", boundaryOffset);
+            EnsureOutputEach(wordBoundaryResultNamePrefix + ".offset", boundaryOffset);
+
+            var boundaryDuration = e.Duration.ToString();
+            EnsureCacheAll(wordBoundaryResultNamePrefix + ".duration", boundaryDuration);
+            EnsureOutputEach(wordBoundaryResultNamePrefix + ".duration", boundaryDuration);
 
             FlushOutputEachCacheStage1();
         }

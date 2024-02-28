@@ -155,13 +155,19 @@ namespace Azure.AI.Details.Common.CLI
             Console.WriteLine();
         }
 
+        public void DisplayTranscribing(MeetingTranscriptionEventArgs e)
+        {
+            if (_quiet) return;
+            Console.WriteLine($"TRANSCRIBING: {e.Result.Text}");
+        }
+
         public void DisplayTranscribing(ConversationTranscriptionEventArgs e)
         {
             if (_quiet) return;
             Console.WriteLine($"TRANSCRIBING: {e.Result.Text}");
         }
 
-        public void DisplayTranscribed(ConversationTranscriptionEventArgs e)
+        public void DisplayTranscribed(MeetingTranscriptionEventArgs e)
         {
             if (_quiet) return;
 
@@ -176,6 +182,44 @@ namespace Azure.AI.Details.Common.CLI
                 Console.WriteLine($"NOMATCH: Speech could not be recognized.");
                 Console.WriteLine();
             }
+        }
+
+        public void DisplayTranscribed(ConversationTranscriptionEventArgs e)
+        {
+            if (_quiet) return;
+
+            var result = e.Result;
+            if (result.Reason == ResultReason.RecognizedSpeech && result.Text.Length != 0)
+            {
+                Console.WriteLine($"TRANSCRIBED: {result.Text} (SpeakerId={result.SpeakerId})");
+                Console.WriteLine();
+            }
+            else if (result.Reason == ResultReason.NoMatch && _verbose)
+            {
+                Console.WriteLine($"NOMATCH: Speech could not be recognized.");
+                Console.WriteLine();
+            }
+        }
+
+        public void DisplayCanceled(MeetingTranscriptionCanceledEventArgs e)
+        {
+            if (_quiet) return;
+
+            var cancellation = CancellationDetails.FromResult(e.Result);
+
+            var normal = cancellation.Reason == CancellationReason.EndOfStream;
+            if (normal && !_verbose) return;
+
+            Console.WriteLine($"CANCELED: Reason={cancellation.Reason}");
+
+            if (cancellation.Reason == CancellationReason.Error)
+            {
+                Console.WriteLine($"CANCELED: ErrorCode={cancellation.ErrorCode}");
+                Console.WriteLine($"CANCELED: ErrorDetails={cancellation.ErrorDetails}");
+                Console.WriteLine($"CANCELED: Did you update the subscription info?");
+            }
+
+            Console.WriteLine();
         }
 
         public void DisplayCanceled(ConversationTranscriptionCanceledEventArgs e)
@@ -310,6 +354,13 @@ namespace Azure.AI.Details.Common.CLI
             }
 
             Console.WriteLine();
+        }
+
+        internal void DisplaySynthesisWordBoundary(SpeechSynthesisWordBoundaryEventArgs e)
+        {
+            if (_quiet) return;
+
+            Console.WriteLine($"METADATA:     wordboundary=[ type: {e.BoundaryType}, length: {e.WordLength}, text: {e.Text}, offset: {e.AudioOffset}, duration: {e.Duration} ]");
         }
 
         private ICommandValues _values;

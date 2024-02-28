@@ -18,9 +18,9 @@ using System.Collections.Generic;
 
 namespace Azure.AI.Details.Common.CLI
 {
-    public class TranscribeConversationCommand : Command
+    public class ConversationTranscriptionCommand : Command
     {
-        internal TranscribeConversationCommand(ICommandValues values)
+        internal ConversationTranscriptionCommand(ICommandValues values)
         {
             _values = values.ReplaceValues();
         }
@@ -73,12 +73,9 @@ namespace Azure.AI.Details.Common.CLI
         private ConversationTranscriber CreateConversationTranscriber()
         {
             SpeechConfig config = CreateSpeechConfig();
-            Conversation conversation = CreateConversation(config);
 
             AudioConfig audioConfig = ConfigHelpers.CreateAudioConfig(_values);
-            var transcriber = new ConversationTranscriber(audioConfig);
-
-            transcriber.JoinConversationAsync(conversation).Wait();
+            var transcriber = new ConversationTranscriber(config, audioConfig);
 
             _disposeAfterStop.Add(audioConfig);
             _disposeAfterStop.Add(transcriber);
@@ -186,7 +183,6 @@ namespace Azure.AI.Details.Common.CLI
 
             // var inRoom = _values.GetOrDefault("conversation.in.room", false);
             // if (inRoom) config.SetProperty("ConversationTranscriptionInRoomAndOnline", "true");
-            config.SetProperty("ConversationTranscriptionInRoomAndOnline", "true");
 
             CheckNotYetImplementedConfigProperties();
         }
@@ -211,15 +207,6 @@ namespace Azure.AI.Details.Common.CLI
                     _values.AddThrowError("WARNING:", $"'{key}={value}' NOT YET IMPLEMENTED!!");
                 }
             }
-        }
-
-        private Conversation CreateConversation(SpeechConfig config)
-        {
-            var conversationId = _values.GetOrDefault("conversation.id", Guid.NewGuid().ToString());
-            var task = Conversation.CreateConversationAsync(config, conversationId);
-
-            const int maxTimeToWait = 30000;
-            return task.Wait(maxTimeToWait) ? task.Result : null;
         }
 
         private void CheckAudioInput()
