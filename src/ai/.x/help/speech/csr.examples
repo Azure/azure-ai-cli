@@ -13,7 +13,7 @@ CUSTOM SPEECH RECOGNITION EXAMPLES
 
     ai speech csr endpoint create --name "LM example" --text @sentences.txt --output id @my.cid.txt
     ai speech csr endpoint status --endpoint @my.cid.txt --wait
-    ai speech recognize --files test.wav --endpoint id @my.cid
+    ai speech recognize --files test.wav --endpoint id @my.cid.txt
 
   `EXAMPLE 2`: List custom speech recognition projects or endpoints
 

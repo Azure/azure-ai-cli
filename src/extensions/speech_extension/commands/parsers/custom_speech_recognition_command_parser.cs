@@ -8,7 +8,7 @@ using System.Linq;
 
 namespace Azure.AI.Details.Common.CLI
 {
-    class CustomSpeechRecognitionCommandParser : CommandParser
+    public class CustomSpeechRecognitionCommandParser : CommandParser
     {
         public static bool ParseCommand(INamedValueTokens tokens, ICommandValues values)
         {
@@ -64,9 +64,13 @@ namespace Azure.AI.Details.Common.CLI
             "csr"
         };
 
-        private static INamedValueTokenParser[] GetCommandParsers(ICommandValues values)
+        public static INamedValueTokenParser[] GetCommandParsers(ICommandValues values)
         {
-            var commandName = values.GetCommand();
+            var commandName = string.Join('.', values.GetCommand()
+                .Split('.')
+                .SkipWhile(x => x == "speech")
+                .ToArray());
+
             switch (commandName)
             {
                 case "csr.list": return listCommandParsers;

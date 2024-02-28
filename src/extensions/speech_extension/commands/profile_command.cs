@@ -21,14 +21,14 @@ namespace Azure.AI.Details.Common.CLI
 {
     public class ProfileCommand : Command
     {
-        internal ProfileCommand(ICommandValues values)
+        public ProfileCommand(ICommandValues values)
         {
             _values = values.ReplaceValues();
             _quiet = _values.GetOrDefault("x.quiet", false);
             _verbose = _values.GetOrDefault("x.verbose", true);
         }
 
-        internal bool RunCommand()
+        public bool RunCommand()
         {
             try
             {
@@ -53,7 +53,7 @@ namespace Azure.AI.Details.Common.CLI
         {
             CheckPath();
 
-            switch (command)
+            switch (command.Replace("speech.", ""))
             {
                 case "profile.list": DoList(); break;
                 case "profile.create": DoCreateProfile(); break;
@@ -95,7 +95,7 @@ namespace Azure.AI.Details.Common.CLI
               saveAs = FileHelpers.GetOutputDataFileName(saveAs, _values);
               var saveMessage = $"Saving as {saveAs} ...";
               if (!_quiet) Console.WriteLine(saveMessage);
-              FileHelpers.WriteAllText(saveAs, json, new UTF8Encoding(false))
+              FileHelpers.WriteAllText(saveAs, json, new UTF8Encoding(false));
               if (!_quiet) Console.WriteLine($"{saveMessage} Done!\n");
             } 
         }

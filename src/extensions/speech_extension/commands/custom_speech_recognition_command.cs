@@ -20,14 +20,14 @@ namespace Azure.AI.Details.Common.CLI
 {
     public class CustomSpeechRecognitionCommand : Command
     {
-        internal CustomSpeechRecognitionCommand(ICommandValues values)
+        public CustomSpeechRecognitionCommand(ICommandValues values)
         {
             _values = values.ReplaceValues();
             _quiet = _values.GetOrDefault("x.quiet", false);
             _verbose = _values.GetOrDefault("x.verbose", true);
         }
 
-        internal bool RunCommand()
+        public bool RunCommand()
         {
             try
             {
@@ -52,7 +52,7 @@ namespace Azure.AI.Details.Common.CLI
         {
             CheckPath();
 
-            switch (command)
+            switch (command.Replace("speech.", ""))
             {
                 case "csr.list": DoList(); break;
                 case "csr.download": DoDownload(); break;

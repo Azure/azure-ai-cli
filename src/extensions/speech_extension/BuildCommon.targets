@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+
+  <PropertyGroup>
+    <CLIAssemblyVersion>1.0.0</CLIAssemblyVersion>
+    <ErrorOnDuplicatePublishOutputFiles>false</ErrorOnDuplicatePublishOutputFiles>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <CurrentDate>$([System.DateTime]::Now.ToString('yyyyMMdd'))</CurrentDate>
+    <UserName>$([System.Environment]::UserName)</UserName>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <CLIAssemblyInformationalVersion Condition="'$(CLIAssemblyInformationalVersion)' == ''">$(CLIAssemblyVersion)-DEV-$(UserName)-$(CurrentDate)</CLIAssemblyInformationalVersion>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <FileVersion>$(CLIAssemblyVersion)</FileVersion>
+    <AssemblyVersion>$(CLIAssemblyVersion)</AssemblyVersion>
+    <InformationalVersion>$(CLIAssemblyInformationalVersion)</InformationalVersion>
+  </PropertyGroup>
+
+</Project>

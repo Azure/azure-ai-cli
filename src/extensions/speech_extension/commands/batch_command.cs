@@ -23,14 +23,14 @@ namespace Azure.AI.Details.Common.CLI
 {
     public class BatchCommand : Command
     {
-        internal BatchCommand(ICommandValues values)
+        public BatchCommand(ICommandValues values)
         {
             _values = values.ReplaceValues();
             _quiet = _values.GetOrDefault("x.quiet", false);
             _verbose = _values.GetOrDefault("x.verbose", true);
         }
 
-        internal bool RunCommand()
+        public bool RunCommand()
         {
             try
             {
@@ -55,7 +55,7 @@ namespace Azure.AI.Details.Common.CLI
         {
             CheckPath();
 
-            switch (command)
+            switch (command.Replace("speech.", ""))
             {
                 case "batch.list": DoList(); break;
                 case "batch.download": DoDownload(); break;

@@ -1,24 +1,29 @@
-﻿using System.Linq;
+using System.Linq;
 
 namespace Azure.AI.Details.Common.CLI
 {
-    class IntentCommandParser : CommandParser
+    public class RecognizeCommandParser : CommandParser
     {
         public static bool ParseCommand(INamedValueTokens tokens, ICommandValues values)
         {
-            return ParseCommand("intent", intentCommandParsers, tokens, values);
+            return ParseCommand("recognize", recognizeCommandParsers, tokens, values);
         }
 
         public static bool ParseCommandValues(INamedValueTokens tokens, ICommandValues values)
         {
-            return ParseCommandValues("intent", intentCommandParsers, tokens, values);
+            return ParseCommandValues("recognize", recognizeCommandParsers, tokens, values);
+        }
+
+        public static IEnumerable<INamedValueTokenParser> GetCommandParsers()
+        {
+            return recognizeCommandParsers;
         }
 
         #region private data
 
-        private static INamedValueTokenParser[] intentCommandParsers = {
+        private static INamedValueTokenParser[] recognizeCommandParsers = {
 
-            new NamedValueTokenParser(null,           "x.command", "11", "1", "intent"),
+            new NamedValueTokenParser(null,           "x.command", "11", "1", "recognize"),
 
             new ExpectOutputTokenParser(),
             new DiagnosticLogTokenParser(),
@@ -59,14 +64,14 @@ namespace Azure.AI.Details.Common.CLI
 
             new NamedValueTokenParser("--phrases",    "grammar.phrase.list", "011", "1", "@;"),
             new NamedValueTokenParser(null,           "grammar.recognition.factor.phrase", "0110", "1"),
-            
+
             new NamedValueTokenParser(null,           "luis.key", "11", "1"),
             new NamedValueTokenParser(null,           "luis.region", "11", "1"),
             new NamedValueTokenParser(null,           "luis.appid", "11", "1"),
             new NamedValueTokenParser(null,           "luis.intent", "11", "2;1"),
             new NamedValueTokenParser("--allintents", "luis.allintents", "01", "1;0", "true;false", null, "true"),
-            new NamedValueTokenParser("--pattern",    "intent.pattern", "01;10", "2;1"),
-            new NamedValueTokenParser("--patterns",   "intent.patterns", "01", "1", "@;"),
+            // new NamedValueTokenParser("--pattern",    "intent.pattern", "01;10", "2;1"),
+            // new NamedValueTokenParser("--patterns",   "intent.patterns", "01", "1", "@"),
 
             new ConnectDisconnectNamedValueTokenParser(),
 
@@ -76,10 +81,11 @@ namespace Azure.AI.Details.Common.CLI
             // new NamedValueTokenParser(null,           "recognizer.property", "11", "2;1"),
             new NamedValueTokenParser(null,           "recognize.keyword.file", "010", "1", null, null, "keyword", "recognize.method"),
             new NamedValueTokenParser(null,           "recognize.timeout", "01", "1"),
-            new NamedValueTokenParser("--recognize",  "recognize.method", "10", "1", "keyword;continuous;once+;once"),
+            new NamedValueTokenParser("--recognize",  "recognize.method", "10", "1", "keyword;continuous;once+;once;rest;intent"),
             new NamedValueTokenParser("--continuous", "recognize.method", "10", "0", null, null, "continuous"),
             new NamedValueTokenParser("--once+",      "recognize.method", "10", "0", null, null, "once+"),
             new NamedValueTokenParser("--once",       "recognize.method", "10", "0", null, null, "once"),
+            new NamedValueTokenParser("--rest",       "recognize.method", "10", "0", null, null, "rest"),
 
             new NamedValueTokenParser("--ini",        "ini.file", "10", "1", "@"),
 
@@ -110,6 +116,7 @@ namespace Azure.AI.Details.Common.CLI
             new NamedValueTokenParser(null, "check.sr.transcript.lexical.text.not.contains", "1001011", "1", null, "check.sr.transcript.lexical.text.not.contains", "true", "output.all.recognizer.recognized.result.lexical.text"),
             new NamedValueTokenParser(null, "check.sr.transcript.lexical.text", "10010", "2;1", null, "check.sr.transcript.lexical.text", "true", "output.all.recognizer.recognized.result.lexical.text"),
 
+            new NamedValueTokenParser(null, "check.jmes.verbose.failures", "1010", "1;0", "true;false", null, "false"),
             new NamedValueTokenParser(null, "check.jmes", "10", "1"),
 
             new TrueFalseNamedValueTokenParser("output.overwrite", "11"),
@@ -117,30 +124,6 @@ namespace Azure.AI.Details.Common.CLI
 
             new OutputBatchRecognizerTokenParser(),
             new OutputSrtVttRecognizerTokenParser(),
-
-            new TrueFalseNamedValueTokenParser("output.all.recognizer.recognized.result.intentid", "100001"),
-            new TrueFalseNamedValueTokenParser("output.each.recognizer.recognized.result.intentid", "110001"),
-
-            new TrueFalseNamedValueTokenParser("output.all.result.intentid", "1101"),
-            new TrueFalseNamedValueTokenParser("output.each.result.intentid", "1101"),
-
-            new TrueFalseNamedValueTokenParser("output.all.recognizer.recognized.result.luis.json", "1000011"),
-            new TrueFalseNamedValueTokenParser("output.each.recognizer.recognized.result.luis.json", "1100011"),
-
-            new TrueFalseNamedValueTokenParser("output.all.result.luis.json", "11011"),
-            new TrueFalseNamedValueTokenParser("output.each.result.luis.json", "11011"),
-
-            new TrueFalseNamedValueTokenParser("output.all.recognizer.recognized.result.entity.json", "1000011"),
-            new TrueFalseNamedValueTokenParser("output.each.recognizer.recognized.result.entity.json", "1100011"),
-
-            new TrueFalseNamedValueTokenParser("output.all.result.entity.json", "11011"),
-            new TrueFalseNamedValueTokenParser("output.each.result.entity.json", "11011"),
-
-            new NamedValueTokenParser(null, "output.all.recognizer.recognized.result.*.entity", "1000011", "1;0", "true;false", null, "true"),
-            new NamedValueTokenParser(null, "output.each.recognizer.recognized.result.*.entity", "1100011", "1;0", "true;false", null, "true"),
-
-            new NamedValueTokenParser(null, "output.all.result.*.entity", "11011", "1;0", "true;false", null, "true"),
-            new NamedValueTokenParser(null, "output.each.result.*.entity", "11011", "1;0", "true;false", null, "true"),
 
             new OutputAllRecognizerEventTokenParser(),
             new OutputEachRecognizerEventTokenParser()

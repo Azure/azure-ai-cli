@@ -11,26 +11,20 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.CognitiveServices.Speech;
+using Microsoft.CognitiveServices.Speech.Translation;
 using Microsoft.CognitiveServices.Speech.Audio;
-using Microsoft.CognitiveServices.Speech.Intent;
 using System.Collections.Generic;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 
 namespace Azure.AI.Details.Common.CLI
 {
-    // TODO: should support PhraseListGrammars
-    // TODO: should support Pattern Matching
-    // TODO: support auto source language detection, and other source language detection scenarios once carbon does w/intent recognizer
-    
-    public class IntentCommand : Command
+    public class TranslateCommand : Command
     {
-        internal IntentCommand(ICommandValues values)
+        public TranslateCommand(ICommandValues values)
         {
             _values = values.ReplaceValues();
         }
 
-        internal bool RunCommand()
+        public bool RunCommand()
         {
             Recognize(_values["recognize.method"]);
             return _values.GetOrDefault("passed", true);
@@ -48,17 +42,23 @@ namespace Azure.AI.Details.Common.CLI
                 case "once+": RecognizeOnce(true); break;
 
                 case "keyword": RecognizeKeyword(); break;
+
+                case "rest": RecognizeREST(); break;
             }
+        }
+
+        private void RecognizeREST()
+        {
+            _values.AddThrowError("WARNING:", $"'recognize=rest' NOT YET IMPLEMENTED!!");
         }
 
         private void RecognizeContinuous()
         {
             StartCommand();
 
-            IntentRecognizer recognizer = CreateIntentRecognizer();
+            TranslationRecognizer recognizer = CreateTranslationRecognizer();
             PrepRecognizerConnection(recognizer, true);
-            // PrepRecognizerGrammars(recognizer);
-            PrepRecognizerIntents(recognizer);
+            PrepRecognizerGrammars(recognizer);
 
             recognizer.SessionStarted += SessionStarted;
             recognizer.SessionStopped += SessionStopped;
@@ -85,10 +85,9 @@ namespace Azure.AI.Details.Common.CLI
         {
             StartCommand();
 
-            IntentRecognizer recognizer = CreateIntentRecognizer();
+            TranslationRecognizer recognizer = CreateTranslationRecognizer();
             PrepRecognizerConnection(recognizer, false);
-            // PrepRecognizerGrammars(recognizer);
-            PrepRecognizerIntents(recognizer);
+            PrepRecognizerGrammars(recognizer);
 
             recognizer.SessionStarted += SessionStarted;
             recognizer.SessionStopped += SessionStopped;
@@ -121,10 +120,9 @@ namespace Azure.AI.Details.Common.CLI
         {
             StartCommand();
 
-            IntentRecognizer recognizer = CreateIntentRecognizer();
+            TranslationRecognizer recognizer = CreateTranslationRecognizer();
             PrepRecognizerConnection(recognizer, false);
-            // PrepRecognizerGrammars(recognizer);
-            PrepRecognizerIntents(recognizer);
+            PrepRecognizerGrammars(recognizer);
 
             recognizer.SessionStarted += SessionStarted;
             recognizer.SessionStopped += SessionStopped;
@@ -148,23 +146,26 @@ namespace Azure.AI.Details.Common.CLI
             DeleteTemporaryFiles();
         }
 
-        private IntentRecognizer CreateIntentRecognizer()
+        private TranslationRecognizer CreateTranslationRecognizer()
         {
-            var config = CreateSpeechConfig();
-            var audioConfig = ConfigHelpers.CreateAudioConfig(_values);
+            SpeechTranslationConfig config = CreateSpeechTranslationConfig();
+            AudioConfig audioConfig = ConfigHelpers.CreateAudioConfig(_values);
 
-            // CreateSourceLanguageConfig(config, out SourceLanguageConfig language, out AutoDetectSourceLanguageConfig autoDetect);
+            SourceLanguageConfig language = null;
+            AutoDetectSourceLanguageConfig autoDetect = null;
+            CreateSourceLanguageConfig(config, out language, out autoDetect);
+
             // var recognizer = autoDetect != null 
-            //     ? new IntentRecognizer(config, autoDetect, audioConfig)
+            //     ? new TranslationRecognizer(config, autoDetect, audioConfig)
             //     : language != null
-            //         ? new IntentRecognizer(config, language, audioConfig)
+            //         ? new TranslationRecognizer(config, language, audioConfig)
             //         : audioConfig != null
-            //             ? new IntentRecognizer(config, audioConfig)
-            //             : new IntentRecognizer(config);
+            //             ? new TranslationRecognizer(config, audioConfig)
+            //             : new TranslationRecognizer(config);
 
             var recognizer = audioConfig != null
-                ? new IntentRecognizer(config, audioConfig)
-                : new IntentRecognizer(config);
+                ? new TranslationRecognizer(config, audioConfig)
+                : new TranslationRecognizer(config);
 
             _disposeAfterStop.Add(audioConfig);
             _disposeAfterStop.Add(recognizer);
@@ -174,52 +175,93 @@ namespace Azure.AI.Details.Common.CLI
             return recognizer;
         }
 
-        // private void CreateSourceLanguageConfig(SpeechConfig config, out SourceLanguageConfig language, out AutoDetectSourceLanguageConfig autoDetect)
-        // {
-        //     language = null;
-        //     autoDetect = null;
-
-        //     var bcp47 = _values["source.language.config"];
-        //     if (string.IsNullOrEmpty(bcp47)) bcp47 = "en-US";
-
-        //     var endpointId = _values["service.config.endpoint.id"];
-        //     var endpointIdOk = !string.IsNullOrEmpty(endpointId);
-
-        //     var langs = new List<SourceLanguageConfig>();
-        //     foreach (var item in bcp47.Split(';'))
-        //     {
-        //         langs.Add(endpointIdOk
-        //             ? SourceLanguageConfig.FromLanguage(item, endpointId)
-        //             : SourceLanguageConfig.FromLanguage(item));
-        //     }
-
-        //     if (langs.Count == 1)
-        //     {
-        //         language = langs[0];
-        //     }
-        //     else
-        //     {
-        //         autoDetect = AutoDetectSourceLanguageConfig.FromSourceLanguageConfigs(langs.ToArray());
-        //     }
-        // }
-
-        private SpeechConfig CreateSpeechConfig()
+        private void CreateSourceLanguageConfig(SpeechConfig config, out SourceLanguageConfig language, out AutoDetectSourceLanguageConfig autoDetect)
         {
-            var key = _values["luis.key"];
-            var region = _values["luis.region"];
+            language = null;
+            autoDetect = null;
 
-            var config = !string.IsNullOrEmpty(key) && !string.IsNullOrEmpty(region)
-                ? ConfigHelpers.CreateSpeechConfig(_values, key, region)
-                : ConfigHelpers.CreateSpeechConfig(_values);
+            var bcp47 = _values["source.language.config"];
+            if (string.IsNullOrEmpty(bcp47)) bcp47 = "en-US";
 
-            SetSpeechConfigProperties(config);
+            var endpointId = _values["service.config.endpoint.id"];
+            var endpointIdOk = !string.IsNullOrEmpty(endpointId);
 
+            // once TranslationRecognizer supports source language config, remove this block
+            // ... and uncomment associated lines from  CreateTranslationRecognizer, replacing existing new TranslationRecognizer* lines
+            if (!string.IsNullOrEmpty(bcp47)) config.SpeechRecognitionLanguage = bcp47;
+
+            var langs = new List<SourceLanguageConfig>();
+            foreach (var item in bcp47.Split(';'))
+            {
+                langs.Add(endpointIdOk
+                    ? SourceLanguageConfig.FromLanguage(item, endpointId)
+                    : SourceLanguageConfig.FromLanguage(item));
+            }
+
+            if (langs.Count == 1)
+            {
+                language = langs[0];
+            }
+            else
+            {
+                autoDetect = AutoDetectSourceLanguageConfig.FromSourceLanguageConfigs(langs.ToArray());
+            }
+        }
+
+        private SpeechTranslationConfig CreateSpeechTranslationConfig()
+        {
+            var key = _values["service.config.key"];
+            var host = _values["service.config.host"];
+            var region = _values["service.config.region"];
+            var endpoint = _values["service.config.endpoint.uri"];
+            var tokenValue = _values["service.config.token.value"];
+
+            if (string.IsNullOrEmpty(endpoint) && string.IsNullOrEmpty(region) && string.IsNullOrEmpty(host))
+            {
+                _values.AddThrowError("ERROR:", $"Creating SpeechConfig; requires one of: region, endpoint, or host.");
+            }
+            else if (!string.IsNullOrEmpty(region) && string.IsNullOrEmpty(tokenValue) && string.IsNullOrEmpty(key))
+            {
+                _values.AddThrowError("ERROR:", $"Creating SpeechConfig; use of region requires one of: key or token.");
+            }
+
+            SpeechTranslationConfig config = null;
+            if (!string.IsNullOrEmpty(endpoint))
+            {
+                config = string.IsNullOrEmpty(key)
+                    ? SpeechTranslationConfig.FromEndpoint(new Uri(endpoint))
+                    : SpeechTranslationConfig.FromEndpoint(new Uri(endpoint), key);
+            }
+            else if (!string.IsNullOrEmpty(host))
+            {
+                config = string.IsNullOrEmpty(key)
+                    ? SpeechTranslationConfig.FromHost(new Uri(host))
+                    : SpeechTranslationConfig.FromHost(new Uri(host), key);
+            }
+            else // if (!string.IsNullOrEmpty(region))
+            {
+                config = string.IsNullOrEmpty(tokenValue)
+                    ? SpeechTranslationConfig.FromSubscription(key, region)
+                    : SpeechTranslationConfig.FromAuthorizationToken(tokenValue, region);
+            }
+
+            if (!string.IsNullOrEmpty(tokenValue))
+            {
+                config.AuthorizationToken = tokenValue;
+            }
+
+            SetTranslationConfigProperties(config);
             return config;
         }
 
-        private void SetSpeechConfigProperties(SpeechConfig config)
+        private void SetTranslationConfigProperties(SpeechTranslationConfig config)
         {
             ConfigHelpers.SetupLogFile(config, _values);
+
+            var target = _values.GetOrDefault("target.language.config", "en-US");
+            if (!string.IsNullOrEmpty(target))
+                foreach (var lang in target.Split(';'))
+                    config.AddTargetLanguage(lang);
 
             var proxyHost = _values["service.config.proxy.host"];
             if (!string.IsNullOrEmpty(proxyHost)) config.SetProxy(proxyHost, _values.GetOrDefault("service.config.proxy.port", 80));
@@ -227,10 +269,13 @@ namespace Azure.AI.Details.Common.CLI
             var endpointId = _values["service.config.endpoint.id"];
             if (!string.IsNullOrEmpty(endpointId)) config.EndpointId = endpointId;
 
+            var categoryId = _values["service.config.category.id"];
+            if (!string.IsNullOrEmpty(categoryId)) config.SetServiceProperty("categoryId", categoryId, ServicePropertyChannel.UriQueryParameter);
+
             var needDetailedText = _output.NeedsLexicalText() || _output.NeedsItnText();
             if (needDetailedText) config.OutputFormat = OutputFormat.Detailed;
 
-            var profanity = _values.GetOrDefault("service.output.config.profanity.option", "").ToLower();
+            var profanity = _values["service.output.config.profanity.option"];
             if (profanity == "removed") config.SetProfanity(ProfanityOption.Removed);
             if (profanity == "masked") config.SetProfanity(ProfanityOption.Masked);
             if (profanity == "raw") config.SetProfanity(ProfanityOption.Raw);
@@ -262,41 +307,20 @@ namespace Azure.AI.Details.Common.CLI
             var stringProperties = _values.GetOrDefault("config.string.properties", "");
             if (!string.IsNullOrEmpty(stringProperties)) ConfigHelpers.SetStringProperties(config, stringProperties);
 
-            var embedded = _values.GetOrDefault("embedded.config.embedded", false);
-            if (embedded) SetEmbeddedProperties(config);
-
             CheckNotYetImplementedConfigProperties();
-        }
-
-        private void SetEmbeddedProperties(SpeechConfig config)
-        {
-            // Turn on embedded (offline) speech recognition.
-            config.SetProperty("SPEECH-RecoBackend", "offline");
-
-            var modelKey = _values.GetOrDefault("embedded.config.model.key", "");
-            config.SetProperty("SPEECH-RecoModelKey", modelKey);
-
-            var modelPath = _values.GetOrDefault("embedded.config.model.path", "");
-            var modelIniFileFullPath = Path.GetFullPath(Path.Combine(modelPath, "sr.ini"));
-            if (!File.Exists(modelIniFileFullPath))
-            {
-                _values.AddThrowError(
-                    "WARNING:", $"Missing or invalid speech recognition model path!", "",
-                        "USE:", $"{Program.Name} intent --embedded --embeddedModelPath PATH [...]");
-            }
-            config.SetProperty("SPEECH-RecoModelIniFile", modelIniFileFullPath);
         }
 
         private static void SetHttpHeaderProperty(SpeechConfig config, string httpHeader)
         {
-            if (StringHelpers.SplitNameValue(httpHeader, out string name, out string value)) config.SetServiceProperty(name, value, ServicePropertyChannel.HttpHeader);
+            string name = "", value = "";
+            if (StringHelpers.SplitNameValue(httpHeader, out name, out value)) config.SetServiceProperty(name, value, ServicePropertyChannel.HttpHeader);
         }
 
         private void CheckNotYetImplementedConfigProperties()
         {
             var notYetImplemented = 
                 ";config.token.type;config.token.password;config.token.username" +
-                ";config.language.target;recognizer.property";
+                ";recognizer.property";
 
             foreach (var key in notYetImplemented.Split(';'))
             {
@@ -311,6 +335,7 @@ namespace Azure.AI.Details.Common.CLI
         private void CheckAudioInput()
         {
             var id = _values["audio.input.id"];
+            var device = _values["audio.input.microphone.device"];
             var input = _values["audio.input.type"];
             var file = _values["audio.input.file"];
             var url = "";
@@ -419,79 +444,34 @@ namespace Azure.AI.Details.Common.CLI
             return keywordModel;
         }
 
-        private void PrepRecognizerIntents(IntentRecognizer recognizer)
+        private void PrepRecognizerGrammars(TranslationRecognizer recognizer)
         {
-            var appId = _values.GetOrDefault("luis.appid", "");
-            var model = !string.IsNullOrEmpty(appId) ? LanguageUnderstandingModel.FromAppId(appId) : null;
-            if (model != null) PrepRecognizerLuisIntents(recognizer, model);
+            var phrases = _values["grammar.phrase.list"];
+            if (!string.IsNullOrEmpty(phrases)) PrepRecognizerPhraseListGrammar(recognizer, phrases.Split('\r', '\n', ';'));
 
-            var intent = _values.GetOrDefault("intent.pattern", "");
-            if (!string.IsNullOrEmpty(intent)) AddIntentPattern(recognizer, intent);
-
-            var intents = _values.GetOrDefault("intent.patterns", "");
-            if (!string.IsNullOrEmpty(intents)) AddIntentPatterns(recognizer, intents);
+            var partialPhraseRecognitionFactor = _values["grammar.recognition.factor.phrase"];
+            if (!string.IsNullOrEmpty(partialPhraseRecognitionFactor)) PrepGrammarList(recognizer, double.Parse(partialPhraseRecognitionFactor));
         }
 
-        private void PrepRecognizerLuisIntents(IntentRecognizer recognizer, LanguageUnderstandingModel model)
+        private void PrepGrammarList(TranslationRecognizer recognizer, double partialPhraseRecognitionFactor)
         {
-            var intent = _values.GetOrDefault("luis.intent", "");
-            if (!string.IsNullOrEmpty(intent)) PrepRecognizerLuisIntent(recognizer, model, intent);
-
-            var useAllIntents = _values.GetOrDefault("luis.allintents", string.IsNullOrEmpty(intent));
-            if (useAllIntents) recognizer.AddAllIntents(model);
+            var grammarList = GrammarList.FromRecognizer(recognizer);
+            grammarList.SetRecognitionFactor(partialPhraseRecognitionFactor, RecognitionFactorScope.PartialPhrase);
         }
 
-        private void PrepRecognizerLuisIntent(IntentRecognizer recognizer, LanguageUnderstandingModel model, string intent)
+        private void PrepRecognizerPhraseListGrammar(TranslationRecognizer recognizer, IEnumerable<string> phrases)
         {
-            var split = intent.Split('=');
-
-            var intentName = split[0];
-            var intentId = string.Empty;
-            if (split.Length > 1)
+            var grammar = PhraseListGrammar.FromRecognizer(recognizer);
+            foreach (var phrase in phrases)
             {
-                intentId = split[1];
-            }
-
-            if (string.IsNullOrEmpty(intentName) && string.IsNullOrEmpty(intentId))
-            {
-                recognizer.AddAllIntents(model);
-            }
-            else if (string.IsNullOrEmpty(intentName))
-            {
-                recognizer.AddAllIntents(model, intentId);
-            }
-            else if (string.IsNullOrEmpty(intentId))
-            {
-                recognizer.AddIntent(model, intentName);
-            }
-            else
-            {
-                recognizer.AddIntent(model, intentName, intentId);
+                if (!string.IsNullOrEmpty(phrase))
+                {
+                    grammar.AddPhrase(phrase);
+                }
             }
         }
 
-        private void AddIntentPattern(IntentRecognizer recognizer, string intent)
-        {
-            if (StringHelpers.SplitNameValue(intent, out string id, out string pattern))
-            {
-                recognizer.AddIntent(pattern, id);
-            }
-            else
-            {
-                recognizer.AddIntent(intent);
-            }
-        }
-
-        private void AddIntentPatterns(IntentRecognizer recognizer, string intents)
-        {
-            var lines = intents.Split('\r', '\n', ';');
-            foreach (var intent in lines)
-            {
-                AddIntentPattern(recognizer, intent);
-            }
-        }
-
-        private void PrepRecognizerConnection(IntentRecognizer recognizer, bool continuous)
+        private void PrepRecognizerConnection(TranslationRecognizer recognizer, bool continuous)
         {
             var connection = Connection.FromRecognizer(recognizer);
             _disposeAfterStop.Add(connection);
@@ -510,39 +490,12 @@ namespace Azure.AI.Details.Common.CLI
             ConnectionHelpers.SetConnectionMessageProperties(connection, _values);
         }
 
-        // private void PrepRecognizerGrammars(IntentRecognizer recognizer)
-        // {
-        //     var phrases = _values["grammar.phrase.list"];
-        //     if (!string.IsNullOrEmpty(phrases)) PrepRecognizerPhraseListGrammar(recognizer, phrases.Split('\r', '\n', ';'));
-
-        //     var partialPhraseRecognitionFactor = _values["grammar.recognition.factor.phrase"];
-        //     if (!string.IsNullOrEmpty(partialPhraseRecognitionFactor)) PrepGrammarList(recognizer, double.Parse(partialPhraseRecognitionFactor));
-        // }
-
-        // private void PrepGrammarList(IntentRecognizer recognizer, double partialPhraseRecognitionFactor)
-        // {
-        //     var grammarList = GrammarList.FromRecognizer(recognizer);
-        //     grammarList.SetRecognitionFactor(partialPhraseRecognitionFactor, RecognitionFactorScope.PartialPhrase);
-        // }
-
-        // private void PrepRecognizerPhraseListGrammar(IntentRecognizer recognizer, IEnumerable<string> phrases)
-        // {
-        //     var grammar = PhraseListGrammar.FromRecognizer(recognizer);
-        //     foreach (var phrase in phrases)
-        //     {
-        //         if (!string.IsNullOrEmpty(phrase))
-        //         {
-        //             grammar.AddPhrase(phrase);
-        //         }
-        //     }
-        // }
-
         private void RecognizerConnectionConnect(Connection connection, bool continuous)
         {
             connection.Open(continuous);
         }
 
-        private void RecognizerConnectionDisconnect(IntentRecognizer recognizer)
+        private void RecognizerConnectionDisconnect(TranslationRecognizer recognizer)
         {
             _lock.EnterReaderLockOnce(ref _expectDisconnected);
 
@@ -588,7 +541,7 @@ namespace Azure.AI.Details.Common.CLI
             _lock.ExitReaderLockOnce(ref _expectSessionStopped);
         }
 
-        private void Recognizing(object sender, IntentRecognitionEventArgs e)
+        private void Recognizing(object sender, TranslationRecognitionEventArgs e)
         {
             _lock.EnterReaderLockOnce(ref _expectRecognized);
 
@@ -596,7 +549,7 @@ namespace Azure.AI.Details.Common.CLI
             _output.Recognizing(e);
         }
 
-        private void Recognized(object sender, IntentRecognitionEventArgs e)
+        private void Recognized(object sender, TranslationRecognitionEventArgs e)
         {
             _display.DisplayRecognized(e);
             _output.Recognized(e);
@@ -604,14 +557,14 @@ namespace Azure.AI.Details.Common.CLI
             _lock.ExitReaderLockOnce(ref _expectRecognized);
         }
 
-        private void Canceled(object sender, IntentRecognitionCanceledEventArgs e)
+        private void Canceled(object sender, TranslationRecognitionCanceledEventArgs e)
         {
             _display.DisplayCanceled(e);
             _output.Canceled(e);
             _canceledEvent.Set();
         }
 
-        private void WaitForContinuousStopCancelKeyOrTimeout(IntentRecognizer recognizer, int timeout)
+        private void WaitForContinuousStopCancelKeyOrTimeout(TranslationRecognizer recognizer, int timeout)
         {
             var interval = 100;
 
@@ -628,7 +581,7 @@ namespace Azure.AI.Details.Common.CLI
             }
         }
 
-        private void WaitForOnceStopCancelOrKey(IntentRecognizer recognizer, Task<IntentRecognitionResult> task)
+        private void WaitForOnceStopCancelOrKey(TranslationRecognizer recognizer, Task<TranslationRecognitionResult> task)
         {
             var interval = 100;
 
@@ -643,8 +596,8 @@ namespace Azure.AI.Details.Common.CLI
                 }
             }
         }
-        
-        private void WaitForKeywordCancelKeyOrTimeout(IntentRecognizer recognizer, int timeout)
+
+        private void WaitForKeywordCancelKeyOrTimeout(TranslationRecognizer recognizer, int timeout)
         {
             var interval = 100;
 
