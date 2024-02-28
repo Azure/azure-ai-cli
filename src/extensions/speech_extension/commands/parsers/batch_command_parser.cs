@@ -9,7 +9,7 @@ using System.Linq;
 
 namespace Azure.AI.Details.Common.CLI
 {
-    class BatchCommandParser : CommandParser
+    public class BatchCommandParser : CommandParser
     {
         public static bool ParseCommand(INamedValueTokens tokens, ICommandValues values)
         {
@@ -42,10 +42,10 @@ namespace Azure.AI.Details.Common.CLI
             "batch"
         };
 
-        private static IEnumerable<INamedValueTokenParser> GetCommandParsers(ICommandValues values)
+        public static IEnumerable<INamedValueTokenParser> GetCommandParsers(ICommandValues values)
         {
             var commandName = values.GetCommand();
-            switch (commandName)
+            switch (commandName.Replace("speech.", ""))
             {
                 case "batch.list":
                 case "batch.transcription.list":

@@ -106,21 +106,22 @@ namespace Azure.AI.Details.Common.CLI
 
         private static IEnumerable<INamedValueTokenParser> GetCommandParsers(ICommandValues values)
         {
-            var commandName = values.GetCommand();
-            switch (commandName)
+            var check = string.Join(".", values.GetCommand()
+                .Split('.')
+                .Take(2)
+                .ToArray());
+
+            switch (check)
             {
                 case "speech.recognize": return RecognizeCommandParser.GetCommandParsers();
                 case "speech.synthesize": return SynthesizeCommandParser.GetCommandParsers();
                 case "speech.intent": return IntentCommandParser.GetCommandParsers();
                 case "speech.translate": return TranslateCommandParser.GetCommandParsers();
-                case "speech.batch": return speechBatchParsers;
-                case "speech.csr": return speechCsrParsers;
-                case "speech.profile": return speechProfileParsers;
-                case "speech.speaker": return speechSpeakerParsers;
+                case "speech.batch": return BatchCommandParser.GetCommandParsers(values);
+                case "speech.csr": return CustomSpeechRecognitionCommandParser.GetCommandParsers(values);
+                case "speech.profile": return ProfileCommandParser.GetCommandParsers(values);
+                case "speech.speaker": return ProfileCommandParser.GetCommandParsers(values);
             }
-
-            if (commandName.StartsWith("speech.batch")) return speechBatchParsers;
-            if (commandName.StartsWith("speech.csr")) return speechCsrParsers;
 
             return null;
         }

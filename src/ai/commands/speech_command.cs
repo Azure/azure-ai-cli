@@ -53,7 +53,12 @@ namespace Azure.AI.Details.Common.CLI
         {
             CheckPath();
 
-            switch (command)
+            var check = string.Join(".", command
+                .Split('.')
+                .Take(2)
+                .ToArray());
+
+            switch (check)
             {
                 case "speech.synthesize":
                     new SynthesizeCommand(_values).RunCommand();
@@ -69,6 +74,19 @@ namespace Azure.AI.Details.Common.CLI
 
                 case "speech.translate":
                     new TranslateCommand(_values).RunCommand();
+                    break;
+
+                case "speech.batch":
+                    new BatchCommand(_values).RunCommand();
+                    break;
+
+                case "speech.csr":
+                    new CustomSpeechRecognitionCommand(_values).RunCommand();
+                    break;
+
+                case "speech.profile":
+                case "speech.speaker":
+                    new ProfileCommand(_values).RunCommand();
                     break;
 
                 default:

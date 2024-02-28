@@ -3,7 +3,7 @@ using System.Linq;
 
 namespace Azure.AI.Details.Common.CLI
 {
-    class ProfileCommandParser : CommandParser
+    public class ProfileCommandParser : CommandParser
     {
         public static bool ParseCommand(INamedValueTokens tokens, ICommandValues values)
         {
@@ -31,10 +31,10 @@ namespace Azure.AI.Details.Common.CLI
             "speaker"
         };
 
-        private static IEnumerable<INamedValueTokenParser> GetCommandParsers(ICommandValues values)
+        public static IEnumerable<INamedValueTokenParser> GetCommandParsers(ICommandValues values)
         {
             var commandName = values.GetCommand();
-            switch (commandName)
+            switch (commandName.Replace("speech.", ""))
             {
                 case "profile.list":
                 case "profile.create":
