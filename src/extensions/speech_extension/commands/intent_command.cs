@@ -25,12 +25,12 @@ namespace Azure.AI.Details.Common.CLI
     
     public class IntentCommand : Command
     {
-        internal IntentCommand(ICommandValues values)
+        public IntentCommand(ICommandValues values)
         {
             _values = values.ReplaceValues();
         }
 
-        internal bool RunCommand()
+        public bool RunCommand()
         {
             Recognize(_values["recognize.method"]);
             return _values.GetOrDefault("passed", true);

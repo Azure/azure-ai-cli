@@ -55,6 +55,22 @@ namespace Azure.AI.Details.Common.CLI
 
             switch (command)
             {
+                case "speech.synthesize":
+                    new SynthesizeCommand(_values).RunCommand();
+                    break;
+
+                case "speech.recognize":
+                    new RecognizeCommand(_values).RunCommand();
+                    break;
+
+                case "speech.intent":
+                    new IntentCommand(_values).RunCommand();
+                    break;
+
+                case "speech.translate":
+                    new TranslateCommand(_values).RunCommand();
+                    break;
+
                 default:
                     _values.AddThrowError("WARNING:", $"'{command.Replace('.', ' ')}' NOT YET IMPLEMENTED!!");
                     break;

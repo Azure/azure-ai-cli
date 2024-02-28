@@ -2,7 +2,7 @@
 
 namespace Azure.AI.Details.Common.CLI
 {
-    class IntentCommandParser : CommandParser
+    public class IntentCommandParser : CommandParser
     {
         public static bool ParseCommand(INamedValueTokens tokens, ICommandValues values)
         {
@@ -12,6 +12,11 @@ namespace Azure.AI.Details.Common.CLI
         public static bool ParseCommandValues(INamedValueTokens tokens, ICommandValues values)
         {
             return ParseCommandValues("intent", intentCommandParsers, tokens, values);
+        }
+
+        public static IEnumerable<INamedValueTokenParser> GetCommandParsers()
+        {
+            return intentCommandParsers;
         }
 
         #region private data

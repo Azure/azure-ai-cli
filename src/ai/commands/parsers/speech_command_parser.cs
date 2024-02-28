@@ -109,10 +109,10 @@ namespace Azure.AI.Details.Common.CLI
             var commandName = values.GetCommand();
             switch (commandName)
             {
-                case "speech.recognize": return speechRecognizeParsers;
-                case "speech.synthesize": return speechSynthesizeParsers;
-                case "speech.intent": return speechIntentParsers;
-                case "speech.translate": return speechTranslateParsers;
+                case "speech.recognize": return RecognizeCommandParser.GetCommandParsers();
+                case "speech.synthesize": return SynthesizeCommandParser.GetCommandParsers();
+                case "speech.intent": return IntentCommandParser.GetCommandParsers();
+                case "speech.translate": return TranslateCommandParser.GetCommandParsers();
                 case "speech.batch": return speechBatchParsers;
                 case "speech.csr": return speechCsrParsers;
                 case "speech.profile": return speechProfileParsers;

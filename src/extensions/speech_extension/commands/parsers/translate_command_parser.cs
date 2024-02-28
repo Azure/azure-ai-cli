@@ -2,7 +2,7 @@ using System.Linq;
 
 namespace Azure.AI.Details.Common.CLI
 {
-    class TranslateCommandParser : CommandParser
+    public class TranslateCommandParser : CommandParser
     {
         public static bool ParseCommand(INamedValueTokens tokens, ICommandValues values)
         {
@@ -12,6 +12,11 @@ namespace Azure.AI.Details.Common.CLI
         public static bool ParseCommandValues(INamedValueTokens tokens, ICommandValues values)
         {
             return ParseCommandValues("translate", translateCommandParsers, tokens, values);
+        }
+
+        public static IEnumerable<INamedValueTokenParser> GetCommandParsers()
+        {
+            return translateCommandParsers;
         }
 
         #region private data

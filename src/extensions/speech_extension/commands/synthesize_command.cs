@@ -21,12 +21,12 @@ namespace Azure.AI.Details.Common.CLI
 {
     public class SynthesizeCommand : Command
     {
-        internal SynthesizeCommand(ICommandValues values)
+        public SynthesizeCommand(ICommandValues values)
         {
             _values = values.ReplaceValues();
         }
 
-        internal bool RunCommand()
+        public bool RunCommand()
         {
             var listVoices = _values.GetOrDefault("synthesizer.list.voices", false);
             if (listVoices) return DoListVoices();
