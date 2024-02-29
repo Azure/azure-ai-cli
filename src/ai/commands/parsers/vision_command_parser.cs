@@ -62,12 +62,11 @@ namespace Azure.AI.Details.Common.CLI
         private static IEnumerable<INamedValueTokenParser> GetCommandParsers(ICommandValues values)
         {
             var commandName = values.GetCommand();
-            foreach (var command in _commands)
+            switch (commandName)
             {
-                if (commandName == command.name)
-                {
-                    return _visionPlaceHolderParsers;
-                }
+                case "vision.image":
+                case "vision.image.analyze":
+                    return imageAnalyzeParsers;
             }
 
             return null;
@@ -84,7 +83,10 @@ namespace Azure.AI.Details.Common.CLI
                     new CommonNamedValueTokenParsers(),
                     new NamedValueTokenParser("--ini", "ini.file", "10", "1", "@"),
                     new NamedValueTokenParser(null, "x.command.expand.file.name", "11111", "1"),
-
+                    new NamedValueTokenParser(null, "service.config.endpoint.uri", "0011", "1"),
+                    new NamedValueTokenParser("--url", "vision.input.url", "001", "1", null, null, "url", "vision.input.type"),
+                    new NamedValueTokenParser("--file", "vision.input.file", "001", "1", null, null, "file", "vision.input.type"),
+                    new NamedValueTokenParser("--outputtype", "vision.output.type", "011", "1"),
                     new ExpectConsoleOutputTokenParser(),
                     new DiagnosticLogTokenParser()
 
@@ -98,6 +100,15 @@ namespace Azure.AI.Details.Common.CLI
             new CommonVisionNamedValueTokenParsers()
 
         };
+
+        private static INamedValueTokenParser[] imageAnalyzeParsers = [
+            new CommonVisionNamedValueTokenParsers(),
+            new NamedValueTokenParser("--language",  "vision.image.language", "001", "1"),
+            new NamedValueTokenParser("--genderneutralcaptions",  "vision.image.gender.neutral.caption", "00111", "1"),
+            new NamedValueTokenParser("--smartcropaspectratios",  "vision.image.smart.crop.aspect.ratio", "001111", "1"),
+            new NamedValueTokenParser("--modelversion",  "vision.image.model.version", "0011", "1"),
+            new NamedValueTokenParser("--visualfeatures", "vision.image.visual.features", "0011", "1")
+        ];
 
         #endregion
     }

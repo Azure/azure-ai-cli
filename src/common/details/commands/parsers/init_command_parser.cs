@@ -26,6 +26,7 @@ namespace Azure.AI.Details.Common.CLI
             ("init.openai", false),
             ("init.search", false),
             ("init.speech", false),
+            ("init.vision", false),
             ("init.project.new", false),
             ("init.project.select", false),
             ("init.project", false),
@@ -47,6 +48,7 @@ namespace Azure.AI.Details.Common.CLI
                 case "init.openai":
                 case "init.search":
                 case "init.speech":
+                case "init.vision":
                 case "init.project":
                 case "init.project.new":
                 case "init.project.select":
@@ -87,8 +89,8 @@ namespace Azure.AI.Details.Common.CLI
 
                 new NamedValueTokenParser("--interactive", "init.service.interactive", "001", "1;0", "true;false", null, "true")
 
-                // new NamedValueTokenParser(null, "init.output.azcli.command.file", "01100", "1", "@@"),
-                // new NamedValueTokenParser(null, "init.output.azcli.json.file", "01110", "1", "@@")
+            // new NamedValueTokenParser(null, "init.output.azcli.command.file", "01100", "1", "@@"),
+            // new NamedValueTokenParser(null, "init.output.azcli.json.file", "01110", "1", "@@")
             )
             {
             }
