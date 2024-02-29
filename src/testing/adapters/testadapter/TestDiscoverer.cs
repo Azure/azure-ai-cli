@@ -28,6 +28,7 @@ namespace Azure.AI.Details.Common.CLI.TestAdapter
                 foreach (var test in YamlTestAdapter.GetTestsFromFiles(sources))
                 {
                     test.ExecutorUri = new Uri(YamlTestAdapter.Executor);
+                    Console.WriteLine(test.Traits.ToString());
                     discoverySink.SendTestCase(test);
                 }
                 Logger.Log($"TestDiscoverer.DiscoverTests(): EXIT");

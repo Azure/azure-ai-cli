@@ -35,7 +35,7 @@ echo Cleaning previous build artifacts...
 
 set ARTIFACTS_DIR=%CD%\artifacts
 mkdir %ARTIFACTS_DIR%
-set PYTHON_DIR=%ARTIFACTS_DIR%\Python_Win_%ARCH%
+set PYTHON_DIR=%ARTIFACTS_DIR%\python\win-%ARCH%
 
 REM ensure Python is available
 if exist %PYTHON_DIR% (
@@ -71,6 +71,10 @@ set PYTHON_EXE=%PYTHON_DIR%\python.exe
 
 REM Check azure.cli can be executed. This also prints the Python version.
 %PYTHON_EXE% --version
+set REQUIREMENT_FILE=%CD%\requirements.txt
+pushd %PYTHON_DIR%
+
+%PYTHON_EXE% -m pip install -r %REQUIREMENT_FILE%
 
 if %errorlevel% neq 0 goto ERROR
 
@@ -78,6 +82,32 @@ REM Remove pywin32 help file to reduce size.
 del %PYTHON_DIR%\Lib\site-packages\PyWin32.chm
 
 if %errorlevel% neq 0 goto ERROR
+
+REM Remove .py and only deploy .pyc files
+pushd %PYTHON_DIR%\Lib\site-packages
+for /f %%f in ('dir /b /s *.pyc') do (
+    set PARENT_DIR=%%~df%%~pf..
+    echo !PARENT_DIR! | findstr /C:\Lib\site-packages\pip\ 1>nul
+    if !errorlevel! neq  0 (
+        REM Only take the file name without 'pyc' extension: e.g., (same below) __init__.cpython-310
+        set FILENAME=%%~nf
+        REM Truncate the '.cpython-310' postfix which is 12 chars long: __init__
+        REM https://stackoverflow.com/a/636391/2199657
+        set BASE_FILENAME=!FILENAME:~0,-12!
+        REM __init__.pyc
+        set pyc=!BASE_FILENAME!.pyc
+        REM Delete ..\__init__.py
+        del !PARENT_DIR!\!BASE_FILENAME!.py
+        REM Copy to ..\__init__.pyc
+        copy %%~f !PARENT_DIR!\!pyc! >nul
+        REM Delete __init__.pyc
+        del %%~f
+    ) ELSE (
+        REM pip source code is required when install packages from source code
+        echo --SKIP !PARENT_DIR! under pip
+    )
+)
+popd
 
 REM Remove __pycache__
 echo remove pycache

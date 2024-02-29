@@ -222,11 +222,26 @@ namespace Azure.AI.Details.Common.CLI
             // Detect the OS type (Windows,  Linux, macOS) and the architecture (x86, x64, arm, arm64)
             var rid = RuntimeInformation.RuntimeIdentifier;
             
-            var possiblePython = Path.Combine(basePath, "python", rid, "python");
+            var possiblePythonDir = Path.Combine(basePath, "python", rid);
 
-            if (File.Exists(possiblePython)) return possiblePython;
+            if(!Directory.Exists(possiblePythonDir))
+            {
+                return null;
+            }
 
-            return string.Empty;
+            string fullPath;
+
+            if(OperatingSystem.IsWindows())
+            {
+                fullPath = Path.Combine(possiblePythonDir, "python.exe");
+            }
+            else
+            {
+                fullPath = Path.Combine(possiblePythonDir, "python3");
+            }
+
+            return File.Exists(fullPath) ? fullPath : null;
+            
         }
         private static string? FindPythonBinaryInOsPath()
         {
