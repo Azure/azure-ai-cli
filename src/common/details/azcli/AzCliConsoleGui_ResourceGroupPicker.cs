@@ -51,7 +51,18 @@ namespace Azure.AI.Details.Common.CLI
             Console.Write("\rGroup: ");
             if (string.IsNullOrEmpty(response.Output.StdOutput) && !string.IsNullOrEmpty(response.Output.StdError))
             {
-                throw new ApplicationException($"ERROR: Loading resource groups: {response.Output.StdError}");
+                if (response.Output.StdError.Contains("az login"))
+                {
+                    var loginResponse = await LoginHelpers.AttemptLogin(interactive, "groups");
+                    if (!loginResponse.Equals(default(ParsedJsonProcessOutput<AzCli.SubscriptionInfo[]>)))
+                    {
+                        response = await AzCli.ListResourceGroups(subscription, regionLocation);
+                    }
+                }
+                if (string.IsNullOrEmpty(response.Output.StdOutput) && !string.IsNullOrEmpty(response.Output.StdError))
+                {
+                    throw new ApplicationException($"ERROR: Loading resource groups: {response.Output.StdError}");
+                }
             }
 
             var groups = response.Payload

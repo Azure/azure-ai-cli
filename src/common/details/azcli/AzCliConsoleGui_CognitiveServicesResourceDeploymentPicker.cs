@@ -47,7 +47,18 @@ namespace Azure.AI.Details.Common.CLI
             Console.Write($"\rName: ");
             if (string.IsNullOrEmpty(response.Output.StdOutput) && !string.IsNullOrEmpty(response.Output.StdError))
             {
-                throw new ApplicationException($"ERROR: Loading deployments:\n{response.Output.StdError}");
+                if (response.Output.StdError.Contains("az login"))
+                {
+                    var loginResponse = await LoginHelpers.AttemptLogin(interactive, "deployments");
+                    if (!loginResponse.Equals(default(ParsedJsonProcessOutput<AzCli.SubscriptionInfo[]>)))
+                    {
+                        response = await AzCli.ListCognitiveServicesDeployments(subscriptionId, groupName, resourceName, "OpenAI");
+                    }
+                }
+                if (string.IsNullOrEmpty(response.Output.StdOutput) && !string.IsNullOrEmpty(response.Output.StdError))
+                {
+                    throw new ApplicationException($"ERROR: Loading deployments:\n{response.Output.StdError}");
+                }
             }
 
             var lookForChatCompletionCapable = deploymentExtra.ToLower() == "chat" || deploymentExtra.ToLower() == "evaluation";
