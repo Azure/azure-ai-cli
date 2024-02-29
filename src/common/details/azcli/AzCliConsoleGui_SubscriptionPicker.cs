@@ -77,7 +77,7 @@ namespace Azure.AI.Details.Common.CLI
                 throw new ApplicationException($"*** ERROR: Loading subscriptions ***\n{response.Output.StdError}");
             }
 
-            var needLogin = response.Output.StdError != null && (response.Output.StdError.Split('\'', '"').Contains("az login") || response.Output.StdError.Contains("refresh token"));
+            var needLogin = response.Output.StdError != null && LoginHelpers.HasLoginError(response.Output.StdError);
             if (needLogin)
             {
                 response = await LoginHelpers.AttemptLogin(allowInteractiveLogin, subscriptionLabel);

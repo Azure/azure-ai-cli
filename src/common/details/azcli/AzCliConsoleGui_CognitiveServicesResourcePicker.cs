@@ -64,7 +64,7 @@ namespace Azure.AI.Details.Common.CLI
             Console.Write("\rName: ");
             if (string.IsNullOrEmpty(response.Output.StdOutput) && !string.IsNullOrEmpty(response.Output.StdError))
             {
-                if (response.Output.StdError.Contains("az login"))
+                if (LoginHelpers.HasLoginError(response.Output.StdError))
                 {
                     var loginResponse = await LoginHelpers.AttemptLogin(interactive, "resources");
                     if (!loginResponse.Equals(default(ParsedJsonProcessOutput<AzCli.SubscriptionInfo[]>)))

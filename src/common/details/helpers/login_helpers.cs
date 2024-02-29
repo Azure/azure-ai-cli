@@ -49,5 +49,7 @@ namespace Azure.AI.Details.Common.CLI
             Console.Write($"\r{label}: ");
             return response;
         }
+
+        public static bool HasLoginError(string errorMessage) => errorMessage.Split('\'', '"').Contains("az login") || errorMessage.Contains("refresh token");
     }
 }
