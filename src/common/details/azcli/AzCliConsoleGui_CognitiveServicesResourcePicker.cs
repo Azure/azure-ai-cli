@@ -64,7 +64,18 @@ namespace Azure.AI.Details.Common.CLI
             Console.Write("\rName: ");
             if (string.IsNullOrEmpty(response.Output.StdOutput) && !string.IsNullOrEmpty(response.Output.StdError))
             {
-                throw new ApplicationException($"ERROR: Loading Cognitive Services resources: {response.Output.StdError}");
+                if (response.Output.StdError.Contains("az login"))
+                {
+                    var loginResponse = await LoginHelpers.AttemptLogin(interactive, "resources");
+                    if (!loginResponse.Equals(default(ParsedJsonProcessOutput<AzCli.SubscriptionInfo[]>)))
+                    {
+                        response = await AzCli.ListCognitiveServicesResources(subscriptionId, kinds);
+                    }
+                }
+                if (string.IsNullOrEmpty(response.Output.StdOutput) && !string.IsNullOrEmpty(response.Output.StdError))
+                {
+                    throw new ApplicationException($"ERROR: Loading Cognitive Services resources: {response.Output.StdError}");
+                }
             }
 
             var resources = response.Payload
