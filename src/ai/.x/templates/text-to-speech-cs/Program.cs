@@ -14,35 +14,31 @@ public class Program
         // Connection and spoken language details required
         var speechKey = Environment.GetEnvironmentVariable("AZURE_AI_SPEECH_KEY") ?? "<#= AZURE_AI_SPEECH_KEY #>";
         var speechRegion = Environment.GetEnvironmentVariable("AZURE_AI_SPEECH_REGION") ?? "<#= AZURE_AI_SPEECH_REGION #>";
-        var speechLanguage = "en-US"; // BCP-47 language code
+        var voiceName = "en-US-AndrewNeural"; // You can list voice names with `ai speech synthesize --list-voices`
 
-        // Create instances of a speech config, audio config, and source language config
+        // Create instances of a speech config and audio config, and set the voice name to use
         var config = SpeechConfig.FromSubscription(speechKey, speechRegion);
-        var audioConfig = AudioConfig.FromDefaultMicrophoneInput();
-        var sourceLanguageConfig = SourceLanguageConfig.FromLanguage(speechLanguage);
+        var audioConfig = AudioConfig.FromDefaultSpeakerOutput();
+        config.SpeechSynthesisVoiceName = voiceName;
 
-        // Create the speech recognizer from the above configuration information
-        using (var recognizer = new SpeechRecognizer(config, sourceLanguageConfig, audioConfig))
+        // Create the speech synthesizer from the above configuration information
+        using (var synthesizer = new SpeechSynthesizer(config, audioConfig))
         {
-            Console.WriteLine("Listening ...\n");
+            // Get text from the user to synthesize
+            Console.Write("Enter text: ");
+            var text = Console.ReadLine();
 
-            // Start speech recognition, and return after a single utterance is recognized. The end of a
-            // single utterance is determined by listening for silence at the end or until a maximum of 15
-            // seconds of audio is processed.
-            var result = await recognizer.RecognizeOnceAsync();
+            // Start speech synthesis, and return after it has completed
+            var result = await synthesizer.SpeakTextAsync(text);
 
             // Check the result
-            if (result.Reason == ResultReason.RecognizedSpeech)
+            if (result.Reason == ResultReason.SynthesizingAudioCompleted)
             {
-                Console.WriteLine($"RECOGNIZED: {result.Text}");
-            }
-            else if (result.Reason == ResultReason.NoMatch)
-            {
-                Console.WriteLine($"NOMATCH: Speech could not be recognized.");
+                Console.WriteLine($"SYNTHESIZED: {result.AudioData.Length} byte(s)");
             }
             else if (result.Reason == ResultReason.Canceled)
             {
-                var cancellation = CancellationDetails.FromResult(result);
+                var cancellation = SpeechSynthesisCancellationDetails.FromResult(result);
                 Console.WriteLine($"CANCELED: Reason={cancellation.Reason}");
 
                 if (cancellation.Reason == CancellationReason.Error)
