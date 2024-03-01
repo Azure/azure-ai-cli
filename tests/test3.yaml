@@ -467,3 +467,68 @@
       bash: |
         cd openai-webpage-with-functions-ts
         npx webpack
+
+- area: ai dev new speech tests
+  tests:
+
+  - area: ai dev new speech-to-text
+    tests:
+
+    - class: dev new speech-to-text (c#)
+      steps:
+      - name: generate template
+        command: ai dev new speech-to-text --cs
+      - name: build template
+        bash: |
+          cd speech-to-text-cs
+          dotnet build
+      # - name: run template
+      #   command: ai dev shell --bash "cd speech-to-text-cs;./bin/Debug/net8.0/SpeechToText"
+      #   tag: skip
+
+  - area: ai dev new speech-to-text-continuous
+    tests:
+
+    - class: dev new speech-to-text-continuous (c#)
+      steps:
+      - name: generate template
+        command: ai dev new speech-to-text-continuous --cs
+      - name: build template
+        bash: |
+          cd speech-to-text-continuous-cs
+          dotnet build
+      # - name: run template
+      #   command: ai dev shell --bash "cd speech-to-text-continuous-cs;./bin/Debug/net8.0/SpeechToTextContinuous"
+      #   tag: skip
+
+  - area: ai dev new text-to-speech
+    tests:
+
+    - class: dev new text-to-speech (c#)
+      steps:
+      - name: generate template
+        command: ai dev new text-to-speech --cs
+      - name: build template
+        bash: |
+          cd text-to-speech-cs
+          dotnet build
+      # - name: run template
+      #   command: ai dev shell --bash "cd text-to-speech-cs;./bin/Debug/net8.0/TextToSpeech"
+      #   input: |-
+      #     Hello, World!
+
+  - area: ai dev new text-to-speech-with-file
+    tests:
+
+    - class: dev new text-to-speech-with-file (c#)
+      steps:
+      - name: generate template
+        command: ai dev new text-to-speech-with-file --cs
+      - name: build template
+        bash: |
+          cd text-to-speech-with-file-cs
+          dotnet build
+      - name: run template
+        command: ai dev shell --bash "cd text-to-speech-with-file-cs;./bin/Debug/net8.0/TextToSpeechWithFile"
+        input: |-
+          Hello, World!
