@@ -11,7 +11,7 @@ public class Program
 {
     public static async Task<int> Main(string[] args)
     {
-        // Connection and spoken language details required
+        // Connection and configuration details required
         var speechKey = Environment.GetEnvironmentVariable("AZURE_AI_SPEECH_KEY") ?? "<#= AZURE_AI_SPEECH_KEY #>";
         var speechRegion = Environment.GetEnvironmentVariable("AZURE_AI_SPEECH_REGION") ?? "<#= AZURE_AI_SPEECH_REGION #>";
         var speechLanguage = "en-US"; // BCP-47 language code
