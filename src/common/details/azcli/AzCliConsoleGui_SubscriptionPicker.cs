@@ -77,44 +77,10 @@ namespace Azure.AI.Details.Common.CLI
                 throw new ApplicationException($"*** ERROR: Loading subscriptions ***\n{response.Output.StdError}");
             }
 
-            var needLogin = response.Output.StdError != null && (response.Output.StdError.Split('\'', '"').Contains("az login") || response.Output.StdError.Contains("refresh token"));
+            var needLogin = response.Output.StdError != null && LoginHelpers.HasLoginError(response.Output.StdError);
             if (needLogin)
             {
-                bool cancelLogin = !allowInteractiveLogin;
-                bool useDeviceCode = false;
-                if (allowInteractiveLogin)
-                {
-                    ConsoleHelpers.WriteError("*** WARNING: `az login` required ***");
-                    Console.Write(" ");
-
-                    var selection = 0;
-                    var choices = new List<string>() {
-                        "LAUNCH: `az login` (interactive device code)",
-                        "CANCEL: `az login ...` (non-interactive)",
-                    };
-
-                    if (!OS.IsCodeSpaces())
-                    {
-                        choices.Insert(0, "LAUNCH: `az login` (interactive browser)");
-                        selection = OS.IsWindows() ? 0 : 1;
-                    }
-
-                    var picked = ListBoxPicker.PickIndexOf(choices.ToArray(), selection);
-
-                    cancelLogin = picked < 0 || picked == choices.Count() - 1;
-                    useDeviceCode = picked == choices.Count() - 2;
-                }
-
-                if (cancelLogin)
-                {
-                    Console.Write($"\r{subscriptionLabel}: ");
-                    ConsoleHelpers.WriteLineError("*** Please run `az login` and try again ***");
-                    return null;
-                }
-
-                Console.Write($"\r{subscriptionLabel}: *** Launching `az login` (interactive) ***");
-                response = await AzCli.Login(useDeviceCode);
-                Console.Write($"\r{subscriptionLabel}: ");
+                response = await LoginHelpers.AttemptLogin(allowInteractiveLogin, subscriptionLabel);
             }
 
             var subscriptions = response.Payload
