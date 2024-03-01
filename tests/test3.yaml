@@ -486,19 +486,19 @@
       #   command: ai dev shell --bash "cd speech-to-text-cs;./bin/Debug/net8.0/SpeechToText"
       #   tag: skip
 
-  - area: ai dev new speech-to-text-continuous
+  - area: ai dev new speech-to-text-continuous-reco
     tests:
 
-    - class: dev new speech-to-text-continuous (c#)
+    - class: dev new speech-to-text-continuous-reco (c#)
       steps:
       - name: generate template
-        command: ai dev new speech-to-text-continuous --cs
+        command: ai dev new speech-to-text-continuous-reco --cs
       - name: build template
         bash: |
-          cd speech-to-text-continuous-cs
+          cd speech-to-text-continuous-reco-cs
           dotnet build
       # - name: run template
-      #   command: ai dev shell --bash "cd speech-to-text-continuous-cs;./bin/Debug/net8.0/SpeechToTextContinuous"
+      #   command: ai dev shell --bash "cd speech-to-text-continuous-reco-cs;./bin/Debug/net8.0/SpeechToTextContinuous"
       #   tag: skip
 
   - area: ai dev new text-to-speech
