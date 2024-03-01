@@ -3,6 +3,7 @@
 // Licensed under the MIT license. See LICENSE.md file in the project root for full license information.
 //
 
+using System.Runtime.CompilerServices;
 using System.Text;
 using Azure.AI.Details.Common.CLI.ConsoleGui;
 
@@ -10,6 +11,30 @@ namespace Azure.AI.Details.Common.CLI
 {
     public class LoginHelpers
     {
+        public static async Task<ParsedJsonProcessOutput<T>> GetResponseOnLogin<T>(bool allowInteractiveLogin, string label, Func<Task<ParsedJsonProcessOutput<T>>> getResponse, string titleLabel = "Name")
+        {
+            Console.Write($"\r{titleLabel}: *** Loading choices ***");
+            var response = await getResponse();
+
+            Console.Write($"\r{titleLabel}: ");
+            if (string.IsNullOrEmpty(response.Output.StdOutput) && !string.IsNullOrEmpty(response.Output.StdError))
+            {
+                if (LoginHelpers.HasLoginError(response.Output.StdError))
+                {
+                    var loginResponse = await LoginHelpers.AttemptLogin(allowInteractiveLogin, $"{label}s");
+                    if (!loginResponse.Equals(default(ParsedJsonProcessOutput<AzCli.SubscriptionInfo[]>)))
+                    {
+                        response = await getResponse();
+                    }
+                }
+                if (string.IsNullOrEmpty(response.Output.StdOutput) && !string.IsNullOrEmpty(response.Output.StdError))
+                {
+                    throw new ApplicationException($"ERROR: Loading resource {label}s: {response.Output.StdError}");
+                }
+            }
+            return response;
+        }
+
         public static async Task<ParsedJsonProcessOutput<AzCli.SubscriptionInfo[]>> AttemptLogin(bool allowInteractiveLogin, string label)
         {
             bool cancelLogin = !allowInteractiveLogin;

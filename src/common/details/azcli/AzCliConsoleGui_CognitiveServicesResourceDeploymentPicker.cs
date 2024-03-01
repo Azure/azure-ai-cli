@@ -41,25 +41,8 @@ namespace Azure.AI.Details.Common.CLI
         {
             var allowCreateDeployment = !string.IsNullOrEmpty(allowCreateDeploymentOption);
 
-            Console.Write($"Name: *** Loading choices ***");
-            var response = await AzCli.ListCognitiveServicesDeployments(subscriptionId, groupName, resourceName, "OpenAI");
-
-            Console.Write($"\rName: ");
-            if (string.IsNullOrEmpty(response.Output.StdOutput) && !string.IsNullOrEmpty(response.Output.StdError))
-            {
-                if (LoginHelpers.HasLoginError(response.Output.StdError))
-                {
-                    var loginResponse = await LoginHelpers.AttemptLogin(interactive, "deployments");
-                    if (!loginResponse.Equals(default(ParsedJsonProcessOutput<AzCli.SubscriptionInfo[]>)))
-                    {
-                        response = await AzCli.ListCognitiveServicesDeployments(subscriptionId, groupName, resourceName, "OpenAI");
-                    }
-                }
-                if (string.IsNullOrEmpty(response.Output.StdOutput) && !string.IsNullOrEmpty(response.Output.StdError))
-                {
-                    throw new ApplicationException($"ERROR: Loading deployments:\n{response.Output.StdError}");
-                }
-            }
+            var listDeploymentsFunc = async () => await AzCli.ListCognitiveServicesDeployments(subscriptionId, groupName, resourceName, "OpenAI");
+            var response = await LoginHelpers.GetResponseOnLogin<AzCli.CognitiveServicesDeploymentInfo[]>(interactive, "deployment", listDeploymentsFunc);
 
             var lookForChatCompletionCapable = deploymentExtra.ToLower() == "chat" || deploymentExtra.ToLower() == "evaluation";
             var lookForEmbeddingCapable = deploymentExtra.ToLower() == "embeddings";
