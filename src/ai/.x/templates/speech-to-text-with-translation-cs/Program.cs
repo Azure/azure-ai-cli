@@ -112,6 +112,17 @@ public class Program
         }
     }
 
+    private static void HandleSessionStartedEvent(SessionEventArgs e)
+    {
+        Console.WriteLine($"SESSION STARTED: {e.SessionId}.\n");
+    }
+
+    private static void HandleSessionStoppedEvent(SessionEventArgs e, TaskCompletionSource<bool> sessionStoppedNoError)
+    {
+        Console.WriteLine($"SESSION STOPPED: {e.SessionId}.");
+        sessionStoppedNoError.TrySetResult(true); // Set the result so the main thread can exit
+   }
+
     private static void HandleCanceledEvent(TranslationRecognitionCanceledEventArgs e, TaskCompletionSource<bool> sessionStoppedNoError)
     {
         Console.WriteLine($"CANCELED: Reason={e.Reason}");
@@ -131,15 +142,4 @@ public class Program
         // Set the task completion source result so the main thread can exit
         sessionStoppedNoError.TrySetResult(e.Reason != CancellationReason.Error);
     }
-
-    private static void HandleSessionStartedEvent(SessionEventArgs e)
-    {
-        Console.WriteLine($"SESSION STARTED: {e.SessionId}.\n");
-    }
-
-    private static void HandleSessionStoppedEvent(SessionEventArgs e, TaskCompletionSource<bool> sessionStoppedNoError)
-    {
-        Console.WriteLine($"SESSION STOPPED: {e.SessionId}.");
-        sessionStoppedNoError.TrySetResult(true); // Set the result so the main thread can exit
-   }
 }
