@@ -1,0 +1,92 @@
+﻿tests:
+- name: ai init speech
+  command: ai init speech
+  tags: [before]
+  arguments:
+    subscription: e72e5254-f265-4e95-9bd2-9ee8e7329051
+    name: robch-cranky-red-koala-ais
+    interactive: false
+
+- area: ai dev new speech tests
+  tests:
+
+  - area: ai dev new speech-to-text
+    tests:
+
+    - class: dev new speech-to-text (c#)
+      steps:
+      - name: generate template
+        command: ai dev new speech-to-text --cs
+      - name: build template
+        bash: |
+          cd speech-to-text-cs
+          dotnet build
+      # - name: run template
+      #   command: ai dev shell --bash "cd speech-to-text-cs;./bin/Debug/net8.0/SpeechToText"
+      #   tag: skip-run-requires-microphone
+
+  - area: ai dev new speech-to-text-continuous-reco
+    tests:
+
+    - class: dev new speech-to-text-continuous-reco (c#)
+      steps:
+      - name: generate template
+        command: ai dev new speech-to-text-continuous-reco --cs
+      - name: build template
+        bash: |
+          cd speech-to-text-continuous-reco-cs
+          dotnet build
+      # - name: run template
+      #   command: ai dev shell --bash "cd speech-to-text-continuous-reco-cs;./bin/Debug/net8.0/SpeechToTextContinuous"
+      #   tag: skip-run-requires-microphone
+
+  - area: ai dev new speech-to-text-with-file
+    tests:
+
+    - class: dev new speech-to-text-with-file (c#)
+      steps:
+      - name: generate template
+        command: ai dev new speech-to-text-with-file --cs
+      - name: build template
+        bash: |
+          cd speech-to-text-with-file-cs
+          dotnet build
+      - name: create audio file for input
+        command: ai speech synthesize --text "Hello world" --audio-output "speech-to-text-with-file-cs/hello.wav"
+      - name: run template
+        command: ai dev shell --bash "cd speech-to-text-with-file-cs;./bin/Debug/net8.0/SpeechToTextWithFile hello.wav"
+        expect: |
+          Hello world.
+
+  - area: ai dev new text-to-speech
+    tests:
+
+    - class: dev new text-to-speech (c#)
+      steps:
+      - name: generate template
+        command: ai dev new text-to-speech --cs
+      - name: build template
+        bash: |
+          cd text-to-speech-cs
+          dotnet build
+      # - name: run template
+      #   command: ai dev shell --bash "cd text-to-speech-cs;./bin/Debug/net8.0/TextToSpeech"
+      #   input: |-
+      #     Hello world.
+      #   tag: skip-run-requires-speakers
+
+  - area: ai dev new text-to-speech-with-file
+    tests:
+
+    - class: dev new text-to-speech-with-file (c#)
+      steps:
+      - name: generate template
+        command: ai dev new text-to-speech-with-file --cs
+      - name: build template
+        bash: |
+          cd text-to-speech-with-file-cs
+          dotnet build
+      - name: run template
+        command: ai dev shell --bash "cd text-to-speech-with-file-cs;./bin/Debug/net8.0/TextToSpeechWithFile"
+        input: |-
+          Hello world.

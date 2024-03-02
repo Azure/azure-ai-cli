@@ -15,10 +15,18 @@ public class Program
         var speechKey = Environment.GetEnvironmentVariable("AZURE_AI_SPEECH_KEY") ?? "<#= AZURE_AI_SPEECH_KEY #>";
         var speechRegion = Environment.GetEnvironmentVariable("AZURE_AI_SPEECH_REGION") ?? "<#= AZURE_AI_SPEECH_REGION #>";
         var speechLanguage = "en-US"; // BCP-47 language code
+        var inputFileName = args.Length == 1 ? args[0] : "audio.wav";
+
+        // Check to see if the input file exists
+        if (!File.Exists(inputFileName))
+        {
+            Console.WriteLine($"ERROR: Cannot find audio input file: {inputFileName}");
+            return 1;
+        }
 
         // Create instances of a speech config, audio config, and source language config
         var config = SpeechConfig.FromSubscription(speechKey, speechRegion);
-        var audioConfig = AudioConfig.FromDefaultMicrophoneInput();
+        var audioConfig = AudioConfig.FromWavFileInput(inputFileName);
         var sourceLanguageConfig = SourceLanguageConfig.FromLanguage(speechLanguage);
 
         // Create the speech recognizer from the above configuration information
