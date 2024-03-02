@@ -58,6 +58,24 @@
         expect: |
           Hello world.
 
+  - area: ai dev new speech-to-text-with-translation
+    tests:
+
+    - class: dev new speech-to-text-with-translation (c#)
+      steps:
+      - name: generate template
+        command: ai dev new speech-to-text-with-translation --cs
+      - name: build template
+        bash: |
+          cd speech-to-text-with-translation-cs
+          dotnet build
+      - name: create audio file for input
+        command: ai speech synthesize --text "Hello world" --audio-output "speech-to-text-with-translation-cs/hello.wav"
+      - name: run template
+        command: ai dev shell --bash "cd speech-to-text-with-translation-cs;./bin/Debug/net8.0/SpeechToTextWithTranslation hello.wav"
+        expect: |
+          Hello world.
+  
   - area: ai dev new text-to-speech
     tests:
 
