@@ -15,19 +15,29 @@ public class Program
         var speechKey = Environment.GetEnvironmentVariable("AZURE_AI_SPEECH_KEY") ?? "<#= AZURE_AI_SPEECH_KEY #>";
         var speechRegion = Environment.GetEnvironmentVariable("AZURE_AI_SPEECH_REGION") ?? "<#= AZURE_AI_SPEECH_REGION #>";
         var speechLanguage = "en-US"; // BCP-47 language code
-        var inputFileName = args.Length == 1 ? args[0] : "audio.wav";
+        var inputFileName = args.Length == 1 ? args[0] : null;
+        var keywordFileName = "keyword.table";
 
         // Check to see if the input file exists
-        if (!File.Exists(inputFileName))
+        if (inputFileName != null && !File.Exists(inputFileName))
         {
             Console.WriteLine($"ERROR: Cannot find audio input file: {inputFileName}");
+            return 1;
+        }
+
+        // Check to see if the keyword file exists
+        if (!File.Exists(keywordFileName))
+        {
+            Console.WriteLine($"ERROR: Cannot find keyword file: {keywordFileName}");
             return 1;
         }
 
         // Create instances of a speech config, source language config, and audio config
         var config = SpeechConfig.FromSubscription(speechKey, speechRegion);
         var sourceLanguageConfig = SourceLanguageConfig.FromLanguage(speechLanguage);
-        var audioConfig = AudioConfig.FromWavFileInput(inputFileName);
+        var audioConfig = inputFileName != null
+            ? AudioConfig.FromWavFileInput(inputFileName)
+            : AudioConfig.FromDefaultMicrophoneInput();
 
         // Create the speech recognizer from the above configuration information
         using (var recognizer = new SpeechRecognizer(config, sourceLanguageConfig, audioConfig))
@@ -47,7 +57,7 @@ public class Program
             // logging the start and end of a speech recognition session. In console apps, this is
             // used to allow the application to block the main thread until recognition is complete.
             recognizer.SessionStarted += (s, e) => HandleSessionStartedEvent(e);
-            recognizer.SessionStopped += (s, e) => HandleSessionStoppedEvent(e, sessionStoppedNoError);
+            recognizer.SessionStopped += (s, e) => HandleSessionStoppedEvent(e);
 
             // Subscribe to the Canceled event, which indicates that the recognition operation
             // was stopped/canceled, likely due to an error of some kind.
@@ -60,9 +70,11 @@ public class Program
                 recognizer.StopContinuousRecognitionAsync();
             });
 
-            // Start speech recognition
-            await recognizer.StartContinuousRecognitionAsync();
-            Console.WriteLine("Listening; press ENTER to stop ...\n");
+            var keywordModel = KeywordRecognitionModel.FromFile(keywordFileName);
+
+            // Start keyword recognition
+            await recognizer.StartKeywordRecognitionAsync(keywordModel);
+            Console.WriteLine("Listening for keyword; press ENTER to stop ...\n");
 
             // Wait for the session to stop. The Task will not complete until the recognition
             // session stops, and the result will indicate whether the session completed
@@ -78,7 +90,11 @@ public class Program
 
     private static void HandleRecognizedEvent(SpeechRecognitionEventArgs e)
     {
-        if (e.Result.Reason == ResultReason.RecognizedSpeech && !string.IsNullOrEmpty(e.Result.Text))
+        if (e.Result.Reason == ResultReason.RecognizedKeyword && !string.IsNullOrEmpty(e.Result.Text))
+        {
+            Console.WriteLine($"RECOGNIZED: {e.Result.Text}\n");
+        }
+        else if (e.Result.Reason == ResultReason.RecognizedSpeech && !string.IsNullOrEmpty(e.Result.Text))
         {
             Console.WriteLine($"RECOGNIZED: {e.Result.Text}\n");
         }
@@ -93,10 +109,9 @@ public class Program
         Console.WriteLine($"SESSION STARTED: {e.SessionId}.\n");
     }
 
-    private static void HandleSessionStoppedEvent(SessionEventArgs e, TaskCompletionSource<bool> sessionStoppedNoError)
+    private static void HandleSessionStoppedEvent(SessionEventArgs e)
     {
         Console.WriteLine($"SESSION STOPPED: {e.SessionId}.");
-        sessionStoppedNoError.TrySetResult(true); // Set the result so the main thread can exit
    }
 
     private static void HandleCanceledEvent(SpeechRecognitionCanceledEventArgs e, TaskCompletionSource<bool> sessionStoppedNoError)

@@ -16,10 +16,10 @@ public class Program
         var speechRegion = Environment.GetEnvironmentVariable("AZURE_AI_SPEECH_REGION") ?? "<#= AZURE_AI_SPEECH_REGION #>";
         var speechLanguage = "en-US"; // BCP-47 language code
 
-        // Create instances of a speech config, audio config, and source language config
+        // Create instances of a speech config, source language config, and audio config
         var config = SpeechConfig.FromSubscription(speechKey, speechRegion);
-        var audioConfig = AudioConfig.FromDefaultMicrophoneInput();
         var sourceLanguageConfig = SourceLanguageConfig.FromLanguage(speechLanguage);
+        var audioConfig = AudioConfig.FromDefaultMicrophoneInput();
 
         // Create the speech recognizer from the above configuration information
         using (var recognizer = new SpeechRecognizer(config, sourceLanguageConfig, audioConfig))

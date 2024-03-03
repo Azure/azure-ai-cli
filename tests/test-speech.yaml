@@ -58,6 +58,21 @@
         expect: |
           Hello world.
 
+  - area: ai dev new speech-to-text-with-keyword
+    tests:
+
+    - class: dev new speech-to-text-with-keyword (c#)
+      steps:
+      - name: generate template
+        command: ai dev new speech-to-text-with-keyword --cs
+      - name: build template
+        bash: |
+          cd speech-to-text-with-keyword-cs
+          dotnet build
+      # - name: run template
+      #   command: ai dev shell --bash "cd speech-to-text-with-keyword-cs;./bin/Debug/net8.0/SpeechToTextWithKeyword"
+      #   tag: skip-run-requires-microphone
+      
   - area: ai dev new speech-to-text-with-translation
     tests:
 
