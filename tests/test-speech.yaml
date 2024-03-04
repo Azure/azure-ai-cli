@@ -25,6 +25,26 @@
       #   command: ai dev shell --bash "cd speech-to-text-cs;./bin/Debug/net8.0/SpeechToText"
       #   tag: skip-run-requires-microphone
 
+    - class: dev new speech-to-text (python)
+      steps:
+      - name: generate template
+        command: ai dev new speech-to-text --py
+      - name: install requirements
+        bash: |
+          cd speech-to-text-py
+          pip install -r requirements.txt
+      # - name: run template
+      #   command: ai dev shell
+      #   arguments:
+      #     bash: |
+      #       cd speech-to-text-py
+      #       if [ -f /etc/os-release ]; then
+      #         python3 main.py
+      #       else
+      #         python main.py
+      #       fi
+      #   tag: skip-run-requires-microphone
+
   - area: ai dev new speech-to-text-continuous-reco
     tests:
 

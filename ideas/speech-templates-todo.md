@@ -1,6 +1,6 @@
 | name                                          | short                             | languages
 | ----                                          | -----                             | ---------
-| Speech-to-text                                | speech-to-text                    | C++, __C#__, Go, Java, JavaScript, Python
+| Speech-to-text                                | speech-to-text                    | C++, __C#__, Go, Java, JavaScript, __Python__
 | Speech-to-text (w/ Continuous recognition)    | speech-to-text-continuous         | C++, __C#__, Go, Java, JavaScript, __Python__
 | Speech-to-text (w/ File input)                | speech-to-text-with-file          | C++, __C#__, Go, Java, JavaScript, Python
 | Speech-to-text (w/ Keyword detection)         | speech-to-text-with-keyword       | C++, __C#__, Go, Java, JavaScript, Python
