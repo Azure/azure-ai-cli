@@ -175,7 +175,28 @@
         command: ai dev shell --bash "cd speech-to-text-with-translation-cs;./bin/Debug/net8.0/SpeechToTextWithTranslation hello.wav"
         expect: |
           Hello world.
-  
+
+    - class: dev new speech-to-text-with-translation (python)
+      steps:
+      - name: generate template
+        command: ai dev new speech-to-text-with-translation --py
+      - name: install requirements
+        bash: |
+          cd speech-to-text-with-translation-py
+          pip install -r requirements.txt
+      - name: create audio file for input
+        command: ai speech synthesize --text "Hello world" --audio-output "speech-to-text-with-translation-py/hello.wav"
+      - name: run template
+        command: ai dev shell
+        arguments:
+          bash: |
+            cd speech-to-text-with-translation-py
+            if [ -f /etc/os-release ]; then
+              python3 main.py hello.wav
+            else
+              python main.py hello.wav
+            fi
+
   - area: ai dev new text-to-speech
     tests:
 
