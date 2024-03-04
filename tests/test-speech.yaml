@@ -130,9 +130,33 @@
         bash: |
           cd speech-to-text-with-keyword-cs
           dotnet build
+      # - name: create audio file for input
+      #   command: ai speech synthesize --text "Computer tell me a joke. Computer tell me another joke." --audio-output "speech-to-text-with-keyword-cs/jokes.wav"
       # - name: run template
-      #   command: ai dev shell --bash "cd speech-to-text-with-keyword-cs;./bin/Debug/net8.0/SpeechToTextWithKeyword"
-      #   tag: skip-run-requires-microphone
+      #   command: ai dev shell --bash "cd speech-to-text-with-keyword-cs;./bin/Debug/net8.0/SpeechToTextWithKeyword jokes.wav"
+      #   tag: skip-run-requires-bugfix
+
+    - class: dev new speech-to-text-with-keyword (python)
+      steps:
+      - name: generate template
+        command: ai dev new speech-to-text-with-keyword --py
+      - name: install requirements
+        bash: |
+          cd speech-to-text-with-keyword-py
+          pip install -r requirements.txt
+      # - name: create audio file for input
+      #   command: ai speech synthesize --text "Computer tell me a joke. Computer tell me another joke." --audio-output "speech-to-text-with-keyword-py/jokes.wav"
+      # - name: run template
+      #   command: ai dev shell
+      #   arguments:
+      #     bash: |
+      #       cd speech-to-text-with-keyword-py
+      #       if [ -f /etc/os-release ]; then
+      #         python3 main.py jokes.wav
+      #       else
+      #         python main.py jokes.wav
+      #       fi
+      #   tag: skip-run-requires-bugfix
       
   - area: ai dev new speech-to-text-with-translation
     tests:
