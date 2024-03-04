@@ -1,0 +1,32 @@
+VISION IMAGE ANALYZE
+
+@include.the.azure.ai.service
+
+USAGE: ai vision image analyze [...]
+
+  INPUT
+    --file FILEPATH                     (see: ai help vision image analyze file)
+    --url  IMAGEURL                     (see: ai help vision image analyze url)
+
+  FEATURES
+    --visualfeatures FEATURES          (see: ai help vision image analyze visualfeatures)
+
+  LANGUAGE
+    --language LANGUAGE                 (see: ai help vision image analyze language)
+
+  CAPTIONS
+    --genderneutralcaptions TRUE|FALSE  (see: ai help vision image analyze genderneutralcaptions)
+
+  ASPECT RATIOS
+    --smartaspectratios RATIOS          (see: ai help vision image analyze smartaspectratios)
+
+  MODEL
+    --modelversion VERSION              (see: ai help vision image analyze modelversion)
+
+EXAMPLES
+
+  ai vision image analyze --file image.jpg --visualfeatures Caption
+
+SEE ALSO
+
+  ai help vision image analyze examples

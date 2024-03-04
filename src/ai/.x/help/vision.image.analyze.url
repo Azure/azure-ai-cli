@@ -1,0 +1,9 @@
+VISION IMAGE ANALYZE URL
+
+The `--url` argument is used to specify the URL of the image to analyze. The image must be publicly accessible.
+
+USAGE: ai vision image analyze --url <url> [...other options]
+
+EXAMPLE
+
+  ai vision image analyze --url https://example.com/image.jpg --visualfeatures Caption

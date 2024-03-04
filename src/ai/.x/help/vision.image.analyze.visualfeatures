@@ -1,0 +1,19 @@
+VISION IMAGE ANALYZE VISUAL FEATURES
+
+The `--visualfeatures` argument is used to specify one or more visual features to extract from the image. The options are specified by a comma separated list.
+
+Here are the supported features:
+
+1. `Caption`: Generate a human-readable sentence that describes the content of an image.
+2. `Read`: Also known as Optical Character Recognition (OCR). Extract printed or handwritten text from images.
+3. `DenseCaptions`: Dense Captions provides more details by generating one-sentence captions for up to 10 different regions in the image, including one for the whole image. 
+4. `Tags`: Extract content tags for thousands of recognizable objects, living beings, scenery, and actions that appear in images.
+5. `Objects`: Object detection. This is similar to tagging, but focuses on detecting physical objects in the image and returning their location.
+6. `SmartCrops`: Used to find a representative sub-region of the image for thumbnail generation, with priority given to include faces.
+7. `People`: Locate people in the image and return their location.
+
+USAGE: ai vision image analyze --visualfeatures <features list> [...other options]
+
+EXAMPLE
+
+  ai vision image analyze --file image.jpg --visualfeatures Caption,People

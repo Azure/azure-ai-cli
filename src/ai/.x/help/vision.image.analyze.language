@@ -1,0 +1,9 @@
+VISION IMAGE ANALYZE LANGUAGE
+
+The `--language` argument is used to specify the language to use for analysis. This affects the language of the generated captions and extracted text.
+
+USAGE: ai vision image analyze --language <language> [...other options]
+
+EXAMPLE
+
+  ai vision image analyze --file image.jpg --visualfeatures Caption --language en

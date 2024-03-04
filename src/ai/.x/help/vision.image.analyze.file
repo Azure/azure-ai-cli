@@ -1,0 +1,9 @@
+VISION IMAGE ANALYZE FILE
+
+The `--file` argument is used to specify the path to the image file to analyze. The file must be in one of the following formats: JPEG, PNG, GIF, BMP, WEBP, ICO, TIFF, or MPO. The file size must be less than 20 megabytes (MB), and the dimensions of the image must be greater than 50 x 50 pixels and less than 16,000 x 16,000 pixels.
+
+USAGE: ai vision image analyze --file <filePath> [...other options]
+
+EXAMPLE
+
+  ai vision image analyze --file image.jpg --visualfeatures Caption
