@@ -104,8 +104,8 @@ namespace Azure.AI.Details.Common.CLI
         private static INamedValueTokenParser[] imageAnalyzeParsers = [
             new CommonVisionNamedValueTokenParsers(),
             new NamedValueTokenParser("--language",  "vision.image.language", "001", "1"),
-            new NamedValueTokenParser("--gender-neutral-captions",  "vision.image.gender.neutral.caption", "00111", "1"),
-            new NamedValueTokenParser("--smart-crop-aspect-ratios",  "vision.image.smart.crop.aspect.ratio", "001111", "1"),
+            new NamedValueTokenParser("--gender-neutral-captions",  "vision.image.gender.neutral.captions", "00111", "1"),
+            new NamedValueTokenParser("--smart-crop-aspect-ratios",  "vision.image.smart.crop.aspect.ratios", "001111", "1"),
             new NamedValueTokenParser("--model-version",  "vision.image.model.version", "0011", "1"),
             new NamedValueTokenParser("--visual-features", "vision.image.visual.features", "0011", "1")
         ];

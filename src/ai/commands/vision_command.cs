@@ -106,18 +106,18 @@ namespace Azure.AI.Details.Common.CLI
             {
                 options.Language = values.Get("vision.image.language");
             }
-            if(values.Contains("vision.image.gender.neutral.caption"))
+            if(values.Contains("vision.image.gender.neutral.captions"))
             {
-                options.GenderNeutralCaption = bool.Parse(values.Get("vision.image.gender.neutral.caption"));
+                options.GenderNeutralCaption = bool.Parse(values.Get("vision.image.gender.neutral.captions"));
             }
             if(values.Contains("vision.image.model.version"))
             {
                 options.ModelVersion = values.Get("vision.image.model.version");
             }
-            if(values.Contains("vision.image.smart.crop.aspect.ratio"))
+            if(values.Contains("vision.image.smart.crop.aspect.ratios"))
             {
                 List<float> aspectRatios = new List<float>();
-                var ratios = values.Get("vision.image.smart.crop.aspect.ratio").Split(',');
+                var ratios = values.Get("vision.image.smart.crop.aspect.ratios").Split(',');
                 foreach(var ratio in ratios)
                 {
                     aspectRatios.Add(float.Parse(ratio));
