@@ -249,3 +249,24 @@
         command: ai dev shell --bash "cd text-to-speech-with-file-cs;./bin/Debug/net8.0/TextToSpeechWithFile"
         input: |-
           Hello world.
+    
+    - class: dev new text-to-speech-with-file (python)
+      steps:
+      - name: generate template
+        command: ai dev new text-to-speech-with-file --py
+      - name: install requirements
+        bash: |
+          cd text-to-speech-with-file-py
+          pip install -r requirements.txt
+      - name: run template
+        command: ai dev shell
+        arguments:
+          bash: |
+            cd text-to-speech-with-file-py
+            if [ -f /etc/os-release ]; then
+              python3 main.py
+            else
+              python main.py
+            fi
+        input: |-
+          Hello world.
