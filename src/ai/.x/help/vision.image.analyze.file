@@ -6,4 +6,4 @@ USAGE: ai vision image analyze --file <filePath> [...other options]
 
 EXAMPLE
 
-  ai vision image analyze --file image.jpg --visualfeatures Caption
+  ai vision image analyze --file image.jpg --visual-features Caption

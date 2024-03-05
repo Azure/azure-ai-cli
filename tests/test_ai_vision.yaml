@@ -52,14 +52,14 @@
       command: ai vision image analyze
       arguments:
         url: https://aka.ms/azsdk/image-analysis/sample.jpg
-        visualfeatures: caption
+        visual-features: caption
     - name: test ai IA caption (Visual Features are case insensitive)
       expect: woman wearing a mask sitting at a table
       not-expect: ERROR
       command: ai vision image analyze
       arguments:
         url: https://aka.ms/azsdk/image-analysis/sample.jpg
-        visualfeatures: CaPtiOn
+        visual-features: CaPtiOn
     - name: test ai IA Multiple Visual Features
       expect: |
         Metadata: Model:
@@ -75,29 +75,29 @@
       command: ai vision image analyze
       arguments:
         url: https://aka.ms/azsdk/image-analysis/sample.jpg
-        visualfeatures: caption,objects,densecaptions,tags,read,people
+        visual-features: caption,objects,densecaptions,tags,read,people
     - name: test ai IA caption (gender neutral)
       expect: person wearing a mask sitting at a table
       not-expect: ERROR
       command: ai vision image analyze
       arguments:
         url: https://aka.ms/azsdk/image-analysis/sample.jpg
-        visualfeatures: caption
-        genderneutralcaptions: true
+        visual-features: caption
+        gender-neutral-captions: true
     - name: test ai IA Model selection
       expect: Invalid model version.
       command: ai vision image analyze
       arguments:
         url: https://aka.ms/azsdk/image-analysis/sample.jpg
-        visualfeatures: caption
-        modelversion: badmodel
+        visual-features: caption
+        model-version: badmodel
     - name: test ai IA from file
       expect: woman wearing a mask sitting at a table
       not-expect: ERROR
       command: ai vision image analyze
       arguments:
         file: ../tests/image-analysis-sample.jpg
-        visualfeatures: caption
+        visual-features: caption
     - name: test ai IA smart crop (single)
       expect: |
         Aspect ratio: 0.92, Bounding box: Top:
@@ -105,8 +105,8 @@
       command: ai vision image analyze
       arguments:
         url: https://aka.ms/azsdk/image-analysis/sample.jpg
-        visualfeatures: smartcrops
-        smartcropaspectratios: 0.92
+        visual-features: smartcrops
+        smart-crop-aspect-ratios: 0.92
     - name: test ai IA smart crop (multiple)
       expect: |
         Aspect ratio: 0.9, Bounding box: Top:
@@ -115,8 +115,8 @@
       command: ai vision image analyze
       arguments:
         url: https://aka.ms/azsdk/image-analysis/sample.jpg
-        visualfeatures: smartcrops
-        smartcropaspectratios: 0.9,1.78
+        visual-features: smartcrops
+        smart-crop-aspect-ratios: 0.9,1.78
     - name: test ai IA caption (JSON)
       expect: |
         {
@@ -128,5 +128,5 @@
       command: ai vision image analyze
       arguments:
         url: https://aka.ms/azsdk/image-analysis/sample.jpg
-        visualfeatures: caption
+        visual-features: caption
         outputtype: json

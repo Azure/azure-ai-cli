@@ -1,6 +1,6 @@
 VISION IMAGE ANALYZE VISUAL FEATURES
 
-The `--visualfeatures` argument is used to specify one or more visual features to extract from the image. The options are specified by a comma separated list.
+The `--visual-features` argument is used to specify one or more visual features to extract from the image. The options are specified by a comma separated list.
 
 Here are the supported features:
 
@@ -12,8 +12,8 @@ Here are the supported features:
 6. `SmartCrops`: Used to find a representative sub-region of the image for thumbnail generation, with priority given to include faces.
 7. `People`: Locate people in the image and return their location.
 
-USAGE: ai vision image analyze --visualfeatures <features list> [...other options]
+USAGE: ai vision image analyze --visual-features <features list> [...other options]
 
 EXAMPLE
 
-  ai vision image analyze --file image.jpg --visualfeatures Caption,People
+  ai vision image analyze --file image.jpg --visual-features Caption,People

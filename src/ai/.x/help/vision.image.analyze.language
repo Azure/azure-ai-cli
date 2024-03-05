@@ -6,4 +6,4 @@ USAGE: ai vision image analyze --language <language> [...other options]
 
 EXAMPLE
 
-  ai vision image analyze --file image.jpg --visualfeatures Caption --language en
+  ai vision image analyze --file image.jpg --visual-features Caption --language en

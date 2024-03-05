@@ -6,4 +6,4 @@ USAGE: ai vision image analyze --url <url> [...other options]
 
 EXAMPLE
 
-  ai vision image analyze --url https://example.com/image.jpg --visualfeatures Caption
+  ai vision image analyze --url https://example.com/image.jpg --visual-features Caption

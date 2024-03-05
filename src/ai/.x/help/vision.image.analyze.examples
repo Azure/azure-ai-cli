@@ -2,23 +2,23 @@ VISION IMAGE ANALYZE EXAMPLES
 
   `EXAMPLE 1`: Analyze an image file using the Caption feature
 
-    ai vision image analyze --file image.jpg --visualfeatures Caption
+    ai vision image analyze --file image.jpg --visual-features Caption
 
   `EXAMPLE 2`: Analyze an image file using the Read feature for OCR
 
-    ai vision image analyze --file text_image.jpg --visualfeatures Read
+    ai vision image analyze --file text_image.jpg --visual-features Read
 
   `EXAMPLE 3`: Analyze an image from a URL using the Caption feature
 
-    ai vision image analyze --url https://example.com/image.jpg --visualfeatures Caption
+    ai vision image analyze --url https://example.com/image.jpg --visual-features Caption
 
   `EXAMPLE 4`: Analyze an image file using multiple features
 
-    ai vision image analyze --file image.jpg --visualfeatures Caption,Objects
+    ai vision image analyze --file image.jpg --visual-features Caption,Objects
 
   `EXAMPLE 5`: Analyze an image file using the Caption feature with gender-neutral terms
 
-    ai vision image analyze --file image.jpg --visualfeatures Caption --genderneutralcaptions true
+    ai vision image analyze --file image.jpg --visual-features Caption --gender-neutral-captions true
 
 SEE ALSO
 
