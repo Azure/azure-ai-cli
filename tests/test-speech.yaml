@@ -214,6 +214,26 @@
       #     Hello world.
       #   tag: skip-run-requires-speakers
 
+    - class: dev new text-to-speech (python)
+      steps:
+      - name: generate template
+        command: ai dev new text-to-speech --py
+      - name: install requirements
+        bash: |
+          cd text-to-speech-py
+          pip install -r requirements.txt
+      # - name: run template
+      #   command: ai dev shell
+      #   arguments:
+      #     bash: |
+      #       cd text-to-speech-py
+      #       if [ -f /etc/os-release ]; then
+      #         python3 main.py
+      #       else
+      #         python main.py
+      #       fi
+      #   tag: skip-run-requires-speakers
+
   - area: ai dev new text-to-speech-with-file
     tests:
 
