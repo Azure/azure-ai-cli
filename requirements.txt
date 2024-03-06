@@ -11,6 +11,6 @@ keyrings.alt # This is for promptflow
 azureml-mlflow==1.53.0
 pytest
 
-langchain==0.1.1
+langchain==0.1.11
 langchain-openai==0.0.2.post1
 semantic-kernel
