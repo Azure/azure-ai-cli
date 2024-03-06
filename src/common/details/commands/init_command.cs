@@ -112,17 +112,18 @@ namespace Azure.AI.Details.Common.CLI
 
         private async Task DoInitRootVerifyConfigFileAsync(bool interactive, string fileName)
         {
-            ParseConfigJson(fileName, out string subscription, out string groupName, out string projectName);
+            bool success = ParseConfigJson(fileName, out string subscription, out string groupName, out string projectName);
+            if (success)
+            {
+                var (hubName, openai, search) = await VerifyProjectAsync(interactive, subscription, groupName, projectName);
+                if (openai != null && search != null)
+                {
+                    await DoInitRootConfirmVerifiedProjectResources(interactive, subscription, projectName, hubName, openai.Value, search.Value);
+                    return;
+                }
+            }
 
-            var (hubName, openai, search) = await VerifyProjectAsync(interactive, subscription, groupName, projectName);
-            if (openai != null && search != null)
-            {
-                await DoInitRootConfirmVerifiedProjectResources(interactive, subscription, projectName, hubName, openai.Value, search.Value);
-            }
-            else
-            {
-                await DoInitRootMenuPick();
-            }
+            await DoInitRootMenuPick();
         }
 
         private async Task<(string, AzCli.CognitiveServicesResourceInfo?, AzCli.CognitiveSearchResourceInfo?)> VerifyProjectAsync(bool interactive, string subscription, string groupName, string projectName)

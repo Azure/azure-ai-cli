@@ -113,11 +113,19 @@ namespace Azure.AI.Details.Common.CLI
                 }
             };
 
-            var process = TryCatchHelpers.TryCatchNoThrow<Process>(() => StartShellCommandProcess(command, arguments, addToEnvironment, redirectOutput), null, out Exception processException);
-            if (process == null)
+            Process process;
+            try
+            {
+                process = StartShellCommandProcess(command, arguments, addToEnvironment, redirectOutput);
+            }
+            catch (Exception processException)
             {
                 SHELL_DEBUG_TRACE($"ERROR: {processException}");
-                return new ProcessOutput() { StdError = processException.ToString() };
+                return new ProcessOutput()
+                {
+                    ExitCode = -1,
+                    StdError = processException.ToString()
+                };
             }
 
             if (redirectOutput)
@@ -137,10 +145,10 @@ namespace Azure.AI.Details.Common.CLI
             }
 
             var output = new ProcessOutput();
-            output.StdOutput = process != null ? sbOut.ToString().Trim(' ', '\r', '\n') : "";
-            output.StdError = process != null ? sbErr.ToString().Trim(' ', '\r', '\n') : processException.ToString();
-            output.MergedOutput = process != null ? sbMerged.ToString().Trim(' ', '\r', '\n') : "";
-            output.ExitCode = process != null ? process.ExitCode : -1;
+            output.StdOutput = sbOut.ToString().Trim(' ', '\r', '\n');
+            output.StdError = sbErr.ToString().Trim(' ', '\r', '\n');
+            output.MergedOutput = sbMerged.ToString().Trim(' ', '\r', '\n');
+            output.ExitCode = process.ExitCode;
 
             if (!string.IsNullOrEmpty(output.StdOutput)) SHELL_DEBUG_TRACE($"---\nSTDOUT\n---\n{output.StdOutput}");
             if (!string.IsNullOrEmpty(output.StdError)) SHELL_DEBUG_TRACE($"---\nSTDERR\n---\n{output.StdError}");
