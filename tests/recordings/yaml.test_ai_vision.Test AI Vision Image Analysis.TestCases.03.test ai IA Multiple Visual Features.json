@@ -1,0 +1,611 @@
+{
+  "Entries": [
+    {
+      "RequestUri": "https://fakeendpoint/v3-flatcontainer/azure.ai.cli/index.json",
+      "RequestMethod": "GET",
+      "RequestHeaders": {
+        "Connection": "close",
+        "X-Forwarded-For": "127.0.0.1",
+        "X-Forwarded-Proto": "https",
+        "X-Real-IP": "127.0.0.1"
+      },
+      "RequestBody": null,
+      "StatusCode": 200,
+      "ResponseHeaders": {
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Expose-Headers": "x-ms-request-id,Server,x-ms-version,Content-Type,Cache-Control,Last-Modified,ETag,Content-MD5,x-ms-lease-status,x-ms-blob-type,Content-Length,Date,Transfer-Encoding",
+        "Cache-Control": "no-store",
+        "Connection": "close",
+        "Content-Length": "289",
+        "Content-MD5": "OdGb7KCQM/k3NJbFsbZkHg==",
+        "Content-Type": "application/json",
+        "Date": "Fri, 01 Mar 2024 22:01:23 GMT",
+        "ETag": "0x8DC2F70EE1F211A",
+        "Last-Modified": "Sat, 17 Feb 2024 04:28:45 GMT",
+        "Strict-Transport-Security": "max-age=31536000; includeSubDomains",
+        "X-Azure-Ref": "0NFDiZQAAAACBomSC2CrzRqC6cIufYec\u002BV1NURURHRTAxMjIAODBkMWJkZTMtMmNhZC00MmRmLWJhNDItNGNjNTAyMDRlMmZi",
+        "X-Cache": "CONFIG_NOCACHE",
+        "X-Content-Type-Options": "nosniff",
+        "x-ms-blob-type": "BlockBlob",
+        "x-ms-lease-status": "unlocked",
+        "x-ms-request-id": "55cbfa5c-601e-0004-0524-6c30f0000000",
+        "x-ms-version": "2009-09-19"
+      },
+      "ResponseBody": {
+        "versions": [
+          "1.0.0-preview-20231115.3",
+          "1.0.0-preview-20231116.1",
+          "1.0.0-preview-20231205.4",
+          "1.0.0-preview-20231208.1",
+          "1.0.0-preview-20231214.1",
+          "1.0.0-preview-20240207.1",
+          "1.0.0-preview-20240215.1",
+          "1.0.0-preview-20240216.1"
+        ]
+      }
+    },
+    {
+      "RequestUri": "https://fakeendpoint/v3-flatcontainer/azure.ai.cli/index.json",
+      "RequestMethod": "GET",
+      "RequestHeaders": {
+        "Connection": "close",
+        "X-Forwarded-For": "127.0.0.1",
+        "X-Forwarded-Proto": "https",
+        "X-Real-IP": "127.0.0.1"
+      },
+      "RequestBody": null,
+      "StatusCode": 200,
+      "ResponseHeaders": {
+        "Accept-Ranges": "bytes",
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Expose-Headers": "x-ms-request-id,Server,x-ms-version,Content-Type,Cache-Control,Last-Modified,ETag,x-ms-lease-status,x-ms-blob-type,Content-Length,Date,Transfer-Encoding",
+        "Cache-Control": "no-store",
+        "Connection": "close",
+        "Content-Length": "289",
+        "Content-Type": "application/json",
+        "Date": "Fri, 01 Mar 2024 22:01:24 GMT",
+        "ETag": "0x8DC2F70EE1F211A",
+        "Last-Modified": "Sat, 17 Feb 2024 04:28:45 GMT",
+        "Strict-Transport-Security": "max-age=31536000; includeSubDomains",
+        "x-azure-ref": "20240301T220124Z-39q2av0fgh1e1auv8vh2bg95xg000000034000000000hdx5",
+        "X-Cache": "PRIVATE_NOSTORE",
+        "X-Content-Type-Options": "nosniff",
+        "x-fd-int-roxy-purgeid": "0",
+        "x-ms-blob-type": "BlockBlob",
+        "x-ms-lease-status": "unlocked",
+        "x-ms-request-id": "918ef52b-a01e-000b-3d24-6c469c000000",
+        "x-ms-version": "2009-09-19"
+      },
+      "ResponseBody": {
+        "versions": [
+          "1.0.0-preview-20231115.3",
+          "1.0.0-preview-20231116.1",
+          "1.0.0-preview-20231205.4",
+          "1.0.0-preview-20231208.1",
+          "1.0.0-preview-20231214.1",
+          "1.0.0-preview-20240207.1",
+          "1.0.0-preview-20240215.1",
+          "1.0.0-preview-20240216.1"
+        ]
+      }
+    },
+    {
+      "RequestUri": "https://fakeendpoint/computervision/imageanalysis:analyze?features=tags%2Ccaption%2CdenseCaptions%2Cobjects%2Cread%2Cpeople\u0026api-version=2023-10-01",
+      "RequestMethod": "POST",
+      "RequestHeaders": {
+        "Accept": "application/json",
+        "Connection": "close",
+        "Content-Length": "56",
+        "Content-Type": "application/json",
+        "Ocp-Apim-Subscription-Key": "00000000-0000-0000-0000-000000000000",
+        "User-Agent": "azsdk-net-AI.Vision.ImageAnalysis/1.0.0-beta.2 (.NET 8.0.2; Microsoft Windows 10.0.22621)",
+        "X-Forwarded-For": "127.0.0.1",
+        "X-Forwarded-Proto": "https",
+        "x-ms-client-request-id": "f9bdfbb5-e671-439c-9f66-4be4da0ee627",
+        "x-ms-return-client-request-id": "true",
+        "X-Real-IP": "127.0.0.1"
+      },
+      "RequestBody": {
+        "url": "https://aka.ms/azsdk/image-analysis/sample.jpg"
+      },
+      "StatusCode": 200,
+      "ResponseHeaders": {
+        "api-supported-versions": "4.0-pre1,2022-07-31-preview,2022-10-12-preview,2023-02-01-preview,2023-04-01-preview,2023-06-01-preview,2023-07-01-preview,2023-10-01,2024-02-01",
+        "apim-request-id": "02c73e88-deef-4f07-968b-688b2b025d9b",
+        "Connection": "close",
+        "Content-Length": "4059",
+        "Content-Type": "application/json; charset=utf-8",
+        "CSP-Billing-Usage": "CognitiveServices.ComputerVision.Transaction=1",
+        "Date": "Fri, 01 Mar 2024 22:01:25 GMT",
+        "ms-vision-response-time-input-processed": "1119",
+        "ms-vision-response-time-input-received": "74",
+        "request-id": "02c73e88-deef-4f07-968b-688b2b025d9b",
+        "Strict-Transport-Security": "max-age=31536000; includeSubDomains; preload",
+        "X-Content-Type-Options": "nosniff",
+        "x-envoy-upstream-service-time": "1197",
+        "x-ms-region": "East US"
+      },
+      "ResponseBody": {
+        "modelVersion": "2023-10-01",
+        "captionResult": {
+          "text": "a woman wearing a mask sitting at a table with a laptop",
+          "confidence": 0.8502674698829651
+        },
+        "denseCaptionsResult": {
+          "values": [
+            {
+              "text": "a woman wearing a mask sitting at a table with a laptop",
+              "confidence": 0.8498482704162598,
+              "boundingBox": {
+                "x": 0,
+                "y": 0,
+                "w": 864,
+                "h": 576
+              }
+            },
+            {
+              "text": "a person using a laptop",
+              "confidence": 0.7729847431182861,
+              "boundingBox": {
+                "x": 293,
+                "y": 383,
+                "w": 195,
+                "h": 100
+              }
+            },
+            {
+              "text": "a woman wearing a face mask",
+              "confidence": 0.8215275406837463,
+              "boundingBox": {
+                "x": 383,
+                "y": 233,
+                "w": 275,
+                "h": 336
+              }
+            },
+            {
+              "text": "a close-up of a green chair",
+              "confidence": 0.8763102889060974,
+              "boundingBox": {
+                "x": 616,
+                "y": 211,
+                "w": 164,
+                "h": 249
+              }
+            },
+            {
+              "text": "a person wearing a colorful cloth face mask",
+              "confidence": 0.7087528109550476,
+              "boundingBox": {
+                "x": 473,
+                "y": 294,
+                "w": 68,
+                "h": 56
+              }
+            },
+            {
+              "text": "a person using a laptop",
+              "confidence": 0.7638993859291077,
+              "boundingBox": {
+                "x": 288,
+                "y": 211,
+                "w": 151,
+                "h": 244
+              }
+            },
+            {
+              "text": "a woman wearing a colorful fabric face mask",
+              "confidence": 0.7733591794967651,
+              "boundingBox": {
+                "x": 433,
+                "y": 240,
+                "w": 180,
+                "h": 236
+              }
+            },
+            {
+              "text": "a close-up of a laptop on a table",
+              "confidence": 0.8535224795341492,
+              "boundingBox": {
+                "x": 115,
+                "y": 443,
+                "w": 476,
+                "h": 125
+              }
+            },
+            {
+              "text": "a woman wearing a face mask",
+              "confidence": 0.8323811888694763,
+              "boundingBox": {
+                "x": 0,
+                "y": 0,
+                "w": 775,
+                "h": 433
+              }
+            },
+            {
+              "text": "a close up of a text",
+              "confidence": 0.6402827501296997,
+              "boundingBox": {
+                "x": 714,
+                "y": 493,
+                "w": 130,
+                "h": 80
+              }
+            }
+          ]
+        },
+        "metadata": {
+          "width": 864,
+          "height": 576
+        },
+        "tagsResult": {
+          "values": [
+            {
+              "name": "furniture",
+              "confidence": 0.9874444007873535
+            },
+            {
+              "name": "clothing",
+              "confidence": 0.9792501926422119
+            },
+            {
+              "name": "person",
+              "confidence": 0.9427268505096436
+            },
+            {
+              "name": "houseplant",
+              "confidence": 0.9400021433830261
+            },
+            {
+              "name": "desk",
+              "confidence": 0.9182863235473633
+            },
+            {
+              "name": "indoor",
+              "confidence": 0.8963587880134583
+            },
+            {
+              "name": "laptop",
+              "confidence": 0.8781791925430298
+            },
+            {
+              "name": "computer",
+              "confidence": 0.8481509685516357
+            },
+            {
+              "name": "sitting",
+              "confidence": 0.8134787678718567
+            },
+            {
+              "name": "wall",
+              "confidence": 0.7511621117591858
+            },
+            {
+              "name": "woman",
+              "confidence": 0.7410725951194763
+            },
+            {
+              "name": "table",
+              "confidence": 0.6811204552650452
+            },
+            {
+              "name": "plant",
+              "confidence": 0.6445217132568359
+            },
+            {
+              "name": "using",
+              "confidence": 0.5358914136886597
+            }
+          ]
+        },
+        "objectsResult": {
+          "values": [
+            {
+              "boundingBox": {
+                "x": 603,
+                "y": 225,
+                "w": 152,
+                "h": 224
+              },
+              "tags": [
+                {
+                  "name": "chair",
+                  "confidence": 0.618
+                }
+              ]
+            },
+            {
+              "boundingBox": {
+                "x": 399,
+                "y": 244,
+                "w": 249,
+                "h": 325
+              },
+              "tags": [
+                {
+                  "name": "person",
+                  "confidence": 0.881
+                }
+              ]
+            },
+            {
+              "boundingBox": {
+                "x": 295,
+                "y": 387,
+                "w": 211,
+                "h": 102
+              },
+              "tags": [
+                {
+                  "name": "Laptop",
+                  "confidence": 0.767
+                }
+              ]
+            },
+            {
+              "boundingBox": {
+                "x": 441,
+                "y": 436,
+                "w": 256,
+                "h": 136
+              },
+              "tags": [
+                {
+                  "name": "chair",
+                  "confidence": 0.581
+                }
+              ]
+            },
+            {
+              "boundingBox": {
+                "x": 123,
+                "y": 437,
+                "w": 460,
+                "h": 125
+              },
+              "tags": [
+                {
+                  "name": "dining table",
+                  "confidence": 0.606
+                }
+              ]
+            }
+          ]
+        },
+        "readResult": {
+          "blocks": [
+            {
+              "lines": [
+                {
+                  "text": "Sample text",
+                  "boundingPolygon": [
+                    {
+                      "x": 721,
+                      "y": 502
+                    },
+                    {
+                      "x": 843,
+                      "y": 502
+                    },
+                    {
+                      "x": 843,
+                      "y": 519
+                    },
+                    {
+                      "x": 721,
+                      "y": 519
+                    }
+                  ],
+                  "words": [
+                    {
+                      "text": "Sample",
+                      "boundingPolygon": [
+                        {
+                          "x": 722,
+                          "y": 503
+                        },
+                        {
+                          "x": 785,
+                          "y": 503
+                        },
+                        {
+                          "x": 785,
+                          "y": 520
+                        },
+                        {
+                          "x": 722,
+                          "y": 520
+                        }
+                      ],
+                      "confidence": 0.993
+                    },
+                    {
+                      "text": "text",
+                      "boundingPolygon": [
+                        {
+                          "x": 800,
+                          "y": 503
+                        },
+                        {
+                          "x": 842,
+                          "y": 502
+                        },
+                        {
+                          "x": 842,
+                          "y": 519
+                        },
+                        {
+                          "x": 800,
+                          "y": 520
+                        }
+                      ],
+                      "confidence": 0.989
+                    }
+                  ]
+                },
+                {
+                  "text": "Hand writing",
+                  "boundingPolygon": [
+                    {
+                      "x": 720,
+                      "y": 525
+                    },
+                    {
+                      "x": 819,
+                      "y": 526
+                    },
+                    {
+                      "x": 819,
+                      "y": 544
+                    },
+                    {
+                      "x": 720,
+                      "y": 543
+                    }
+                  ],
+                  "words": [
+                    {
+                      "text": "Hand",
+                      "boundingPolygon": [
+                        {
+                          "x": 721,
+                          "y": 526
+                        },
+                        {
+                          "x": 759,
+                          "y": 526
+                        },
+                        {
+                          "x": 759,
+                          "y": 544
+                        },
+                        {
+                          "x": 721,
+                          "y": 543
+                        }
+                      ],
+                      "confidence": 0.989
+                    },
+                    {
+                      "text": "writing",
+                      "boundingPolygon": [
+                        {
+                          "x": 765,
+                          "y": 526
+                        },
+                        {
+                          "x": 819,
+                          "y": 527
+                        },
+                        {
+                          "x": 819,
+                          "y": 545
+                        },
+                        {
+                          "x": 765,
+                          "y": 544
+                        }
+                      ],
+                      "confidence": 0.994
+                    }
+                  ]
+                },
+                {
+                  "text": "123 456",
+                  "boundingPolygon": [
+                    {
+                      "x": 721,
+                      "y": 548
+                    },
+                    {
+                      "x": 791,
+                      "y": 548
+                    },
+                    {
+                      "x": 791,
+                      "y": 563
+                    },
+                    {
+                      "x": 721,
+                      "y": 564
+                    }
+                  ],
+                  "words": [
+                    {
+                      "text": "123",
+                      "boundingPolygon": [
+                        {
+                          "x": 723,
+                          "y": 548
+                        },
+                        {
+                          "x": 750,
+                          "y": 548
+                        },
+                        {
+                          "x": 750,
+                          "y": 564
+                        },
+                        {
+                          "x": 723,
+                          "y": 564
+                        }
+                      ],
+                      "confidence": 0.994
+                    },
+                    {
+                      "text": "456",
+                      "boundingPolygon": [
+                        {
+                          "x": 761,
+                          "y": 548
+                        },
+                        {
+                          "x": 788,
+                          "y": 549
+                        },
+                        {
+                          "x": 787,
+                          "y": 564
+                        },
+                        {
+                          "x": 760,
+                          "y": 564
+                        }
+                      ],
+                      "confidence": 0.999
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        "peopleResult": {
+          "values": [
+            {
+              "boundingBox": {
+                "x": 395,
+                "y": 241,
+                "w": 261,
+                "h": 333
+              },
+              "confidence": 0.9602553248405457
+            },
+            {
+              "boundingBox": {
+                "x": 831,
+                "y": 246,
+                "w": 31,
+                "h": 255
+              },
+              "confidence": 0.0016505217645317316
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "Variables": {}
+}

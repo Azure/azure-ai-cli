@@ -119,6 +119,21 @@ namespace Azure.AI.Details.Common.CLI
             actions.ForEach(x => x?.Invoke(maxLabelWidth));
         }
 
+        public static void ConfigVisionResource(string subscriptionId, string region, string endpoint, string key)
+        {
+            ConsoleHelpers.WriteLineWithHighlight($"\n`CONFIG VISION RESOURCE`");
+            Console.WriteLine();
+
+            int maxLabelWidth = 0;
+            var actions = new List<Action<int>>(new Action<int>[] {
+                ConfigSetLambda("@subscription", subscriptionId, "Subscription", subscriptionId, ref maxLabelWidth),
+                ConfigSetLambda("@vision.endpoint", endpoint, "Endpoint (vision)", endpoint, ref maxLabelWidth),
+                ConfigSetLambda("@vision.key", key, "Key (vision)", key.Substring(0, 4) + "****************************", ref maxLabelWidth),
+                ConfigSetLambda("@vision.region", region, "Region (vision)", region, ref maxLabelWidth),
+            });
+            actions.ForEach(x => x?.Invoke(maxLabelWidth));
+        }
+
         public static void ConfigSearchResource(string endpoint, string key)
         {
             ConsoleHelpers.WriteLineWithHighlight($"\n`CONFIG AI SEARCH RESOURCE`");

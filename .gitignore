@@ -8,3 +8,4 @@
 **/obj/*
 ideas/website/node_modules/**
 testresults/**
+**/launchSettings.json

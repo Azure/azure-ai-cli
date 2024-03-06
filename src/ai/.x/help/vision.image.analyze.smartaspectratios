@@ -1,0 +1,9 @@
+VISION IMAGE ANALYZE SMART ASPECT RATIOS
+
+The `--smart-crop-aspect-ratios` argument is used to specify the aspect ratios to use for smart cropping. Smart cropping is used to find a representative sub-region of the image for thumbnail generation, with priority given to include faces.
+
+USAGE: ai vision image analyze --smart-crop-aspect-ratios <ratios,> [...other options]
+
+EXAMPLE
+
+  ai vision image analyze --file image.jpg --visual-features SmartCrops --smart-crop-aspect-ratios 1:1,16:9

@@ -42,5 +42,28 @@ namespace Azure.AI.Details.Common.CLI
                 Key = keys.Key1,
             };
         }
+        public static async Task<AzCli.CognitiveServicesVisionResourceInfo> PickOrCreateAndConfigCognitiveServicesComputerVisionKindResource(bool interactive, string subscriptionId, string regionFilter = null, string groupFilter = null, string resourceFilter = null, string kinds = null, string sku = null, bool yes = false)
+        {
+            kinds ??= "ComputerVision";
+            var sectionHeader = "VISION RESOURCE";
+
+            var regionLocation = !string.IsNullOrEmpty(regionFilter) ? await AzCliConsoleGui.PickRegionLocationAsync(interactive, regionFilter) : new AzCli.AccountRegionLocationInfo();
+            var resource = await AzCliConsoleGui.PickOrCreateCognitiveResource(sectionHeader, interactive, subscriptionId, regionLocation.Name, groupFilter, resourceFilter, kinds, sku, yes);
+
+            var keys = await AzCliConsoleGui.LoadCognitiveServicesResourceKeys(sectionHeader, subscriptionId, resource);
+
+            ConfigSetHelpers.ConfigVisionResource(subscriptionId, resource.RegionLocation, resource.Endpoint, keys.Key1);
+
+            return new AzCli.CognitiveServicesVisionResourceInfo
+            {
+                Id = resource.Id,
+                Group = resource.Group,
+                Name = resource.Name,
+                Kind = resource.Kind,
+                RegionLocation = resource.RegionLocation,
+                Endpoint = resource.Endpoint,
+                Key = keys.Key1,
+            };
+        }
     }
 }
