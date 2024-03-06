@@ -3,33 +3,53 @@
 // Licensed under the MIT license. See LICENSE.md file in the project root for full license information.
 //
 
-using System;
-using System.Linq;
-using System.Threading.Tasks;
-using System.Collections.Generic;
-using Newtonsoft.Json.Linq;
-using Azure.AI.Details.Common.CLI.ConsoleGui;
 using System.Text.Json;
-using System.IO;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 namespace Azure.AI.Details.Common.CLI
 {
-    public struct AiHubResourceInfo
+    public readonly struct AiHubResourceInfo
     {
-        public string Id;
-        public string Group;
-        public string Name;
-        public string RegionLocation;
+        [JsonProperty("id")]
+        public string Id { get; init; }
+
+        [JsonProperty("resource_group")]
+        public string Group { get; init; }
+        
+        [JsonProperty("name")]
+        public string Name { get; init; }
+        
+        [JsonProperty("location")]
+        public string RegionLocation { get; init; }
+
+        [JsonProperty("display_name")]
+        public string DisplayName { get; init; }
+
+        public override string ToString() => $"{DisplayName ?? Name} ({RegionLocation})";
     }
 
-    public struct AiHubProjectInfo
+    public readonly struct AiHubProjectInfo
     {
-        public string Id;
-        public string Group;
-        public string Name;
-        public string DisplayName;
-        public string RegionLocation;
-        public string HubId;
+        [JsonProperty("id")]
+        public string Id { get; init; }
+
+        [JsonProperty("resource_group")]
+        public string Group{ get; init; }
+
+        [JsonProperty("name")]
+        public string Name{ get; init; }
+
+        [JsonProperty("display_name")]
+        public string DisplayName{ get; init; }
+
+        [JsonProperty("location")]
+        public string RegionLocation{ get; init; }
+
+        [JsonProperty("workspace_hub")]
+        public string HubId{ get; init; }
+
+        public override string ToString() => $"{DisplayName} ({RegionLocation})";
     }
 
     public partial class AiSdkConsoleGui

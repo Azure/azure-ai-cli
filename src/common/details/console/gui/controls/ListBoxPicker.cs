@@ -3,13 +3,15 @@
 // Licensed under the MIT license. See LICENSE.md file in the project root for full license information.
 //
 
-using System;
-using System.Linq;
-using System.Text;
-using Azure.AI.Details.Common.CLI;
-
 namespace Azure.AI.Details.Common.CLI.ConsoleGui
 {
+    public interface IListBoxPickerChoice
+    {
+        bool IsDefault { get; }
+
+        string DisplayName { get; }
+    }
+
     public class ListBoxPicker : SpeedSearchListBoxControl
     {
         public static int PickIndexOf(string[] choices, int select = 0)
@@ -60,6 +62,30 @@ namespace Azure.AI.Details.Common.CLI.ConsoleGui
                 : null;
         }
 
+        public static TVal PickValue<TVal>(IEnumerable<TVal> items) where TVal : IListBoxPickerChoice
+        {
+            if (items == null)
+            {
+                return default;
+            }
+
+            int? select = null;
+            var displayTexts = items
+                .Select((item, index) =>
+                {
+                    if (item.IsDefault && !select.HasValue)
+                    {
+                        select = index;
+                    }
+
+                    return item.DisplayName;
+                })
+                .ToArray();
+
+            int selected = PickIndexOf(displayTexts, select ?? 0);
+            return items.ElementAtOrDefault(selected); // this handles negatives and values out of bound
+        }
+
         public override bool ProcessKey(ConsoleKeyInfo key)
         {
             var processed = ProcessSpeedSearchKey(key);
@@ -100,5 +126,50 @@ namespace Azure.AI.Details.Common.CLI.ConsoleGui
         private int _picked;
 
         #endregion
+    }
+
+    public class ListBoxPickerChoice<TVal> : IListBoxPickerChoice
+    {
+        public ListBoxPickerChoice()
+        { }
+
+        public ListBoxPickerChoice(string displayName, TVal value, bool isDefault = false)
+        {
+            IsDefault = isDefault;
+            DisplayName = displayName;
+            Value = value;
+        }
+
+        public bool IsDefault { get; set; }
+
+        public string DisplayName { get; set; }
+
+        public TVal Value { get; set; }
+
+        public override string ToString() => DisplayName;
+    }
+
+    public class ListBoxPickerChoice<TVal, TMeta> : ListBoxPickerChoice<TVal>
+    {
+        public ListBoxPickerChoice()
+        { }
+
+        public ListBoxPickerChoice(string displayName, TVal value, TMeta metadata = default, bool isDefault = false)
+            : base(displayName, value, isDefault)
+        {
+            Metadata = metadata;
+        }
+
+        public TMeta Metadata { get; set; }
+    }
+
+    public class ListBoxPickerChoice : ListBoxPickerChoice<string, string>
+    {
+        public ListBoxPickerChoice()
+        { }
+
+        public ListBoxPickerChoice(string displayName, string value, string metadata = null, bool isDefault = false)
+            : base(displayName, value, metadata, isDefault)
+        { }
     }
 }

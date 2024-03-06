@@ -95,8 +95,7 @@ namespace Azure.AI.Details.Common.CLI
 
         public static AiHubProjectInfo CreateAiHubProject(ICommandValues values, string subscription, string resourceId)
         {
-            var project = TryCreateAiHubProjectInteractive(values, subscription, resourceId);
-            return AiHubProjectInfoFromToken(values, project);
+            return TryCreateAiHubProjectInteractive(values, subscription, resourceId);
         }
 
         private static AiHubProjectInfo PickOrCreateAiHubProject(bool allowCreate, ICommandValues values, string subscription, string resourceId, out bool createNew)
@@ -107,33 +106,22 @@ namespace Azure.AI.Details.Common.CLI
             var json = PythonSDKWrapper.ListProjects(values, subscription);
             if (Program.Debug) Console.WriteLine(json);
 
-            var parsed = !string.IsNullOrEmpty(json) ? JToken.Parse(json) : null;
-            var items = parsed?.Type == JTokenType.Object ? parsed["projects"] : new JArray();
+            var items = JsonHelpers.DeserializePropertyValueOrDefault<IEnumerable<AiHubProjectInfo>>(json, "projects")
+                ?.Where(proj => string.IsNullOrEmpty(resourceId) || proj.HubId == resourceId)
+                .OrderBy(item => item.DisplayName + " " + item.Name)
+                .ThenBy(item => item.RegionLocation)
+                .ToArray()
+                ?? Array.Empty<AiHubProjectInfo>();
 
             var choices = new List<string>();
-            var itemJTokens = new List<JToken>();
-            foreach (var item in items)
-            {
-                var hub = item["workspace_hub"]?.Value<string>();
-
-                var hubOk = string.IsNullOrEmpty(resourceId) || hub == resourceId;
-                if (!hubOk) continue;
-
-                itemJTokens.Add(item);
-
-                var name = item["name"].Value<string>();
-                var location = item["location"].Value<string>();
-                var displayName = item["display_name"].Value<string>();
-
-                choices.Add(string.IsNullOrEmpty(displayName)
-                    ? $"{name} ({location})"
-                    : $"{displayName} ({location})");
-            }
-
             if (allowCreate)
             {
-                choices.Insert(0, "(Create new)");
+                choices.Add("(Create new)");
             }
+
+            choices.AddRange(items
+                .Select(proj =>
+                    $"{(string.IsNullOrEmpty(proj.DisplayName) ? proj.Name : proj.DisplayName)} ({proj.RegionLocation})"));
 
             if (choices.Count == 0)
             {
@@ -148,20 +136,27 @@ namespace Azure.AI.Details.Common.CLI
             }
 
             Console.WriteLine($"\rName: {choices[picked]}");
-            var project = allowCreate
-                ? (picked > 0 ? itemJTokens[picked - 1] : null)
-                : itemJTokens[picked];
 
-            createNew = allowCreate && picked == 0;
-            if (createNew)
+            createNew = false;
+            AiHubProjectInfo project;
+            if (allowCreate && picked == 0)
             {
+                createNew = true;
                 project = TryCreateAiHubProjectInteractive(values, subscription, resourceId);
             }
+            else if (allowCreate && picked > 0)
+            {
+                project = items[picked - 1];
+            }
+            else
+            {
+                project = items[picked];
+            }
 
-            return AiHubProjectInfoFromToken(values, project);
+            return project;
         }
 
-        private static JToken TryCreateAiHubProjectInteractive(ICommandValues values, string subscription, string resourceId)
+        private static AiHubProjectInfo TryCreateAiHubProjectInteractive(ICommandValues values, string subscription, string resourceId)
         {
             var group = ResourceGroupNameToken.Data().GetOrDefault(values);
             var location = RegionLocationToken.Data().GetOrDefault(values, "");
@@ -174,22 +169,7 @@ namespace Azure.AI.Details.Common.CLI
             return TryCreateAiHubProjectInteractive(values, subscription, resourceId, group, location, ref displayName, ref description, smartName, smartNameKind);
         }
 
-        private static AiHubProjectInfo AiHubProjectInfoFromToken(ICommandValues values, JToken project)
-        {
-            var aiHubProject = new AiHubProjectInfo
-            {
-                Id = project["id"].Value<string>(),
-                Group = project["resource_group"].Value<string>(),
-                Name = project["name"].Value<string>(),
-                DisplayName = project["display_name"].Value<string>(),
-                RegionLocation = project["location"].Value<string>(),
-                HubId = project["workspace_hub"].Value<string>(),
-            };
-
-            return aiHubProject;
-        }
-
-        private static JToken TryCreateAiHubProjectInteractive(ICommandValues values, string subscription, string resourceId, string group, string location, ref string displayName, ref string description, string smartName = null, string smartNameKind = null)
+        private static AiHubProjectInfo TryCreateAiHubProjectInteractive(ICommandValues values, string subscription, string resourceId, string group, string location, ref string displayName, ref string description, string smartName = null, string smartNameKind = null)
         {
             ConsoleHelpers.WriteLineWithHighlight($"\n`CREATE AZURE AI PROJECT`");
 
@@ -208,8 +188,7 @@ namespace Azure.AI.Details.Common.CLI
 
             Console.WriteLine("\r*** CREATED ***  ");
 
-            var parsed = !string.IsNullOrEmpty(json) ? JToken.Parse(json) : null;
-            return parsed["project"];
+            return JsonHelpers.DeserializePropertyValueOrDefault<AiHubProjectInfo>(json, "project");
         }
 
         public static void GetOrCreateAiHubProjectConnections(ICommandValues values, bool create, string subscription, string groupName, string projectName, string openAiEndpoint, string openAiKey, string searchEndpoint, string searchKey)
