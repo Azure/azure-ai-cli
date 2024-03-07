@@ -224,10 +224,10 @@ def run_evaluate_part(subscription_id, resource_group_name, project_name, run_re
         prediction_data="answer",
         task_type="qa",
         data_mapping={
-            "questions": "question",
-            "contexts": "context",
-            "y_pred": "answer",
-            "y_test": "truth"
+            "question": "question",
+            "context": "context",
+            "answer": "answer",
+            "ground_truth": "truth"
         },
         model_config={
             "api_version": os.getenv("OPENAI_API_VERSION"),

@@ -66,12 +66,51 @@ namespace Azure.AI.Details.Common.CLI
             return Process.Start(start);
         }
 
-        public static async Task<ProcessOutput> RunShellCommandAsync(string commandLine, Dictionary<string, string> addToEnvironment = null, Action<string> stdOutHandler = null, Action<string> stdErrHandler = null, Action<string> mergedOutputHandler = null, bool captureOutput = true)
+        public static async Task<ProcessOutput> RunShellScriptAsync(string inlineScriptOrFileName, bool scriptIsBash = false, Dictionary<string, string> addToEnvironment = null, Action<string> stdOutHandler = null, Action<string> stdErrHandler = null, Action<string> mergedOutputHandler = null, bool captureOutput = true, bool interactive = false)
         {
-            var isWindows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
-            var command =  isWindows ? "cmd" : "bash";
-            var arguments = isWindows ? $"/c \"{commandLine}\"" : $"-li \"{commandLine}\"";
-            return await RunShellCommandAsync(command, arguments, addToEnvironment, stdOutHandler, stdErrHandler, mergedOutputHandler, captureOutput);
+            ProcessOutput processOutput;
+            var useBinBash = !RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
+            if (useBinBash)
+            {
+                var binBashArguments = interactive
+                    ? $"-lic \"{inlineScriptOrFileName}\""
+                    : $"-lc \"{inlineScriptOrFileName}\"";
+                processOutput = await RunShellCommandAsync("/bin/bash", binBashArguments, addToEnvironment, stdOutHandler, stdErrHandler, mergedOutputHandler, captureOutput);
+            }
+            else if (scriptIsBash)
+            {
+                var cmdFile = Path.GetTempFileName() + ".cmd";
+                File.WriteAllText(cmdFile, inlineScriptOrFileName);
+
+                var git = FindCacheGitBashExe();
+                var gitBashCommand = interactive
+                    ? $"@\"{git}\" -li \"{cmdFile}\""
+                    : $"@\"{git}\" -l \"{cmdFile}\"";
+                var gitBashCmdFile = Path.GetTempFileName() + ".cmd";
+                File.WriteAllText(gitBashCmdFile, gitBashCommand);
+
+                processOutput = await RunShellCommandAsync(gitBashCmdFile, "", addToEnvironment, stdOutHandler, stdErrHandler, mergedOutputHandler, captureOutput);
+                File.Delete(gitBashCmdFile);
+                File.Delete(cmdFile);
+            }
+            else
+            {
+                var cmdFile = Path.GetTempFileName() + ".cmd";
+                File.WriteAllText(cmdFile, inlineScriptOrFileName);
+
+                processOutput = await RunShellCommandAsync(cmdFile, "", addToEnvironment, stdOutHandler, stdErrHandler, mergedOutputHandler, captureOutput);
+                File.Delete(cmdFile);
+            }
+
+            return processOutput;
+        }
+
+        public static async Task<ProcessOutput> RunShellInteractiveAsync(Dictionary<string, string> addToEnvironment = null, Action<string> stdOutHandler = null, Action<string> stdErrHandler = null, Action<string> mergedOutputHandler = null, bool captureOutput = true)
+        {
+            var interactiveShellFileName = !OS.IsWindows() ? "bash" : "cmd.exe";
+            var interactiveShellArguments = !OS.IsWindows() ? "-li" : "/k PROMPT (ai dev shell) %PROMPT%& title (ai dev shell)";
+
+            return await RunShellCommandAsync(interactiveShellFileName, interactiveShellArguments, addToEnvironment, stdOutHandler, stdErrHandler, mergedOutputHandler, captureOutput);
         }
 
         public static async Task<ProcessOutput> RunShellCommandAsync(string command, string arguments, Dictionary<string, string> addToEnvironment = null, Action<string> stdOutHandler = null, Action<string> stdErrHandler = null, Action<string> mergedOutputHandler = null, bool captureOutput = true)
@@ -197,5 +236,37 @@ namespace Azure.AI.Details.Common.CLI
             }
             return string.Join(' ', kvps);
         }
+
+        private static string EnsureFindCacheGetBashExe()
+        {
+            var gitBash = FindCacheGitBashExe();
+            if (gitBash == null || gitBash == "bash.exe")
+            {
+                throw new Exception("Could not find Git for Windows bash.exe in PATH!");
+            }
+            return gitBash;
+        }
+
+        private static string FindCacheGitBashExe()
+        {
+            var bashExe = "bash.exe";
+            if (_cliCache.ContainsKey(bashExe))
+            {
+                return _cliCache[bashExe];
+            }
+
+            var found = FindGitBashExe();
+            _cliCache[bashExe] = found;
+
+            return found;
+        }
+
+        private static string FindGitBashExe()
+        {
+            var found = FileHelpers.FindFilesInOsPath("bash.exe");
+            return found.Where(x => x.ToLower().Contains("git")).FirstOrDefault() ?? "bash.exe";
+        }
+
+        private static Dictionary<string, string> _cliCache = new Dictionary<string, string>();
     }
 }

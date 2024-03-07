@@ -119,11 +119,11 @@ namespace Azure.AI.Details.Common.CLI
         #endregion
 
         #region help command data
-        public string HelpCommandTokens => "wizard;dev;init;config;chat;flow;speech;vision;language;search;service;tool;samples;eval;run";
+        public string HelpCommandTokens => "wizard;dev;test;init;config;chat;flow;speech;vision;language;search;service;tool;samples;eval;run";
         #endregion
 
         #region config command data
-        public string ConfigScopeTokens => $"wizard;dev;init;chat;flow;speech;vision;language;search;service;tool;samples;eval;run;*";
+        public string ConfigScopeTokens => $"wizard;dev;test;init;chat;flow;speech;vision;language;search;service;tool;samples;eval;run;*";
         #endregion
 
         #region zip option data
@@ -187,7 +187,10 @@ namespace Azure.AI.Details.Common.CLI
                 "eval" => (new EvalCommand(values)).RunCommand(),
                 "wizard" => (new ScenarioWizardCommand(values)).RunCommand(),
                 "dev" => (new DevCommand(values)).RunCommand(),
+                "test" => (new TestCommand(values)).RunCommand(),
                 "run" => (new RunJobCommand(values)).RunCommand(),
+                "version" => (new VersionCommand(values)).RunCommand(),
+                "update" => (new VersionCommand(values)).RunCommand(),
                 _ => false
             };
         }
@@ -212,7 +215,10 @@ namespace Azure.AI.Details.Common.CLI
                 "service" => ServiceCommandParser.ParseCommand(tokens, values),
                 "tool" => ToolCommandParser.ParseCommand(tokens, values),
                 "wizard" => ScenarioWizardCommandParser.ParseCommand(tokens, values),
+                "version" => VersionCommandParser.ParseCommand(tokens, values),
+                "update" => UpdateCommandParser.ParseCommand(tokens, values),
                 "dev" => DevCommandParser.ParseCommand(tokens, values),
+                "test" => TestCommandParser.ParseCommand(tokens, values),
                 "run" => RunJobCommandParser.ParseCommand(tokens, values),
                 _ => false
             };
@@ -236,7 +242,10 @@ namespace Azure.AI.Details.Common.CLI
                 "tool" => ToolCommandParser.ParseCommandValues(tokens, values),
                 "wizard" => ScenarioWizardCommandParser.ParseCommandValues(tokens, values),
                 "dev" => DevCommandParser.ParseCommandValues(tokens, values),
+                "test" => TestCommandParser.ParseCommandValues(tokens, values),
                 "run" => RunJobCommandParser.ParseCommandValues(tokens, values),
+                "version" => VersionCommandParser.ParseCommandValues(tokens, values),
+                "update" => UpdateCommandParser.ParseCommandValues(tokens, values),
                 _ => false
             };
         }

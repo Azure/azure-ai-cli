@@ -60,7 +60,7 @@ else
             sudo dpkg -i packages-microsoft-prod.deb
             rm packages-microsoft-prod.deb
         elif [[ "$CHECK_VERSION" == "22.04" ]]; then
-            # Install the Microsoft package signing key for Ubuntu 20.04
+            # Install the Microsoft package signing key for Ubuntu 22.04
             wget https://packages.microsoft.com/config/ubuntu/22.04/packages-microsoft-prod.deb -O packages-microsoft-prod.deb
             sudo dpkg -i packages-microsoft-prod.deb
             rm packages-microsoft-prod.deb

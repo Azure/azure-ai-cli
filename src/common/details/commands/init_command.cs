@@ -78,6 +78,7 @@ namespace Azure.AI.Details.Common.CLI
                 case "init.openai": await DoInitRootOpenAi(interactive); break;
                 case "init.search": await DoInitRootSearch(interactive); break;
                 case "init.speech": await DoInitRootSpeech(interactive); break;
+                case "init.vision": await DoInitRootVision(interactive); break;
 
                 // POST-IGNITE: TODO: add ability to init deployments
                 // TODO: ensure that deployments in "openai" flow can be skipped
@@ -322,7 +323,7 @@ namespace Azure.AI.Details.Common.CLI
                 Console.WriteLine("\rInitialize: CANCELED (no selection)");
                 return;
             }
-    
+
             var part = choiceToPart[choices[picked]];
             var display = partToLabelDisplay[part];
             Console.WriteLine($"\rInitialize: {display}");
@@ -576,6 +577,11 @@ namespace Azure.AI.Details.Common.CLI
             await DoInitSubscriptionId(interactive);
             await DoInitSpeech(interactive);
         }
+        private async Task DoInitRootVision(bool interactive)
+        {
+            await DoInitSubscriptionId(interactive);
+            await DoInitVision(interactive);
+        }
 
         private async Task DoInitSpeech(bool interactive)
         {
@@ -588,6 +594,21 @@ namespace Azure.AI.Details.Common.CLI
             var yes = _values.GetOrDefault("init.service.cognitiveservices.terms.agree", false);
 
             var resource = await AzCliConsoleGui.PickOrCreateAndConfigCognitiveServicesSpeechServicesKindResource(interactive, subscriptionId, regionFilter, groupFilter, resourceFilter, kind, sku, yes);
+
+            SubscriptionToken.Data().Set(_values, subscriptionId);
+        }
+
+        private async Task DoInitVision(bool interactive)
+        {
+            var subscriptionId = SubscriptionToken.Data().GetOrDefault(_values, "");
+            var regionFilter = _values.GetOrDefault("init.service.resource.region.name", "");
+            var groupFilter = _values.GetOrDefault("init.service.resource.group.name", "");
+            var resourceFilter = _values.GetOrDefault("init.service.cognitiveservices.resource.name", "");
+            var kind = _values.GetOrDefault("init.service.cognitiveservices.resource.kind", "ComputerVision");
+            var sku = _values.GetOrDefault("init.service.cognitiveservices.resource.sku", "S0");
+            var yes = _values.GetOrDefault("init.service.cognitiveservices.terms.agree", false);
+
+            var resource = await AzCliConsoleGui.PickOrCreateAndConfigCognitiveServicesComputerVisionKindResource(interactive, subscriptionId, regionFilter, groupFilter, resourceFilter, kind, sku, yes);
 
             SubscriptionToken.Data().Set(_values, subscriptionId);
         }

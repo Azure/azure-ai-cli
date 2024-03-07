@@ -1,0 +1,132 @@
+- area: ai init
+  tags: 
+    before: true
+    recordable: true
+    _sanitize:
+      - headers:
+        - name: api-key
+          value: 00000000-0000-0000-0000-000000000000
+        - name: Set-Cookie
+          regex: (_gh_sess=.*?;)  
+          value: _gh_ses=GHTOKEN
+      - uri:
+        - regex: https://(?<host>[^/]+)/
+          value: https://fakeendpoint/
+      - body:
+        - regex: "refresh_token=([^&]+)"
+          value: "refresh_token=TOKEN"
+        - regex: "\\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Z|a-z]{2,}\\b"
+          value: "email@domain.com"
+        - regex: "(\"id_token\":\\s*\")(.*?)(\")"
+          value: "\"id_token\": \"ID_TOKEN\""
+        - regex: "(\"iKey\":\\s*\")(.*?)(\")"  
+          value: "\"iKey\": \"INSTRUMENTATION_KEY\""
+        - regex: "(\"(?:key1)\":\\s*\")(.*?)(\")"
+          value: "\"key1\": \"COGSVCSKey1\""
+        - regex: "(\"(?:key2)\":\\s*\")(.*?)(\")"
+          value: "\"key2\": \"COGSVCSKey2\""
+        - regex: "(\"time\":\\s*\")(.*?)(\")"
+          value: "\"time\": \"TIME\""   
+  tests:
+  - name: ai init vision
+    command: ai init vision
+    arguments:
+      subscription: e72e5254-f265-4e95-9bd2-9ee8e7329051
+      name: rhurey-vision-eastus
+      interactive: false
+  
+- area: Test AI Vision Image Analysis
+  tags:
+    recordable: true
+    _sanitize:
+      - headers:
+        - name: Ocp-Apim-Subscription-Key
+          value: 00000000-0000-0000-0000-000000000000
+      - uri:
+        - regex: https://(?<host>[^/]+)/
+          value: https://fakeendpoint/
+  steps:
+    - name: test ai IA caption
+      expect: woman wearing a mask sitting at a table
+      not-expect: ERROR
+      command: ai vision image analyze
+      arguments:
+        url: https://aka.ms/azsdk/image-analysis/sample.jpg
+        visual-features: caption
+    - name: test ai IA caption (Visual Features are case insensitive)
+      expect: woman wearing a mask sitting at a table
+      not-expect: ERROR
+      command: ai vision image analyze
+      arguments:
+        url: https://aka.ms/azsdk/image-analysis/sample.jpg
+        visual-features: CaPtiOn
+    - name: test ai IA Multiple Visual Features
+      expect: |
+        Metadata: Model:
+        woman wearing a mask sitting at a table
+        Dense Captions:
+        Tags:
+        Objects:
+        People:
+        Read:
+        Line:
+        Word:
+      not-expect: ERROR
+      command: ai vision image analyze
+      arguments:
+        url: https://aka.ms/azsdk/image-analysis/sample.jpg
+        visual-features: caption,objects,densecaptions,tags,read,people
+    - name: test ai IA caption (gender neutral)
+      expect: person wearing a mask sitting at a table
+      not-expect: ERROR
+      command: ai vision image analyze
+      arguments:
+        url: https://aka.ms/azsdk/image-analysis/sample.jpg
+        visual-features: caption
+        gender-neutral-captions: true
+    - name: test ai IA Model selection
+      expect: Invalid model version.
+      command: ai vision image analyze
+      arguments:
+        url: https://aka.ms/azsdk/image-analysis/sample.jpg
+        visual-features: caption
+        model-version: badmodel
+    - name: test ai IA from file
+      expect: woman wearing a mask sitting at a table
+      not-expect: ERROR
+      command: ai vision image analyze
+      arguments:
+        file: ../tests/image-analysis-sample.jpg
+        visual-features: caption
+    - name: test ai IA smart crop (single)
+      expect: |
+        Aspect ratio: 0.92, Bounding box: Top:
+      not-expect: ERROR
+      command: ai vision image analyze
+      arguments:
+        url: https://aka.ms/azsdk/image-analysis/sample.jpg
+        visual-features: smartcrops
+        smart-crop-aspect-ratios: 0.92
+    - name: test ai IA smart crop (multiple)
+      expect: |
+        Aspect ratio: 0.9, Bounding box: Top:
+        Aspect ratio: 1.78, Bounding box: Top:
+      not-expect: ERROR
+      command: ai vision image analyze
+      arguments:
+        url: https://aka.ms/azsdk/image-analysis/sample.jpg
+        visual-features: smartcrops
+        smart-crop-aspect-ratios: 0.9,1.78
+    - name: test ai IA caption (JSON)
+      expect: |
+        {
+        "captionResult":
+        "text":
+        woman wearing a mask sitting at a table
+        }
+      not-expect: ERROR
+      command: ai vision image analyze
+      arguments:
+        url: https://aka.ms/azsdk/image-analysis/sample.jpg
+        visual-features: caption
+        outputtype: json

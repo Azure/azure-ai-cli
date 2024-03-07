@@ -45,6 +45,13 @@ namespace Azure.AI.Details.Common.CLI
                     values.AddDisplayHelpRequest();
                     break;
 
+                case "-v":
+                case "--v":
+                case "--version":
+                    values.AddDisplayVersionRequest();
+                    break;
+
+
                 default:
                     values.AddError("ERROR:", $"Unknown command: {command}");
                     values.AddDisplayHelpRequest();
@@ -177,7 +184,7 @@ namespace Azure.AI.Details.Common.CLI
         protected static bool ParseCommandDefaults(string commandName, IEnumerable<INamedValueTokenParser> parsers, INamedValueTokens tokens, ICommandValues values)
         {
             var noDefaults = values.GetOrDefault("x.command.nodefaults", false);
-            if (commandName != "config" && commandName != "help" && !noDefaults)
+            if (ExpectsDefaults(commandName) && !noDefaults)
             {
                 var token = tokens.PeekNextToken();
                 if (token == "--nodefaults")
@@ -251,6 +258,11 @@ namespace Azure.AI.Details.Common.CLI
 
             return parsed;
         }
+
+        private static bool ExpectsDefaults(string commandName)
+        {
+            return commandName != "config" && commandName != "help" && commandName != "update" && commandName != "version";
+        } 
 
         private static bool ParseAtFileToken(IEnumerable<INamedValueTokenParser> parsers, INamedValueTokens tokens, ICommandValues values)
         {

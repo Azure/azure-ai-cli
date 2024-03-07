@@ -1,0 +1,9 @@
+VISION IMAGE ANALYZE GENDER NEUTRAL CAPTIONS
+
+The `--gender-neutral-captions` argument is used to specify whether to use gender-neutral terms in the captions. If set to true, terms like 'person' and 'child' are used instead of 'man', 'woman', 'boy', 'girl', etc.
+
+USAGE: ai vision image analyze --gender-neutral-captions <true|false> [...other options]
+
+EXAMPLE
+
+  ai vision image analyze --file image.jpg --visual-features Caption --gender-neutral-captions true

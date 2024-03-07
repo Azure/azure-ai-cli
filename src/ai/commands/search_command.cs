@@ -1,4 +1,4 @@
-﻿//
+//
 // Copyright (c) Microsoft. All rights reserved.
 // Licensed under the MIT license. See LICENSE.md file in the project root for full license information.
 //
@@ -161,7 +161,11 @@ namespace Azure.AI.Details.Common.CLI
 
         private string DoIndexUpdateWithGenAi(string subscription, string groupName, string projectName, string indexName, string embeddingModelDeployment, string embeddingModelName, string dataFiles, string externalSourceUrl)
         {
-            return PythonSDKWrapper.UpdateMLIndex(_values, subscription, groupName, projectName, indexName, embeddingModelDeployment, embeddingModelName, dataFiles, externalSourceUrl);
+            // work around issue with Py GenAI SDK needing this var to be set; do not set any additional values... See Hanchi Wang for more info.
+            var env = ConfigEnvironmentHelpers.GetEnvironment(_values);
+            env = new Dictionary<string, string>(env.Where(x => x.Key == "AZURE_OPENAI_KEY"));
+            
+            return PythonSDKWrapper.UpdateMLIndex(_values, subscription, groupName, projectName, indexName, embeddingModelDeployment, embeddingModelName, dataFiles, externalSourceUrl, env);
         }
 
         private async Task<string> DoIndexUpdateWithAISearch(string aiServicesApiKey, string searchEndpoint, string searchApiKey, string embeddingsEndpoint, string embeddingsDeployment, string embeddingsApiKey, string searchIndexName, string dataSourceConnectionName, string blobContainer, string pattern, string skillsetName, string indexerName, string idFieldName, string contentFieldName, string vectorFieldName)
@@ -490,6 +494,7 @@ namespace Azure.AI.Details.Common.CLI
             StoreMemoryAsync(kernel, searchIndexName, kvps).Wait();
         }
 
+#nullable enable
         private IKernel? CreateSemanticKernel(string searchEndpoint, string searchApiKey, string embeddingsEndpoint, string embeddingsDeployment, string embeddingsApiKey)
         {
             var store = new AzureCognitiveSearchMemoryStore(searchEndpoint, searchApiKey);
@@ -500,6 +505,7 @@ namespace Azure.AI.Details.Common.CLI
 
             return kernelWithACS;
         }
+#nullable disable
 
         private static async Task StoreMemoryAsync(IKernel kernel, string index, IEnumerable<KeyValuePair<string, string>> kvps)
         {

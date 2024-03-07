@@ -16,6 +16,7 @@ USAGE: ai <command> [...]
   ai config [...]           (see: ai help config)
 
   ai dev [...]              (see: ai help dev)
+  ai test [...]             (see: ai help test)
 
   ai chat [...]             (see: ai help chat)
   ai flow [...]             (see: ai help flow)

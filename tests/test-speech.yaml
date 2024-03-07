@@ -1,0 +1,272 @@
+﻿tests:
+- name: ai init speech
+  command: ai init speech
+  tags: [before]
+  arguments:
+    subscription: e72e5254-f265-4e95-9bd2-9ee8e7329051
+    name: robch-cranky-red-koala-ais
+    interactive: false
+
+- area: ai dev new speech tests
+  tests:
+
+  - area: ai dev new speech-to-text
+    tests:
+
+    - class: dev new speech-to-text (c#)
+      steps:
+      - name: generate template
+        command: ai dev new speech-to-text --cs
+      - name: build template
+        bash: |
+          cd speech-to-text-cs
+          dotnet build
+      # - name: run template
+      #   command: ai dev shell --bash "cd speech-to-text-cs;./bin/Debug/net8.0/SpeechToText"
+      #   tag: skip-run-requires-microphone
+
+    - class: dev new speech-to-text (python)
+      steps:
+      - name: generate template
+        command: ai dev new speech-to-text --py
+      - name: install requirements
+        bash: |
+          cd speech-to-text-py
+          pip install -r requirements.txt
+      # - name: run template
+      #   command: ai dev shell
+      #   arguments:
+      #     bash: |
+      #       cd speech-to-text-py
+      #       if [ -f /etc/os-release ]; then
+      #         python3 main.py
+      #       else
+      #         python main.py
+      #       fi
+      #   tag: skip-run-requires-microphone
+
+  - area: ai dev new speech-to-text-continuous-reco
+    tests:
+
+    - class: dev new speech-to-text-continuous-reco (c#)
+      steps:
+      - name: generate template
+        command: ai dev new speech-to-text-continuous-reco --cs
+      - name: build template
+        bash: |
+          cd speech-to-text-continuous-reco-cs
+          dotnet build
+      # - name: run template
+      #   command: ai dev shell --bash "cd speech-to-text-continuous-reco-cs;./bin/Debug/net8.0/SpeechToTextContinuous"
+      #   tag: skip-run-requires-microphone
+
+    - class: dev new speech-to-text-continuous-reco (python)
+      steps:
+      - name: generate template
+        command: ai dev new speech-to-text-continuous-reco --py
+      - name: install requirements
+        bash: |
+          cd speech-to-text-continuous-reco-py
+          pip install -r requirements.txt
+      # - name: run template
+      #   command: ai dev shell
+      #   arguments:
+      #     bash: |
+      #       cd speech-to-text-continuous-reco-py
+      #       if [ -f /etc/os-release ]; then
+      #         python3 main.py
+      #       else
+      #         python main.py
+      #       fi
+      #   tag: skip-run-requires-microphone
+
+  - area: ai dev new speech-to-text-with-file
+    tests:
+
+    - class: dev new speech-to-text-with-file (c#)
+      steps:
+      - name: generate template
+        command: ai dev new speech-to-text-with-file --cs
+      - name: build template
+        bash: |
+          cd speech-to-text-with-file-cs
+          dotnet build
+      - name: create audio file for input
+        command: ai speech synthesize --text "Hello world" --audio-output "speech-to-text-with-file-cs/hello.wav"
+      - name: run template
+        command: ai dev shell --bash "cd speech-to-text-with-file-cs;./bin/Debug/net8.0/SpeechToTextWithFile hello.wav"
+        expect: |
+          Hello world.
+
+    - class: dev new speech-to-text-with-file (python)
+      steps:
+      - name: generate template
+        command: ai dev new speech-to-text-with-file --py
+      - name: install requirements
+        bash: |
+          cd speech-to-text-with-file-py
+          pip install -r requirements.txt
+      - name: create audio file for input
+        command: ai speech synthesize --text "Hello world" --audio-output "speech-to-text-with-file-py/hello.wav"
+      - name: run template
+        command: ai dev shell
+        arguments:
+          bash: |
+            cd speech-to-text-with-file-py
+            if [ -f /etc/os-release ]; then
+              python3 main.py hello.wav
+            else
+              python main.py hello.wav
+            fi
+
+  - area: ai dev new speech-to-text-with-keyword
+    tests:
+
+    - class: dev new speech-to-text-with-keyword (c#)
+      steps:
+      - name: generate template
+        command: ai dev new speech-to-text-with-keyword --cs
+      - name: build template
+        bash: |
+          cd speech-to-text-with-keyword-cs
+          dotnet build
+      # - name: create audio file for input
+      #   command: ai speech synthesize --text "Computer tell me a joke. Computer tell me another joke." --audio-output "speech-to-text-with-keyword-cs/jokes.wav"
+      # - name: run template
+      #   command: ai dev shell --bash "cd speech-to-text-with-keyword-cs;./bin/Debug/net8.0/SpeechToTextWithKeyword jokes.wav"
+      #   tag: skip-run-requires-bugfix
+
+    - class: dev new speech-to-text-with-keyword (python)
+      steps:
+      - name: generate template
+        command: ai dev new speech-to-text-with-keyword --py
+      - name: install requirements
+        bash: |
+          cd speech-to-text-with-keyword-py
+          pip install -r requirements.txt
+      # - name: create audio file for input
+      #   command: ai speech synthesize --text "Computer tell me a joke. Computer tell me another joke." --audio-output "speech-to-text-with-keyword-py/jokes.wav"
+      # - name: run template
+      #   command: ai dev shell
+      #   arguments:
+      #     bash: |
+      #       cd speech-to-text-with-keyword-py
+      #       if [ -f /etc/os-release ]; then
+      #         python3 main.py jokes.wav
+      #       else
+      #         python main.py jokes.wav
+      #       fi
+      #   tag: skip-run-requires-bugfix
+      
+  - area: ai dev new speech-to-text-with-translation
+    tests:
+
+    - class: dev new speech-to-text-with-translation (c#)
+      steps:
+      - name: generate template
+        command: ai dev new speech-to-text-with-translation --cs
+      - name: build template
+        bash: |
+          cd speech-to-text-with-translation-cs
+          dotnet build
+      - name: create audio file for input
+        command: ai speech synthesize --text "Hello world" --audio-output "speech-to-text-with-translation-cs/hello.wav"
+      - name: run template
+        command: ai dev shell --bash "cd speech-to-text-with-translation-cs;./bin/Debug/net8.0/SpeechToTextWithTranslation hello.wav"
+        expect: |
+          Hello world.
+
+    - class: dev new speech-to-text-with-translation (python)
+      steps:
+      - name: generate template
+        command: ai dev new speech-to-text-with-translation --py
+      - name: install requirements
+        bash: |
+          cd speech-to-text-with-translation-py
+          pip install -r requirements.txt
+      - name: create audio file for input
+        command: ai speech synthesize --text "Hello world" --audio-output "speech-to-text-with-translation-py/hello.wav"
+      - name: run template
+        command: ai dev shell
+        arguments:
+          bash: |
+            cd speech-to-text-with-translation-py
+            if [ -f /etc/os-release ]; then
+              python3 main.py hello.wav
+            else
+              python main.py hello.wav
+            fi
+
+  - area: ai dev new text-to-speech
+    tests:
+
+    - class: dev new text-to-speech (c#)
+      steps:
+      - name: generate template
+        command: ai dev new text-to-speech --cs
+      - name: build template
+        bash: |
+          cd text-to-speech-cs
+          dotnet build
+      # - name: run template
+      #   command: ai dev shell --bash "cd text-to-speech-cs;./bin/Debug/net8.0/TextToSpeech"
+      #   input: |-
+      #     Hello world.
+      #   tag: skip-run-requires-speakers
+
+    - class: dev new text-to-speech (python)
+      steps:
+      - name: generate template
+        command: ai dev new text-to-speech --py
+      - name: install requirements
+        bash: |
+          cd text-to-speech-py
+          pip install -r requirements.txt
+      # - name: run template
+      #   command: ai dev shell
+      #   arguments:
+      #     bash: |
+      #       cd text-to-speech-py
+      #       if [ -f /etc/os-release ]; then
+      #         python3 main.py
+      #       else
+      #         python main.py
+      #       fi
+      #   tag: skip-run-requires-speakers
+
+  - area: ai dev new text-to-speech-with-file
+    tests:
+
+    - class: dev new text-to-speech-with-file (c#)
+      steps:
+      - name: generate template
+        command: ai dev new text-to-speech-with-file --cs
+      - name: build template
+        bash: |
+          cd text-to-speech-with-file-cs
+          dotnet build
+      - name: run template
+        command: ai dev shell --bash "cd text-to-speech-with-file-cs;./bin/Debug/net8.0/TextToSpeechWithFile"
+        input: |-
+          Hello world.
+    
+    - class: dev new text-to-speech-with-file (python)
+      steps:
+      - name: generate template
+        command: ai dev new text-to-speech-with-file --py
+      - name: install requirements
+        bash: |
+          cd text-to-speech-with-file-py
+          pip install -r requirements.txt
+      - name: run template
+        command: ai dev shell
+        arguments:
+          bash: |
+            cd text-to-speech-with-file-py
+            if [ -f /etc/os-release ]; then
+              python3 main.py
+            else
+              python main.py
+            fi
+        input: |-
+          Hello world.

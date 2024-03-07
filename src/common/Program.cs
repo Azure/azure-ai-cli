@@ -5,14 +5,19 @@
 
 using System.Reflection;
 using System.Text;
+using System.Text.Json;
 using Azure.AI.Details.Common.CLI.Telemetry;
 using Azure.AI.Details.Common.CLI.Telemetry.Events;
+using System.Threading.Tasks;
 
 namespace Azure.AI.Details.Common.CLI
 {
     public class Program
     {
         public static bool Debug { get; internal set; }
+
+        private static int usingResource = 0;
+        private static string updateMessage = "";
 
         public static int Main(IProgramData data, string[] mainArgs)
         {
@@ -37,9 +42,18 @@ namespace Azure.AI.Details.Common.CLI
             int exitCode = ParseCommand(tokens, values);
             if (exitCode == 0 && !values.DisplayHelpRequested())
             {
-                DisplayBanner(values);
-                DisplayParsedValues(values);
+                if (!values.DisplayVersionRequested() && !values.DisplayUpdateRequested())
+                {
+                    var __ = Task.Run(() => DisplayVersion(values, true));
+                    DisplayBanner(values);
+                    DisplayParsedValues(values);
+                }
                 exitCode = RunCommand(values) ? 0 : 1;
+                var updateMessage = GetUpdateMessage();
+                if (!String.IsNullOrEmpty(updateMessage))
+                {
+                    ConsoleHelpers.WriteLineWithHighlight(updateMessage);
+                }
             }
 
             if (values.GetOrDefault("x.pause", false))
@@ -118,6 +132,31 @@ namespace Azure.AI.Details.Common.CLI
             return $"{Program.Name.ToUpper()} - {Program.DisplayName}" + version;
         }
 
+        private static string GetUpdateMessage()
+        {
+            string message = "";
+            //0 indicates that the method is not in use.
+            if(0 == Interlocked.Exchange(ref usingResource, 1))
+            {
+                message = updateMessage;
+            
+                //Release the lock
+                Interlocked.Exchange(ref usingResource, 0);
+            }
+            return message;
+        }
+
+        private static void SetUpdateMessage(string message)
+        {
+            if(0 == Interlocked.Exchange(ref usingResource, 1))
+            {
+                updateMessage = message;
+            
+                //Release the lock
+                Interlocked.Exchange(ref usingResource, 0);
+            }
+        }
+
         private static void DisplayBanner(ICommandValues values)
         {
             if (values.GetOrDefault("x.quiet", false)) return;
@@ -135,7 +174,7 @@ namespace Azure.AI.Details.Common.CLI
             }
         }
 
-        private static string GetVersionFromAssembly()
+        public static string GetVersionFromAssembly()
         {
             var sdkAssembly = Program.BindingAssemblySdkType?.Assembly;
             var sdkVersionAttribute = sdkAssembly?.GetCustomAttribute<AssemblyInformationalVersionAttribute>();
@@ -161,6 +200,46 @@ namespace Azure.AI.Details.Common.CLI
             HelpCommandParser.DisplayHelp(tokens, values);
         }
 
+        public static void DisplayVersion(INamedValues values, bool setUpdateMessage = false)
+        {
+            var currentVersion = GetVersionFromAssembly().Split("-")[0];
+
+            if (!setUpdateMessage)
+            {
+                Console.WriteLine(values.DisplayUpdateRequested() ? 
+                    $"Current Version: {currentVersion}"
+                    : currentVersion); 
+            }
+
+            var domain = values.DisplayUpdateRequested() ? "update" : "version";
+            var latestVersion = HttpHelpers.GetLatestVersionInfo(values, domain);
+            if (latestVersion != null)
+            {
+                var currentVersionNumbers = currentVersion.Split(".");
+                var latestVersionNumbers = latestVersion.Split("-")[0].Split(".");
+                if (StringHelpers.UpdateNeeded(currentVersionNumbers, latestVersionNumbers))
+                {
+                    var line1 = $"\n`#e_;Update available, Latest Version: {latestVersion}`\n";
+                    var line2 = @"Go to `#e0;https://aka.ms/azure-ai-cli-update` for more information.";
+                    if (setUpdateMessage)
+                    {
+                        SetUpdateMessage(line1 + line2);
+                    }
+                    else
+                    {
+                        ConsoleHelpers.WriteLineWithHighlight(line1);
+                        ConsoleHelpers.WriteLineWithHighlight(line2); 
+                    }
+                    return;
+                }
+            }
+            if (values.DisplayUpdateRequested())
+            {
+                Console.WriteLine("No update available"); 
+            }
+        }
+
+
         private static void DisplayParsedValues(INamedValues values)
         {
             if (values.GetOrDefault("x.quiet", true)) return;
@@ -178,6 +257,7 @@ namespace Azure.AI.Details.Common.CLI
             {
                 if (key == "error") continue;
                 if (key == "display.help") continue;
+                if (key == "display.version") continue;
 
                 var value = values[key];
                 var obfuscateValue = key.EndsWith(passwordPostfix) ||
@@ -254,6 +334,11 @@ namespace Azure.AI.Details.Common.CLI
                 if (displayBanner) DisplayBanner(values);
                 DisplayCommandHelp(tokens, values);
                 return values.GetOrDefault("display.help.exit.code", 0);
+            }
+            else if (values.DisplayVersionRequested() || values.DisplayUpdateRequested())
+            {
+                DisplayVersion(values);
+                return 0;
             }
             else if (ex != null)
             {

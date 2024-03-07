@@ -74,6 +74,17 @@ namespace Azure.AI.Details.Common.CLI
             public string Key;
         }
 
+        public struct CognitiveServicesVisionResourceInfo
+        {
+            public string Id;
+            public string Group;
+            public string Name;
+            public string Kind;
+            public string RegionLocation;
+            public string Endpoint;
+
+            public string Key;
+        }
 
         public struct CognitiveServicesKeyInfo
         {

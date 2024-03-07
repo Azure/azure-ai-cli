@@ -1,8 +1,10 @@
 ﻿- name: simulate pass
   simulate: Passed
+  tag: skip
 
 - name: simulate skipped
   simulate: Skipped
+  tag: skip
 
 - test1: run --script "echo hello"
 - test2: run --script "echo oh yeah?"
@@ -49,6 +51,7 @@
     ^  ai config \[\.\.\.\]           \(see: ai help config\)\r?$\n
     ^\r?$\n
     ^  ai dev \[\.\.\.\]              \(see: ai help dev\)\r?$\n
+    ^  ai test \[\.\.\.\]             \(see: ai help test\)\r?$\n
     ^\r?$\n
     ^  ai chat \[\.\.\.\]             \(see: ai help chat\)\r?$\n
     ^  ai flow \[\.\.\.\]             \(see: ai help flow\)\r?$\n
