@@ -1,70 +1,122 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Text;
 
 namespace Azure.AI.Details.Common.CLI.Telemetry.Events
 {
+    /// <summary>
+    /// What step of the init command we are in
+    /// </summary>
     public enum InitStage
     {
-        Initial,
+        /// <summary>
+        /// (Optional) Initial verification of saved data
+        /// </summary>
+        VerifySave,
+
+        /// <summary>
+        /// The user has made a selection
+        /// </summary>
+        Choice,
+
+        /// <summary>
+        /// The user has chosen a subscription
+        /// </summary>
         Subscription,
+
+        /// <summary>
+        /// The user has chosen a resource. Refer to the <see cref="InitTelemetryEvent.Selected"> property to see
+        /// which kind of resource was selected
+        /// </summary>
         Resource,
+
+        /// <summary>
+        /// (Optional) The user has chosen an AI project
+        /// </summary>
         Project,
+
+        /// <summary>
+        /// (Optional) The user has made a choice regarding a chat deployment. <see cref="InitTelemetryEvent.Selected">
+        /// property to see what was chosen (e.g. new, existing, skip)
+        /// </summary>
         Chat,
-        Embedding,
-        Evalution,
-        Keys,
-        Search
+
+        /// <summary>
+        /// (Optional) The user has made a choice regarding an embedding deployment. <see cref="InitTelemetryEvent.Selected">
+        /// property to see what was chosen (e.g. new, existing, skip)
+        /// </summary>
+        Embeddings,
+
+        /// <summary>
+        /// (Optional) The user has made a choice regarding an evaluation deployment. <see cref="InitTelemetryEvent.Selected">
+        /// property to see what was chosen (e.g. new, existing, skip)
+        /// </summary>
+        Evaluation,
+
+        /// <summary>
+        /// (Optional) Connections have been verified or new ones have been created
+        /// </summary>
+        Connections,
+
+        /// <summary>
+        /// (Optional) We have successfully saved the configuration
+        /// </summary>
+        Save
     }
 
+    /// <summary>
+    /// Represents details about the init command. This is used to generate (pseudo-)funnels in the dashboards to get an
+    /// idea of where end users are encountering issues or giving up
+    /// </summary>
     public readonly struct InitTelemetryEvent : ITelemetryEvent
     {
-        private readonly string _name;
-
+        /// <summary>
+        /// Creates a new instance
+        /// </summary>
+        /// <param name="stage"></param>
         public InitTelemetryEvent(InitStage stage)
         {
-            _name = ToEventName(stage);
+            Stage = stage;
         }
 
-        public string Name => _name;
+        /// <summary>
+        /// The name of this event
+        /// </summary>
+        public string Name => "init.stage";
 
+        /// <summary>
+        /// The stage in the init process
+        /// </summary>
+        public InitStage Stage { get; }
+
+        /// <summary>
+        /// A unique identifier for this particular run of the init command. This can be used to uniquely identify
+        /// a single sequence of events
+        /// </summary>
         public string RunId { get; init; }
 
+        /// <summary>
+        /// The type of init run we are doing. Due to subtle differences in the various options, there are currently
+        /// 3 kinds: new, existing, standalone_{resType}
+        /// </summary>
+        public string RunType { get; init; }
+
+        /// <summary>
+        /// The outcome of this step
+        /// </summary>
         public Outcome Outcome { get; init; }
 
+        /// <summary>
+        /// (Optional) Some additional information about what was selected (e.g. new, existing, skipped)
+        /// </summary>
         public string Selected { get; init; }
 
+        /// <summary>
+        /// How long the user spent in that particular stage
+        /// </summary>
         public double DurationInMs { get; init; }
 
+        /// <summary>
+        /// (Optional) Any error information encountered that lead to a failed outcome
+        /// </summary>
         public string Error { get; init; }
-
-        private string ToEventName(InitStage stage)
-        {
-            var builder = new StringBuilder("init.stage.");
-            bool first = true;
-
-            foreach(var c in stage.ToString())
-            {
-                if (char.IsUpper(c))
-                {
-                    if (first) first = false;
-                    else builder.Append("_");
-
-                    builder.Append(char.ToLowerInvariant(c));
-                }
-                else if (c == '.')
-                {
-                    builder.Append("_");
-                }
-                else
-                {
-                    builder.Append(c);
-                }
-            }
-
-            return builder.ToString();
-        }
     }
 }

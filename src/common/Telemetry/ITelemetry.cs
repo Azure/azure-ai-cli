@@ -90,8 +90,18 @@ namespace Azure.AI.Details.Common.CLI.Telemetry
             }
             catch (Exception ex)
             {
-                exception = ex;
-                outcome = ex switch
+                // special case for AggregateExceptions that wrap only a single exception. This can happen for
+                // example if we call Task<>.Result. We unwrap here for clearer and simpler exception reporting
+                if (ex is AggregateException aex && aex.InnerExceptions.Count == 1)
+                {
+                    exception = aex.InnerExceptions[0];
+                }
+                else
+                {
+                    exception = ex;
+                }
+
+                outcome = exception switch
                 {
                     OperationCanceledException => Outcome.Canceled,
                     TimeoutException => Outcome.TimedOut,
@@ -103,7 +113,10 @@ namespace Azure.AI.Details.Common.CLI.Telemetry
             {
                 stopwatch.Stop();
                 ITelemetryEvent evt = createTelemetryEvent(outcome, exception, stopwatch.Elapsed);
-                var _ = telemetry?.LogEventAsync(evt, token);
+                if (evt != null)
+                {
+                    var _ = telemetry?.LogEventAsync(evt, token);
+                }
             }
         }
     }

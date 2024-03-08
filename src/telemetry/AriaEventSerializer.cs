@@ -9,6 +9,7 @@ using AriaPii = Microsoft.Applications.Events.PiiKind;
 
 namespace Azure.AI.Details.Common.CLI.Telemetry
 {
+    [System.Diagnostics.DebuggerStepThrough]
     internal class AriaEventSerializer
     {
         public EventProperties Serialize(ITelemetryEvent evt)

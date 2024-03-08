@@ -57,7 +57,7 @@ namespace Azure.AI.Details.Common.CLI
             return value;
         }
 
-        public static TVal GetOrSet<TVal>(this INamedValues values, string name, Func<TVal> creator)
+        public static TVal GetOrAdd<TVal>(this INamedValues values, string name, Func<TVal> creator)
         {
             var converter = TypeDescriptor.GetConverter(typeof(TVal));
 

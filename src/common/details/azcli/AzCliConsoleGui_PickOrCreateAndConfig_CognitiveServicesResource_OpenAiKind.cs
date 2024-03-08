@@ -14,12 +14,15 @@ using System.Collections.Generic;
 using System.Net;
 using Newtonsoft.Json.Linq;
 using Azure.AI.Details.Common.CLI.ConsoleGui;
+using Azure.AI.Details.Common.CLI.Telemetry;
+using Azure.AI.Details.Common.CLI.Telemetry.Events;
 
 namespace Azure.AI.Details.Common.CLI
 {
     public partial class AzCliConsoleGui
     {
         public static async Task<AzCli.CognitiveServicesResourceInfoEx> PickOrCreateAndConfigCognitiveServicesOpenAiKindResource(
+            INamedValues values,
             bool interactive,
             bool allowSkipDeployments,
             string subscriptionId,
@@ -40,6 +43,7 @@ namespace Azure.AI.Details.Common.CLI
             var resource = await AzCliConsoleGui.PickOrCreateCognitiveResource(sectionHeader, interactive, subscriptionId, regionLocation.Name, groupFilter, resourceFilter, kinds, sku, yes);
 
             var (chatDeployment, embeddingsDeployment, evaluationDeployment, keys) = await PickOrCreateAndConfigCognitiveServicesOpenAiKindResourceDeployments(
+                values,
                 sectionHeader,
                 interactive,
                 allowSkipDeployments,
@@ -66,6 +70,7 @@ namespace Azure.AI.Details.Common.CLI
 
         public static async Task<(AzCli.CognitiveServicesDeploymentInfo?, AzCli.CognitiveServicesDeploymentInfo?, AzCli.CognitiveServicesDeploymentInfo?, AzCli.CognitiveServicesKeyInfo)>
             PickOrCreateAndConfigCognitiveServicesOpenAiKindResourceDeployments(
+                INamedValues values,
                 string sectionHeader,
                 bool interactive,
                 bool allowSkipDeployments,
@@ -75,9 +80,35 @@ namespace Azure.AI.Details.Common.CLI
                 string embeddingsDeploymentFilter = null,
                 string evaluationsDeploymentFilter = null)
         {
-            var chatDeployment = await AzCliConsoleGui.PickOrCreateCognitiveServicesResourceDeployment(interactive, allowSkipDeployments, "Chat", subscriptionId, resource.Group, resource.RegionLocation, resource.Name, chatDeploymentFilter);
-            var embeddingsDeployment = await AzCliConsoleGui.PickOrCreateCognitiveServicesResourceDeployment(interactive, allowSkipDeployments, "Embeddings", subscriptionId, resource.Group, resource.RegionLocation, resource.Name, embeddingsDeploymentFilter);
-            var evaluationDeployment = await AzCliConsoleGui.PickOrCreateCognitiveServicesResourceDeployment(interactive, allowSkipDeployments, "Evaluation", subscriptionId, resource.Group, resource.RegionLocation, resource.Name, evaluationsDeploymentFilter);
+            bool createdNew = false;
+            AzCli.CognitiveServicesDeploymentInfo? chatDeployment = null, embeddingsDeployment = null, evaluationDeployment = null;
+            var token = CancellationToken.None;
+
+            await Program.Telemetry.WrapWithTelemetryAsync(async (t) =>
+                {
+                    (chatDeployment, createdNew) = await PickOrCreateCognitiveServicesResourceDeployment(interactive, allowSkipDeployments, "Chat", subscriptionId, resource.Group, resource.RegionLocation, resource.Name, chatDeploymentFilter)
+                        .ConfigureAwait(false);
+                },
+                (outcome, ex, timeTaken) => CreateInitDeploymentTelemetryEvent(values, InitStage.Chat, outcome, ex, timeTaken, createdNew, chatDeployment),
+                token)
+                .ConfigureAwait(false);
+            await Program.Telemetry.WrapWithTelemetryAsync(async (t) =>
+                {
+                    (embeddingsDeployment, createdNew) = await PickOrCreateCognitiveServicesResourceDeployment(interactive, allowSkipDeployments, "Embeddings", subscriptionId, resource.Group, resource.RegionLocation, resource.Name, embeddingsDeploymentFilter)
+                        .ConfigureAwait(false);
+                },
+                (outcome, ex, timeTaken) => CreateInitDeploymentTelemetryEvent(values, InitStage.Embeddings, outcome, ex, timeTaken, createdNew, embeddingsDeployment),
+                token)
+                .ConfigureAwait(false);
+            await Program.Telemetry.WrapWithTelemetryAsync(async (t) =>
+                {
+                    (evaluationDeployment, createdNew) = await PickOrCreateCognitiveServicesResourceDeployment(interactive, allowSkipDeployments, "Evaluation", subscriptionId, resource.Group, resource.RegionLocation, resource.Name, evaluationsDeploymentFilter)
+                        .ConfigureAwait(false);
+                },
+                (outcome, ex, timeTaken) => CreateInitDeploymentTelemetryEvent(values, InitStage.Evaluation, outcome, ex, timeTaken, createdNew, evaluationDeployment),
+                token)
+                .ConfigureAwait(false);
+            
             var keys = await AzCliConsoleGui.LoadCognitiveServicesResourceKeys(sectionHeader, subscriptionId, resource);
          
             if (resource.Kind == "AIServices")
@@ -91,5 +122,18 @@ namespace Azure.AI.Details.Common.CLI
          
             return (chatDeployment, embeddingsDeployment, evaluationDeployment, keys);
         }
+
+        private static ITelemetryEvent CreateInitDeploymentTelemetryEvent(INamedValues values, InitStage stage, Outcome outcome, Exception ex, TimeSpan duration, bool createdNew, AzCli.CognitiveServicesDeploymentInfo? deployment) =>
+            values == null ? null : new InitTelemetryEvent(stage)
+            {
+                Outcome = outcome,
+                DurationInMs = duration.TotalMilliseconds,
+                Error = ex?.Message,
+                Selected = deployment == null
+                    ? ex == null ? "skip" : "new"
+                    : createdNew ? "new" : "existing",
+                RunId = values.GetOrDefault("telemetry.init.run_id", null),
+                RunType = values.GetOrDefault("telemetry.init.run_type", null),
+            };
     }
 }

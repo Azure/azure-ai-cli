@@ -3,31 +3,47 @@
 // Licensed under the MIT license. See LICENSE.md file in the project root for full license information.
 //
 
-using System;
-using System.Linq;
-using System.Threading.Tasks;
-using System.Collections.Generic;
-using Newtonsoft.Json.Linq;
-using Azure.AI.Details.Common.CLI.ConsoleGui;
-using System.Text.Json;
-using System.IO;
 using System.Text;
+using System.Text.Json;
+using Azure.AI.Details.Common.CLI.ConsoleGui;
+using Azure.AI.Details.Common.CLI.Telemetry;
+using Azure.AI.Details.Common.CLI.Telemetry.Events;
+using Newtonsoft.Json.Linq;
 
 namespace Azure.AI.Details.Common.CLI
 {
     public partial class AiSdkConsoleGui
     {
-        public static async Task<AiHubProjectInfo> PickOrCreateAndConfigAiHubProject(bool allowCreate, bool allowPick, bool allowSkipDeployments, bool allowSkipSearch, ICommandValues values, string subscription, string resourceId, string groupName, string openAiEndpoint, string openAiKey, string searchEndpoint, string searchKey)
+        public static AiHubProjectInfo PickOrCreateAiHubProject(bool allowCreate, bool allowPick, ICommandValues values, string subscription, string resourceId, out bool createdProject)
         {
-            var createdProject = false;
-            var project = allowCreate && allowPick
-                ? PickOrCreateAiHubProject(values, subscription, resourceId, out createdProject)
-                : allowCreate
-                    ? CreateAiHubProject(values, subscription, resourceId)
-                    : allowPick
-                        ? PickAiHubProject(values, subscription, resourceId)
-                        : throw new ApplicationException($"CANCELED: No project selected");
+            createdProject = false;
+            if (allowCreate && allowPick)
+                return PickOrCreateAiHubProject(values, subscription, resourceId, out createdProject);
+            else if (allowCreate)
+            {
+                createdProject = true;
+                return CreateAiHubProject(values, subscription, resourceId);
+            }
+            else if (allowPick)
+                return PickAiHubProject(values, subscription, resourceId);
+            else
+                throw new ApplicationException($"CANCELED: No project selected");
+        }
 
+        public static async Task<AiHubProjectInfo> ConfigAiHubProject(
+            ICommandValues values,
+            AiHubProjectInfo project,
+            bool createdProject,
+            bool allowSkipDeployments,
+            bool allowSkipSearch,
+            string subscription,
+            string resourceId,
+            string groupName,
+            string openAiEndpoint,
+            string openAiKey,
+            string searchEndpoint,
+            string searchKey)
+        {
             var createdOrPickedSearch = false;
             if (!createdProject)
             {
@@ -47,13 +63,13 @@ namespace Azure.AI.Details.Common.CLI
                 }
                 else if (!string.IsNullOrEmpty(openai?.Name))
                 {
-                    var (chatDeployment, embeddingsDeployment, evaluationDeployment, keys) = await AzCliConsoleGui.PickOrCreateAndConfigCognitiveServicesOpenAiKindResourceDeployments("AZURE OPENAI RESOURCE", true, allowSkipDeployments, subscription, openai.Value);
+                    var (chatDeployment, embeddingsDeployment, evaluationDeployment, keys) = await AzCliConsoleGui.PickOrCreateAndConfigCognitiveServicesOpenAiKindResourceDeployments(values, "AZURE OPENAI RESOURCE", true, allowSkipDeployments, subscription, openai.Value);
                     openAiEndpoint = openai.Value.Endpoint;
                     openAiKey = keys.Key1;
                 }
                 else
                 {
-                    var openAiResource = await AzCliConsoleGui.PickOrCreateAndConfigCognitiveServicesOpenAiKindResource(true, allowSkipDeployments, subscription);
+                    var openAiResource = await AzCliConsoleGui.PickOrCreateAndConfigCognitiveServicesOpenAiKindResource(values, true, allowSkipDeployments, subscription);
                     openAiEndpoint = openAiResource.Endpoint;
                     openAiKey = openAiResource.Key;
                 }
@@ -77,8 +93,31 @@ namespace Azure.AI.Details.Common.CLI
                 }
             }
 
-            GetOrCreateAiHubProjectConnections(values, createdProject || createdOrPickedSearch, subscription, project.Group, project.Name, openAiEndpoint, openAiKey, searchEndpoint, searchKey);
-            CreateAiHubProjectConfigJsonFile(subscription, project.Group, project.Name);
+            // TODO FIXME: Telemetry events should not be sent from this place in the code
+            Program.Telemetry.WrapWithTelemetry(() =>
+                GetOrCreateAiHubProjectConnections(values, createdProject || createdOrPickedSearch, subscription, project.Group, project.Name, openAiEndpoint, openAiKey, searchEndpoint, searchKey),
+                (outcome, ex, duration) => new InitTelemetryEvent(InitStage.Connections)
+                {
+                    Outcome = outcome,
+                    // TODO set selected?
+                    RunId = values.GetOrDefault("telemetry.init.run_id", null),
+                    RunType = values.GetOrDefault("telemetry.init.run_type", null),
+                    DurationInMs = duration.TotalMilliseconds,
+                    Error = ex?.Message
+                },
+                CancellationToken.None);
+
+            Program.Telemetry.WrapWithTelemetry(() =>
+                CreateAiHubProjectConfigJsonFile(subscription, project.Group, project.Name),
+                (outcome, ex, duration) => new InitTelemetryEvent(InitStage.Save)
+                {
+                    Outcome = outcome,
+                    RunId = values.GetOrDefault("telemetry.init.run_id", null),
+                    RunType = values.GetOrDefault("telemetry.init.run_type", null),
+                    DurationInMs = duration.TotalMilliseconds,
+                    Error = ex?.Message
+                },
+                CancellationToken.None);
 
             return project;
         }
