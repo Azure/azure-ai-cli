@@ -262,13 +262,10 @@ namespace Azure.AI.Details.Common.CLI
 
         private static bool DisplayDefaultHelp()
         {
-            Console.WriteLine(
-                """
-                   ___ ____  ___  _____ 
-                  / _ /_  / / _ |/_  _/
-                 / __ |/ /_/ __ |_/ /_
-                /_/ |_/___/_/ |_/____/
-                """);
+            Console.WriteLine(@"  ______ ___ _  __");
+            Console.WriteLine(@" /  ___// _ \ \/ /");
+            Console.WriteLine(@" \___ \/ ___/   <");
+            Console.WriteLine(@"/____ /_/  /__/\_\");
             Console.WriteLine();
             Console.WriteLine($"USAGE: {Program.Name} <command> [...]");
             Console.WriteLine();

@@ -23,7 +23,7 @@ namespace Azure.AI.Details.Common.CLI
         {
             _data = data;
 
-            var _ = _data.Telemetry.LogEventAsync(new LaunchedTelemetryEvent());
+            var __ = _data.Telemetry.LogEventAsync(new LaunchedTelemetryEvent());
 
             var screen = ConsoleGui.Screen.Current;
             Console.OutputEncoding = Encoding.UTF8;
@@ -44,7 +44,7 @@ namespace Azure.AI.Details.Common.CLI
             {
                 if (!values.DisplayVersionRequested() && !values.DisplayUpdateRequested())
                 {
-                    var __ = Task.Run(() => DisplayVersion(values, true));
+                    _ = Task.Run(() => DisplayVersion(values, true));
                     DisplayBanner(values);
                     DisplayParsedValues(values);
                 }
@@ -371,6 +371,25 @@ namespace Azure.AI.Details.Common.CLI
         {
             FileHelpers.LogException(values, ex);
             DisplayException(ex);
+        }
+
+        private static void TryCatchErrorOrException(ICommandValues values, Action action)
+        {
+            if (System.Diagnostics.Debugger.IsAttached)
+            {
+                action();
+            }
+            else
+            {
+                try
+                {
+                    action();
+                }
+                catch (Exception ex)
+                {
+                    DisplayErrorOrException(values, ex);
+                }
+            }
         }
 
         private static bool RunCommand(ICommandValues values)

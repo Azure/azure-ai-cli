@@ -25,13 +25,11 @@ namespace Azure.AI.Details.Common.CLI
                 return new ProcessOutput() { ExitCode = -1 };
             }
 
-            string tempFile = null;
+            var tempFile = Path.GetTempFileName() + ".py";
+            FileHelpers.WriteAllText(tempFile, script, new UTF8Encoding(false));
 
             try
             {
-                tempFile = Path.GetTempFileName() + ".py";
-                FileHelpers.WriteAllText(tempFile, script, new UTF8Encoding(false));
-
                 args = args != null
                     ? $"\"{tempFile}\" {args}"
                     : $"\"{tempFile}\"";
@@ -39,8 +37,7 @@ namespace Azure.AI.Details.Common.CLI
             }
             finally
             {
-                if (tempFile != null)
-                    File.Delete(tempFile);
+                File.Delete(tempFile);
             }
         }
 
@@ -75,8 +72,8 @@ namespace Azure.AI.Details.Common.CLI
             {
                 AI.DBG_TRACE_WARNING($"RunEmbeddedPythonScript: exit={exit}");
 
-                output = output?.Trim('\r', '\n', ' ');
-                output = "\n\n    " + output?.Replace("\n", "\n    ");
+                output = output.Trim('\r', '\n', ' ');
+                output = "\n\n    " + output.Replace("\n", "\n    ");
 
                 var info = new List<string>();
 
@@ -181,7 +178,7 @@ namespace Azure.AI.Details.Common.CLI
 
         private static string ParseOutputAndSkipLinesUntilStartsWith(string output, string startsWith)
         {
-            var lines = output.Split(new[] { "\r\n", "\n", "\r" }, StringSplitOptions.None);
+            var lines = output.Split('\n');
             var sb = new StringBuilder();
             var skip = true;
             foreach (var line in lines)
@@ -203,6 +200,7 @@ namespace Azure.AI.Details.Common.CLI
             if (_pythonBinary == null)
             {
                 _pythonBinary = FindPython();
+                AI.DBG_TRACE_VERBOSE($"Python found: {_pythonBinary}");
             }
 
             return _pythonBinary;
@@ -210,26 +208,9 @@ namespace Azure.AI.Details.Common.CLI
 
         private static string FindPython()
         {
-            string fullPath = FindPythonBinaryInOsPath();
-            string pythonExec = fullPath; 
-            if (OperatingSystem.IsWindows())
-            {
-                // TODO FIXME Longer term we really shouldn't be wrapping calls to python in cmd /c python
-                // and instead just calling python directly
-
-                // since we found the python executable in our standard search path, we can skip passing
-                // the entire path since it may contain spaces (e.g. C:\Program Files\Python312\python.exe)
-                // which can cause irritating errors requiring complex escaping. Instead, we can just pass
-                // the executable name and let Windows will handle querying the OS search path for us
-                pythonExec = Path.GetFileName(fullPath);
-            }
-
-            var process = ProcessHelpers.RunShellCommandAsync(pythonExec, "--version").Result;
-            if (process.ExitCode == 0 && process.MergedOutput.Contains("Python 3."))
-            {
-                AI.DBG_TRACE_VERBOSE($"Python found: {fullPath}");
-                return pythonExec;
-            }
+            var lastTry = FindPythonBinaryInOsPath();
+            var process = ProcessHelpers.RunShellCommandAsync(lastTry, "--version").Result;
+            if (process.ExitCode == 0 && process.MergedOutput.Contains("Python 3.")) return lastTry;
 
             return null;
         }

@@ -21,7 +21,7 @@ namespace Azure.AI.Details.Common.CLI
     {
         public static string GetSubscriptionUserName(string subscriptionId)
         {
-            if (_subscriptionIdToUserName.TryGetValue(subscriptionId, out var userName))
+            if (_subscriptionIdToUsreName.TryGetValue(subscriptionId, out var userName))
             {
                 return userName;
             }
@@ -161,9 +161,9 @@ namespace Azure.AI.Details.Common.CLI
 
         private static void CacheSubscriptionUserName(AzCli.SubscriptionInfo subscription)
         {
-            _subscriptionIdToUserName[subscription.Id] = subscription.UserName;
+            _subscriptionIdToUsreName[subscription.Id] = subscription.UserName;
         }
 
-        private static Dictionary<string, string> _subscriptionIdToUserName = new Dictionary<string, string>();
+        private static Dictionary<string, string> _subscriptionIdToUsreName = new Dictionary<string, string>();
     }
 }

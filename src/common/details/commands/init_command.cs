@@ -61,7 +61,6 @@ namespace Azure.AI.Details.Common.CLI
             var interactive = _values.GetOrDefault("init.service.interactive", true);
             var runId = _values.GetOrAdd("telemetry.init.run_id", Guid.NewGuid);
 
-
             switch (command)
             {
                 // case "init": await DoInitServiceCommand(); break;
@@ -248,33 +247,34 @@ namespace Azure.AI.Details.Common.CLI
             Console.WriteLine("  - Standalone resources: Recommended when building simple solutions connecting to a single AI service.");
             Console.WriteLine();
 
-            ListBoxPickerChoice selected = default;
+            var label = "  Initialize";
+            Console.Write($"{label}: ");
+
+            var choices = new[]
+            {
+                new { DisplayName = "New AI Project", Value = "init-root-project-create", Metadata = "new" },
+                new { DisplayName = "Existing AI Project", Value = "init-root-project-select", Metadata = "existing" },
+                new { DisplayName = "Standalone resources", Value = "init-root-standalone-select-or-create", Metadata = "standalone" },
+            };
+
+            int selected = -1;
+
             var outcome = Program.Telemetry.WrapWithTelemetry(
                 () =>
                 {
-                    var label = "  Initialize";
-                    Console.Write($"{label}: ");
-
-                    var choices = new ListBoxPickerChoice[]
-                    {
-                        new() { DisplayName = "New AI Project", Value = "init-root-project-create", Metadata = "new" },
-                        new() { DisplayName = "Existing AI Project", Value = "init-root-project-select", Metadata = "existing" },
-                        new() { DisplayName = "Standalone resources", Value = "init-root-standalone-select-or-create", Metadata = "standalone" },
-                    };
-
-                    selected = ListBoxPicker.PickValue(choices);
-                    if (selected == null)
+                    selected = ListBoxPicker.PickIndexOf(choices.Select(e => e.DisplayName).ToArray());
+                    if (selected < 0)
                     {
                         Console.WriteLine($"\r{label}: CANCELED (no selection)");
                         return Outcome.Canceled;
                     }
 
-                    Console.Write($"\r{label.Trim()}: {selected.DisplayName}\n");
-                    _values.Add("telemetry.init.run_type", selected.Metadata);
+                    Console.Write($"\r{label.Trim()}: {choices.ElementAtOrDefault(selected)?.DisplayName}\n");
+                    _values.Add("telemetry.init.run_type", choices.ElementAtOrDefault(selected)?.Metadata);
 
                     return Outcome.Success;
                 },
-                (outcome, ex, timeTaken) => selected.Metadata == "standalone"
+                (outcome, ex, timeTaken) => choices.ElementAtOrDefault(selected)?.Metadata == "standalone"
                     ? null
                     : new InitTelemetryEvent(InitStage.Choice)
                     {
@@ -288,8 +288,7 @@ namespace Azure.AI.Details.Common.CLI
 
             if (outcome == Outcome.Success)
             {
-                await DoInitServiceParts(interactive, selected.Value)
-                    .ConfigureAwait(false);
+                await DoInitServiceParts(interactive, choices.ElementAtOrDefault(selected)?.Value);
             }
         }
 
@@ -303,29 +302,30 @@ namespace Azure.AI.Details.Common.CLI
             Console.WriteLine("  - Azure Speech: Provides speech recognition, synthesis, and translation.");
             Console.WriteLine();
 
-            ListBoxPickerChoice picked = null;
+            var label = "  Initialize";
+            Console.Write($"{label}: ");
+
+            var choices = new[]
+            {
+                new { DisplayName = "Azure AI Services (v2)", Value = "init-root-cognitiveservices-ai-services-kind-create-or-select", Metadata = "aiservices" },
+                new { DisplayName = "Azure AI Services (v1)", Value = "init-root-cognitiveservices-cognitiveservices-kind-create-or-select", Metadata ="cognitiveservices" },
+                new { DisplayName = "Azure OpenAI", Value = "init-root-openai-create-or-select", Metadata = "openai" },
+                new { DisplayName = "Azure Search", Value = "init-root-search-create-or-select", Metadata = "search" },
+                new { DisplayName = "Azure Speech", Value = "init-root-speech-create-or-select", Metadata = "speech" }
+            };
+
+            int picked = -1;
 
             var outcome = Program.Telemetry.WrapWithTelemetry(() =>
                 {
-                    Console.Write("  Initialize: ");
-
-                    var choices = new ListBoxPickerChoice[]
-                    {
-                        new ("Azure AI Services (v2)", "init-root-cognitiveservices-ai-services-kind-create-or-select", "aiservices"),
-                        new ("Azure AI Services (v1)", "init-root-cognitiveservices-cognitiveservices-kind-create-or-select", "cognitiveservices"),
-                        new ("Azure OpenAI", "init-root-openai-create-or-select", "openai"),
-                        new ("Azure Search", "init-root-search-create-or-select", "search"),
-                        new ("Azure Speech", "init-root-speech-create-or-select", "speech")
-                    };
-
-                    picked = ListBoxPicker.PickValue(choices);
-                    if (picked == null)
+                    picked = ListBoxPicker.PickIndexOf(choices.Select(e => e.DisplayName).ToArray());
+                    if (picked < 0)
                     {
                         Console.WriteLine("\rInitialize: CANCELED (no selection)");
                         return Outcome.Canceled;
                     }
 
-                    Console.WriteLine($"\rInitialize: {picked.DisplayName}");
+                    Console.WriteLine($"\rInitialize: {choices.ElementAtOrDefault(picked)?.DisplayName}");
                     return Outcome.Success;
                 },
                 (outcome, ex, timeTaken) => new InitTelemetryEvent(InitStage.Choice)
@@ -333,7 +333,7 @@ namespace Azure.AI.Details.Common.CLI
                     Outcome = outcome,
                     RunId = _values.GetOrDefault("telemetry.init.run_id", null),
                     RunType = _values.GetOrDefault("telemetry.init.run_type", null),
-                    Selected = picked.Metadata,
+                    Selected = choices.ElementAtOrDefault(picked)?.Metadata,
                     DurationInMs = timeTaken.TotalMilliseconds,
                     Error  = ex?.Message
                 },
@@ -341,7 +341,7 @@ namespace Azure.AI.Details.Common.CLI
 
             if (outcome == Outcome.Success)
             {
-                await DoInitServiceParts(true, picked.Value.Split(';', StringSplitOptions.RemoveEmptyEntries));
+                await DoInitServiceParts(true, choices.ElementAtOrDefault(picked)?.Value);
             }
         }
 
@@ -447,8 +447,7 @@ namespace Azure.AI.Details.Common.CLI
         {
             if (allowCreate)
             {
-                await DoInitHubResource(interactive)
-                    .ConfigureAwait(false);
+                await DoInitHubResource(interactive);
             }
 
             var subscription = SubscriptionToken.Data().GetOrDefault(_values, "");
@@ -624,7 +623,6 @@ namespace Azure.AI.Details.Common.CLI
             await DoInitSubscriptionId(interactive);
             await DoInitSpeech(interactive);
         }
-
         private async Task DoInitRootVision(bool interactive)
         {
             await DoInitSubscriptionId(interactive);

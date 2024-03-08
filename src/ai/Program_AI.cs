@@ -200,7 +200,7 @@ namespace Azure.AI.Details.Common.CLI
             var command = values.GetCommand(null) ?? tokens.PeekNextToken();
             var root = command.Split('.').FirstOrDefault();
 
-            return root switch
+            return root switch 
             {
                 "help" => HelpCommandParser.ParseCommand(tokens, values),
                 "init" => InitCommandParser.ParseCommand(tokens, values),
