@@ -192,7 +192,18 @@ namespace Azure.AI.Details.Common.CLI
             var accounts = parsed.Payload;
 
             var x = new ParsedJsonProcessOutput<SubscriptionInfo[]>(parsed.Output);
-            x.Payload = accounts.ToObject<SubscriptionInfo[]>();
+            x.Payload = new SubscriptionInfo[accounts.Count];
+
+            var i = 0;
+            foreach (var account in accounts)
+            {
+                x.Payload[i].Id = account["Id"].Value<string>();
+                x.Payload[i].Name = account["Name"].Value<string>();
+                x.Payload[i].IsDefault = account["IsDefault"].Value<bool>();
+                x.Payload[i].UserName = account["UserName"].Value<string>();
+                i++;
+            }
+
             return x;
         }
 

@@ -40,22 +40,26 @@ namespace Azure.AI.Details.Common.CLI
             var json = PythonSDKWrapper.ListResources(values, subscription);
             if (Program.Debug) Console.WriteLine(json);
 
-            var items = JsonHelpers.DeserializePropertyValueOrDefault<IEnumerable<AiHubResourceInfo>>(json, "resources")
-                ?.OrderBy(res => res.DisplayName + " " + res.Name)
-                .ThenBy(res => res.RegionLocation)
-                .ToArray()
-                ?? Array.Empty<AiHubResourceInfo>();
+            var parsed = !string.IsNullOrEmpty(json) ? JToken.Parse(json) : null;
+            var items = parsed?.Type == JTokenType.Object ? parsed["resources"] : new JArray();
 
             var choices = new List<string>();
-            if (allowCreate)
+            foreach (var item in items)
             {
-                choices.Add("(Create w/ integrated Open AI + AI Services)");
-                choices.Add("(Create w/ standalone Open AI resource)");
+                var name = item["name"].Value<string>();
+                var location = item["location"].Value<string>();
+                var displayName = item["display_name"].Value<string>();
+
+                choices.Add(string.IsNullOrEmpty(displayName)
+                    ? $"{name} ({location})"
+                    : $"{displayName} ({location})");
             }
 
-            choices.AddRange(items
-                .Select(item =>
-                    $"{(string.IsNullOrEmpty(item.DisplayName) ? item.Name : item.DisplayName)} ({item.RegionLocation})"));
+            if (allowCreate)
+            {
+                choices.Insert(0, "(Create w/ integrated Open AI + AI Services)");
+                choices.Insert(1, "(Create w/ standalone Open AI resource)");
+            }
 
             if (choices.Count == 0)
             {
@@ -70,9 +74,9 @@ namespace Azure.AI.Details.Common.CLI
             }
 
             Console.WriteLine($"\rName: {choices[picked]}");
-            AiHubResourceInfo resource = allowCreate
-                ? (picked >= 2 ? items[picked - 2] : default)
-                : items[picked];
+            var resource = allowCreate
+                ? (picked >= 2 ? items.ToArray()[picked - 2] : null)
+                : items.ToArray()[picked];
 
             var byoServices = allowCreate && picked == 1;
             if (byoServices)
@@ -105,7 +109,7 @@ namespace Azure.AI.Details.Common.CLI
             return (FinishPickOrCreateAiHubResource(values, resource), createNewHub);
         }
 
-        private static async Task<AiHubResourceInfo> TryCreateAiHubResourceInteractive(ICommandValues values, string subscription)
+        private static async Task<JToken> TryCreateAiHubResourceInteractive(ICommandValues values, string subscription)
         {
             var locationName = values.GetOrDefault("service.resource.region.name", "");
             var groupName = ResourceGroupNameToken.Data().GetOrDefault(values);
@@ -121,17 +125,25 @@ namespace Azure.AI.Details.Common.CLI
             return await TryCreateAiHubResourceInteractive(values, subscription, locationName, groupName, displayName, description, openAiResourceId, openAiResourceKind, smartName, smartNameKind);
         }
 
-        private static AiHubResourceInfo FinishPickOrCreateAiHubResource(ICommandValues values, AiHubResourceInfo resource)
+        private static AiHubResourceInfo FinishPickOrCreateAiHubResource(ICommandValues values, JToken resource)
         {
-            ResourceIdToken.Data().Set(values, resource.Id);
-            ResourceNameToken.Data().Set(values, resource.Name);
-            ResourceGroupNameToken.Data().Set(values, resource.Group);
-            RegionLocationToken.Data().Set(values, resource.RegionLocation);
+            var aiHubResource = new AiHubResourceInfo
+            {
+                Id = resource["id"].Value<string>(),
+                Group = resource["resource_group"].Value<string>(),
+                Name = resource["name"].Value<string>(),
+                RegionLocation = resource["location"].Value<string>(),
+            };
 
-            return resource;
+            ResourceIdToken.Data().Set(values, aiHubResource.Id);
+            ResourceNameToken.Data().Set(values, aiHubResource.Name);
+            ResourceGroupNameToken.Data().Set(values, aiHubResource.Group);
+            RegionLocationToken.Data().Set(values, aiHubResource.RegionLocation);
+
+            return aiHubResource;
         }
 
-        private static async Task<AiHubResourceInfo> TryCreateAiHubResourceInteractive(ICommandValues values, string subscription, string locationName, string groupName, string displayName, string description, string openAiResourceId, string openAiResourceKind, string smartName = null, string smartNameKind = null)
+        private static async Task<JToken> TryCreateAiHubResourceInteractive(ICommandValues values, string subscription, string locationName, string groupName, string displayName, string description, string openAiResourceId, string openAiResourceKind, string smartName = null, string smartNameKind = null)
         {
             var sectionHeader = $"\n`CREATE AZURE AI RESOURCE`";
             ConsoleHelpers.WriteLineWithHighlight(sectionHeader);
@@ -166,7 +178,8 @@ namespace Azure.AI.Details.Common.CLI
 
             Console.WriteLine("\r*** CREATED ***  ");
 
-            return JsonHelpers.DeserializePropertyValueOrDefault<AiHubResourceInfo>(json, "resource");
+            var parsed = !string.IsNullOrEmpty(json) ? JToken.Parse(json) : null;
+            return parsed["resource"];
         }
     }
 }

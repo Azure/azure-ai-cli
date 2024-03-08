@@ -117,22 +117,19 @@ namespace Azure.AI.Details.Common.CLI
 
         private static AzCli.SubscriptionInfo? ListBoxPickSubscription(AzCli.SubscriptionInfo[] subscriptions)
         {
-            var selected = ListBoxPicker.PickValue(
-                subscriptions
-                .Select(s => new ListBoxPickerChoice<AzCli.SubscriptionInfo>()
-                {
-                    IsDefault = s.IsDefault,
-                    DisplayName = s.Name,
-                    Value = s
-                }));
-            if (selected == null)
+            var list = subscriptions.Select(x => x.Name).ToArray();
+            var defaultIndex = subscriptions.Select((x, i) => new { x, i }).Where(x => x.x.IsDefault).Select(x => x.i).FirstOrDefault();
+
+            var picked = ListBoxPicker.PickIndexOf(list, defaultIndex);
+            if (picked < 0)
             {
                 throw new OperationCanceledException("User canceled");
             }
 
-            DisplayNameAndId(selected.Value);
-            CacheSubscriptionUserName(selected.Value);
-            return selected.Value;
+            var subscription = subscriptions[picked];
+            DisplayNameAndId(subscription);
+            CacheSubscriptionUserName(subscription);
+            return subscription;
         }
 
         private static bool MatchSubscriptionFilter(AzCli.SubscriptionInfo subscription, string subscriptionFilter)
