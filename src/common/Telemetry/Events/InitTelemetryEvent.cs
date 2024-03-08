@@ -8,11 +8,6 @@ namespace Azure.AI.Details.Common.CLI.Telemetry.Events
     public enum InitStage
     {
         /// <summary>
-        /// (Optional) Initial verification of saved data
-        /// </summary>
-        VerifySave,
-
-        /// <summary>
         /// The user has made a selection
         /// </summary>
         Choice,

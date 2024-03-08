@@ -53,9 +53,25 @@ namespace Azure.AI.Details.Common.CLI
             return subscription.Value;
         }
 
-        public static async Task<AzCli.SubscriptionInfo?> ValidateSubscriptionAsync(bool allowInteractiveLogin, string subscriptionFilter, string subscriptionLabel)
+        public static async Task<AzCli.SubscriptionInfo?> ValidateSubscriptionAsync(bool allowInteractiveLogin, string subscriptionId)
         {
-            return await FindSubscriptionAsync(allowInteractiveLogin, false, subscriptionFilter, subscriptionLabel);
+            var allSubscriptions = await LoginHelpers.GetResponseOnLogin(allowInteractiveLogin, "subscription", AzCli.ListAccounts, "  SUBSCRIPTION");
+            var subscription = allSubscriptions
+                .Payload
+                .FirstOrDefault(subs => string.Equals(subs.Id, subscriptionId, StringComparison.OrdinalIgnoreCase));
+
+            bool found = !string.IsNullOrWhiteSpace(subscription.Id);
+            if (found)
+            {
+                Console.WriteLine($"{subscription.Name} ({subscription.Id})");
+                CacheSubscriptionUserName(subscription);
+                return subscription;
+            }
+            else
+            {
+                ConsoleHelpers.WriteLineWithHighlight($"`#e_;WARNING: Could not find subscription {subscriptionId}!`");
+                return null;
+            }
         }
 
         private static async Task<AzCli.SubscriptionInfo?> FindSubscriptionAsync(bool allowInteractiveLogin, bool allowInteractivePickSubscription, string subscriptionFilter = null, string subscriptionLabel = "Subscription")
