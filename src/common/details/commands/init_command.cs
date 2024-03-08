@@ -112,24 +112,66 @@ namespace Azure.AI.Details.Common.CLI
 
         private async Task DoInitRootVerifyConfigFileAsync(bool interactive, string fileName)
         {
-            bool success = ParseConfigJson(fileName, out string subscription, out string groupName, out string projectName);
-            if (success)
-            {
-                var (hubName, openai, search) = await VerifyProjectAsync(interactive, subscription, groupName, projectName);
-                if (openai != null && search != null)
-                {
-                    await DoInitRootConfirmVerifiedProjectResources(interactive, subscription, projectName, hubName, openai.Value, search.Value);
-                    return;
-                }
-            }
+            string detail = null;
+            bool? useSaved = null;
 
-            await DoInitRootMenuPick();
+            await Program.Telemetry.WrapWithTelemetryAsync(async (t) =>
+            {
+                bool success = ParseConfigJson(fileName, out string subscription, out string groupName, out string projectName);
+                if (success)
+                {
+                    var (hubName, openai, search) = await VerifyProjectAsync(interactive, subscription, groupName, projectName);
+                    if (openai != null && search != null)
+                    {
+                        bool? useSaved = await DoInitRootConfirmVerifiedProjectResources(
+                            interactive, subscription, projectName, hubName, openai.Value, search.Value);
+
+                        detail = useSaved.HasValue
+                            ? useSaved == true ? "saved_config" : "something_else"
+                            : null;
+
+                        return useSaved == null
+                            ? Outcome.Canceled
+                            : Outcome.Success;
+                    }
+                    else
+                    {
+                        detail = "invalid_config";
+                        useSaved = false;
+                        return Outcome.Failed;
+                    }
+                }
+                else
+                {
+                    detail = "invalid_json";
+                    useSaved = false;
+                    return Outcome.Failed;
+                }
+            },
+            (outcome, ex, duration) => new VerifySavedConfigTelemetryEvent()
+            {
+                Outcome = outcome,
+                Detail = detail,
+                DurationInMs = duration.TotalMilliseconds,
+                Error = ex?.Message,
+            },
+            CancellationToken.None);
+
+            if (useSaved == false)
+            {
+                await DoInitRootMenuPick();
+            }
         }
 
-        private async Task<(string, AzCli.CognitiveServicesResourceInfo?, AzCli.CognitiveSearchResourceInfo?)> VerifyProjectAsync(bool interactive, string subscription, string groupName, string projectName)
+        private async Task<(string, AzCli.CognitiveServicesResourceInfo?, AzCli.CognitiveSearchResourceInfo?)> VerifyProjectAsync(bool interactive, string subscriptionId, string groupName, string projectName)
         {
             Console.WriteLine($"  PROJECT: {projectName}");
-            var validated = await AzCliConsoleGui.ValidateSubscriptionAsync(interactive, subscription, "  SUBSCRIPTION");
+
+            var validated = await AzCliConsoleGui.ValidateSubscriptionAsync(interactive, subscriptionId);
+            if (validated == null)
+            {
+                return (null, null, null);
+            }
 
             ConsoleHelpers.WriteLineWithHighlight("\n  `ATTACHED SERVICES AND RESOURCES`\n");
 
@@ -139,7 +181,7 @@ namespace Azure.AI.Details.Common.CLI
             var (hubName, openai, search) = await AiSdkConsoleGui.VerifyResourceConnections(_values, validated?.Id, groupName, projectName);
             if (openai != null && search != null)
             {
-                Console.Write(new string(' ', message.Length + 2) + "\r");
+                Console.Write($"\r{new string(' ', message.Length)}\r");
                 return (hubName, openai, search);
             }
             else
@@ -150,11 +192,10 @@ namespace Azure.AI.Details.Common.CLI
             }
         }
 
-        private async Task DoInitRootConfirmVerifiedProjectResources(bool interactive, string subscription, string projectName, string resourceName, AzCli.CognitiveServicesResourceInfo openaiResource, AzCli.CognitiveSearchResourceInfo searchResource)
+        private async Task<bool?> DoInitRootConfirmVerifiedProjectResources(bool interactive, string subscription, string projectName, string resourceName, AzCli.CognitiveServicesResourceInfo openaiResource, AzCli.CognitiveSearchResourceInfo searchResource)
         {
             ConsoleHelpers.WriteLineWithHighlight($"    AI RESOURCE: {resourceName}");
             ConsoleHelpers.WriteLineWithHighlight($"    AI SEARCH RESOURCE: {searchResource.Name}");
-            // Console.WriteLine();
             ConsoleHelpers.WriteLineWithHighlight($"    AZURE OPENAI RESOURCE: {openaiResource.Name}");
 
             // TODO: If there's a way to get the deployments, get them, and do this... Print correct stuff here... 
@@ -167,37 +208,24 @@ namespace Azure.AI.Details.Common.CLI
             Console.Write($"{label}: ");
 
             var choices = new string[] { $"PROJECT: {projectName}", $"     OR: (Initialize something else)" };
-            var timer = Stopwatch.StartNew();
             int picked = ListBoxPicker.PickIndexOf(choices.ToArray());
-            timer.Stop();
-
-            string runId = _values.GetOrDefault("telemetry.init.run_id", null);
-            string runType = "saved";
 
             if (picked < 0)
             {
                 Console.WriteLine($"\r{label}: CANCELED (no selection)");
-                var _ = Program.Telemetry.LogEventAsync(new InitTelemetryEvent(InitStage.VerifySave)
-                {
-                    DurationInMs = timer.ElapsedMilliseconds,
-                    Outcome = Outcome.Canceled,
-                    RunId = runId,
-                    RunType = runType
-                });
-                return;
+                return null;
             }
             else if (picked > 0)
             {
                 Console.Write(new string(' ', label.Length + 2) + "\r");
                 Console.WriteLine("  Initializing something else...\n");
-                await DoInitRootMenuPick();
-                return;
+                return false;
             }
             else
             {
                 Console.Write("\r" + new string(' ', label.Length + 2) + "\r");
 
-                var (chatDeployment, embeddingsDeployment, evaluationDeployment, keys) = await AzCliConsoleGui.PickOrCreateAndConfigCognitiveServicesOpenAiKindResourceDeployments(_values, "AZURE OPENAI RESOURCE", interactive, true, subscription, openaiResource);
+                await AzCliConsoleGui.PickOrCreateAndConfigCognitiveServicesOpenAiKindResourceDeployments(null, "AZURE OPENAI RESOURCE", interactive, true, subscription, openaiResource);
 
                 var searchKeys = await AzCliConsoleGui.LoadSearchResourceKeys(subscription, searchResource);
                 ConfigSetHelpers.ConfigSearchResource(searchResource.Endpoint, searchKeys.Key1);
@@ -206,14 +234,7 @@ namespace Azure.AI.Details.Common.CLI
                 ConfigSetHelpers.ConfigSet("@project", projectName);
                 ConfigSetHelpers.ConfigSet("@group", openaiResource.Group);
 
-                _values.Add("telemetry.init.run_type", runType);
-                var _ = Program.Telemetry.LogEventAsync(new InitTelemetryEvent(InitStage.VerifySave)
-                {
-                    DurationInMs = timer.ElapsedMilliseconds,
-                    Outcome = Outcome.Success,
-                    RunId = runId,
-                    RunType = runType,
-                });
+                return true;
             }
         }
 
@@ -270,7 +291,7 @@ namespace Azure.AI.Details.Common.CLI
                     }
 
                     Console.Write($"\r{label.Trim()}: {choices.ElementAtOrDefault(selected)?.DisplayName}\n");
-                    _values.Add("telemetry.init.run_type", choices.ElementAtOrDefault(selected)?.Metadata);
+                    _values.Reset("telemetry.init.run_type", choices.ElementAtOrDefault(selected)?.Metadata);
 
                     return Outcome.Success;
                 },

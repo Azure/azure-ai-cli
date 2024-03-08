@@ -13,10 +13,12 @@ namespace Azure.AI.Details.Common.CLI
     {
         public static async Task<ParsedJsonProcessOutput<T>> GetResponseOnLogin<T>(bool allowInteractiveLogin, string label, Func<Task<ParsedJsonProcessOutput<T>>> getResponse, string titleLabel = "Name")
         {
-            Console.Write($"\r{titleLabel}: *** Loading choices ***");
+            string message = $"\r{titleLabel}: *** Loading choices ***";
+            Console.Write(message);
+
             var response = await getResponse();
 
-            Console.Write($"\r{titleLabel}: ");
+            Console.Write($"\r{new string(' ', message.Length)}\r{titleLabel}: ");
             if (string.IsNullOrEmpty(response.Output.StdOutput) && !string.IsNullOrEmpty(response.Output.StdError))
             {
                 if (LoginHelpers.HasLoginError(response.Output.StdError))
