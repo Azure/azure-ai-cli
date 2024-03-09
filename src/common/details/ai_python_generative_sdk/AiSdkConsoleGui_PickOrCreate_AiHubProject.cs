@@ -94,8 +94,8 @@ namespace Azure.AI.Details.Common.CLI
             }
 
             // TODO FIXME: Telemetry events should not be sent from this place in the code
-            Program.Telemetry.WrapWithTelemetry(() =>
-                GetOrCreateAiHubProjectConnections(values, createdProject || createdOrPickedSearch, subscription, project.Group, project.Name, openAiEndpoint, openAiKey, searchEndpoint, searchKey),
+            Program.Telemetry.Wrap(
+                () => GetOrCreateAiHubProjectConnections(values, createdProject || createdOrPickedSearch, subscription, project.Group, project.Name, openAiEndpoint, openAiKey, searchEndpoint, searchKey),
                 (outcome, ex, duration) => new InitTelemetryEvent(InitStage.Connections)
                 {
                     Outcome = outcome,
@@ -104,11 +104,10 @@ namespace Azure.AI.Details.Common.CLI
                     RunType = values.GetOrDefault("telemetry.init.run_type", null),
                     DurationInMs = duration.TotalMilliseconds,
                     Error = ex?.Message
-                },
-                CancellationToken.None);
+                });
 
-            Program.Telemetry.WrapWithTelemetry(() =>
-                CreateAiHubProjectConfigJsonFile(subscription, project.Group, project.Name),
+            Program.Telemetry.Wrap(
+                () => CreateAiHubProjectConfigJsonFile(subscription, project.Group, project.Name),
                 (outcome, ex, duration) => new InitTelemetryEvent(InitStage.Save)
                 {
                     Outcome = outcome,
@@ -116,8 +115,7 @@ namespace Azure.AI.Details.Common.CLI
                     RunType = values.GetOrDefault("telemetry.init.run_type", null),
                     DurationInMs = duration.TotalMilliseconds,
                     Error = ex?.Message
-                },
-                CancellationToken.None);
+                });
 
             return project;
         }

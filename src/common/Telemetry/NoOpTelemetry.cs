@@ -16,9 +16,9 @@
             return ValueTask.CompletedTask;
         }
 
-        public ValueTask LogEventAsync(ITelemetryEvent evt, CancellationToken token)
+        public void LogEvent(ITelemetryEvent evt)
         {
-            return ValueTask.CompletedTask;
+            // Nothing to see here, move along...
         }
     }
 }

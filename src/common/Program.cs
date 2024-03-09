@@ -23,7 +23,7 @@ namespace Azure.AI.Details.Common.CLI
         {
             _data = data;
 
-            var _ = _data.Telemetry.LogEventAsync(new LaunchedTelemetryEvent());
+            Program.Telemetry.LogEvent(new LaunchedTelemetryEvent());
 
             var screen = ConsoleGui.Screen.Current;
             Console.OutputEncoding = Encoding.UTF8;
@@ -44,7 +44,7 @@ namespace Azure.AI.Details.Common.CLI
             {
                 if (!values.DisplayVersionRequested() && !values.DisplayUpdateRequested())
                 {
-                    var __ = Task.Run(() => DisplayVersion(values, true));
+                    _ = Task.Run(() => DisplayVersion(values, true));
                     DisplayBanner(values);
                     DisplayParsedValues(values);
                 }
@@ -407,7 +407,7 @@ namespace Azure.AI.Details.Common.CLI
             }
             finally
             {
-                var _ = _data?.Telemetry?.LogEventAsync(new CommandTelemetryEvent()
+                _data?.Telemetry?.LogEvent(new CommandTelemetryEvent()
                 {
                     Type = values.GetCommand("unknown"),
                     Outcome = outcome,

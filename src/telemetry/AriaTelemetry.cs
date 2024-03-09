@@ -9,6 +9,11 @@ using Microsoft.Applications.Events;
 
 namespace Azure.AI.Details.Common.CLI.Telemetry
 {
+    /// <summary>
+    /// An implementation that uses Aria for telemetry. See <see cref="https://www.aria.ms/help/FAQs/"/> for more information about Aria
+    /// </summary>
+    /// <remarks>This creates and maintains a JSON file in the .config user profile directory to store some information between
+    /// runs for Aria. For example, a GUID is generated and used as the user ID for now the first time this code is run</remarks>
     public class AriaTelemetry : ITelemetry
     {
         private ILogger _logger;
@@ -32,25 +37,24 @@ namespace Azure.AI.Details.Common.CLI.Telemetry
             _serializer = new AriaEventSerializer();
             _userAgent = programData?.TelemetryUserAgent ?? string.Empty;
             _userConfig = GetOrCreateUserConfig();
+
+            // set common event properties
+            _logger.SetContext("UserId", _userConfig.UserId, Microsoft.Applications.Events.PiiKind.Identity);
+            if (programData?.TelemetryUserAgent != null)
+            {
+                _logger.SetContext("UserAgent", _userAgent);
+            }
         }
 
-        public ValueTask LogEventAsync(ITelemetryEvent evt, CancellationToken token)
+        public void LogEvent(ITelemetryEvent evt)
         {
-            if (evt == null || token.IsCancellationRequested)
+            if (evt == null)
             {
-                return ValueTask.CompletedTask;
+                return;
             }
 
             EventProperties eventProps = _serializer.Serialize(evt);
-            eventProps.SetProperty("UserId", _userConfig.UserId, Microsoft.Applications.Events.PiiKind.Identity);
-            if (_userAgent != null)
-            {
-                eventProps.SetProperty("UserAgent", _userAgent);
-            }
-
             _logger.LogEvent(eventProps);
-
-            return ValueTask.CompletedTask;
         }
 
         public async ValueTask DisposeAsync()
