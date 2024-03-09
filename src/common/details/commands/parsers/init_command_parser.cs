@@ -23,6 +23,10 @@ namespace Azure.AI.Details.Common.CLI
         private static readonly (string name, bool valuesRequired)[] _commands =  {
             ("init.aiservices", false),
             ("init.cognitiveservices", false),
+            ("init.openai.chat", false),
+            ("init.openai.embeddings", false),
+            ("init.openai.evaluations", false),
+            ("init.openai.deployments", false),
             ("init.openai", false),
             ("init.search", false),
             ("init.speech", false),
@@ -35,7 +39,8 @@ namespace Azure.AI.Details.Common.CLI
         };
 
         private static readonly string[] _partialCommands = {
-            "init"
+            "init",
+            "init.openai"
         };
 
         private static INamedValueTokenParser[] GetCommandParsers(ICommandValues values)
@@ -46,6 +51,10 @@ namespace Azure.AI.Details.Common.CLI
                 case "init.aiservices":
                 case "init.cognitiveservices":
                 case "init.openai":
+                case "init.openai.chat":
+                case "init.openai.embeddings":
+                case "init.openai.evaluations":
+                case "init.openai.deployments":
                 case "init.search":
                 case "init.speech":
                 case "init.vision":

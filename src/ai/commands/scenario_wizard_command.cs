@@ -116,7 +116,7 @@ namespace Azure.AI.Details.Common.CLI
             StartCommand();
 
             var subscription = await AzCliConsoleGui.PickSubscriptionAsync(true, true);
-            var openAiResource = await AzCliConsoleGui.PickOrCreateAndConfigCognitiveServicesOpenAiKindResource(true, false, subscription.Id);
+            var openAiResource = await AzCliConsoleGui.PickOrCreateAndConfigCognitiveServicesOpenAiKindResource(true, subscription.Id, skipChat: false, skipEmbeddings: false, skipEvaluations: true);
             var cogSearchResource = await AzCliConsoleGui.PickOrCreateAndConfigCogSearchResource(false, subscription.Id, openAiResource.RegionLocation, openAiResource.Group);
             // var aiHubResource = await AiSdkConsoleGui.PickOrCreateAiHubResource(_values, subscription.Id);
             // var aiHubProject = AiSdkConsoleGui.PickOrCreateAndConfigAiHubProject(true, true, _values, subscription.Id, aiHubResource.Id, openAiResource.Group, openAiResource.Endpoint, openAiResource.Key, cogSearchResource.Endpoint, cogSearchResource.Key);
