@@ -92,9 +92,11 @@ namespace Azure.AI.Details.Common.CLI
                 new NamedValueTokenParser("--sku", "init.service.cognitiveservices.resource.sku", "00001", "1"),
                 new NamedValueTokenParser("--yes", "init.service.cognitiveservices.terms.agree", "00001", "1;0", "true;false", null, "true"),
 
-                new NamedValueTokenParser(null, "init.chat.model.deployment.name", "01010", "1"),
+                new NamedValueTokenParser(null, "init.chat.model.deployment.name", "01010;00010", "1"),
                 new NamedValueTokenParser(null, "init.embeddings.model.deployment.name", "01010", "1"),
                 new NamedValueTokenParser(null, "init.evaluation.model.deployment.name", "01010", "1"),
+
+                new NamedValueTokenParser(null, "init.output.env.file", "0110", "1;0", "true;false", null, "true"),
 
                 new NamedValueTokenParser("--interactive", "init.service.interactive", "001", "1;0", "true;false", null, "true")
 

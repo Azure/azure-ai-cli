@@ -90,6 +90,18 @@ namespace Azure.AI.Details.Common.CLI
                     break;
             }
 
+            var outputEnvFile = _values.GetOrDefault("init.output.env.file", false);
+            if (outputEnvFile)
+            {
+                var fileName = ".env";
+
+                var env = ConfigEnvironmentHelpers.GetEnvironment(_values);
+                var fqn = ConfigEnvironmentHelpers.SaveEnvironment(env, fileName);
+
+                Console.WriteLine($"\n{fileName} (saved at '{fqn}')\n");
+                ConfigEnvironmentHelpers.PrintEnvironment(env);
+            }
+
             StopCommand();
             DisposeAfterStop();
             DeleteTemporaryFiles();
