@@ -85,30 +85,20 @@ namespace Azure.AI.Details.Common.CLI
             var token = CancellationToken.None;
 
             // TODO FIXME Telemetry events should not be raised from here. Will be addressed in future refactor
-            await Program.Telemetry.WrapWithTelemetryAsync(async (t) =>
-                {
-                    (chatDeployment, createdNew) = await PickOrCreateCognitiveServicesResourceDeployment(interactive, allowSkipDeployments, "Chat", subscriptionId, resource.Group, resource.RegionLocation, resource.Name, chatDeploymentFilter)
-                        .ConfigureAwait(false);
-                },
-                (outcome, ex, timeTaken) => CreateInitDeploymentTelemetryEvent(values, InitStage.Chat, outcome, ex, timeTaken, createdNew, chatDeployment),
-                token)
-                .ConfigureAwait(false);
-            await Program.Telemetry.WrapWithTelemetryAsync(async (t) =>
-                {
-                    (embeddingsDeployment, createdNew) = await PickOrCreateCognitiveServicesResourceDeployment(interactive, allowSkipDeployments, "Embeddings", subscriptionId, resource.Group, resource.RegionLocation, resource.Name, embeddingsDeploymentFilter)
-                        .ConfigureAwait(false);
-                },
-                (outcome, ex, timeTaken) => CreateInitDeploymentTelemetryEvent(values, InitStage.Embeddings, outcome, ex, timeTaken, createdNew, embeddingsDeployment),
-                token)
-                .ConfigureAwait(false);
-            await Program.Telemetry.WrapWithTelemetryAsync(async (t) =>
-                {
-                    (evaluationDeployment, createdNew) = await PickOrCreateCognitiveServicesResourceDeployment(interactive, allowSkipDeployments, "Evaluation", subscriptionId, resource.Group, resource.RegionLocation, resource.Name, evaluationsDeploymentFilter)
-                        .ConfigureAwait(false);
-                },
-                (outcome, ex, timeTaken) => CreateInitDeploymentTelemetryEvent(values, InitStage.Evaluation, outcome, ex, timeTaken, createdNew, evaluationDeployment),
-                token)
-                .ConfigureAwait(false);
+            (chatDeployment, createdNew) = await Program.Telemetry.WrapAsync(
+                () => PickOrCreateCognitiveServicesResourceDeployment(interactive, allowSkipDeployments, "Chat", subscriptionId, resource.Group, resource.RegionLocation, resource.Name, chatDeploymentFilter),
+                (outcome, res, ex, timeTaken) => CreateInitDeploymentTelemetryEvent(values, InitStage.Chat, outcome, ex, timeTaken, res))
+            .ConfigureAwait(false);
+
+            (embeddingsDeployment, createdNew) = await Program.Telemetry.WrapAsync(
+                () => PickOrCreateCognitiveServicesResourceDeployment(interactive, allowSkipDeployments, "Embeddings", subscriptionId, resource.Group, resource.RegionLocation, resource.Name, embeddingsDeploymentFilter),
+                (outcome, res,ex, timeTaken) => CreateInitDeploymentTelemetryEvent(values, InitStage.Embeddings, outcome, ex, timeTaken, res))
+            .ConfigureAwait(false);
+
+            (evaluationDeployment, createdNew) = await Program.Telemetry.WrapAsync(
+                () => PickOrCreateCognitiveServicesResourceDeployment(interactive, allowSkipDeployments, "Evaluation", subscriptionId, resource.Group, resource.RegionLocation, resource.Name, evaluationsDeploymentFilter),
+                (outcome, res, ex, timeTaken) => CreateInitDeploymentTelemetryEvent(values, InitStage.Evaluation, outcome, ex, timeTaken, res))
+            .ConfigureAwait(false);
             
             var keys = await AzCliConsoleGui.LoadCognitiveServicesResourceKeys(sectionHeader, subscriptionId, resource);
          
@@ -124,15 +114,15 @@ namespace Azure.AI.Details.Common.CLI
             return (chatDeployment, embeddingsDeployment, evaluationDeployment, keys);
         }
 
-        private static ITelemetryEvent CreateInitDeploymentTelemetryEvent(INamedValues values, InitStage stage, Outcome outcome, Exception ex, TimeSpan duration, bool createdNew, AzCli.CognitiveServicesDeploymentInfo? deployment) =>
+        private static ITelemetryEvent CreateInitDeploymentTelemetryEvent(INamedValues values, InitStage stage, Outcome outcome, Exception ex, TimeSpan duration, (AzCli.CognitiveServicesDeploymentInfo? deployment, bool createdNew) result) =>
             values == null ? null : new InitTelemetryEvent(stage)
             {
                 Outcome = outcome,
                 DurationInMs = duration.TotalMilliseconds,
                 Error = ex?.Message,
-                Selected = deployment == null
+                Selected = result.deployment == null
                     ? ex == null ? "skip" : "new"
-                    : createdNew ? "new" : "existing",
+                    : result.createdNew ? "new" : "existing",
                 RunId = values.GetOrDefault("telemetry.init.run_id", null),
                 RunType = values.GetOrDefault("telemetry.init.run_type", null),
             };

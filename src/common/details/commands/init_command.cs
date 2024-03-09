@@ -113,9 +113,8 @@ namespace Azure.AI.Details.Common.CLI
         private async Task DoInitRootVerifyConfigFileAsync(bool interactive, string fileName)
         {
             string detail = null;
-            bool? useSaved = null;
 
-            await Program.Telemetry.WrapWithTelemetryAsync(async (t) =>
+            bool? useSaved = await Program.Telemetry.WrapAsync<bool?>(async () =>
             {
                 bool success = ParseConfigJson(fileName, out string subscription, out string groupName, out string projectName);
                 if (success)
@@ -130,34 +129,30 @@ namespace Azure.AI.Details.Common.CLI
                             ? useSaved == true ? "saved_config" : "something_else"
                             : null;
 
-                        return useSaved == null
-                            ? Outcome.Canceled
-                            : Outcome.Success;
+                        return useSaved; 
                     }
                     else
                     {
                         detail = "invalid_config";
-                        useSaved = false;
-                        return Outcome.Failed;
+                        return null;
                     }
                 }
                 else
                 {
                     detail = "invalid_json";
-                    useSaved = false;
-                    return Outcome.Failed;
+                    return null;
                 }
             },
-            (outcome, ex, duration) => new VerifySavedConfigTelemetryEvent()
+            (outcome, useSaved, ex, duration) => new VerifySavedConfigTelemetryEvent()
             {
-                Outcome = outcome,
+                Outcome = useSaved == null ? Outcome.Failed : outcome,
                 Detail = detail,
                 DurationInMs = duration.TotalMilliseconds,
                 Error = ex?.Message,
-            },
-            CancellationToken.None);
+            })
+            .ConfigureAwait(false);
 
-            if (useSaved == false)
+            if (useSaved != true)
             {
                 await DoInitRootMenuPick();
             }
@@ -280,32 +275,30 @@ namespace Azure.AI.Details.Common.CLI
 
             int selected = -1;
 
-            var outcome = Program.Telemetry.WrapWithTelemetry(
-                () =>
+            var outcome = Program.Telemetry.Wrap(() =>
+            {
+                selected = ListBoxPicker.PickIndexOf(choices.Select(e => e.DisplayName).ToArray());
+                if (selected < 0)
                 {
-                    selected = ListBoxPicker.PickIndexOf(choices.Select(e => e.DisplayName).ToArray());
-                    if (selected < 0)
-                    {
-                        Console.WriteLine($"\r{label}: CANCELED (no selection)");
-                        return Outcome.Canceled;
-                    }
+                    Console.WriteLine($"\r{label}: CANCELED (no selection)");
+                    return Outcome.Canceled;
+                }
 
-                    Console.Write($"\r{label.Trim()}: {choices.ElementAtOrDefault(selected)?.DisplayName}\n");
-                    _values.Reset("telemetry.init.run_type", choices.ElementAtOrDefault(selected)?.Metadata);
+                Console.Write($"\r{label.Trim()}: {choices.ElementAtOrDefault(selected)?.DisplayName}\n");
+                _values.Reset("telemetry.init.run_type", choices.ElementAtOrDefault(selected)?.Metadata);
 
-                    return Outcome.Success;
-                },
-                (outcome, ex, timeTaken) => choices.ElementAtOrDefault(selected)?.Metadata == "standalone"
-                    ? null
-                    : new InitTelemetryEvent(InitStage.Choice)
-                    {
-                        Outcome = outcome,
-                        RunId = _values.GetOrDefault("telemetry.init.run_id", null),
-                        RunType = _values.GetOrDefault("telemetry.init.run_type", null),
-                        DurationInMs = timeTaken.TotalMilliseconds,
-                        Error  = ex?.Message
-                    },
-                CancellationToken.None);
+                return Outcome.Success;
+            },
+            (outcome, ex, timeTaken) => choices.ElementAtOrDefault(selected)?.Metadata == "standalone"
+                ? null
+                : new InitTelemetryEvent(InitStage.Choice)
+                {
+                    Outcome = outcome,
+                    RunId = _values.GetOrDefault("telemetry.init.run_id", null),
+                    RunType = _values.GetOrDefault("telemetry.init.run_type", null),
+                    DurationInMs = timeTaken.TotalMilliseconds,
+                    Error  = ex?.Message
+                });
 
             if (outcome == Outcome.Success)
             {
@@ -336,8 +329,7 @@ namespace Azure.AI.Details.Common.CLI
             };
 
             int picked = -1;
-
-            var outcome = Program.Telemetry.WrapWithTelemetry(() =>
+            var outcome = Program.Telemetry.Wrap(() =>
                 {
                     picked = ListBoxPicker.PickIndexOf(choices.Select(e => e.DisplayName).ToArray());
                     if (picked < 0)
@@ -357,8 +349,7 @@ namespace Azure.AI.Details.Common.CLI
                     Selected = choices.ElementAtOrDefault(picked)?.Metadata,
                     DurationInMs = timeTaken.TotalMilliseconds,
                     Error  = ex?.Message
-                },
-                CancellationToken.None);
+                });
 
             if (outcome == Outcome.Success)
             {
@@ -401,18 +392,17 @@ namespace Azure.AI.Details.Common.CLI
             }
         }
 
-        private Task DoInitSubscriptionId(bool interactive)
+        private Task<string> DoInitSubscriptionId(bool interactive)
         {
-            string subscriptionId = null;
-
-            return Program.Telemetry.WrapWithTelemetryAsync(
-                async token =>
+            return Program.Telemetry.WrapAsync(
+                async () =>
                 {
                     var subscriptionFilter = SubscriptionToken.Data().GetOrDefault(_values, "");
-                    subscriptionId = await AzCliConsoleGui.PickSubscriptionIdAsync(interactive, interactive, subscriptionFilter);
+                    string subscriptionId = await AzCliConsoleGui.PickSubscriptionIdAsync(interactive, interactive, subscriptionFilter);
                     SubscriptionToken.Data().Set(_values, subscriptionId);
+                    return subscriptionId;
                 },
-                (outcome, ex, timeTaken) => new InitTelemetryEvent(InitStage.Subscription)
+                (outcome, subscriptionId, ex, timeTaken) => new InitTelemetryEvent(InitStage.Subscription)
                 {
                     Outcome = outcome,
                     //Selected = subscriptionId, // TODO PRIVACY REVIEW: can include this?
@@ -420,8 +410,7 @@ namespace Azure.AI.Details.Common.CLI
                     RunType = _values.GetOrDefault("telemetry.init.run_type", null),
                     DurationInMs = timeTaken.TotalMilliseconds,
                     Error = ex?.Message
-                },
-                CancellationToken.None);
+                });
         }
 
         private async Task DoInitRootHubResource(bool interactive)
@@ -434,26 +423,21 @@ namespace Azure.AI.Details.Common.CLI
 
         private Task DoInitHubResource(bool interactive)
         {
-            AiHubResourceInfo hubResource = default;
-            bool createdNewHub = false;
-
-            return Program.Telemetry.WrapWithTelemetryAsync(
-                async token =>
+            return Program.Telemetry.WrapAsync(
+                () =>
                 {
                     var subscription = SubscriptionToken.Data().GetOrDefault(_values, "");
-                    (hubResource, createdNewHub) = await AiSdkConsoleGui.PickOrCreateAiHubResource(_values, subscription)
-                        .ConfigureAwait(false);
+                    return AiSdkConsoleGui.PickOrCreateAiHubResource(_values, subscription);
                 },
-                (outcome, ex, timeTaken) => new InitTelemetryEvent(InitStage.Resource)
+                (outcome, res, ex, timeTaken) => new InitTelemetryEvent(InitStage.Resource)
                 {
                     Outcome = outcome,
                     RunId = _values.GetOrDefault("telemetry.init.run_id", null),
                     RunType = _values.GetOrDefault("telemetry.init.run_type", null),
-                    Selected = createdNewHub ? "new" : "existing",
+                    Selected = res.Item2 ? "new" : "existing",
                     DurationInMs = timeTaken.TotalMilliseconds,
                     Error = ex?.Message
-                },
-                CancellationToken.None);
+                });
         }
 
         private async Task DoInitRootProject(bool interactive, bool allowCreate = true, bool allowPick = true)
@@ -484,7 +468,7 @@ namespace Azure.AI.Details.Common.CLI
             // since they directly choose a project. So we add back this missing telemetry event here
             if (!allowCreate && allowPick)
             {
-                _ = Program.Telemetry.LogEventAsync(new InitTelemetryEvent(InitStage.Resource)
+                Program.Telemetry.LogEvent(new InitTelemetryEvent(InitStage.Resource)
                 {
                     Outcome = Outcome.Success,
                     Selected = "project",
@@ -495,12 +479,9 @@ namespace Azure.AI.Details.Common.CLI
             }
 
             bool createdNew = false;
-            AiHubProjectInfo project = default;
-            Program.Telemetry.WrapWithTelemetry(() =>
-                {
-                    project = AiSdkConsoleGui.PickOrCreateAiHubProject(allowCreate, allowPick, _values, subscription, resourceId, out createdNew);
-                },
-                (outcome, ex, timeTaken) => new InitTelemetryEvent(InitStage.Project)
+            AiHubProjectInfo project = Program.Telemetry.Wrap(
+                () => AiSdkConsoleGui.PickOrCreateAiHubProject(allowCreate, allowPick, _values, subscription, resourceId, out createdNew),
+                (outcome, project, ex, timeTaken) => new InitTelemetryEvent(InitStage.Project)
                 {
                     Outcome = outcome,
                     Selected = createdNew ? "new" : "existing",
@@ -508,8 +489,7 @@ namespace Azure.AI.Details.Common.CLI
                     RunType = _values.GetOrDefault("telemetry.init.run_type", null),
                     DurationInMs = timeTaken.TotalMilliseconds,
                     Error = ex?.Message
-                },
-                CancellationToken.None);
+                });
 
             // TODO FIXME: There was a bug in the what used to one method call that was split into two. Namely when allowCreate == true and allowPick == false,
             //             createdNew would not be correctly to true. The ConfigAiHubProject relies on this bug so restore this broken behaviour here.

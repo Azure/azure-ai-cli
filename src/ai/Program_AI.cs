@@ -57,11 +57,11 @@ namespace Azure.AI.Details.Common.CLI
             {
                 if (data?.Telemetry != null)
                 {
-                    await data.Telemetry.LogEventAsync(new ExitedTelemetryEvent()
+                    data.Telemetry.LogEvent(new ExitedTelemetryEvent()
                     {
                         ExitCode = exitCode,
                         Elapsed = stopwatch.Elapsed
-                    }).ConfigureAwait(false);
+                    });
 
                     await data.Telemetry.DisposeAsync()
                         .ConfigureAwait(false);

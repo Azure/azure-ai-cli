@@ -23,7 +23,7 @@ namespace Azure.AI.Details.Common.CLI
         {
             _data = data;
 
-            var __ = _data.Telemetry.LogEventAsync(new LaunchedTelemetryEvent());
+            Program.Telemetry.LogEvent(new LaunchedTelemetryEvent());
 
             var screen = ConsoleGui.Screen.Current;
             Console.OutputEncoding = Encoding.UTF8;
@@ -426,7 +426,7 @@ namespace Azure.AI.Details.Common.CLI
             }
             finally
             {
-                var _ = _data?.Telemetry?.LogEventAsync(new CommandTelemetryEvent()
+                _data?.Telemetry?.LogEvent(new CommandTelemetryEvent()
                 {
                     Type = values.GetCommand("unknown"),
                     Outcome = outcome,
