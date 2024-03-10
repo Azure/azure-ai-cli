@@ -96,6 +96,10 @@ namespace Azure.AI.Details.Common.CLI
                 new NamedValueTokenParser(null, "init.embeddings.model.deployment.name", "01010", "1"),
                 new NamedValueTokenParser(null, "init.evaluation.model.deployment.name", "01010", "1"),
 
+                new NamedValueTokenParser(null, "init.chat.model.name", "0110;0010", "1"),
+                new NamedValueTokenParser(null, "init.embeddings.model.name", "0110", "1"),
+                new NamedValueTokenParser(null, "init.evaluation.model.name", "0110", "1"),
+
                 new NamedValueTokenParser(null, "init.output.env.file", "0110", "1;0", "true;false", null, "true"),
 
                 new NamedValueTokenParser("--interactive", "init.service.interactive", "001", "1;0", "true;false", null, "true")

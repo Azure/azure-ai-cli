@@ -408,7 +408,7 @@ namespace Azure.AI.Details.Common.CLI
 
         private async Task DoInitRootOpenAi(bool interactive, bool skipChat = false, bool allowSkipChat = true, bool skipEmbeddings = false, bool allowSkipEmbeddings = true, bool skipEvaluations = false, bool allowSkipEvaluations = true)
         {
-            if (!interactive) ThrowInteractiveNotSupportedApplicationException(); // POST-IGNITE: TODO: Add back non-interactive mode support
+            // if (!interactive) ThrowInteractiveNotSupportedApplicationException(); // POST-IGNITE: TODO: Add back non-interactive mode support
 
             await DoInitSubscriptionId(interactive);
             await DoInitOpenAi(interactive, skipChat, allowSkipChat, skipEmbeddings, allowSkipEmbeddings, skipEvaluations, allowSkipEvaluations);
@@ -428,7 +428,11 @@ namespace Azure.AI.Details.Common.CLI
             var embeddingsDeploymentFilter = _values.GetOrDefault("init.embeddings.model.deployment.name", "");
             var evaluationsDeploymentFilter = _values.GetOrDefault("init.evaluation.model.deployment.name", "");
 
-            var resource = await AzCliConsoleGui.PickOrCreateAndConfigCognitiveServicesOpenAiKindResource(interactive, subscriptionId, regionFilter, groupFilter, resourceFilter, kind, sku, yes, skipChat, allowSkipChat, skipEmbeddings, allowSkipEmbeddings, skipEvaluations, allowSkipEvaluations, chatDeploymentFilter, embeddingsDeploymentFilter, evaluationsDeploymentFilter);
+            var chatModelFilter = _values.GetOrDefault("init.chat.model.name", "");
+            var embeddingsModelFilter = _values.GetOrDefault("init.embeddings.model.name", "");
+            var evaluationsModelFilter = _values.GetOrDefault("init.evaluation.model.name", "");
+            
+            var resource = await AzCliConsoleGui.PickOrCreateAndConfigCognitiveServicesOpenAiKindResource(interactive, subscriptionId, regionFilter, groupFilter, resourceFilter, kind, sku, yes, skipChat, allowSkipChat, skipEmbeddings, allowSkipEmbeddings, skipEvaluations, allowSkipEvaluations, chatDeploymentFilter, embeddingsDeploymentFilter, evaluationsDeploymentFilter, chatModelFilter, embeddingsModelFilter, evaluationsModelFilter);
             _values.Reset("service.openai.deployments.picked", "true");
 
             SubscriptionToken.Data().Set(_values, subscriptionId);

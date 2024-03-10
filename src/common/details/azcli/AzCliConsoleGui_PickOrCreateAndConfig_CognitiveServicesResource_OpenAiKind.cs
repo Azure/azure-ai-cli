@@ -36,7 +36,10 @@ namespace Azure.AI.Details.Common.CLI
             bool allowSkipEvaluations = true,
             string chatDeploymentFilter = null,
             string embeddingsDeploymentFilter = null,
-            string evaluationsDeploymentFilter = null)
+            string evaluationsDeploymentFilter = null,
+            string chatModelFilter = null,
+            string embeddingsModelFilter = null,
+            string evaluationsModelFilter = null)
         {
             kinds ??= "OpenAI;AIServices";
             var sectionHeader = "AZURE OPENAI RESOURCE";
@@ -52,12 +55,15 @@ namespace Azure.AI.Details.Common.CLI
                 skipChat,
                 allowSkipChat,
                 chatDeploymentFilter,
+                chatModelFilter,
                 skipEmbeddings,
                 allowSkipEmbeddings,
                 embeddingsDeploymentFilter,
+                embeddingsModelFilter,
                 skipEvaluations,
                 allowSkipEvaluations,
-                evaluationsDeploymentFilter);
+                evaluationsDeploymentFilter,
+                evaluationsModelFilter);
 
             return new AzCli.CognitiveServicesResourceInfoEx
             {
@@ -83,21 +89,24 @@ namespace Azure.AI.Details.Common.CLI
                 bool skipChat = false,
                 bool allowSkipChat = true,
                 string chatDeploymentFilter = null,
+                string chatModelFilter = null,
                 bool skipEmbeddings = true,
                 bool allowSkipEmbeddings = true,
                 string embeddingsDeploymentFilter = null,
+                string embeddingsModelFilter = null,
                 bool skipEvaluations = true,
                 bool allowSkipEvaluations = true,
-                string evaluationsDeploymentFilter = null)
+                string evaluationsDeploymentFilter = null,
+                string evaluationsModelFilter = null)
         {
             var chatDeployment = !skipChat
-                ? await AzCliConsoleGui.PickOrCreateCognitiveServicesResourceDeployment(interactive, allowSkipChat, "Chat", subscriptionId, resource.Group, resource.RegionLocation, resource.Name, chatDeploymentFilter)
+                ? await AzCliConsoleGui.PickOrCreateCognitiveServicesResourceDeployment(interactive, allowSkipChat, "Chat", subscriptionId, resource.Group, resource.RegionLocation, resource.Name, chatDeploymentFilter, chatModelFilter)
                 : null;
             var embeddingsDeployment = !skipEmbeddings
-                ? await AzCliConsoleGui.PickOrCreateCognitiveServicesResourceDeployment(interactive, allowSkipEmbeddings, "Embeddings", subscriptionId, resource.Group, resource.RegionLocation, resource.Name, embeddingsDeploymentFilter)
+                ? await AzCliConsoleGui.PickOrCreateCognitiveServicesResourceDeployment(interactive, allowSkipEmbeddings, "Embeddings", subscriptionId, resource.Group, resource.RegionLocation, resource.Name, embeddingsDeploymentFilter, embeddingsModelFilter)
                 : null;
             var evaluationDeployment = !skipEvaluations
-                ? await AzCliConsoleGui.PickOrCreateCognitiveServicesResourceDeployment(interactive, allowSkipEvaluations, "Evaluation", subscriptionId, resource.Group, resource.RegionLocation, resource.Name, evaluationsDeploymentFilter)
+                ? await AzCliConsoleGui.PickOrCreateCognitiveServicesResourceDeployment(interactive, allowSkipEvaluations, "Evaluation", subscriptionId, resource.Group, resource.RegionLocation, resource.Name, evaluationsDeploymentFilter, evaluationsModelFilter)
                 : null;
 
             var keys = await AzCliConsoleGui.LoadCognitiveServicesResourceKeys(sectionHeader, subscriptionId, resource);
