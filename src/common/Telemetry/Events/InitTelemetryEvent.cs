@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using System.Diagnostics;
+using System.Text;
 
 namespace Azure.AI.Details.Common.CLI.Telemetry.Events
 {
@@ -61,6 +62,7 @@ namespace Azure.AI.Details.Common.CLI.Telemetry.Events
     /// Represents details about the init command. This is used to generate (pseudo-)funnels in the dashboards to get an
     /// idea of where end users are encountering issues or giving up
     /// </summary>
+    [DebuggerDisplay("{Name}: {Stage} {Outcome} {Selected}")]
     public readonly struct InitTelemetryEvent : ITelemetryEvent
     {
         /// <summary>

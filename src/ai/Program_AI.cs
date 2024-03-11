@@ -40,12 +40,6 @@ namespace Azure.AI.Details.Common.CLI
                     Console.WriteLine($"StopWatch: Stopped at {DateTime.Now} ({GetStopWatchElapsedAsString(stopwatch.Elapsed)})");
                 }
 
-                if (data.Telemetry != null)
-                {
-                    await data.Telemetry.DisposeAsync()
-                        .ConfigureAwait(false);
-                }
-
                 return exitCode;
             }
             catch (Exception)
