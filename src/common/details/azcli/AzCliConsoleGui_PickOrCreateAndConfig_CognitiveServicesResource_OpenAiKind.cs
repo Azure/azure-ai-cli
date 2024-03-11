@@ -84,7 +84,6 @@ namespace Azure.AI.Details.Common.CLI
             AzCli.CognitiveServicesDeploymentInfo? chatDeployment = null, embeddingsDeployment = null, evaluationDeployment = null;
             var token = CancellationToken.None;
 
-            // TODO FIXME Telemetry events should not be raised from here. Will be addressed in future refactor
             (chatDeployment, createdNew) = await Program.Telemetry.WrapAsync(
                 () => PickOrCreateCognitiveServicesResourceDeployment(interactive, allowSkipDeployments, "Chat", subscriptionId, resource.Group, resource.RegionLocation, resource.Name, chatDeploymentFilter),
                 (outcome, res, ex, timeTaken) => CreateInitDeploymentTelemetryEvent(values, InitStage.Chat, outcome, ex, timeTaken, res))
