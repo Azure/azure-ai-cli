@@ -8,6 +8,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.IO;
+using System.ComponentModel;
+using System.Xml.Linq;
 
 namespace Azure.AI.Details.Common.CLI
 {
@@ -54,6 +56,25 @@ namespace Azure.AI.Details.Common.CLI
                 throw new Exception(values["error"]);
             }
             return value;
+        }
+
+        public static TVal GetOrAdd<TVal>(this INamedValues values, string name, Func<TVal> creator)
+        {
+            var converter = TypeDescriptor.GetConverter(typeof(TVal));
+
+            // TODO Should we have a TryGet pattern instead to avoid double lookups?
+            if (values.Contains(name, true))
+            {
+                string stringValue = values[name];
+                return (TVal)converter.ConvertFromInvariantString(stringValue);
+            }
+            else
+            {
+                TVal val = creator();
+                string stringValue = converter.ConvertToInvariantString(val);
+                values.Add(name, stringValue);
+                return val;
+            }
         }
 
         public static string ReplaceValues(this string s, INamedValues values)

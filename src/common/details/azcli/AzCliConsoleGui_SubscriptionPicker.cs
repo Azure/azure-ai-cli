@@ -53,9 +53,25 @@ namespace Azure.AI.Details.Common.CLI
             return subscription.Value;
         }
 
-        public static async Task<AzCli.SubscriptionInfo?> ValidateSubscriptionAsync(bool allowInteractiveLogin, string subscriptionFilter, string subscriptionLabel)
+        public static async Task<AzCli.SubscriptionInfo?> ValidateSubscriptionAsync(bool allowInteractiveLogin, string subscriptionId)
         {
-            return await FindSubscriptionAsync(allowInteractiveLogin, false, subscriptionFilter, subscriptionLabel);
+            var allSubscriptions = await LoginHelpers.GetResponseOnLogin(allowInteractiveLogin, "subscription", AzCli.ListAccounts, "  SUBSCRIPTION");
+            var subscription = allSubscriptions
+                .Payload
+                .FirstOrDefault(subs => string.Equals(subs.Id, subscriptionId, StringComparison.OrdinalIgnoreCase));
+
+            bool found = !string.IsNullOrWhiteSpace(subscription.Id);
+            if (found)
+            {
+                Console.WriteLine($"{subscription.Name} ({subscription.Id})");
+                CacheSubscriptionUserName(subscription);
+                return subscription;
+            }
+            else
+            {
+                ConsoleHelpers.WriteLineWithHighlight($"`#e_;WARNING: Could not find subscription {subscriptionId}!`");
+                return null;
+            }
         }
 
         private static async Task<AzCli.SubscriptionInfo?> FindSubscriptionAsync(bool allowInteractiveLogin, bool allowInteractivePickSubscription, string subscriptionFilter = null, string subscriptionLabel = "Subscription")
@@ -90,10 +106,11 @@ namespace Azure.AI.Details.Common.CLI
 
             if (subscriptions.Count() == 0)
             {
-                ConsoleHelpers.WriteLineError(response.Payload.Count() > 0
-                    ? "*** No matching subscriptions found ***"
-                    : "*** No subscriptions found ***");
-                return null;
+                string error = response.Payload.Count() > 0
+                    ? "No matching subscriptions found"
+                    : "No subscriptions found";
+                ConsoleHelpers.WriteLineError($"*** {error} ***");
+                throw new ApplicationException(error);
             }
             else if (subscriptions.Count() == 1)
             {
@@ -104,10 +121,11 @@ namespace Azure.AI.Details.Common.CLI
             }
             else if (!allowInteractivePickSubscription)
             {
-                ConsoleHelpers.WriteLineError("*** More than 1 subscription found ***");
+                string error = "More than 1 subscription found";
+                ConsoleHelpers.WriteLineError($"*** { error } ***");
                 Console.WriteLine();
                 DisplaySubscriptions(subscriptions, "  ");
-                return null;
+                throw new ApplicationException(error);
             }
 
             return ListBoxPickSubscription(subscriptions);
@@ -121,7 +139,7 @@ namespace Azure.AI.Details.Common.CLI
             var picked = ListBoxPicker.PickIndexOf(list, defaultIndex);
             if (picked < 0)
             {
-                return null;
+                throw new OperationCanceledException("User canceled");
             }
 
             var subscription = subscriptions[picked];
