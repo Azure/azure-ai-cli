@@ -49,15 +49,17 @@
         supported here. Thus need to check for each possible 8.x SDK folder and
         if none is found then install the configured (highest) 8.x version.
         -->
+        <util:DirectorySearch Id="DotNet80202" Path="[ProgramFiles64Folder]dotnet\sdk\8.0.202" Result="exists" Variable="NET_80202"/>
         <util:DirectorySearch Id="DotNet80201" Path="[ProgramFiles64Folder]dotnet\sdk\8.0.201" Result="exists" Variable="NET_80201"/>
         <util:DirectorySearch Id="DotNet80200" Path="[ProgramFiles64Folder]dotnet\sdk\8.0.200" Result="exists" Variable="NET_80200"/>
+        <util:DirectorySearch Id="DotNet80103" Path="[ProgramFiles64Folder]dotnet\sdk\8.0.103" Result="exists" Variable="NET_80103"/>
         <util:DirectorySearch Id="DotNet80102" Path="[ProgramFiles64Folder]dotnet\sdk\8.0.102" Result="exists" Variable="NET_80102"/>
         <util:DirectorySearch Id="DotNet80101" Path="[ProgramFiles64Folder]dotnet\sdk\8.0.101" Result="exists" Variable="NET_80101"/>
         <util:DirectorySearch Id="DotNet80100" Path="[ProgramFiles64Folder]dotnet\sdk\8.0.100" Result="exists" Variable="NET_80100"/>
 
         <PackageGroup Id="DotNetSdk">
             <ExePackage Compressed="no"
-                        DetectCondition="NET_80201 OR NET_80200 OR NET_80102 OR NET_80101 OR NET_80100"
+                        DetectCondition="NET_80202 OR NET_80201 OR NET_80200 OR NET_80103 OR NET_80102 OR NET_80101 OR NET_80100"
                         DownloadUrl="$(var.dotNetUrl)"
                         InstallCommand="/quiet /norestart"
                         PerMachine="yes"
