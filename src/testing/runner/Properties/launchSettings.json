@@ -1,8 +1,0 @@
-{
-  "profiles": {
-    "YamlTestRunner": {
-      "commandName": "Project",
-      "commandLineArgs": "list --file D:\\git\\azure-ai-cli\\tests\\test3.yaml"
-    }
-  }
-}

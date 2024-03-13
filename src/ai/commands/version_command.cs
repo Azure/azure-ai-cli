@@ -36,7 +36,10 @@ namespace Azure.AI.Details.Common.CLI
 
             switch (command)
             {
-                case "version": DoVersion(); break;
+                case "version":
+                case "update":
+                    DoVersionUpdate();
+                    break;
 
                 default:
                     _values.AddThrowError("WARNING:", $"'{command.Replace('.', ' ')}' NOT YET IMPLEMENTED!!");
@@ -86,7 +89,7 @@ namespace Azure.AI.Details.Common.CLI
         // OutputHelper _output = null;
         // DisplayHelper _display = null;
 
-        private void DoVersion()
+        private void DoVersionUpdate()
         {
             // Handled by adding "display.help" to values in parser
         }

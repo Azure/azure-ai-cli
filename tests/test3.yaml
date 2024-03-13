@@ -10,12 +10,6 @@
       embeddings-deployment-name: text-embedding-ada-002-2
       evaluation-deployment-name: gpt-4-32k-0613
       interactive: false
-  - name: ai init speech
-    command: ai init speech
-    arguments:
-      subscription: e72e5254-f265-4e95-9bd2-9ee8e7329051
-      name: robch-cranky-red-koala-ais
-      interactive: false
 
 - name: test ai chat
   command: ai chat --question "Why is the sky blue, what's it called" --index-name @none
@@ -25,12 +19,12 @@
   command: ai chat --interactive --built-in-functions
   input: |
     Create a file named "test.txt" with the following content: "Hello, World!"
-    What files are in the current directory?
+    What text files are in the current directory?
     Show me what's in the file "test.txt"
     exit
   expect: |
     assistant-function: CreateFileAndSaveText
-    assistant-function: FindAllFilesInCurrentDirectory
+    assistant-function: FindAllFilesMatchingPattern
     test.txt
     Hello, World!
 

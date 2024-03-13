@@ -3,15 +3,11 @@
 // Licensed under the MIT license. See LICENSE.md file in the project root for full license information.
 //
 
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.IO;
-using System.Linq;
 using System.Reflection;
-using System.Runtime.InteropServices;
 using System.Text;
 using System.Text.Json;
+using Azure.AI.Details.Common.CLI.Telemetry;
+using Azure.AI.Details.Common.CLI.Telemetry.Events;
 using System.Threading.Tasks;
 
 namespace Azure.AI.Details.Common.CLI
@@ -20,9 +16,14 @@ namespace Azure.AI.Details.Common.CLI
     {
         public static bool Debug { get; internal set; }
 
+        private static int usingResource = 0;
+        private static string updateMessage = "";
+
         public static int Main(IProgramData data, string[] mainArgs)
         {
             _data = data;
+
+            Program.Telemetry.LogEvent(new LaunchedTelemetryEvent());
 
             var screen = ConsoleGui.Screen.Current;
             Console.OutputEncoding = Encoding.UTF8;
@@ -38,15 +39,21 @@ namespace Azure.AI.Details.Common.CLI
             ICommandValues values = new CommandValues();
             INamedValueTokens tokens = new CmdLineTokenSource(mainArgs, values);
 
-            var exitCode = ParseCommand(tokens, values);
+            int exitCode = ParseCommand(tokens, values);
             if (exitCode == 0 && !values.DisplayHelpRequested())
             {
-                if (!values.DisplayVersionRequested())
+                if (!values.DisplayVersionRequested() && !values.DisplayUpdateRequested())
                 {
+                    _ = Task.Run(() => DisplayVersion(values, true));
                     DisplayBanner(values);
                     DisplayParsedValues(values);
                 }
                 exitCode = RunCommand(values) ? 0 : 1;
+                var updateMessage = GetUpdateMessage();
+                if (!String.IsNullOrEmpty(updateMessage))
+                {
+                    ConsoleHelpers.WriteLineWithHighlight(updateMessage);
+                }
             }
 
             if (values.GetOrDefault("x.pause", false))
@@ -125,6 +132,31 @@ namespace Azure.AI.Details.Common.CLI
             return $"{Program.Name.ToUpper()} - {Program.DisplayName}" + version;
         }
 
+        private static string GetUpdateMessage()
+        {
+            string message = "";
+            //0 indicates that the method is not in use.
+            if(0 == Interlocked.Exchange(ref usingResource, 1))
+            {
+                message = updateMessage;
+            
+                //Release the lock
+                Interlocked.Exchange(ref usingResource, 0);
+            }
+            return message;
+        }
+
+        private static void SetUpdateMessage(string message)
+        {
+            if(0 == Interlocked.Exchange(ref usingResource, 1))
+            {
+                updateMessage = message;
+            
+                //Release the lock
+                Interlocked.Exchange(ref usingResource, 0);
+            }
+        }
+
         private static void DisplayBanner(ICommandValues values)
         {
             if (values.GetOrDefault("x.quiet", false)) return;
@@ -168,29 +200,45 @@ namespace Azure.AI.Details.Common.CLI
             HelpCommandParser.DisplayHelp(tokens, values);
         }
 
-        public static void DisplayVersion(INamedValues values)
+        public static void DisplayVersion(INamedValues values, bool setUpdateMessage = false)
         {
             var currentVersion = GetVersionFromAssembly().Split("-")[0];
-            Console.WriteLine(currentVersion); 
 
-            var latestVersion = HttpHelpers.GetLatestVersionInfo(values, "version");
+            if (!setUpdateMessage)
+            {
+                Console.WriteLine(values.DisplayUpdateRequested() ? 
+                    $"Current Version: {currentVersion}"
+                    : currentVersion); 
+            }
+
+            var domain = values.DisplayUpdateRequested() ? "update" : "version";
+            var latestVersion = HttpHelpers.GetLatestVersionInfo(values, domain);
             if (latestVersion != null)
             {
                 var currentVersionNumbers = currentVersion.Split(".");
                 var latestVersionNumbers = latestVersion.Split("-")[0].Split(".");
-                if (updateNeeded(currentVersionNumbers, latestVersionNumbers))
+                if (StringHelpers.UpdateNeeded(currentVersionNumbers, latestVersionNumbers))
                 {
-                    Console.WriteLine($"\nUpdate available, Latest Version: {latestVersion}"); 
+                    var line1 = $"\n`#e_;Update available, Latest Version: {latestVersion}`\n";
+                    var line2 = @"Go to `#e0;https://aka.ms/azure-ai-cli-update` for more information.";
+                    if (setUpdateMessage)
+                    {
+                        SetUpdateMessage(line1 + line2);
+                    }
+                    else
+                    {
+                        ConsoleHelpers.WriteLineWithHighlight(line1);
+                        ConsoleHelpers.WriteLineWithHighlight(line2); 
+                    }
+                    return;
                 }
+            }
+            if (values.DisplayUpdateRequested())
+            {
+                Console.WriteLine("No update available"); 
             }
         }
 
-        private static bool updateNeeded(string[] current, string[] latest)
-        {
-            return Int32.Parse(current[0]) < Int32.Parse(latest[0])
-                || Int32.Parse(current[1]) < Int32.Parse(latest[1])
-                || Int32.Parse(current[2]) < Int32.Parse(latest[2]);
-        }
 
         private static void DisplayParsedValues(INamedValues values)
         {
@@ -287,7 +335,7 @@ namespace Azure.AI.Details.Common.CLI
                 DisplayCommandHelp(tokens, values);
                 return values.GetOrDefault("display.help.exit.code", 0);
             }
-            else if (values.DisplayVersionRequested())
+            else if (values.DisplayVersionRequested() || values.DisplayUpdateRequested())
             {
                 DisplayVersion(values);
                 return 0;
@@ -346,14 +394,47 @@ namespace Azure.AI.Details.Common.CLI
 
         private static bool RunCommand(ICommandValues values)
         {
-            bool passed = false;
+            string errorInfo = null;
+            var outcome = Outcome.Unknown;
 
-            TryCatchErrorOrException(values, () =>
+            try
             {
-                passed = CommandRunDispatcher.DispatchRunCommand(values);
-            });
+                bool success = CommandRunDispatcher.DispatchRunCommand(values);
+                if (success)
+                {
+                    outcome = Outcome.Success;
+                }
+                else
+                {
+                    outcome = Outcome.Failed;
+                    errorInfo = $"Failed while running '{values.GetCommand()}' command";
+                }
+            }
+            catch (OperationCanceledException ex)
+            {
+                errorInfo = "Timed out";
+                outcome = Outcome.TimedOut;
 
-            return passed;
+                DisplayErrorOrException(values, ex);
+            }
+            catch (Exception ex)
+            {
+                errorInfo = ex.Message;
+                outcome = Outcome.Failed;
+
+                DisplayErrorOrException(values, ex);
+            }
+            finally
+            {
+                _data?.Telemetry?.LogEvent(new CommandTelemetryEvent()
+                {
+                    Type = values.GetCommand("unknown"),
+                    Outcome = outcome,
+                    ErrorInfo = errorInfo
+                });
+            }
+
+            return outcome == Outcome.Success;
         }
 
         private static IProgramData _data;
@@ -398,5 +479,7 @@ namespace Azure.AI.Details.Common.CLI
         public static bool DisplayKnownErrors(ICommandValues values, Exception ex) => _data != null && _data.DisplayKnownErrors(values, ex);
 
         public static IEventLoggerHelpers EventLoggerHelpers => _data?.EventLoggerHelpers;
+
+        public static ITelemetry Telemetry => _data.Telemetry;
     }
 }

@@ -1,3 +1,8 @@
+//
+// Copyright (c) Microsoft. All rights reserved.
+// Licensed under the MIT license. See LICENSE.md file in the project root for full license information.
+//
+
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -74,6 +79,7 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
             var expect = YamlTestProperties.Get(test, "expect");
             var expectGpt = YamlTestProperties.Get(test, "expect-gpt");
             var notExpect = YamlTestProperties.Get(test, "not-expect");
+            var env = YamlTestProperties.Get(test, "env");
             var workingDirectory = YamlTestProperties.Get(test, "working-directory");
             var timeout = int.Parse(YamlTestProperties.Get(test, "timeout"));
             var simulate = YamlTestProperties.Get(test, "simulate");
@@ -92,8 +98,8 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
                 var start = DateTime.Now;
 
                 var outcome = string.IsNullOrEmpty(simulate)
-                    ? RunTestCase(test, skipOnFailure, cli, command, script, scriptIsBash, foreachItem, arguments, input, expect, expectGpt, notExpect, workingDirectory, timeout, out string stdOut, out string stdErr, out string errorMessage, out string stackTrace, out string additional, out string debugTrace)
-                    : SimulateTestCase(test, simulate, cli, command, script, scriptIsBash, foreachItem, arguments, input, expect, expectGpt, notExpect, workingDirectory, out stdOut, out stdErr, out errorMessage, out stackTrace, out additional, out debugTrace);
+                    ? RunTestCase(test, skipOnFailure, cli, command, script, scriptIsBash, foreachItem, arguments, input, expect, expectGpt, notExpect, env, workingDirectory, timeout, out string stdOut, out string stdErr, out string errorMessage, out string stackTrace, out string additional, out string debugTrace)
+                    : SimulateTestCase(test, simulate, cli, command, script, scriptIsBash, foreachItem, arguments, input, expect, expectGpt, notExpect, env, workingDirectory, out stdOut, out stdErr, out errorMessage, out stackTrace, out additional, out debugTrace);
 
                 // #if DEBUG
                 // additional += outcome == TestOutcome.Failed ? $"\nEXTRA: {ExtraDebugInfo()}" : "";
@@ -212,7 +218,7 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
             return dup;
         }
 
-        private static TestOutcome RunTestCase(TestCase test, bool skipOnFailure, string cli, string command, string script, bool scriptIsBash, string @foreach, string arguments, string input, string expect, string expectGpt, string notExpect, string workingDirectory, int timeout, out string stdOut, out string stdErr, out string errorMessage, out string stackTrace, out string additional, out string debugTrace)
+        private static TestOutcome RunTestCase(TestCase test, bool skipOnFailure, string cli, string command, string script, bool scriptIsBash, string @foreach, string arguments, string input, string expect, string expectGpt, string notExpect, string env, string workingDirectory, int timeout, out string stdOut, out string stdErr, out string errorMessage, out string stackTrace, out string additional, out string debugTrace)
         {
             var outcome = TestOutcome.None;
 
@@ -251,6 +257,7 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
                     RedirectStandardOutput = true,
                     WorkingDirectory = workingDirectory
                 };
+                UpdateEnvironment(startInfo, env);
                 UpdatePathEnvironment(startInfo);
 
                 var process = Process.Start(startInfo);
@@ -594,6 +601,18 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
             return new string[]{ "" };
         }
 
+        private static void UpdateEnvironment(ProcessStartInfo startInfo, string envAsMultiLineString)
+        {
+            var ok = !string.IsNullOrEmpty(envAsMultiLineString);
+            if (!ok) return;
+            
+            var env = YamlEnvHelpers.GetEnvironmentFromMultiLineString(envAsMultiLineString);
+            foreach (var item in env)
+            {
+                startInfo.Environment[item.Key] = item.Value;
+            }
+        }
+
         static void UpdatePathEnvironment(ProcessStartInfo startInfo)
         {
             var cli = new FileInfo(startInfo.FileName);
@@ -785,7 +804,7 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
             return args.ToString().TrimEnd();
         }
 
-        private static TestOutcome SimulateTestCase(TestCase test, string simulate, string cli, string command, string script, bool scriptIsBash, string @foreach, string arguments, string input, string expect, string expectGpt, string notExpect, string workingDirectory, out string stdOut, out string stdErr, out string errorMessage, out string stackTrace, out string additional, out string debugTrace)
+        private static TestOutcome SimulateTestCase(TestCase test, string simulate, string cli, string command, string script, bool scriptIsBash, string @foreach, string arguments, string input, string expect, string expectGpt, string notExpect, string env, string workingDirectory, out string stdOut, out string stdErr, out string errorMessage, out string stackTrace, out string additional, out string debugTrace)
         {
             var sb = new StringBuilder();
             sb.AppendLine($"cli='{cli?.Replace("\n", "\\n")}'");

@@ -1376,7 +1376,7 @@ namespace Azure.AI.Details.Common.CLI
             return CheckDotDirectory(GetAppDataDir(), mustExist, createIfDoesnt);
         }
 
-        private static string GetUserConfigDotDir(bool mustExist = true, bool createIfDoesnt = false)
+        internal static string GetUserConfigDotDir(bool mustExist = true, bool createIfDoesnt = false)
         {
             return CheckDotDirectory(GetAppUserDir(), mustExist, createIfDoesnt);
         }

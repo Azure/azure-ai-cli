@@ -16,6 +16,8 @@ using System.Collections.Generic;
 using System.Net;
 using Newtonsoft.Json.Linq;
 using Azure.AI.Details.Common.CLI.ConsoleGui;
+using Azure.AI.Details.Common.CLI.Telemetry;
+using Azure.AI.Details.Common.CLI.Telemetry.Events;
 
 namespace Azure.AI.Details.Common.CLI
 {
@@ -57,6 +59,7 @@ namespace Azure.AI.Details.Common.CLI
             DisplayInitServiceBanner();
 
             var interactive = _values.GetOrDefault("init.service.interactive", true);
+            var runId = _values.GetOrAdd("telemetry.init.run_id", Guid.NewGuid);
 
             switch (command)
             {
@@ -74,6 +77,7 @@ namespace Azure.AI.Details.Common.CLI
                 case "init.openai": await DoInitRootOpenAi(interactive); break;
                 case "init.search": await DoInitRootSearch(interactive); break;
                 case "init.speech": await DoInitRootSpeech(interactive); break;
+                case "init.vision": await DoInitRootVision(interactive); break;
 
                 // POST-IGNITE: TODO: add ability to init deployments
                 // TODO: ensure that deployments in "openai" flow can be skipped
@@ -108,23 +112,61 @@ namespace Azure.AI.Details.Common.CLI
 
         private async Task DoInitRootVerifyConfigFileAsync(bool interactive, string fileName)
         {
-            ParseConfigJson(fileName, out string subscription, out string groupName, out string projectName);
+            string detail = null;
 
-            var (hubName, openai, search) = await VerifyProjectAsync(interactive, subscription, groupName, projectName);
-            if (openai != null && search != null)
+            bool? useSaved = await Program.Telemetry.WrapAsync<bool?>(async () =>
             {
-                await DoInitRootConfirmVerifiedProjectResources(interactive, subscription, projectName, hubName, openai.Value, search.Value);
-            }
-            else
+                bool success = ParseConfigJson(fileName, out string subscription, out string groupName, out string projectName);
+                if (success)
+                {
+                    var (hubName, openai, search) = await VerifyProjectAsync(interactive, subscription, groupName, projectName);
+                    if (openai != null && search != null)
+                    {
+                        bool? useSaved = await DoInitRootConfirmVerifiedProjectResources(
+                            interactive, subscription, projectName, hubName, openai.Value, search.Value);
+
+                        detail = useSaved.HasValue
+                            ? useSaved == true ? "saved_config" : "something_else"
+                            : null;
+
+                        return useSaved; 
+                    }
+                    else
+                    {
+                        detail = "invalid_config";
+                        return null;
+                    }
+                }
+                else
+                {
+                    detail = "invalid_json";
+                    return null;
+                }
+            },
+            (outcome, useSaved, ex, duration) => new VerifySavedConfigTelemetryEvent()
+            {
+                Outcome = useSaved == null ? Outcome.Failed : outcome,
+                Detail = detail,
+                DurationInMs = duration.TotalMilliseconds,
+                Error = ex?.Message,
+            })
+            .ConfigureAwait(false);
+
+            if (useSaved != true)
             {
                 await DoInitRootMenuPick();
             }
         }
 
-        private async Task<(string, AzCli.CognitiveServicesResourceInfo?, AzCli.CognitiveSearchResourceInfo?)> VerifyProjectAsync(bool interactive, string subscription, string groupName, string projectName)
+        private async Task<(string, AzCli.CognitiveServicesResourceInfo?, AzCli.CognitiveSearchResourceInfo?)> VerifyProjectAsync(bool interactive, string subscriptionId, string groupName, string projectName)
         {
             Console.WriteLine($"  PROJECT: {projectName}");
-            var validated = await AzCliConsoleGui.ValidateSubscriptionAsync(interactive, subscription, "  SUBSCRIPTION");
+
+            var validated = await AzCliConsoleGui.ValidateSubscriptionAsync(interactive, subscriptionId);
+            if (validated == null)
+            {
+                return (null, null, null);
+            }
 
             ConsoleHelpers.WriteLineWithHighlight("\n  `ATTACHED SERVICES AND RESOURCES`\n");
 
@@ -134,7 +176,7 @@ namespace Azure.AI.Details.Common.CLI
             var (hubName, openai, search) = await AiSdkConsoleGui.VerifyResourceConnections(_values, validated?.Id, groupName, projectName);
             if (openai != null && search != null)
             {
-                Console.Write(new string(' ', message.Length + 2) + "\r");
+                Console.Write($"\r{new string(' ', message.Length)}\r");
                 return (hubName, openai, search);
             }
             else
@@ -145,11 +187,10 @@ namespace Azure.AI.Details.Common.CLI
             }
         }
 
-        private async Task DoInitRootConfirmVerifiedProjectResources(bool interactive, string subscription, string projectName, string resourceName, AzCli.CognitiveServicesResourceInfo openaiResource, AzCli.CognitiveSearchResourceInfo searchResource)
+        private async Task<bool?> DoInitRootConfirmVerifiedProjectResources(bool interactive, string subscription, string projectName, string resourceName, AzCli.CognitiveServicesResourceInfo openaiResource, AzCli.CognitiveSearchResourceInfo searchResource)
         {
             ConsoleHelpers.WriteLineWithHighlight($"    AI RESOURCE: {resourceName}");
             ConsoleHelpers.WriteLineWithHighlight($"    AI SEARCH RESOURCE: {searchResource.Name}");
-            // Console.WriteLine();
             ConsoleHelpers.WriteLineWithHighlight($"    AZURE OPENAI RESOURCE: {openaiResource.Name}");
 
             // TODO: If there's a way to get the deployments, get them, and do this... Print correct stuff here... 
@@ -162,24 +203,24 @@ namespace Azure.AI.Details.Common.CLI
             Console.Write($"{label}: ");
 
             var choices = new string[] { $"PROJECT: {projectName}", $"     OR: (Initialize something else)" };
-            var picked = ListBoxPicker.PickIndexOf(choices.ToArray());
+            int picked = ListBoxPicker.PickIndexOf(choices.ToArray());
+
             if (picked < 0)
             {
                 Console.WriteLine($"\r{label}: CANCELED (no selection)");
-                return;
+                return null;
             }
             else if (picked > 0)
             {
                 Console.Write(new string(' ', label.Length + 2) + "\r");
                 Console.WriteLine("  Initializing something else...\n");
-                await DoInitRootMenuPick();
-                return;
+                return false;
             }
             else
             {
                 Console.Write("\r" + new string(' ', label.Length + 2) + "\r");
 
-                var (chatDeployment, embeddingsDeployment, evaluationDeployment, keys) = await AzCliConsoleGui.PickOrCreateAndConfigCognitiveServicesOpenAiKindResourceDeployments("AZURE OPENAI RESOURCE", interactive, true, subscription, openaiResource);
+                await AzCliConsoleGui.PickOrCreateAndConfigCognitiveServicesOpenAiKindResourceDeployments(null, "AZURE OPENAI RESOURCE", interactive, true, subscription, openaiResource);
 
                 var searchKeys = await AzCliConsoleGui.LoadSearchResourceKeys(subscription, searchResource);
                 ConfigSetHelpers.ConfigSearchResource(searchResource.Endpoint, searchKeys.Key1);
@@ -187,6 +228,8 @@ namespace Azure.AI.Details.Common.CLI
                 ConfigSetHelpers.ConfigSet("@subscription", subscription);
                 ConfigSetHelpers.ConfigSet("@project", projectName);
                 ConfigSetHelpers.ConfigSet("@group", openaiResource.Group);
+
+                return true;
             }
         }
 
@@ -211,7 +254,7 @@ namespace Azure.AI.Details.Common.CLI
             return !string.IsNullOrEmpty(subscription) && !string.IsNullOrEmpty(groupName) && !string.IsNullOrEmpty(projectName);
         }
 
-        private async Task DoInitRootMenuPick()
+        private async ValueTask DoInitRootMenuPick()
         {
             var interactive = true;
 
@@ -222,36 +265,45 @@ namespace Azure.AI.Details.Common.CLI
 
             var label = "  Initialize";
             Console.Write($"{label}: ");
-            var choiceToPart = new Dictionary<string, string>
+
+            var choices = new[]
             {
-                // ["AI Project"] = "init-root-project-select-or-create",
-                ["New AI Project"] = "init-root-project-create",
-                ["Existing AI Project"] = "init-root-project-select",
-                ["Standalone resources"] = "init-root-standalone-select-or-create",
-            };
-            var partToLabelDisplay = new Dictionary<string, string>()
-            {
-                // ["init-root-project-select-or-create"] = "AI Project",
-                ["init-root-project-create"] = "New AI Project",
-                ["init-root-project-select"] = "Existing AI Project",
-                ["init-root-standalone-select-or-create"] = null
+                new { DisplayName = "New AI Project", Value = "init-root-project-create", Metadata = "new" },
+                new { DisplayName = "Existing AI Project", Value = "init-root-project-select", Metadata = "existing" },
+                new { DisplayName = "Standalone resources", Value = "init-root-standalone-select-or-create", Metadata = "standalone" },
             };
 
-            var choices = choiceToPart.Keys.ToArray();
-            var picked = ListBoxPicker.PickIndexOf(choices.ToArray());
-            if (picked < 0)
+            int selected = -1;
+
+            var outcome = Program.Telemetry.Wrap(() =>
             {
-                Console.WriteLine($"\r{label}: CANCELED (no selection)");
-                return;
+                selected = ListBoxPicker.PickIndexOf(choices.Select(e => e.DisplayName).ToArray());
+                if (selected < 0)
+                {
+                    Console.WriteLine($"\r{label}: CANCELED (no selection)");
+                    return Outcome.Canceled;
+                }
+
+                Console.Write($"\r{label.Trim()}: {choices.ElementAtOrDefault(selected)?.DisplayName}\n");
+                _values.Reset("telemetry.init.run_type", choices.ElementAtOrDefault(selected)?.Metadata);
+
+                return Outcome.Success;
+            },
+            (outcome, ex, timeTaken) => choices.ElementAtOrDefault(selected)?.Metadata == "standalone"
+                ? null
+                : new InitTelemetryEvent(InitStage.Choice)
+                {
+                    Outcome = outcome,
+                    RunId = _values.GetOrDefault("telemetry.init.run_id", null),
+                    RunType = _values.GetOrDefault("telemetry.init.run_type", null),
+                    DurationInMs = timeTaken.TotalMilliseconds,
+                    Error  = ex?.Message
+                });
+
+            if (outcome == Outcome.Success)
+            {
+                await DoInitServiceParts(interactive, choices.ElementAtOrDefault(selected)?.Value);
             }
-
-            var part = choiceToPart[choices[picked]];
-            var display = partToLabelDisplay[part];
-
-            Console.Write(display == null
-                ? new string(' ', label.Length + 2) + "\r"
-                : $"\r{label.Trim()}: {display}\n");
-            await DoInitServiceParts(interactive, part.Split(';').ToArray());
         }
 
         private async Task DoInitStandaloneResources(bool interactive)
@@ -266,39 +318,43 @@ namespace Azure.AI.Details.Common.CLI
 
             var label = "  Initialize";
             Console.Write($"{label}: ");
-            var choiceToPart = new Dictionary<string, string>
+
+            var choices = new[]
             {
-                ["Azure AI Services (v2)"] = "init-root-cognitiveservices-ai-services-kind-create-or-select",
-                ["Azure AI Services (v1)"] = "init-root-cognitiveservices-cognitiveservices-kind-create-or-select",
-                ["Azure OpenAI"] = "init-root-openai-create-or-select",
-                ["Azure Search"] = "init-root-search-create-or-select",
-                ["Azure Speech"] = "init-root-speech-create-or-select"
+                new { DisplayName = "Azure AI Services (v2)", Value = "init-root-cognitiveservices-ai-services-kind-create-or-select", Metadata = "aiservices" },
+                new { DisplayName = "Azure AI Services (v1)", Value = "init-root-cognitiveservices-cognitiveservices-kind-create-or-select", Metadata ="cognitiveservices" },
+                new { DisplayName = "Azure OpenAI", Value = "init-root-openai-create-or-select", Metadata = "openai" },
+                new { DisplayName = "Azure Search", Value = "init-root-search-create-or-select", Metadata = "search" },
+                new { DisplayName = "Azure Speech", Value = "init-root-speech-create-or-select", Metadata = "speech" }
             };
 
-            var partToLabelDisplay = new Dictionary<string, string>()
+            int picked = -1;
+            var outcome = Program.Telemetry.Wrap(() =>
+                {
+                    picked = ListBoxPicker.PickIndexOf(choices.Select(e => e.DisplayName).ToArray());
+                    if (picked < 0)
+                    {
+                        Console.WriteLine("\rInitialize: CANCELED (no selection)");
+                        return Outcome.Canceled;
+                    }
+
+                    Console.WriteLine($"\rInitialize: {choices.ElementAtOrDefault(picked)?.DisplayName}");
+                    return Outcome.Success;
+                },
+                (outcome, ex, timeTaken) => new InitTelemetryEvent(InitStage.Choice)
+                {
+                    Outcome = outcome,
+                    RunId = _values.GetOrDefault("telemetry.init.run_id", null),
+                    RunType = _values.GetOrDefault("telemetry.init.run_type", null),
+                    Selected = choices.ElementAtOrDefault(picked)?.Metadata,
+                    DurationInMs = timeTaken.TotalMilliseconds,
+                    Error  = ex?.Message
+                });
+
+            if (outcome == Outcome.Success)
             {
-                ["init-root-cognitiveservices-ai-services-kind-create-or-select"] = "Azure AI Services (v2)",
-                ["init-root-cognitiveservices-cognitiveservices-kind-create-or-select"] = "Azure AI Services (v1)",
-                ["init-root-openai-create-or-select"] = "Azure OpenAI",
-                ["init-root-search-create-or-select"] = "Azure Search",
-                ["init-root-speech-create-or-select"] = "Azure Speech"
-            };
-
-
-            var choices = choiceToPart.Keys.ToArray();
-
-            var picked = ListBoxPicker.PickIndexOf(choices.ToArray());
-            if (picked < 0)
-            {
-                Console.WriteLine("\rInitialize: CANCELED (no selection)");
-                return;
+                await DoInitServiceParts(true, choices.ElementAtOrDefault(picked)?.Value);
             }
-    
-            var part = choiceToPart[choices[picked]];
-            var display = partToLabelDisplay[part];
-            Console.WriteLine($"\rInitialize: {display}");
-
-            await DoInitServiceParts(true, part.Split(';', StringSplitOptions.RemoveEmptyEntries));
         }
 
         private async Task DoInitServiceParts(bool interactive, params string[] operations)
@@ -336,11 +392,25 @@ namespace Azure.AI.Details.Common.CLI
             }
         }
 
-        private async Task DoInitSubscriptionId(bool interactive)
+        private Task<string> DoInitSubscriptionId(bool interactive)
         {
-            var subscriptionFilter = SubscriptionToken.Data().GetOrDefault(_values, "");
-            var subscriptionId = await AzCliConsoleGui.PickSubscriptionIdAsync(interactive, interactive, subscriptionFilter);
-            SubscriptionToken.Data().Set(_values, subscriptionId);
+            return Program.Telemetry.WrapAsync(
+                async () =>
+                {
+                    var subscriptionFilter = SubscriptionToken.Data().GetOrDefault(_values, "");
+                    string subscriptionId = await AzCliConsoleGui.PickSubscriptionIdAsync(interactive, interactive, subscriptionFilter);
+                    SubscriptionToken.Data().Set(_values, subscriptionId);
+                    return subscriptionId;
+                },
+                (outcome, subscriptionId, ex, timeTaken) => new InitTelemetryEvent(InitStage.Subscription)
+                {
+                    Outcome = outcome,
+                    //Selected = subscriptionId, // TODO PRIVACY REVIEW: can include this?
+                    RunId = _values.GetOrDefault("telemetry.init.run_id", null),
+                    RunType = _values.GetOrDefault("telemetry.init.run_type", null),
+                    DurationInMs = timeTaken.TotalMilliseconds,
+                    Error = ex?.Message
+                });
         }
 
         private async Task DoInitRootHubResource(bool interactive)
@@ -351,10 +421,23 @@ namespace Azure.AI.Details.Common.CLI
             await DoInitHubResource(interactive);
         }
 
-        private async Task DoInitHubResource(bool interactive)
+        private Task DoInitHubResource(bool interactive)
         {
-            var subscription = SubscriptionToken.Data().GetOrDefault(_values, "");
-            var aiHubResource = await AiSdkConsoleGui.PickOrCreateAiHubResource(_values, subscription);
+            return Program.Telemetry.WrapAsync(
+                () =>
+                {
+                    var subscription = SubscriptionToken.Data().GetOrDefault(_values, "");
+                    return AiSdkConsoleGui.PickOrCreateAiHubResource(_values, subscription);
+                },
+                (outcome, res, ex, timeTaken) => new InitTelemetryEvent(InitStage.Resource)
+                {
+                    Outcome = outcome,
+                    RunId = _values.GetOrDefault("telemetry.init.run_id", null),
+                    RunType = _values.GetOrDefault("telemetry.init.run_type", null),
+                    Selected = res.Item2 ? "new" : "existing",
+                    DurationInMs = timeTaken.TotalMilliseconds,
+                    Error = ex?.Message
+                });
         }
 
         private async Task DoInitRootProject(bool interactive, bool allowCreate = true, bool allowPick = true)
@@ -381,7 +464,42 @@ namespace Azure.AI.Details.Common.CLI
             var searchEndpoint = _values.GetOrDefault("service.search.endpoint", null);
             var searchKey = _values.GetOrDefault("service.search.key", null);
 
-            var project = await AiSdkConsoleGui.PickOrCreateAndConfigAiHubProject(allowCreate, allowPick, allowSkipDeployments, allowSkipSearch, _values, subscription, resourceId, groupName, openAiEndpoint, openAiKey, searchEndpoint, searchKey);
+            // Special case for "existing" AI project. The UI skips presenting the user with a choice of AI hub resource
+            // since they directly choose a project. So we add back this missing telemetry event here
+            if (!allowCreate && allowPick)
+            {
+                Program.Telemetry.LogEvent(new InitTelemetryEvent(InitStage.Resource)
+                {
+                    Outcome = Outcome.Success,
+                    Selected = "project",
+                    DurationInMs = 0,
+                    RunId = _values.GetOrDefault("telemetry.init.run_id", null),
+                    RunType = _values.GetOrDefault("telemetry.init.run_type", null)
+                });
+            }
+
+            bool createdNew = false;
+            AiHubProjectInfo project = Program.Telemetry.Wrap(
+                () => AiSdkConsoleGui.PickOrCreateAiHubProject(allowCreate, allowPick, _values, subscription, resourceId, out createdNew),
+                (outcome, project, ex, timeTaken) => new InitTelemetryEvent(InitStage.Project)
+                {
+                    Outcome = outcome,
+                    Selected = createdNew ? "new" : "existing",
+                    RunId = _values.GetOrDefault("telemetry.init.run_id", null),
+                    RunType = _values.GetOrDefault("telemetry.init.run_type", null),
+                    DurationInMs = timeTaken.TotalMilliseconds,
+                    Error = ex?.Message
+                });
+
+            // TODO FIXME: There was a bug in the what used to one method call that was split into two. Namely when allowCreate == true and allowPick == false,
+            //             createdNew would not be correctly to true. The ConfigAiHubProject relies on this bug so restore this broken behaviour here.
+            //             This will be fixed in a future re-factor/simplification of this code
+            if (allowCreate && !allowPick)
+            {
+                createdNew = false;
+            }
+
+            await AiSdkConsoleGui.ConfigAiHubProject(_values, project, createdNew, allowSkipDeployments, allowSkipSearch, subscription, resourceId, groupName, openAiEndpoint, openAiKey, searchEndpoint, searchKey);
 
             ProjectNameToken.Data().Set(_values, project.Name);
             _values.Reset("service.project.id", project.Id);
@@ -407,7 +525,7 @@ namespace Azure.AI.Details.Common.CLI
             var embeddingsDeploymentFilter = _values.GetOrDefault("init.embeddings.model.deployment.name", "");
             var evaluationsDeploymentFilter = _values.GetOrDefault("init.evaluation.model.deployment.name", "");
 
-            var resource = await AzCliConsoleGui.PickOrCreateAndConfigCognitiveServicesOpenAiKindResource(interactive, allowSkipDeployments, subscriptionId, regionFilter, groupFilter, resourceFilter, kind, sku, yes, chatDeploymentFilter, embeddingsDeploymentFilter, evaluationsDeploymentFilter);
+            var resource = await AzCliConsoleGui.PickOrCreateAndConfigCognitiveServicesOpenAiKindResource(_values, interactive, allowSkipDeployments, subscriptionId, regionFilter, groupFilter, resourceFilter, kind, sku, yes, chatDeploymentFilter, embeddingsDeploymentFilter, evaluationsDeploymentFilter);
             _values.Reset("service.openai.deployments.picked", "true");
 
             SubscriptionToken.Data().Set(_values, subscriptionId);
@@ -438,7 +556,7 @@ namespace Azure.AI.Details.Common.CLI
             var sku = _values.GetOrDefault("init.service.cognitiveservices.resource.sku", Program.CognitiveServiceResourceSku);
             var yes = _values.GetOrDefault("init.service.cognitiveservices.terms.agree", false);
 
-            var resource = await AzCliConsoleGui.PickOrCreateAndConfigCognitiveServicesAiServicesKindResource(interactive, allowSkipDeployments, subscriptionId, regionFilter, groupFilter, resourceFilter, kind, sku, yes);
+            var resource = await AzCliConsoleGui.PickOrCreateAndConfigCognitiveServicesAiServicesKindResource(_values, interactive, allowSkipDeployments, subscriptionId, regionFilter, groupFilter, resourceFilter, kind, sku, yes);
 
             SubscriptionToken.Data().Set(_values, subscriptionId);
             _values.Reset("service.resource.region.name", resource.RegionLocation);
@@ -506,6 +624,11 @@ namespace Azure.AI.Details.Common.CLI
             await DoInitSubscriptionId(interactive);
             await DoInitSpeech(interactive);
         }
+        private async Task DoInitRootVision(bool interactive)
+        {
+            await DoInitSubscriptionId(interactive);
+            await DoInitVision(interactive);
+        }
 
         private async Task DoInitSpeech(bool interactive)
         {
@@ -518,6 +641,21 @@ namespace Azure.AI.Details.Common.CLI
             var yes = _values.GetOrDefault("init.service.cognitiveservices.terms.agree", false);
 
             var resource = await AzCliConsoleGui.PickOrCreateAndConfigCognitiveServicesSpeechServicesKindResource(interactive, subscriptionId, regionFilter, groupFilter, resourceFilter, kind, sku, yes);
+
+            SubscriptionToken.Data().Set(_values, subscriptionId);
+        }
+
+        private async Task DoInitVision(bool interactive)
+        {
+            var subscriptionId = SubscriptionToken.Data().GetOrDefault(_values, "");
+            var regionFilter = _values.GetOrDefault("init.service.resource.region.name", "");
+            var groupFilter = _values.GetOrDefault("init.service.resource.group.name", "");
+            var resourceFilter = _values.GetOrDefault("init.service.cognitiveservices.resource.name", "");
+            var kind = _values.GetOrDefault("init.service.cognitiveservices.resource.kind", "ComputerVision");
+            var sku = _values.GetOrDefault("init.service.cognitiveservices.resource.sku", "S0");
+            var yes = _values.GetOrDefault("init.service.cognitiveservices.terms.agree", false);
+
+            var resource = await AzCliConsoleGui.PickOrCreateAndConfigCognitiveServicesComputerVisionKindResource(interactive, subscriptionId, regionFilter, groupFilter, resourceFilter, kind, sku, yes);
 
             SubscriptionToken.Data().Set(_values, subscriptionId);
         }

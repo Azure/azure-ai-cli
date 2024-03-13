@@ -3,18 +3,15 @@
 // Licensed under the MIT license. See LICENSE.md file in the project root for full license information.
 //
 
-using System;
-using System.Linq;
-using System.Threading.Tasks;
-using System.Collections.Generic;
 using Azure.AI.Details.Common.CLI.ConsoleGui;
 
 namespace Azure.AI.Details.Common.CLI
 {
     public partial class AzCliConsoleGui
     {
-        public static async Task<AzCli.CognitiveServicesDeploymentInfo?> PickOrCreateCognitiveServicesResourceDeployment(bool interactive, bool allowSkipDeployment, string deploymentExtra, string subscriptionId, string groupName, string resourceRegionLocation, string resourceName, string deploymentFilter)
+        public static async Task<(AzCli.CognitiveServicesDeploymentInfo?,bool)> PickOrCreateCognitiveServicesResourceDeployment(bool interactive, bool allowSkipDeployment, string deploymentExtra, string subscriptionId, string groupName, string resourceRegionLocation, string resourceName, string deploymentFilter)
         {
+            bool createdNew = false;
             ConsoleHelpers.WriteLineWithHighlight($"\n`AZURE OPENAI DEPLOYMENT ({deploymentExtra.ToUpper()})`");
 
             var createNewItem = !string.IsNullOrEmpty(deploymentFilter)
@@ -22,10 +19,12 @@ namespace Azure.AI.Details.Common.CLI
                 : interactive ? "(Create new)" : null;
 
             var deployment = await FindCognitiveServicesResourceDeployment(interactive, allowSkipDeployment, deploymentExtra, subscriptionId, groupName, resourceName, deploymentFilter, createNewItem);
-            if (deployment == null && allowSkipDeployment) return null;
-            
+            if (deployment == null && allowSkipDeployment)
+                return (null, createdNew);
+
             if (deployment != null && deployment.Value.Name == null)
             {
+                createdNew = true;
                 deployment = await TryCreateCognitiveServicesResourceDeployment(interactive, deploymentExtra, subscriptionId, groupName, resourceRegionLocation, resourceName, deploymentFilter);
             }
 
@@ -34,21 +33,15 @@ namespace Azure.AI.Details.Common.CLI
                 throw new ApplicationException($"CANCELED: No deployment selected");
             }
 
-            return deployment.Value;
+            return (deployment, createdNew);
         }
 
         public static async Task<AzCli.CognitiveServicesDeploymentInfo?> FindCognitiveServicesResourceDeployment(bool interactive, bool allowSkipDeployment, string deploymentExtra, string subscriptionId, string groupName, string resourceName, string deploymentFilter, string allowCreateDeploymentOption)
         {
             var allowCreateDeployment = !string.IsNullOrEmpty(allowCreateDeploymentOption);
 
-            Console.Write($"Name: *** Loading choices ***");
-            var response = await AzCli.ListCognitiveServicesDeployments(subscriptionId, groupName, resourceName, "OpenAI");
-
-            Console.Write($"\rName: ");
-            if (string.IsNullOrEmpty(response.Output.StdOutput) && !string.IsNullOrEmpty(response.Output.StdError))
-            {
-                throw new ApplicationException($"ERROR: Loading deployments:\n{response.Output.StdError}");
-            }
+            var listDeploymentsFunc = async () => await AzCli.ListCognitiveServicesDeployments(subscriptionId, groupName, resourceName, "OpenAI");
+            var response = await LoginHelpers.GetResponseOnLogin<AzCli.CognitiveServicesDeploymentInfo[]>(interactive, "deployment", listDeploymentsFunc);
 
             var lookForChatCompletionCapable = deploymentExtra.ToLower() == "chat" || deploymentExtra.ToLower() == "evaluation";
             var lookForEmbeddingCapable = deploymentExtra.ToLower() == "embeddings";

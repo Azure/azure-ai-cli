@@ -53,9 +53,25 @@ namespace Azure.AI.Details.Common.CLI
             return subscription.Value;
         }
 
-        public static async Task<AzCli.SubscriptionInfo?> ValidateSubscriptionAsync(bool allowInteractiveLogin, string subscriptionFilter, string subscriptionLabel)
+        public static async Task<AzCli.SubscriptionInfo?> ValidateSubscriptionAsync(bool allowInteractiveLogin, string subscriptionId)
         {
-            return await FindSubscriptionAsync(allowInteractiveLogin, false, subscriptionFilter, subscriptionLabel);
+            var allSubscriptions = await LoginHelpers.GetResponseOnLogin(allowInteractiveLogin, "subscription", AzCli.ListAccounts, "  SUBSCRIPTION");
+            var subscription = allSubscriptions
+                .Payload
+                .FirstOrDefault(subs => string.Equals(subs.Id, subscriptionId, StringComparison.OrdinalIgnoreCase));
+
+            bool found = !string.IsNullOrWhiteSpace(subscription.Id);
+            if (found)
+            {
+                Console.WriteLine($"{subscription.Name} ({subscription.Id})");
+                CacheSubscriptionUserName(subscription);
+                return subscription;
+            }
+            else
+            {
+                ConsoleHelpers.WriteLineWithHighlight($"`#e_;WARNING: Could not find subscription {subscriptionId}!`");
+                return null;
+            }
         }
 
         private static async Task<AzCli.SubscriptionInfo?> FindSubscriptionAsync(bool allowInteractiveLogin, bool allowInteractivePickSubscription, string subscriptionFilter = null, string subscriptionLabel = "Subscription")
@@ -77,44 +93,10 @@ namespace Azure.AI.Details.Common.CLI
                 throw new ApplicationException($"*** ERROR: Loading subscriptions ***\n{response.Output.StdError}");
             }
 
-            var needLogin = response.Output.StdError != null && (response.Output.StdError.Split('\'', '"').Contains("az login") || response.Output.StdError.Contains("refresh token"));
+            var needLogin = response.Output.StdError != null && LoginHelpers.HasLoginError(response.Output.StdError);
             if (needLogin)
             {
-                bool cancelLogin = !allowInteractiveLogin;
-                bool useDeviceCode = false;
-                if (allowInteractiveLogin)
-                {
-                    ConsoleHelpers.WriteError("*** WARNING: `az login` required ***");
-                    Console.Write(" ");
-
-                    var selection = 0;
-                    var choices = new List<string>() {
-                        "LAUNCH: `az login` (interactive device code)",
-                        "CANCEL: `az login ...` (non-interactive)",
-                    };
-
-                    if (!OS.IsCodeSpaces())
-                    {
-                        choices.Insert(0, "LAUNCH: `az login` (interactive browser)");
-                        selection = OS.IsWindows() ? 0 : 1;
-                    }
-
-                    var picked = ListBoxPicker.PickIndexOf(choices.ToArray(), selection);
-
-                    cancelLogin = picked < 0 || picked == choices.Count() - 1;
-                    useDeviceCode = picked == choices.Count() - 2;
-                }
-
-                if (cancelLogin)
-                {
-                    Console.Write($"\r{subscriptionLabel}: ");
-                    ConsoleHelpers.WriteLineError("*** Please run `az login` and try again ***");
-                    return null;
-                }
-
-                Console.Write($"\r{subscriptionLabel}: *** Launching `az login` (interactive) ***");
-                response = await AzCli.Login(useDeviceCode);
-                Console.Write($"\r{subscriptionLabel}: ");
+                response = await LoginHelpers.AttemptLogin(allowInteractiveLogin, subscriptionLabel);
             }
 
             var subscriptions = response.Payload
@@ -124,10 +106,11 @@ namespace Azure.AI.Details.Common.CLI
 
             if (subscriptions.Count() == 0)
             {
-                ConsoleHelpers.WriteLineError(response.Payload.Count() > 0
-                    ? "*** No matching subscriptions found ***"
-                    : "*** No subscriptions found ***");
-                return null;
+                string error = response.Payload.Count() > 0
+                    ? "No matching subscriptions found"
+                    : "No subscriptions found";
+                ConsoleHelpers.WriteLineError($"*** {error} ***");
+                throw new ApplicationException(error);
             }
             else if (subscriptions.Count() == 1)
             {
@@ -138,10 +121,11 @@ namespace Azure.AI.Details.Common.CLI
             }
             else if (!allowInteractivePickSubscription)
             {
-                ConsoleHelpers.WriteLineError("*** More than 1 subscription found ***");
+                string error = "More than 1 subscription found";
+                ConsoleHelpers.WriteLineError($"*** { error } ***");
                 Console.WriteLine();
                 DisplaySubscriptions(subscriptions, "  ");
-                return null;
+                throw new ApplicationException(error);
             }
 
             return ListBoxPickSubscription(subscriptions);
@@ -155,7 +139,7 @@ namespace Azure.AI.Details.Common.CLI
             var picked = ListBoxPicker.PickIndexOf(list, defaultIndex);
             if (picked < 0)
             {
-                return null;
+                throw new OperationCanceledException("User canceled");
             }
 
             var subscription = subscriptions[picked];

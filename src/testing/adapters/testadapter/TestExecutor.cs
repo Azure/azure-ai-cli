@@ -1,4 +1,9 @@
-﻿using Microsoft.VisualStudio.TestPlatform.ObjectModel;
+//
+// Copyright (c) Microsoft. All rights reserved.
+// Licensed under the MIT license. See LICENSE.md file in the project root for full license information.
+//
+
+using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Adapter;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 using System;
@@ -20,7 +25,7 @@ namespace Azure.AI.Details.Common.CLI.TestAdapter
         {
             tests = tests.ToList(); // force enumeration
 
-            Logger.Log(frameworkHandle);
+            Logger.Log(new YamlTestFrameworkTestAdapterMessageLogger(frameworkHandle));
             Logger.Log($"TextExecutor.RunTests(IEnumerable<TestCase>(): ENTER");
             Logger.Log($"TextExecutor.RunTests(IEnumerable<TestCase>(): count={tests.Count()}");
             YamlTestAdapter.RunTests(tests, runContext, frameworkHandle);
@@ -31,7 +36,7 @@ namespace Azure.AI.Details.Common.CLI.TestAdapter
         {
             sources = sources.ToList(); // force enumeration
             
-            Logger.Log(frameworkHandle);
+            Logger.Log(new YamlTestFrameworkTestAdapterMessageLogger(frameworkHandle));
             Logger.Log($"TextExecutor.RunTests(IEnumerable<string>(): ENTER");
             Logger.Log($"TextExecutor.RunTests(IEnumerable<string>(): count={sources.Count()}");
             RunTests(YamlTestAdapter.GetTestsFromFiles(sources), runContext, frameworkHandle);
