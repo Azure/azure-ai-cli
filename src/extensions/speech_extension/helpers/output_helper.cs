@@ -17,10 +17,10 @@ using Microsoft.CognitiveServices.Speech.Transcription;
 using System.Collections.Generic;
 using System.IO.Compression;
 using System.Globalization;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using System.Net;
 using DevLab.JmesPath;
+using System.Text.Unicode;
+using System.Text.Json;
 
 namespace Azure.AI.Details.Common.CLI
 {
@@ -434,14 +434,18 @@ namespace Azure.AI.Details.Common.CLI
 
         private void OutputBatchJsonFile()
         {
-            var file = GetBatchAudioFileJson();
-            var files = new JArray();
-            files.Add(file);
+            var stream = new MemoryStream();
+            var writer = new Utf8JsonWriter(stream, new JsonWriterOptions { Indented = true });
+            writer.WriteStartObject();
 
-            var fileResults = new JObject();
-            fileResults.Add("AudioFileResults", files);
+            writer.WriteStartArray("AudioFileResults");
+            WriteBatchAudioFileJsonObject(writer);
+            writer.WriteEndArray();
 
-            var text = fileResults.ToString() + Environment.NewLine;
+            writer.WriteEndObject();
+            writer.Flush();
+
+            var text = Encoding.UTF8.GetString(stream.ToArray()) + Environment.NewLine;
             FileHelpers.WriteAllText(_outputBatchFileName, text, Encoding.UTF8);
         }
 
@@ -471,30 +475,31 @@ namespace Azure.AI.Details.Common.CLI
             }
         }
 
-        private JObject GetBatchAudioFileJson()
+        private void WriteBatchAudioFileJsonObject(Utf8JsonWriter writer)
         {
-            var result = new JObject();
+            writer.WriteStartObject();
 
             var id = _propertyCache["audio.input.id"];
             var file = _propertyCache["audio.input.file"];
 
             if (file != null && file.StartsWith("http"))
             {
-                result.Add("AudioFileName", id);
-                result.Add("AudioFileUrl", file);
+                writer.WriteString("AudioFileName", id);
+                writer.WriteString("AudioFileUrl", file);
             }
             else
             {
                 var existing = FileHelpers.FindFileInDataPath(file, _values);
-                result.Add("AudioFileName", file ?? id);
-                result.Add("AudioFileUrl", existing ?? file ?? id);
+                writer.WriteString("AudioFileName", file ?? id);
+                writer.WriteString("AudioFileUrl", existing ?? file ?? id);
             }
 
-            result.Add("AudioLengthInSeconds", GetBatchAudioLengthInSeconds());
-            result.Add("CombinedResults", GetBatchAudioFileCombined());
-            result.Add("SegmentResults", GetBatchAudioFileSegments());
+            writer.WriteNumber("AudioLengthInSeconds", GetBatchAudioLengthInSeconds());
 
-            return result;
+            WriteBatchAudioFileCombinedResultsJsonProperty(writer, "CombinedResults");
+            WriteBatchAudioFileSegmentResultsJsonProperty(writer, "SegmentResults");
+
+            writer.WriteEndObject();
         }
 
         private string GetSrtFile(string language = null)
@@ -522,19 +527,19 @@ namespace Azure.AI.Details.Common.CLI
             return sb.ToString().Trim();
         }
 
-        private JArray GetBatchAudioFileCombined()
+        private void WriteBatchAudioFileCombinedResultsJsonProperty(Utf8JsonWriter writer, string arrayName)
         {
-            var channel = new JObject();
-            channel.Add("ChannelNumber", "0");
-            channel.Add("Lexical", GetBatchCombinedText("Lexical"));
-            channel.Add("ITN", GetBatchCombinedText("ITN"));
-            channel.Add("MaskedITN", GetBatchCombinedText("MaskedITN"));
-            channel.Add("Display", GetBatchCombinedText("Display"));
+            writer.WriteStartArray(arrayName);
+            writer.WriteStartObject();
 
-            var array = new JArray();
-            array.Add(channel);
+            writer.WriteString("ChannelNumber", "0");
+            writer.WriteString("Lexical", GetBatchCombinedText("Lexical"));
+            writer.WriteString("ITN", GetBatchCombinedText("ITN"));
+            writer.WriteString("MaskedITN", GetBatchCombinedText("MaskedITN"));
+            writer.WriteString("Display", GetBatchCombinedText("Display"));
 
-            return array;
+            writer.WriteEndObject();
+            writer.WriteEndArray();
         }
 
         private string GetBatchCombinedText(string kind)
@@ -589,21 +594,19 @@ namespace Azure.AI.Details.Common.CLI
                                 : "";
         }
 
-        private JArray GetBatchAudioFileSegments()
+        private void WriteBatchAudioFileSegmentResultsJsonProperty(Utf8JsonWriter writer, string arrayName)
         {
-            var segments = new JArray();
+            writer.WriteStartArray(arrayName);
             foreach (var result in _outputResultCache)
             {
-                var segment = GetBatchAudioFileSegment(result);
-                if (segment != null) segments.Add(segment);
+                WriteBatchAudioFileSegmentJsonObject(writer, result);
             }
-
-            return segments;
+            writer.WriteEndArray();
         }
 
-        private JObject GetBatchAudioFileSegment(object result)
+        private bool WriteBatchAudioFileSegmentJsonObject(Utf8JsonWriter writer, object result)
         {
-            if (!IsFinalResult(result)) return null;
+            if (!IsFinalResult(result)) return false;
 
             var resultSpeech = result as SpeechRecognitionResult;
             var resultTranslation = result as TranslationRecognitionResult;
@@ -611,138 +614,152 @@ namespace Azure.AI.Details.Common.CLI
             var resultMeetingTranscription = result as MeetingTranscriptionResult;
 
             return resultSpeech != null
-                ? GetBatchAudioFileSegment(resultSpeech)
+                ? WriteBatchAudioFileSegmentJsonObject(writer, resultSpeech)
                 : resultTranslation != null
-                    ? GetBatchAudioFileSegment(resultTranslation)
+                    ? WriteBatchAudioFileSegmentJsonObject(writer, resultTranslation)
                     : resultConversationTranscription != null
-                        ? GetBatchAudioFileSegment(resultConversationTranscription)
+                        ? WriteBatchAudioFileSegmentJsonObject(writer, resultConversationTranscription)
                         : resultMeetingTranscription != null
-                            ? GetBatchAudioFileSegment(resultMeetingTranscription)
-                            : null;
+                            ? WriteBatchAudioFileSegmentJsonObject(writer, resultMeetingTranscription)
+                            : false;
         }
 
-        private JObject GetBatchAudioFileSegment(SpeechRecognitionResult result)
+        private bool WriteBatchAudioFileSegmentJsonObject(Utf8JsonWriter writer, SpeechRecognitionResult result)
         {
-            var segment = new JObject();
-
             if (result.Reason == ResultReason.Canceled)
             {
                 var cancelDetails = CancellationDetails.FromResult(result);
-                if (cancelDetails.Reason == CancellationReason.EndOfStream) return null;
+                if (cancelDetails.Reason == CancellationReason.EndOfStream) return false;
 
-                segment.Add("ErrorDetails", cancelDetails.ErrorDetails);
-                segment.Add("ErrorCode", cancelDetails.ErrorCode.ToString());
-                return segment;
+                writer.WriteStartObject();
+                writer.WriteString("ErrorDetails", cancelDetails.ErrorDetails);
+                writer.WriteString("ErrorCode", cancelDetails.ErrorCode.ToString());
+                writer.WriteEndObject();
+                return true;
             }
 
+            writer.WriteStartObject();
+
             var json = result.Properties.GetProperty(PropertyId.SpeechServiceResponse_JsonResult);
-            var parsed = !string.IsNullOrEmpty(json) ? JToken.Parse(json) : null;
+            var parsed = !string.IsNullOrEmpty(json) ? JsonDocument.Parse(json) : null;
 
-            segment.Add("RecognitionStatus", parsed["RecognitionStatus"] ?? result.Reason.ToString());
-            
-            segment.Add("ChannelNumber", "0");
-            segment.Add("SpeakerId", null);
-            segment.Add("Offset", result.OffsetInTicks);
-            segment.Add("Duration", (long)(result.Duration.TotalMilliseconds * 10000));
-            segment.Add("OffsetInSeconds", Math.Round(1.0 * result.OffsetInTicks / 10000 / 1000, 2));
-            segment.Add("DurationInSeconds", Math.Round(result.Duration.TotalSeconds, 2));
+            var status = parsed.GetPropertyStringOrNull("RecognitionStatus") ?? result.Reason.ToString();
+            writer.WriteString("RecognitionStatus", status);
 
-            segment.Add("NBest", parsed["NBest"] ?? new JArray());
+            writer.WriteString("ChannelNumber", "0");
+            writer.WriteNull("SpeakerId");
+            writer.WriteNumber("Offset", result.OffsetInTicks);
+            writer.WriteNumber("Duration", (long)(result.Duration.TotalMilliseconds * 10000));
+            writer.WriteNumber("OffsetInSeconds", Math.Round(1.0 * result.OffsetInTicks / 10000 / 1000, 2));
+            writer.WriteNumber("DurationInSeconds", Math.Round(result.Duration.TotalSeconds, 2));
 
-            return segment;
+            writer.WritePropertyName("NBest");
+            writer.WriteRawValue(parsed.GetPropertyElementOrNull("NBest")?.GetRawText() ?? "[]");
+
+            writer.WriteEndObject();
+            return true;
         }
 
-        private JObject GetBatchAudioFileSegment(TranslationRecognitionResult result)
+        private bool WriteBatchAudioFileSegmentJsonObject(Utf8JsonWriter writer, TranslationRecognitionResult result)
         {
-            var segment = new JObject();
-
             if (result.Reason == ResultReason.Canceled)
             {
                 var cancelDetails = CancellationDetails.FromResult(result);
-                if (cancelDetails.Reason == CancellationReason.EndOfStream) return null;
+                if (cancelDetails.Reason == CancellationReason.EndOfStream) return false;
 
-                segment.Add("ErrorDetails", cancelDetails.ErrorDetails);
-                segment.Add("ErrorCode", cancelDetails.ErrorCode.ToString());
-                return segment;
+                writer.WriteStartObject();
+                writer.WriteString("ErrorDetails", cancelDetails.ErrorDetails);
+                writer.WriteString("ErrorCode", cancelDetails.ErrorCode.ToString());
+                writer.WriteEndObject();
+                return true;
             }
 
             var json = result.Properties.GetProperty(PropertyId.SpeechServiceResponse_JsonResult);
-            var parsed = !string.IsNullOrEmpty(json) ? JToken.Parse(json) : null;
+            var parsed = !string.IsNullOrEmpty(json) ? JsonDocument.Parse(json) : null;
 
-            segment.Add("RecognitionStatus", parsed["RecognitionStatus"] ?? result.Reason.ToString());
-            
-            segment.Add("ChannelNumber", "0");
-            segment.Add("SpeakerId", null);
-            segment.Add("Offset", result.OffsetInTicks);
-            segment.Add("Duration", (long)(result.Duration.TotalMilliseconds * 10000));
-            segment.Add("OffsetInSeconds", Math.Round(1.0 * result.OffsetInTicks / 10000 / 1000, 2));
-            segment.Add("DurationInSeconds", Math.Round(result.Duration.TotalSeconds, 2));
+            var status = parsed.GetPropertyStringOrNull("RecognitionStatus") ?? result.Reason.ToString();
+            writer.WriteString("RecognitionStatus", status);
 
-            segment.Add("NBest", parsed["NBest"] ?? new JArray());
+            writer.WriteString("ChannelNumber", "0");
+            writer.WriteNull("SpeakerId");
+            writer.WriteNumber("Offset", result.OffsetInTicks);
+            writer.WriteNumber("Duration", (long)(result.Duration.TotalMilliseconds * 10000));
+            writer.WriteNumber("OffsetInSeconds", Math.Round(1.0 * result.OffsetInTicks / 10000 / 1000, 2));
+            writer.WriteNumber("DurationInSeconds", Math.Round(result.Duration.TotalSeconds, 2));
 
-            return segment;
+            writer.WritePropertyName("NBest");
+            writer.WriteRawValue(parsed.GetPropertyElementOrNull("NBest")?.GetRawText() ?? "[]");
+
+            writer.WriteEndObject();
+            return true;
         }
 
-        private JObject GetBatchAudioFileSegment(ConversationTranscriptionResult result)
+        private bool WriteBatchAudioFileSegmentJsonObject(Utf8JsonWriter writer, ConversationTranscriptionResult result)
         {
-            var segment = new JObject();
-
             if (result.Reason == ResultReason.Canceled)
             {
                 var cancelDetails = CancellationDetails.FromResult(result);
-                if (cancelDetails.Reason == CancellationReason.EndOfStream) return null;
+                if (cancelDetails.Reason == CancellationReason.EndOfStream) return false;
 
-                segment.Add("ErrorDetails", cancelDetails.ErrorDetails);
-                segment.Add("ErrorCode", cancelDetails.ErrorCode.ToString());
-                return segment;
+                writer.WriteStartObject();
+                writer.WriteString("ErrorDetails", cancelDetails.ErrorDetails);
+                writer.WriteString("ErrorCode", cancelDetails.ErrorCode.ToString());
+                writer.WriteEndObject();
+                return true;
             }
 
             var json = result.Properties.GetProperty(PropertyId.SpeechServiceResponse_JsonResult);
-            var parsed = !string.IsNullOrEmpty(json) ? JToken.Parse(json) : null;
+            var parsed = !string.IsNullOrEmpty(json) ? JsonDocument.Parse(json) : null;
 
-            segment.Add("RecognitionStatus", parsed["RecognitionStatus"] ?? result.Reason.ToString());
-            
-            segment.Add("ChannelNumber", "0");
-            segment.Add("SpeakerId", null);
-            segment.Add("Offset", result.OffsetInTicks);
-            segment.Add("Duration", (long)(result.Duration.TotalMilliseconds * 10000));
-            segment.Add("OffsetInSeconds", Math.Round(1.0 * result.OffsetInTicks / 10000 / 1000, 2));
-            segment.Add("DurationInSeconds", Math.Round(result.Duration.TotalSeconds, 2));
+            var status = parsed.GetPropertyStringOrNull("RecognitionStatus") ?? result.Reason.ToString();
+            writer.WriteString("RecognitionStatus", status);
 
-            segment.Add("NBest", parsed["NBest"] ?? new JArray());
+            writer.WriteString("ChannelNumber", "0");
+            writer.WriteNull("SpeakerId");
+            writer.WriteNumber("Offset", result.OffsetInTicks);
+            writer.WriteNumber("Duration", (long)(result.Duration.TotalMilliseconds * 10000));
+            writer.WriteNumber("OffsetInSeconds", Math.Round(1.0 * result.OffsetInTicks / 10000 / 1000, 2));
+            writer.WriteNumber("DurationInSeconds", Math.Round(result.Duration.TotalSeconds, 2));
 
-            return segment;
+            writer.WritePropertyName("NBest");
+            writer.WriteRawValue(parsed.GetPropertyElementOrNull("NBest")?.GetRawText() ?? "[]");
+
+            writer.WriteEndObject();
+            return true;
         }
 
-        private JObject GetBatchAudioFileSegment(MeetingTranscriptionResult result)
+        private bool WriteBatchAudioFileSegmentJsonObject(Utf8JsonWriter writer, MeetingTranscriptionResult result)
         {
-            var segment = new JObject();
-
             if (result.Reason == ResultReason.Canceled)
             {
                 var cancelDetails = CancellationDetails.FromResult(result);
-                if (cancelDetails.Reason == CancellationReason.EndOfStream) return null;
+                if (cancelDetails.Reason == CancellationReason.EndOfStream) return false;
 
-                segment.Add("ErrorDetails", cancelDetails.ErrorDetails);
-                segment.Add("ErrorCode", cancelDetails.ErrorCode.ToString());
-                return segment;
+                writer.WriteStartObject();
+                writer.WriteString("ErrorDetails", cancelDetails.ErrorDetails);
+                writer.WriteString("ErrorCode", cancelDetails.ErrorCode.ToString());
+                writer.WriteEndObject();
+                return true;
             }
 
             var json = result.Properties.GetProperty(PropertyId.SpeechServiceResponse_JsonResult);
-            var parsed = !string.IsNullOrEmpty(json) ? JToken.Parse(json) : null;
+            var parsed = !string.IsNullOrEmpty(json) ? JsonDocument.Parse(json) : null;
 
-            segment.Add("RecognitionStatus", parsed["RecognitionStatus"] ?? result.Reason.ToString());
+            var status = parsed.GetPropertyStringOrNull("RecognitionStatus") ?? result.Reason.ToString();
+            writer.WriteString("RecognitionStatus", status);
 
-            segment.Add("ChannelNumber", "0");
-            segment.Add("SpeakerId", null);
-            segment.Add("Offset", result.OffsetInTicks);
-            segment.Add("Duration", (long)(result.Duration.TotalMilliseconds * 10000));
-            segment.Add("OffsetInSeconds", Math.Round(1.0 * result.OffsetInTicks / 10000 / 1000, 2));
-            segment.Add("DurationInSeconds", Math.Round(result.Duration.TotalSeconds, 2));
+            writer.WriteString("ChannelNumber", "0");
+            writer.WriteNull("SpeakerId");
+            writer.WriteNumber("Offset", result.OffsetInTicks);
+            writer.WriteNumber("Duration", (long)(result.Duration.TotalMilliseconds * 10000));
+            writer.WriteNumber("OffsetInSeconds", Math.Round(1.0 * result.OffsetInTicks / 10000 / 1000, 2));
+            writer.WriteNumber("DurationInSeconds", Math.Round(result.Duration.TotalSeconds, 2));
 
-            segment.Add("NBest", parsed["NBest"] ?? new JArray());
+            writer.WritePropertyName("NBest");
+            writer.WriteRawValue(parsed.GetPropertyElementOrNull("NBest")?.GetRawText() ?? "[]");
 
-            return segment;
+            writer.WriteEndObject();
+            return true;
         }
 
         private double GetBatchAudioLengthInSeconds()
@@ -970,7 +987,7 @@ namespace Azure.AI.Details.Common.CLI
 
         private void OutputAllJsonFile()
         {
-            var json = JObjectFrom(_outputAllCache).ToString() + Environment.NewLine;
+            var json = JsonHelpers.GetJsonObjectText(_outputAllCache) + Environment.NewLine;
             FileHelpers.AppendAllText(_outputAllFileName, json, Encoding.UTF8);
         }
 
@@ -1134,7 +1151,7 @@ namespace Azure.AI.Details.Common.CLI
 
         private void OutputEachJsonFile()
         {
-            var json = JArrayFrom(_outputEachCache2).ToString() + Environment.NewLine;
+            var json = JsonHelpers.GetJsonArrayText(_outputEachCache2) + Environment.NewLine;
             FileHelpers.AppendAllText(_outputEachFileName, json, Encoding.UTF8);
         }
 
@@ -1832,24 +1849,22 @@ namespace Azure.AI.Details.Common.CLI
                 EnsureCacheAll(namePrefix + ".entity.json", entityJson);
                 EnsureOutputEach(namePrefix + ".entity.json", entityJson);
 
-                var parsed = JToken.Parse(entityJson);
-                if (parsed.HasValues)
-                {
-                    var outputAll = StringHelpers.WhereLeftRightTrim(_values.Names, $"output.all.{namePrefix}.", ".entity");
-                    foreach (var x in outputAll.Where(x => _values.GetOrDefault($"output.all.{namePrefix}.{x}.entity", false)))
-                    {
-                        var token = parsed[x];
-                        var tokenOk = token != null && token.Type == JTokenType.String;
-                        if (tokenOk) EnsureCacheAll($"{namePrefix}.{x}.entity", token.Value<string>());
-                    }
+                var parsed = JsonDocument.Parse(entityJson);
 
-                    var outputEach = StringHelpers.WhereLeftRightTrim(_values.Names, $"output.each.{namePrefix}.", ".entity");
-                    foreach (var x in outputEach.Where(x => _values.GetOrDefault($"output.each.{namePrefix}.{x}.entity", false)))
-                    {
-                        var token = parsed[x];
-                        var tokenOk = token != null && token.Type == JTokenType.String;
-                        if (tokenOk) EnsureOutputEach($"{namePrefix}.{x}.entity", token.Value<string>());
-                    }
+                var outputAll = StringHelpers.WhereLeftRightTrim(_values.Names, $"output.all.{namePrefix}.", ".entity");
+                foreach (var x in outputAll.Where(x => _values.GetOrDefault($"output.all.{namePrefix}.{x}.entity", false)))
+                {
+                    var value = parsed.GetPropertyStringOrNull(x);
+                    var valueOk = value != null;
+                    if (valueOk) EnsureCacheAll($"{namePrefix}.{x}.entity", value!);
+                }
+
+                var outputEach = StringHelpers.WhereLeftRightTrim(_values.Names, $"output.each.{namePrefix}.", ".entity");
+                foreach (var x in outputEach.Where(x => _values.GetOrDefault($"output.each.{namePrefix}.{x}.entity", false)))
+                {
+                    var value = parsed.GetPropertyStringOrNull(x);
+                    var valueOk = value != null;
+                    if (valueOk) EnsureOutputEach($"{namePrefix}.{x}.entity", value);
                 }
             }
         }
@@ -2575,7 +2590,7 @@ namespace Azure.AI.Details.Common.CLI
             var jmesValue = _values.GetOrDefault("check.jmes", null);
             if (jmesValue != null)
             {
-                var json = JObjectFrom(_checkAllCache).ToString();
+                var json = JsonHelpers.GetJsonObjectText(_checkAllCache);
                 if(String.IsNullOrEmpty(json))
                 {
                     SetPassed(false);
@@ -2752,13 +2767,15 @@ namespace Azure.AI.Details.Common.CLI
             {
                 using (var jsonStream = new StreamReader(responseStream))
                 {
-                    var werJson = jsonStream.ReadToEnd();
-                    var werSchema = new { wordCount = 0, errors = 0 };
-                    var wer = JsonConvert.DeserializeAnonymousType(werJson, werSchema);
-                    return new WerFraction(wer.wordCount, wer.errors);
+                    var json = jsonStream.ReadToEnd();
+                    var parsed = JsonDocument.Parse(json);
+                    var wordCount = parsed.RootElement.GetProperty("wordCount").GetInt32();
+                    var errors = parsed.RootElement.GetProperty("errors").GetInt32();
+                    return new WerFraction(wordCount, errors);
                 }
             }
         }
+
         private bool CheckNumber(int n1, string checkName, string checking)
         {
             int n2 = 0;
@@ -2954,77 +2971,6 @@ namespace Azure.AI.Details.Common.CLI
             if (entry != null) entry.Delete();
 
             zip.CreateEntryFromFile(file, name);
-        }
-
-        private JArray JArrayFrom(List<Dictionary<string, string>> items)
-        {
-            var json = new JArray();
-            foreach (var item in items.Where(x => x != null).ToList())
-            {
-                json.Add(JObjectFrom(item));
-            }
-            return json;
-        }
-
-        private JObject JObjectFrom(Dictionary<string, string> properties)
-        {
-            var json = new JObject();
-            foreach (var key in properties.Keys)
-            {
-                AddPropertyOrJson(json, key, properties[key]);
-            }
-            return json;
-        }
-
-        private static void AddPropertyOrJson(JObject json, string key, string value)
-        {
-            if (key.EndsWith(".json"))
-            {
-                if (!string.IsNullOrWhiteSpace(value))
-                {
-                    json.Add(key, JToken.Parse(value));
-                }
-            }
-            else
-            {
-                json.Add(key, value);
-            }
-        }
-
-        private static void AddValueOrJson(JArray json, string key, string value)
-        {
-            if (key.EndsWith(".json"))
-            {
-                if (!string.IsNullOrWhiteSpace(value))
-                {
-                    json.Add(JToken.Parse(value));
-                }
-            }
-            else
-            {
-                json.Add(value);
-            }
-        }
-
-        private JObject JObjectFrom(Dictionary<string, List<string>> properties)
-        {
-            var json = new JObject();
-            foreach (var key in properties.Keys)
-            {
-                var values = properties[key].Where(x => !string.IsNullOrEmpty(x));
-                if (values.Count() == 1)
-                {
-                    AddPropertyOrJson(json, key, values.First());
-                    continue;
-                }
-                var array = new JArray();
-                foreach (var item in values)
-                {
-                    AddValueOrJson(array, key, item);
-                }
-                json.Add(key, array);
-            }
-            return json;
         }
 
         private ICommandValues _values;

@@ -381,5 +381,100 @@ namespace Azure.AI.Details.Common.CLI
             writer.Flush();
             return Encoding.UTF8.GetString(stream.ToArray());
         }
+
+        public static string GetJsonObjectText(Dictionary<string, List<string>> properties)
+        {
+            using var stream = new MemoryStream();
+            using var writer = new Utf8JsonWriter(stream, new JsonWriterOptions{ Indented = false });
+
+            WriteJsonObject(writer, properties);
+
+            writer.Flush();
+            return Encoding.UTF8.GetString(stream.ToArray());
+        }
+
+        public static string GetJsonArrayText(List<Dictionary<string, string>> list)
+        {
+            using var stream = new MemoryStream();
+            using var writer = new Utf8JsonWriter(stream, new JsonWriterOptions{ Indented = false });
+
+            WriteJsonArray(writer, list);
+
+            writer.Flush();
+            return Encoding.UTF8.GetString(stream.ToArray());
+        }
+
+        private static void WriteJsonArray(Utf8JsonWriter writer, List<Dictionary<string, string>> items)
+        {
+            writer.WriteStartArray();
+            foreach (var item in items.Where(x => x != null).ToList())
+            {
+                WriteJsonObject(writer, item);
+            }
+            writer.WriteEndArray();
+        }
+
+        private static void WriteJsonObject(Utf8JsonWriter writer, Dictionary<string, string> properties)
+        {
+            writer.WriteStartObject();
+            foreach (var key in properties.Keys)
+            {
+                WritePropertyJsonOrString(writer, key, properties[key]);
+            }
+            writer.WriteEndObject();
+        }
+
+        private static void WritePropertyJsonOrString(Utf8JsonWriter writer, string key, string value)
+        {
+            if (key.EndsWith(".json"))
+            {
+                if (!string.IsNullOrWhiteSpace(value))
+                {
+                    writer.WritePropertyName(key);
+                    writer.WriteRawValue(value);
+                }
+            }
+            else
+            {
+                writer.WriteString(key, value);
+            }
+        }
+
+        private static void WriteJsonOrStringValue(Utf8JsonWriter writer, string key, string value)
+        {
+            if (key.EndsWith(".json"))
+            {
+                if (!string.IsNullOrWhiteSpace(value))
+                {
+                    writer.WriteRawValue(value);
+                }
+            }
+            else
+            {
+                writer.WriteStringValue(value);
+            }
+        }
+
+        private static void WriteJsonObject(Utf8JsonWriter writer, Dictionary<string, List<string>> properties)
+        {
+            writer.WriteStartObject();
+            foreach (var key in properties.Keys)
+            {
+                var values = properties[key].Where(x => !string.IsNullOrEmpty(x));
+                if (values.Count() == 1)
+                {
+                    WritePropertyJsonOrString(writer, key, values.First());
+                    continue;
+                }
+
+                writer.WriteStartArray(key);
+                foreach (var item in values)
+                {
+                    WriteJsonOrStringValue(writer, key, item);
+                }
+                writer.WriteEndArray();
+            }
+            writer.WriteEndObject();
+        }
     }
 }
