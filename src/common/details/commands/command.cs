@@ -13,8 +13,6 @@ using System.Threading.Tasks;
 using System.Collections.Generic;
 using System.IO.Compression;
 using System.Runtime.InteropServices;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using DevLab.JmesPath;
 
 namespace Azure.AI.Details.Common.CLI

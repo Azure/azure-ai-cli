@@ -14,7 +14,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 using System.Net;
-using Newtonsoft.Json.Linq;
 using Azure.AI.Details.Common.CLI.ConsoleGui;
 
 namespace Azure.AI.Details.Common.CLI
@@ -216,11 +215,11 @@ namespace Azure.AI.Details.Common.CLI
             var json = FileHelpers.ReadAllHelpText(fileName, Encoding.UTF8);
             try
             {
-                var config = JObject.Parse(json);
-                subscription = config.ContainsKey("subscription_id") ? config["subscription_id"].ToString() : null;
-                groupName = config.ContainsKey("resource_group") ? config["resource_group"].ToString() : null;
-                projectName = config.ContainsKey("project_name") ? config["project_name"].ToString() : null;
-                projectName ??= config.ContainsKey("workspace_name") ? config["workspace_name"].ToString() : null;
+                var config = JsonDocument.Parse(json).RootElement;
+                subscription = config.GetPropertyStringOrNull("subscription_id");
+                groupName = config.GetPropertyStringOrNull("resource_group");
+                projectName = config.GetPropertyStringOrNull("project_name");
+                projectName ??= config.GetPropertyStringOrNull("workspace_name");
             }
             catch (Exception)
             {

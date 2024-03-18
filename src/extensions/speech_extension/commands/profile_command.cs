@@ -16,6 +16,7 @@ using Newtonsoft.Json.Linq;
 using Microsoft.CognitiveServices.Speech;
 using Microsoft.CognitiveServices.Speech.Audio;
 using Microsoft.CognitiveServices.Speech.Speaker;
+using System.Text.Json;
 
 namespace Azure.AI.Details.Common.CLI
 {
@@ -400,8 +401,8 @@ namespace Azure.AI.Details.Common.CLI
 
         private string CheckWriteOutputSelf(string json, string key)
         {
-            var parsed = JToken.Parse(json);
-            var id = parsed[key].Value<string>();
+            var parsed = JsonDocument.Parse(json);
+            var id = parsed.GetPropertyStringOrNull(key);
             CheckWriteOutputId(id);
             return id;
         }
@@ -415,11 +416,11 @@ namespace Azure.AI.Details.Common.CLI
             var outputLast = _values.GetOrDefault("profile.output.list.last", false);
             if (!atIdsOk && !outputLast) return;
 
-            var parsed = JToken.Parse(json);
-            var items = parsed.Type == JTokenType.Object ? parsed["profiles"] : new JArray();
-            foreach (var token in items)
+            var parsed = JsonDocument.Parse(json);
+            var items = parsed.GetPropertyArrayOrEmpty("profiles");
+            foreach (var item in items)
             {
-                var id = token[key].Value<string>();
+                var id = item.GetPropertyStringOrNull(key);
                 if (ids != null) ids.AppendLine(id); 
             } 
             if (ids != null) 
@@ -430,8 +431,8 @@ namespace Azure.AI.Details.Common.CLI
 
             if (outputLast && items.Count() > 0)
             {
-                var token = items.Last();
-                var id = token[key].Value<string>();
+                var item = items.Last();
+                var id = item.GetPropertyStringOrNull(key);
                 CheckWriteOutputId(id);
             }
         }

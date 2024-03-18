@@ -9,8 +9,8 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Net;
-using Newtonsoft.Json.Linq;
 using System.Threading;
+using System.Text.Json;
 
 namespace Azure.AI.Details.Common.CLI
 {
@@ -153,8 +153,8 @@ namespace Azure.AI.Details.Common.CLI
             // if we're checking a "status" json...
             if (statusJson != null)
             {
-                var parsed = JToken.Parse(statusJson);
-                var status = parsed["status"].Value<string>();
+                var parsed = JsonDocument.Parse(statusJson);
+                var status = parsed.GetPropertyStringOrNull("status");
                 var completed = status == "Success" || status == "Succeeded" || status == "Failed" ||
                                 status == "success" || status == "succeeded" || status == "failed";
                 if (completed) return completed;
@@ -183,9 +183,9 @@ namespace Azure.AI.Details.Common.CLI
                 var response = HttpHelpers.GetWebResponse(request);
 
                 var json = HttpHelpers.ReadWriteJson(response, values, domain);
-                var parsed = JToken.Parse(json);
+                var parsed = JsonDocument.Parse(json);
 
-                var status = parsed["status"].Value<string>();
+                var status = parsed.GetPropertyStringOrNull("status");
                 switch (status)
                 {
                     case "success":
@@ -281,10 +281,10 @@ namespace Azure.AI.Details.Common.CLI
                 request.Method = WebRequestMethods.Http.Get;
                 var response = HttpHelpers.GetWebResponse(request);
                 var json = HttpHelpers.ReadWriteJson(response, values, domain);
-                var info = JObject.Parse(json);
-                var versionList = (JArray)info["versions"];
+                var info = JsonDocument.Parse(json);
+                var versionList = info.GetPropertyArrayOrEmpty("versions");
 
-                return versionList.Last().ToString();
+                return versionList.Last().GetString();
             }
             catch (Exception)
             {

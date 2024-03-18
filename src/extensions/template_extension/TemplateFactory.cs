@@ -3,7 +3,6 @@
 // Licensed under the MIT license. See LICENSE.md file in the project root for full license information.
 //
 
-using Newtonsoft.Json.Linq;
 using Mono.TextTemplating;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -15,6 +14,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Azure.AI.Details.Common.CLI;
 using Azure.AI.Details.Common.CLI.ConsoleGui;
+using System.Text.Json;
 
 namespace Azure.AI.Details.Common.CLI.Extensions.Templates
 {
@@ -270,12 +270,12 @@ namespace Azure.AI.Details.Common.CLI.Extensions.Templates
         private static void UpdateParameters(string? jsonFile, Dictionary<string, string> parameters)
         {
             var json = FileHelpers.ReadAllText(jsonFile, new UTF8Encoding(false));
-            foreach (var item in JObject.Parse(json))
+            foreach (var item in JsonDocument.Parse(json).RootElement.EnumerateObject())
             {
-                var name = item.Key;
-                var value = parameters.Keys.Contains(name)
+                var name = item.Name;
+                var value = parameters.ContainsKey(name)
                     ? parameters[name]
-                    : item.Value?.ToString();
+                    : item.Value.ToString();
                 parameters[name] = value!;
             }
         }
