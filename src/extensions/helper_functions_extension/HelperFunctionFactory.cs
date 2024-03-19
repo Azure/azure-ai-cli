@@ -267,7 +267,7 @@ namespace Azure.AI.Details.Common.CLI.Extensions.HelperFunctions
                 var list = collection as IList;
                 foreach (var item in array)
                 {
-                    var parsed = ParseParameterValue(item.ToString(), elementType);
+                    var parsed = ParseParameterValue(item.GetRawText(), elementType);
                     if (parsed != null) list!.Add(parsed);
                 }
                 return collection!;
@@ -371,9 +371,8 @@ namespace Azure.AI.Details.Common.CLI.Extensions.HelperFunctions
             writer.WriteStartObject();
             writer.WriteString("type", "array");
 
-            writer.WriteStartObject("items");
+            writer.WritePropertyName("items");
             WriteJsonArrayItemSchemaType(writer, containerType);
-            writer.WriteEndObject();
 
             if (!string.IsNullOrEmpty(parameterDescription))
             {
