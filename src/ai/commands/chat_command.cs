@@ -688,14 +688,16 @@ namespace Azure.AI.Details.Common.CLI
 
             var textFile = _values["chat.message.history.text.file"];
             var jsonFile = InputChatHistoryJsonFileToken.Data().GetOrDefault(_values);
+            var parameterFile = InputChatParameterFileToken.Data().GetOrDefault(_values);
 
-            if(!string.IsNullOrEmpty(jsonFile) && !string.IsNullOrEmpty(textFile))
+            if(!string.IsNullOrEmpty(jsonFile) && !string.IsNullOrEmpty(textFile) && !string.IsNullOrEmpty(parameterFile))
             {
                 _values.AddThrowError("chat.message.history.text.file", "chat.message.history.json.file", "Only one of these options can be specified");
             }
 
             if (!string.IsNullOrEmpty(jsonFile)) options.ReadChatHistoryFromFile(jsonFile);
             if (!string.IsNullOrEmpty(textFile)) AddChatMessagesFromTextFile(options.Messages, textFile);
+            if (!string.IsNullOrEmpty(parameterFile)) SetValuesFromParameterFile(parameterFile);
 
             var maxTokens = _values["chat.options.max.tokens"];
             var temperature = _values["chat.options.temperature"];
@@ -954,6 +956,13 @@ namespace Azure.AI.Details.Common.CLI
                 return ChatRole.Assistant;
             }
             return currentRole ?? ChatRole.System;
+        }
+
+        private void SetValuesFromParameterFile(string parameterFile)
+        {
+            var existing = FileHelpers.DemandFindFileInDataPath(parameterFile, _values, "chat parameter");
+            var text = FileHelpers.ReadAllText(existing, Encoding.Default);
+            //TODO: parse parameter file (prompty format) and set values accordingly
         }
 
         private void AddChatMessagesFromTextFile(IList<ChatRequestMessage> messages, string textFile)

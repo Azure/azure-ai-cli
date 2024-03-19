@@ -122,6 +122,7 @@ namespace Azure.AI.Details.Common.CLI
             OutputChatAnswerFileToken.Parser(),
             OutputChatHistoryFileToken.Parser(),
             InputChatHistoryJsonFileToken.Parser(),
+            InputChatParameterFileToken.Parser(),
             // new TrueFalseRequiredPrefixNamedValueTokenParser("output", "all.answer", "01"),
             // new TrueFalseRequiredPrefixNamedValueTokenParser("output", "each.answer", "11")
 
