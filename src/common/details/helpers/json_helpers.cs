@@ -329,6 +329,13 @@ namespace Azure.AI.Details.Common.CLI
             return sb.ToString().Trim(',', ' ');
         }
 
+        public static string MergeJsonObjects(JsonElement elem1, params JsonElement[] parameters)
+        {
+            var allPages = new List<JsonElement> { elem1 };
+            allPages.AddRange(parameters);
+            return MergeJsonObjects(allPages);
+        }
+
         public static string MergeJsonObjects(List<JsonElement> allPages)
         {
             var properties = new Dictionary<string, string>();
