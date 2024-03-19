@@ -19,9 +19,9 @@ namespace Azure.AI.Details.Common.CLI
         public List<string> Tags { get; set; }
         public string Base { get; set; }
         public IModel Model { get; set; }
-        public object Inputs { get; set; }
-        public string Template { get; set; } = "f-string";
-        public Dictionary<string, object> Parameters { get; set; }
+        public Dictionary<string, string> Inputs { get; set; }
+        //public string Template { get; set; } = "f-string";
+        public ModelParameters Parameters { get; set; }
     }
 
     public interface IModel { }
@@ -45,6 +45,20 @@ namespace Azure.AI.Details.Common.CLI
     {
         public string Type { get; set; } = "model_as_a_service";
         public string AzureEndpoint { get; set; }
+    }
+
+    public class ModelParameters
+    {
+        public object ResponseFormat { get; set; }
+        public int Seed { get; set; }
+        public int MaxTokens { get; set; }
+        public double Temperature { get; set; }
+
+        public List<object> Tools { get; set; }
+        public double FrequencyPenalty { get; set; }
+        public double PresencePenalty { get; set; }
+        public List<string> Stop { get; set; }
+        public double TopP { get; set; }
     }
 
     public abstract class INamedValueFileParser
