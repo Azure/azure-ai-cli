@@ -17,10 +17,10 @@ namespace Azure.AI.Details.Common.CLI
     {
         public static async Task<AiHubResourceInfo> PickAiHubResource(ICommandValues values, string subscription)
         {
-            return await PickOrCreateAiHubResource(false, values, subscription);
+            return (await PickOrCreateAiHubResource(false, values, subscription)).Item1;
         }
 
-        public static async Task<AiHubResourceInfo> PickOrCreateAiHubResource(ICommandValues values, string subscription)
+        public static async Task<(AiHubResourceInfo, bool)> PickOrCreateAiHubResource(ICommandValues values, string subscription)
         {
             return await PickOrCreateAiHubResource(true, values, subscription);
         }
@@ -31,7 +31,7 @@ namespace Azure.AI.Details.Common.CLI
             return FinishPickOrCreateAiHubResource(values, resource);
         }
 
-        private static async Task<AiHubResourceInfo> PickOrCreateAiHubResource(bool allowCreate, ICommandValues values, string subscription)
+        private static async Task<(AiHubResourceInfo, bool)> PickOrCreateAiHubResource(bool allowCreate, ICommandValues values, string subscription)
         {
             ConsoleHelpers.WriteLineWithHighlight($"\n`AZURE AI RESOURCE`");
             Console.Write("\rName: *** Loading choices ***");
@@ -69,7 +69,7 @@ namespace Azure.AI.Details.Common.CLI
             var picked = ListBoxPicker.PickIndexOf(choices.ToArray());
             if (picked < 0)
             {
-                throw new ApplicationException($"CANCELED: No resource selected");
+                throw new OperationCanceledException($"CANCELED: No resource selected");
             }
 
             Console.WriteLine($"\rName: {choices[picked]}");
@@ -87,7 +87,7 @@ namespace Azure.AI.Details.Common.CLI
                 var sku = values.GetOrDefault("init.service.cognitiveservices.resource.sku", Program.CognitiveServiceResourceSku);
                 var yes = values.GetOrDefault("init.service.cognitiveservices.terms.agree", false);
 
-                var openAiResource = await AzCliConsoleGui.PickOrCreateAndConfigCognitiveServicesOpenAiKindResource(true, subscription, regionFilter, groupFilter, resourceFilter, kind, sku, yes);
+                var openAiResource = await AzCliConsoleGui.PickOrCreateAndConfigCognitiveServicesOpenAiKindResource(values, true, subscription, regionFilter, groupFilter, resourceFilter, kind, sku, yes);
                 values.Reset("service.openai.deployments.picked", "true");
 
                 ResourceGroupNameToken.Data().Set(values, openAiResource.Group);
@@ -105,7 +105,7 @@ namespace Azure.AI.Details.Common.CLI
                 resource = await TryCreateAiHubResourceInteractive(values, subscription);
             }
 
-            return FinishPickOrCreateAiHubResource(values, resource);
+            return (FinishPickOrCreateAiHubResource(values, resource), createNewHub);
         }
 
         private static async Task<JsonElement?> TryCreateAiHubResourceInteractive(ICommandValues values, string subscription)

@@ -73,11 +73,11 @@
           value: /test.txt
   input: |
     Create a file named "test.txt" with the following content: "Hello, World!"
-    What files are in the current directory?
+    What text files are in the current directory?
     Show me what's in the file "test.txt"
   expect: |
     assistant-function: CreateFileAndSaveText
-    assistant-function: FindAllFilesInCurrentDirectory
+    assistant-function: FindAllFilesMatchingPattern
     test.txt
     Hello, World!
 

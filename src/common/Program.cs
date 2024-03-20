@@ -3,15 +3,11 @@
 // Licensed under the MIT license. See LICENSE.md file in the project root for full license information.
 //
 
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.IO;
-using System.Linq;
 using System.Reflection;
-using System.Runtime.InteropServices;
 using System.Text;
 using System.Text.Json;
+using Azure.AI.Details.Common.CLI.Telemetry;
+using Azure.AI.Details.Common.CLI.Telemetry.Events;
 using System.Threading.Tasks;
 
 namespace Azure.AI.Details.Common.CLI
@@ -27,6 +23,8 @@ namespace Azure.AI.Details.Common.CLI
         {
             _data = data;
 
+            Program.Telemetry.LogEvent(new LaunchedTelemetryEvent());
+
             var screen = ConsoleGui.Screen.Current;
             Console.OutputEncoding = Encoding.UTF8;
             Console.CancelKeyPress += (s, e) =>
@@ -41,7 +39,7 @@ namespace Azure.AI.Details.Common.CLI
             ICommandValues values = new CommandValues();
             INamedValueTokens tokens = new CmdLineTokenSource(mainArgs, values);
 
-            var exitCode = ParseCommand(tokens, values);
+            int exitCode = ParseCommand(tokens, values);
             if (exitCode == 0 && !values.DisplayHelpRequested())
             {
                 if (!values.DisplayVersionRequested() && !values.DisplayUpdateRequested())
@@ -396,14 +394,47 @@ namespace Azure.AI.Details.Common.CLI
 
         private static bool RunCommand(ICommandValues values)
         {
-            bool passed = false;
+            string errorInfo = null;
+            var outcome = Outcome.Unknown;
 
-            TryCatchErrorOrException(values, () =>
+            try
             {
-                passed = CommandRunDispatcher.DispatchRunCommand(values);
-            });
+                bool success = CommandRunDispatcher.DispatchRunCommand(values);
+                if (success)
+                {
+                    outcome = Outcome.Success;
+                }
+                else
+                {
+                    outcome = Outcome.Failed;
+                    errorInfo = $"Failed while running '{values.GetCommand()}' command";
+                }
+            }
+            catch (OperationCanceledException ex)
+            {
+                errorInfo = "Timed out";
+                outcome = Outcome.TimedOut;
 
-            return passed;
+                DisplayErrorOrException(values, ex);
+            }
+            catch (Exception ex)
+            {
+                errorInfo = ex.Message;
+                outcome = Outcome.Failed;
+
+                DisplayErrorOrException(values, ex);
+            }
+            finally
+            {
+                _data?.Telemetry?.LogEvent(new CommandTelemetryEvent()
+                {
+                    Type = values.GetCommand("unknown"),
+                    Outcome = outcome,
+                    ErrorInfo = errorInfo
+                });
+            }
+
+            return outcome == Outcome.Success;
         }
 
         private static IProgramData _data;
@@ -448,5 +479,7 @@ namespace Azure.AI.Details.Common.CLI
         public static bool DisplayKnownErrors(ICommandValues values, Exception ex) => _data != null && _data.DisplayKnownErrors(values, ex);
 
         public static IEventLoggerHelpers EventLoggerHelpers => _data?.EventLoggerHelpers;
+
+        public static ITelemetry Telemetry => _data.Telemetry;
     }
 }
