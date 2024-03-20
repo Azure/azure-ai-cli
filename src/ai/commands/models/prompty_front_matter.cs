@@ -19,8 +19,10 @@ namespace Azure.AI.Details.Common.CLI
         public List<string> Tags { get; set; }
         public string Base { get; set; }
         public IModel Model { get; set; }
-        public Dictionary<string, string> Inputs { get; set; }
-        //public string Template { get; set; } = "f-string";
+        public string Inputs { get; set; }
+        public string InputPath { get; set; }
+        public Dictionary<string, string> InputMap { get; set; }
+        public string Template { get; set; } = "f-string";
         public ModelParameters Parameters { get; set; }
     }
 
@@ -59,26 +61,5 @@ namespace Azure.AI.Details.Common.CLI
         public double PresencePenalty { get; set; }
         public List<string> Stop { get; set; }
         public double TopP { get; set; }
-    }
-
-    public abstract class INamedValueFileParser
-    {
-        public abstract bool Parse(string path, INamedValues values);
-    }
-
-    public class NamedValuePromptyFileParser : INamedValueFileParser
-    {
-        /// <summary>
-        /// Constructor
-        /// </summary>
-        public NamedValuePromptyFileParser()
-        {
-        }
-
-        public override bool Parse(string path, INamedValues values)
-        {
-            bool parsed = false;
-            return parsed;
-        }
     }
 }
