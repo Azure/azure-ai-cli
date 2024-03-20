@@ -32,6 +32,13 @@
       - name: install requirements
         bash: |
           cd speech-to-text-py
+          if [ -f /etc/os-release ]; then
+            python3 -m venv env
+            source env/bin/activate
+          else
+            python -m venv env
+            source env/Scripts/activate
+          fi
           pip install -r requirements.txt
       # - name: run template
       #   command: ai dev shell
@@ -39,8 +46,10 @@
       #     bash: |
       #       cd speech-to-text-py
       #       if [ -f /etc/os-release ]; then
+      #         source env/bin/activate
       #         python3 main.py
       #       else
+      #         source env/Scripts/activate
       #         python main.py
       #       fi
       #   tag: skip-run-requires-microphone
@@ -67,6 +76,13 @@
       - name: install requirements
         bash: |
           cd speech-to-text-continuous-reco-py
+          if [ -f /etc/os-release ]; then
+            python3 -m venv env
+            source env/bin/activate
+          else
+            python -m venv env
+            source env/Scripts/activate
+          fi
           pip install -r requirements.txt
       # - name: run template
       #   command: ai dev shell
@@ -74,8 +90,10 @@
       #     bash: |
       #       cd speech-to-text-continuous-reco-py
       #       if [ -f /etc/os-release ]; then
+      #         source env/bin/activate
       #         python3 main.py
       #       else
+      #         source env/Scripts/activate
       #         python main.py
       #       fi
       #   tag: skip-run-requires-microphone
@@ -105,6 +123,13 @@
       - name: install requirements
         bash: |
           cd speech-to-text-with-file-py
+          if [ -f /etc/os-release ]; then
+            python3 -m venv env
+            source env/bin/activate
+          else
+            python -m venv env
+            source env/Scripts/activate
+          fi
           pip install -r requirements.txt
       - name: create audio file for input
         command: ai speech synthesize --text "Hello world" --audio-output "speech-to-text-with-file-py/hello.wav"
@@ -114,8 +139,10 @@
           bash: |
             cd speech-to-text-with-file-py
             if [ -f /etc/os-release ]; then
+              source env/bin/activate
               python3 main.py hello.wav
             else
+              source env/Scripts/activate
               python main.py hello.wav
             fi
 
@@ -143,6 +170,13 @@
       - name: install requirements
         bash: |
           cd speech-to-text-with-keyword-py
+          if [ -f /etc/os-release ]; then
+            python3 -m venv env
+            source env/bin/activate
+          else
+            python -m venv env
+            source env/Scripts/activate
+          fi
           pip install -r requirements.txt
       # - name: create audio file for input
       #   command: ai speech synthesize --text "Computer tell me a joke. Computer tell me another joke." --audio-output "speech-to-text-with-keyword-py/jokes.wav"
@@ -152,8 +186,10 @@
       #     bash: |
       #       cd speech-to-text-with-keyword-py
       #       if [ -f /etc/os-release ]; then
+      #         source env/bin/activate
       #         python3 main.py jokes.wav
       #       else
+      #         source env/Scripts/activate
       #         python main.py jokes.wav
       #       fi
       #   tag: skip-run-requires-bugfix
@@ -183,6 +219,13 @@
       - name: install requirements
         bash: |
           cd speech-to-text-with-translation-py
+          if [ -f /etc/os-release ]; then
+            python3 -m venv env
+            source env/bin/activate
+          else
+            python -m venv env
+            source env/Scripts/activate
+          fi
           pip install -r requirements.txt
       - name: create audio file for input
         command: ai speech synthesize --text "Hello world" --audio-output "speech-to-text-with-translation-py/hello.wav"
@@ -192,8 +235,10 @@
           bash: |
             cd speech-to-text-with-translation-py
             if [ -f /etc/os-release ]; then
+              source env/bin/activate
               python3 main.py hello.wav
             else
+              source env/Scripts/activate
               python main.py hello.wav
             fi
 
@@ -221,6 +266,13 @@
       - name: install requirements
         bash: |
           cd text-to-speech-py
+          if [ -f /etc/os-release ]; then
+            python3 -m venv env
+            source env/bin/activate
+          else
+            python -m venv env
+            source env/Scripts/activate
+          fi
           pip install -r requirements.txt
       # - name: run template
       #   command: ai dev shell
@@ -228,8 +280,10 @@
       #     bash: |
       #       cd text-to-speech-py
       #       if [ -f /etc/os-release ]; then
+      #         source env/bin/activate
       #         python3 main.py
       #       else
+      #         source env/Scripts/activate
       #         python main.py
       #       fi
       #   tag: skip-run-requires-speakers
@@ -257,6 +311,13 @@
       - name: install requirements
         bash: |
           cd text-to-speech-with-file-py
+          if [ -f /etc/os-release ]; then
+            python3 -m venv env
+            source env/bin/activate
+          else
+            python -m venv env
+            source env/Scripts/activate
+          fi
           pip install -r requirements.txt
       - name: run template
         command: ai dev shell
@@ -264,8 +325,10 @@
           bash: |
             cd text-to-speech-with-file-py
             if [ -f /etc/os-release ]; then
+              source env/bin/activate
               python3 main.py
             else
+              source env/Scripts/activate
               python main.py
             fi
         input: |-
