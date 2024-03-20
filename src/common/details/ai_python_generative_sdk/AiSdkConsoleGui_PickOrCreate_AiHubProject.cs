@@ -369,7 +369,7 @@ namespace Azure.AI.Details.Common.CLI
 
             var configJson = JsonSerializer.Serialize(configJsonData, new JsonSerializerOptions { WriteIndented = true });
             var configJsonFile = new FileInfo("config.json");
-            FileHelpers.WriteAllText(configJsonFile.FullName, configJson + "\n", new UTF8Encoding(false));
+            FileHelpers.WriteAllText(configJsonFile.FullName, configJson, new UTF8Encoding(false));
 
             Console.WriteLine($"{configJsonFile.Name} (saved at {configJsonFile.Directory})\n");
             Console.WriteLine("  " + configJson.Replace("\n", "\n  "));
