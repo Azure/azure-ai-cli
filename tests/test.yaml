@@ -54,7 +54,6 @@
     ^  ai test \[\.\.\.\]             \(see: ai help test\)\r?$\n
     ^\r?$\n
     ^  ai chat \[\.\.\.\]             \(see: ai help chat\)\r?$\n
-    ^  ai flow \[\.\.\.\]             \(see: ai help flow\)\r?$\n
     ^\r?$\n
     ^  ai search \[\.\.\.\]           \(see: ai help search\)\r?$\n
     ^  ai speech \[\.\.\.\]           \(see: ai help speech\)\r?$\n
