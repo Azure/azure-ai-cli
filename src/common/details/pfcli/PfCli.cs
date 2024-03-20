@@ -7,7 +7,6 @@ using System;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
-using Newtonsoft.Json.Linq;
 using Azure.AI.Details.Common.CLI;
 using System.Collections.Generic;
 

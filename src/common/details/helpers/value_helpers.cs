@@ -9,7 +9,6 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Net;
-using Newtonsoft.Json.Linq;
 using System.Collections.Generic;
 
 namespace Azure.AI.Details.Common.CLI

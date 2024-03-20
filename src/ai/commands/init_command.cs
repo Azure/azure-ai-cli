@@ -14,7 +14,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 using System.Net;
-using Newtonsoft.Json.Linq;
 using Azure.AI.Details.Common.CLI.ConsoleGui;
 using Azure.AI.Details.Common.CLI.Telemetry;
 using Azure.AI.Details.Common.CLI.Telemetry.Events;
@@ -74,7 +73,13 @@ namespace Azure.AI.Details.Common.CLI
 
                 case "init.aiservices": await DoInitRootCognitiveServicesAIServicesKind(interactive); break;
                 case "init.cognitiveservices": await DoInitRootCognitiveServicesCognitiveServicesKind(interactive); break;
-                case "init.openai": await DoInitRootOpenAi(interactive); break;
+
+                case "init.openai":
+                case "init.openai.chat": await DoInitRootOpenAi(interactive, false, false, true, true, true, true); break;
+                case "init.openai.embeddings": await DoInitRootOpenAi(interactive, true, true, false, false, true, true); break;
+                case "init.openai.evaluations": await DoInitRootOpenAi(interactive, true, true, true, true, false, false); break;
+                case "init.openai.deployments": await DoInitRootOpenAi(interactive, false, true, false, true, false, true); break;
+
                 case "init.search": await DoInitRootSearch(interactive); break;
                 case "init.speech": await DoInitRootSpeech(interactive); break;
                 case "init.vision": await DoInitRootVision(interactive); break;
@@ -85,6 +90,18 @@ namespace Azure.AI.Details.Common.CLI
                 default:
                     _values.AddThrowError("WARNING", $"Unknown command '{command}'");
                     break;
+            }
+
+            var outputEnvFile = _values.GetOrDefault("init.output.env.file", false);
+            if (outputEnvFile)
+            {
+                var fileName = ".env";
+
+                var env = ConfigEnvironmentHelpers.GetEnvironment(_values);
+                var fqn = ConfigEnvironmentHelpers.SaveEnvironment(env, fileName);
+
+                Console.WriteLine($"\n{fileName} (saved at '{fqn}')\n");
+                ConfigEnvironmentHelpers.PrintEnvironment(env);
             }
 
             StopCommand();
@@ -220,7 +237,7 @@ namespace Azure.AI.Details.Common.CLI
             {
                 Console.Write("\r" + new string(' ', label.Length + 2) + "\r");
 
-                await AzCliConsoleGui.PickOrCreateAndConfigCognitiveServicesOpenAiKindResourceDeployments(null, "AZURE OPENAI RESOURCE", interactive, true, subscription, openaiResource);
+                await AzCliConsoleGui.PickOrCreateAndConfigCognitiveServicesOpenAiKindResourceDeployments(null, "AZURE OPENAI RESOURCE", interactive, subscription, openaiResource);
 
                 var searchKeys = await AzCliConsoleGui.LoadSearchResourceKeys(subscription, searchResource);
                 ConfigSetHelpers.ConfigSearchResource(searchResource.Endpoint, searchKeys.Key1);
@@ -240,11 +257,11 @@ namespace Azure.AI.Details.Common.CLI
             var json = FileHelpers.ReadAllHelpText(fileName, Encoding.UTF8);
             try
             {
-                var config = JObject.Parse(json);
-                subscription = config.ContainsKey("subscription_id") ? config["subscription_id"].ToString() : null;
-                groupName = config.ContainsKey("resource_group") ? config["resource_group"].ToString() : null;
-                projectName = config.ContainsKey("project_name") ? config["project_name"].ToString() : null;
-                projectName ??= config.ContainsKey("workspace_name") ? config["workspace_name"].ToString() : null;
+                var config = JsonDocument.Parse(json).RootElement;
+                subscription = config.GetPropertyStringOrNull("subscription_id");
+                groupName = config.GetPropertyStringOrNull("resource_group");
+                projectName = config.GetPropertyStringOrNull("project_name");
+                projectName ??= config.GetPropertyStringOrNull("workspace_name");
             }
             catch (Exception)
             {
@@ -448,7 +465,7 @@ namespace Azure.AI.Details.Common.CLI
             await DoInitProject(interactive, allowCreate, allowPick);
         }
 
-        private async Task DoInitProject(bool interactive, bool allowCreate = true, bool allowPick = true, bool allowSkipDeployments = true, bool allowSkipSearch = true)
+        private async Task DoInitProject(bool interactive, bool allowCreate = true, bool allowPick = true, bool allowSkipSearch = true)
         {
             if (allowCreate)
             {
@@ -499,19 +516,21 @@ namespace Azure.AI.Details.Common.CLI
                 createdNew = false;
             }
 
-            await AiSdkConsoleGui.ConfigAiHubProject(_values, project, createdNew, allowSkipDeployments, allowSkipSearch, subscription, resourceId, groupName, openAiEndpoint, openAiKey, searchEndpoint, searchKey);
+            await AiSdkConsoleGui.ConfigAiHubProject(_values, project, createdNew, allowSkipSearch, subscription, resourceId, groupName, openAiEndpoint, openAiKey, searchEndpoint, searchKey);
 
             ProjectNameToken.Data().Set(_values, project.Name);
             _values.Reset("service.project.id", project.Id);
         }
 
-        private async Task DoInitRootOpenAi(bool interactive)
+        private async Task DoInitRootOpenAi(bool interactive, bool skipChat = false, bool allowSkipChat = true, bool skipEmbeddings = false, bool allowSkipEmbeddings = true, bool skipEvaluations = false, bool allowSkipEvaluations = true)
         {
+            // if (!interactive) ThrowInteractiveNotSupportedApplicationException(); // POST-IGNITE: TODO: Add back non-interactive mode support
+
             await DoInitSubscriptionId(interactive);
-            await DoInitOpenAi(interactive);
+            await DoInitOpenAi(interactive, skipChat, allowSkipChat, skipEmbeddings, allowSkipEmbeddings, skipEvaluations, allowSkipEvaluations);
         }
 
-        private async Task DoInitOpenAi(bool interactive, bool allowSkipDeployments = true)
+        private async Task DoInitOpenAi(bool interactive, bool skipChat = false, bool allowSkipChat = true, bool skipEmbeddings = false, bool allowSkipEmbeddings = true, bool skipEvaluations = false, bool allowSkipEvaluations = true)
         {
             var subscriptionId = SubscriptionToken.Data().GetOrDefault(_values, "");
             var regionFilter = _values.GetOrDefault("init.service.resource.region.name", "");
@@ -525,7 +544,11 @@ namespace Azure.AI.Details.Common.CLI
             var embeddingsDeploymentFilter = _values.GetOrDefault("init.embeddings.model.deployment.name", "");
             var evaluationsDeploymentFilter = _values.GetOrDefault("init.evaluation.model.deployment.name", "");
 
-            var resource = await AzCliConsoleGui.PickOrCreateAndConfigCognitiveServicesOpenAiKindResource(_values, interactive, allowSkipDeployments, subscriptionId, regionFilter, groupFilter, resourceFilter, kind, sku, yes, chatDeploymentFilter, embeddingsDeploymentFilter, evaluationsDeploymentFilter);
+            var chatModelFilter = _values.GetOrDefault("init.chat.model.name", "");
+            var embeddingsModelFilter = _values.GetOrDefault("init.embeddings.model.name", "");
+            var evaluationsModelFilter = _values.GetOrDefault("init.evaluation.model.name", "");
+            
+            var resource = await AzCliConsoleGui.PickOrCreateAndConfigCognitiveServicesOpenAiKindResource(_values, interactive, subscriptionId, regionFilter, groupFilter, resourceFilter, kind, sku, yes, skipChat, allowSkipChat, skipEmbeddings, allowSkipEmbeddings, skipEvaluations, allowSkipEvaluations, chatDeploymentFilter, embeddingsDeploymentFilter, evaluationsDeploymentFilter, chatModelFilter, embeddingsModelFilter, evaluationsModelFilter);
             _values.Reset("service.openai.deployments.picked", "true");
 
             SubscriptionToken.Data().Set(_values, subscriptionId);
@@ -546,7 +569,7 @@ namespace Azure.AI.Details.Common.CLI
             await DoInitCognitiveServicesAIServicesKind(interactive);
         }
 
-        private async Task DoInitCognitiveServicesAIServicesKind(bool interactive, bool allowSkipDeployments = true)
+        private async Task DoInitCognitiveServicesAIServicesKind(bool interactive)
         {
             var subscriptionId = SubscriptionToken.Data().GetOrDefault(_values, "");
             var regionFilter = _values.GetOrDefault("init.service.resource.region.name", "");
@@ -556,7 +579,7 @@ namespace Azure.AI.Details.Common.CLI
             var sku = _values.GetOrDefault("init.service.cognitiveservices.resource.sku", Program.CognitiveServiceResourceSku);
             var yes = _values.GetOrDefault("init.service.cognitiveservices.terms.agree", false);
 
-            var resource = await AzCliConsoleGui.PickOrCreateAndConfigCognitiveServicesAiServicesKindResource(_values, interactive, allowSkipDeployments, subscriptionId, regionFilter, groupFilter, resourceFilter, kind, sku, yes);
+            var resource = await AzCliConsoleGui.PickOrCreateAndConfigCognitiveServicesAiServicesKindResource(_values, interactive, subscriptionId, regionFilter, groupFilter, resourceFilter, kind, sku, yes);
 
             SubscriptionToken.Data().Set(_values, subscriptionId);
             _values.Reset("service.resource.region.name", resource.RegionLocation);

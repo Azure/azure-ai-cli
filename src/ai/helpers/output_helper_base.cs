@@ -17,8 +17,6 @@ using Microsoft.CognitiveServices.Speech.Transcription;
 using System.Collections.Generic;
 using System.IO.Compression;
 using System.Globalization;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using System.Net;
 using DevLab.JmesPath;
 
@@ -230,7 +228,7 @@ namespace Azure.AI.Details.Common.CLI
 
         private void OutputAllJsonFile()
         {
-            var json = JObjectFrom(_outputAllCache).ToString() + Environment.NewLine;
+            var json = JsonHelpers.GetJsonObjectText(_outputAllCache) + Environment.NewLine;
             FileHelpers.AppendAllText(_outputAllFileName, json, Encoding.UTF8);
         }
 
@@ -394,7 +392,7 @@ namespace Azure.AI.Details.Common.CLI
 
         private void OutputEachJsonFile()
         {
-            var json = JArrayFrom(_outputEachCache2).ToString() + Environment.NewLine;
+            var json = JsonHelpers.GetJsonArrayText(_outputEachCache2) + Environment.NewLine;
             FileHelpers.AppendAllText(_outputEachFileName, json, Encoding.UTF8);
         }
 
@@ -477,77 +475,6 @@ namespace Azure.AI.Details.Common.CLI
             if (entry != null) entry.Delete();
 
             zip.CreateEntryFromFile(file, name);
-        }
-
-        private JArray JArrayFrom(List<Dictionary<string, string>> items)
-        {
-            var json = new JArray();
-            foreach (var item in items.Where(x => x != null).ToList())
-            {
-                json.Add(JObjectFrom(item));
-            }
-            return json;
-        }
-
-        private JObject JObjectFrom(Dictionary<string, string> properties)
-        {
-            var json = new JObject();
-            foreach (var key in properties.Keys)
-            {
-                AddPropertyOrJson(json, key, properties[key]);
-            }
-            return json;
-        }
-
-        private static void AddPropertyOrJson(JObject json, string key, string value)
-        {
-            if (key.EndsWith(".json"))
-            {
-                if (!string.IsNullOrWhiteSpace(value))
-                {
-                    json.Add(key, JToken.Parse(value));
-                }
-            }
-            else
-            {
-                json.Add(key, value);
-            }
-        }
-
-        private static void AddValueOrJson(JArray json, string key, string value)
-        {
-            if (key.EndsWith(".json"))
-            {
-                if (!string.IsNullOrWhiteSpace(value))
-                {
-                    json.Add(JToken.Parse(value));
-                }
-            }
-            else
-            {
-                json.Add(value);
-            }
-        }
-
-        private JObject JObjectFrom(Dictionary<string, List<string>> properties)
-        {
-            var json = new JObject();
-            foreach (var key in properties.Keys)
-            {
-                var values = properties[key].Where(x => !string.IsNullOrEmpty(x));
-                if (values.Count() == 1)
-                {
-                    AddPropertyOrJson(json, key, values.First());
-                    continue;
-                }
-                var array = new JArray();
-                foreach (var item in values)
-                {
-                    AddValueOrJson(array, key, item);
-                }
-                json.Add(key, array);
-            }
-            return json;
         }
 
         private ICommandValues _values;

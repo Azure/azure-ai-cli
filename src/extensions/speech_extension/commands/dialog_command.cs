@@ -4,12 +4,12 @@
 //
 
 using System;
+using System.Text.Json;
 using System.Text.RegularExpressions;
 using System.Threading;
 using Microsoft.Bot.Schema;
 using Microsoft.CognitiveServices.Speech;
 using Microsoft.CognitiveServices.Speech.Dialog;
-using Newtonsoft.Json;
 
 namespace Azure.AI.Details.Common.CLI
 {
@@ -184,8 +184,8 @@ namespace Azure.AI.Details.Common.CLI
 
         private void ActivityReceived(object sender, ActivityReceivedEventArgs e)
         {
-            var activity = JsonConvert.DeserializeObject<Activity>(e.Activity);
-            if (e.HasAudio && activity.Speak != null)
+            var activity = JsonSerializer.Deserialize<Activity>(e.Activity);
+            if (e.HasAudio && activity?.Speak != null)
             {
                 // Audio playback workaround pending Speech SDK work to include
                 // automatic audio rendering in the DialogServiceConnector.
@@ -207,8 +207,8 @@ namespace Azure.AI.Details.Common.CLI
                 PrintToConsole("Audio playback complete.");
             }
 
-            if (activity.Type == ActivityTypes.Message
-                && activity.InputHint == InputHints.ExpectingInput)
+            if (activity?.Type == ActivityTypes.Message && 
+                activity.InputHint == InputHints.ExpectingInput)
             {
                 // Signal to listen for multi-turn input
                 _expectingInputActivityEvent.Set();
