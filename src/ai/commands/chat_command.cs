@@ -23,6 +23,8 @@ using System.Reflection;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
+using YamlDotNet.Serialization;
+using YamlDotNet.Serialization.NamingConventions;
 
 namespace Azure.AI.Details.Common.CLI
 {
@@ -962,6 +964,12 @@ namespace Azure.AI.Details.Common.CLI
         {
             var existing = FileHelpers.DemandFindFileInDataPath(parameterFile, _values, "chat parameter");
             var text = FileHelpers.ReadAllText(existing, Encoding.Default);
+            var deserializer = new DeserializerBuilder()
+                .WithNamingConvention(CamelCaseNamingConvention.Instance)
+                .Build();
+		
+            var obj =  deserializer.Deserialize<PromptyFrontMatter>(text);
+            Console.WriteLine(obj.Name);
             //TODO: parse parameter file (prompty format) and set values accordingly
         }
 
