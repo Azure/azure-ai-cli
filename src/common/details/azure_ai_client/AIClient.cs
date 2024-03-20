@@ -162,7 +162,7 @@ namespace Azure.AI.Details.Common.CLI
                                         projects.Add(previousProject);
                                         previousProject = null;
                                     }
-                                }    
+                                }
                             }
                             hubs.Add(hub);
                         }
@@ -172,8 +172,8 @@ namespace Azure.AI.Details.Common.CLI
             // If we have projects left without assigned hub, try to find the hub for them.
             for (int i = 0; i < projectsWithoutHub.Count; i++)
             {
-                 foreach (AIResourceHub hubCandidate in hubs)
-                 {
+                foreach (AIResourceHub hubCandidate in hubs)
+                {
                     if (hubCandidate.projects.Contains(projectsWithoutHub[i].id))
                     {
                         projectsWithoutHub[i].workspace_hub = hubCandidate.id;
@@ -248,7 +248,7 @@ namespace Azure.AI.Details.Common.CLI
                 group.GetMachineLearningWorkspace(resourceHubName);
                 throw new AIResourceException("AI resource hub already exists");
             }
-            catch(Exception)
+            catch (Exception)
             {
             }
             // Create KeyVault
@@ -429,7 +429,7 @@ namespace Azure.AI.Details.Common.CLI
             }
             projectConnection.type = categoryValueString;
             projectConnection.target = connection.Data.Properties.Target;
-            string connectionJson = JsonSerializer.Serialize(connection);
+            string connectionJson = JsonSerializer.Serialize(projectConnection);
             return "{\"connection\": " + connectionJson + "}";
         }
 
@@ -500,7 +500,7 @@ namespace Azure.AI.Details.Common.CLI
             }
             projectConnection.type = categoryValueString;
             projectConnection.target = connection.Data.Properties.Target;
-            string connectionJson = JsonSerializer.Serialize(connection);
+            string connectionJson = JsonSerializer.Serialize(projectConnection);
             return "{\"connection\": " + connectionJson + "}";
         }
 
@@ -652,4 +652,5 @@ namespace Azure.AI.Details.Common.CLI
 
             return string.Empty; // Account name not found  
         }
+    }
 }
