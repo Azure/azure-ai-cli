@@ -38,7 +38,7 @@ namespace Azure.AI.Details.Common.CLI
         {
             try
             {
-                var projectJson = PythonSDKWrapper.ListProjects(values, subscription);
+                var projectJson = AIClientWrapper.ListProjects(values, subscription);
                 var projects = JObject.Parse(projectJson)["projects"] as JArray;
                 var project = projects.FirstOrDefault(x => x["name"].ToString() == projectName);
                 if (project == null) return (null, null, null);
@@ -46,7 +46,7 @@ namespace Azure.AI.Details.Common.CLI
                 var hub = project["workspace_hub"].ToString();
                 var hubName = hub.Split('/').Last();
 
-                var json = PythonSDKWrapper.ListConnections(values, subscription, groupName, projectName);
+                var json = AIClientWrapper.ListConnections(values, subscription, groupName, projectName);
                 if (string.IsNullOrEmpty(json)) return (null, null, null);
 
                 var connections = JObject.Parse(json)["connections"] as JArray;

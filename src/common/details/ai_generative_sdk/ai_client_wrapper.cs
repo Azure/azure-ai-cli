@@ -19,56 +19,148 @@ using Newtonsoft.Json.Linq;
 
 namespace Azure.AI.Details.Common.CLI
 {
-    public class PythonSDKWrapper
+    public class AIClientWrapper
     {
+        private static bool s_usePython = true;
         static public string CreateResource(ICommandValues values, string subscription, string group, string name, string location, string displayName, string description, string openAiResourceId = null, string openAiResourceKind = null)
         {
-            return DoCreateResourceViaPython(values, subscription, group, name, location, displayName, description, openAiResourceId, openAiResourceKind);
+            if (s_usePython)
+            {
+                string resource = DoCreateResourceViaPython(values, subscription, group, name, location, displayName, description, openAiResourceId, openAiResourceKind);
+                return resource;
+
+            }
+            else
+            {
+                string resource = CheckIgnoreAIClientErrors(() => AIClient.CreateAIResourceHub(subscription, group, name, location, displayName, description, openAiResourceId, openAiResourceKind), "[]");
+                return resource;
+            }
         }
 
         static public string CreateProject(ICommandValues values, string subscription, string group, string resource, string name, string location, string displayName = null, string description = null)
         {
-            return DoCreateProjectViaPython(values, subscription, group, resource, name, location, displayName, description);
+            if (s_usePython)
+            {
+                string project = DoCreateProjectViaPython(values, subscription, group, resource, name, location, displayName, description);
+                return project;
+            }
+            else
+            {
+                string project = CheckIgnoreAIClientErrors(() => AIClient.CreateAIProject(subscription, group, resource, name, location, displayName, description), "[]");
+                return project;
+            }
         }
 
         static public string ListResources(ICommandValues values, string subscription)
         {
-            return CheckIgnorePythonSdkErrors(() => DoListResourcesViaPython(values, subscription), "[]");
+            if (s_usePython)
+            {
+                string resources = CheckIgnorePythonSdkErrors(() => DoListResourcesViaPython(values, subscription), "[]");
+                return resources;
+            }
+            else
+            {
+                string resources = CheckIgnoreAIClientErrors(() => AIClient.ListAIResourceHubs(subscription), "[]");
+                return resources;
+            }
         }
 
         static public string ListProjects(ICommandValues values, string subscription)
         {
-            return CheckIgnorePythonSdkErrors(() => DoListProjectsViaPython(values, subscription), "[]");
+            if (s_usePython)
+            {
+                string projects = CheckIgnorePythonSdkErrors(() => DoListProjectsViaPython(values, subscription), "[]");
+                return projects;
+            }
+            else
+            {
+                string projects = CheckIgnoreAIClientErrors(() => AIClient.ListAIProjects(subscription), "[]");
+                return projects;
+            }
         }
 
         static public string ListConnections(ICommandValues values, string subscription, string group, string projectName)
         {
-            return CheckIgnorePythonSdkErrors(() => DoListConnectionsViaPython(values, subscription, group, projectName), "[]");
+            if (s_usePython)
+            {
+                string connections = CheckIgnorePythonSdkErrors(() => DoListConnectionsViaPython(values, subscription, group, projectName), "[]");
+                return connections;
+            }
+            else
+            {
+                string connections = CheckIgnoreAIClientErrors(() => AIClient.ListConnections(subscription, group, projectName), "[]");
+                return connections;
+            }
         }
 
         static public string DeleteResource(ICommandValues values, string subscription, string group, string name, bool deleteDependentResources)
         {
-            return DoDeleteResourceViaPython(values, subscription, group, name, deleteDependentResources);
+            if (s_usePython)
+            {
+                string resource = DoDeleteResourceViaPython(values, subscription, group, name, deleteDependentResources);
+                return resource;
+            }
+            else
+            {
+                string resource = CheckIgnoreAIClientErrors(() => AIClient.DeleteAIResourceHub(subscription, group, name, deleteDependentResources), "[]");
+                return resource;
+            }
         }
 
         static public string DeleteProject(ICommandValues values, string subscription, string group, string name, bool deleteDependentResources)
         {
-            return DoDeleteProjectViaPython(values, subscription, group, name, deleteDependentResources);
+            if (s_usePython)
+            {
+                string project = DoDeleteProjectViaPython(values, subscription, group, name, deleteDependentResources);
+                return project;
+            }
+            else
+            {
+                string project = CheckIgnoreAIClientErrors(() => AIClient.DeleteAIProject(subscription, group, name, deleteDependentResources), "[]");
+                return project;
+            }
         }
 
         static public string DeleteConnection(ICommandValues values, string subscription, string group, string projectName, string connectionName)
         {
-            return DoDeleteConnectionViaPython(values, subscription, group, projectName, connectionName);
+            if (s_usePython)
+            {
+                string connection = DoDeleteConnectionViaPython(values, subscription, group, projectName, connectionName);
+                return connection;
+            }
+            else
+            {
+                string connection = CheckIgnoreAIClientErrors(() => AIClient.DeleteConnection(subscription, group, projectName, connectionName), "[]");
+                return connection;
+            }
         }
 
         static public string CreateConnection(ICommandValues values, string subscription, string group, string projectName, string connectionName, string connectionType, string cogServicesResourceKind, string endpoint, string key)
         {
-            return DoCreateConnectionViaPython(values, subscription, group, projectName, connectionName, connectionType, cogServicesResourceKind, endpoint, key);
+            if (s_usePython)
+            {
+                string connection = DoCreateConnectionViaPython(values, subscription, group, projectName, connectionName, connectionType, cogServicesResourceKind, endpoint, key);
+                return connection;
+            }
+            else
+            {
+                string connection = CheckIgnoreAIClientErrors(() => AIClient.CreateConnection(subscription, group, projectName, connectionName, connectionType, cogServicesResourceKind, endpoint, key), "[]");
+                return connection;
+            }
         }
 
         static public string GetConnection(ICommandValues values, string subscription, string group, string projectName, string connectionName)
         {
-            return DoGetConnectionViaPython(values, subscription, group, projectName, connectionName);
+            if (s_usePython)
+            {
+                string connection = DoGetConnectionViaPython(values, subscription, group, projectName, connectionName);
+                return connection;
+            }
+            else
+            {
+                string connection = CheckIgnoreAIClientErrors(() => AIClient.GetConnection(subscription, group, projectName, connectionName), "[]");
+                return connection;
+            }
         }
 
         static public string UpdateMLIndex(ICommandValues values, string subscription, string group, string projectName, string indexName, string embeddingModelDeployment, string embeddingModelName, string dataFiles, string externalSourceUrl, Dictionary<string, string> addToEnvironment)
@@ -235,6 +327,31 @@ namespace Azure.AI.Details.Common.CLI
             return ignorePythonSdkErrors != null && ignorePythonSdkErrors != "false" && ignorePythonSdkErrors != "0"
                 ? TryCatchHelpers.TryCatchNoThrow<string>(() => func(), returnOnError, out var exception)
                 : func();
+        }
+
+        private static string CheckIgnoreAIClientErrors(Func<string> func, string returnOnError)
+        {
+            // Check to see if the environment variable "AZAI_IGNORE_PYTHON_SDK_ERRORS" is set
+            // If it is, then we will ignore any errors from resource management and return the value of "returnOnError"
+            var ignoreResourceManagementErrors = Environment.GetEnvironmentVariable("AZAI_IGNORE_PYTHON_SDK_ERRORS");
+            return ignoreResourceManagementErrors != null && ignoreResourceManagementErrors != "false" && ignoreResourceManagementErrors != "0"
+                ? TryCatchHelpers.TryCatchNoThrow<string>(() => func(), returnOnError, out var exception)
+                : func();
+        }
+
+        private static void CheckIgnoreAIClientErrors(Action action)
+        {
+            // Check to see if the environment variable "AZAI_IGNORE_PYTHON_SDK_ERRORS" is set
+            // If it is, then we will ignore any errors from resource management
+            var ignoreResourceManagementErrors = Environment.GetEnvironmentVariable("AZAI_IGNORE_PYTHON_SDK_ERRORS");
+            if (ignoreResourceManagementErrors != null && ignoreResourceManagementErrors != "false" && ignoreResourceManagementErrors != "0")
+            {
+                TryCatchHelpers.TryCatchNoThrow(() => action(), out var exception);
+            }
+            else
+            {
+                action();
+            }
         }
     }
 }

@@ -165,7 +165,7 @@ namespace Azure.AI.Details.Common.CLI
             var env = ConfigEnvironmentHelpers.GetEnvironment(_values);
             env = new Dictionary<string, string>(env.Where(x => x.Key == "AZURE_OPENAI_KEY"));
             
-            return PythonSDKWrapper.UpdateMLIndex(_values, subscription, groupName, projectName, indexName, embeddingModelDeployment, embeddingModelName, dataFiles, externalSourceUrl, env);
+            return AIClientWrapper.UpdateMLIndex(_values, subscription, groupName, projectName, indexName, embeddingModelDeployment, embeddingModelName, dataFiles, externalSourceUrl, env);
         }
 
         private async Task<string> DoIndexUpdateWithAISearch(string aiServicesApiKey, string searchEndpoint, string searchApiKey, string embeddingsEndpoint, string embeddingsDeployment, string embeddingsApiKey, string searchIndexName, string dataSourceConnectionName, string blobContainer, string pattern, string skillsetName, string indexerName, string idFieldName, string contentFieldName, string vectorFieldName)

@@ -37,7 +37,7 @@ namespace Azure.AI.Details.Common.CLI
             ConsoleHelpers.WriteLineWithHighlight($"\n`AZURE AI RESOURCE`");
             Console.Write("\rName: *** Loading choices ***");
 
-            var json = PythonSDKWrapper.ListResources(values, subscription);
+            var json = AIClientWrapper.ListResources(values, subscription);
             if (Program.Debug) Console.WriteLine(json);
 
             var parsed = !string.IsNullOrEmpty(json) ? JToken.Parse(json) : null;
@@ -174,7 +174,7 @@ namespace Azure.AI.Details.Common.CLI
             description ??= name;
 
             Console.Write("*** CREATING ***");
-            var json = PythonSDKWrapper.CreateResource(values, subscription, groupName, name, locationName, displayName, description, openAiResourceId, openAiResourceKind);
+            var json = AIClientWrapper.CreateResource(values, subscription, groupName, name, locationName, displayName, description, openAiResourceId, openAiResourceKind);
 
             Console.WriteLine("\r*** CREATED ***  ");
 

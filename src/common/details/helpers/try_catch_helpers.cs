@@ -83,5 +83,18 @@ namespace Azure.AI.Details.Common.CLI
             }
             return defaultResult;
         }
+
+        public static void TryCatchNoThrow(Action action, out Exception functionThrewException)
+        {
+            functionThrewException = null;
+            try
+            {
+                action();
+            }
+            catch (Exception ex)
+            {
+                functionThrewException = ex;
+            }
+        }
     }
 }

@@ -104,7 +104,7 @@ namespace Azure.AI.Details.Common.CLI
             ConsoleHelpers.WriteLineWithHighlight($"\n`AZURE AI PROJECT`");
             Console.Write("\rName: *** Loading choices ***");
 
-            var json = PythonSDKWrapper.ListProjects(values, subscription);
+            var json = AIClientWrapper.ListProjects(values, subscription);
             if (Program.Debug) Console.WriteLine(json);
 
             var parsed = !string.IsNullOrEmpty(json) ? JToken.Parse(json) : null;
@@ -204,7 +204,7 @@ namespace Azure.AI.Details.Common.CLI
             description ??= name;
 
             Console.Write("*** CREATING ***");
-            var json = PythonSDKWrapper.CreateProject(values, subscription, group, resourceId, name, location, displayName, description);
+            var json = AIClientWrapper.CreateProject(values, subscription, group, resourceId, name, location, displayName, description);
 
             Console.WriteLine("\r*** CREATED ***  ");
 
@@ -236,7 +236,7 @@ namespace Azure.AI.Details.Common.CLI
 
                 var connectionType = "azure_open_ai";
                 var connectionJson = createOpenAiConnection
-                    ? PythonSDKWrapper.CreateConnection(values, subscription, groupName, projectName, connectionName, connectionType, null, openAiEndpoint, openAiKey)
+                    ? AIClientWrapper.CreateConnection(values, subscription, groupName, projectName, connectionName, connectionType, null, openAiEndpoint, openAiKey)
                     : GetConnection(values, subscription, groupName, projectName, connectionName);
 
                 var message = createSearchConnection ? "\r*** CREATED ***  " : null;
@@ -276,7 +276,7 @@ namespace Azure.AI.Details.Common.CLI
 
                 var connectionType = "cognitive_search";
                 var connectionJson = createSearchConnection
-                    ? PythonSDKWrapper.CreateConnection(values, subscription, groupName, projectName, connectionName, connectionType, null, searchEndpoint, searchKey)
+                    ? AIClientWrapper.CreateConnection(values, subscription, groupName, projectName, connectionName, connectionType, null, searchEndpoint, searchKey)
                     : GetConnection(values, subscription, groupName, projectName, connectionName);
 
                 var message = createSearchConnection ? "\r*** CREATED ***  " : null;
@@ -308,7 +308,7 @@ namespace Azure.AI.Details.Common.CLI
         {
             try
             {
-                return PythonSDKWrapper.GetConnection(values, subscription, groupName, projectName, connectionName);
+                return AIClientWrapper.GetConnection(values, subscription, groupName, projectName, connectionName);
             }
             catch (Exception)
             {

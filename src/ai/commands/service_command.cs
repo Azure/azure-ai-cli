@@ -90,7 +90,7 @@ namespace Azure.AI.Details.Common.CLI
             var message = $"{action} '{name}'";
 
             if (!_quiet) Console.WriteLine(message);
-            var output = PythonSDKWrapper.CreateResource(_values, subscription, group, name, location, displayName, description);
+            var output = AIClientWrapper.CreateResource(_values, subscription, group, name, location, displayName, description);
             if (!_quiet) Console.WriteLine($"{message} Done!\n");
 
             if (!_quiet) Console.WriteLine(output);
@@ -114,7 +114,7 @@ namespace Azure.AI.Details.Common.CLI
             var message = $"{action} '{name}'";
 
             if (!_quiet) Console.WriteLine(message);
-            var output = PythonSDKWrapper.CreateProject(_values, subscription, group, resource, name, location, displayName, description);
+            var output = AIClientWrapper.CreateProject(_values, subscription, group, resource, name, location, displayName, description);
             if (!_quiet) Console.WriteLine($"{message} Done!\n");
 
             if (!_quiet) Console.WriteLine(output);
@@ -141,7 +141,7 @@ namespace Azure.AI.Details.Common.CLI
             var message = $"{action} '{connectionName}'";
 
             if (!_quiet) Console.WriteLine(message);
-            var output = PythonSDKWrapper.CreateConnection(_values, subscription, group, project, connectionName, connectionType, cogServicesResourceKind, connectionEndpoint, connectionKey);
+            var output = AIClientWrapper.CreateConnection(_values, subscription, group, project, connectionName, connectionType, cogServicesResourceKind, connectionEndpoint, connectionKey);
             if (!_quiet) Console.WriteLine($"{message} Done!\n");
 
             if (!_quiet) Console.WriteLine(output);
@@ -157,7 +157,7 @@ namespace Azure.AI.Details.Common.CLI
             var message = $"{action} for '{subscription}'";
 
             if (!_quiet) Console.WriteLine(message);
-            var output = PythonSDKWrapper.ListResources(_values, subscription);
+            var output = AIClientWrapper.ListResources(_values, subscription);
             if (!_quiet) Console.WriteLine($"{message} Done!\n");
 
             if (!_quiet) Console.WriteLine(output);
@@ -173,7 +173,7 @@ namespace Azure.AI.Details.Common.CLI
             var message = $"{action} for '{subscription}'";
 
             if (!_quiet) Console.WriteLine(message);
-            var output = PythonSDKWrapper.ListProjects(_values, subscription);
+            var output = AIClientWrapper.ListProjects(_values, subscription);
             if (!_quiet) Console.WriteLine($"{message} Done!\n");
 
             if (!_quiet) Console.WriteLine(output);
@@ -191,7 +191,7 @@ namespace Azure.AI.Details.Common.CLI
             var message = $"{action} for '{project}'";
 
             if (!_quiet) Console.WriteLine(message);
-            var output = PythonSDKWrapper.ListConnections(_values, subscription, group, project);
+            var output = AIClientWrapper.ListConnections(_values, subscription, group, project);
             if (!_quiet) Console.WriteLine($"{message} Done!\n");
 
             if (!_quiet) Console.WriteLine(output);
@@ -212,7 +212,7 @@ namespace Azure.AI.Details.Common.CLI
             var message = $"{action} for '{resourceName}'";
 
             if (!_quiet) Console.WriteLine(message);
-            var output = PythonSDKWrapper.DeleteResource(_values, subscription, group, resourceName, deleteDependentResources);
+            var output = AIClientWrapper.DeleteResource(_values, subscription, group, resourceName, deleteDependentResources);
             if (!_quiet) Console.WriteLine($"{message} Done!\n");
 
             if (!_quiet) Console.WriteLine(output);
@@ -233,7 +233,7 @@ namespace Azure.AI.Details.Common.CLI
             var message = $"{action} for '{projectName}'";
 
             if (!_quiet) Console.WriteLine(message);
-            var output = PythonSDKWrapper.DeleteProject(_values, subscription, group, projectName, deleteDependentResources);
+            var output = AIClientWrapper.DeleteProject(_values, subscription, group, projectName, deleteDependentResources);
             if (!_quiet) Console.WriteLine($"{message} Done!\n");
 
             if (!_quiet) Console.WriteLine(output);
@@ -253,7 +253,7 @@ namespace Azure.AI.Details.Common.CLI
             var message = $"{action} for '{connectionName}'";
 
             if (!_quiet) Console.WriteLine(message);
-            var output = PythonSDKWrapper.DeleteConnection(_values, subscription, group, projectName, connectionName);
+            var output = AIClientWrapper.DeleteConnection(_values, subscription, group, projectName, connectionName);
             if (!_quiet) Console.WriteLine($"{message} Done!\n");
 
             if (!_quiet) Console.WriteLine(output);
