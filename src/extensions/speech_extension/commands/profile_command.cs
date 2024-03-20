@@ -11,11 +11,10 @@ using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 using System.Net;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using Microsoft.CognitiveServices.Speech;
 using Microsoft.CognitiveServices.Speech.Audio;
 using Microsoft.CognitiveServices.Speech.Speaker;
+using System.Text.Json;
 
 namespace Azure.AI.Details.Common.CLI
 {
@@ -157,30 +156,32 @@ namespace Azure.AI.Details.Common.CLI
             }
         }
 
-        private List<string> GetAllIdsFromFile(string profilesList, string key)
+        private List<string>? GetAllIdsFromFile(string profilesList, string key)
         {
-            dynamic list = JsonConvert.DeserializeObject(profilesList);
-            if (list is JArray)
+            var parsed = JsonDocument.Parse(profilesList);
+            var root = parsed.RootElement;
+
+            if (root.ValueKind == JsonValueKind.Array)
             {
-                return ParseArray(list, key);
+                return ParseArray(root.EnumerateArray().ToArray(), key);
             }
-            else if (list.ContainsKey("value"))
+            else if (root.TryGetProperty("value", out var value))
             {
-                return ParseArray(list.value, "profileId");
+                return ParseArray(value.EnumerateArray().ToArray(), "profileId");
             }
-            else if (list.ContainsKey("profiles"))
+            else if (root.TryGetProperty("profiles", out var profiles))
             {
-                return ParseArray(list.profiles, "profileId");
+                return ParseArray(profiles.EnumerateArray().ToArray(), "profileId");
             }
             return null;
         }
 
-        private List<string> ParseArray(JArray array, string key)
+        private List<string> ParseArray(JsonElement[] array, string key)
         {
-            var ids = new List<string>{};
+            var ids = new List<string>{}; 
             foreach (var token in array)
             {
-                var id = token[key].Value<string>();
+                var id = token.GetPropertyStringOrNull(key);
                 ids.Add(id); 
             }
 
@@ -360,21 +361,28 @@ namespace Azure.AI.Details.Common.CLI
 
         private string ReadWritePrintResultJson(object result, string resultReason)
         {
-            var jsonString = Newtonsoft.Json.JsonConvert.SerializeObject(result);
-            var obj = JObject.Parse(jsonString);
-            obj["Reason"] = resultReason;
-            return ReadWritePrintObjectJson(obj);
+            var resultJson = System.Text.Json.JsonSerializer.Serialize(result);
+            var resultParsed = JsonDocument.Parse(resultJson);
+
+            var reasonJson = $"{{\"Reason\": \"{resultReason}\"}}";
+            var reasonParsed = JsonDocument.Parse(reasonJson);
+
+            var json = JsonHelpers.MergeJsonObjects(resultParsed.RootElement, reasonParsed.RootElement); 
+            FileHelpers.CheckOutputJson(json, _values, "profile");
+
+            if (!_quiet && _verbose) JsonHelpers.PrintJson(json);
+
+            return json;
         }
 
         private string ReadWritePrintObjectJson(object o)
         {
-            var jsonString = Newtonsoft.Json.JsonConvert.SerializeObject(o);
-            using (var stream = new MemoryStream(Encoding.UTF8.GetBytes(jsonString ?? "")))
-            {
-              var json = FileHelpers.ReadTextWriteIfJson(stream, true, _values, "profile");
-              if (!_quiet && _verbose) JsonHelpers.PrintJson(json);
-              return json;
-            }
+            var json = System.Text.Json.JsonSerializer.Serialize(o) + Environment.NewLine;
+            FileHelpers.CheckOutputJson(json, _values, "profile");
+
+            if (!_quiet && _verbose) JsonHelpers.PrintJson(json);
+
+            return json;
         }
 
         private void CheckWriteOutputId(string id)
@@ -400,8 +408,8 @@ namespace Azure.AI.Details.Common.CLI
 
         private string CheckWriteOutputSelf(string json, string key)
         {
-            var parsed = JToken.Parse(json);
-            var id = parsed[key].Value<string>();
+            var parsed = JsonDocument.Parse(json);
+            var id = parsed.GetPropertyStringOrNull(key);
             CheckWriteOutputId(id);
             return id;
         }
@@ -415,11 +423,11 @@ namespace Azure.AI.Details.Common.CLI
             var outputLast = _values.GetOrDefault("profile.output.list.last", false);
             if (!atIdsOk && !outputLast) return;
 
-            var parsed = JToken.Parse(json);
-            var items = parsed.Type == JTokenType.Object ? parsed["profiles"] : new JArray();
-            foreach (var token in items)
+            var parsed = JsonDocument.Parse(json);
+            var items = parsed.GetPropertyArrayOrEmpty("profiles");
+            foreach (var item in items)
             {
-                var id = token[key].Value<string>();
+                var id = item.GetPropertyStringOrNull(key);
                 if (ids != null) ids.AppendLine(id); 
             } 
             if (ids != null) 
@@ -430,8 +438,8 @@ namespace Azure.AI.Details.Common.CLI
 
             if (outputLast && items.Count() > 0)
             {
-                var token = items.Last();
-                var id = token[key].Value<string>();
+                var item = items.Last();
+                var id = item.GetPropertyStringOrNull(key);
                 CheckWriteOutputId(id);
             }
         }

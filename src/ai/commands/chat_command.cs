@@ -11,9 +11,8 @@ using Microsoft.CognitiveServices.Speech;
 using Microsoft.SemanticKernel;
 using Microsoft.SemanticKernel.Connectors.Memory.AzureCognitiveSearch;
 using Microsoft.SemanticKernel.Memory;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using System;
+using System.Text.Json;
 using System.ClientModel.Primitives;
 using System.Collections.Generic;
 using System.Diagnostics.Tracing;
@@ -21,8 +20,8 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text;
-using System.Text.Json;
 using System.Threading.Tasks;
+using System.Text.Json.Nodes;
 
 namespace Azure.AI.Details.Common.CLI
 {
@@ -80,10 +79,10 @@ namespace Azure.AI.Details.Common.CLI
 
             if (!string.IsNullOrEmpty(output))
             {
-                var parsed = JArray.Parse(output);
+                var parsed = JsonDocument.Parse(output).RootElement.EnumerateArray();
                 foreach (var item in parsed)
                 {
-                    Console.WriteLine(item.ToString(Formatting.None));
+                    Console.WriteLine(item.GetRawText());
                 }
             }
         }
@@ -134,28 +133,28 @@ namespace Azure.AI.Details.Common.CLI
                 return (answer, context);
             };
 
-            var results = new JArray();
+            var results = new JsonArray();
             foreach (var line in lines)
             {
                 var jsonText = line.Trim();
                 if (string.IsNullOrEmpty(jsonText)) continue;
 
-                var json = JObject.Parse(jsonText);
-                var question = json["question"].ToString();
+                var json = JsonDocument.Parse(jsonText).RootElement;
+                var question = json.GetPropertyStringOrNull("question");
 
                 var (answer, context) = chatTextHandler(question);
                 if (!string.IsNullOrEmpty(answer))
                 {
-                    var result = new JObject();
-                    result["question"] = question;
-                    result["answer"] = answer;
-                    if (json.ContainsKey("truth")) result["truth"] = json["truth"];
-                    if (!string.IsNullOrEmpty(context)) result["context"] = context;
+                    var result = new JsonObject();
+                    result.Add("question", question);
+                    result.Add("answer", answer);
+                    if (json.TryGetProperty("truth", out var truth)) result.Add("truth", truth.GetRawText());
+                    if (!string.IsNullOrEmpty(context)) result.Add("context", context);
                     results.Add(result);
                 }
             }
 
-            return results.ToString(Formatting.None);
+            return results.ToString();
         }
 
         private ChatResponseMessage GetChatCompletion(OpenAIClient client, ChatCompletionsOptions options, HelperFunctionCallContext funcContext)
@@ -197,10 +196,10 @@ namespace Azure.AI.Details.Common.CLI
         private string ChatEvalNonFunction(string action, string command)
         {
             var data = ChatRunNonFunction();
-            var parsed = JArray.Parse(data);
+            var parsed = JsonDocument.Parse(data).RootElement.EnumerateArray();
 
             var sb = new StringBuilder();
-            parsed.ToList().ForEach(x => sb.AppendLine(x.ToString(Formatting.None)));
+            parsed.ToList().ForEach(x => sb.AppendLine(x.GetRawText()));
             data = sb.ToString();
 
             var dataFile = Path.GetTempFileName();

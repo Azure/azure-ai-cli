@@ -17,7 +17,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.CognitiveServices.Speech;
 using Microsoft.CognitiveServices.Speech.Audio;
-using Newtonsoft.Json.Linq;
 
 namespace Azure.AI.Details.Common.CLI
 {
@@ -93,11 +92,11 @@ namespace Azure.AI.Details.Common.CLI
             if (!_quiet) Console.WriteLine($"Fetched onprem batch transcriptions.\n");
             
             var batchPaths = new StringBuilder();
-            var parsed = JToken.Parse(json);
-            var items = parsed.Type == JTokenType.Object ? parsed["values"] : new JArray();
-            foreach (var token in items)
+            var parsed = JsonDocument.Parse(json);
+            var items = parsed.GetPropertyArrayOrEmpty("values");
+            foreach (var item in items)
             {
-                var batchPath = token["self"].Value<string>();
+                var batchPath = item.GetPropertyStringOrNull("self");
                 batchPaths.AppendLine(batchPath);
             }
 
@@ -308,10 +307,13 @@ namespace Azure.AI.Details.Common.CLI
             if (!_quiet) Console.WriteLine($"{message} Done!\n");
 
             var json = ReadWritePrintJson(response, true);
-            if (json.Contains("@nextLink") && !query.Contains("top="))
+            var parsed = JsonDocument.Parse(json);
+
+            var nextLink = parsed.GetPropertyStringOrNull("@nextLink");
+            if (!string.IsNullOrEmpty(nextLink) && !query.Contains("top="))
             {
-                var allPages = (JContainer)JToken.Parse(json);
-                var nextLink = allPages["@nextLink"].Value<string>();
+                var allPages = new List<JsonElement>();
+                allPages.Add(parsed.RootElement);
 
                 for (; ;)
                 {
@@ -325,15 +327,15 @@ namespace Azure.AI.Details.Common.CLI
                     if (!_quiet) Console.WriteLine($"{message} Done!\n");
 
                     var jsonNext = ReadWritePrintJson(responseNext, true);
-                    if (!jsonNext.Contains("@nextLink")) break;
+                    var parsedNext = JsonDocument.Parse(jsonNext);
+                    var thisPage = parsedNext.RootElement;
+                    allPages.Add(thisPage);
 
-                    var parsedNext = JToken.Parse(jsonNext);
-                    nextLink = parsedNext["@nextLink"].Value<string>();
-
-                    allPages.Merge(parsedNext);
+                    nextLink = thisPage.GetPropertyStringOrNull("@nextLink");
+                    if (string.IsNullOrEmpty(nextLink)) break;
                 }
 
-                json = allPages.ToString();
+                json = JsonHelpers.MergeJsonObjects(allPages);
             }
 
             FileHelpers.CheckOutputJson(json, _values, "batch");
@@ -364,10 +366,10 @@ namespace Azure.AI.Details.Common.CLI
             }
 
             var json = ReadWritePrintJson(response);
-            var parsed = JToken.Parse(json);
+            var parsed = JsonDocument.Parse(json);
 
-            var fileUrl = parsed["links"]["contentUrl"].Value<string>();
-            var fileName = parsed["name"].Value<string>();
+            var fileUrl = parsed.GetPropertyElementOrNull("links")?.GetPropertyStringOrNull("contentUrl") ?? string.Empty;
+            var fileName = parsed.GetPropertyStringOrNull("name");
             return DownloadUrl(fileUrl, fileName);
         }
 

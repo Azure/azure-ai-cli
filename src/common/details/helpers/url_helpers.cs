@@ -9,8 +9,8 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Net;
-using Newtonsoft.Json.Linq;
 using System.Collections.Generic;
+using System.Text.Json;
 
 namespace Azure.AI.Details.Common.CLI
 {
@@ -84,9 +84,9 @@ namespace Azure.AI.Details.Common.CLI
 
         public static void CheckWriteOutputNameOrId(string json, string nameOrIdName, INamedValues values, string domain, IdKind kind)
         {
-            var parsed = JToken.Parse(json);
-            var value = parsed?[nameOrIdName];
-            var nameOrId = value?.Value<string>();
+            var parsed = JsonDocument.Parse(json);
+            var value = parsed.GetPropertyElementOrNull(nameOrIdName);
+            var nameOrId = value?.GetString();
             CheckWriteOutputNameOrId(nameOrId, values, domain, kind);
         }
 
@@ -138,9 +138,9 @@ namespace Azure.AI.Details.Common.CLI
 
         public static string CheckWriteOutputUrlOrId(string json, string urlName, INamedValues values, string domain, IdKind kinds = IdKind.Guid)
         {
-            var parsed = JToken.Parse(json);
-            var value = parsed?[urlName];
-            var url = value?.Value<string>();
+            var parsed = JsonDocument.Parse(json);
+            var value = parsed?.GetPropertyElementOrNull(urlName);
+            var url = value?.GetString();
             return CheckWriteOutputUrlOrId(url, values, domain, kinds);
         }
 
@@ -248,17 +248,12 @@ namespace Azure.AI.Details.Common.CLI
 
         private static void GetUrlsAndIdsForOneKind(string json, string arrayName, string urlName, IList<string> urls, IList<string> ids, IdKind oneKind)
         {
-            var parsed = JToken.Parse(json);
-            var items = parsed.Type == JTokenType.Array
-                ? parsed
-                : parsed.Type == JTokenType.Object && arrayName != null
-                    ? parsed[arrayName]
-                    : new JArray();
+            var parsed = JsonDocument.Parse(json);
+            var items = parsed.GetPropertyArrayOrEmpty(arrayName);
 
-            foreach (var token in items ?? new JArray())
+            foreach (var item in items)
             {
-                if (!token.HasValues) continue;
-                var url = token[urlName]?.Value<string>();
+                var url = item.GetPropertyStringOrNull(urlName);
                 if (string.IsNullOrEmpty(url)) continue;
                 
                 var id = UrlHelpers.IdFromUrl(url, oneKind);

@@ -154,7 +154,6 @@ namespace Azure.AI.Details.Common.CLI
             "Microsoft.SemanticKernel.Planning.ActionPlanner.dll",
             "Microsoft.SemanticKernel.Planning.SequentialPlanner.dll",
             "Microsoft.SemanticKernel.Skills.Core.dll",
-            "Newtonsoft.Json.dll",
             "System.Diagnostics.DiagnosticSource.dll",
             "System.Interactive.Async.dll",
             "System.Linq.Async.dll",

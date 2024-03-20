@@ -9,9 +9,9 @@ using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
-using Newtonsoft.Json.Linq;
 using Azure.AI.Details.Common.CLI;
 using System.Text;
+using System.Text.Json;
 
 namespace Azure.AI.Details.Common.CLI
 {
@@ -187,17 +187,14 @@ namespace Azure.AI.Details.Common.CLI
             return output;
         }
 
-        public static async Task<ParsedJsonProcessOutput<T>> ParseShellCommandJson<T>(string command, string arguments, Dictionary<string, string> addToEnvironment = null, Action<string> stdOutHandler = null, Action<string> stdErrHandler = null) where T : JToken, new()
+        public static async Task<ParsedJsonProcessOutput<JsonElement>> ParseShellCommandJson(string command, string arguments, Dictionary<string, string> addToEnvironment = null, Action<string> stdOutHandler = null, Action<string> stdErrHandler = null)
         {
             var processOutput = await RunShellCommandAsync(command, arguments, addToEnvironment, stdOutHandler, stdErrHandler);
             var stdOutput = processOutput.StdOutput;
 
-            var parsed = !string.IsNullOrWhiteSpace(stdOutput) ? JToken.Parse(stdOutput) : null;
-
-            var x = new ParsedJsonProcessOutput<T>(processOutput);
-            x.Payload = parsed is T ? parsed as T : new T();
-
-            return x;
+            return !string.IsNullOrWhiteSpace(stdOutput)
+                ? new ParsedJsonProcessOutput<JsonElement>(processOutput) { Payload = JsonDocument.Parse(stdOutput).RootElement }
+                : new ParsedJsonProcessOutput<JsonElement>(processOutput);
         }
 
         private static Process StartShellCommandProcess(string command, string arguments, Dictionary<string, string> addToEnvironment = null, bool captureOutput = true)
