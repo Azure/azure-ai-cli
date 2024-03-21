@@ -82,12 +82,12 @@ namespace Azure.AI.Details.Common.CLI
             return Path.Combine(file.DirectoryName, $"{Path.GetFileNameWithoutExtension(file.FullName)}{appendBeforeExtension}{file.Extension}{appendAfterExtension}");
         }
 
-        public static IEnumerable<string> FindFiles(string path, string pattern, INamedValues values = null, bool checkOverrides = true, bool checkResources = true)
+        public static IEnumerable<string> FindFiles(string path, string pattern, INamedValues? values = null, bool checkOverrides = true, bool checkResources = true)
         {
             return FindFiles(PathHelpers.Combine(path, pattern), values, checkOverrides, checkResources);
         }
 
-        public static IEnumerable<string> FindFiles(string fileNames, INamedValues values = null, bool checkOverrides = true, bool checkResources = true)
+        public static IEnumerable<string> FindFiles(string fileNames, INamedValues? values = null, bool checkOverrides = true, bool checkResources = true)
         {
             var currentDir = Directory.GetCurrentDirectory();
             foreach (var item in fileNames.Split(new char[] { ';', '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries))
@@ -522,7 +522,7 @@ namespace Azure.AI.Details.Common.CLI
             return existing != null;
         }
 
-        public static string ExpandAtFileValue(string atFileValue, INamedValues values = null)
+        public static string ExpandAtFileValue(string atFileValue, INamedValues? values = null)
         {
             if (atFileValue.StartsWith("@") && FileHelpers.FileExistsInConfigPath(atFileValue[1..], values))
             {
@@ -561,7 +561,7 @@ namespace Azure.AI.Details.Common.CLI
             return text.Trim('\r', '\n');
         }
 
-        public static string GetOutputConfigFileName(string file, INamedValues values = null)
+        public static string GetOutputConfigFileName(string file, INamedValues? values = null)
         {
             file = file.TrimStart('@');
 
@@ -578,7 +578,7 @@ namespace Azure.AI.Details.Common.CLI
             return fileName == "-" || fileName == "stdout";
         }
 
-        public static string GetOutputDataFileName(string file, INamedValues values = null)
+        public static string? GetOutputDataFileName(string? file, INamedValues? values = null)
         {
             if (file == null) return null;
             if (file.StartsWith("@")) return GetOutputConfigFileName(file, values);
@@ -1229,7 +1229,7 @@ namespace Azure.AI.Details.Common.CLI
             }
         }
 
-        private static string GetConfigPath(INamedValues values = null)
+        private static string GetConfigPath(INamedValues? values = null)
         {
             var cwd = Directory.GetCurrentDirectory();
             if (_configPathCalculatedFrom != cwd)
@@ -1285,7 +1285,7 @@ namespace Azure.AI.Details.Common.CLI
             return path0.TrimEnd(';') + ";" + sb.ToString().TrimEnd(';');
         }
 
-        public static string GetConfigOutputDir(INamedValues values = null)
+        public static string GetConfigOutputDir(INamedValues? values = null)
         {
             CheckScopedConfigOutputDir(values);
             if (!string.IsNullOrEmpty(_configOutputDirScoped)) return _configOutputDirScoped;

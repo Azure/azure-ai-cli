@@ -20,10 +20,11 @@ namespace Azure.AI.Details.Common.CLI
             var vars = Environment.GetEnvironmentVariables();
             foreach (var key in vars.Keys)
             {
-                if (key.ToString().ToLower().StartsWith($"{Program.Name}_"))
+                var ks = key.ToString() ?? string.Empty;
+                if (ks.ToLower().StartsWith($"{Program.Name}_"))
                 {
-                    var name = key.ToString().Substring(4).Replace("_", ".").ToLower();
-                    var value = vars[key].ToString();
+                    var name = ks.Substring(4).Replace("_", ".").ToLower();
+                    var value = vars[key]!.ToString();
                     _values.Add(name, value);
                 }
             }

@@ -64,7 +64,7 @@ namespace Azure.AI.Details.Common.CLI
             var atIdOk = !string.IsNullOrEmpty(atId);
             if (atIdOk)
             {
-                var atIdFile = FileHelpers.GetOutputDataFileName(atId, values);
+                var atIdFile = FileHelpers.GetOutputDataFileName(atId, values)!;
                 FileHelpers.WriteAllText(atIdFile, nameOrId, Encoding.UTF8);
                 values.Reset(atIdName); // once we wrote it, don't try to again
             }
@@ -76,7 +76,7 @@ namespace Azure.AI.Details.Common.CLI
             var addIdOk = !string.IsNullOrEmpty(addId);
             if (addIdOk)
             {
-                var addIdFile = FileHelpers.GetOutputDataFileName(addId, values);
+                var addIdFile = FileHelpers.GetOutputDataFileName(addId, values)!;
                 FileHelpers.AppendAllText(addIdFile, "\n" + nameOrId, Encoding.UTF8);
                 values.Reset(addIdName); // once we wrote it, don't try to again
             }
@@ -169,14 +169,14 @@ namespace Azure.AI.Details.Common.CLI
 
             if (atUrlsOk)
             {
-                var atUrlsFile = FileHelpers.GetOutputDataFileName(atUrls, values);
+                var atUrlsFile = FileHelpers.GetOutputDataFileName(atUrls, values)!;
                 FileHelpers.WriteAllLines(atUrlsFile, urls, new UTF8Encoding(false));
                 values.Reset(atUrlsName); // only write once
             }
 
             if (atIdsOk)
             {
-                var atIdsFile = FileHelpers.GetOutputDataFileName(atIds, values);
+                var atIdsFile = FileHelpers.GetOutputDataFileName(atIds, values)!;
                 FileHelpers.WriteAllLines(atIdsFile, ids, new UTF8Encoding(false));
                 values.Reset(atIdsName);
             }
@@ -201,7 +201,7 @@ namespace Azure.AI.Details.Common.CLI
             var atUrlOk = !string.IsNullOrEmpty(atUrl);
             if (atUrlOk)
             {
-                var atUrlFile = FileHelpers.GetOutputDataFileName(atUrl, values);
+                var atUrlFile = FileHelpers.GetOutputDataFileName(atUrl, values)!;
                 FileHelpers.WriteAllText(atUrlFile, url, Encoding.UTF8);
                 values.Reset(atUrlName); // once we wrote it, don't try to again
             }
@@ -211,7 +211,7 @@ namespace Azure.AI.Details.Common.CLI
             var addUrlOk = !string.IsNullOrEmpty(addUrl);
             if (addUrlOk)
             {
-                var addUrlFile = FileHelpers.GetOutputDataFileName(addUrl, values);
+                var addUrlFile = FileHelpers.GetOutputDataFileName(addUrl, values)!;
                 FileHelpers.AppendAllText(addUrlFile, "\n" + url, Encoding.UTF8);
                 values.Reset(addUrlName); // once we wrote it, don't try to again
             }
