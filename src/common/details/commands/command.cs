@@ -44,7 +44,7 @@ namespace Azure.AI.Details.Common.CLI
             return DispatchRunCommand(values, queue, true, true);
         }
 
-        public static bool DispatchRunCommand(ICommandValues values, Queue<ICommandValues> queue, bool expandOk, bool parallelOk)
+        public static bool DispatchRunCommand(ICommandValues values, Queue<ICommandValues>? queue, bool expandOk, bool parallelOk)
         {
             var command = values.GetCommand();
 
@@ -194,7 +194,7 @@ namespace Azure.AI.Details.Common.CLI
             _values.ReplaceValues();
         }
 
-        public static bool RunCommand(ICommandValues values, Queue<ICommandValues> queue, bool expandOk = true, bool parallelOk = true)
+        public static bool RunCommand(ICommandValues values, Queue<ICommandValues>? queue, bool expandOk = true, bool parallelOk = true)
         {
             if (expandOk) return CheckExpandRunCommand(values, queue, expandOk, parallelOk);
             if (parallelOk) return CheckParallelRunCommand(values, queue, expandOk, ref parallelOk);
@@ -202,7 +202,7 @@ namespace Azure.AI.Details.Common.CLI
             return queue != null && CheckExpectedRunInProcAsync(values, queue).Result;
         }
 
-        protected static bool CheckExpandRunCommand(ICommandValues values, Queue<ICommandValues> queue, bool expandOk, bool parallelOk)
+        protected static bool CheckExpandRunCommand(ICommandValues values, Queue<ICommandValues>? queue, bool expandOk, bool parallelOk)
         {
             bool passed = false;
 
@@ -214,23 +214,23 @@ namespace Azure.AI.Details.Common.CLI
 
             if (!string.IsNullOrEmpty(files))
             {
-                BlockValues(values, queue, $"{fileValueName}s");
-                passed = CommandRunDispatcher.DispatchRunCommand(values, ExpandQueueForEachFile(queue, fileValueName, files), expandOk, parallelOk);
+                BlockValues(values, queue!, $"{fileValueName}s");
+                passed = CommandRunDispatcher.DispatchRunCommand(values, ExpandQueueForEachFile(queue!, fileValueName, files), expandOk, parallelOk);
             }
             else if (!string.IsNullOrEmpty(forEachCount))
             {
-                BlockValues(values, queue, "foreach.count");
-                passed = CommandRunDispatcher.DispatchRunCommand(values, ExpandQueueForEachTsv(values, queue, forEachCount), expandOk, parallelOk);
+                BlockValues(values, queue!, "foreach.count");
+                passed = CommandRunDispatcher.DispatchRunCommand(values, ExpandQueueForEachTsv(values, queue!, forEachCount), expandOk, parallelOk);
             }
             else if (!string.IsNullOrEmpty(repeat))
             {
-                BlockValues(values, queue, "x.command.repeat");
-                passed = CommandRunDispatcher.DispatchRunCommand(values, ExpandQueueFromRepeatCount(queue, repeat), expandOk, parallelOk);
+                BlockValues(values, queue!, "x.command.repeat");
+                passed = CommandRunDispatcher.DispatchRunCommand(values, ExpandQueueFromRepeatCount(queue!, repeat), expandOk, parallelOk);
             }
             else
             {
                 var max = values.GetOrDefault("x.command.max", int.MaxValue);
-                if (queue.Count > max) queue = new Queue<ICommandValues>(queue.Take(max));
+                if (queue != null && queue.Count > max) queue = new Queue<ICommandValues>(queue.Take(max));
 
                 expandOk = false;
                 passed = CommandRunDispatcher.DispatchRunCommand(values, queue, expandOk, parallelOk);
@@ -377,7 +377,7 @@ namespace Azure.AI.Details.Common.CLI
             return values;
         }
 
-        protected static bool CheckParallelRunCommand(ICommandValues values, Queue<ICommandValues> queue, bool expandOk, ref bool parallelOk)
+        protected static bool CheckParallelRunCommand(ICommandValues values, Queue<ICommandValues>? queue, bool expandOk, ref bool parallelOk)
         {
             bool passed;
             var processCount = values.GetOrDefault("x.command.parallel.process.count", 0);
@@ -386,16 +386,16 @@ namespace Azure.AI.Details.Common.CLI
             if (processCount > 0)
             {
                 var rampEvery = values.GetOrDefault("x.command.parallel.ramp.threads.every", 0);
-                BlockValues(values, queue, "x.command.parallel.ramp.processes.every");
-                BlockValues(values, queue, "x.command.parallel.process.count");
-                passed = CheckExpectedRunOutOfProcAsync(values, queue, processCount, rampEvery).Result;
+                BlockValues(values, queue!, "x.command.parallel.ramp.processes.every");
+                BlockValues(values, queue!, "x.command.parallel.process.count");
+                passed = CheckExpectedRunOutOfProcAsync(values, queue!, processCount, rampEvery).Result;
             }
             else if (threadCount > 0)
             {
                 var rampEvery = values.GetOrDefault("x.command.parallel.ramp.threads.every", 0);
-                BlockValues(values, queue, "x.command.parallel.ramp.threads.every");
-                BlockValues(values, queue, "x.command.parallel.thread.count");
-                passed = CheckExpectedRunOnThreadsAsync(values, queue, threadCount, rampEvery).Result;
+                BlockValues(values, queue!, "x.command.parallel.ramp.threads.every");
+                BlockValues(values, queue!, "x.command.parallel.thread.count");
+                passed = CheckExpectedRunOnThreadsAsync(values, queue!, threadCount, rampEvery).Result;
             }
             else
             {
