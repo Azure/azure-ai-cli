@@ -34,7 +34,7 @@ namespace Azure.AI.Details.Common.CLI
 
         public static bool ParseCommandValues(INamedValueTokens tokens, ICommandValues values)
         {
-            return ParseCommandValues("help", null, tokens, values);
+            return ParseCommandValues("help", Enumerable.Empty<INamedValueTokenParser>(), tokens, values);
         }
 
         public static bool DisplayHelp(INamedValueTokens tokens, INamedValues values)
@@ -218,7 +218,7 @@ namespace Azure.AI.Details.Common.CLI
             var result = path != null ? DisplayHelp(path, values) : DisplayDefaultHelp();
 
             var checkTokensFound = allTokens?.Replace(" ", ".").Replace("--", "").Split('.');
-            var foundAllTokens = path == null || checkTokensFound.Count(x => path.Contains(x)) == checkTokensFound.Count();
+            var foundAllTokens = path == null || checkTokensFound?.Count(x => path.Contains(x)) == checkTokensFound?.Count();
 
             if (!foundAllTokens)
             {
@@ -379,7 +379,7 @@ namespace Azure.AI.Details.Common.CLI
 
             if (string.IsNullOrEmpty(command)) command = values.GetOrEmpty("x.command");
 
-            string path = FindHelpFile(command, option, more);
+            string? path = FindHelpFile(command, option, more);
 
             string partial = command;
             while (path == null && partial.Contains("."))
@@ -407,13 +407,13 @@ namespace Azure.AI.Details.Common.CLI
             return path;
         }
 
-        private static string FindHelpFile(string command, string option, string more)
+        private static string? FindHelpFile(string command, string option, string more)
         {
             var hasCommand = !string.IsNullOrEmpty(command);
             var hasOption = !string.IsNullOrEmpty(option);
             var hasMore = !string.IsNullOrEmpty(more);
 
-            string path = hasCommand && hasOption && hasMore
+            string? path = hasCommand && hasOption && hasMore
                 ? FileHelpers.FindFileInHelpPath($"help/{command}.{option}.{more}")
                 : null;
             if (path == null && hasCommand && hasMore) path = FileHelpers.FindFileInHelpPath($"help/{command}.{more}");

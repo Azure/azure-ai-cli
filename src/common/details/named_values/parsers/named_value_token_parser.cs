@@ -168,21 +168,21 @@ namespace Azure.AI.Details.Common.CLI
                 if (count == 0)
                 {
                     tokens.SkipTokens(skipNameTokens);
-                    parsed = AddValue(values, PinnedValueKey, PinnedValue);
+                    parsed = AddValue(values, PinnedValueKey!, PinnedValue!);
                 }
                 else if (count == 1 && ValueMatchesValidValue(peekToken1, peekToken1Value, true))
                 {
                     tokens.SkipTokens(skipNameTokens);
 
                     parsed = AddValue(values, ValueKey, tokens.PopNextTokenValue(values));
-                    parsed = parsed && AddValue(values, PinnedValueKey, PinnedValue);
+                    parsed = parsed && AddValue(values, PinnedValueKey!, PinnedValue!);
                 }
                 else if (count == 1 && ValueMatchesValidValue(peekToken1, peekToken1Value, false))
                 {
                     tokens.SkipTokens(skipNameTokens);
 
                     parsed = AddValue(values, ValueKey, tokens.PopNextToken().TrimStart('='));
-                    parsed = parsed && AddValue(values, PinnedValueKey, PinnedValue);
+                    parsed = parsed && AddValue(values, PinnedValueKey!, PinnedValue!);
                 }
                 else if (count == 2 && ValueMatchesValidValue(peekToken1, peekToken1Value) && peekToken2Value != null)
                 {
@@ -192,7 +192,7 @@ namespace Azure.AI.Details.Common.CLI
                     value += "=" + tokens.PopNextTokenValue(values);
 
                     parsed = AddValue(values, ValueKey, value.TrimStart('='));
-                    parsed = parsed && AddValue(values, PinnedValueKey, PinnedValue);
+                    parsed = parsed && AddValue(values, PinnedValueKey!, PinnedValue!);
                 }
             }
 
@@ -278,16 +278,16 @@ namespace Azure.AI.Details.Common.CLI
 
         #region protected / private data
 
-        protected string ShortName; // e.g. "--file"
+        protected string? ShortName; // e.g. "--file"
         protected string FullName; // e.g. "audio.input.push.stream.file"
         protected string RequiredParts; // e.g. "00100"
 
         protected string ValueCount; // e.g. "0" or "1" or "2" or "2;1" or ...
-        protected string ValidValues; // e.g. "file;blob;microphone"
+        protected string? ValidValues; // e.g. "file;blob;microphone"
         protected string ValueKey; // e.g. "audio.input.type"
 
-        protected string PinnedValue;
-        protected string PinnedValueKey;
+        protected string? PinnedValue;
+        protected string? PinnedValueKey;
 
         #endregion
     }
