@@ -24,6 +24,7 @@ using System.Threading.Tasks;
 using YamlDotNet.Serialization;
 using YamlDotNet.Serialization.NamingConventions;
 using System.Text.Json.Nodes;
+using System.ComponentModel;
 
 namespace Azure.AI.Details.Common.CLI
 {
@@ -973,6 +974,7 @@ namespace Azure.AI.Details.Common.CLI
                 var promptyFrontMatterText = sections[1];
                 var chatTemplate = sections[2];
                 var obj = deserializer.Deserialize<PromptyFrontMatter>(promptyFrontMatterText);
+                Dictionary<string, string> templateInputs = ParsePromptyInputs(obj.Inputs);
                 Console.WriteLine(obj.Name);
                 Console.WriteLine(chatTemplate);
             }
@@ -981,6 +983,32 @@ namespace Azure.AI.Details.Common.CLI
                 _values.AddThrowError("ERROR:", $"parsing {parameterFile}; unable to parse, incorrect yaml format.");
             }
             //TODO: parse parameter file (prompty format) and set values accordingly
+        }
+
+        private Dictionary<string, string> ParsePromptyInputs(object input)
+        {
+            var dictionary = new Dictionary<string, string>();
+            var inputString = input as string;
+            if (inputString == null)
+            {
+                var inputIter = input as IDictionary<object, object>;
+
+                foreach (var kv in inputIter)
+                {
+                    dictionary.Add(kv.Key.ToString(), kv.Value.ToString());
+                }
+            }
+            else
+            {
+                var existing = FileHelpers.DemandFindFileInDataPath(inputString, _values, "chat parameter");
+                var text = FileHelpers.ReadAllText(existing, Encoding.Default);
+                dictionary = text
+                    .Split(Environment.NewLine)
+                    .Select(part => part.Split(':'))
+                    .Where(part => part.Length == 2)
+                    .ToDictionary(sp => sp[0], sp => sp[1].TrimStart());
+            }
+            return dictionary;
         }
 
         private void AddChatMessagesFromTextFile(IList<ChatRequestMessage> messages, string textFile)

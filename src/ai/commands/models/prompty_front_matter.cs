@@ -19,7 +19,7 @@ namespace Azure.AI.Details.Common.CLI
         public List<string> Tags { get; set; }
         public string Base { get; set; }
         public AIModel Model { get; set; }
-        public Dictionary<string, string> Inputs { get; set; }
+        public object Inputs { get; set; }
         public string Template { get; set; } = "f-string";
         public ModelParameters Parameters { get; set; }
     }
