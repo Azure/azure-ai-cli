@@ -71,7 +71,7 @@ namespace Azure.AI.Details.Common.CLI
             return true;
         }
 
-        private static string ParseHelpCommandToken(INamedValueTokens tokens, ICommandValues values, ref string token)
+        private static string ParseHelpCommandToken(INamedValueTokens tokens, ICommandValues values, ref string? token)
         {
             string command = values.GetOrEmpty("x.command");
             if (command == "help") command = "";
@@ -99,7 +99,7 @@ namespace Azure.AI.Details.Common.CLI
             return $";{Program.HelpCommandTokens};".Contains($";{token};");
         }
 
-        private static string ParseHelpCommandOptionToken(INamedValueTokens tokens, ref string token)
+        private static string ParseHelpCommandOptionToken(INamedValueTokens tokens, ref string? token)
         {
             string option = "";
             if (token != null && token.StartsWith("--"))
@@ -112,7 +112,7 @@ namespace Azure.AI.Details.Common.CLI
             return option;
         }
 
-        private static string ParseHelpCommandMoreTokens(INamedValueTokens tokens, ref string token)
+        private static string ParseHelpCommandMoreTokens(INamedValueTokens tokens, ref string? token)
         {
             string more = "";
             while (token != null)
