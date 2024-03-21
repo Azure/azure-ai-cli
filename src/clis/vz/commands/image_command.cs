@@ -189,10 +189,10 @@ namespace Azure.AI.Details.Common.CLI
                 _values.AddThrowError("ERROR:", $"Creating VisionServiceOptions; requires one of: key or token.");
             }
 
-            // var stringProperty = values.GetOrDefault("config.string.property", "");
+            // var stringProperty = values.GetOrEmpty("config.string.property");
             // if (!string.IsNullOrEmpty(stringProperty)) ConfigHelpers.SetStringProperty(config, stringProperty);
 
-            // var stringProperties = values.GetOrDefault("config.string.properties", "");
+            // var stringProperties = values.GetOrEmpty("config.string.properties");
             // if (!string.IsNullOrEmpty(stringProperties)) ConfigHelpers.SetStringProperties(config, stringProperties);
 
             return serviceOptions;

@@ -41,13 +41,13 @@ namespace Azure.AI.Details.Common.CLI
 
             var process = _values.GetOrEmpty("run.input.process");
 
-            var command = _values.GetOrDefault($"run.input.{Program.Name}.command", "");
-            var commandArgs = _values.GetOrDefault($"run.input.{Program.Name}.post.command.args", "").Replace(';', ' ');
-            var preCommandArgs = _values.GetOrDefault($"run.input.{Program.Name}.pre.command.args", "").Replace(';', ' ');
+            var command = _values.GetOrEmpty($"run.input.{Program.Name}.command");
+            var commandArgs = _values.GetOrEmpty($"run.input.{Program.Name}.post.command.args").Replace(';', ' ');
+            var preCommandArgs = _values.GetOrEmpty($"run.input.{Program.Name}.pre.command.args").Replace(';', ' ');
 
-            var job = _values.GetOrDefault($"run.input.{Program.Name}.job", "");
-            var jobArgs = _values.GetOrDefault($"run.input.{Program.Name}.post.job.args", "").Replace(';', ' ');
-            var preJobArgs = _values.GetOrDefault($"run.input.{Program.Name}.pre.job.args", "").Replace(';', ' ');
+            var job = _values.GetOrEmpty($"run.input.{Program.Name}.job");
+            var jobArgs = _values.GetOrEmpty($"run.input.{Program.Name}.post.job.args").Replace(';', ' ');
+            var preJobArgs = _values.GetOrEmpty($"run.input.{Program.Name}.pre.job.args").Replace(';', ' ');
 
             var line = _values.GetOrEmpty("run.input.line");
             var lineArgs = _values.GetOrEmpty("run.input.post.line.args").Replace(';', ' ');
@@ -65,7 +65,7 @@ namespace Azure.AI.Details.Common.CLI
             var itemArgs = _values.GetOrEmpty("run.input.post.item.args").Replace(';', ' ');
             var preItemArgs = _values.GetOrEmpty("run.input.pre.item.args").Replace(';', ' ');
 
-            var inputPath = _values.GetOrDefault("x.input.path", Directory.GetCurrentDirectory());
+            var inputPath = _values.GetOrDefault("x.input.path", Directory.GetCurrentDirectory())!;
 
             var processOk = !string.IsNullOrEmpty(process);
             var commandOk = !string.IsNullOrEmpty(command);
@@ -152,7 +152,7 @@ namespace Azure.AI.Details.Common.CLI
             return DoRunJob(start.Trim(), startArgs.Trim(), startPath, expected, notExpected, autoExpect, timeout, retries);
         }
 
-        private bool UpdateProcessIfFileNotExist(string checkFileProcess, ref string process, string defaultProcess = null)
+        private bool UpdateProcessIfFileNotExist(string checkFileProcess, ref string process, string? defaultProcess = null)
         {
             if (!FileHelpers.FileExistsInDataPath(checkFileProcess, _values))
             {
@@ -170,7 +170,7 @@ namespace Azure.AI.Details.Common.CLI
             {
                 var existing = FileHelpers.DemandFindFileInDataPath(job.Trim('@'), _values, "job");
                 var fi = new FileInfo(existing);
-                startPath = fi.DirectoryName;
+                startPath = fi.DirectoryName!;
                 job = $"@{fi.Name}";
             }
             return startPath;
@@ -227,10 +227,14 @@ namespace Azure.AI.Details.Common.CLI
             }
 
             var process = Process.Start(startInfo);
+            if (process == null)
+            {
+                _values.AddThrowError("ERROR:", $"Failed to start process: {start} {startArgs}");
+            }
 
             return checkExpected || checkNotExpected || autoExpect
-                ? (CheckExpectedAsync(process, expected, notExpected, autoExpect, timeout).Result ? 0 : 4)
-                : (WaitForExit(process, timeout).Result ? process.ExitCode : 3);
+                ? (CheckExpectedAsync(process!, expected, notExpected, autoExpect, timeout).Result ? 0 : 4)
+                : (WaitForExit(process!, timeout).Result ? process!.ExitCode : 3);
         }
 
         private Task<bool> WaitForExit(Process process, int timeout)

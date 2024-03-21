@@ -67,7 +67,7 @@ namespace Azure.AI.Details.Common.CLI
     {
         public static void UpdatePaths(INamedValues values)
         {
-            var outputPath = values.GetOrDefault("x.output.path", "");
+            var outputPath = values.GetOrEmpty("x.output.path");
             SetOutputPath(outputPath);
 
             var inputPath = values.GetOrDefault("x.input.path", outputPath);
@@ -800,7 +800,7 @@ namespace Azure.AI.Details.Common.CLI
             }
         }
 
-        public static void CopyFile(string path1, string file1, string path2, string file2 = null, bool verbose = true)
+        public static void CopyFile(string path1, string file1, string path2, string? file2 = null, bool verbose = true)
         {
             if (file2 == null) file2 = file1;
 
@@ -817,7 +817,7 @@ namespace Azure.AI.Details.Common.CLI
             File.Copy(source, dest, true);
         }
 
-        public static void CopyFiles(IEnumerable<string> sourceLocations, string[] files, string destinationLocation, string dllNewPrefix, string dllNewSuffix, bool verbose)
+        public static void CopyFiles(IEnumerable<string> sourceLocations, string[] files, string destinationLocation, string? dllNewPrefix, string? dllNewSuffix, bool verbose)
         {
             var remapDlls = !string.IsNullOrEmpty(dllNewPrefix) && !string.IsNullOrEmpty(dllNewSuffix);
             foreach (var location in sourceLocations)
@@ -851,7 +851,7 @@ namespace Azure.AI.Details.Common.CLI
         {
             var file = $"exception.{{run.time}}.{{pid}}.{{time}}.{Program.Name}.error.log";
 
-            var runTime = values.GetOrDefault("x.run.time", "");
+            var runTime = values.GetOrEmpty("x.run.time");
             file = file.Replace("{run.time}", runTime);
 
             var pid = Process.GetCurrentProcess().Id.ToString();

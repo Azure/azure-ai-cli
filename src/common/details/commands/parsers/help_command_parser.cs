@@ -39,10 +39,10 @@ namespace Azure.AI.Details.Common.CLI
 
         public static bool DisplayHelp(INamedValueTokens tokens, INamedValues values)
         {
-            var topicSearch = values.GetOrDefault("display.help.topic", "");
+            var topicSearch = values.GetOrEmpty("display.help.topic");
             if (!string.IsNullOrEmpty(topicSearch)) return DoListHelpTopics(topicSearch, values);
 
-            var textSearch = values.GetOrDefault("display.help.text", "");
+            var textSearch = values.GetOrEmpty("display.help.text");
             if (!string.IsNullOrEmpty(textSearch)) return DoFindHelpTopics(textSearch, values);
 
             return DoDisplayHelpTopic(values);
@@ -73,7 +73,7 @@ namespace Azure.AI.Details.Common.CLI
 
         private static string ParseHelpCommandToken(INamedValueTokens tokens, ICommandValues values, ref string token)
         {
-            string command = values.GetOrDefault("x.command", "");
+            string command = values.GetOrEmpty("x.command");
             if (command == "help") command = "";
 
             if (string.IsNullOrEmpty(command) && token != null && IsHelpCommandToken(token))
@@ -206,7 +206,7 @@ namespace Azure.AI.Details.Common.CLI
 
         private static bool DoDisplayHelpTopic(INamedValues values)
         {
-            var allTokens = values.GetOrDefault("display.help.tokens", "");
+            var allTokens = values.GetOrEmpty("display.help.tokens");
             if (allTokens == "colors")
             {
                 ColorHelpers.ShowColorChart();
@@ -373,11 +373,11 @@ namespace Azure.AI.Details.Common.CLI
 
         private static string FindHelpTopic(INamedValues values, string allTokens)
         {
-            var command = values.GetOrDefault("display.help.command", "");
-            var option = values.GetOrDefault("display.help.option", "");
-            var more = values.GetOrDefault("display.help.more", "");
+            var command = values.GetOrEmpty("display.help.command");
+            var option = values.GetOrEmpty("display.help.option");
+            var more = values.GetOrEmpty("display.help.more");
 
-            if (string.IsNullOrEmpty(command)) command = values.GetOrDefault("x.command", "");
+            if (string.IsNullOrEmpty(command)) command = values.GetOrEmpty("x.command");
 
             string path = FindHelpFile(command, option, more);
 

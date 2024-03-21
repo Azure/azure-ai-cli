@@ -15,11 +15,11 @@ namespace Azure.AI.Details.Common.CLI
 {
     public interface INamedValues
     {
-        void Add(string name, string value);
+        void Add(string name, string? value);
         bool Contains(string name, bool checkDefault = true);
         string Get(string name, bool checkDefault = true);
 
-        void Reset(string name, string value = null);
+        void Reset(string name, string? value = null);
 
         string this[string name] { get; }
         IEnumerable<string> Names { get; }
@@ -231,7 +231,7 @@ namespace Azure.AI.Details.Common.CLI
 
     public class NamedValues : INamedValues
     {
-        public void Add(string name, string value)
+        public void Add(string name, string? value)
         {
             var exists = _values.ContainsKey(name);
             var current = exists ? _values[name] : null;
@@ -256,7 +256,7 @@ namespace Azure.AI.Details.Common.CLI
             return Contains(name, checkDefault) ? _values[name] : null;
         }
 
-        public void Reset(string name, string value = null)
+        public void Reset(string name, string? value = null)
         {
             _values.Remove(name);
             _names.Remove(name);
@@ -282,7 +282,7 @@ namespace Azure.AI.Details.Common.CLI
             }
         }
 
-        private Dictionary<string, string> _values = new Dictionary<string, string>();
+        private Dictionary<string, string?> _values = new Dictionary<string, string?>();
         private List<string> _names = new List<string>();
     }
 }

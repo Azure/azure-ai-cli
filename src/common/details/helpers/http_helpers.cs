@@ -254,7 +254,7 @@ namespace Azure.AI.Details.Common.CLI
 
         public static string GetFileNameFromResponse(WebResponse response, INamedValues values)
         {
-            var runtime = values.GetOrDefault("x.run.time", "");
+            var runtime = values.GetOrEmpty("x.run.time");
             var defaultFileName = $"{runtime}.downloaded";
 
             var path = response.ResponseUri.LocalPath;

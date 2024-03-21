@@ -94,7 +94,7 @@ namespace Azure.AI.Details.Common.CLI
 
             var isWindows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
 
-            var zipTarget = values.GetOrDefault("x.command.zip.target", "");
+            var zipTarget = values.GetOrEmpty("x.command.zip.target");
             var targetWebJob = zipTarget.ToLower() == "webjob";
 
             // run.cmd or run.sh
@@ -200,8 +200,8 @@ namespace Azure.AI.Details.Common.CLI
         {
             bool passed = false;
 
-            var fileValueName = values.GetOrDefault("x.command.expand.file.name", "");
-            var files = values.GetOrDefault($"{fileValueName}s", "");
+            var fileValueName = values.GetOrEmpty("x.command.expand.file.name");
+            var files = values.GetOrEmpty($"{fileValueName}s");
 
             var forEachCount = values["foreach.count"];
             var repeat = values["x.command.repeat"];
@@ -224,7 +224,7 @@ namespace Azure.AI.Details.Common.CLI
             else
             {
                 var max = values.GetOrDefault("x.command.max", int.MaxValue);
-                if (queue != null && queue.Count > max) queue = new Queue<ICommandValues>(queue.Take(max));
+                if (queue.Count > max) queue = new Queue<ICommandValues>(queue.Take(max));
 
                 expandOk = false;
                 passed = CommandRunDispatcher.DispatchRunCommand(values, queue, expandOk, parallelOk);
@@ -523,13 +523,13 @@ namespace Azure.AI.Details.Common.CLI
 
         private static async Task<bool> CheckExpectedOutputAsync(ICommandValues values, Queue<ICommandValues> queue, Func<bool> func)
         {
-            var expected = values.GetOrDefault("x.command.output.expect", "");
-            var notExpected = values.GetOrDefault("x.command.output.not.expect", "");
+            var expected = values.GetOrEmpty("x.command.output.expect");
+            var notExpected = values.GetOrEmpty("x.command.output.not.expect");
             var autoExpect = values.GetOrDefault("x.command.output.auto.expect", false);
-            var expectedLog = values.GetOrDefault("x.command.diagnostics.log.expect", "");
-            var notExpectedLog = values.GetOrDefault("x.command.diagnostics.log.not.expect", "");
+            var expectedLog = values.GetOrEmpty("x.command.diagnostics.log.expect");
+            var notExpectedLog = values.GetOrEmpty("x.command.diagnostics.log.not.expect");
             var autoExpectLog = values.GetOrDefault("x.command.diagnostics.log.auto.expect", false);
-            var autoExpectLogFilter = values.GetOrDefault("x.command.diagnostics.log.auto.expect.filter", "");
+            var autoExpectLogFilter = values.GetOrEmpty("x.command.diagnostics.log.auto.expect.filter");
             var ignoreCheckFailures = values.GetOrDefault("x.command.output.ignore.check.failures", false);
 
             BlockValues(values, queue, "x.command.output.expect");

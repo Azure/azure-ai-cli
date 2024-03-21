@@ -80,9 +80,9 @@ namespace Azure.AI.Details.Common.CLI
             var byoServices = allowCreate && picked == 1;
             if (byoServices)
             {
-                var regionFilter = values.GetOrDefault("init.service.resource.region.name", "");
-                var groupFilter = values.GetOrDefault("init.service.resource.group.name", "");
-                var resourceFilter = values.GetOrDefault("init.service.cognitiveservices.resource.name", "");
+                var regionFilter = values.GetOrEmpty("init.service.resource.region.name");
+                var groupFilter = values.GetOrEmpty("init.service.resource.group.name");
+                var resourceFilter = values.GetOrEmpty("init.service.cognitiveservices.resource.name");
                 var kind = values.GetOrDefault("init.service.cognitiveservices.resource.kind", "OpenAI;AIServices");
                 var sku = values.GetOrDefault("init.service.cognitiveservices.resource.sku", Program.CognitiveServiceResourceSku);
                 var yes = values.GetOrDefault("init.service.cognitiveservices.terms.agree", false);
@@ -110,13 +110,13 @@ namespace Azure.AI.Details.Common.CLI
 
         private static async Task<JsonElement?> TryCreateAiHubResourceInteractive(ICommandValues values, string subscription)
         {
-            var locationName = values.GetOrDefault("service.resource.region.name", "");
+            var locationName = values.GetOrEmpty("service.resource.region.name");
             var groupName = ResourceGroupNameToken.Data().GetOrDefault(values);
             var displayName = ResourceDisplayNameToken.Data().GetOrDefault(values);
             var description = ResourceDescriptionToken.Data().GetOrDefault(values);
 
-            var openAiResourceId = values.GetOrDefault("service.openai.resource.id", "");
-            var openAiResourceKind = values.GetOrDefault("service.openai.resource.kind", "");
+            var openAiResourceId = values.GetOrEmpty("service.openai.resource.id");
+            var openAiResourceKind = values.GetOrEmpty("service.openai.resource.kind");
 
             var smartName = ResourceNameToken.Data().GetOrDefault(values);
             var smartNameKind = smartName != null && smartName.Contains("openai") ? "openai" : "oai";
