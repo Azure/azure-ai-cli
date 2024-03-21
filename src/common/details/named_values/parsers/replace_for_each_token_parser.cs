@@ -40,8 +40,8 @@ namespace Azure.AI.Details.Common.CLI
             var token5 = tokens.PeekNextToken(skip++);
 
             var delegateTokens = token4 == "files" && !string.IsNullOrEmpty(token5)
-                ? ParseReplaceForEachInFiles(tokens, values, name, skip -= 1)
-                : ParseReplaceForEachInSemiListOrAtFile(tokens, values, name, skip -= 2);
+                ? ParseReplaceForEachInFiles(tokens, values, name!, skip -= 1)
+                : ParseReplaceForEachInSemiListOrAtFile(tokens, values, name!, skip -= 2);
             var forEachTokenSource = new CmdLineTokenSource(delegateTokens.ToArray(), values);
 
             var parsed = _forEachTokenParser.Parse(forEachTokenSource, values);
@@ -55,7 +55,7 @@ namespace Azure.AI.Details.Common.CLI
             yield return $"replace.var.{name}";
             yield return "in";
 
-            var pattern = tokens.PeekNextToken(skip);
+            var pattern = tokens.PeekNextToken(skip)!;
             var found = FileHelpers.FindFiles(pattern, values).ToList();
 
             var str = string.Join(";", found);
@@ -67,7 +67,7 @@ namespace Azure.AI.Details.Common.CLI
             yield return "--foreach";
             yield return $"replace.var.{name}";
             yield return "in";
-            yield return tokens.PeekNextToken(v);
+            yield return tokens.PeekNextToken(v)!;
         }
 
         private NamedValueTokenParser _parser1 = new NamedValueTokenParser(null, "replace.var.*", "011;101", "1;0", null, null, "=");

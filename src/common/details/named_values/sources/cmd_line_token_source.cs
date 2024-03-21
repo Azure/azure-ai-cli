@@ -87,7 +87,7 @@ namespace Azure.AI.Details.Common.CLI
             }
         }
 
-        public override string PopNextToken()
+        public override string? PopNextToken()
         {
             if (_tokens.Count == 0) return null;
 
@@ -97,18 +97,18 @@ namespace Azure.AI.Details.Common.CLI
             return token;
         }
 
-        public override string PopNextTokenValue(INamedValues? values = null)
+        public override string? PopNextTokenValue(INamedValues? values = null)
         {
             var token = PopNextToken();
             return ValueFromToken(token, values);
         }
 
-        public override string PeekNextToken(int skip = 0)
+        public override string? PeekNextToken(int skip = 0)
         {
             return _tokens.Count > skip ? _tokens[skip] : null;
         }
 
-        public override string PeekNextTokenValue(int skip = 0, INamedValues? values = null)
+        public override string? PeekNextTokenValue(int skip = 0, INamedValues? values = null)
         {
             var token = PeekNextToken(skip);
             return ValueFromToken(token, values);
@@ -131,7 +131,7 @@ namespace Azure.AI.Details.Common.CLI
             _tokens.RemoveRange(0, Math.Min(count, _tokens.Count));
         }
 
-        public override string? ValueFromToken(string token, INamedValues? values = null)
+        public override string? ValueFromToken(string? token, INamedValues? values = null)
         {
             if (token == null) return null;
 

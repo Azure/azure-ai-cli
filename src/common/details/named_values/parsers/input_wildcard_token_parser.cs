@@ -38,7 +38,7 @@ namespace Azure.AI.Details.Common.CLI
 
             if (peekToken1 != null && peekToken1.Contains('='))
             {
-                StringHelpers.SplitNameValue(peekToken1Value, out var name, out var value);
+                StringHelpers.SplitNameValue(peekToken1Value!, out var name, out var value);
                 values.Add("input." + name, value);
                 tokens.SkipTokens(nameTokenCount + 1);
                 return true;

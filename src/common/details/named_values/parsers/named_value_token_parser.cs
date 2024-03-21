@@ -128,12 +128,12 @@ namespace Azure.AI.Details.Common.CLI
                 else if (count == 1 && ValueMatchesValidValue(peekToken1, peekToken1Value, true))
                 {
                     tokens.SkipTokens(skipNameTokens);
-                    parsed = AddValue(values, ValueKey, tokens.PopNextTokenValue(values));
+                    parsed = AddValue(values, ValueKey, tokens.PopNextTokenValue(values)!);
                 }
                 else if (count == 1 && ValueMatchesValidValue(peekToken1, peekToken1Value, false))
                 {
                     tokens.SkipTokens(skipNameTokens);
-                    parsed = AddValue(values, ValueKey, tokens.PopNextToken().TrimStart('='));
+                    parsed = AddValue(values, ValueKey, tokens.PopNextToken()!.TrimStart('='));
                 }
                 else if (count == 2 && ValueMatchesValidValue(peekToken1, peekToken1Value) && peekToken2Value != null)
                 {
@@ -155,12 +155,12 @@ namespace Azure.AI.Details.Common.CLI
                 else if (count == 1 && ValueMatchesValidValue(peekToken1, peekToken1Value, true))
                 {
                     tokens.SkipTokens(skipNameTokens);
-                    parsed = AddValue(values, ValueKey, tokens.PopNextTokenValue(values));
+                    parsed = AddValue(values, ValueKey, tokens.PopNextTokenValue(values)!);
                 }
                 else if (count == 1 && ValueMatchesValidValue(peekToken1, peekToken1Value, false))
                 {
                     tokens.SkipTokens(skipNameTokens);
-                    parsed = AddValue(values, ValueKey, tokens.PopNextToken().TrimStart('='));
+                    parsed = AddValue(values, ValueKey, tokens.PopNextToken()!.TrimStart('='));
                 }
             }
             else // if (PinnedValueKey != null && PinnedValue != null)
@@ -174,14 +174,14 @@ namespace Azure.AI.Details.Common.CLI
                 {
                     tokens.SkipTokens(skipNameTokens);
 
-                    parsed = AddValue(values, ValueKey, tokens.PopNextTokenValue(values));
+                    parsed = AddValue(values, ValueKey, tokens.PopNextTokenValue(values)!);
                     parsed = parsed && AddValue(values, PinnedValueKey!, PinnedValue!);
                 }
                 else if (count == 1 && ValueMatchesValidValue(peekToken1, peekToken1Value, false))
                 {
                     tokens.SkipTokens(skipNameTokens);
 
-                    parsed = AddValue(values, ValueKey, tokens.PopNextToken().TrimStart('='));
+                    parsed = AddValue(values, ValueKey, tokens.PopNextToken()!.TrimStart('='));
                     parsed = parsed && AddValue(values, PinnedValueKey!, PinnedValue!);
                 }
                 else if (count == 2 && ValueMatchesValidValue(peekToken1, peekToken1Value) && peekToken2Value != null)
@@ -199,7 +199,7 @@ namespace Azure.AI.Details.Common.CLI
             return parsed;
         }
 
-        private bool ValueMatchesValidValue(string peekToken, string peekTokenValue, bool skipAtAt = false)
+        private bool ValueMatchesValidValue(string? peekToken, string? peekTokenValue, bool skipAtAt = false)
         {
             return NamedValueTokenParserHelpers.ValueMatchesValidValue(ValidValues, peekToken, peekTokenValue, skipAtAt);
         }

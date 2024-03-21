@@ -85,7 +85,7 @@ namespace Azure.AI.Details.Common.CLI
             return false;
         }
 
-        public static bool ValueMatchesValidValue(string? validValues, string peekToken, string peekTokenValue, bool skipAtAt = false)
+        public static bool ValueMatchesValidValue(string? validValues, string? peekToken, string? peekTokenValue, bool skipAtAt = false)
         {
             if (peekToken == null) return false;
             if (peekTokenValue == null) return false;

@@ -9,7 +9,7 @@ namespace Azure.AI.Details.Common.CLI
     {
         public static INamedValueTokenParser Parser() => new ArgXTokenParser();
 
-        public static string GetArg(ICommandValues values, int x) => values.GetOrDefault("arg" + x, null);
+        public static string? GetArg(ICommandValues values, int x) => values.GetOrDefault("arg" + x, null);
 
         public static IEnumerable<string> GetArgs(ICommandValues values)
         {

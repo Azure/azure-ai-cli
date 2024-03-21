@@ -17,7 +17,7 @@ namespace Azure.AI.Details.Common.CLI
             _requiredDisplayName = requiredDisplayName;
         }
 
-        public string Demand(INamedValues values, string action, string command, string checkConfig = null)
+        public string Demand(INamedValues values, string action, string command, string? checkConfig = null)
         {
             if (checkConfig != null)
             {
@@ -35,7 +35,7 @@ namespace Azure.AI.Details.Common.CLI
             return NamedValueTokenDataHelpers.Demand(values, _fullName, _requiredDisplayName, $"{_optionName} {_optionExample}", action, command);
         }
 
-        public string GetOrDefault(INamedValues values, string defaultValue = null)
+        public string? GetOrDefault(INamedValues values, string? defaultValue = null)
         {
             return values.GetOrDefault(_fullName, defaultValue);
         }
@@ -50,12 +50,12 @@ namespace Azure.AI.Details.Common.CLI
             return values.GetOrDefault(_fullName, defaultValue);
         }
 
-        public void Set(INamedValues values, string value = null)
+        public void Set(INamedValues values, string? value = null)
         {
             values.Reset(_fullName, value);
         }
 
-        private string ReadConfig(INamedValues values, string name)
+        private string? ReadConfig(INamedValues values, string name)
         {
             return FileHelpers.FileExistsInConfigPath(name, values)
                 ? FileHelpers.ReadAllText(FileHelpers.DemandFindFileInConfigPath(name, values, "configuration"), Encoding.UTF8)

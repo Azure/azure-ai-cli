@@ -35,7 +35,7 @@ namespace Azure.AI.Details.Common.CLI
             {
                 return ParseIndexedTsvFile(tokens, values, index);
             }
-            else if (token.Where(x => char.IsDigit(x)).Count() == token.Length)
+            else if (token != null && token.Where(x => char.IsDigit(x)).Count() == token.Length)
             {
                 return ParseIndexedTsvFile(tokens, values, int.Parse(token));
             }
@@ -122,7 +122,7 @@ namespace Azure.AI.Details.Common.CLI
             return false;
         }
 
-        private static bool ParseNonIndexedTsvFile(INamedValueTokens tokens, INamedValues values, string token, int skip, int index)
+        private static bool ParseNonIndexedTsvFile(INamedValueTokens tokens, INamedValues values, string? token, int skip, int index)
         {
             // --foreach [tsv] @COL-TSV-FILE [skip header] in @TSV-FILE
             // --foreach [tsv] [columns] "COL1;COL2" [skip header] in @TSV-FILE
@@ -149,6 +149,8 @@ namespace Azure.AI.Details.Common.CLI
                 token = tokens.PeekNextToken(skip++);
             }
 
+            if (token == null) return false;
+
             var hasHeader = string.IsNullOrEmpty(columns) || skipHeader;
 
             var atFile = token.StartsWith("@");
@@ -158,7 +160,7 @@ namespace Azure.AI.Details.Common.CLI
             {
                 var value = isFile
                     ? FileHelpers.ReadAllText(token, Encoding.Default)
-                    : tokens.ValueFromToken(token);
+                    : tokens.ValueFromToken(token)!;
                 if (isList)
                 {
                     hasHeader = false;
