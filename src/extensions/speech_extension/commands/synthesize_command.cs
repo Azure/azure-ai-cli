@@ -376,7 +376,7 @@ namespace Azure.AI.Details.Common.CLI
 
             var fileValueDisplayName = _values.Contains("synthesizer.input.text.file") ? "text file" : "ssml file";
             var fileValueName = _values.Contains("synthesizer.input.text.file") ? "synthesizer.input.text.file" : "synthesizer.input.ssml.file";
-            var file = _values.GetOrDefault(fileValueName, "");
+            var file = _values.GetOrEmpty(fileValueName);
             var url = "";
 
             if (!string.IsNullOrEmpty(file) && file.StartsWith("http"))

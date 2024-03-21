@@ -439,7 +439,7 @@ namespace Azure.AI.Details.Common.CLI
 
         protected string ReplaceFileNameValues(string fileName, string idValueName)
         {
-            var id = _values.GetOrDefault(idValueName, "");
+            var id = _values.GetOrEmpty(idValueName);
             if (fileName.Contains("{id}")) fileName = fileName.Replace("{id}", id);
 
             var pid = Process.GetCurrentProcess().Id.ToString();

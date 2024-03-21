@@ -52,7 +52,7 @@ namespace Azure.AI.Details.Common.CLI
         public static string GetIdFromNamedValue(ICommandValues values, string name, string defaultValue = "")
         {
             var value = values.GetOrDefault(name, defaultValue);
-            return IdHelpers.IdFromString(value);
+            return IdHelpers.IdFromString(value!);
         }
 
         public static void CheckWriteOutputNameOrId(string nameOrId, INamedValues values, string domain, IdKind kind)
@@ -60,7 +60,7 @@ namespace Azure.AI.Details.Common.CLI
             var atIdName = kind == IdKind.Name
                 ? $"{domain}.output.name"
                 : $"{domain}.output.id";
-            var atId = values.GetOrDefault(atIdName, "");
+            var atId = values.GetOrEmpty(atIdName);
             var atIdOk = !string.IsNullOrEmpty(atId);
             if (atIdOk)
             {
@@ -72,7 +72,7 @@ namespace Azure.AI.Details.Common.CLI
             var addIdName = kind == IdKind.Name
                 ? $"{domain}.output.add.name"
                 : $"{domain}.output.add.id";
-            var addId = values.GetOrDefault(addIdName, "");
+            var addId = values.GetOrEmpty(addIdName);
             var addIdOk = !string.IsNullOrEmpty(addId);
             if (addIdOk)
             {
@@ -87,7 +87,10 @@ namespace Azure.AI.Details.Common.CLI
             var parsed = JsonDocument.Parse(json);
             var value = parsed.GetPropertyElementOrNull(nameOrIdName);
             var nameOrId = value?.GetString();
-            CheckWriteOutputNameOrId(nameOrId, values, domain, kind);
+            if (nameOrId != null)
+            {
+                CheckWriteOutputNameOrId(nameOrId, values, domain, kind);
+            }
         }
 
         #region private data
@@ -107,7 +110,7 @@ namespace Azure.AI.Details.Common.CLI
 
         public static string ContinueWithQueryString(string name, INamedValues values, string valueName)
         {
-            var value = values.GetOrDefault(valueName, "");
+            var value = values.GetOrEmpty(valueName);
             return ContinueWithQueryString(name, value);
         }
 
@@ -120,7 +123,7 @@ namespace Azure.AI.Details.Common.CLI
 
         public static string ContinueWithQueryStringOrEmpty(string name, INamedValues values, string valueName)
         {
-            var value = values.GetOrDefault(valueName, "");
+            var value = values.GetOrEmpty(valueName);
             return ContinueWithQueryStringOrEmpty(name, value);
         }
 
@@ -136,12 +139,12 @@ namespace Azure.AI.Details.Common.CLI
             return url;
         }
 
-        public static string CheckWriteOutputUrlOrId(string json, string urlName, INamedValues values, string domain, IdKind kinds = IdKind.Guid)
+        public static string? CheckWriteOutputUrlOrId(string json, string urlName, INamedValues values, string domain, IdKind kinds = IdKind.Guid)
         {
             var parsed = JsonDocument.Parse(json);
             var value = parsed?.GetPropertyElementOrNull(urlName);
             var url = value?.GetString();
-            return CheckWriteOutputUrlOrId(url, values, domain, kinds);
+            return url != null ? CheckWriteOutputUrlOrId(url!, values, domain, kinds) : null;
         }
 
         public static void CheckWriteOutputUrlsOrIds(string json, string arrayName, string urlName, INamedValues values, string domain, IdKind kinds = IdKind.Guid)
@@ -155,13 +158,13 @@ namespace Azure.AI.Details.Common.CLI
         public static void CheckWriteOutputUrlsOrIds(INamedValues values, string domain, List<string> urls, List<string> ids, IdKind kind)
         {
             var atUrlsName = $"{domain}.output.urls";
-            var atUrls = values.GetOrDefault(atUrlsName, "");
+            var atUrls = values.GetOrEmpty(atUrlsName);
             var atUrlsOk = !string.IsNullOrEmpty(atUrls);
 
             var atIdsName = kind == IdKind.Name
                 ? $"{domain}.output.names"
                 : $"{domain}.output.ids";
-            var atIds = values.GetOrDefault(atIdsName, "");
+            var atIds = values.GetOrEmpty(atIdsName);
             var atIdsOk = !string.IsNullOrEmpty(atIds);
 
             if (atUrlsOk)
@@ -194,7 +197,7 @@ namespace Azure.AI.Details.Common.CLI
             if (!urlOk) return;
 
             var atUrlName = $"{domain}.output.url";
-            var atUrl = values.GetOrDefault(atUrlName, "");
+            var atUrl = values.GetOrEmpty(atUrlName);
             var atUrlOk = !string.IsNullOrEmpty(atUrl);
             if (atUrlOk)
             {
@@ -204,7 +207,7 @@ namespace Azure.AI.Details.Common.CLI
             }
 
             var addUrlName = $"{domain}.output.add.url";
-            var addUrl = values.GetOrDefault(addUrlName, "");
+            var addUrl = values.GetOrEmpty(addUrlName);
             var addUrlOk = !string.IsNullOrEmpty(addUrl);
             if (addUrlOk)
             {
@@ -240,7 +243,7 @@ namespace Azure.AI.Details.Common.CLI
                 var askedForThisKind = (thisKind & kinds) != 0;
                 if (askedForThisKind)
                 {
-                    GetUrlsAndIdsForOneKind(json, arrayName, urlName, getUrlsOnlyOnce, ids, thisKind);
+                    GetUrlsAndIdsForOneKind(json, arrayName, urlName, getUrlsOnlyOnce!, ids, thisKind);
                     getUrlsOnlyOnce = null; // we'll get the URLs on the first
                 }
             }

@@ -132,7 +132,7 @@ namespace Azure.AI.Details.Common.CLI
 
         public static string MakeString(INamedValues values, string valueName)
         {
-            var value = values.GetOrDefault(valueName, "");
+            var value = values.GetOrEmpty(valueName);
             return MakeString(value);
         }
 
@@ -145,7 +145,7 @@ namespace Azure.AI.Details.Common.CLI
 
         public static string MakeStringOrEmpty(INamedValues values, string valueName)
         {
-            var value = values.GetOrDefault(valueName, "");
+            var value = values.GetOrEmpty(valueName);
             return MakeStringOrEmpty(value);
         }
 
@@ -161,14 +161,14 @@ namespace Azure.AI.Details.Common.CLI
 
         public static string MakeStringArray(INamedValues values, string delimitedValuesName, string delimiters)
         {
-            var delimitedValues = values.GetOrDefault(delimitedValuesName, "");
+            var delimitedValues = values.GetOrEmpty(delimitedValuesName);
             return MakeStringArray(delimitedValues, delimiters);
         }
 
         public static string MakeStringArray(INamedValues values, string singleValueName, string delimitedValuesName, string delimiters)
         {
-            var singleValue = values.GetOrDefault(singleValueName, "");
-            var delimitedValues = values.GetOrDefault(delimitedValuesName, "");
+            var singleValue = values.GetOrEmpty(singleValueName);
+            var delimitedValues = values.GetOrEmpty(delimitedValuesName);
             return MakeStringArray($"{singleValue};{delimitedValues}", delimiters);
         }
 
@@ -182,14 +182,14 @@ namespace Azure.AI.Details.Common.CLI
 
         public static string MakeStringArrayOrEmpty(INamedValues values, string delimitedValuesName, string delimiters)
         {
-            var delimitedValues = values.GetOrDefault(delimitedValuesName, "");
+            var delimitedValues = values.GetOrEmpty(delimitedValuesName);
             return MakeStringArrayOrEmpty(delimitedValues, delimiters);
         }
 
         public static string MakeStringArrayOrEmpty(INamedValues values, string singleValueName, string delimitedValuesName, string delimiters)
         {
-            var singleValue = values.GetOrDefault(singleValueName, "");
-            var delimitedValues = values.GetOrDefault(delimitedValuesName, "");
+            var singleValue = values.GetOrEmpty(singleValueName);
+            var delimitedValues = values.GetOrEmpty(delimitedValuesName);
 
             var singleOk = !string.IsNullOrEmpty(singleValue);
             var delimitedOk = !string.IsNullOrEmpty(delimitedValues);
