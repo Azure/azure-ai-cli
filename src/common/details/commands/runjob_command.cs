@@ -36,10 +36,10 @@ namespace Azure.AI.Details.Common.CLI
 
             var quiet = _values.GetOrDefault("x.quiet", false);
 
-            var args = _values.GetOrDefault("run.input.post.args", "").Replace(';', ' ');
-            var preArgs = _values.GetOrDefault("run.input.pre.args", "").Replace(';', ' ');
+            var args = _values.GetOrEmpty("run.input.post.args").Replace(';', ' ');
+            var preArgs = _values.GetOrEmpty("run.input.pre.args").Replace(';', ' ');
 
-            var process = _values.GetOrDefault("run.input.process", "");
+            var process = _values.GetOrEmpty("run.input.process");
 
             var command = _values.GetOrDefault($"run.input.{Program.Name}.command", "");
             var commandArgs = _values.GetOrDefault($"run.input.{Program.Name}.post.command.args", "").Replace(';', ' ');
@@ -49,21 +49,21 @@ namespace Azure.AI.Details.Common.CLI
             var jobArgs = _values.GetOrDefault($"run.input.{Program.Name}.post.job.args", "").Replace(';', ' ');
             var preJobArgs = _values.GetOrDefault($"run.input.{Program.Name}.pre.job.args", "").Replace(';', ' ');
 
-            var line = _values.GetOrDefault("run.input.line", "");
-            var lineArgs = _values.GetOrDefault("run.input.post.line.args", "").Replace(';', ' ');
-            var preLineArgs = _values.GetOrDefault("run.input.pre.line.args", "").Replace(';', ' ');
+            var line = _values.GetOrEmpty("run.input.line");
+            var lineArgs = _values.GetOrEmpty("run.input.post.line.args").Replace(';', ' ');
+            var preLineArgs = _values.GetOrEmpty("run.input.pre.line.args").Replace(';', ' ');
 
-            var script = _values.GetOrDefault("run.input.script", "");
-            var scriptArgs = _values.GetOrDefault("run.input.post.script.args", "").Replace(';', ' ');
-            var preScriptArgs = _values.GetOrDefault("run.input.pre.script.args", "").Replace(';', ' ');
+            var script = _values.GetOrEmpty("run.input.script");
+            var scriptArgs = _values.GetOrEmpty("run.input.post.script.args").Replace(';', ' ');
+            var preScriptArgs = _values.GetOrEmpty("run.input.pre.script.args").Replace(';', ' ');
 
-            var file = _values.GetOrDefault("run.input.file", "");
-            var fileArgs = _values.GetOrDefault("run.input.post.file.args", "").Replace(';', ' ');
-            var preFileArgs = _values.GetOrDefault("run.input.pre.file.args", "").Replace(';', ' ');
+            var file = _values.GetOrEmpty("run.input.file");
+            var fileArgs = _values.GetOrEmpty("run.input.post.file.args").Replace(';', ' ');
+            var preFileArgs = _values.GetOrEmpty("run.input.pre.file.args").Replace(';', ' ');
 
-            var item = _values.GetOrDefault("run.input.item", "");
-            var itemArgs = _values.GetOrDefault("run.input.post.item.args", "").Replace(';', ' ');
-            var preItemArgs = _values.GetOrDefault("run.input.pre.item.args", "").Replace(';', ' ');
+            var item = _values.GetOrEmpty("run.input.item");
+            var itemArgs = _values.GetOrEmpty("run.input.post.item.args").Replace(';', ' ');
+            var preItemArgs = _values.GetOrEmpty("run.input.pre.item.args").Replace(';', ' ');
 
             var inputPath = _values.GetOrDefault("x.input.path", Directory.GetCurrentDirectory());
 
@@ -145,8 +145,8 @@ namespace Azure.AI.Details.Common.CLI
 
             var retries = _values.GetOrDefault("run.retries", 0);
             var timeout = _values.GetOrDefault("run.timeout", 86400000);
-            var expected = _values.GetOrDefault("run.output.expect", "");
-            var notExpected = _values.GetOrDefault("run.output.not.expect", "");
+            var expected = _values.GetOrEmpty("run.output.expect");
+            var notExpected = _values.GetOrEmpty("run.output.not.expect");
             var autoExpect = _values.GetOrDefault("run.output.auto.expect", false);
 
             return DoRunJob(start.Trim(), startArgs.Trim(), startPath, expected, notExpected, autoExpect, timeout, retries);

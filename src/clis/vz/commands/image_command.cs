@@ -233,7 +233,7 @@ namespace Azure.AI.Details.Common.CLI
 
         private ImageAnalysisOptions CreateImageAnalysisOptions()
         {
-            var featuresRequested = _values.GetOrDefault("vision.image.visual.features", "");
+            var featuresRequested = _values.GetOrEmpty("vision.image.visual.features");
             var features = string.IsNullOrEmpty(featuresRequested)
                 ? GetDefaultImageAnalysisFeatures()
                 : GetImageAnalysisFeatures(featuresRequested);
@@ -408,7 +408,7 @@ namespace Azure.AI.Details.Common.CLI
             var log = _values["diagnostics.config.log.file"];
             if (!string.IsNullOrEmpty(log))
             {
-                var id = _values.GetOrDefault("vision.input.id", "");
+                var id = _values.GetOrEmpty("vision.input.id");
                 if (log.Contains("{id}")) log = log.Replace("{id}", id);
 
                 var pid = Process.GetCurrentProcess().Id.ToString();
@@ -417,7 +417,7 @@ namespace Azure.AI.Details.Common.CLI
                 var time = DateTime.Now.ToFileTime().ToString();
                 if (log.Contains("{time}")) log = log.Replace("{time}", time);
 
-                var runTime = _values.GetOrDefault("x.run.time", "");
+                var runTime = _values.GetOrEmpty("x.run.time");
                 if (log.Contains("{run.time}")) log = log.Replace("{run.time}", runTime);
 
                 log = FileHelpers.GetOutputDataFileName(log, _values);

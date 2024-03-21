@@ -27,7 +27,12 @@ namespace Azure.AI.Details.Common.CLI
 
     public static class NamedValueExtensions
     {
-        public static string GetOrDefault(this INamedValues values, string name, string defaultValue)
+        public static string GetOrEmpty(this INamedValues values, string name)
+        {
+            return values.GetOrDefault(name, string.Empty)!;
+        }
+
+        public static string? GetOrDefault(this INamedValues values, string name, string? defaultValue)
         {
             var value = values[name];
             return !string.IsNullOrEmpty(value) ? value : defaultValue;

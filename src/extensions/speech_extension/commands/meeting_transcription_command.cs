@@ -164,10 +164,10 @@ namespace Azure.AI.Details.Common.CLI
             var trafficType = _values.GetOrDefault("service.config.endpoint.traffic.type", "spx");
             config.SetServiceProperty("traffictype", trafficType, ServicePropertyChannel.UriQueryParameter);
 
-            var endpointParam = _values.GetOrDefault("service.config.endpoint.query.string", "");
+            var endpointParam = _values.GetOrEmpty("service.config.endpoint.query.string");
             if (!string.IsNullOrEmpty(endpointParam)) ConfigHelpers.SetEndpointParams(config, endpointParam);
 
-            var httpHeader = _values.GetOrDefault("service.config.endpoint.http.header", "");
+            var httpHeader = _values.GetOrEmpty("service.config.endpoint.http.header");
             if (!string.IsNullOrEmpty(httpHeader)) SetHttpHeaderProperty(config, httpHeader);
 
             var rtf = _values.GetOrDefault("audio.input.real.time.factor", -1);
@@ -176,10 +176,10 @@ namespace Azure.AI.Details.Common.CLI
             var fastLane = _values.GetOrDefault("audio.input.fast.lane", rtf >= 0 ? 0 : -1);
             if (fastLane >= 0) config.SetProperty("SPEECH-TransmitLengthBeforThrottleMs", fastLane.ToString());
 
-            var stringProperty = _values.GetOrDefault("config.string.property", "");
+            var stringProperty = _values.GetOrEmpty("config.string.property");
             if (!string.IsNullOrEmpty(stringProperty)) ConfigHelpers.SetStringProperty(config, stringProperty);
 
-            var stringProperties = _values.GetOrDefault("config.string.properties", "");
+            var stringProperties = _values.GetOrEmpty("config.string.properties");
             if (!string.IsNullOrEmpty(stringProperties)) ConfigHelpers.SetStringProperties(config, stringProperties);
 
             // config.SetProperty("AudioConfig_NumberOfChannelsForCapture", "8");

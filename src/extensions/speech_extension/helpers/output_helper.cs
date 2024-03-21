@@ -391,7 +391,7 @@ namespace Azure.AI.Details.Common.CLI
         {
             var file = _values.GetOrDefault("output.batch.file.name", "output.{id}.{run.time}.json");
 
-            var id = _values.GetOrDefault("audio.input.id", "");
+            var id = _values.GetOrEmpty("audio.input.id");
             if (file.Contains("{id}")) file = file.Replace("{id}", id);
 
             var pid = Process.GetCurrentProcess().Id.ToString();
@@ -400,7 +400,7 @@ namespace Azure.AI.Details.Common.CLI
             var time = DateTime.Now.ToFileTime().ToString();
             if (file.Contains("{time}")) file = file.Replace("{time}", time);
 
-            var runTime = _values.GetOrDefault("x.run.time", "");
+            var runTime = _values.GetOrEmpty("x.run.time");
             if (file.Contains("{run.time}")) file = file.Replace("{run.time}", runTime);
 
             return file.ReplaceValues(_values);
@@ -410,10 +410,10 @@ namespace Azure.AI.Details.Common.CLI
         {
             var file = _values.GetOrDefault("output.srt.file.name", "output.{id}.{run.time}.srt");
 
-            var id = _values.GetOrDefault("audio.input.id", "");
+            var id = _values.GetOrEmpty("audio.input.id");
             if (file.Contains("{id}")) file = file.Replace("{id}", id);
 
-            var runTime = _values.GetOrDefault("x.run.time", "");
+            var runTime = _values.GetOrEmpty("x.run.time");
             if (file.Contains("{run.time}")) file = file.Replace("{run.time}", runTime);
 
             return file.ReplaceValues(_values);
@@ -423,10 +423,10 @@ namespace Azure.AI.Details.Common.CLI
         {
             var file = _values.GetOrDefault("output.vtt.file.name", "output.{id}.{run.time}.vtt");
 
-            var id = _values.GetOrDefault("audio.input.id", "");
+            var id = _values.GetOrEmpty("audio.input.id");
             if (file.Contains("{id}")) file = file.Replace("{id}", id);
 
-            var runTime = _values.GetOrDefault("x.run.time", "");
+            var runTime = _values.GetOrEmpty("x.run.time");
             if (file.Contains("{run.time}")) file = file.Replace("{run.time}", runTime);
 
             return file.ReplaceValues(_values);
@@ -454,7 +454,7 @@ namespace Azure.AI.Details.Common.CLI
             var text = GetSrtFile() + Environment.NewLine;
             FileHelpers.WriteAllText(_outputSrtFileName, text, Encoding.UTF8);
 
-            foreach (var language in _values.GetOrDefault("target.language.config", "")?.Split(';', StringSplitOptions.RemoveEmptyEntries))
+            foreach (var language in _values.GetOrEmpty("target.language.config")?.Split(';', StringSplitOptions.RemoveEmptyEntries))
             {
                 var translated = GetSrtFile(language) + Environment.NewLine;
                 var translatedFile = FileHelpers.AppendToFileName(_outputSrtFileName, $".{language}", "");
@@ -467,7 +467,7 @@ namespace Azure.AI.Details.Common.CLI
             var text = GetVttFile() + Environment.NewLine;
             FileHelpers.WriteAllText(_outputVttFileName, text, Encoding.UTF8);
 
-            foreach (var language in _values.GetOrDefault("target.language.config", "")?.Split(';', StringSplitOptions.RemoveEmptyEntries))
+            foreach (var language in _values.GetOrEmpty("target.language.config")?.Split(';', StringSplitOptions.RemoveEmptyEntries))
             {
                 var translated = GetVttFile(language) + Environment.NewLine;
                 var translatedFile = FileHelpers.AppendToFileName(_outputVttFileName, $".{language}", "");
@@ -956,7 +956,7 @@ namespace Azure.AI.Details.Common.CLI
         {
             var file = _values.GetOrDefault("output.all.file.name", "output.{run.time}." + GetOutputAllFileType());
 
-            var id = _values.GetOrDefault("audio.input.id", "");
+            var id = _values.GetOrEmpty("audio.input.id");
             if (file.Contains("{id}")) file = file.Replace("{id}", id);
 
             var pid = Process.GetCurrentProcess().Id.ToString();
@@ -965,7 +965,7 @@ namespace Azure.AI.Details.Common.CLI
             var time = DateTime.Now.ToFileTime().ToString();
             if (file.Contains("{time}")) file = file.Replace("{time}", time);
 
-            var runTime = _values.GetOrDefault("x.run.time", "");
+            var runTime = _values.GetOrEmpty("x.run.time");
             if (file.Contains("{run.time}")) file = file.Replace("{run.time}", runTime);
 
             return file.ReplaceValues(_values);
@@ -1120,7 +1120,7 @@ namespace Azure.AI.Details.Common.CLI
         {
             var file = _values.GetOrDefault("output.each.file.name", "each.{run.time}." + GetOutputEachFileType());
 
-            var id = _values.GetOrDefault("audio.input.id", "");
+            var id = _values.GetOrEmpty("audio.input.id");
             if (file.Contains("{id}")) file = file.Replace("{id}", id);
 
             var pid = Process.GetCurrentProcess().Id.ToString();
@@ -1129,7 +1129,7 @@ namespace Azure.AI.Details.Common.CLI
             var time = DateTime.Now.ToFileTime().ToString();
             if (file.Contains("{time}")) file = file.Replace("{time}", time);
 
-            var runTime = _values.GetOrDefault("x.run.time", "");
+            var runTime = _values.GetOrEmpty("x.run.time");
             if (file.Contains("{run.time}")) file = file.Replace("{run.time}", runTime);
 
             return file.ReplaceValues(_values);
@@ -2936,7 +2936,7 @@ namespace Azure.AI.Details.Common.CLI
         {
             if (!_outputAll && !_outputEach && !_outputBatch) return;
 
-            var zipFileName = _values.GetOrDefault("output.zip.file", "");
+            var zipFileName = _values.GetOrEmpty("output.zip.file");
             if (string.IsNullOrEmpty(zipFileName)) return;
 
             TryCatchHelpers.TryCatchRetry(() =>

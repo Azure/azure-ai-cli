@@ -448,7 +448,7 @@ namespace Azure.AI.Details.Common.CLI
             var time = DateTime.Now.ToFileTime().ToString();
             if (fileName.Contains("{time}")) fileName = fileName.Replace("{time}", time);
 
-            var runTime = _values.GetOrDefault("x.run.time", "");
+            var runTime = _values.GetOrEmpty("x.run.time");
             if (fileName.Contains("{run.time}")) fileName = fileName.Replace("{run.time}", runTime);
 
             return fileName.ReplaceValues(_values);

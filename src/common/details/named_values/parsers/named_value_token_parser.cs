@@ -27,9 +27,9 @@ namespace Azure.AI.Details.Common.CLI
         /// <param name="pinnedValue">The default value, unless pinnedValueKey is non-null, then the value passed to a property with the name whose value is pinnedValueKey</param>
         /// <param name="pinnedValueKey">The name of the property value pinnedValue will be set to.</param>
         public NamedValueTokenParser(
-                    string name, string fullName, string requiredParts,
-                    string valueCount, string validValues = null, string valueKey = null,
-                    string pinnedValue = null, string pinnedValueKey = null)
+                    string? name, string fullName, string requiredParts,
+                    string valueCount, string? validValues = null, string? valueKey = null,
+                    string? pinnedValue = null, string? pinnedValueKey = null)
         {
             ShortName = name;
             FullName = fullName;

@@ -216,7 +216,7 @@ namespace Azure.AI.Details.Common.CLI
             var needDetailedText = _output.NeedsLexicalText() || _output.NeedsItnText();
             if (needDetailedText) config.OutputFormat = OutputFormat.Detailed;
 
-            var profanity = _values.GetOrDefault("service.output.config.profanity.option", "").ToLower();
+            var profanity = _values.GetOrEmpty("service.output.config.profanity.option").ToLower();
             if (profanity == "removed") config.SetProfanity(ProfanityOption.Removed);
             if (profanity == "masked") config.SetProfanity(ProfanityOption.Masked);
             if (profanity == "raw") config.SetProfanity(ProfanityOption.Raw);
@@ -230,10 +230,10 @@ namespace Azure.AI.Details.Common.CLI
             var trafficType = _values.GetOrDefault("service.config.endpoint.traffic.type", "spx");
             config.SetServiceProperty("traffictype", trafficType, ServicePropertyChannel.UriQueryParameter);
 
-            var endpointParam = _values.GetOrDefault("service.config.endpoint.query.string", "");
+            var endpointParam = _values.GetOrEmpty("service.config.endpoint.query.string");
             if (!string.IsNullOrEmpty(endpointParam)) ConfigHelpers.SetEndpointParams(config, endpointParam);
 
-            var httpHeader = _values.GetOrDefault("service.config.endpoint.http.header", "");
+            var httpHeader = _values.GetOrEmpty("service.config.endpoint.http.header");
             if (!string.IsNullOrEmpty(httpHeader)) SetHttpHeaderProperty(config, httpHeader);
 
             var rtf = _values.GetOrDefault("audio.input.real.time.factor", -1);
@@ -242,10 +242,10 @@ namespace Azure.AI.Details.Common.CLI
             var fastLane = _values.GetOrDefault("audio.input.fast.lane", rtf >= 0 ? 0 : -1);
             if (fastLane >= 0) config.SetProperty("SPEECH-TransmitLengthBeforThrottleMs", fastLane.ToString());
 
-            var stringProperty = _values.GetOrDefault("config.string.property", "");
+            var stringProperty = _values.GetOrEmpty("config.string.property");
             if (!string.IsNullOrEmpty(stringProperty)) ConfigHelpers.SetStringProperty(config, stringProperty);
 
-            var stringProperties = _values.GetOrDefault("config.string.properties", "");
+            var stringProperties = _values.GetOrEmpty("config.string.properties");
             if (!string.IsNullOrEmpty(stringProperties)) ConfigHelpers.SetStringProperties(config, stringProperties);
 
             var embedded = _values.GetOrDefault("embedded.config.embedded", false);
@@ -259,10 +259,10 @@ namespace Azure.AI.Details.Common.CLI
             // Turn on embedded (offline) speech recognition.
             config.SetProperty("SPEECH-RecoBackend", "offline");
 
-            var modelKey = _values.GetOrDefault("embedded.config.model.key", "");
+            var modelKey = _values.GetOrEmpty("embedded.config.model.key");
             config.SetProperty("SPEECH-RecoModelKey", modelKey);
 
-            var modelPath = _values.GetOrDefault("embedded.config.model.path", "");
+            var modelPath = _values.GetOrEmpty("embedded.config.model.path");
             var modelIniFileFullPath = Path.GetFullPath(Path.Combine(modelPath, "sr.ini"));
             if (!File.Exists(modelIniFileFullPath))
             {

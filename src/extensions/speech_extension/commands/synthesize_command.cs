@@ -134,13 +134,13 @@ namespace Azure.AI.Details.Common.CLI
 
         private void SynthesizeText()
         {
-            var text = _values.GetOrDefault("synthesizer.input.text", "");
+            var text = _values.GetOrEmpty("synthesizer.input.text");
             SynthesizeText(text);
         }
 
         private void SynthesizeTextFile()
         {
-            var fileName = _values.GetOrDefault("synthesizer.input.text.file", "");
+            var fileName = _values.GetOrEmpty("synthesizer.input.text.file");
             var existing = FileHelpers.DemandFindFileInDataPath(fileName, _values, "text input");
             var text = FileHelpers.ReadAllText(existing, Encoding.Default);
             SynthesizeText(text);
@@ -166,13 +166,13 @@ namespace Azure.AI.Details.Common.CLI
 
         private void SynthesizeSsml()
         {
-            var ssml = _values.GetOrDefault("synthesizer.input.ssml", "");
+            var ssml = _values.GetOrEmpty("synthesizer.input.ssml");
             SynthesizeSsml(ssml);
         }
 
         private void SynthesizeSsmlFile()
         {
-            var fileName = _values.GetOrDefault("synthesizer.input.ssml.file", _values.GetOrDefault("synthesizer.input.text.file", ""));
+            var fileName = _values.GetOrDefault("synthesizer.input.ssml.file", _values.GetOrEmpty("synthesizer.input.text.file"));
             var existing = FileHelpers.DemandFindFileInDataPath(fileName, _values, "ssml input");
             var content = FileHelpers.ReadAllText(existing, Encoding.Default);
 
@@ -307,16 +307,16 @@ namespace Azure.AI.Details.Common.CLI
             var trafficType = _values.GetOrDefault("service.config.endpoint.traffic.type", "spx");
             config.SetServiceProperty("traffictype", trafficType, ServicePropertyChannel.UriQueryParameter);
 
-            var endpointParam = _values.GetOrDefault("service.config.endpoint.query.string", "");
+            var endpointParam = _values.GetOrEmpty("service.config.endpoint.query.string");
             if (!string.IsNullOrEmpty(endpointParam)) ConfigHelpers.SetEndpointParams(config, endpointParam);
 
-            var httpHeader = _values.GetOrDefault("service.config.endpoint.http.header", "");
+            var httpHeader = _values.GetOrEmpty("service.config.endpoint.http.header");
             if (!string.IsNullOrEmpty(httpHeader)) SetHttpHeaderProperty(config, httpHeader);
 
-            var stringProperty = _values.GetOrDefault("config.string.property", "");
+            var stringProperty = _values.GetOrEmpty("config.string.property");
             if (!string.IsNullOrEmpty(stringProperty)) ConfigHelpers.SetStringProperty(config, stringProperty);
 
-            var stringProperties = _values.GetOrDefault("config.string.properties", "");
+            var stringProperties = _values.GetOrEmpty("config.string.properties");
             if (!string.IsNullOrEmpty(stringProperties)) ConfigHelpers.SetStringProperties(config, stringProperties);
 
             var embedded = _values.GetOrDefault("embedded.config.embedded", false);
@@ -332,10 +332,10 @@ namespace Azure.AI.Details.Common.CLI
             // The device neural voices only support 24kHz and the offline engine has no ability to resample
             config.SetSpeechSynthesisOutputFormat(SpeechSynthesisOutputFormat.Riff24Khz16BitMonoPcm);
 
-            var modelKey = _values.GetOrDefault("embedded.config.model.key", "");
+            var modelKey = _values.GetOrEmpty("embedded.config.model.key");
             config.SetProperty("SPEECH-SynthesisModelKey", modelKey);
 
-            var modelPath = _values.GetOrDefault("embedded.config.model.path", "");
+            var modelPath = _values.GetOrEmpty("embedded.config.model.path");
             var modelXmlFileFullPath = Path.GetFullPath(Path.Combine(modelPath, "Tokens.xml"));
             if (!File.Exists(modelXmlFileFullPath))
             {

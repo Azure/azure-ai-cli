@@ -100,7 +100,7 @@ namespace Azure.AI.Details.Common.CLI
             GetGroupId(out string kind, out string id, false);
             if (string.IsNullOrEmpty(id)) id = Guid.NewGuid().ToString();
 
-            var name = _values.GetOrDefault("person.group.name", "");
+            var name = _values.GetOrEmpty("person.group.name");
             if (string.IsNullOrEmpty(name))
             {
                 _values.AddThrowError(
@@ -192,7 +192,7 @@ namespace Azure.AI.Details.Common.CLI
         {
             GetGroupId(out string kind, out string id);
 
-            var name = _values.GetOrDefault("person.name", "");
+            var name = _values.GetOrEmpty("person.name");
             if (string.IsNullOrEmpty(name))
             {
                 _values.AddThrowError(
@@ -252,7 +252,7 @@ namespace Azure.AI.Details.Common.CLI
             var message = $"Adding {kind} person face ('{id}') ...";
             if (!_quiet) Console.WriteLine(message);
 
-            var file = _values.GetOrDefault("vision.input.file", "");
+            var file = _values.GetOrEmpty("vision.input.file");
             var existing = FileHelpers.FindFileInDataPath(file, _values);
 
             var query = GetAddPersonFaceQueryString(file, existing);
@@ -320,21 +320,21 @@ namespace Azure.AI.Details.Common.CLI
         private void GetIds(out string kind, out string groupId, out string personId, out string id, bool groupIdRequired, bool personIdRequired, bool faceIdRequired)
         {
             kind = _values.GetOrDefault("person.group.kind", "large");
-            groupId = _values.GetOrDefault("person.group.id", "");
+            groupId = _values.GetOrEmpty("person.group.id");
             if (string.IsNullOrEmpty(groupId) && groupIdRequired)
             {
                 _values.AddThrowError(
                     "WARNING:", $"Group id not specified!", "",
                         "USE:", $"{Program.Name} {_values.GetCommandForDisplay()} --group id ID [...]");
             }
-            personId = _values.GetOrDefault("person.id", "");
+            personId = _values.GetOrEmpty("person.id");
             if (string.IsNullOrEmpty(personId) && personIdRequired)
             {
                 _values.AddThrowError(
                     "WARNING:", $"Person id not specified!", "",
                         "USE:", $"{Program.Name} {_values.GetCommandForDisplay()} --person id ID [...]");
             }
-            id = _values.GetOrDefault("person.face.id", "");
+            id = _values.GetOrEmpty("person.face.id");
             if (string.IsNullOrEmpty(id) && faceIdRequired)
             {
                 _values.AddThrowError(
@@ -410,8 +410,8 @@ namespace Azure.AI.Details.Common.CLI
                         "SEE:", $"{Program.Name} help person");
             }
 
-            var top = _values.GetOrDefault("person.top", "");
-            var skip = _values.GetOrDefault("person.skip", "");
+            var top = _values.GetOrEmpty("person.top");
+            var skip = _values.GetOrEmpty("person.skip");
 
             query = "";
             if (!string.IsNullOrEmpty(skip)) query += $"&skip={skip}";
@@ -495,8 +495,8 @@ namespace Azure.AI.Details.Common.CLI
 
         private HttpWebRequest CreateWebRequest(string method, string path, string id = null, string query = null, string contentType = null)
         {
-            var key = _values.GetOrDefault("service.config.key", "");
-            var region = _values.GetOrDefault("service.config.region", "");
+            var key = _values.GetOrEmpty("service.config.key");
+            var region = _values.GetOrEmpty("service.config.region");
             var timeout = _values.GetOrDefault("person.wait.timeout", 100000);
 
             if (string.IsNullOrEmpty(region) || string.IsNullOrEmpty(key))
@@ -543,7 +543,7 @@ namespace Azure.AI.Details.Common.CLI
 
         private string CheckWriteOutputRequest(HttpWebRequest request, string payload = null, bool append = false)
         {
-            var output = _values.GetOrDefault("person.output.request.file", "");
+            var output = _values.GetOrEmpty("person.output.request.file");
             if (!string.IsNullOrEmpty(output))
             {
                 var fileName = FileHelpers.GetOutputDataFileName(output, _values);
@@ -554,7 +554,7 @@ namespace Azure.AI.Details.Common.CLI
 
         private byte[] CheckWriteOutputRequest(HttpWebRequest request, byte[] payload)
         {
-            var output = _values.GetOrDefault("person.output.request.file", "");
+            var output = _values.GetOrEmpty("person.output.request.file");
             if (!string.IsNullOrEmpty(output))
             {
                 var fileName = FileHelpers.GetOutputDataFileName(output, _values);

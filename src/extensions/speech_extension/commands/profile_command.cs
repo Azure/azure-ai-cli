@@ -116,8 +116,8 @@ namespace Azure.AI.Details.Common.CLI
 
         private void DoDeleteProfile()
         {
-            var profileId = _values.GetOrDefault("profile.id", "");
-            var file = _values.GetOrDefault("profile.input.file", "");
+            var profileId = _values.GetOrEmpty("profile.id");
+            var file = _values.GetOrEmpty("profile.input.file");
             if (string.IsNullOrEmpty(profileId) && string.IsNullOrEmpty(file))
             {
                 _values.AddThrowError(
@@ -190,7 +190,7 @@ namespace Azure.AI.Details.Common.CLI
 
         private void DoProfileStatus()
         {
-            var id = _values.GetOrDefault("profile.id", "");
+            var id = _values.GetOrEmpty("profile.id");
             if (string.IsNullOrEmpty(id))
             {
                 _values.AddThrowError(
@@ -239,7 +239,7 @@ namespace Azure.AI.Details.Common.CLI
 
         private void DoEnrollProfile()
         {
-            var id = _values.GetOrDefault("profile.id", "");
+            var id = _values.GetOrEmpty("profile.id");
             if (string.IsNullOrEmpty(id))
             {
                 _values.AddThrowError(
@@ -276,7 +276,7 @@ namespace Azure.AI.Details.Common.CLI
 
         private void Recognize(VoiceProfileType type = VoiceProfileType.TextIndependentVerification)
         {
-            var id = _values.GetOrDefault("profile.id", "");
+            var id = _values.GetOrEmpty("profile.id");
             RecognizeSpeaker(type, id);
         }
 
@@ -389,7 +389,7 @@ namespace Azure.AI.Details.Common.CLI
         {
             var idOk = !string.IsNullOrEmpty(id);
 
-            var atId = _values.GetOrDefault("profile.output.id", "");
+            var atId = _values.GetOrEmpty("profile.output.id");
             var atIdOk = !string.IsNullOrEmpty(atId);
             if (idOk && atIdOk)
             {
@@ -397,7 +397,7 @@ namespace Azure.AI.Details.Common.CLI
                 FileHelpers.WriteAllText(atIdFile, id, Encoding.UTF8);
             }
 
-            var addId = _values.GetOrDefault("profile.output.add.id", "");
+            var addId = _values.GetOrEmpty("profile.output.add.id");
             var addIdOk = !string.IsNullOrEmpty(addId);
             if (idOk && addIdOk)
             {
@@ -416,7 +416,7 @@ namespace Azure.AI.Details.Common.CLI
 
         private void CheckWriteOutputIds(string json, string key)
         {
-            var atIds = _values.GetOrDefault("profile.output.ids", "");
+            var atIds = _values.GetOrEmpty("profile.output.ids");
             var atIdsOk = !string.IsNullOrEmpty(atIds);
             var ids = atIdsOk ? new StringBuilder() : null;
 

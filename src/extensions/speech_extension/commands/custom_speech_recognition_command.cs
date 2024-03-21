@@ -148,7 +148,7 @@ namespace Azure.AI.Details.Common.CLI
 
         private string DoDownload()
         {
-            var url = _values.GetOrDefault("csr.download.url", "");
+            var url = _values.GetOrEmpty("csr.download.url");
             var urlOk = !string.IsNullOrEmpty(url);
             if (urlOk) return DownloadUrl(url);
 
@@ -179,7 +179,7 @@ namespace Azure.AI.Details.Common.CLI
 
         private void DoCreateProject()
         {
-            var name = _values.GetOrDefault("csr.project.name", "");
+            var name = _values.GetOrEmpty("csr.project.name");
             if (string.IsNullOrEmpty(name))
             {
                 _values.AddThrowError(
@@ -202,7 +202,7 @@ namespace Azure.AI.Details.Common.CLI
 
         private void DoUpdateProject()
         {
-            var id = _values.GetOrDefault("csr.project.id", "");
+            var id = _values.GetOrEmpty("csr.project.id");
 
             var message = $"Updating project '{id}' ...";
             if (!_quiet) Console.WriteLine(message);
@@ -218,7 +218,7 @@ namespace Azure.AI.Details.Common.CLI
 
         private void DoDeleteProject()
         {
-            var id = _values.GetOrDefault("csr.project.id", "");
+            var id = _values.GetOrEmpty("csr.project.id");
 
             var message = $"Deleting project '{id}' ...";
             if (!_quiet) Console.WriteLine(message);
@@ -234,7 +234,7 @@ namespace Azure.AI.Details.Common.CLI
 
         private void DoProjectStatus()
         {
-            var id = _values.GetOrDefault("csr.project.id", "");
+            var id = _values.GetOrEmpty("csr.project.id");
 
             var message = $"Getting status for project {id} ...";
             if (!_quiet) Console.WriteLine(message);
@@ -251,7 +251,7 @@ namespace Azure.AI.Details.Common.CLI
 
         private void DoCreateDataset()
         {
-            var name = _values.GetOrDefault("csr.dataset.name", "");
+            var name = _values.GetOrEmpty("csr.dataset.name");
             if (string.IsNullOrEmpty(name))
             {
                 _values.AddThrowError(
@@ -276,7 +276,7 @@ namespace Azure.AI.Details.Common.CLI
 
         private void DoUploadDataset()
         {
-            var name = _values.GetOrDefault("csr.dataset.name", "");
+            var name = _values.GetOrEmpty("csr.dataset.name");
             if (string.IsNullOrEmpty(name))
             {
                 _values.AddThrowError(
@@ -306,7 +306,7 @@ namespace Azure.AI.Details.Common.CLI
 
         private void DoUpdateDataset()
         {
-            var id = _values.GetOrDefault("csr.dataset.id", "");
+            var id = _values.GetOrEmpty("csr.dataset.id");
 
             var message = $"Updating dataset '{id}' ...";
             if (!_quiet) Console.WriteLine(message);
@@ -322,7 +322,7 @@ namespace Azure.AI.Details.Common.CLI
 
         private void DoDeleteDataset()
         {
-            var id = _values.GetOrDefault("csr.dataset.id", "");
+            var id = _values.GetOrEmpty("csr.dataset.id");
 
             var message = $"Deleting dataset {id} ...";
             if (!_quiet) Console.WriteLine(message);
@@ -338,8 +338,8 @@ namespace Azure.AI.Details.Common.CLI
 
         private void DoDatasetStatus()
         {
-            var id = _values.GetOrDefault("csr.dataset.id", "");
-            var projectId = _values.GetOrDefault("csr.project.id", "");
+            var id = _values.GetOrEmpty("csr.dataset.id");
+            var projectId = _values.GetOrEmpty("csr.project.id");
 
             if (!string.IsNullOrEmpty(projectId))
             {
@@ -364,7 +364,7 @@ namespace Azure.AI.Details.Common.CLI
 
         private void DoCreateModel()
         {
-            var name = _values.GetOrDefault("csr.model.name", "");
+            var name = _values.GetOrEmpty("csr.model.name");
             if (string.IsNullOrEmpty(name))
             {
                 _values.AddThrowError(
@@ -389,7 +389,7 @@ namespace Azure.AI.Details.Common.CLI
 
         private void DoUpdateModel()
         {
-            var id = _values.GetOrDefault("csr.model.id", "");
+            var id = _values.GetOrEmpty("csr.model.id");
 
             var message = $"Updating model '{id}' ...";
             if (!_quiet) Console.WriteLine(message);
@@ -405,7 +405,7 @@ namespace Azure.AI.Details.Common.CLI
 
         private void DoDeleteModel()
         {
-            var id = _values.GetOrDefault("csr.model.id", "");
+            var id = _values.GetOrEmpty("csr.model.id");
 
             var message = $"Deleting model {id} ...";
             if (!_quiet) Console.WriteLine(message);
@@ -421,8 +421,8 @@ namespace Azure.AI.Details.Common.CLI
 
         private void DoModelStatus()
         {
-            var id = _values.GetOrDefault("csr.model.id", "");
-            var projectId = _values.GetOrDefault("csr.project.id", "");
+            var id = _values.GetOrEmpty("csr.model.id");
+            var projectId = _values.GetOrEmpty("csr.project.id");
 
             if (!string.IsNullOrEmpty(projectId))
             {
@@ -447,9 +447,9 @@ namespace Azure.AI.Details.Common.CLI
 
         private void DoModelCopy()
         {
-            var id = _values.GetOrDefault("csr.model.id", "");
-            var projectId = _values.GetOrDefault("csr.project.id", "");
-            var targetKey = _values.GetOrDefault("csr.model.copy.target.key", "");
+            var id = _values.GetOrEmpty("csr.model.id");
+            var projectId = _values.GetOrEmpty("csr.project.id");
+            var targetKey = _values.GetOrEmpty("csr.model.copy.target.key");
 
             if (!string.IsNullOrEmpty(projectId))
             {
@@ -479,7 +479,7 @@ namespace Azure.AI.Details.Common.CLI
 
         private void DoCreateEvaluation()
         {
-            var name = _values.GetOrDefault("csr.evaluation.name", "");
+            var name = _values.GetOrEmpty("csr.evaluation.name");
             if (string.IsNullOrEmpty(name))
             {
                 _values.AddThrowError(
@@ -504,7 +504,7 @@ namespace Azure.AI.Details.Common.CLI
 
         private void DoUpdateEvaluation()
         {
-            var id = _values.GetOrDefault("csr.evaluation.id", "");
+            var id = _values.GetOrEmpty("csr.evaluation.id");
 
             var message = $"Updating evaluation '{id}' ...";
             if (!_quiet) Console.WriteLine(message);
@@ -520,7 +520,7 @@ namespace Azure.AI.Details.Common.CLI
 
         private void DoDeleteEvaluation()
         {
-            var id = _values.GetOrDefault("csr.evaluation.id", "");
+            var id = _values.GetOrEmpty("csr.evaluation.id");
 
             var message = $"Deleting evaluation {id} ...";
             if (!_quiet) Console.WriteLine(message);
@@ -536,8 +536,8 @@ namespace Azure.AI.Details.Common.CLI
 
         private void DoEvaluationStatus()
         {
-            var id = _values.GetOrDefault("csr.evaluation.id", "");
-            var projectId = _values.GetOrDefault("csr.project.id", "");
+            var id = _values.GetOrEmpty("csr.evaluation.id");
+            var projectId = _values.GetOrEmpty("csr.project.id");
 
             if (!string.IsNullOrEmpty(projectId))
             {
@@ -562,7 +562,7 @@ namespace Azure.AI.Details.Common.CLI
 
         private void DoCreateEndpoint()
         {
-            var name = _values.GetOrDefault("csr.endpoint.name", "");
+            var name = _values.GetOrEmpty("csr.endpoint.name");
             if (string.IsNullOrEmpty(name))
             {
                 _values.AddThrowError(
@@ -587,7 +587,7 @@ namespace Azure.AI.Details.Common.CLI
 
         private void DoUpdateEndpoint()
         {
-            var id = _values.GetOrDefault("csr.endpoint.id", "");
+            var id = _values.GetOrEmpty("csr.endpoint.id");
 
             var message = $"Updating endpoint '{id}' ...";
             if (!_quiet) Console.WriteLine(message);
@@ -603,7 +603,7 @@ namespace Azure.AI.Details.Common.CLI
 
         private void DoDeleteEndpoint()
         {
-            var id = _values.GetOrDefault("csr.endpoint.id", "");
+            var id = _values.GetOrEmpty("csr.endpoint.id");
 
             var message = $"Deleting endpoint {id} ...";
             if (!_quiet) Console.WriteLine(message);
@@ -619,8 +619,8 @@ namespace Azure.AI.Details.Common.CLI
 
         private void DoEndpointStatus()
         {
-            var id = _values.GetOrDefault("csr.endpoint.id", "");
-            var projectId = _values.GetOrDefault("csr.project.id", "");
+            var id = _values.GetOrEmpty("csr.endpoint.id");
+            var projectId = _values.GetOrEmpty("csr.project.id");
 
             if (!string.IsNullOrEmpty(projectId))
             {
@@ -650,12 +650,12 @@ namespace Azure.AI.Details.Common.CLI
             var listLanguages = _values.GetOrDefault("csr.list.languages", false);
             var languageKind = _values.GetOrDefault("csr.list.languages.kind", listLanguages ? kind.TrimEnd('s') : "");
 
-            var list = _values.GetOrDefault("csr.list.id", "");
+            var list = _values.GetOrEmpty("csr.list.id");
             var listOk = list.StartsWith("http");
 
             var listId = listOk ? "" : list;
 
-            var dataset = _values.GetOrDefault("csr.dataset.id", "");
+            var dataset = _values.GetOrEmpty("csr.dataset.id");
             var datasetOk = !string.IsNullOrEmpty(dataset) && dataset.StartsWith("http");
 
             var kindIsDatasets = kind == "datasets";
@@ -670,7 +670,7 @@ namespace Azure.AI.Details.Common.CLI
                         "USE:", $"{Program.Name} csr dataset list --dataset ID/URL --files");
             }
 
-            var evaluation = _values.GetOrDefault("csr.evaluation.id", "");
+            var evaluation = _values.GetOrEmpty("csr.evaluation.id");
             var evaluationOk = !string.IsNullOrEmpty(evaluation) && evaluation.StartsWith("http");
 
             var kindIsEvaluations = kind == "evaluations";
@@ -685,7 +685,7 @@ namespace Azure.AI.Details.Common.CLI
                         "USE:", $"{Program.Name} csr evaluation list --evaluation ID/URL --files");
             }
 
-            var endpoint = _values.GetOrDefault("csr.endpoint.id", "");
+            var endpoint = _values.GetOrEmpty("csr.endpoint.id");
             var endpointOk = !string.IsNullOrEmpty(endpoint) && endpoint.StartsWith("http");
 
             var kindIsEndpoints = kind == "endpoints";
@@ -767,8 +767,8 @@ namespace Azure.AI.Details.Common.CLI
                         "SEE:", $"{Program.Name} help csr");
             }
 
-            var top = _values.GetOrDefault("csr.top", "");
-            var skip = _values.GetOrDefault("csr.skip", "");
+            var top = _values.GetOrEmpty("csr.top");
+            var skip = _values.GetOrEmpty("csr.skip");
 
             query = "";
             if (!string.IsNullOrEmpty(skip)) query += $"&skip={skip}";
@@ -795,7 +795,7 @@ namespace Azure.AI.Details.Common.CLI
 
         private void CheckDownloadFile(ref string path, ref string message)
         {
-            var file = _values.GetOrDefault("csr.download.file", "");
+            var file = _values.GetOrEmpty("csr.download.file");
             var fileOk = !string.IsNullOrEmpty(file) && file.StartsWith("http");
 
             if (fileOk)
@@ -810,10 +810,10 @@ namespace Azure.AI.Details.Common.CLI
 
         private void CheckDownloadDatasetFile(ref string path, ref string message)
         {
-            var datasetFile = _values.GetOrDefault("csr.dataset.file.id", "");
+            var datasetFile = _values.GetOrEmpty("csr.dataset.file.id");
             var datasetFileOk = !string.IsNullOrEmpty(datasetFile) && datasetFile.StartsWith("http");
 
-            var downloadId = _values.GetOrDefault("csr.download.id", "");
+            var downloadId = _values.GetOrEmpty("csr.download.id");
             var datasetId = IdHelpers.GetIdFromNamedValue(_values, "csr.dataset.id", downloadId);
             var datasetIdOk = !string.IsNullOrEmpty(datasetId);
 
@@ -834,10 +834,10 @@ namespace Azure.AI.Details.Common.CLI
 
         private void CheckDownloadEvaluationFile(ref string path, ref string message)
         {
-            var evaluationFile = _values.GetOrDefault("csr.evaluation.file.id", "");
+            var evaluationFile = _values.GetOrEmpty("csr.evaluation.file.id");
             var evaluationFileOk = !string.IsNullOrEmpty(evaluationFile) && evaluationFile.StartsWith("http");
 
-            var downloadId = _values.GetOrDefault("csr.download.id", "");
+            var downloadId = _values.GetOrEmpty("csr.download.id");
             var evaluationId = IdHelpers.GetIdFromNamedValue(_values, "csr.evaluation.id", downloadId);
             var evaluationIdOk = !string.IsNullOrEmpty(evaluationId);
 
@@ -858,10 +858,10 @@ namespace Azure.AI.Details.Common.CLI
 
         private void CheckDownloadEndpointLog(ref string path, ref string message)
         {
-            var endpointLog = _values.GetOrDefault("csr.endpoint.log.id", "");
+            var endpointLog = _values.GetOrEmpty("csr.endpoint.log.id");
             var endpointLogOk = !string.IsNullOrEmpty(endpointLog) && endpointLog.StartsWith("http");
 
-            var downloadId = _values.GetOrDefault("csr.download.id", "");
+            var downloadId = _values.GetOrEmpty("csr.download.id");
             var endpointId = IdHelpers.GetIdFromNamedValue(_values, "csr.endpoint.id", downloadId);
             var endpointIdOk = !string.IsNullOrEmpty(endpointId);
 
@@ -883,17 +883,17 @@ namespace Azure.AI.Details.Common.CLI
         private string GetCreateProjectPostJson(string name)
         {
             var language = _values.GetOrDefault("csr.project.language", "en-US");
-            var description = _values.GetOrDefault("csr.project.description", "");
+            var description = _values.GetOrEmpty("csr.project.description");
             return $"{{ \"locale\": \"{language}\", \"displayName\": \"{name}\", \"description\": \"{description}\" }}";
         }
 
         private string GetUpdateProjectPostJson()
         {
-            var name = _values.GetOrDefault("csr.project.name", "");
-            var description = _values.GetOrDefault("csr.project.description", "");
+            var name = _values.GetOrEmpty("csr.project.name");
+            var description = _values.GetOrEmpty("csr.project.description");
 
-            var region = _values.GetOrDefault("service.config.region", "");
-            var projectId = _values.GetOrDefault("csr.project.id", "");
+            var region = _values.GetOrEmpty("service.config.region");
+            var projectId = _values.GetOrEmpty("csr.project.id");
             var projectUrl = GetCustomSpeechUrl(region, "projects", projectId);
             var projectRef = !string.IsNullOrEmpty(projectId) ? $"\"project\": {{ \"self\": \"{projectUrl}\" }}," : "";
 
@@ -902,18 +902,18 @@ namespace Azure.AI.Details.Common.CLI
 
         private string GetCreateModelPostJson(string name)
         {
-            var projectId = _values.GetOrDefault("csr.project.id", "");
+            var projectId = _values.GetOrEmpty("csr.project.id");
 
-            var region = _values.GetOrDefault("service.config.region", "");
+            var region = _values.GetOrEmpty("service.config.region");
             var projectUrl = GetCustomSpeechUrl(region, "projects", projectId);
             var projectRef = !string.IsNullOrEmpty(projectId) ? $"\"project\": {{ \"self\": \"{projectUrl}\" }}," : "";
 
-            var baseId = _values.GetOrDefault("csr.model.create.base.model.id", "");
+            var baseId = _values.GetOrEmpty("csr.model.create.base.model.id");
             var baseUrl = GetCustomSpeechUrl(region, "models/base", baseId);
             var baseRef = !string.IsNullOrEmpty(baseId) ? $"\"baseModel\": {{ \"self\": \"{baseUrl}\" }}," : "";
 
             StringBuilder sb = new StringBuilder();
-            var datasetIds = _values.GetOrDefault("csr.model.create.dataset.ids", _values.GetOrDefault("csr.model.create.dataset.id", ""));
+            var datasetIds = _values.GetOrDefault("csr.model.create.dataset.ids", _values.GetOrEmpty("csr.model.create.dataset.id"));
             foreach (var datasetId in datasetIds.Split(";\r\n".ToCharArray()))
             {
                 if (!string.IsNullOrEmpty(datasetId))
@@ -926,22 +926,22 @@ namespace Azure.AI.Details.Common.CLI
             var datasets = sb.ToString().Trim(',', ' ');
             var datasetRefs = datasets.Length > 0 ? $"\"datasets\": [ {datasets} ]," : "";
 
-            var text = _values.GetOrDefault("csr.model.create.text", "");
+            var text = _values.GetOrEmpty("csr.model.create.text");
             var textRef = !string.IsNullOrEmpty(text) ? $"\"text\": \"{text}\"," : "";
 
             var language = _values.GetOrDefault("csr.model.language", "en-US");
-            var description = _values.GetOrDefault("csr.model.description", "");
+            var description = _values.GetOrEmpty("csr.model.description");
 
             return $"{{ {projectRef} {baseRef} {datasetRefs} {textRef} \"locale\": \"{language}\", \"displayName\": \"{name}\", \"description\": \"{description}\" }}";
         }
 
         private string GetUpdateModelPostJson()
         {
-            var name = _values.GetOrDefault("csr.model.name", "");
-            var description = _values.GetOrDefault("csr.model.description", "");
+            var name = _values.GetOrEmpty("csr.model.name");
+            var description = _values.GetOrEmpty("csr.model.description");
 
-            var region = _values.GetOrDefault("service.config.region", "");
-            var projectId = _values.GetOrDefault("csr.project.id", "");
+            var region = _values.GetOrEmpty("service.config.region");
+            var projectId = _values.GetOrEmpty("csr.project.id");
             var projectUrl = GetCustomSpeechUrl(region, "projects", projectId);
             var projectRef = !string.IsNullOrEmpty(projectId) ? $"\"project\": {{ \"self\": \"{projectUrl}\" }}," : "";
 
@@ -955,37 +955,37 @@ namespace Azure.AI.Details.Common.CLI
 
         private string GetCreateEvaluationPostJson(string name)
         {
-            var projectId = _values.GetOrDefault("csr.project.id", "");
+            var projectId = _values.GetOrEmpty("csr.project.id");
 
-            var region = _values.GetOrDefault("service.config.region", "");
+            var region = _values.GetOrEmpty("service.config.region");
             var projectUrl = GetCustomSpeechUrl(region, "projects", projectId);
             var projectRef = !string.IsNullOrEmpty(projectId) ? $"\"project\": {{ \"self\": \"{projectUrl}\" }}," : "";
 
-            var modelId1 = _values.GetOrDefault("csr.evaluation.create.model1.id", "");
+            var modelId1 = _values.GetOrEmpty("csr.evaluation.create.model1.id");
             var modelUrl1 = GetCustomSpeechUrl(region, "models", modelId1);
             var modelRef1 = !string.IsNullOrEmpty(modelId1) ? $"\"model1\": {{ \"self\": \"{modelUrl1}\" }}," : "";
 
-            var modelId2 = _values.GetOrDefault("csr.evaluation.create.model2.id", "");
+            var modelId2 = _values.GetOrEmpty("csr.evaluation.create.model2.id");
             var modelUrl2 = GetCustomSpeechUrl(region, "models", modelId2);
             var modelRef2 = !string.IsNullOrEmpty(modelId2) ? $"\"model2\": {{ \"self\": \"{modelUrl2}\" }}," : "";
 
-            var datasetId = _values.GetOrDefault("csr.evaluation.create.dataset.id", "");
+            var datasetId = _values.GetOrEmpty("csr.evaluation.create.dataset.id");
             var datasetUrl = GetCustomSpeechUrl(region, "datasets", datasetId);
             var datasetRef = !string.IsNullOrEmpty(modelId1) ? $"\"dataset\": {{ \"self\": \"{datasetUrl}\" }}," : "";
 
             var language = _values.GetOrDefault("csr.evaluation.language", "en-US");
-            var description = _values.GetOrDefault("csr.evaluation.description", "");
+            var description = _values.GetOrEmpty("csr.evaluation.description");
 
             return $"{{ {projectRef} {modelRef1} {modelRef2} {datasetRef} \"locale\": \"{language}\", \"displayName\": \"{name}\", \"description\": \"{description}\" }}";
         }
 
         private string GetUpdateEvaluationPostJson()
         {
-            var name = _values.GetOrDefault("csr.evaluation.name", "");
-            var description = _values.GetOrDefault("csr.evaluation.description", "");
+            var name = _values.GetOrEmpty("csr.evaluation.name");
+            var description = _values.GetOrEmpty("csr.evaluation.description");
 
-            var region = _values.GetOrDefault("service.config.region", "");
-            var projectId = _values.GetOrDefault("csr.project.id", "");
+            var region = _values.GetOrEmpty("service.config.region");
+            var projectId = _values.GetOrEmpty("csr.project.id");
             var projectUrl = GetCustomSpeechUrl(region, "projects", projectId);
             var projectRef = !string.IsNullOrEmpty(projectId) ? $"\"project\": {{ \"self\": \"{projectUrl}\" }}," : "";
 
@@ -994,23 +994,23 @@ namespace Azure.AI.Details.Common.CLI
 
         private string GetCreateDatasetPostJson(string name)
         {
-            var contentUrl = _values.GetOrDefault("csr.dataset.create.content.url", "");
-            var projectId = _values.GetOrDefault("csr.project.id", "");
+            var contentUrl = _values.GetOrEmpty("csr.dataset.create.content.url");
+            var projectId = _values.GetOrEmpty("csr.project.id");
 
-            var region = _values.GetOrDefault("service.config.region", "");
+            var region = _values.GetOrEmpty("service.config.region");
             var projectUrl = GetCustomSpeechUrl(region, "projects", projectId);
             var projectRef = !string.IsNullOrEmpty(projectId) ? $"\"project\": {{ \"self\": \"{projectUrl}\" }}," : "";
 
-            var kind = _values.GetOrDefault("csr.dataset.kind", "");
+            var kind = _values.GetOrEmpty("csr.dataset.kind");
             var language = _values.GetOrDefault("csr.dataset.language", "en-US");
-            var description = _values.GetOrDefault("csr.dataset.description", "");
+            var description = _values.GetOrEmpty("csr.dataset.description");
 
             return $"{{ {projectRef} \"kind\": \"{kind}\", \"contentUrl\": \"{contentUrl}\", \"locale\": \"{language}\", \"displayName\": \"{name}\", \"description\": \"{description}\" }}";
         }
 
         private byte[] GetUploadDatasetPostFormData(string name, string boundary)
         {
-            var dataFile = _values.GetOrDefault("csr.dataset.upload.data.file", "");
+            var dataFile = _values.GetOrEmpty("csr.dataset.upload.data.file");
             if (string.IsNullOrEmpty(dataFile))
             {
                 _values.AddThrowError(
@@ -1024,14 +1024,14 @@ namespace Azure.AI.Details.Common.CLI
                 _values.AddThrowError("ERROR:", $"Cannot find data file: \"{dataFile}\"");
             }
 
-            var projectId = _values.GetOrDefault("csr.project.id", "");
+            var projectId = _values.GetOrEmpty("csr.project.id");
 
-            var region = _values.GetOrDefault("service.config.region", "");
+            var region = _values.GetOrEmpty("service.config.region");
             var projectUrl = GetCustomSpeechUrl(region, "projects", projectId);
 
-            var kind = _values.GetOrDefault("csr.dataset.kind", "");
+            var kind = _values.GetOrEmpty("csr.dataset.kind");
             var language = _values.GetOrDefault("csr.dataset.language", "en-US");
-            var description = _values.GetOrDefault("csr.dataset.description", "");
+            var description = _values.GetOrEmpty("csr.dataset.description");
 
             var sb = new StringBuilder();
 
@@ -1063,11 +1063,11 @@ namespace Azure.AI.Details.Common.CLI
 
         private string GetUpdateDatasetPostJson()
         {
-            var name = _values.GetOrDefault("csr.dataset.name", "");
-            var description = _values.GetOrDefault("csr.dataset.description", "");
+            var name = _values.GetOrEmpty("csr.dataset.name");
+            var description = _values.GetOrEmpty("csr.dataset.description");
 
-            var region = _values.GetOrDefault("service.config.region", "");
-            var projectId = _values.GetOrDefault("csr.project.id", "");
+            var region = _values.GetOrEmpty("service.config.region");
+            var projectId = _values.GetOrEmpty("csr.project.id");
             var projectUrl = GetCustomSpeechUrl(region, "projects", projectId);
             var projectRef = !string.IsNullOrEmpty(projectId) ? $"\"project\": {{ \"self\": \"{projectUrl}\" }}," : "";
 
@@ -1076,21 +1076,21 @@ namespace Azure.AI.Details.Common.CLI
 
         private string GetCreateEndpointPostJson(string name)
         {
-            var projectId = _values.GetOrDefault("csr.project.id", "");
+            var projectId = _values.GetOrEmpty("csr.project.id");
 
-            var region = _values.GetOrDefault("service.config.region", "");
+            var region = _values.GetOrEmpty("service.config.region");
             var projectUrl = GetCustomSpeechUrl(region, "projects", projectId);
             var projectRef = !string.IsNullOrEmpty(projectId) ? $"\"project\": {{ \"self\": \"{projectUrl}\" }}," : "";
 
-            var modelId = _values.GetOrDefault("csr.endpoint.create.model.id", "");
+            var modelId = _values.GetOrEmpty("csr.endpoint.create.model.id");
             var modelUrl = GetCustomSpeechUrl(region, "models", modelId);
             var modelRef = !string.IsNullOrEmpty(modelId) ? $"\"model\": {{ \"self\": \"{modelUrl}\" }}, " : "";
 
-            var text = _values.GetOrDefault("csr.endpoint.create.text", "");
+            var text = _values.GetOrEmpty("csr.endpoint.create.text");
             var textRef = !string.IsNullOrEmpty(text) ? $"\"text\": \"{text}\"," : "";
 
             var language = _values.GetOrDefault("csr.endpoint.language", "en-US");
-            var description = _values.GetOrDefault("csr.endpoint.description", "");
+            var description = _values.GetOrEmpty("csr.endpoint.description");
             var properties = GetProperties("endpoint");
 
             return $"{{ {projectRef} {modelRef} {textRef} {properties} \"locale\": \"{language}\", \"displayName\": \"{name}\", \"description\": \"{description}\" }}";
@@ -1098,12 +1098,12 @@ namespace Azure.AI.Details.Common.CLI
 
         private string GetUpdateEndpointPostJson()
         {
-            var name = _values.GetOrDefault("csr.endpoint.name", "");
-            var description = _values.GetOrDefault("csr.endpoint.description", "");
+            var name = _values.GetOrEmpty("csr.endpoint.name");
+            var description = _values.GetOrEmpty("csr.endpoint.description");
             var properties = GetProperties("endpoint");
 
-            var region = _values.GetOrDefault("service.config.region", "");
-            var projectId = _values.GetOrDefault("csr.project.id", "");
+            var region = _values.GetOrEmpty("service.config.region");
+            var projectId = _values.GetOrEmpty("csr.project.id");
             var projectUrl = GetCustomSpeechUrl(region, "projects", projectId);
             var projectRef = !string.IsNullOrEmpty(projectId) ? $"\"project\": {{ \"self\": \"{projectUrl}\" }}," : "";
 
@@ -1120,8 +1120,8 @@ namespace Azure.AI.Details.Common.CLI
 
         private HttpWebRequest CreateWebRequest(string method, string path, string id = null, string query = null, string contentType = null)
         {
-            var key = _values.GetOrDefault("service.config.key", "");
-            var region = _values.GetOrDefault("service.config.region", "");
+            var key = _values.GetOrEmpty("service.config.key");
+            var region = _values.GetOrEmpty("service.config.region");
             var timeout = _values.GetOrDefault("csr.wait.timeout", 100000);
 
             if (string.IsNullOrEmpty(region) || string.IsNullOrEmpty(key))
@@ -1168,7 +1168,7 @@ namespace Azure.AI.Details.Common.CLI
 
         private string CheckWriteOutputRequest(HttpWebRequest request, string payload = null, bool append = false)
         {
-            var output = _values.GetOrDefault("csr.output.request.file", "");
+            var output = _values.GetOrEmpty("csr.output.request.file");
             if (!string.IsNullOrEmpty(output))
             {
                 var fileName = FileHelpers.GetOutputDataFileName(output, _values);
