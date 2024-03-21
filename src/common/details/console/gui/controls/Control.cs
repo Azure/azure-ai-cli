@@ -9,7 +9,7 @@ namespace Azure.AI.Details.Common.CLI.ConsoleGui
 {
     public class ControlWindow : Window
     {
-        public ControlWindow(Window parent, Rect rect, Colors colors, string border = null, bool enabled = true) : base(parent, rect, colors, border)
+        public ControlWindow(Window? parent, Rect rect, Colors colors, string? border = null, bool enabled = true) : base(parent, rect, colors, border)
         {
             this._enabled = enabled;
         }

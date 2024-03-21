@@ -43,7 +43,7 @@ namespace Azure.AI.Details.Common.CLI.ConsoleGui
 
         #region protected methods
 
-        protected ScrollingControl(Window parent, Rect rect, Colors colors, string border, bool fEnabled) : base(parent, rect, colors, border, fEnabled)
+        protected ScrollingControl(Window? parent, Rect rect, Colors colors, string? border, bool fEnabled) : base(parent, rect, colors, border, fEnabled)
         {
             _rowOffset = 0;
             _columnOffset = 0;

@@ -77,9 +77,9 @@ namespace Azure.AI.Details.Common.CLI.ConsoleGui
                     start.UseShellExecute = false;
                     
                     var process = Process.Start(start);
-                    process.WaitForExit();
+                    process?.WaitForExit();
                     
-                    if (process.ExitCode == 1)
+                    if (process?.ExitCode == 1)
                     {
                         Environment.Exit(process.ExitCode);
                     }
@@ -105,7 +105,7 @@ namespace Azure.AI.Details.Common.CLI.ConsoleGui
                         var programExe = OperatingSystem.IsWindows() ? Program.Exe : Program.Exe.Replace(".exe", "");
                         var start = new ProcessStartInfo(programExe, $"cls {tryCommand}");
                         start.UseShellExecute = false;
-                        Process.Start(start).WaitForExit();
+                        Process.Start(start)?.WaitForExit();
                         Environment.Exit(1);
                     }
                 }
@@ -124,7 +124,7 @@ namespace Azure.AI.Details.Common.CLI.ConsoleGui
                 var start = new ProcessStartInfo(programExe, $"quiet {helpCommand}");
 
                 start.UseShellExecute = false;
-                Process.Start(start).WaitForExit();
+                Process.Start(start)?.WaitForExit();
             }
         }
 
@@ -147,11 +147,11 @@ namespace Azure.AI.Details.Common.CLI.ConsoleGui
 
         #region protected methods
 
-        protected HelpViewer(Window parent, Rect rect, Colors colorNormal, Colors colorSelected, string border = null, bool fEnabled = true) : base(parent, rect, colorNormal, colorSelected, border, fEnabled)
+        protected HelpViewer(Window? parent, Rect rect, Colors colorNormal, Colors colorSelected, string? border = null, bool fEnabled = true) : base(parent, rect, colorNormal, colorSelected, border, fEnabled)
         {
         }
 
-        protected override void PaintWindow(Colors colors, string border = null)
+        protected override void PaintWindow(Colors colors, string? border = null)
         {
             base.PaintWindow(colors, border);
             if (border != null)
