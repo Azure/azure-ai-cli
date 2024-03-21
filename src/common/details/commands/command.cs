@@ -13,8 +13,6 @@ using System.Threading.Tasks;
 using System.Collections.Generic;
 using System.IO.Compression;
 using System.Runtime.InteropServices;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using DevLab.JmesPath;
 
 namespace Azure.AI.Details.Common.CLI
@@ -172,9 +170,9 @@ namespace Azure.AI.Details.Common.CLI
                 FileHelpers.CopyFiles(PathHelpers.Combine(sourcePath, locations), Program.ZipIncludes, tempDirectory, "lib", ".dylib", verbose);
             }
 
-            // Dependent type assemblies (Newtonsoft, Linq Async, System.Interactive.Async and JMESPath)
+            // Dependent type assemblies (Linq Async, System.Interactive.Async and JMESPath)
             // These assemblies are embedded in spx.exe when PublishAsSingleFile is set (Dependency package)
-            Type[] types = { typeof(Newtonsoft.Json.Linq.JObject), typeof(System.Linq.AsyncEnumerable), typeof(System.Linq.AsyncEnumerableEx), typeof(DevLab.JmesPath.Parser), typeof(DevLab.JmesPath.JmesPath)};
+            Type[] types = { typeof(System.Linq.AsyncEnumerable), typeof(System.Linq.AsyncEnumerableEx), typeof(DevLab.JmesPath.Parser), typeof(DevLab.JmesPath.JmesPath)};
             foreach (var t in types)
             {
                 var fi = FileHelpers.GetAssemblyFileInfo(t);

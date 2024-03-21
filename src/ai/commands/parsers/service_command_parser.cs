@@ -52,12 +52,6 @@ namespace Azure.AI.Details.Common.CLI
             ("service.search.update", true),
             ("service.search.delete", true),
             ("service.search", true),
-            ("service.flow.create", true),
-            ("service.flow.status", true),
-            ("service.flow.list", false),
-            ("service.flow.update", true),
-            ("service.flow.delete", true),
-            ("service.flow", true),
             ("service.evaluation.create", true),
             ("service.evaluation.status", true),
             ("service.evaluation.list", false),
@@ -73,7 +67,6 @@ namespace Azure.AI.Details.Common.CLI
             "service.connection",
             "service.deployment",
             "service.search",
-            "service.flow",
             "service.evaluation",
             "service"
         };

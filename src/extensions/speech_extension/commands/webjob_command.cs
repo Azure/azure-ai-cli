@@ -14,7 +14,6 @@ using Microsoft.CognitiveServices.Speech;
 using Microsoft.CognitiveServices.Speech.Audio;
 using System.Collections.Generic;
 using System.Net;
-using Newtonsoft.Json.Linq;
 
 namespace Azure.AI.Details.Common.CLI
 {

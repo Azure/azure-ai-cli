@@ -33,10 +33,10 @@
     This PUBLIC PREVIEW version may change at any time\.
     See: https://aka\.ms/azure-ai-cli-public-preview
 
-       ___ ____  ___  _____
-      / _ /_  / / _ |/_  _/
-     / __ |/ /_/ __ |_/ /_
-    /_/ |_/___/_/ |_/____/
+       ___  _____
+      / _ |/_  _/
+     / __ |_/ /_
+    /_/ |_/____/
 
     USAGE: ai <command> \[\.\.\.\]\r?$\n
     ^\r?$\n
@@ -54,7 +54,6 @@
     ^  ai test \[\.\.\.\]             \(see: ai help test\)\r?$\n
     ^\r?$\n
     ^  ai chat \[\.\.\.\]             \(see: ai help chat\)\r?$\n
-    ^  ai flow \[\.\.\.\]             \(see: ai help flow\)\r?$\n
     ^\r?$\n
     ^  ai search \[\.\.\.\]           \(see: ai help search\)\r?$\n
     ^  ai speech \[\.\.\.\]           \(see: ai help speech\)\r?$\n

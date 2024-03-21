@@ -12,7 +12,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 using System.Net;
-using Newtonsoft.Json.Linq;
 using Azure.AI.Details.Common.CLI.ConsoleGui;
 
 namespace Azure.AI.Details.Common.CLI
@@ -21,7 +20,7 @@ namespace Azure.AI.Details.Common.CLI
     {
         public static string GetSubscriptionUserName(string subscriptionId)
         {
-            if (_subscriptionIdToUsreName.TryGetValue(subscriptionId, out var userName))
+            if (_subscriptionIdToUserName.TryGetValue(subscriptionId, out var userName))
             {
                 return userName;
             }
@@ -177,9 +176,9 @@ namespace Azure.AI.Details.Common.CLI
 
         private static void CacheSubscriptionUserName(AzCli.SubscriptionInfo subscription)
         {
-            _subscriptionIdToUsreName[subscription.Id] = subscription.UserName;
+            _subscriptionIdToUserName[subscription.Id] = subscription.UserName;
         }
 
-        private static Dictionary<string, string> _subscriptionIdToUsreName = new Dictionary<string, string>();
+        private static Dictionary<string, string> _subscriptionIdToUserName = new Dictionary<string, string>();
     }
 }

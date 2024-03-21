@@ -15,7 +15,6 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Threading;
 using System.Threading.Tasks;
-using Newtonsoft.Json.Linq;
 using Microsoft.SemanticKernel;
 using Microsoft.SemanticKernel.Memory;
 using Microsoft.SemanticKernel.Connectors.Memory.AzureCognitiveSearch;
@@ -143,8 +142,8 @@ namespace Azure.AI.Details.Common.CLI
 
                 output = DoIndexUpdateWithGenAi(subscription, group, project, searchIndexName, embeddingModelDeployment, embeddingModelName, pattern, externalSourceUrl);
 
-                var parsed = !string.IsNullOrEmpty(output) ? JToken.Parse(output) : null;
-                var index = parsed?.Type == JTokenType.Object ? parsed["index"] : null;
+                var parsed = !string.IsNullOrEmpty(output) ? JsonDocument.Parse(output) : null;
+                var index = parsed?.GetPropertyElementOrNull("index");
                 if (index == null)
                 {
                     _values.AddThrowError("ERROR:", $"Failed to update search index '{searchIndexName}'");
