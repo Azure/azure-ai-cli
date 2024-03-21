@@ -15,6 +15,10 @@ namespace Azure.AI.Details.Common.CLI
 {
     public class RecognizeCommandBase : Command
     {
+        internal RecognizeCommandBase(ICommandValues values) : base(values)
+        {
+        }
+
         protected void StartCommand()
         {
             CheckPath();

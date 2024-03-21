@@ -19,9 +19,8 @@ namespace Azure.AI.Details.Common.CLI
 {
     public class RunJobCommand : Command
     {
-        public RunJobCommand(ICommandValues values)
+        public RunJobCommand(ICommandValues values) : base(values)
         {
-            _values = values.ReplaceValues();
         }
 
         public bool RunCommand()

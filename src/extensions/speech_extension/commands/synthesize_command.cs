@@ -19,9 +19,8 @@ namespace Azure.AI.Details.Common.CLI
 {
     public class SynthesizeCommand : Command
     {
-        public SynthesizeCommand(ICommandValues values)
+        public SynthesizeCommand(ICommandValues values) : base(values)
         {
-            _values = values.ReplaceValues();
         }
 
         public bool RunCommand()

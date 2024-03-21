@@ -19,9 +19,8 @@ namespace Azure.AI.Details.Common.CLI
 {
     public class TranslateCommand : Command
     {
-        public TranslateCommand(ICommandValues values)
+        public TranslateCommand(ICommandValues values) : base(values)
         {
-            _values = values.ReplaceValues();
         }
 
         public bool RunCommand()

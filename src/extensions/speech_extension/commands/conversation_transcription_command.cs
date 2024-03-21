@@ -20,9 +20,8 @@ namespace Azure.AI.Details.Common.CLI
 {
     public class ConversationTranscriptionCommand : Command
     {
-        internal ConversationTranscriptionCommand(ICommandValues values)
+        internal ConversationTranscriptionCommand(ICommandValues values) : base(values)
         {
-            _values = values.ReplaceValues();
         }
 
         internal bool RunCommand()

@@ -35,9 +35,8 @@ namespace Azure.AI.Details.Common.CLI
 {
     public class SearchCommand : Command
     {
-        internal SearchCommand(ICommandValues values)
+        internal SearchCommand(ICommandValues values) : base(values)
         {
-            _values = values.ReplaceValues();
             _quiet = _values.GetOrDefault("x.quiet", false);
             _verbose = _values.GetOrDefault("x.verbose", true);
         }

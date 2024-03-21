@@ -15,9 +15,8 @@ namespace Azure.AI.Details.Common.CLI
 {
     public class DevCommand : Command
     {
-        internal DevCommand(ICommandValues values)
+        internal DevCommand(ICommandValues values) : base(values)
         {
-            _values = values.ReplaceValues();
             _quiet = _values.GetOrDefault("x.quiet", false);
             _verbose = _values.GetOrDefault("x.verbose", false);
         }

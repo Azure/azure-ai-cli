@@ -19,9 +19,8 @@ namespace Azure.AI.Details.Common.CLI
 {
     public class RecognizeCommand : Command
     {
-        public RecognizeCommand(ICommandValues values)
+        public RecognizeCommand(ICommandValues values) : base(values)
         {
-            _values = values.ReplaceValues();
         }
 
         public bool RunCommand()

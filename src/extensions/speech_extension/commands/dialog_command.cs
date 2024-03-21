@@ -24,10 +24,8 @@ namespace Azure.AI.Details.Common.CLI
 
     public class DialogCommand : RecognizeCommandBase
     {
-        internal DialogCommand(ICommandValues values)
+        internal DialogCommand(ICommandValues values) : base(values)
         {
-            _values = values.ReplaceValues();
-
             _activityReceivedTimeout = _values.GetOrDefault("recognize.timeout", _microphone ? 10000 : int.MaxValue);
         }
 

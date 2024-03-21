@@ -17,9 +17,8 @@ namespace Azure.AI.Details.Common.CLI
 {
     public class TestCommand : Command
     {
-        internal TestCommand(ICommandValues values)
+        internal TestCommand(ICommandValues values) : base(values)
         {
-            _values = values.ReplaceValues();
             _quiet = _values.GetOrDefault("x.quiet", false);
             _verbose = _values.GetOrDefault("x.verbose", false);
         }

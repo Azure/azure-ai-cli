@@ -20,9 +20,8 @@ namespace Azure.AI.Details.Common.CLI
 {
     public class ServiceCommand : Command
     {
-        internal ServiceCommand(ICommandValues values)
+        internal ServiceCommand(ICommandValues values) : base(values)
         {
-            _values = values.ReplaceValues();
             _quiet = _values.GetOrDefault("x.quiet", false);
             _verbose = _values.GetOrDefault("x.verbose", true);
         }

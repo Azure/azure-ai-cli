@@ -151,7 +151,7 @@ namespace Azure.AI.Details.Common.CLI
             #endif
 
             var bindingAssembly = FileHelpers.GetAssemblyFileInfo(Program.BindingAssemblySdkType);
-            sourcePath = bindingAssembly.DirectoryName;
+            sourcePath = bindingAssembly.DirectoryName!;
             FileHelpers.CopyFile(sourcePath, bindingAssembly.Name, tempDirectory, null, verbose);
 
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
@@ -176,7 +176,7 @@ namespace Azure.AI.Details.Common.CLI
             foreach (var t in types)
             {
                 var fi = FileHelpers.GetAssemblyFileInfo(t);
-                FileHelpers.CopyFile(fi.DirectoryName, fi.Name, tempDirectory, null, verbose);
+                FileHelpers.CopyFile(fi.DirectoryName!, fi.Name, tempDirectory, null, verbose);
             }
 
             File.Delete(zipAsFile);
@@ -188,6 +188,12 @@ namespace Azure.AI.Details.Common.CLI
 
     public class Command
     {
+        public Command(ICommandValues values)
+        {
+            _values = values;
+            _values.ReplaceValues();
+        }
+
         public static bool RunCommand(ICommandValues values, Queue<ICommandValues> queue, bool expandOk = true, bool parallelOk = true)
         {
             if (expandOk) return CheckExpandRunCommand(values, queue, expandOk, parallelOk);
@@ -289,7 +295,7 @@ namespace Azure.AI.Details.Common.CLI
             {
                 var forEachTsvFile = $"foreach.{i}.tsv.file";
 
-                var forEachItems = new Queue<string>(tsvOptions.GetOrDefault(forEachTsvFile, "").Split('\n', '\r').Where(x => x.Trim().Length > 0));
+                var forEachItems = new Queue<string>(tsvOptions.GetOrEmpty(forEachTsvFile).Split('\n', '\r').Where(x => x.Trim().Length > 0));
                 BlockValues(tsvOptions, queue, forEachTsvFile);
 
                 var hasHeader = tsvOptions.GetOrDefault(forEachTsvFile + ".has.header", true);
@@ -299,7 +305,7 @@ namespace Azure.AI.Details.Common.CLI
                 BlockValues(tsvOptions, queue, forEachTsvFile + ".skip.header");
 
                 var defaultColumns = hasHeader ? forEachItems.Dequeue() : "audio.input.id\taudio.input.file";
-                var tsvColumns = tsvOptions.GetOrDefault(forEachTsvFile + ".columns", defaultColumns);
+                var tsvColumns = tsvOptions.GetOrDefault(forEachTsvFile + ".columns", defaultColumns)!;
                 BlockValues(tsvOptions, queue, forEachTsvFile + ".columns");
 
                 if (forEachItems.Count() >= 1)
@@ -337,7 +343,7 @@ namespace Azure.AI.Details.Common.CLI
             var names = new List<string>(thisRow.Names);
             foreach (var name in names)
             {
-                var value = thisRow[name];
+                var value = thisRow[name]!;
                 if (value.StartsWith("@@"))
                 {
                     var newValue = FileHelpers.ExpandAtFileValue(value.Substring(1), thisRow);
@@ -408,9 +414,13 @@ namespace Azure.AI.Details.Common.CLI
         protected string DownloadInputFile(string file, string fileValueName, string fileValueDisplayName)
         {
             var downloaded = HttpHelpers.DownloadFileWithRetry(file);
-            if (FileHelpers.FileExistsInDataPath(downloaded, _values))
+            if (downloaded == null)
             {
-                file = downloaded;
+                _values.AddThrowError("ERROR:", $"Cannot download {fileValueDisplayName} file: \"{file}\"");
+            }
+            else if (FileHelpers.FileExistsInDataPath(downloaded!, _values))
+            {
+                file = downloaded!;
                 _values.Reset(fileValueName, file);
                 _delete.Add(file);
             }
@@ -488,11 +498,11 @@ namespace Azure.AI.Details.Common.CLI
         {
             expectedItems = !string.IsNullOrEmpty(expected)
                 ? expected.Split(new char[] { ';', '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries)
-                : null;
+                : Enumerable.Empty<string>();
             notExpectedItems = !string.IsNullOrEmpty(notExpected)
                 ? notExpected.Split(new char[] { ';', '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries)
-                : null;
-            return expectedItems != null || notExpectedItems != null;
+                : Enumerable.Empty<string>();
+            return expectedItems.Count() + notExpectedItems.Count() > 0;
         }
 
         private static async Task<bool> CheckExpectedLogOutputAsync(IEnumerable<string> expected, IEnumerable<string> notExpected, bool autoExpect, string autoExpectLogFilter, AutoResetEvent signalStop)
@@ -606,7 +616,7 @@ namespace Azure.AI.Details.Common.CLI
                 var start = new ProcessStartInfo(Program.Exe, $"{values.GetCommand()} --nodefaults @{fileName}");
                 start.UseShellExecute = false;
 
-                var process = Process.Start(start);
+                var process = Process.Start(start)!;
                 processes.Add(fileNames, process);
 
                 WaitForProcesses(rampStarted, rampDuration, maxProcesses, processes, ref passed);

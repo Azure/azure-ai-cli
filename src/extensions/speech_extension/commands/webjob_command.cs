@@ -19,9 +19,8 @@ namespace Azure.AI.Details.Common.CLI
 {
     public class WebJobCommand : Command
     {
-        internal WebJobCommand(ICommandValues values)
+        internal WebJobCommand(ICommandValues values) : base(values)
         {
-            _values = values.ReplaceValues();
             _quiet = _values.GetOrDefault("x.quiet", false);
             _verbose = _values.GetOrDefault("x.verbose", true);
         }

@@ -23,9 +23,8 @@ namespace Azure.AI.Details.Common.CLI
     
     public class IntentCommand : Command
     {
-        public IntentCommand(ICommandValues values)
+        public IntentCommand(ICommandValues values) : base(values)
         {
-            _values = values.ReplaceValues();
         }
 
         public bool RunCommand()

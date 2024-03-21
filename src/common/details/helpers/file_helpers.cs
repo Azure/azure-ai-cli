@@ -838,11 +838,12 @@ namespace Azure.AI.Details.Common.CLI
             // GetAssembly.Location always returns empty when the project is built as 
             // a single-file app (which we do when publishing the Dependency package),
             // warning IL3000
-            string assemblyPath = Assembly.GetAssembly(type).Location;
+            var assembly = Assembly.GetAssembly(type);
+            string assemblyPath = assembly?.Location ?? string.Empty;
             if (assemblyPath == string.Empty)
             {
                 assemblyPath = AppContext.BaseDirectory;
-                assemblyPath += Assembly.GetAssembly(type).GetName().Name + ".dll";
+                assemblyPath += assembly?.GetName().Name + ".dll";
             }
             return new FileInfo(assemblyPath);
         }

@@ -20,9 +20,8 @@ namespace Azure.AI.Details.Common.CLI
 {
     public class MeetingTranscriptionCommand : Command
     {
-        internal MeetingTranscriptionCommand(ICommandValues values)
+        internal MeetingTranscriptionCommand(ICommandValues values) : base(values)
         {
-            _values = values.ReplaceValues();
         }
 
         internal bool RunCommand()
