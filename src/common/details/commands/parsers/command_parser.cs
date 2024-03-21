@@ -219,7 +219,7 @@ namespace Azure.AI.Details.Common.CLI
             bool parsed = true;
             while (tokens.PeekNextToken() != null)
             {
-                parsed = tokens.PeekNextToken().StartsWith("@")
+                parsed = tokens.PeekNextToken()!.StartsWith("@")
                     ? ParseAtFileToken(parsers, tokens, values)
                     : ParseNextCommandValue(parsers, tokens, values);
 
@@ -266,9 +266,9 @@ namespace Azure.AI.Details.Common.CLI
 
         private static bool ParseAtFileToken(IEnumerable<INamedValueTokenParser> parsers, INamedValueTokens tokens, ICommandValues values)
         {
-            if (tokens.PeekNextToken().StartsWith("@"))
+            if (tokens.PeekNextToken()?.StartsWith("@") ?? false)
             {
-                var iniFile = tokens.PeekNextTokenValue(0, values);
+                var iniFile = tokens.PeekNextTokenValue(0, values)!;
                 if (ParseIniFileLines(iniFile, parsers, values))
                 {
                     tokens.PopNextToken();
@@ -288,7 +288,7 @@ namespace Azure.AI.Details.Common.CLI
             var iniFile = values["ini.file"];
             values.Reset("ini.file");
 
-            return ParseIniFileLines(iniFile, parsers, values);
+            return ParseIniFileLines(iniFile!, parsers, values);
         }
 
         private static bool ParseIniFile(string fileName, IEnumerable<INamedValueTokenParser> parsers, INamedValues values)

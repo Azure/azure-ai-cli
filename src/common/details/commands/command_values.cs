@@ -17,13 +17,13 @@ namespace Azure.AI.Details.Common.CLI
 
     public class CommandValues : ICommandValues, INamedValues
     {
-        public CommandValues(INamedValues defaults = null)
+        public CommandValues(INamedValues? defaults = null)
         {
             _defaults = defaults == null ? _overrides : defaults;
             _values = new NamedValues();
         }
 
-        public void Add(string name, string value)
+        public void Add(string name, string? value)
         {
             _values.Add(name, value);
         }
@@ -38,7 +38,7 @@ namespace Azure.AI.Details.Common.CLI
             return !blockValue && (containsValue || (checkDefault && _defaults.Contains(name, true)));
         }
 
-        public string Get(string name, bool checkDefault = true)
+        public string? Get(string name, bool checkDefault = true)
         {
             var containsOverride = _overrides.Contains(name, false);
             if (containsOverride) return _overrides.Get(name, false);
@@ -53,7 +53,7 @@ namespace Azure.AI.Details.Common.CLI
             return checkDefault ? _defaults.Get(name, true) : value;
         }
 
-        public void Reset(string name, string value = null)
+        public void Reset(string name, string? value = null)
         {
             _values.Reset(name);
             if (value != null)
@@ -62,7 +62,7 @@ namespace Azure.AI.Details.Common.CLI
             }
         }
 
-        public string this[string name]
+        public string? this[string name]
         {
             get
             {

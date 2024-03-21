@@ -30,11 +30,11 @@ namespace Azure.AI.Details.Common.CLI
             }
         }
 
-        public string this[string name] => Get(name, true);
+        public string? this[string name] => Get(name, true);
         public IEnumerable<string> Names => _values.Names;
         public void Add(string name, string? value) => _values.Add(name, value);
         public bool Contains(string name, bool checkDefault = true) => _values.Contains(name, checkDefault);
-        public string Get(string name, bool checkDefault = true) => _values.Get(name, checkDefault);
+        public string? Get(string name, bool checkDefault = true) => _values.Get(name, checkDefault);
         public void Reset(string name, string? value = null) => _values.Reset(name, value);
 
         private INamedValues _values;
