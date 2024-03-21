@@ -18,34 +18,20 @@ namespace Azure.AI.Details.Common.CLI
         public List<string> Authors { get; set; }
         public List<string> Tags { get; set; }
         public string Base { get; set; }
-        public IModel Model { get; set; }
-        public string Inputs { get; set; }
-        public string InputPath { get; set; }
-        public Dictionary<string, string> InputMap { get; set; }
+        public AIModel Model { get; set; }
+        public Dictionary<string, string> Inputs { get; set; }
         public string Template { get; set; } = "f-string";
         public ModelParameters Parameters { get; set; }
     }
 
-    public interface IModel { }
 
-    public class OpenAIModel : IModel
-    {
-        public string Type { get; set; } = "openai";
+    public class AIModel
+    { 
+        public string Type { get; set; }
         public string Name { get; set; }
         public string Organization { get; set; }
-    }
-
-    public class AzureOpenAIModel : IModel
-    {
-        public string Type { get; set; } = "azure_openai";
         public string ApiVersion { get; set; }
         public string AzureDeployment { get; set; }
-        public string AzureEndpoint { get; set; }
-    }
-
-    public class MaasModel : IModel
-    {
-        public string Type { get; set; } = "model_as_a_service";
         public string AzureEndpoint { get; set; }
     }
 

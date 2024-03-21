@@ -963,12 +963,23 @@ namespace Azure.AI.Details.Common.CLI
         {
             var existing = FileHelpers.DemandFindFileInDataPath(parameterFile, _values, "chat parameter");
             var text = FileHelpers.ReadAllText(existing, Encoding.Default);
+            string[] sections = text.Split("---\n");
             var deserializer = new DeserializerBuilder()
                 .WithNamingConvention(CamelCaseNamingConvention.Instance)
                 .Build();
-		
-            var obj =  deserializer.Deserialize<PromptyFrontMatter>(text);
-            Console.WriteLine(obj.Name);
+
+            if (sections.Length > 2)
+            {
+                var promptyFrontMatterText = sections[1];
+                var chatTemplate = sections[2];
+                var obj = deserializer.Deserialize<PromptyFrontMatter>(promptyFrontMatterText);
+                Console.WriteLine(obj.Name);
+                Console.WriteLine(chatTemplate);
+            }
+            else
+            { 
+                _values.AddThrowError("ERROR:", $"parsing {parameterFile}; unable to parse, incorrect yaml format.");
+            }
             //TODO: parse parameter file (prompty format) and set values accordingly
         }
 
