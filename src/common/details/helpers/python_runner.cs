@@ -15,7 +15,7 @@ namespace Azure.AI.Details.Common.CLI
 {
     public class PythonRunner
     {
-        public static async Task<ProcessOutput> RunPythonScriptAsync(string script, string args = null, Dictionary<string, string> addToEnvironment = null, Action<string> stdOutHandler = null, Action<string> stdErrHandler = null, Action<string> mergedOutputHandler = null)
+        public static async Task<ProcessOutput> RunPythonScriptAsync(string script, string? args = null, Dictionary<string, string>? addToEnvironment = null, Action<string>? stdOutHandler = null, Action<string>? stdErrHandler = null, Action<string>? mergedOutputHandler = null)
         {
             EnsureFindPython();
             if (_pythonBinary == null)
@@ -25,7 +25,7 @@ namespace Azure.AI.Details.Common.CLI
                 return new ProcessOutput() { ExitCode = -1 };
             }
 
-            string tempFile = null;
+            string? tempFile = null;
 
             try
             {
@@ -44,7 +44,7 @@ namespace Azure.AI.Details.Common.CLI
             }
         }
 
-        public static string RunEmbeddedPythonScript(ICommandValues values, string scriptName, string scriptArgs = null, Dictionary<string, string> addToEnvironment = null, Action<string> stdOutHandler = null, Action<string> stdErrHandler = null, Action<string> mergedOutputHandler = null)
+        public static string RunEmbeddedPythonScript(ICommandValues values, string scriptName, string? scriptArgs = null, Dictionary<string, string>? addToEnvironment = null, Action<string>? stdOutHandler = null, Action<string>? stdErrHandler = null, Action<string>? mergedOutputHandler = null)
         {
             var path = FileHelpers.FindFileInHelpPath($"help/include.python.script.{scriptName}.py");
             var script = FileHelpers.ReadAllHelpText(path, Encoding.UTF8);
@@ -83,7 +83,7 @@ namespace Azure.AI.Details.Common.CLI
                 if (output.Contains("MESSAGE:") && output.Contains("EXCEPTION:") && output.Contains("TRACEBACK:"))
                 {
                     var messageLine = process.StdError.Split(new[] { '\r', '\n' }).FirstOrDefault(x => x.StartsWith("MESSAGE:"));
-                    var message = messageLine.Substring("MESSAGE:".Length).Trim();
+                    var message = messageLine?.Substring("MESSAGE:".Length)?.Trim();
                     FileHelpers.LogException(values, new PythonScriptException(output, exit));
 
                     if (output.Contains("az login"))
@@ -171,12 +171,14 @@ namespace Azure.AI.Details.Common.CLI
                 info.Add($"Python script failed! (exit code={exit})");
                 info.Add("");
                 info.Add("OUTPUT:");
-                info.Add(output);
+                info.Add(output ?? string.Empty);
 
                 values.AddThrowError(info[0], info[1], info.Skip(2).ToArray());
             }
 
-            return ParseOutputAndSkipLinesUntilStartsWith(output, "---").Trim('\r', '\n', ' ');
+            return output != null
+                ? ParseOutputAndSkipLinesUntilStartsWith(output, "---").Trim('\r', '\n', ' ')
+                : string.Empty;
         }
 
         private static string ParseOutputAndSkipLinesUntilStartsWith(string output, string startsWith)
@@ -198,7 +200,7 @@ namespace Azure.AI.Details.Common.CLI
             return sb.ToString();
         }
 
-        private static string EnsureFindPython()
+        private static string? EnsureFindPython()
         {
             if (_pythonBinary == null)
             {
@@ -208,10 +210,10 @@ namespace Azure.AI.Details.Common.CLI
             return _pythonBinary;
         }
 
-        private static string FindPython()
+        private static string? FindPython()
         {
-            string fullPath = FindPythonBinaryInOsPath();
-            string pythonExec = fullPath; 
+            var fullPath = FindPythonBinaryInOsPath();
+            var pythonExec = fullPath; 
             if (OperatingSystem.IsWindows())
             {
                 // TODO FIXME Longer term we really shouldn't be wrapping calls to python in cmd /c python
@@ -222,6 +224,11 @@ namespace Azure.AI.Details.Common.CLI
                 // which can cause irritating errors requiring complex escaping. Instead, we can just pass
                 // the executable name and let Windows will handle querying the OS search path for us
                 pythonExec = Path.GetFileName(fullPath);
+            }
+
+            if (pythonExec == null)
+            {
+                return null;
             }
 
             var process = ProcessHelpers.RunShellCommandAsync(pythonExec, "--version").Result;
