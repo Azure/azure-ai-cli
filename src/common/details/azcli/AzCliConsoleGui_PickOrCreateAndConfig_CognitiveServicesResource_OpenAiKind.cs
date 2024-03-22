@@ -39,7 +39,7 @@ namespace Azure.AI.Details.Common.CLI
             kinds ??= "OpenAI;AIServices";
             var sectionHeader = "AZURE OPENAI RESOURCE";
 
-            var regionLocation = !string.IsNullOrEmpty(regionFilter) ? await AzCliConsoleGui.PickRegionLocationAsync(interactive, regionFilter) : new AzCli.AccountRegionLocationInfo();
+            var regionLocation = !string.IsNullOrEmpty(regionFilter) ? await AzCliConsoleGui.PickRegionLocationAsync(interactive, subscriptionId, regionFilter) : new AzCli.AccountRegionLocationInfo();
             var resource = await AzCliConsoleGui.PickOrCreateCognitiveResource(sectionHeader, interactive, subscriptionId, regionLocation.Name, groupFilter, resourceFilter, kinds, sku, yes);
 
             var (chatDeployment, embeddingsDeployment, evaluationDeployment, keys) = await PickOrCreateAndConfigCognitiveServicesOpenAiKindResourceDeployments(
@@ -58,7 +58,7 @@ namespace Azure.AI.Details.Common.CLI
                 Id = resource.Id,
                 Group = resource.Group,
                 Name = resource.Name,
-                Kind = resource.Kind,
+                Kind = resource.Kind.ToString(),
                 RegionLocation = resource.RegionLocation,
                 Endpoint = resource.Endpoint,
                 Key = keys.Key1,
@@ -68,7 +68,7 @@ namespace Azure.AI.Details.Common.CLI
             };
         }
 
-        public static async Task<(AzCli.CognitiveServicesDeploymentInfo?, AzCli.CognitiveServicesDeploymentInfo?, AzCli.CognitiveServicesDeploymentInfo?, AzCli.CognitiveServicesKeyInfo)>
+        public static async Task<(AzCli.CognitiveServicesDeploymentInfo?, AzCli.CognitiveServicesDeploymentInfo?, AzCli.CognitiveServicesDeploymentInfo?, AzCli.ResourceKeyInfo)>
             PickOrCreateAndConfigCognitiveServicesOpenAiKindResourceDeployments(
                 INamedValues values,
                 string sectionHeader,
@@ -102,7 +102,7 @@ namespace Azure.AI.Details.Common.CLI
             
             var keys = await AzCliConsoleGui.LoadCognitiveServicesResourceKeys(sectionHeader, subscriptionId, resource);
          
-            if (resource.Kind == "AIServices")
+            if (resource.Kind == AzCli.ResourceKind.AIServices)
             {
                 ConfigSetHelpers.ConfigCognitiveServicesAIServicesKindResource(subscriptionId, resource.RegionLocation, resource.Endpoint, chatDeployment, embeddingsDeployment, evaluationDeployment, keys.Key1);
             }

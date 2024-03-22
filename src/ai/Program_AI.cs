@@ -7,8 +7,11 @@ using System;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
+using Azure.AI.CLI.Clients.AzPython;
+using Azure.AI.CLI.Common.Clients;
 using Azure.AI.Details.Common.CLI.Telemetry;
 using Azure.AI.Details.Common.CLI.Telemetry.Events;
+using Azure.Search.Documents;
 
 
 namespace Azure.AI.Details.Common.CLI
@@ -94,6 +97,16 @@ namespace Azure.AI.Details.Common.CLI
             _telemetry = new Lazy<ITelemetry>(
                 () => TelemetryHelpers.InstantiateFromConfig(this),
                 System.Threading.LazyThreadSafetyMode.ExecutionAndPublication);
+
+            LoginManager = new AzConsoleLoginManager(TelemetryUserAgent);
+            var azCliClient = new AzCliClient(
+                LoginManager,
+                () => Values?.GetOrDefault("init.service.interactive", true) ?? true,
+                TelemetryUserAgent);
+
+            SubscriptionsClient = azCliClient;
+            CognitiveServicesClient = azCliClient;
+            SearchClient = azCliClient;
         }
 
         #region name data
@@ -282,5 +295,11 @@ namespace Azure.AI.Details.Common.CLI
 
         public IEventLoggerHelpers EventLoggerHelpers => new AiEventLoggerHelpers();
         public ITelemetry Telemetry => _telemetry.Value;
+
+        public ILoginManager LoginManager { get; }
+        public ISubscriptionsClient SubscriptionsClient { get; }
+        public ICognitiveServicesClient CognitiveServicesClient { get; }
+        public ISearchClient SearchClient { get; }
+        public ICommandValues Values { get; } = new CommandValues();
     }
 }

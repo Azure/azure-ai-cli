@@ -99,6 +99,14 @@ namespace Azure.AI.Details.Common.CLI
                 || Int32.Parse(current[1]) < Int32.Parse(latest[1])
                 || Int32.Parse(current[2]) < Int32.Parse(latest[2]);
         }
+
+        public static int AppendOrTruncate(ref Span<char> buffer, ReadOnlySpan<char> additional)
+        {
+            int toCopy = Math.Min(buffer.Length, additional.Length);
+            additional.CopyTo(buffer);
+            buffer = buffer.Slice(toCopy);
+            return toCopy;
+        }
     }
 
     public static class StringExtensions
@@ -127,10 +135,5 @@ namespace Azure.AI.Details.Common.CLI
         {
             return s.IfTrimStartsWith(value, action).IfTrimEndsWith(value, action);
         }
-
-        public static IList<string> AsLines(this string str)
-            => str == null
-                ? Array.Empty<string>()
-                : str.Split(new[] { "\r\n", "\r", "\n" }, StringSplitOptions.None);
     }
 }

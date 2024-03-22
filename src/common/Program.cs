@@ -5,10 +5,9 @@
 
 using System.Reflection;
 using System.Text;
-using System.Text.Json;
+using Azure.AI.CLI.Common.Clients;
 using Azure.AI.Details.Common.CLI.Telemetry;
 using Azure.AI.Details.Common.CLI.Telemetry.Events;
-using System.Threading.Tasks;
 
 namespace Azure.AI.Details.Common.CLI
 {
@@ -36,7 +35,8 @@ namespace Azure.AI.Details.Common.CLI
                 Environment.Exit(1);
             };
 
-            ICommandValues values = new CommandValues();
+            var values = _data.Values;
+
             INamedValueTokens tokens = new CmdLineTokenSource(mainArgs, values);
 
             int exitCode = ParseCommand(tokens, values);
@@ -462,5 +462,12 @@ namespace Azure.AI.Details.Common.CLI
         public static IEventLoggerHelpers EventLoggerHelpers => _data?.EventLoggerHelpers;
 
         public static ITelemetry Telemetry => _data.Telemetry;
+        public static ILoginManager LoginManager => _data.LoginManager;
+        public static ISubscriptionsClient SubscriptionClient => _data.SubscriptionsClient;
+        public static ICognitiveServicesClient CognitiveServicesClient => _data.CognitiveServicesClient;
+        public static ISearchClient SearchClient => _data.SearchClient;
+
+        // TODO FIXME: This is a temporary hack to make it easier to track where this is used
+        public static CancellationToken CancelToken { get; } = CancellationToken.None;
     }
 }

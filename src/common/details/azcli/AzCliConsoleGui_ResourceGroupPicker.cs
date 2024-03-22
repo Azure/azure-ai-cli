@@ -14,12 +14,13 @@ using System.Collections.Generic;
 using System.Net;
 using Newtonsoft.Json.Linq;
 using Azure.AI.Details.Common.CLI.ConsoleGui;
+using Azure.AI.CLI.Common.Clients.Models;
 
 namespace Azure.AI.Details.Common.CLI
 {
     public partial class AzCliConsoleGui
     {
-        public static async Task<(AzCli.ResourceGroupInfo, bool createdNew)> PickOrCreateResourceGroup(bool interactive, string subscriptionId = null, string regionFilter = null, string groupFilter = null)
+        public static async Task<(AzCli.ResourceGroupInfo, bool createdNew)> PickOrCreateResourceGroup(bool interactive, string subscriptionId, string regionFilter = null, string groupFilter = null)
         {
             var createdNew = false;
             var createNewItem = !string.IsNullOrEmpty(groupFilter)
@@ -41,14 +42,14 @@ namespace Azure.AI.Details.Common.CLI
             return (group.Value, createdNew);
         }
 
-        public static async Task<AzCli.ResourceGroupInfo?> FindGroupAsync(bool interactive, string subscription = null, string regionLocation = null, string groupFilter = null, string allowCreateGroupOption = null)
+        public static async Task<AzCli.ResourceGroupInfo?> FindGroupAsync(bool interactive, string subscription, string regionLocation = null, string groupFilter = null, string allowCreateGroupOption = null)
         {
             var allowCreateGroup = !string.IsNullOrEmpty(allowCreateGroupOption);
 
-            var listResourcesFunc = async () => await AzCli.ListResourceGroups(subscription, regionLocation);
-            var response = await LoginHelpers.GetResponseOnLogin<AzCli.ResourceGroupInfo[]>(interactive, "group", listResourcesFunc, "Group");
+            var allResGroups = await Program.SubscriptionClient.GetAllResourceGroupsAsync(subscription, Program.CancelToken);
+            allResGroups.ThrowOnFail("Loading resource groups");
 
-            var groups = response.Payload
+            var groups = allResGroups.Value
                 .Where(x => MatchGroupFilter(x, groupFilter))
                 .OrderBy(x => x.Name)
                 .ToList();
@@ -60,7 +61,7 @@ namespace Azure.AI.Details.Common.CLI
             {
                 if  (!allowCreateGroup)
                 {
-                    ConsoleHelpers.WriteLineError(response.Payload.Count() > 0
+                    ConsoleHelpers.WriteLineError(allResGroups.Value.Count() > 0
                         ? $"*** No matching resource groups found ***"
                         : $"*** No resource groups found ***");
                     return null;
@@ -92,7 +93,7 @@ namespace Azure.AI.Details.Common.CLI
         {
             ConsoleHelpers.WriteLineWithHighlight("\n`CREATE RESOURCE GROUP`");
 
-            var regionLocation = await FindRegionAsync(interactive, regionLocationFilter, false);
+            var regionLocation = await FindRegionAsync(interactive, subscriptionId, regionLocationFilter, false);
             if (regionLocation == null) return null;
 
             var name = string.IsNullOrEmpty(groupName)
@@ -101,16 +102,11 @@ namespace Azure.AI.Details.Common.CLI
             if (string.IsNullOrEmpty(name)) return null;
 
             Console.Write("*** CREATING ***");
-            var response = await AzCli.CreateResourceGroup(subscriptionId, regionLocation.Value.Name, name);
-
-            Console.Write("\r");
-            if (string.IsNullOrEmpty(response.Output.StdOutput) && !string.IsNullOrEmpty(response.Output.StdError))
-            {
-                throw new ApplicationException($"ERROR: Creating resource group.\n{response.Output.StdError}");
-            }
+            var response = await Program.SubscriptionClient.CreateResourceGroupAsync(subscriptionId, regionLocation.Value.Name, name, Program.CancelToken);
+            response.ThrowOnFail("Creating resource group");
 
             Console.WriteLine("\r*** CREATED ***  ");
-            return response.Payload;
+            return response.Value;
         }
 
         private static AzCli.ResourceGroupInfo? ListBoxPickResourceGroup(AzCli.ResourceGroupInfo[] groups, string p0)
@@ -164,7 +160,7 @@ namespace Azure.AI.Details.Common.CLI
 
         private static void DisplayNameAndRegionLocation(AzCli.ResourceGroupInfo group)
         {
-            Console.Write($"{group.Name} ({group.RegionLocation})");
+            Console.Write($"{group.Name} ({group.Region})");
             Console.WriteLine(new string(' ', 20));
         }
     }

@@ -63,8 +63,8 @@ namespace Azure.AI.Details.Common.CLI
                 }
                 else if (!string.IsNullOrEmpty(openai?.Name))
                 {
-                    var (chatDeployment, embeddingsDeployment, evaluationDeployment, keys) = await AzCliConsoleGui.PickOrCreateAndConfigCognitiveServicesOpenAiKindResourceDeployments(values, "AZURE OPENAI RESOURCE", true, allowSkipDeployments, subscription, openai.Value);
-                    openAiEndpoint = openai.Value.Endpoint;
+                    var (chatDeployment, embeddingsDeployment, evaluationDeployment, keys) = await AzCliConsoleGui.PickOrCreateAndConfigCognitiveServicesOpenAiKindResourceDeployments(values, "AZURE OPENAI RESOURCE", true, allowSkipDeployments, subscription, openai);
+                    openAiEndpoint = openai.Endpoint;
                     openAiKey = keys.Key1;
                 }
                 else
@@ -76,9 +76,9 @@ namespace Azure.AI.Details.Common.CLI
 
                 if (!string.IsNullOrEmpty(search?.Name))
                 {
-                    var keys = await AzCliConsoleGui.LoadSearchResourceKeys(subscription, search.Value);
-                    ConfigSetHelpers.ConfigSearchResource(search.Value.Endpoint, keys.Key1);
-                    searchEndpoint = search.Value.Endpoint;
+                    var keys = await AzCliConsoleGui.LoadSearchResourceKeys(subscription, search);
+                    ConfigSetHelpers.ConfigSearchResource(search.Endpoint, keys.Key1);
+                    searchEndpoint = search.Endpoint;
                     searchKey = keys.Key1;
                 }
                 else

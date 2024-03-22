@@ -3,40 +3,30 @@
 // Licensed under the MIT license. See LICENSE.md file in the project root for full license information.
 //
 
-using System;
-using System.Collections.Generic;
+#nullable enable
+
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
-using System.Threading.Tasks;
-using Newtonsoft.Json.Linq;
-using Azure.AI.Details.Common.CLI;
 using System.Text;
+using Azure.AI.CLI.Common.Clients.Models;
+using Newtonsoft.Json.Linq;
 
 namespace Azure.AI.Details.Common.CLI
 {
-    public struct ProcessOutput
+    public readonly struct ProcessOutput
     {
-        public string StdOutput;
-        public string StdError;
-        public string MergedOutput;
-        public int ExitCode;
-    }
+        public string StdOutput { get; init; }
+        public string StdError { get; init; }
+        public string MergedOutput { get; init; }
+        public int ExitCode { get; init; }
 
-    public struct ParsedJsonProcessOutput<T>
-    {
-        public ParsedJsonProcessOutput(ProcessOutput output)
-        {
-            Output = output;
-        }
-
-        public ProcessOutput Output;
-        public T Payload;
+        public bool HasError => ExitCode != 0 || !string.IsNullOrWhiteSpace(StdError);
     }
 
     public class ProcessHelpers
     {
-        public static Process StartBrowser(string url)
+        public static Process? StartBrowser(string url)
         {
             return RuntimeInformation.IsOSPlatform(OSPlatform.Windows)
                 ? Process.Start(new ProcessStartInfo("cmd", $"/c start {url.Replace("&", "^&")}") { CreateNoWindow = true })
@@ -47,7 +37,7 @@ namespace Azure.AI.Details.Common.CLI
                         : null;
         }
 
-        public static Process StartProcess(string fileName, string arguments, Dictionary<string, string> addToEnvironment = null, bool redirectOutput = true, bool redirectInput = false)
+        public static Process? StartProcess(string fileName, string arguments, IDictionary<string, string> addToEnvironment = null, bool redirectOutput = true, bool redirectInput = false)
         {
             var start = new ProcessStartInfo(fileName, arguments);
             start.UseShellExecute = false;
@@ -113,7 +103,7 @@ namespace Azure.AI.Details.Common.CLI
             return await RunShellCommandAsync(interactiveShellFileName, interactiveShellArguments, addToEnvironment, stdOutHandler, stdErrHandler, mergedOutputHandler, captureOutput);
         }
 
-        public static async Task<ProcessOutput> RunShellCommandAsync(string command, string arguments, Dictionary<string, string> addToEnvironment = null, Action<string> stdOutHandler = null, Action<string> stdErrHandler = null, Action<string> mergedOutputHandler = null, bool captureOutput = true)
+        public static async Task<ProcessOutput> RunShellCommandAsync(string command, string arguments, IDictionary<string, string>? addToEnvironment = null, Action<string>? stdOutHandler = null, Action<string>? stdErrHandler = null, Action<string>? mergedOutputHandler = null, bool captureOutput = true)
         {
             SHELL_DEBUG_TRACE($"COMMAND: {command} {arguments} {DictionaryToString(addToEnvironment)}");
 
@@ -152,10 +142,18 @@ namespace Azure.AI.Details.Common.CLI
                 }
             };
 
-            Process process;
+            Process? process;
             try
             {
                 process = StartShellCommandProcess(command, arguments, addToEnvironment, redirectOutput);
+                if (process == null)
+                {
+                    return new ProcessOutput()
+                    {
+                        ExitCode = -1,
+                        StdError = "Process failed to start"
+                    };
+                }
             }
             catch (Exception processException)
             {
@@ -183,11 +181,13 @@ namespace Azure.AI.Details.Common.CLI
                 errDoneSignal.WaitOne();
             }
 
-            var output = new ProcessOutput();
-            output.StdOutput = sbOut.ToString().Trim(' ', '\r', '\n');
-            output.StdError = sbErr.ToString().Trim(' ', '\r', '\n');
-            output.MergedOutput = sbMerged.ToString().Trim(' ', '\r', '\n');
-            output.ExitCode = process.ExitCode;
+            var output = new ProcessOutput()
+            {
+                StdOutput = sbOut.ToString().Trim(' ', '\r', '\n'),
+                StdError = sbErr.ToString().Trim(' ', '\r', '\n'),
+                MergedOutput = sbMerged.ToString().Trim(' ', '\r', '\n'),
+                ExitCode = process.ExitCode,
+            };
 
             if (!string.IsNullOrEmpty(output.StdOutput)) SHELL_DEBUG_TRACE($"---\nSTDOUT\n---\n{output.StdOutput}");
             if (!string.IsNullOrEmpty(output.StdError)) SHELL_DEBUG_TRACE($"---\nSTDERR\n---\n{output.StdError}");
@@ -195,20 +195,20 @@ namespace Azure.AI.Details.Common.CLI
             return output;
         }
 
-        public static async Task<ParsedJsonProcessOutput<T>> ParseShellCommandJson<T>(string command, string arguments, Dictionary<string, string> addToEnvironment = null, Action<string> stdOutHandler = null, Action<string> stdErrHandler = null) where T : JToken, new()
-        {
-            var processOutput = await RunShellCommandAsync(command, arguments, addToEnvironment, stdOutHandler, stdErrHandler);
-            var stdOutput = processOutput.StdOutput;
+        //public static async Task<ParsedJsonProcessOutput<JToken>> ParseShellCommandJson(string command, string arguments, IDictionary<string, string>? addToEnvironment = null, Action<string>? stdOutHandler = null, Action<string>? stdErrHandler = null)
+        //{
+        //    var processOutput = await RunShellCommandAsync(command, arguments, addToEnvironment, stdOutHandler, stdErrHandler);
+        //    var stdOutput = processOutput.StdOutput;
 
-            var parsed = !string.IsNullOrWhiteSpace(stdOutput) ? JToken.Parse(stdOutput) : null;
+        //    var parsed = !string.IsNullOrWhiteSpace(stdOutput) ? JToken.Parse(stdOutput) : null;
 
-            var x = new ParsedJsonProcessOutput<T>(processOutput);
-            x.Payload = parsed is T ? parsed as T : new T();
+        //    var x = new ParsedJsonProcessOutput<JToken>(processOutput);
+        //    x.Payload = parsed;
 
-            return x;
-        }
+        //    return x;
+        //}
 
-        private static Process StartShellCommandProcess(string command, string arguments, Dictionary<string, string> addToEnvironment = null, bool captureOutput = true)
+        private static Process? StartShellCommandProcess(string command, string arguments, IDictionary<string, string> addToEnvironment = null, bool captureOutput = true)
         {
             var isWindows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
             return  isWindows
@@ -224,8 +224,13 @@ namespace Azure.AI.Details.Common.CLI
             AI.DBG_TRACE_INFO(message, line, caller, file);
         }
 
-        private static string DictionaryToString(Dictionary<string, string> dictionary)
+        private static string DictionaryToString(IDictionary<string, string>? dictionary)
         {
+            if (dictionary == null)
+            {
+                return string.Empty;
+            }
+
             var kvps = new List<string>();
             if (dictionary != null)
             {

@@ -14,12 +14,14 @@ using System.Collections.Generic;
 using System.Net;
 using Newtonsoft.Json.Linq;
 using Azure.AI.Details.Common.CLI.ConsoleGui;
+using Azure.AI.Details.Common.CLI.AzCli;
+using Azure.AI.CLI.Common.Clients.Models.Utils;
 
 namespace Azure.AI.Details.Common.CLI
 {
     public partial class AzCliConsoleGui
     {
-        public static async Task<AzCli.CognitiveServicesResourceInfo> PickOrCreateCognitiveResource(string sectionHeader, bool interactive, string subscriptionId = null, string regionFilter = null, string groupFilter = null, string resourceFilter = null, string kinds = null, string sku = "F0", bool agreeTerms = false)
+        public static async Task<AzCli.CognitiveServicesResourceInfo> PickOrCreateCognitiveResource(string sectionHeader, bool interactive, string subscriptionId, string regionFilter = null, string groupFilter = null, string resourceFilter = null, string kinds = null, string sku = "F0", bool agreeTerms = false)
         {
             ConsoleHelpers.WriteLineWithHighlight($"\n`{sectionHeader}`");
 
@@ -28,7 +30,7 @@ namespace Azure.AI.Details.Common.CLI
                 : interactive ? "(Create new)" : null;
 
             var resource = await FindCognitiveServicesResource(interactive, subscriptionId, regionFilter, groupFilter, resourceFilter, kinds, createNewItem);
-            if (resource != null && resource.Value.Name == null)
+            if (resource != null && resource.Name == null)
             {
                 resource = await TryCreateCognitiveServicesResource(sectionHeader, interactive, subscriptionId, regionFilter, groupFilter, resourceFilter, kinds, sku, agreeTerms);
             }
@@ -38,30 +40,35 @@ namespace Azure.AI.Details.Common.CLI
                 throw new ApplicationException($"CANCELED: No resource selected");
             }
 
-            return resource.Value;
+            return resource;
         }
 
-        public static async Task<AzCli.CognitiveServicesKeyInfo> LoadCognitiveServicesResourceKeys(string sectionHeader, string subscriptionId, AzCli.CognitiveServicesResourceInfo resource)
+        public static async Task<AzCli.ResourceKeyInfo> LoadCognitiveServicesResourceKeys(string sectionHeader, string subscriptionId, AzCli.CognitiveServicesResourceInfo resource)
         {
             ConsoleHelpers.WriteLineWithHighlight($"\n`{sectionHeader} KEYS`");
 
             Console.Write("Keys: *** Loading ***");
-            var keys = await AzCli.ListCognitiveServicesKeys(subscriptionId, resource.Group, resource.Name);
+            var keys = await Program.CognitiveServicesClient.GetResourceKeysFromNameAsync(subscriptionId, resource.Group, resource.Name, Program.CancelToken);
+
+            var result = new ResourceKeyInfo();
+            (result.Key1, result.Key2) = keys.Value;
 
             Console.Write("\r");
-            Console.WriteLine($"Key1: {keys.Payload.Key1.Substring(0, 4)}****************************");
-            Console.WriteLine($"Key2: {keys.Payload.Key2.Substring(0, 4)}****************************");
-            return keys.Payload;
+            Console.WriteLine($"Key1: {result.Key1.Substring(0, 4)}****************************");
+            Console.WriteLine($"Key2: {result.Key2.Substring(0, 4)}****************************");
+            return result;
         }
 
-        public static async Task<AzCli.CognitiveServicesResourceInfo?> FindCognitiveServicesResource(bool interactive, string subscriptionId = null, string regionLocationFilter = null, string groupFilter = null, string resourceFilter = null, string kinds = null, string allowCreateResourceOption = null)
+        public static async Task<AzCli.CognitiveServicesResourceInfo?> FindCognitiveServicesResource(bool interactive, string subscriptionId, string regionLocationFilter = null, string groupFilter = null, string resourceFilter = null, string kinds = null, string allowCreateResourceOption = null)
         {
             var allowCreateResource = !string.IsNullOrEmpty(allowCreateResourceOption);
 
-            var listResourcesFunc = async () => await AzCli.ListCognitiveServicesResources(subscriptionId, kinds);
-            var response = await LoginHelpers.GetResponseOnLogin<AzCli.CognitiveServicesResourceInfo[]>(interactive, "resource", listResourcesFunc);
-
-            var resources = response.Payload
+            // TODO FIXME: Switch to ResourceKind as flags instead of passing strings?
+            ResourceKind? kind = ResourceKindHelpers.ParseString(kinds, ';');
+            var response = await Program.CognitiveServicesClient.GetAllResourcesAsync(subscriptionId, Program.CancelToken, kind);
+            response.ThrowOnFail("Loading Cognitive Services resources");
+            
+            var resources = response.Value
                 .Where(x => MatchResourceFilter(x, regionLocationFilter, groupFilter, resourceFilter))
                 .OrderBy(x => x.Name + x.RegionLocation)
                 .ToList();
@@ -101,28 +108,28 @@ namespace Azure.AI.Details.Common.CLI
                 : null;
         }
 
-        public static async Task<AzCli.CognitiveServicesResourceInfo?> TryCreateCognitiveServicesResource(string sectionHeader, bool interactive, string subscriptionId = null, string regionLocationFilter = null, string groupFilter = null, string resourceFilter = null, string kinds = null, string sku = "F0", bool agreeTerms = false)
+        public static async Task<AzCli.CognitiveServicesResourceInfo?> TryCreateCognitiveServicesResource(string sectionHeader, bool interactive, string subscriptionId, string regionLocationFilter = null, string groupFilter = null, string resourceFilter = null, string kinds = null, string sku = "F0", bool agreeTerms = false)
         {
             ConsoleHelpers.WriteLineWithHighlight("\n`RESOURCE GROUP`");
 
-            var regionLocation = !string.IsNullOrEmpty(regionLocationFilter) ? await FindRegionAsync(interactive, regionLocationFilter, true) : new AzCli.AccountRegionLocationInfo();
+            var regionLocation = !string.IsNullOrEmpty(regionLocationFilter) ? await FindRegionAsync(interactive, subscriptionId, regionLocationFilter, true) : new AccountRegionLocationInfo();
             if (regionLocation == null) return null;
 
             var (group, createdNew) = await PickOrCreateResourceGroup(interactive, subscriptionId, regionLocation?.Name, groupFilter);
-            var createKind = kinds.Split(';').Last();
+            var createKind = ResourceKindHelpers.ParseString(kinds.Split(';').LastOrDefault()) ?? ResourceKind.Unknown;
 
             ConsoleHelpers.WriteLineWithHighlight($"\n`CREATE {sectionHeader}`");
-            Console.WriteLine($"Region: {group.RegionLocation}");
+            Console.WriteLine($"Region: {group.Region}");
             Console.WriteLine($"Group: {group.Name}");
             Console.WriteLine($"Kind: {createKind}");
 
             var smartName = group.Name;
             var smartNameKind = "rg";
-            var nameOutKind = createKind?.ToLower() switch
+            var nameOutKind = createKind switch
             {
-                "aiservices" => "ais",
-                "cognitiveservices" => "cs",
-                _ => createKind.ToLower()
+                ResourceKind.AIServices => "ais",
+                ResourceKind.CognitiveServices => "cs",
+                _ => createKind.ToString().ToLowerInvariant()
             };
 
             var name = string.IsNullOrEmpty(resourceFilter)
@@ -133,16 +140,14 @@ namespace Azure.AI.Details.Common.CLI
             if (!agreeTerms && !CheckAgreeTerms(createKind)) return null;
 
             Console.Write("*** CREATING ***");
-            var response = await AzCli.CreateCognitiveServicesResource(subscriptionId, group.Name, group.RegionLocation, name, createKind, sku);
-
+            
+            var response = await Program.CognitiveServicesClient.CreateResourceAsync(
+                createKind, subscriptionId, group.Name, group.Region, name, sku, Program.CancelToken);
             Console.Write("\r");
-            if (string.IsNullOrEmpty(response.Output.StdOutput) && !string.IsNullOrEmpty(response.Output.StdError))
-            {
-                throw new ApplicationException($"ERROR: Creating Cognitive Services resource: {response.Output.StdError}");
-            }
+            response.ThrowOnFail("Creating Cognitive Services resource");
 
             Console.WriteLine("\r*** CREATED ***  ");
-            return response.Payload;
+            return response.Value;
         }
 
         private static AzCli.CognitiveServicesResourceInfo? ListBoxPickCognitiveServicesResource(AzCli.CognitiveServicesResourceInfo[] resources, string p0)
@@ -210,12 +215,12 @@ namespace Azure.AI.Details.Common.CLI
             Console.WriteLine(new string(' ', 20));
         }
 
-        private static bool CheckAgreeTerms(string createKind)
+        private static bool CheckAgreeTerms(ResourceKind createKind)
         {
-            var checkAttestation = createKind.ToLower() switch
+            var checkAttestation = createKind switch
             {
-                "cognitiveservices" => true,
-                "face" => true,
+                ResourceKind.CognitiveServices => true,
+                ResourceKind.Vision => true,
                 _ => false
             };
 

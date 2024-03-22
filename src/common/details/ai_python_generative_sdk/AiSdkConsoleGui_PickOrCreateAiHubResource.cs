@@ -139,7 +139,7 @@ namespace Azure.AI.Details.Common.CLI
             var groupOk = !string.IsNullOrEmpty(groupName);
             if (!groupOk)
             {
-                var location =  await AzCliConsoleGui.PickRegionLocationAsync(true, locationName, false);
+                var location =  await AzCliConsoleGui.PickRegionLocationAsync(true, subscription, locationName, false);
                 locationName = location.Name;
             }
 

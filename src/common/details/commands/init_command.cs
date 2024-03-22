@@ -123,7 +123,7 @@ namespace Azure.AI.Details.Common.CLI
                     if (openai != null && search != null)
                     {
                         bool? useSaved = await DoInitRootConfirmVerifiedProjectResources(
-                            interactive, subscription, projectName, hubName, openai.Value, search.Value);
+                            interactive, subscription, projectName, hubName, openai, search);
 
                         detail = useSaved.HasValue
                             ? useSaved == true ? "saved_config" : "something_else"

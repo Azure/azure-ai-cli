@@ -93,17 +93,19 @@ namespace Azure.AI.Details.Common.CLI
             var openaiEndpoint = openaiConnection?["target"].ToString();
             if (string.IsNullOrEmpty(openaiEndpoint)) return null;
 
-            var responseOpenAi = await AzCli.ListCognitiveServicesResources(subscription, "OpenAI");
-            var responseOpenAiOk = !string.IsNullOrEmpty(responseOpenAi.Output.StdOutput) && string.IsNullOrEmpty(responseOpenAi.Output.StdError);
-            if (!responseOpenAiOk) return null;
+            var responseOpenAi =  await Program.CognitiveServicesClient.GetAllResourcesAsync(subscription, Program.CancelToken, AzCli.ResourceKind.OpenAI);
+            if (responseOpenAi.IsError)
+            {
+                return null;
+            }
 
             Func<string, string, bool> match = (a, b) => {
                 return a == b ||
-                    a.Replace(".openai.azure.com/", ".cognitiveservices.azure.com/") == b ||
-                    b.Replace(".openai.azure.com/", ".cognitiveservices.azure.com/") == a;
+                    a?.Replace(".openai.azure.com/", ".cognitiveservices.azure.com/") == b ||
+                    b?.Replace(".openai.azure.com/", ".cognitiveservices.azure.com/") == a;
             };
 
-            var matchOpenAiEndpoint = responseOpenAi.Payload.Where(x => match(x.Endpoint, openaiEndpoint)).ToList();
+            var matchOpenAiEndpoint = responseOpenAi.Value.Where(x => match(x.Endpoint, openaiEndpoint)).ToList();
             if (matchOpenAiEndpoint.Count() != 1) return null;
 
             return matchOpenAiEndpoint.First();
@@ -117,11 +119,10 @@ namespace Azure.AI.Details.Common.CLI
             var searchEndpoint = searchConnection?["target"].ToString();
             if (string.IsNullOrEmpty(searchEndpoint)) return null;
 
-            var responseSearch = await AzCli.ListSearchResources(subscription, null);
-            var responseSearchOk = !string.IsNullOrEmpty(responseSearch.Output.StdOutput) && string.IsNullOrEmpty(responseSearch.Output.StdError);
-            if (!responseSearchOk) return null;
+            var responseSearch = await Program.SearchClient.GetAllAsync(subscription, null, Program.CancelToken);
+            if (responseSearch.IsError) { return null; }
 
-            var matchSearchEndpoint = responseSearch.Payload.Where(x => x.Endpoint == searchEndpoint).ToList();
+            var matchSearchEndpoint = responseSearch.Value.Where(x => x.Endpoint == searchEndpoint).ToList();
             if (matchSearchEndpoint.Count() != 1) return null;
 
             return matchSearchEndpoint.First();

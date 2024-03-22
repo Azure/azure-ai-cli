@@ -3,6 +3,8 @@
 // Licensed under the MIT license. See LICENSE.md file in the project root for full license information.
 //
 
+#nullable enable
+
 using System;
 using System.Diagnostics;
 using System.IO;
@@ -15,17 +17,17 @@ namespace Azure.AI.Details.Common.CLI
 {
     public class PythonRunner
     {
-        public static async Task<ProcessOutput> RunPythonScriptAsync(string script, string args = null, Dictionary<string, string> addToEnvironment = null, Action<string> stdOutHandler = null, Action<string> stdErrHandler = null, Action<string> mergedOutputHandler = null)
+        public static async Task<ProcessOutput> RunPythonScriptAsync(string script, string? args = null, IDictionary<string, string>? addToEnvironment = null, Action<string>? stdOutHandler = null, Action<string>? stdErrHandler = null, Action<string>? mergedOutputHandler = null)
         {
-            EnsureFindPython();
-            if (_pythonBinary == null)
+            string? pythonBinary = EnsureFindPython();
+            if (pythonBinary == null)
             {
                 ConsoleHelpers.WriteLineError("*** Please install Python 3.10 or above ***");
                 Console.Write("\nNOTE: If it's already installed ensure it's in the system PATH and working (try: `python --version`)\n");
                 return new ProcessOutput() { ExitCode = -1 };
             }
 
-            string tempFile = null;
+            string? tempFile = null;
 
             try
             {
@@ -35,7 +37,7 @@ namespace Azure.AI.Details.Common.CLI
                 args = args != null
                     ? $"\"{tempFile}\" {args}"
                     : $"\"{tempFile}\"";
-                return await ProcessHelpers.RunShellCommandAsync(_pythonBinary, args, addToEnvironment, stdOutHandler, stdErrHandler, mergedOutputHandler);
+                return await ProcessHelpers.RunShellCommandAsync(pythonBinary, args, addToEnvironment, stdOutHandler, stdErrHandler, mergedOutputHandler);
             }
             finally
             {
@@ -68,8 +70,8 @@ namespace Azure.AI.Details.Common.CLI
             AI.DBG_TRACE_VERBOSE($"RunEmbeddedPythonScript: '{scriptName}' {scriptArgs}");
 
             var process = PythonRunner.RunPythonScriptAsync(script, scriptArgs, addToEnvironment, stdOutHandler, stdErrHandler, mergedOutputHandler).Result;
-            var output = process.MergedOutput;
-            var exit = process.ExitCode;
+            string? output = process.MergedOutput;
+            int exit = process.ExitCode;
 
             if (exit != 0)
             {
@@ -82,8 +84,8 @@ namespace Azure.AI.Details.Common.CLI
 
                 if (output.Contains("MESSAGE:") && output.Contains("EXCEPTION:") && output.Contains("TRACEBACK:"))
                 {
-                    var messageLine = process.StdError.Split(new[] { '\r', '\n' }).FirstOrDefault(x => x.StartsWith("MESSAGE:"));
-                    var message = messageLine.Substring("MESSAGE:".Length).Trim();
+                    string? messageLine = process.StdError.Split(new[] { '\r', '\n' }).FirstOrDefault(x => x.StartsWith("MESSAGE:"));
+                    var message = messageLine?.Substring("MESSAGE:".Length).Trim();
                     FileHelpers.LogException(values, new PythonScriptException(output, exit));
 
                     if (output.Contains("az login"))
@@ -171,7 +173,7 @@ namespace Azure.AI.Details.Common.CLI
                 info.Add($"Python script failed! (exit code={exit})");
                 info.Add("");
                 info.Add("OUTPUT:");
-                info.Add(output);
+                info.Add(output ?? string.Empty);
 
                 values.AddThrowError(info[0], info[1], info.Skip(2).ToArray());
             }
@@ -179,8 +181,13 @@ namespace Azure.AI.Details.Common.CLI
             return ParseOutputAndSkipLinesUntilStartsWith(output, "---").Trim('\r', '\n', ' ');
         }
 
-        private static string ParseOutputAndSkipLinesUntilStartsWith(string output, string startsWith)
+        private static string ParseOutputAndSkipLinesUntilStartsWith(string? output, string startsWith)
         {
+            if (output == null)
+            {
+                return string.Empty;
+            }
+
             var lines = output.Split(new[] { "\r\n", "\n", "\r" }, StringSplitOptions.None);
             var sb = new StringBuilder();
             var skip = true;
@@ -198,7 +205,7 @@ namespace Azure.AI.Details.Common.CLI
             return sb.ToString();
         }
 
-        private static string EnsureFindPython()
+        private static string? EnsureFindPython()
         {
             if (_pythonBinary == null)
             {
@@ -208,10 +215,10 @@ namespace Azure.AI.Details.Common.CLI
             return _pythonBinary;
         }
 
-        private static string FindPython()
+        private static string? FindPython()
         {
-            string fullPath = FindPythonBinaryInOsPath();
-            string pythonExec = fullPath; 
+            string? fullPath = FindPythonBinaryInOsPath();
+            string? pythonExec = fullPath; 
             if (OperatingSystem.IsWindows())
             {
                 // TODO FIXME Longer term we really shouldn't be wrapping calls to python in cmd /c python
@@ -224,11 +231,14 @@ namespace Azure.AI.Details.Common.CLI
                 pythonExec = Path.GetFileName(fullPath);
             }
 
-            var process = ProcessHelpers.RunShellCommandAsync(pythonExec, "--version").Result;
-            if (process.ExitCode == 0 && process.MergedOutput.Contains("Python 3."))
+            if (pythonExec != null)
             {
-                AI.DBG_TRACE_VERBOSE($"Python found: {fullPath}");
-                return pythonExec;
+                var process = ProcessHelpers.RunShellCommandAsync(pythonExec, "--version").Result;
+                if (process.ExitCode == 0 && process.MergedOutput.Contains("Python 3."))
+                {
+                    AI.DBG_TRACE_VERBOSE($"Python found: {fullPath}");
+                    return pythonExec;
+                }
             }
 
             return null;
