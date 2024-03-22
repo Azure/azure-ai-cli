@@ -428,7 +428,7 @@ namespace Azure.AI.Details.Common.CLI
             {
                 _data?.Telemetry?.LogEvent(new CommandTelemetryEvent()
                 {
-                    Type = values.GetCommand("unknown"),
+                    Type = values.GetCommand("unknown")!,
                     Outcome = outcome,
                     ErrorInfo = errorInfo
                 });
