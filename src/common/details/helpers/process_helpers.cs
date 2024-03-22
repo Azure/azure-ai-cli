@@ -195,19 +195,6 @@ namespace Azure.AI.Details.Common.CLI
             return output;
         }
 
-        //public static async Task<ParsedJsonProcessOutput<JToken>> ParseShellCommandJson(string command, string arguments, IDictionary<string, string>? addToEnvironment = null, Action<string>? stdOutHandler = null, Action<string>? stdErrHandler = null)
-        //{
-        //    var processOutput = await RunShellCommandAsync(command, arguments, addToEnvironment, stdOutHandler, stdErrHandler);
-        //    var stdOutput = processOutput.StdOutput;
-
-        //    var parsed = !string.IsNullOrWhiteSpace(stdOutput) ? JToken.Parse(stdOutput) : null;
-
-        //    var x = new ParsedJsonProcessOutput<JToken>(processOutput);
-        //    x.Payload = parsed;
-
-        //    return x;
-        //}
-
         private static Process? StartShellCommandProcess(string command, string arguments, IDictionary<string, string> addToEnvironment = null, bool captureOutput = true)
         {
             var isWindows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
