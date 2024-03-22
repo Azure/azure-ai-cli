@@ -1,7 +1,4 @@
-﻿using System.Diagnostics;
-using System.Runtime.CompilerServices;
-
-namespace IntegrationTests
+﻿namespace Azure.AI.CLI.Test
 {
     /// <summary>
     /// Extensions for the Assert class

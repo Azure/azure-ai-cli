@@ -183,9 +183,9 @@ namespace Azure.AI.Details.Common.CLI
 
             var output = new ProcessOutput()
             {
-                StdOutput = sbOut.ToString().Trim(' ', '\r', '\n'),
-                StdError = sbErr.ToString().Trim(' ', '\r', '\n'),
-                MergedOutput = sbMerged.ToString().Trim(' ', '\r', '\n'),
+                StdOutput = sbOut.ToString().Trim(),
+                StdError = sbErr.ToString().Trim(),
+                MergedOutput = sbMerged.ToString().Trim(),
                 ExitCode = process.ExitCode,
             };
 

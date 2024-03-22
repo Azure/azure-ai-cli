@@ -4,10 +4,10 @@ using Azure.AI.CLI.Common.Clients.Models;
 using Azure.AI.Details.Common.CLI;
 using Azure.AI.Details.Common.CLI.AzCli;
 
-namespace IntegrationTests
+namespace Azure.AI.CLI.Test.UnitTests
 {
     [TestClass]
-    [Ignore("Until the recording test proxy has been set up, this test is not ready to run in CI/CD")]
+    [Ignore("Until the recording test proxy has been set up, this test is not ready to run in CI/CD. You can remove this to run these tests locally")]
     public class AzCliClientIntegrationTests
     {
         const string TEST_DATA_FILE = "test_config.json";
