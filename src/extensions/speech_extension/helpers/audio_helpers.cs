@@ -18,6 +18,11 @@ namespace Azure.AI.Details.Common.CLI
 {
     public class AudioHelpers : Command
     {
+        public AudioHelpers(ICommandValues values) : base(values)
+        {
+            // weird that this is a command... it's never instantiated
+        }
+
         public static AudioConfig CreateAudioConfigFromFile(string file, string format)
         {
             return !string.IsNullOrEmpty(format)
@@ -80,6 +85,11 @@ namespace Azure.AI.Details.Common.CLI
 
     public class AudioOutputHelpers : Command
     {
+        public AudioOutputHelpers(ICommandValues values) : base(values)
+        {
+            // weird that this is a command... it's never instantiated
+        }
+
         public static AudioConfig CreateAudioConfigForFile(string file)
         {
             return FileHelpers.IsStandardOutputReference(file)

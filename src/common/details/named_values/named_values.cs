@@ -213,19 +213,19 @@ namespace Azure.AI.Details.Common.CLI
             return values.GetOrDefault("display.help.dump", false);
         }
 
-        public static string GetCommand(this INamedValues values, string defaultValue = "")
+        public static string? GetCommand(this INamedValues values, string defaultValue = "")
         {
-            return values.GetOrDefault("x.command", defaultValue) ?? string.Empty;
+            return values.GetOrDefault("x.command", defaultValue);
         }
 
-        public static string GetCommandRoot(this INamedValues values, string defaultValue = "")
+        public static string? GetCommandRoot(this INamedValues values, string defaultValue = "")
         {
-            return values.GetCommand(defaultValue).Split('.').FirstOrDefault() ?? string.Empty;
+            return values.GetCommand(defaultValue)?.Split('.').FirstOrDefault() ?? string.Empty;
         }
 
-        public static string GetCommandForDisplay(this INamedValues values)
+        public static string? GetCommandForDisplay(this INamedValues values)
         {
-            return values.GetCommand().Replace('.', ' ');
+            return values.GetCommand()?.Replace('.', ' ');
         }
     }
 
