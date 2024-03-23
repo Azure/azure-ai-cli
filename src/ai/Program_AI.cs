@@ -18,59 +18,38 @@ namespace Azure.AI.Details.Common.CLI
         static async Task<int> Main(string[] args)
         {
             bool isDebug = args.Length > 0 && args[0] == "debug";
-            int exitCode = int.MinValue;
+            if (isDebug) Console.WriteLine($"StopWatch: Started at {DateTime.Now}");
 
-            IProgramData data = null;
             Stopwatch stopwatch = new Stopwatch();
+            stopwatch.Start();
 
-            try
+            var exitCode = TryCatchHelpers.TryCatchNoThrow(() => Program.Main(new AiProgramData(), args), -1, out var ex);
+
+            stopwatch.Stop();
+            var elapsed = stopwatch.Elapsed;
+            if (isDebug) Console.WriteLine($"StopWatch: Stopped at {DateTime.Now} ({GetStopWatchElapsedAsString(elapsed)})");
+
+            stopwatch.Restart();
+            await LogExitEventAsync(elapsed, exitCode);
+
+            stopwatch.Stop();
+            if (isDebug) Console.WriteLine($"StopWatch: Telemetry completed at {DateTime.Now} ({GetStopWatchElapsedAsString(stopwatch.Elapsed)})");
+
+            if (ex != null) throw ex;
+            return exitCode;
+        }
+
+        static async Task LogExitEventAsync(TimeSpan elapsed, int exitCode)
+        {
+            if (Program.Telemetry != null)
             {
-                if (isDebug)
+                Program.Telemetry.LogEvent(new ExitedTelemetryEvent()
                 {
-                    Console.WriteLine($"StopWatch: Started at {DateTime.Now}");
-                }
+                    ExitCode = exitCode,
+                    Elapsed = elapsed
+                });
 
-                stopwatch.Start();
-
-                data = new AiProgramData();
-                exitCode = Program.Main(data, args);
-                stopwatch.Stop();
-
-                if (isDebug)
-                {
-                    Console.WriteLine($"StopWatch: Stopped at {DateTime.Now} ({GetStopWatchElapsedAsString(stopwatch.Elapsed)})");
-                }
-
-                return exitCode;
-            }
-            catch (Exception)
-            {
-                exitCode = -1;
-                throw;
-            }
-            finally
-            {
-                if (data?.Telemetry != null)
-                {
-                    var elapsed = stopwatch.Elapsed;
-                    stopwatch = new Stopwatch();
-                    stopwatch.Start();
-
-                    data.Telemetry.LogEvent(new ExitedTelemetryEvent()
-                    {
-                        ExitCode = exitCode,
-                        Elapsed = elapsed
-                    });
-
-                    await data.Telemetry.DisposeAsync()
-                        .ConfigureAwait(false);
-
-                    stopwatch.Stop();
-                    if (isDebug)
-                    {
-                        Console.WriteLine($"StopWatch: Telemetry Disposed at {DateTime.Now} ({GetStopWatchElapsedAsString(stopwatch.Elapsed)})");
-                    }
-                }
+                await Program.Telemetry.DisposeAsync();
             }
         }
 
