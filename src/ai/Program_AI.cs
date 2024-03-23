@@ -17,13 +17,14 @@ namespace Azure.AI.Details.Common.CLI
     {
         static async Task<int> Main(string[] args)
         {
+            bool isDebug = args.Length > 0 && args[0] == "debug";
+            int exitCode = int.MinValue;
+
             IProgramData data = null;
             Stopwatch stopwatch = new Stopwatch();
-            int exitCode = int.MinValue;
 
             try
             {
-                bool isDebug = args.Length > 0 && args[0] == "debug";
                 if (isDebug)
                 {
                     Console.WriteLine($"StopWatch: Started at {DateTime.Now}");
@@ -51,14 +52,24 @@ namespace Azure.AI.Details.Common.CLI
             {
                 if (data?.Telemetry != null)
                 {
+                    var elapsed = stopwatch.Elapsed;
+                    stopwatch = new Stopwatch();
+                    stopwatch.Start();
+
                     data.Telemetry.LogEvent(new ExitedTelemetryEvent()
                     {
                         ExitCode = exitCode,
-                        Elapsed = stopwatch.Elapsed
+                        Elapsed = elapsed
                     });
 
                     await data.Telemetry.DisposeAsync()
                         .ConfigureAwait(false);
+
+                    stopwatch.Stop();
+                    if (isDebug)
+                    {
+                        Console.WriteLine($"StopWatch: Telemetry Disposed at {DateTime.Now} ({GetStopWatchElapsedAsString(stopwatch.Elapsed)})");
+                    }
                 }
             }
         }
