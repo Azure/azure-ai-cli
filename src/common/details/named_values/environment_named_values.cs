@@ -21,9 +21,10 @@ namespace Azure.AI.Details.Common.CLI
             foreach (var key in vars.Keys)
             {
                 var ks = key.ToString() ?? string.Empty;
-                if (ks.ToLower().StartsWith($"{Program.Name}_"))
+                var nameAndPrefix = $"{Program.Name}_";
+                if (ks.ToLower().StartsWith(nameAndPrefix))
                 {
-                    var name = ks.Substring(4).Replace("_", ".").ToLower();
+                    var name = ks.Substring(nameAndPrefix.Length).Replace("_", ".").ToLower();
                     var value = vars[key]!.ToString();
                     _values.Add(name, value);
                 }
