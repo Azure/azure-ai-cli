@@ -62,7 +62,7 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
             return string.Join("\n", lines);
         }
 
-        public static string? ConvertScalarSequenceToTsvString(this YamlNode node, string[] keys = null)
+        public static string? ConvertScalarSequenceToTsvString(this YamlNode node, string[]? keys = null)
         {
             // ensure it's a sequence (list/array)
             var sequence = node as YamlSequenceNode;
