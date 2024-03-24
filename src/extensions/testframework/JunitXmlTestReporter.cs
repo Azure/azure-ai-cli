@@ -12,8 +12,10 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
 {
     public static class JunitXmlTestReporter
     {
-        public static string WriteResultsFile(TestRun testRun, string resultsFile = "test-results.xml")
+        public static string WriteResultsFile(TestRun testRun, string? resultsFile = null)
         {
+            resultsFile ??= "test-results.xml";
+            
             var testCases = testRun.TestCases;
             var testResults = testRun.TestResults;
             var startTime = testRun.StartTime;
@@ -50,17 +52,23 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
                 var debugTrace = testResult.Messages.FirstOrDefault(x => x.Category == TestResultMessage.DebugTraceCategory)?.Text;
                 var message = testResult.Messages.FirstOrDefault(x => x.Category == TestResultMessage.AdditionalInfoCategory)?.Text;
 
-                writer.WriteStartElement("system-out");
-                writer.WriteRaw(System.Security.SecurityElement
-                    .Escape(stdout.Replace("\u001b", string.Empty))
-                    .Replace("\r\n", "&#xD;\n"));
-                writer.WriteEndElement();
+                if (stdout != null)
+                {
+                    writer.WriteStartElement("system-out");
+                    writer.WriteRaw(System.Security.SecurityElement
+                        .Escape(stdout.Replace("\u001b", string.Empty))
+                        .Replace("\r\n", "&#xD;\n"));
+                    writer.WriteEndElement();
+                }
 
-                writer.WriteStartElement("system-err");
-                writer.WriteRaw(System.Security.SecurityElement
-                    .Escape(stderr.Replace("\u001b", string.Empty))
-                    .Replace("\r\n", "&#xD;\n"));
-                writer.WriteEndElement();
+                if (stderr != null)
+                {
+                    writer.WriteStartElement("system-err");
+                    writer.WriteRaw(System.Security.SecurityElement
+                        .Escape(stderr.Replace("\u001b", string.Empty))
+                        .Replace("\r\n", "&#xD;\n"));
+                    writer.WriteEndElement();
+                }
 
                 if (testResult.Outcome == TestOutcome.Failed)
                 {

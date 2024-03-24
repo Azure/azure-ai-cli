@@ -12,8 +12,10 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
 {
     public static class TrxXmlTestReporter
     {
-        public static string WriteResultsFile(TestRun testRun, string resultsFile = "test-results.trx")
+        public static string WriteResultsFile(TestRun testRun, string? resultsFile = null)
         {
+            resultsFile ??= "test-results.trx";
+            
             var testCases = testRun.TestCases;
             var testResults = testRun.TestResults;
             var startTime = testRun.StartTime;

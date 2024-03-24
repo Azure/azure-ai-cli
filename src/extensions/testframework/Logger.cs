@@ -73,7 +73,7 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
 
         #region private methods and data
  
-        private static IYamlTestFrameworkLogger logger = null;
+        private static IYamlTestFrameworkLogger? logger = null;
 
         #endregion
     }

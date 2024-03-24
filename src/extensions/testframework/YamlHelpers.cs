@@ -53,7 +53,7 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
 
             using var reader = new StringReader(writer.ToString());
             var deserializer = new Deserializer();
-            var yamlObject = deserializer.Deserialize(reader);
+            var yamlObject = deserializer.Deserialize(reader)!;
 
             var trimmed = serializer.Serialize(yamlObject).Trim('\r', '\n');
             return yaml ? trimmed : trimmed.Replace("\t", "\\t").Replace("\f", "\\f");

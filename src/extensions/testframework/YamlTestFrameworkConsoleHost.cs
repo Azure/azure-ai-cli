@@ -42,7 +42,7 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
             _testRun.EndTest(testCase, outcome);
         }
 
-        public bool Finish(IDictionary<string, IList<TestResult>> resultsByTestCaseId, string outputResultsFormat = "trx", string outputResultsFile = null)
+        public bool Finish(IDictionary<string, IList<TestResult>> resultsByTestCaseId, string outputResultsFormat = "trx", string? outputResultsFile = null)
         {
             _testRun.EndRun();
 
@@ -163,7 +163,7 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
                     var hasStdErr = !string.IsNullOrEmpty(stdErr);
                     if (hasStdErr)
                     {
-                        var lines = stdErr.Split('\n');
+                        var lines = stdErr!.Split('\n');
                         if (lines.Length > 10)
                         {
                             var first5 = lines.Take(5);

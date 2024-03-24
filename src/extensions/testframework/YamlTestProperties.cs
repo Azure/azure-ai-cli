@@ -26,7 +26,7 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
             }
         }
 
-        public static string Get(TestCase test, string name, string defaultValue = null)
+        public static string? Get(TestCase test, string name, string? defaultValue = null)
         {
             var value = test.GetPropertyValue(properties[name], defaultValue);
             Logger.LogIf(!string.IsNullOrEmpty(value), $"TestCaseProperties.Get('{name}') = '{value?.Replace("\n", "\\n")}'");
