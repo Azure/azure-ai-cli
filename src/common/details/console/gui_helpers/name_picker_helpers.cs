@@ -73,9 +73,9 @@ namespace Azure.AI.Details.Common.CLI
             }
         }
 
-        private static string[] LoadFrom(string fileName)
+        private static string[] LoadFrom(string fromFileName)
         {
-            fileName = $"help/include.text.{fileName}";
+            var fileName = $"help/include.text.{fromFileName}";
             fileName = FileHelpers.FindFileInHelpPath(fileName);
 
             var text = !string.IsNullOrEmpty(fileName)

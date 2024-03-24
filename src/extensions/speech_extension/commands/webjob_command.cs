@@ -223,7 +223,7 @@ namespace Azure.AI.Details.Common.CLI
         ///     --output request FILE/-
         ///     --output file FILE/-
         /// </example>
-        private string DoDownload()
+        private string? DoDownload()
         {
             GetDownloadParameters(out string url, out string message);
 
@@ -479,7 +479,7 @@ namespace Azure.AI.Details.Common.CLI
             return json;
         }
 
-        private string ReadWritePrintResponse(HttpWebResponse response, string defaultFileName = null)
+        private string? ReadWritePrintResponse(HttpWebResponse response, string defaultFileName = null)
         {
             var saveAs = HttpHelpers.GetOutputDataFileName(defaultFileName, response, _values, "webjob", out bool isText, out bool isJson);
 

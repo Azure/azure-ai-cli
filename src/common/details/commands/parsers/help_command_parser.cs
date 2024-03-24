@@ -404,7 +404,7 @@ namespace Azure.AI.Details.Common.CLI
 
             if (path == null && more == "help") path = FileHelpers.FindFileInHelpPath("help/help");
             if (path == null) path = FileHelpers.FindFileInHelpPath("help/usage");
-            return path;
+            return path!;
         }
 
         private static string? FindHelpFile(string command, string option, string more)

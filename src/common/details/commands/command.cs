@@ -77,7 +77,7 @@ namespace Azure.AI.Details.Common.CLI
 
             if (!zipAsFile.EndsWith(".zip")) zipAsFile = zipAsFile + ".zip";
 
-            var tempDirectory = PathHelpers.Combine(Path.GetTempPath(), zipAsFile + DateTime.Now.ToFileTime().ToString() + ".temp");
+            var tempDirectory = PathHelpers.Combine(Path.GetTempPath(), zipAsFile + DateTime.Now.ToFileTime().ToString() + ".temp")!;
             Directory.CreateDirectory(tempDirectory);
 
             ZipCommand(values, zipAsFile, tempDirectory, verbose);
@@ -104,7 +104,7 @@ namespace Azure.AI.Details.Common.CLI
             var command = values.GetCommand();
             var commandJob = "./" + command + ".job";
 
-            var runScriptPath = PathHelpers.Combine(tempDirectory, runScript);
+            var runScriptPath = PathHelpers.Combine(tempDirectory, runScript)!;
 
             if (targetWebJob)
             {
@@ -125,7 +125,7 @@ namespace Azure.AI.Details.Common.CLI
                 if (verbose) Console.WriteLine($"  Saving {settingsPath}... ");
 
                 var settingsJson = "{ \"is_in_place\": true }";
-                settingsPath = PathHelpers.Combine(tempDirectory, "settings.job");
+                settingsPath = PathHelpers.Combine(tempDirectory, "settings.job")!;
                 FileHelpers.WriteAllText(settingsPath, settingsJson, Encoding.Default);
             }
 
@@ -133,7 +133,7 @@ namespace Azure.AI.Details.Common.CLI
             var files = values.SaveAs(commandJob).Split(';');
             foreach (var file in files)
             {
-                FileHelpers.CopyFile(".", file, tempDirectory, null, verbose);
+                FileHelpers.TryCopyFile(".", file, tempDirectory, null, verbose);
                 File.Delete(file);
             }
 
@@ -141,33 +141,33 @@ namespace Azure.AI.Details.Common.CLI
             var sourcePath = AppContext.BaseDirectory;
 
             var programExe = OperatingSystem.IsWindows() ? Program.Exe : Program.Exe.Replace(".exe", "");
-            FileHelpers.CopyFile(sourcePath, programExe, tempDirectory, null, verbose);
+            FileHelpers.TryCopyFile(sourcePath, programExe, tempDirectory, null, verbose);
 
             #if NETCOREAPP
-            FileHelpers.CopyFile(sourcePath, Program.Name, tempDirectory, null, verbose);
-            FileHelpers.CopyFile(sourcePath, Program.Dll, tempDirectory, null, verbose);
-            FileHelpers.CopyFile(sourcePath, "runtimeconfig.json", tempDirectory, null, verbose);
-            FileHelpers.CopyFile(sourcePath, $"{Program.Name}.runtimeconfig.json", tempDirectory, null, verbose);
+            FileHelpers.TryCopyFile(sourcePath, Program.Name, tempDirectory, null, verbose);
+            FileHelpers.TryCopyFile(sourcePath, Program.Dll, tempDirectory, null, verbose);
+            FileHelpers.TryCopyFile(sourcePath, "runtimeconfig.json", tempDirectory, null, verbose);
+            FileHelpers.TryCopyFile(sourcePath, $"{Program.Name}.runtimeconfig.json", tempDirectory, null, verbose);
             #endif
 
             var bindingAssembly = FileHelpers.GetAssemblyFileInfo(Program.BindingAssemblySdkType);
             sourcePath = bindingAssembly.DirectoryName!;
-            FileHelpers.CopyFile(sourcePath, bindingAssembly.Name, tempDirectory, null, verbose);
+            FileHelpers.TryCopyFile(sourcePath, bindingAssembly.Name, tempDirectory, null, verbose);
 
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
             {
                 string[] locations = { "", "runtimes/win-x64/native/", "../runtimes/win-x64/native/" };
-                FileHelpers.CopyFiles(PathHelpers.Combine(sourcePath, locations), Program.ZipIncludes, tempDirectory, null, null, verbose);
+                FileHelpers.TryCopyFiles(PathHelpers.Combine(sourcePath, locations), Program.ZipIncludes, tempDirectory, null, null, verbose);
             }
             else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
             {
                 string[] locations = { "", "runtimes/linux-x64/native/", "../../runtimes/linux-x64/native/" };
-                FileHelpers.CopyFiles(PathHelpers.Combine(sourcePath, locations), Program.ZipIncludes, tempDirectory, "lib", ".so", verbose);
+                FileHelpers.TryCopyFiles(PathHelpers.Combine(sourcePath, locations), Program.ZipIncludes, tempDirectory, "lib", ".so", verbose);
             }
             else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
             {
                 string[] locations = { "", "runtimes/osx-x64/native/", "../../runtimes/osx-x64/native/" };
-                FileHelpers.CopyFiles(PathHelpers.Combine(sourcePath, locations), Program.ZipIncludes, tempDirectory, "lib", ".dylib", verbose);
+                FileHelpers.TryCopyFiles(PathHelpers.Combine(sourcePath, locations), Program.ZipIncludes, tempDirectory, "lib", ".dylib", verbose);
             }
 
             // Dependent type assemblies (Linq Async, System.Interactive.Async and JMESPath)
@@ -176,7 +176,7 @@ namespace Azure.AI.Details.Common.CLI
             foreach (var t in types)
             {
                 var fi = FileHelpers.GetAssemblyFileInfo(t);
-                FileHelpers.CopyFile(fi.DirectoryName!, fi.Name, tempDirectory, null, verbose);
+                FileHelpers.TryCopyFile(fi.DirectoryName!, fi.Name, tempDirectory, null, verbose);
             }
 
             File.Delete(zipAsFile);

@@ -248,7 +248,7 @@ namespace Azure.AI.Details.Common.CLI
                     : HttpHelpers.GetFileNameFromResponse(response, values);
             }
 
-            var fileName = values.GetOrDefault($"{domain}.output.file", defaultFileName);
+            var fileName = values.GetOrDefault($"{domain}.output.file", defaultFileName)!;
             return FileHelpers.GetOutputDataFileName(fileName, values);
         }
 
@@ -265,7 +265,7 @@ namespace Azure.AI.Details.Common.CLI
             return lastPartValid ? lastPart : defaultFileName;
         }
 
-        public static string ReadWriteResponse(WebResponse response, string fileName, string message, bool returnAsText)
+        public static string? ReadWriteResponse(WebResponse response, string fileName, string message, bool returnAsText)
         {
             Stream stream;
             using (stream = response.GetResponseStream())

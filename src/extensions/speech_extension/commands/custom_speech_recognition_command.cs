@@ -145,7 +145,7 @@ namespace Azure.AI.Details.Common.CLI
             UrlHelpers.CheckWriteOutputUrlsOrIds(json, "values", "self", _values, "csr");
         }
 
-        private string DoDownload()
+        private string? DoDownload()
         {
             var url = _values.GetOrEmpty("csr.download.url");
             var urlOk = !string.IsNullOrEmpty(url);
@@ -1183,7 +1183,7 @@ namespace Azure.AI.Details.Common.CLI
             return HttpHelpers.CheckWaitForComplete(created, statusJson, createWebRequest, _values, domain, message, _quiet, _verbose);
         }
 
-        private string DownloadUrl(string url, string defaultFileName = null)
+        private string? DownloadUrl(string url, string defaultFileName = null)
         {
             var message = url.Substring(0, Math.Min(100, url.Length));
             message = url.Length > 100
@@ -1200,7 +1200,7 @@ namespace Azure.AI.Details.Common.CLI
             return ReadWritePrintResponse(response, defaultFileName);
         }
 
-        private string ReadWritePrintResponse(HttpWebResponse response, string defaultFileName = null)
+        private string? ReadWritePrintResponse(HttpWebResponse response, string defaultFileName = null)
         {
             var saveAs = HttpHelpers.GetOutputDataFileName(defaultFileName, response, _values, "csr", out _, out bool isJson);
 

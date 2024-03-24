@@ -47,6 +47,12 @@ namespace Azure.AI.Details.Common.CLI
         public static string RunEmbeddedPythonScript(ICommandValues values, string scriptName, string? scriptArgs = null, Dictionary<string, string>? addToEnvironment = null, Action<string>? stdOutHandler = null, Action<string>? stdErrHandler = null, Action<string>? mergedOutputHandler = null)
         {
             var path = FileHelpers.FindFileInHelpPath($"help/include.python.script.{scriptName}.py");
+            if (path == null)
+            {
+                values.AddThrowError("ERROR:", $"Python script '{scriptName}' not found!");
+                return string.Empty;
+            }
+
             var script = FileHelpers.ReadAllHelpText(path, Encoding.UTF8);
 
             if (Program.Debug)
