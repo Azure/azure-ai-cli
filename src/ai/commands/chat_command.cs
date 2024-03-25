@@ -974,7 +974,7 @@ namespace Azure.AI.Details.Common.CLI
                 var promptyFrontMatterText = sections[1];
                 var chatTemplate = sections[2];
                 var obj = deserializer.Deserialize<PromptyFrontMatter>(promptyFrontMatterText);
-                Dictionary<string, string> templateInputs = ParsePromptyInputs(obj.Inputs);
+                Dictionary<string, object> templateInputs = ParsePromptyInputs(obj.Inputs);
                 Console.WriteLine(obj.Name);
                 Console.WriteLine(chatTemplate);
             }
@@ -985,9 +985,9 @@ namespace Azure.AI.Details.Common.CLI
             //TODO: parse parameter file (prompty format) and set values accordingly
         }
 
-        private Dictionary<string, string> ParsePromptyInputs(object input)
+        private Dictionary<string, object> ParsePromptyInputs(object input)
         {
-            var dictionary = new Dictionary<string, string>();
+            var dictionary = new Dictionary<string, object>();
             var inputString = input as string;
             if (inputString == null)
             {
@@ -995,7 +995,7 @@ namespace Azure.AI.Details.Common.CLI
 
                 foreach (var kv in inputIter)
                 {
-                    dictionary.Add(kv.Key.ToString(), kv.Value.ToString());
+                    dictionary.Add(kv.Key.ToString(), kv.Value);
                 }
             }
             else
@@ -1006,7 +1006,7 @@ namespace Azure.AI.Details.Common.CLI
                     .Split(Environment.NewLine)
                     .Select(part => part.Split(':'))
                     .Where(part => part.Length == 2)
-                    .ToDictionary(sp => sp[0], sp => sp[1].TrimStart());
+                    .ToDictionary(sp => sp[0], sp => sp[1] as object);
             }
             return dictionary;
         }
