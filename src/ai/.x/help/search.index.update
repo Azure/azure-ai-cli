@@ -4,11 +4,6 @@ SEARCH INDEX UPDATE
 
 USAGE: ai index update [...]
 
-  AZURE AI
-    --subscription SUBSCRIPTION             (see: ai help search subscription)
-    --project PROJECT                       (see: ai help search project)
-    --group group                           (see: ai help search group)
-
   AZURE SEARCH
     --index-name NAME                       (see: ai help search index name)
     --index-kind KIND                       (see: ai help search index kind)
@@ -26,12 +21,10 @@ USAGE: ai index update [...]
 
   OPENAI EMBEDDINGS
     --embedding-deployment DEPLOYMENT       (see: ai help search embedding deployment)
-    --embedding-model MODEL                 (see: ai help search embedding model)
 
   DATA
     --file FILE                             (see: ai help search index file)
     --files FILEs                           (see: ai help search index files)
-    --external-source                       (see: ai help search index external source)
 
 EXAMPLE
 

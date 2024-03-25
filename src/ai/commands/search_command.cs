@@ -128,27 +128,9 @@ namespace Azure.AI.Details.Common.CLI
 
                 DoIndexUpdateWithSK(searchEndpoint, searchApiKey, embeddingsEndpoint, embeddingsDeployment, embeddingsApiKey, searchIndexName, pattern);
             }
-            else // use GenAi
+            else
             {
-                var subscription = SubscriptionToken.Data().Demand(_values, action, command, checkConfig: "subscription");
-                var project = ProjectNameToken.Data().Demand(_values, action, command, checkConfig: "project");
-                var group = ResourceGroupNameToken.Data().Demand(_values, action, command, checkConfig: "group");
-                var searchEndpoint = DemandSearchEndpointUri(action, command);
-                var searchApiKey = DemandSearchApiKey(action, command);
-                var embeddingsEndpoint = DemandEmbeddingsEndpointUri(action, command);
-                var embeddingsApiKey = DemandEmbeddingsApiKey(action, command);
-                var embeddingModelDeployment = SearchEmbeddingModelDeploymentNameToken.Data().Demand(_values, action, command, checkConfig: "embedding.model.deployment.name");
-                var embeddingModelName = SearchEmbeddingModelNameToken.Data().Demand(_values, action, command, checkConfig: "embedding.model.name");
-                var externalSourceUrl = ExternalSourceToken.Data().GetOrDefault(_values);
-
-                output = DoIndexUpdateWithGenAi(subscription, group, project, searchIndexName, embeddingModelDeployment, embeddingModelName, pattern, externalSourceUrl);
-
-                var parsed = !string.IsNullOrEmpty(output) ? JToken.Parse(output) : null;
-                var index = parsed?.Type == JTokenType.Object ? parsed["index"] : null;
-                if (index == null)
-                {
-                    _values.AddThrowError("ERROR:", $"Failed to update search index '{searchIndexName}'");
-                }
+                _values.AddThrowError("ERROR:", $"No blob container or sk index kind specified.");
             }
 
             if (!_quiet) Console.WriteLine($"{message} Done!\n");
