@@ -216,7 +216,7 @@ namespace Azure.AI.Details.Common.CLI
             _disposeAfterStop.Add(audioConfig);
             _disposeAfterStop.Add(synthesizer);
 
-            // _output.EnsureCachePropertyCollection("synthesizer", synthesizer.Properties);
+            // _output!.EnsureCachePropertyCollection("synthesizer", synthesizer.Properties);
 
             return synthesizer;
         }
@@ -244,7 +244,7 @@ namespace Azure.AI.Details.Common.CLI
                 _values.AddThrowError("ERROR:", $"Creating SpeechConfig; use of region requires one of: key or token.");
             }
 
-            SpeechConfig config = null;
+            SpeechConfig? config = null;
             if (!string.IsNullOrEmpty(endpoint))
             {
                 config = string.IsNullOrEmpty(key)
@@ -292,7 +292,7 @@ namespace Azure.AI.Details.Common.CLI
             var endpointId = _values["service.config.endpoint.id"];
             if (!string.IsNullOrEmpty(endpointId)) config.EndpointId = endpointId;
 
-            // var needDetailedText = _output.NeedsLexicalText() || _output.NeedsItnText();
+            // var needDetailedText = _output != null && (_output.NeedsLexicalText() || _output.NeedsItnText());
             // if (needDetailedText) config.OutputFormat = OutputFormat.Detailed;
 
             // var profanity = _values["service.output.config.profanity.option"];
@@ -479,7 +479,7 @@ namespace Azure.AI.Details.Common.CLI
             return file;
         }
 
-        private AudioConfig CreateAudioConfig()
+        private AudioConfig? CreateAudioConfig()
         {
             var output = _values["audio.output.type"];
             var file = _values["audio.output.file"];
@@ -502,41 +502,41 @@ namespace Azure.AI.Details.Common.CLI
             return audioConfig;
         }
 
-        private void SynthesisStarted(object sender, SpeechSynthesisEventArgs e)
+        private void SynthesisStarted(object? sender, SpeechSynthesisEventArgs e)
         {
-            _lock.EnterReaderLockOnce(ref _expectSynthesisCompleted);
+            _lock!.EnterReaderLockOnce(ref _expectSynthesisCompleted);
             _stopEvent.Reset();
 
-            _display.DisplaySynthesisStarted(e);
-            _output.SynthesisStarted(e);
+            _display!.DisplaySynthesisStarted(e);
+            _output!.SynthesisStarted(e);
         }
 
-        private void Synthesizing(object sender, SpeechSynthesisEventArgs e)
+        private void Synthesizing(object? sender, SpeechSynthesisEventArgs e)
         {
-            _display.DisplaySynthesizing(e);
-            _output.Synthesizing(e);
+            _display!.DisplaySynthesizing(e);
+            _output!.Synthesizing(e);
         }
 
-        private void SynthesisCompleted(object sender, SpeechSynthesisEventArgs e)
+        private void SynthesisCompleted(object? sender, SpeechSynthesisEventArgs e)
         {
-            _display.DisplaySynthesisCompleted(e);
-            _output.SynthesisCompleted(e);
+            _display!.DisplaySynthesisCompleted(e);
+            _output!.SynthesisCompleted(e);
 
             _stopEvent.Set();
-            _lock.ExitReaderLockOnce(ref _expectSynthesisCompleted);
+            _lock!.ExitReaderLockOnce(ref _expectSynthesisCompleted);
         }
 
-        private void SynthesisCanceled(object sender, SpeechSynthesisEventArgs e)
+        private void SynthesisCanceled(object? sender, SpeechSynthesisEventArgs e)
         {
-            _display.DisplaySynthesisCanceled(e);
-            _output.SynthesisCanceled(e);
+            _display!.DisplaySynthesisCanceled(e);
+            _output!.SynthesisCanceled(e);
             _canceledEvent.Set();
         }
 
-        private void SynthesisWordBoundary(object sender, SpeechSynthesisWordBoundaryEventArgs e)
+        private void SynthesisWordBoundary(object? sender, SpeechSynthesisWordBoundaryEventArgs e)
         {
-            _display.DisplaySynthesisWordBoundary(e);
-            _output.SynthesisWordBoundary(e);
+            _display!.DisplaySynthesisWordBoundary(e);
+            _output!.SynthesisWordBoundary(e);
         }
 
         private void WaitForStopOrCancel(SpeechSynthesizer synthesizer, Task<SpeechSynthesisResult> task)
@@ -558,11 +558,11 @@ namespace Azure.AI.Details.Common.CLI
             _display = new DisplayHelper(_values);
 
             _output = new OutputHelper(_values);
-            _output.StartOutput();
+            _output!.StartOutput();
 
             var id = _values["synthesizer.input.id"];
-            _output.EnsureOutputAll("synthesizer.input.id", id);
-            _output.EnsureOutputEach("synthesizer.input.id", id);
+            _output!.EnsureOutputAll("synthesizer.input.id", id);
+            _output!.EnsureOutputEach("synthesizer.input.id", id);
 
             _lock = new SpinLock();
             _lock.StartLock();
@@ -572,16 +572,16 @@ namespace Azure.AI.Details.Common.CLI
 
         private void StopCommand()
         {
-            _lock.StopLock(5000);
+            _lock!.StopLock(5000);
 
-            _output.CheckOutput();
-            _output.StopOutput();
+            _output!.CheckOutput();
+            _output!.StopOutput();
         }
 
-        private SpinLock _lock = null;
+        private SpinLock? _lock = null;
         private int _expectSynthesisCompleted = 0;
 
-        OutputHelper _output = null;
-        DisplayHelper _display = null;
+        OutputHelper? _output = null;
+        DisplayHelper? _display = null;
     }
 }

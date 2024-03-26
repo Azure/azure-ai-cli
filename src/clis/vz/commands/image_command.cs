@@ -152,7 +152,7 @@ namespace Azure.AI.Details.Common.CLI
             // _disposeAfterStop.Add(visionSource);
             _disposeAfterStop.Add(analyzer);
 
-            // _output.EnsureCachePropertyCollection("recognizer", recognizer.Properties);
+            // _output!.EnsureCachePropertyCollection("recognizer", recognizer.Properties);
 
             return analyzer;
         }
@@ -275,11 +275,11 @@ namespace Azure.AI.Details.Common.CLI
             return features;
         }
 
-        private void Analyzed(object sender, ImageAnalysisEventArgs e)
+        private void Analyzed(object? sender, ImageAnalysisEventArgs e)
         {
-            _display.DisplayAnalyzed(e);
-            // _output.Recognized(e);
-            _lock.ExitReaderLockOnce(ref _expectAnalyzed);
+            _display!.DisplayAnalyzed(e);
+            // _output!.Recognized(e);
+            _lock!.ExitReaderLockOnce(ref _expectAnalyzed);
         }
 
         private void CheckVisionInput()
@@ -442,15 +442,15 @@ namespace Azure.AI.Details.Common.CLI
             _display = new DisplayHelper(_values);
 
             // _output = new OutputHelper(_values);
-            // _output.StartOutput();
+            // _output!.StartOutput();
 
             // var id = _values["vision.input.id"];
-            // _output.EnsureOutputAll("vision.input.id", id);
-            // _output.EnsureOutputEach("vision.input.id", id);
-            // _output.EnsureCacheProperty("vision.input.id", id);
+            // _output!.EnsureOutputAll("vision.input.id", id);
+            // _output!.EnsureOutputEach("vision.input.id", id);
+            // _output!.EnsureCacheProperty("vision.input.id", id);
 
             // var file = _values["vision.input.file"];
-            // _output.EnsureCacheProperty("vision.input.file", file);
+            // _output!.EnsureCacheProperty("vision.input.file", file);
 
             _lock = new SpinLock();
             _lock.StartLock();
@@ -462,13 +462,13 @@ namespace Azure.AI.Details.Common.CLI
 
         private void StopCommand()
         {
-            _lock.StopLock(5000);
+            _lock!.StopLock(5000);
 
             // This shouldn't really be here, but since there is no session stopped event it hast to be here
             _stopEvent.Set();
 
-            // _output.CheckOutput();
-            // _output.StopOutput();
+            // _output!.CheckOutput();
+            // _output!.StopOutput();
         }
 
         private bool _quiet = false;
@@ -478,12 +478,12 @@ namespace Azure.AI.Details.Common.CLI
         // private bool _connect = false;
         // private bool _disconnect = false;
 
-        private SpinLock _lock = null;
+        private SpinLock? _lock = null;
         private int _expectAnalyzed = 0;
         // private int _expectSessionStopped = 0;
         // private int _expectDisconnected = 0;
 
-        // OutputHelper _output = null;
-        DisplayHelper _display = null;
+        // OutputHelper? _output = null;
+        DisplayHelper? _display = null;
     }
 }

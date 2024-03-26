@@ -1049,7 +1049,7 @@ namespace Azure.AI.Details.Common.CLI
             sb.Append($"--{boundary}\r\nContent-Disposition: form-data; name=\"data\"; filename=\"{dataFile}\"\r\nContent-Type: {contentType}\r\n\r\n");
 
             var bytes1 = Encoding.UTF8.GetBytes(sb.ToString());
-            var bytes2 = FileHelpers.ReadAllBytes(zipFile);
+            var bytes2 = FileHelpers.ReadAllBytes(zipFile!);
             var bytes3 = Encoding.UTF8.GetBytes($"\r\n--{boundary}--\r\n");
 
             var bytes = new byte[bytes1.Length + bytes2.Length + bytes3.Length];
@@ -1117,7 +1117,7 @@ namespace Azure.AI.Details.Common.CLI
             return $"\"properties\": {{ {loggingPart} }},";
         }
 
-        private HttpWebRequest CreateWebRequest(string method, string path, string id = null, string query = null, string contentType = null)
+        private HttpWebRequest CreateWebRequest(string method, string path, string? id = null, string? query = null, string? contentType = null)
         {
             var key = _values.GetOrEmpty("service.config.key");
             var region = _values.GetOrEmpty("service.config.region");
@@ -1148,7 +1148,7 @@ namespace Azure.AI.Details.Common.CLI
             return request;
         }
 
-        private string GetCustomSpeechUrl(string region, string path, string id = null, string query = null)
+        private string GetCustomSpeechUrl(string region, string path, string? id = null, string? query = null)
         {
             if (path.StartsWith("http")) return path;
 

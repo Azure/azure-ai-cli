@@ -186,13 +186,13 @@ namespace Azure.AI.Details.Common.CLI
             var filepaths = _values.GetOrEmpty("batch.transcription.onprem.create.files");
             batchSpec["files"] = filepaths.Split(",;\r\n".ToCharArray()).ToList();
 
-            batchSpec["language"] = _values.GetOrDefault("batch.transcription.onprem.create.language", "en-US");
-            batchSpec["diarization"] = _values.GetOrDefault("batch.transcription.onprem.create.diarization", "None");
-            batchSpec["nbest"] = Int32.Parse(_values.GetOrDefault("batch.transcription.onprem.create.nbest", "1"));
-            batchSpec["profanity"] = _values.GetOrDefault("batch.transcription.onprem.create.profanity", "Masked");
-            batchSpec["allow_resume"] = _values.GetOrDefault("batch.transcription.onprem.create.resume", "true");
+            batchSpec["language"] = _values.GetOrDefault("batch.transcription.onprem.create.language", "en-US")!;
+            batchSpec["diarization"] = _values.GetOrDefault("batch.transcription.onprem.create.diarization", "None")!;
+            batchSpec["nbest"] = Int32.Parse(_values.GetOrDefault("batch.transcription.onprem.create.nbest", "1")!);
+            batchSpec["profanity"] = _values.GetOrDefault("batch.transcription.onprem.create.profanity", "Masked")!;
+            batchSpec["allow_resume"] = _values.GetOrDefault("batch.transcription.onprem.create.resume", "true")!;
             if ((string)batchSpec["allow_resume"] == "") { batchSpec["allow_resume"] = "true"; }
-            batchSpec["combine_results"] = _values.GetOrDefault("batch.transcription.onprem.create.combine", "false");
+            batchSpec["combine_results"] = _values.GetOrDefault("batch.transcription.onprem.create.combine", "false")!;
             if ((string)batchSpec["combine_results"] == "") { batchSpec["combine_results"] = "true"; }
             batchSpec["sentiment"] = "false";
 
@@ -612,7 +612,7 @@ namespace Azure.AI.Details.Common.CLI
             return $"{{ {projectRef} \"displayName\": \"{name}\", \"description\": \"{description}\" }}";
         }
 
-        private HttpWebRequest CreateWebRequest(string method, string path, string id = null, string query = null, string contentType = null)
+        private HttpWebRequest CreateWebRequest(string method, string path, string? id = null, string? query = null, string? contentType = null)
         {
             var key = _values.GetOrEmpty("service.config.key");
             var region = _values.GetOrEmpty("service.config.region");
@@ -653,7 +653,7 @@ namespace Azure.AI.Details.Common.CLI
             return url;
         }
 
-        private string GetCustomSpeechUrl(string region, string path, string id = null, string query = null)
+        private string GetCustomSpeechUrl(string region, string path, string? id = null, string? query = null)
         {
             if (path.StartsWith("http")) return path;
 

@@ -239,7 +239,7 @@ namespace Azure.AI.Details.Common.CLI
             return found;
         }
 
-        public static IEnumerable<string> FindFilesInTemplatePath(string fileNames, INamedValues values)
+        public static IEnumerable<string> FindFilesInTemplatePath(string fileNames, INamedValues? values)
         {
             if (Program.Debug) Console.WriteLine($"DEBUG: Searching for TEMPLATE '{fileNames}'\n");
 

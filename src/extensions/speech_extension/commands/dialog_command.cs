@@ -35,7 +35,7 @@ namespace Azure.AI.Details.Common.CLI
             return _values.GetOrDefault("passed", true);
         }
 
-        private void Recognize(string recognize)
+        private void Recognize(string? recognize)
         {
             StartCommand();
 
@@ -122,12 +122,12 @@ namespace Azure.AI.Details.Common.CLI
             _disposeAfterStop.Add(audioConfig);
             _disposeAfterStop.Add(connector);
 
-            // _output.EnsureCachePropertyCollection("recognizer", connector.Properties);
+            // _output!.EnsureCachePropertyCollection("recognizer", connector.Properties);
 
             return connector;
         }
 
-        private DialogServiceConfig CreateDialogServiceConfig(string key = null, string region = null, string botId = null, string ccAppId = null)
+        private DialogServiceConfig CreateDialogServiceConfig(string? key = null, string? region = null, string? botId = null, string? ccAppId = null)
         {
             key = string.IsNullOrEmpty(key) ? _values["service.config.key"] : key;
             region = string.IsNullOrEmpty(region) ? _values["service.config.region"] : region;
@@ -169,18 +169,18 @@ namespace Azure.AI.Details.Common.CLI
             return config;
         }
 
-        private new void Recognized(object sender, SpeechRecognitionEventArgs e)
+        private new void Recognized(object? sender, SpeechRecognitionEventArgs e)
         {
             base.Recognized(sender, e);
 
             if (e.Result.Reason == ResultReason.RecognizedKeyword)
             {
-                _connector.StopKeywordRecognitionAsync().Wait();
+                _connector!.StopKeywordRecognitionAsync().Wait();
                 _keywordRecognizedEvent.Set();
             }
         }
 
-        private void ActivityReceived(object sender, ActivityReceivedEventArgs e)
+        private void ActivityReceived(object? sender, ActivityReceivedEventArgs e)
         {
             var activity = JsonSerializer.Deserialize<Activity>(e.Activity);
             if (e.HasAudio && activity?.Speak != null)
@@ -239,7 +239,7 @@ namespace Azure.AI.Details.Common.CLI
             Console.WriteLine($"DIALOG: {text}");
         }
 
-        private DialogServiceConnector _connector;
+        private DialogServiceConnector? _connector;
         private Regex _ssmlRegex = new Regex("(<speak)(.*|\\s*)*(</speak>)");
 
         private ManualResetEvent _keywordRecognizedEvent = new ManualResetEvent(false);

@@ -492,7 +492,7 @@ namespace Azure.AI.Details.Common.CLI
             return $"{{{sb.ToString().Trim(',', ' ')}}}";
         }
 
-        private HttpWebRequest CreateWebRequest(string method, string path, string id = null, string query = null, string contentType = null)
+        private HttpWebRequest CreateWebRequest(string method, string path, string? id = null, string? query = null, string? contentType = null)
         {
             var key = _values.GetOrEmpty("service.config.key");
             var region = _values.GetOrEmpty("service.config.region");
@@ -523,7 +523,7 @@ namespace Azure.AI.Details.Common.CLI
             return request;
         }
 
-        private string GetFaceApiUrl(string region, string path, string id = null, string query = null)
+        private string GetFaceApiUrl(string region, string path, string? id = null, string? query = null)
         {
             if (path.StartsWith("http")) return path;
 

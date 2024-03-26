@@ -56,7 +56,7 @@ namespace Azure.AI.Details.Common.CLI
 
                 _cacheResults = _values.Names.Any(s => s.StartsWith("check.result")) || _values.Names.Any(s => s.StartsWith("check.jmes"));
 
-                var source = _values.GetOrDefault("source.language.config", "en-US").Split(';')[0];
+                var source = _values.GetOrDefault("source.language.config", "en-US")!.Split(';')[0];
                 _sourceCulture = new System.Globalization.CultureInfo(source);
 
                 var target = _values.GetOrDefault("target.language.config", source);
@@ -76,189 +76,189 @@ namespace Azure.AI.Details.Common.CLI
                 FlushOutputAllCache();
                 FlushOutputResultCache();
                 FlushOutputZipFile();
-                _lock.StopLock();
+                _lock!.StopLock();
             }
         }
 
         public void Connected(ConnectionEventArgs e)
         {
-            _lock.EnterReaderLock();
+            _lock!.EnterReaderLock();
             OutputConnected(e);
-            _lock.ExitReaderLock();
+            _lock!.ExitReaderLock();
         }
 
         public void Disconnected(ConnectionEventArgs e)
         {
-            _lock.EnterReaderLock();
+            _lock!.EnterReaderLock();
             OutputDisconnected(e);
-            _lock.ExitReaderLock();
+            _lock!.ExitReaderLock();
         }
 
         public void ConnectionMessageReceived(ConnectionMessageEventArgs e)
         {
-            _lock.EnterReaderLock();
+            _lock!.EnterReaderLock();
             OutputConnectionMessageReceived(e);
-            _lock.ExitReaderLock();
+            _lock!.ExitReaderLock();
         }
 
         public void SessionStarted(SessionEventArgs e)
         {
-            _lock.EnterReaderLock();
+            _lock!.EnterReaderLock();
             OutputSessionStarted(e);
-            _lock.ExitReaderLock();
+            _lock!.ExitReaderLock();
         }
 
         public void SessionStopped(SessionEventArgs e)
         {
-            _lock.EnterReaderLock();
+            _lock!.EnterReaderLock();
             OutputSessionStopped(e);
-            _lock.ExitReaderLock();
+            _lock!.ExitReaderLock();
         }
 
         public void Recognizing(SpeechRecognitionEventArgs e)
         {
-            _lock.EnterReaderLock();
+            _lock!.EnterReaderLock();
             OutputRecognizing(e);
-            _lock.ExitReaderLock();
+            _lock!.ExitReaderLock();
         }
 
         public void Recognized(SpeechRecognitionEventArgs e)
         {
-            _lock.EnterReaderLock();
+            _lock!.EnterReaderLock();
             OutputRecognized(e);
-            _lock.ExitReaderLock();
+            _lock!.ExitReaderLock();
         }
 
         public void Canceled(SpeechRecognitionCanceledEventArgs e)
         {
-            _lock.EnterReaderLock();
+            _lock!.EnterReaderLock();
             OutputCanceled(e);
-            _lock.ExitReaderLock();
+            _lock!.ExitReaderLock();
         }
         
         public void Recognizing(IntentRecognitionEventArgs e)
         {
-            _lock.EnterReaderLock();
+            _lock!.EnterReaderLock();
             OutputRecognizing(e);
-            _lock.ExitReaderLock();
+            _lock!.ExitReaderLock();
         }
 
         public void Recognized(IntentRecognitionEventArgs e)
         {
-            _lock.EnterReaderLock();
+            _lock!.EnterReaderLock();
             OutputRecognized(e);
-            _lock.ExitReaderLock();
+            _lock!.ExitReaderLock();
         }       
 
         public void Canceled(IntentRecognitionCanceledEventArgs e)
         {
-            _lock.EnterReaderLock();
+            _lock!.EnterReaderLock();
             OutputCanceled(e);
-            _lock.ExitReaderLock();
+            _lock!.ExitReaderLock();
         }
 
         public void Transcribing(MeetingTranscriptionEventArgs e)
         {
-            _lock.EnterReaderLock();
+            _lock!.EnterReaderLock();
             OutputTranscribing(e);
-            _lock.ExitReaderLock();
+            _lock!.ExitReaderLock();
         }
 
         public void Transcribed(MeetingTranscriptionEventArgs e)
         {
-            _lock.EnterReaderLock();
+            _lock!.EnterReaderLock();
             OutputTranscribed(e);
-            _lock.ExitReaderLock();
+            _lock!.ExitReaderLock();
         }
 
         public void Canceled(MeetingTranscriptionCanceledEventArgs e)
         {
-            _lock.EnterReaderLock();
+            _lock!.EnterReaderLock();
             OutputCanceled(e);
-            _lock.ExitReaderLock();
+            _lock!.ExitReaderLock();
         }
 
         public void Transcribing(ConversationTranscriptionEventArgs e)
         {
-            _lock.EnterReaderLock();
+            _lock!.EnterReaderLock();
             OutputTranscribing(e);
-            _lock.ExitReaderLock();
+            _lock!.ExitReaderLock();
         }
 
         public void Transcribed(ConversationTranscriptionEventArgs e)
         {
-            _lock.EnterReaderLock();
+            _lock!.EnterReaderLock();
             OutputTranscribed(e);
-            _lock.ExitReaderLock();
+            _lock!.ExitReaderLock();
         }
 
         public void Canceled(ConversationTranscriptionCanceledEventArgs e)
         {
-            _lock.EnterReaderLock();
+            _lock!.EnterReaderLock();
             OutputCanceled(e);
-            _lock.ExitReaderLock();
+            _lock!.ExitReaderLock();
         }
 
         public void Recognizing(TranslationRecognitionEventArgs e)
         {
-            _lock.EnterReaderLock();
+            _lock!.EnterReaderLock();
             OutputRecognizing(e);
-            _lock.ExitReaderLock();
+            _lock!.ExitReaderLock();
         }
 
         public void Recognized(TranslationRecognitionEventArgs e)
         {
-            _lock.EnterReaderLock();
+            _lock!.EnterReaderLock();
             OutputRecognized(e);
-            _lock.ExitReaderLock();
+            _lock!.ExitReaderLock();
         }
 
         public void Canceled(TranslationRecognitionCanceledEventArgs e)
         {
-            _lock.EnterReaderLock();
+            _lock!.EnterReaderLock();
             OutputCanceled(e);
-            _lock.ExitReaderLock();
+            _lock!.ExitReaderLock();
         }
 
         public void SynthesisStarted(SpeechSynthesisEventArgs e)
         {
-            _lock.EnterReaderLock();
+            _lock!.EnterReaderLock();
             OutputSynthesisStarted(e);
-            _lock.ExitReaderLock();
+            _lock!.ExitReaderLock();
         }
 
         public void Synthesizing(SpeechSynthesisEventArgs e)
         {
-            _lock.EnterReaderLock();
+            _lock!.EnterReaderLock();
             OutputSynthesizing(e);
-            _lock.ExitReaderLock();
+            _lock!.ExitReaderLock();
         }
 
         public void SynthesisCompleted(SpeechSynthesisEventArgs e)
         {
-            _lock.EnterReaderLock();
+            _lock!.EnterReaderLock();
             OutputSynthesisCompleted(e);
-            _lock.ExitReaderLock();
+            _lock!.ExitReaderLock();
         }
 
         public void SynthesisCanceled(SpeechSynthesisEventArgs e)
         {
-            _lock.EnterReaderLock();
+            _lock!.EnterReaderLock();
             OutputSynthesisCanceled(e);
-            _lock.ExitReaderLock();
+            _lock!.ExitReaderLock();
         }
 
         public void SynthesisWordBoundary(SpeechSynthesisWordBoundaryEventArgs e)
         {
-            _lock.EnterReaderLock();
+            _lock!.EnterReaderLock();
             OutputWordBoundary(e);
-            _lock.ExitReaderLock();
+            _lock!.ExitReaderLock();
         }
 
         public void EnsureCachePropertyCollection(string name, PropertyCollection properties)
         {
             EnsureInitPropertyCollectionCache();
-            _propertyCollectionCache[name] = properties;
+            _propertyCollectionCache![name] = properties;
         }
 
         private void EnsureInitPropertyCollectionCache()
@@ -282,9 +282,9 @@ namespace Azure.AI.Details.Common.CLI
             return _outputBatch;
         }
 
-        public void EnsureCacheProperty(string name, string value)
+        public void EnsureCacheProperty(string name, string? value)
         {
-            if (ShouldCacheProperty()) CacheProperty(name, value);
+            if (ShouldCacheProperty() && value != null) CacheProperty(name, value);
         }
 
         private bool ShouldCacheOutputResult()
@@ -325,43 +325,43 @@ namespace Azure.AI.Details.Common.CLI
         private void CacheProperty(string name, string value)
         {
             EnsureInitOutputResultCache();
-            _propertyCache.Add(name, value);
+            _propertyCache!.Add(name, value);
         }
 
         private void CacheOutputResult(SpeechRecognitionResult result)
         {
             EnsureInitOutputResultCache();
-            _outputResultCache.Add(result);
+            _outputResultCache!.Add(result);
         }
 
         private void CacheOutputResult(IntentRecognitionResult result)
         {
             EnsureInitOutputResultCache();
-            _outputResultCache.Add(result);
+            _outputResultCache!.Add(result);
         }
 
         private void CacheOutputResult(MeetingTranscriptionResult result)
         {
             EnsureInitOutputResultCache();
-            _outputResultCache.Add(result);
+            _outputResultCache!.Add(result);
         }
 
         private void CacheOutputResult(ConversationTranscriptionResult result)
         {
             EnsureInitOutputResultCache();
-            _outputResultCache.Add(result);
+            _outputResultCache!.Add(result);
         }
 
         private void CacheOutputResult(TranslationRecognitionResult result)
         {
             EnsureInitOutputResultCache();
-            _outputResultCache.Add(result);
+            _outputResultCache!.Add(result);
         }
 
         private void CacheOutputResult(SpeechSynthesisResult result)
         {
             EnsureInitOutputResultCache();
-            _outputResultCache.Add(result);
+            _outputResultCache!.Add(result);
         }
 
         private void EnsureInitOutputResultCache()
@@ -389,7 +389,7 @@ namespace Azure.AI.Details.Common.CLI
 
         private string GetOutputBatchFileName()
         {
-            var file = _values.GetOrDefault("output.batch.file.name", "output.{id}.{run.time}.json");
+            var file = _values.GetOrDefault("output.batch.file.name", "output.{id}.{run.time}.json")!;
 
             var id = _values.GetOrEmpty("audio.input.id");
             if (file.Contains("{id}")) file = file.Replace("{id}", id);
@@ -408,7 +408,7 @@ namespace Azure.AI.Details.Common.CLI
 
         private string GetOutputSrtFileName()
         {
-            var file = _values.GetOrDefault("output.srt.file.name", "output.{id}.{run.time}.srt");
+            var file = _values.GetOrDefault("output.srt.file.name", "output.{id}.{run.time}.srt")!;
 
             var id = _values.GetOrEmpty("audio.input.id");
             if (file.Contains("{id}")) file = file.Replace("{id}", id);
@@ -421,7 +421,7 @@ namespace Azure.AI.Details.Common.CLI
 
         private string GetOutputVttFileName()
         {
-            var file = _values.GetOrDefault("output.vtt.file.name", "output.{id}.{run.time}.vtt");
+            var file = _values.GetOrDefault("output.vtt.file.name", "output.{id}.{run.time}.vtt")!;
 
             var id = _values.GetOrEmpty("audio.input.id");
             if (file.Contains("{id}")) file = file.Replace("{id}", id);
@@ -446,18 +446,19 @@ namespace Azure.AI.Details.Common.CLI
             writer.Flush();
 
             var text = Encoding.UTF8.GetString(stream.ToArray()) + Environment.NewLine;
-            FileHelpers.WriteAllText(_outputBatchFileName, text, Encoding.UTF8);
+            FileHelpers.WriteAllText(_outputBatchFileName!, text, Encoding.UTF8);
         }
 
         private void OutputSrtFile()
-        { 
+        {
             var text = GetSrtFile() + Environment.NewLine;
-            FileHelpers.WriteAllText(_outputSrtFileName, text, Encoding.UTF8);
+            FileHelpers.WriteAllText(_outputSrtFileName!, text, Encoding.UTF8);
 
-            foreach (var language in _values.GetOrEmpty("target.language.config")?.Split(';', StringSplitOptions.RemoveEmptyEntries))
+            var languages = GetTargetLanguages();
+            foreach (var language in languages)
             {
                 var translated = GetSrtFile(language) + Environment.NewLine;
-                var translatedFile = FileHelpers.AppendToFileName(_outputSrtFileName, $".{language}", "");
+                var translatedFile = FileHelpers.AppendToFileName(_outputSrtFileName!, $".{language}", "");
                 FileHelpers.WriteAllText(translatedFile, translated, Encoding.UTF8);
             }
         }
@@ -465,21 +466,28 @@ namespace Azure.AI.Details.Common.CLI
         private void OutputVttFile()
         { 
             var text = GetVttFile() + Environment.NewLine;
-            FileHelpers.WriteAllText(_outputVttFileName, text, Encoding.UTF8);
+            FileHelpers.WriteAllText(_outputVttFileName!, text, Encoding.UTF8);
 
-            foreach (var language in _values.GetOrEmpty("target.language.config")?.Split(';', StringSplitOptions.RemoveEmptyEntries))
+            var languages = GetTargetLanguages();
+            foreach (var language in languages)
             {
                 var translated = GetVttFile(language) + Environment.NewLine;
-                var translatedFile = FileHelpers.AppendToFileName(_outputVttFileName, $".{language}", "");
+                var translatedFile = FileHelpers.AppendToFileName(_outputVttFileName!, $".{language}", "");
                 FileHelpers.WriteAllText(translatedFile, translated, Encoding.UTF8);
             }
+        }
+
+        private string[] GetTargetLanguages()
+        {
+            var languages = _values.GetOrEmpty("target.language.config")?.Split(';', StringSplitOptions.RemoveEmptyEntries);
+            return languages ?? Array.Empty<string>();
         }
 
         private void WriteBatchAudioFileJsonObject(Utf8JsonWriter writer)
         {
             writer.WriteStartObject();
 
-            var id = _propertyCache["audio.input.id"];
+            var id = _propertyCache!["audio.input.id"];
             var file = _propertyCache["audio.input.file"];
 
             if (file != null && file.StartsWith("http"))
@@ -489,7 +497,7 @@ namespace Azure.AI.Details.Common.CLI
             }
             else
             {
-                var existing = FileHelpers.FindFileInDataPath(file, _values);
+                var existing = FileHelpers.FindFileInDataPath(file!, _values);
                 writer.WriteString("AudioFileName", file ?? id);
                 writer.WriteString("AudioFileUrl", existing ?? file ?? id);
             }
@@ -502,10 +510,10 @@ namespace Azure.AI.Details.Common.CLI
             writer.WriteEndObject();
         }
 
-        private string GetSrtFile(string language = null)
+        private string GetSrtFile(string? language = null)
         {
             StringBuilder sb = new StringBuilder();
-            foreach (var caption in CaptionHelper.GetCaptions(language, 37, 3, _outputResultCache))
+            foreach (var caption in CaptionHelper.GetCaptions(language, 37, 3, _outputResultCache!))
             {
                 sb.AppendLine($"{caption.Sequence}");
                 sb.AppendLine($@"{caption.Begin:hh\:mm\:ss\,fff} --> {caption.End:hh\:mm\:ss\,fff}");
@@ -515,10 +523,10 @@ namespace Azure.AI.Details.Common.CLI
             return sb.ToString().Trim();
         }
 
-        private string GetVttFile(string language = null)
+        private string GetVttFile(string? language = null)
         {
             StringBuilder sb = new StringBuilder($"WEBVTT{Environment.NewLine}");
-            foreach (var caption in CaptionHelper.GetCaptions(language, 37, 3, _outputResultCache))
+            foreach (var caption in CaptionHelper.GetCaptions(language, 37, 3, _outputResultCache!))
             {
                 sb.AppendLine();
                 sb.AppendLine($@"{caption.Begin:hh\:mm\:ss\.fff} --> {caption.End:hh\:mm\:ss\.fff}");
@@ -545,7 +553,7 @@ namespace Azure.AI.Details.Common.CLI
         private string GetBatchCombinedText(string kind)
         {
             StringBuilder sb = new StringBuilder();
-            foreach (var result in _outputResultCache)
+            foreach (var result in _outputResultCache!)
             {
                 if (IsFinalResult(result))
                 {
@@ -558,7 +566,7 @@ namespace Azure.AI.Details.Common.CLI
 
         private bool IsFinalResult(object result)
         {
-            RecognitionResult final = result as RecognitionResult;
+            var final = result as RecognitionResult;
             return final?.Reason == ResultReason.RecognizedSpeech ||
                    final?.Reason == ResultReason.RecognizedIntent ||
                    final?.Reason == ResultReason.TranslatedSpeech;
@@ -597,7 +605,7 @@ namespace Azure.AI.Details.Common.CLI
         private void WriteBatchAudioFileSegmentResultsJsonProperty(Utf8JsonWriter writer, string arrayName)
         {
             writer.WriteStartArray(arrayName);
-            foreach (var result in _outputResultCache)
+            foreach (var result in _outputResultCache!)
             {
                 WriteBatchAudioFileSegmentJsonObject(writer, result);
             }
@@ -643,7 +651,7 @@ namespace Azure.AI.Details.Common.CLI
             var json = result.Properties.GetProperty(PropertyId.SpeechServiceResponse_JsonResult);
             var parsed = !string.IsNullOrEmpty(json) ? JsonDocument.Parse(json) : null;
 
-            var status = parsed.GetPropertyStringOrNull("RecognitionStatus") ?? result.Reason.ToString();
+            var status = parsed?.GetPropertyStringOrNull("RecognitionStatus") ?? result.Reason.ToString();
             writer.WriteString("RecognitionStatus", status);
 
             writer.WriteString("ChannelNumber", "0");
@@ -654,7 +662,7 @@ namespace Azure.AI.Details.Common.CLI
             writer.WriteNumber("DurationInSeconds", Math.Round(result.Duration.TotalSeconds, 2));
 
             writer.WritePropertyName("NBest");
-            writer.WriteRawValue(parsed.GetPropertyElementOrNull("NBest")?.GetRawText() ?? "[]");
+            writer.WriteRawValue(parsed?.GetPropertyElementOrNull("NBest")?.GetRawText() ?? "[]");
 
             writer.WriteEndObject();
             return true;
@@ -677,7 +685,7 @@ namespace Azure.AI.Details.Common.CLI
             var json = result.Properties.GetProperty(PropertyId.SpeechServiceResponse_JsonResult);
             var parsed = !string.IsNullOrEmpty(json) ? JsonDocument.Parse(json) : null;
 
-            var status = parsed.GetPropertyStringOrNull("RecognitionStatus") ?? result.Reason.ToString();
+            var status = parsed?.GetPropertyStringOrNull("RecognitionStatus") ?? result.Reason.ToString();
             writer.WriteString("RecognitionStatus", status);
 
             writer.WriteString("ChannelNumber", "0");
@@ -688,7 +696,7 @@ namespace Azure.AI.Details.Common.CLI
             writer.WriteNumber("DurationInSeconds", Math.Round(result.Duration.TotalSeconds, 2));
 
             writer.WritePropertyName("NBest");
-            writer.WriteRawValue(parsed.GetPropertyElementOrNull("NBest")?.GetRawText() ?? "[]");
+            writer.WriteRawValue(parsed?.GetPropertyElementOrNull("NBest")?.GetRawText() ?? "[]");
 
             writer.WriteEndObject();
             return true;
@@ -711,7 +719,7 @@ namespace Azure.AI.Details.Common.CLI
             var json = result.Properties.GetProperty(PropertyId.SpeechServiceResponse_JsonResult);
             var parsed = !string.IsNullOrEmpty(json) ? JsonDocument.Parse(json) : null;
 
-            var status = parsed.GetPropertyStringOrNull("RecognitionStatus") ?? result.Reason.ToString();
+            var status = parsed?.GetPropertyStringOrNull("RecognitionStatus") ?? result.Reason.ToString();
             writer.WriteString("RecognitionStatus", status);
 
             writer.WriteString("ChannelNumber", "0");
@@ -722,7 +730,7 @@ namespace Azure.AI.Details.Common.CLI
             writer.WriteNumber("DurationInSeconds", Math.Round(result.Duration.TotalSeconds, 2));
 
             writer.WritePropertyName("NBest");
-            writer.WriteRawValue(parsed.GetPropertyElementOrNull("NBest")?.GetRawText() ?? "[]");
+            writer.WriteRawValue(parsed?.GetPropertyElementOrNull("NBest")?.GetRawText() ?? "[]");
 
             writer.WriteEndObject();
             return true;
@@ -745,7 +753,7 @@ namespace Azure.AI.Details.Common.CLI
             var json = result.Properties.GetProperty(PropertyId.SpeechServiceResponse_JsonResult);
             var parsed = !string.IsNullOrEmpty(json) ? JsonDocument.Parse(json) : null;
 
-            var status = parsed.GetPropertyStringOrNull("RecognitionStatus") ?? result.Reason.ToString();
+            var status = parsed?.GetPropertyStringOrNull("RecognitionStatus") ?? result.Reason.ToString();
             writer.WriteString("RecognitionStatus", status);
 
             writer.WriteString("ChannelNumber", "0");
@@ -756,7 +764,7 @@ namespace Azure.AI.Details.Common.CLI
             writer.WriteNumber("DurationInSeconds", Math.Round(result.Duration.TotalSeconds, 2));
 
             writer.WritePropertyName("NBest");
-            writer.WriteRawValue(parsed.GetPropertyElementOrNull("NBest")?.GetRawText() ?? "[]");
+            writer.WriteRawValue(parsed?.GetPropertyElementOrNull("NBest")?.GetRawText() ?? "[]");
 
             writer.WriteEndObject();
             return true;
@@ -765,7 +773,7 @@ namespace Azure.AI.Details.Common.CLI
         private double GetBatchAudioLengthInSeconds()
         {
             double length = 0;
-            foreach (var result in _outputResultCache)
+            foreach (var result in _outputResultCache!)
             {
                 double offset, duration;
                 GetResultOffsetAndDuration(result, out offset, out duration);
@@ -863,7 +871,7 @@ namespace Azure.AI.Details.Common.CLI
             _checkAllCache[name].Add(value);
         }
 
-        private void EnsureInitCheckAllCache(string name = null)
+        private void EnsureInitCheckAllCache(string name)
         {
             if (_checkAllCache == null)
             {
@@ -886,7 +894,7 @@ namespace Azure.AI.Details.Common.CLI
             EnsureOutputAll('\n', name, "{0}", value);
         }
 
-        public string GetAllOutput(string name, string defaultValue = null)
+        public string? GetAllOutput(string name, string? defaultValue = null)
         {
             if (_outputAllCache == null || !_outputAllCache.ContainsKey(name)) return defaultValue;
             
@@ -895,7 +903,7 @@ namespace Azure.AI.Details.Common.CLI
             {
                 if (sb.Length > 0)
                 {
-                    sb.Append(_outputAllSeparatorCache[name]);
+                    sb.Append(_outputAllSeparatorCache![name]);
                 }
                 sb.Append(item);
             }
@@ -912,11 +920,11 @@ namespace Azure.AI.Details.Common.CLI
         private void AppendOutputAll(char ch, string name, string value)
         {
             EnsureInitOutputAllCache(name);
-            _outputAllCache[name].Add(value);
-            _outputAllSeparatorCache[name] = ch;
+            _outputAllCache![name].Add(value);
+            _outputAllSeparatorCache![name] = ch;
         }
 
-        private void EnsureInitOutputAllCache(string name = null)
+        private void EnsureInitOutputAllCache(string name)
         {
             if (_outputAllCache == null)
             {
@@ -935,7 +943,7 @@ namespace Azure.AI.Details.Common.CLI
             if (!_outputAll) return;
 
             var overwrite = _values.GetOrDefault("output.overwrite", false);
-            if (overwrite) File.Delete(_outputAllFileName);
+            if (overwrite) File.Delete(_outputAllFileName!);
 
             switch (_outputAllFileType)
             {
@@ -954,7 +962,7 @@ namespace Azure.AI.Details.Common.CLI
 
         private string GetOutputAllFileName()
         {
-            var file = _values.GetOrDefault("output.all.file.name", "output.{run.time}." + GetOutputAllFileType());
+            var file = _values.GetOrDefault("output.all.file.name", "output.{run.time}." + GetOutputAllFileType())!;
 
             var id = _values.GetOrEmpty("audio.input.id");
             if (file.Contains("{id}")) file = file.Replace("{id}", id);
@@ -973,13 +981,13 @@ namespace Azure.AI.Details.Common.CLI
 
         private string GetOutputAllFileType()
         {
-            return _values.GetOrDefault("output.all.file.type", "tsv");
+            return _values.GetOrDefault("output.all.file.type", "tsv")!;
         }
 
         private string[] GetOutputAllColumns()
         {
             bool hasColumns = _values.Contains("output.all.tsv.file.columns");
-            if (hasColumns) return _values.Get("output.all.tsv.file.columns").Split(';', '\r', '\n', '\t');
+            if (hasColumns) return _values.Get("output.all.tsv.file.columns")!.Split(';', '\r', '\n', '\t');
 
             var output = _values.Names.Where(x => x.StartsWith("output.all.") && !x.Contains(".tsv.") && _values.GetOrDefault(x, false));
             return output.Select(x => x.Remove(0, "output.all.".Length)).ToArray();
@@ -987,15 +995,15 @@ namespace Azure.AI.Details.Common.CLI
 
         private void OutputAllJsonFile()
         {
-            var json = JsonHelpers.GetJsonObjectText(_outputAllCache) + Environment.NewLine;
-            FileHelpers.AppendAllText(_outputAllFileName, json, Encoding.UTF8);
+            var json = JsonHelpers.GetJsonObjectText(_outputAllCache!) + Environment.NewLine;
+            FileHelpers.AppendAllText(_outputAllFileName!, json, Encoding.UTF8);
         }
 
         private void OutputAllTsvFile()
         {
             var columns = GetOutputAllColumns();
-            EnsureOutputAllTsvFileHeader(_outputAllFileName, columns);
-            OutputAllTsvFileRow(_outputAllFileName, columns);
+            EnsureOutputAllTsvFileHeader(_outputAllFileName!, columns);
+            OutputAllTsvFileRow(_outputAllFileName!, columns);
         }
 
         private void EnsureOutputAllTsvFileHeader(string file, string[] columns)
@@ -1018,7 +1026,7 @@ namespace Azure.AI.Details.Common.CLI
             StringBuilder sb = new StringBuilder();
             foreach (var column in columns)
             {
-                var value = GetAllOutput(column, "");
+                var value = GetAllOutput(column, "")!;
                 sb.Append(EncodeOutputValue(value));
                 sb.Append('\t');
             }
@@ -1068,7 +1076,7 @@ namespace Azure.AI.Details.Common.CLI
         private void AddOutputEachCache(string name, string value)
         {
             EnsureInitOutputEachCache();
-            _outputEachCache[name] = value;
+            _outputEachCache![name] = value;
         }
 
         private void EnsureInitOutputEachCache()
@@ -1099,7 +1107,7 @@ namespace Azure.AI.Details.Common.CLI
             if (!_outputEach) return;
 
             overwrite = overwrite && _values.GetOrDefault("output.overwrite", false);
-            if (overwrite) File.Delete(_outputEachFileName);
+            if (overwrite) File.Delete(_outputEachFileName!);
 
             switch (_outputEachFileType)
             {
@@ -1118,7 +1126,7 @@ namespace Azure.AI.Details.Common.CLI
 
         private string GetOutputEachFileName()
         {
-            var file = _values.GetOrDefault("output.each.file.name", "each.{run.time}." + GetOutputEachFileType());
+            var file = _values.GetOrDefault("output.each.file.name", "each.{run.time}." + GetOutputEachFileType())!;
 
             var id = _values.GetOrEmpty("audio.input.id");
             if (file.Contains("{id}")) file = file.Replace("{id}", id);
@@ -1137,13 +1145,13 @@ namespace Azure.AI.Details.Common.CLI
 
         private string GetOutputEachFileType()
         {
-            return _values.GetOrDefault("output.each.file.type", "tsv");
+            return _values.GetOrDefault("output.each.file.type", "tsv")!;
         }
 
         private string[] GetOutputEachColumns()
         {
             bool hasColumns = _values.Contains("output.each.tsv.file.columns");
-            if (hasColumns) return _values.Get("output.each.tsv.file.columns").Split(';', '\r', '\n', '\t');
+            if (hasColumns) return _values.Get("output.each.tsv.file.columns")!.Split(';', '\r', '\n', '\t');
 
             var output = _values.Names.Where(x => x.StartsWith("output.each.") && !x.Contains(".tsv.") && _values.GetOrDefault(x, false));
             return output.Select(x => x.Remove(0, "output.each.".Length)).ToArray();
@@ -1151,15 +1159,15 @@ namespace Azure.AI.Details.Common.CLI
 
         private void OutputEachJsonFile()
         {
-            var json = JsonHelpers.GetJsonArrayText(_outputEachCache2) + Environment.NewLine;
-            FileHelpers.AppendAllText(_outputEachFileName, json, Encoding.UTF8);
+            var json = JsonHelpers.GetJsonArrayText(_outputEachCache2!) + Environment.NewLine;
+            FileHelpers.AppendAllText(_outputEachFileName!, json, Encoding.UTF8);
         }
 
         private void OutputEachTsvFile()
         {
             var columns = GetOutputEachColumns();
-            EnsureOutputEachTsvFileHeader(_outputEachFileName, columns);
-            OutputEachTsvFileRow(_outputEachFileName, columns);
+            EnsureOutputEachTsvFileHeader(_outputEachFileName!, columns);
+            OutputEachTsvFileRow(_outputEachFileName!, columns);
         }
 
         private void EnsureOutputEachTsvFileHeader(string file, string[] columns)
@@ -2632,7 +2640,7 @@ namespace Azure.AI.Details.Common.CLI
                 bool checkEval = false;
 
                 // Match our detailed result.
-                foreach (RecognitionResult result in _outputResultCache)
+                foreach (RecognitionResult result in _outputResultCache!)
                 {
                     // TODO: add other result types
                     if (result.Reason == ResultReason.RecognizedSpeech || result.Reason == ResultReason.TranslatedSpeech ||
@@ -2715,7 +2723,7 @@ namespace Azure.AI.Details.Common.CLI
             if (transcript == null) return;
 
             var textName = "recognizer.recognized.result." + check;
-            var text = GetAllOutput(textName);
+            var text = GetAllOutput(textName)!;
             if (text == null) return;
 
             var checkName = "check.sr.transcript." + check + ".wer";
@@ -2801,7 +2809,7 @@ namespace Azure.AI.Details.Common.CLI
         private void CheckTranscriptText(string check)
         {
             var textName = "recognizer.recognized.result." + check;
-            var text = GetAllOutput(textName);
+            var text = GetAllOutput(textName)!;
 
             var checkName = "check.sr.transcript." + check;
 
@@ -2816,7 +2824,7 @@ namespace Azure.AI.Details.Common.CLI
         private void CheckTranscriptTextExpr(string textName, string text, string check)
         {
             var checkName = "check.sr.transcript." + check;
-            var checking = _values[checkName];
+            var checking = _values[checkName] ?? string.Empty;
 
             if (checking.StartsWith("eq="))
             {
@@ -2859,14 +2867,14 @@ namespace Azure.AI.Details.Common.CLI
             var checkName = "check.sr.transcript." + check + ".in";
             var checking = _values[checkName];
 
-            var checkItems = checking.Split(';', '\r', '\n');
-            var pass = checkItems.Count(x => x.CompareTo(text) == 0) > 0;
+            var checkItems = checking?.Split(';', '\r', '\n');
+            var pass = checkItems?.Count(x => x.CompareTo(text) == 0) > 0;
             if (!pass) SetPassed(false);
 
             _values.Add("output.all." + checkName, "true");
             EnsureCacheAll(checkName, pass ? "true" : "false");
 
-            DebugWriteCheckTranscriptText(textName, text, checkName, checking, pass);
+            DebugWriteCheckTranscriptText(textName, text, checkName, checking!, pass);
         }
 
         private void CheckTranscriptTextContains(string textName, string text, string check)
@@ -2874,14 +2882,14 @@ namespace Azure.AI.Details.Common.CLI
             var checkName = "check.sr.transcript." + check + ".contains";
             var checking = _values[checkName];
 
-            var checkItems = checking.Split(';', '\r', '\n');
-            var pass = checkItems.Count(x => text.Contains(x)) == checkItems.Count();
+            var checkItems = checking?.Split(';', '\r', '\n');
+            var pass = checkItems?.Count(x => text.Contains(x)) == checkItems?.Count();
             if (!pass) SetPassed(false);
 
             _values.Add("output.all." + checkName, "true");
             EnsureCacheAll(checkName, pass ? "true" : "false");
 
-            DebugWriteCheckTranscriptText(textName, text, checkName, checking, pass);
+            DebugWriteCheckTranscriptText(textName, text, checkName, checking!, pass);
         }
 
         private void CheckTranscriptTextNotIn(string textName, string text, string check)
@@ -2889,13 +2897,13 @@ namespace Azure.AI.Details.Common.CLI
             var checkName = "check.sr.transcript." + check + ".not.in";
             var checking = _values[checkName];
 
-            var pass = checking.Split(';', '\r', '\n').Count(x => x.CompareTo(text) == 0) == 0;
+            var pass = checking?.Split(';', '\r', '\n')?.Count(x => x.CompareTo(text) == 0) == 0;
             if (!pass) SetPassed(false);
 
             _values.Add("output.all." + checkName, "true");
             EnsureCacheAll(checkName, pass ? "true" : "false");
 
-            DebugWriteCheckTranscriptText(textName, text, checkName, checking, pass);
+            DebugWriteCheckTranscriptText(textName, text, checkName, checking!, pass);
         }
 
         private void CheckTranscriptTextNotContains(string textName, string text, string check)
@@ -2903,13 +2911,13 @@ namespace Azure.AI.Details.Common.CLI
             var checkName = "check.sr.transcript." + check + ".not.contains";
             var checking = _values[checkName];
 
-            var pass = checking.Split(';', '\r', '\n').Count(x => text.Contains(x)) == 0;
+            var pass = checking?.Split(';', '\r', '\n')?.Count(x => text.Contains(x)) == 0;
             if (!pass) SetPassed(false);
 
             _values.Add("output.all." + checkName, "true");
             EnsureCacheAll(checkName, pass ? "true" : "false");
 
-            DebugWriteCheckTranscriptText(textName, text, checkName, checking, pass);
+            DebugWriteCheckTranscriptText(textName, text, checkName, checking!, pass);
         }
 
         private void DebugWriteCheckTranscriptWer(string transcriptName, string transcript, string textName, string text, string checkName, string checking, bool pass)
@@ -2949,11 +2957,11 @@ namespace Azure.AI.Details.Common.CLI
 
                 using (var archive = ZipFile.Open(zipFileName, ZipArchiveMode.Update))
                 {
-                    if (_outputAll) AddToZip(archive, _outputAllFileName);
-                    if (_outputEach) AddToZip(archive, _outputEachFileName);
-                    if (_outputBatch) AddToZip(archive, _outputBatchFileName);
-                    if (_outputVtt) AddToZip(archive, _outputVttFileName);
-                    if (_outputSrt) AddToZip(archive, _outputSrtFileName);
+                    if (_outputAll) AddToZip(archive, _outputAllFileName!);
+                    if (_outputEach) AddToZip(archive, _outputEachFileName!);
+                    if (_outputBatch) AddToZip(archive, _outputBatchFileName!);
+                    if (_outputVtt) AddToZip(archive, _outputVttFileName!);
+                    if (_outputSrt) AddToZip(archive, _outputSrtFileName!);
                 }
             });
         }
@@ -2981,32 +2989,32 @@ namespace Azure.AI.Details.Common.CLI
         private bool _debugOutput = false;
 
         private bool _outputBatch = false;
-        private string _outputBatchFileName = null;
+        private string? _outputBatchFileName = null;
 
         private bool _outputVtt = false;
-        private string _outputVttFileName = null;
+        private string? _outputVttFileName = null;
 
         private bool _outputSrt = false;
-        private string _outputSrtFileName = null;
+        private string? _outputSrtFileName = null;
 
         private bool _cacheResults = false;
 
-        private List<object> _outputResultCache = null;
-        private Dictionary<string, string> _propertyCache = null;
-        private Dictionary<string, PropertyCollection> _propertyCollectionCache = null;
+        private List<object>? _outputResultCache = null;
+        private Dictionary<string, string>? _propertyCache = null;
+        private Dictionary<string, PropertyCollection>? _propertyCollectionCache = null;
 
         private bool _outputAll = false;
-        private string _outputAllFileName = null;
-        private string _outputAllFileType = null;
-        private Dictionary<string, List<string>> _outputAllCache;
-        private Dictionary<string, char> _outputAllSeparatorCache;
+        private string? _outputAllFileName = null;
+        private string? _outputAllFileType = null;
+        private Dictionary<string, List<string>>? _outputAllCache;
+        private Dictionary<string, char>? _outputAllSeparatorCache;
 
         private bool _outputEach = false;
         private bool _overwriteEach = false;
-        private string _outputEachFileName = null;
-        private string _outputEachFileType = null;
-        private Dictionary<string, string> _outputEachCache;
-        private List<Dictionary<string, string>> _outputEachCache2;
+        private string? _outputEachFileName = null;
+        private string? _outputEachFileType = null;
+        private Dictionary<string, string>? _outputEachCache;
+        private List<Dictionary<string, string>>? _outputEachCache2;
 
         private Dictionary<string, List<string>> _checkAllCache;
 

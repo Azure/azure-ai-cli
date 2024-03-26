@@ -474,7 +474,7 @@ namespace Azure.AI.Details.Common.CLI
                     _disposeAfterStop.Reverse(); // objects should be disposed in reverse order created
                     foreach (var item in _disposeAfterStop)
                     {
-                        item.Dispose();
+                        item?.Dispose();
                     }
                 }
             }
@@ -749,7 +749,7 @@ namespace Azure.AI.Details.Common.CLI
         protected ManualResetEvent _stopEvent = new ManualResetEvent(false);
         protected ManualResetEvent _canceledEvent = new ManualResetEvent(false);
 
-        protected List<IDisposable> _disposeAfterStop = new List<IDisposable>();
+        protected List<IDisposable?> _disposeAfterStop = new List<IDisposable?>();
         protected List<string> _delete = new List<string>();
     }
 }

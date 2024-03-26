@@ -163,7 +163,7 @@ namespace Azure.AI.Details.Common.CLI
         ///     --output request FILE/-
         ///     --output json FILE/-
         /// </example>
-        private void DoStatus(string name = null, string id = null)
+        private void DoStatus(string? name = null, string? id = null)
         {
             GetStatusParameters(out string path, ref name, out string nameAction, ref id, out string message);
 
@@ -383,7 +383,7 @@ namespace Azure.AI.Details.Common.CLI
             path = $"api/triggeredwebjobs";
         }
 
-        private string DemandWebJobName(string name = null)
+        private string DemandWebJobName(string? name = null)
         {
             return _values.DemandGetOrDefault("webjob.job.name", name,
                 ErrorHelpers.CreateMessage(
@@ -391,7 +391,7 @@ namespace Azure.AI.Details.Common.CLI
                         "USE:", $"{Program.Name} webjob [...] --name NAME"));
         }
 
-        private string DemandWebJobId(string id = null)
+        private string DemandWebJobId(string? id = null)
         {
             return _values.DemandGetOrDefault("webjob.job.id", id, 
                 ErrorHelpers.CreateMessage(
@@ -399,7 +399,7 @@ namespace Azure.AI.Details.Common.CLI
                         "USE:", $"{Program.Name} webjob [...] --id ID"));
         }
 
-        private HttpWebRequest CreateWebRequest(string method, string path, string name = null, string nameAction = null, string id = null, string contentType = null)
+        private HttpWebRequest CreateWebRequest(string method, string path, string? name = null, string nameAction = null, string? id = null, string? contentType = null)
         {
             var endpoint = _values.GetOrEmpty("webjob.config.endpoint").Trim('\r', '\n');
             var userName = _values.GetOrEmpty("webjob.config.username").Trim('\r', '\n');
@@ -428,7 +428,7 @@ namespace Azure.AI.Details.Common.CLI
             return request;
         }
 
-        private string GetWebJobUrl(string endpoint, string path, string name = null, string nameAction = null, string id = null)
+        private string GetWebJobUrl(string endpoint, string path, string? name = null, string nameAction = null, string? id = null)
         {
             if (path.StartsWith("http")) return path;
 

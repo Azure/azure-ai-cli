@@ -14,7 +14,7 @@ namespace Azure.AI.Details.Common.CLI
 {
     class ConfigHelpers
     {
-        public static SpeechConfig CreateSpeechConfig(ICommandValues values, string key=null, string region = null)
+        public static SpeechConfig CreateSpeechConfig(ICommandValues values, string? key = null, string? region = null)
         {
             key = string.IsNullOrEmpty(key) ? values["service.config.key"] : key;
             region = string.IsNullOrEmpty(region) ? values["service.config.region"] : region;
@@ -73,7 +73,7 @@ namespace Azure.AI.Details.Common.CLI
             return config;
         }
 
-        public static AudioConfig CreateAudioConfig(ICommandValues values)
+        public static AudioConfig? CreateAudioConfig(ICommandValues values)
         {
             var input = values["audio.input.type"];
             var file = values["audio.input.file"];
