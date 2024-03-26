@@ -25,6 +25,7 @@ using YamlDotNet.Serialization;
 using YamlDotNet.Serialization.NamingConventions;
 using System.Text.Json.Nodes;
 using System.ComponentModel;
+using Scriban;
 
 namespace Azure.AI.Details.Common.CLI
 {
@@ -975,8 +976,9 @@ namespace Azure.AI.Details.Common.CLI
                 var chatTemplate = sections[2];
                 var obj = deserializer.Deserialize<PromptyFrontMatter>(promptyFrontMatterText);
                 Dictionary<string, object> templateInputs = ParsePromptyInputs(obj.Inputs);
-                Console.WriteLine(obj.Name);
-                Console.WriteLine(chatTemplate);
+                var template = Template.Parse(chatTemplate);
+                var parsedText = template.Render(templateInputs);
+                Console.WriteLine(parsedText);
             }
             else
             { 
