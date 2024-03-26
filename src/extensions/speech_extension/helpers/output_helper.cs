@@ -269,10 +269,10 @@ namespace Azure.AI.Details.Common.CLI
             }
         }
 
-        private PropertyCollection GetPropertyCollection(string name)
+        private PropertyCollection? GetPropertyCollection(string name)
         {
             EnsureInitPropertyCollectionCache();
-            return _propertyCollectionCache.ContainsKey(name)
+            return _propertyCollectionCache!.ContainsKey(name)
                 ? _propertyCollectionCache[name]
                 : null;
         }
@@ -868,7 +868,7 @@ namespace Azure.AI.Details.Common.CLI
         private void AppendCheckAll(char ch, string name, string value)
         {
             EnsureInitCheckAllCache(name);
-            _checkAllCache[name].Add(value);
+            _checkAllCache![name].Add(value);
         }
 
         private void EnsureInitCheckAllCache(string name)
@@ -1872,7 +1872,7 @@ namespace Azure.AI.Details.Common.CLI
                 {
                     var value = parsed.GetPropertyStringOrNull(x);
                     var valueOk = value != null;
-                    if (valueOk) EnsureOutputEach($"{namePrefix}.{x}.entity", value);
+                    if (valueOk) EnsureOutputEach($"{namePrefix}.{x}.entity", value!);
                 }
             }
         }
@@ -2598,7 +2598,7 @@ namespace Azure.AI.Details.Common.CLI
             var jmesValue = _values.GetOrDefault("check.jmes", null);
             if (jmesValue != null)
             {
-                var json = JsonHelpers.GetJsonObjectText(_checkAllCache);
+                var json = JsonHelpers.GetJsonObjectText(_checkAllCache!);
                 if(String.IsNullOrEmpty(json))
                 {
                     SetPassed(false);
@@ -2734,8 +2734,8 @@ namespace Azure.AI.Details.Common.CLI
             var werUrl = _values["wer.sr.url"];
             var isUrlOk = !string.IsNullOrEmpty(werUrl) && werUrl.StartsWith("http");
             var wer = isUrlOk ? 
-                GetWerFromUrl(werUrl, transcript, text, _targetCulture.Name) : 
-                WerHelpers.CalculateWer(transcript, text, _targetCulture, ignorePunctuation);
+                GetWerFromUrl(werUrl!, transcript, text, _targetCulture!.Name) : 
+                WerHelpers.CalculateWer(transcript, text, _targetCulture!, ignorePunctuation);
             var pass = CheckNumber(wer.ErrorRate, checkName, checking);
             if (!pass) SetPassed(false);
 
@@ -3016,10 +3016,10 @@ namespace Azure.AI.Details.Common.CLI
         private Dictionary<string, string>? _outputEachCache;
         private List<Dictionary<string, string>>? _outputEachCache2;
 
-        private Dictionary<string, List<string>> _checkAllCache;
+        private Dictionary<string, List<string>>? _checkAllCache;
 
-        private CultureInfo _sourceCulture;
-        private CultureInfo _targetCulture;
+        private CultureInfo? _sourceCulture;
+        private CultureInfo? _targetCulture;
 
     }
 }

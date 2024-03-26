@@ -23,7 +23,7 @@ namespace Azure.AI.Details.Common.CLI
             // weird that this is a command... it's never instantiated
         }
 
-        public static AudioConfig CreateAudioConfigFromFile(string file, string format)
+        public static AudioConfig CreateAudioConfigFromFile(string file, string? format)
         {
             return !string.IsNullOrEmpty(format)
                 ? AudioConfig.FromStreamInput(CreatePushStream(file, format))
@@ -32,7 +32,7 @@ namespace Azure.AI.Details.Common.CLI
                     : AudioConfig.FromWavFileInput(file);
         }
 
-        public static AudioConfig CreateMicrophoneAudioConfig(string device)
+        public static AudioConfig CreateMicrophoneAudioConfig(string? device)
         {
             return !string.IsNullOrEmpty(device)
                 ? AudioConfig.FromMicrophoneInput(device)
@@ -97,7 +97,7 @@ namespace Azure.AI.Details.Common.CLI
                 : AudioConfig.FromWavFileOutput(file);
         }
 
-        public static AudioConfig CreateAudioConfigForSpeaker(string device = null)
+        public static AudioConfig CreateAudioConfigForSpeaker(string? device = null)
         {
             return !string.IsNullOrEmpty(device)
                 ? AudioConfig.FromSpeakerOutput(device)

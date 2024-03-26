@@ -65,7 +65,7 @@ namespace Azure.AI.Details.Common.CLI
         public IEnumerable<Caption> GetCaptions()
         {
             EnsureCaptions();
-            return _captions;
+            return _captions!;
         }
 
         private void EnsureCaptions()
@@ -122,7 +122,7 @@ namespace Azure.AI.Details.Common.CLI
                     var captionText = string.Join('\n', captionLines.ToArray());
                     captionLines.Clear();
 
-                    var captionSequence = _captions.Count + 1;
+                    var captionSequence = _captions!.Count + 1;
                     var isFirstCaption = captionStartsAt == 0;
 
                     (var captionBegin, var captionEnd) = isFirstCaption && isLastCaption
@@ -226,6 +226,6 @@ namespace Azure.AI.Details.Common.CLI
         private readonly int _maxHeight;
         private readonly IEnumerable<object> _results;
 
-        private List<Caption> _captions;
+        private List<Caption>? _captions;
     }
 }
