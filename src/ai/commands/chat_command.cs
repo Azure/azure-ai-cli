@@ -976,8 +976,15 @@ namespace Azure.AI.Details.Common.CLI
                 var chatTemplate = sections[2];
                 var obj = deserializer.Deserialize<PromptyFrontMatter>(promptyFrontMatterText);
                 Dictionary<string, object> templateInputs = ParsePromptyInputs(obj.Inputs);
-                var template = Template.Parse(chatTemplate);
-                var parsedText = template.Render(templateInputs);
+                string parsedText;
+                switch (obj.Template.ToLower())
+                {
+                    // default assumption for templating language is jinja2
+                    case "jinja2":
+                    default:
+                        parsedText = ParseJinja(chatTemplate, templateInputs);
+                        break;
+                }
                 Console.WriteLine(parsedText);
             }
             else
@@ -985,6 +992,12 @@ namespace Azure.AI.Details.Common.CLI
                 _values.AddThrowError("ERROR:", $"parsing {parameterFile}; unable to parse, incorrect yaml format.");
             }
             //TODO: parse parameter file (prompty format) and set values accordingly
+        }
+
+        private string ParseJinja(string chatTemplate, Dictionary<string, object> inputs)
+        {
+            var template = Template.Parse(chatTemplate);
+            return template.Render(inputs);
         }
 
         private Dictionary<string, object> ParsePromptyInputs(object input)
