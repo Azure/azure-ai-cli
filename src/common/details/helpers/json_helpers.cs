@@ -11,11 +11,95 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Collections.Generic;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
+using System.Text.Json;
 
 namespace Azure.AI.Details.Common.CLI
 {
+    public static class JsonElementHelpers
+    {
+        public static string GetPropertyStringOrEmpty(this JsonDocument document, string name)
+        {
+            return document.RootElement.GetPropertyStringOrEmpty(name);
+        }
+
+        public static string GetPropertyStringOrEmpty(this JsonElement element, string name)
+        {
+            if (element.ValueKind == JsonValueKind.Object && element.TryGetProperty(name, out var value))
+            {
+                return value.ValueKind == JsonValueKind.String
+                    ? value.GetString()
+                    : value.GetRawText();
+            }
+            return string.Empty;
+        }
+
+        public static string GetPropertyStringOrNull(this JsonDocument document, string name)
+        {
+            return document.RootElement.GetPropertyStringOrNull(name);
+        }
+        
+        public static string GetPropertyStringOrNull(this JsonElement element, string name)
+        {
+            if (element.ValueKind == JsonValueKind.Object && element.TryGetProperty(name, out var value))
+            {
+                return value.ValueKind == JsonValueKind.String
+                    ? value.GetString()
+                    : value.GetRawText();
+            }
+            return null;
+        }
+
+        public static bool GetPropertyBool(this JsonDocument document, string name, bool defaultValue)
+        {
+            return document.RootElement.GetPropertyBool(name, defaultValue);
+        }
+
+        public static bool GetPropertyBool(this JsonElement element, string name, bool defaultValue)
+        {
+            if (element.ValueKind == JsonValueKind.Object && element.TryGetProperty(name, out var value))
+            {
+                return value.ValueKind == JsonValueKind.True || value.ValueKind == JsonValueKind.False
+                    ? value.GetBoolean()
+                    : defaultValue;
+            }
+            return defaultValue;
+        }
+
+        public static JsonElement? GetPropertyElementOrNull(this JsonDocument document, string name)
+        {
+            return document.RootElement.GetPropertyElementOrNull(name);
+        }
+
+        public static JsonElement? GetPropertyElementOrNull(this JsonElement element, string name)
+        {
+            return element.ValueKind == JsonValueKind.Object && element.TryGetProperty(name, out var value)
+                ? value
+                : null;
+        }
+
+        public static JsonElement.ArrayEnumerator? GetPropertyArrayOrNull(this JsonDocument document, string name)
+        {
+            return document.RootElement.GetPropertyArrayOrNull(name);
+        }
+
+        public static JsonElement.ArrayEnumerator? GetPropertyArrayOrNull(this JsonElement element, string name)
+        {
+            return element.ValueKind == JsonValueKind.Object && element.TryGetProperty(name, out var value)
+                ? value.EnumerateArray()
+                : null;
+        }
+
+        public static JsonElement[] GetPropertyArrayOrEmpty(this JsonDocument document, string name)
+        {
+            return document.RootElement.GetPropertyArrayOrEmpty(name);
+        }
+
+        public static JsonElement[] GetPropertyArrayOrEmpty(this JsonElement element, string name)
+        {
+            return element.GetPropertyArrayOrNull(name)?.ToArray() ?? Array.Empty<JsonElement>();
+        }
+    }
+
     public class JsonHelpers
     {
         #region make member
@@ -206,14 +290,6 @@ namespace Azure.AI.Details.Common.CLI
 
         #endregion
 
-        public static void PrintJson(string text, string indent = "  ", bool naked = false)
-        {
-            if (!string.IsNullOrWhiteSpace(text))
-            {
-                PrintJson(JToken.Parse(text), indent, naked);
-            }
-        }
-
         /// <summary>
         /// Helper method to deserialize the value of a specific named property from a JSON string
         /// </summary>
@@ -228,16 +304,10 @@ namespace Azure.AI.Details.Common.CLI
 
             try
             {
-                JToken token = null;
-                if (!string.IsNullOrWhiteSpace(json))
+                using JsonDocument node = JsonDocument.Parse(json ?? "{}");
+                if (node.RootElement.TryGetProperty(propertyName ?? string.Empty, out JsonElement property))
                 {
-                    token = JToken.Parse(json);
-                }
-
-                JToken property = token?[propertyName ?? string.Empty];
-                if (property != null)
-                {
-                    value = property.ToObject<TValue>();
+                    value = property.Deserialize<TValue>();
                 }
             }
             catch (Exception)
@@ -247,11 +317,19 @@ namespace Azure.AI.Details.Common.CLI
             return value;
         }
 
-        private static void PrintJson(JToken token, string indent = "  ", bool naked = false)
+        public static void PrintJson(string text, string indent = "  ", bool naked = false)
         {
-            var print = !naked
-                ? token.ToString()
-                : token.ToString()
+            if (!string.IsNullOrWhiteSpace(text))
+            {
+                PrintJson(JsonDocument.Parse(text).RootElement, indent, naked);
+            }
+        }
+
+        private static void PrintJson(JsonElement element, string indent = "  ", bool naked = false)
+        {
+            var print = !naked 
+                ? element.GetRawText() 
+                : element.GetRawText()
                     .Replace("  \"", "  ")
                     .Replace("\": \"", ": ")
                     .Replace("\": ", ": ")
@@ -278,5 +356,159 @@ namespace Azure.AI.Details.Common.CLI
             return sb.ToString().Trim(',', ' ');
         }
 
+        public static string MergeJsonObjects(JsonElement elem1, params JsonElement[] parameters)
+        {
+            var allPages = new List<JsonElement> { elem1 };
+            allPages.AddRange(parameters);
+            return MergeJsonObjects(allPages);
+        }
+
+        public static string MergeJsonObjects(List<JsonElement> allPages)
+        {
+            var properties = new Dictionary<string, string>();
+            foreach (var page in allPages)
+            {
+                foreach (var property in page.EnumerateObject())
+                {
+                    if (!properties.ContainsKey(property.Name))
+                    {
+                        properties.Add(property.Name, property.Value.GetRawText());
+                    }
+                    else if (property.Value.ValueKind == JsonValueKind.Array)
+                    {
+                        properties[property.Name] = MergeJsonArrays(properties[property.Name], property.Value.GetRawText());
+                    }
+                    else
+                    {
+                        properties[property.Name] = property.Value.GetRawText();
+                    }
+                }
+            }
+
+            // return as json object
+            using var stream = new MemoryStream();
+            using var writer = new Utf8JsonWriter(stream, new JsonWriterOptions{ Indented = false });
+            writer.WriteStartObject();
+            foreach (var property in properties)
+            {
+                writer.WritePropertyName(property.Key);
+                writer.WriteRawValue(property.Value);
+            }
+            writer.WriteEndObject();
+            writer.Flush();
+            return Encoding.UTF8.GetString(stream.ToArray());
+        }
+
+        private static string MergeJsonArrays(string v1, string v2)
+        {
+            var array1 = JsonDocument.Parse(v1).RootElement.EnumerateArray().ToList();
+            var array2 = JsonDocument.Parse(v2).RootElement.EnumerateArray().ToList();
+            array1.AddRange(array2);
+            using var stream = new MemoryStream();
+            using var writer = new Utf8JsonWriter(stream, new JsonWriterOptions{ Indented = false });
+            writer.WriteStartArray();
+            foreach (var item in array1)
+            {
+                item.WriteTo(writer);
+            }
+            writer.WriteEndArray();
+            writer.Flush();
+            return Encoding.UTF8.GetString(stream.ToArray());
+        }
+
+        public static string GetJsonObjectText(Dictionary<string, List<string>> properties)
+        {
+            using var stream = new MemoryStream();
+            using var writer = new Utf8JsonWriter(stream, new JsonWriterOptions{ Indented = false });
+
+            WriteJsonObject(writer, properties);
+
+            writer.Flush();
+            return Encoding.UTF8.GetString(stream.ToArray());
+        }
+
+        public static string GetJsonArrayText(List<Dictionary<string, string>> list)
+        {
+            using var stream = new MemoryStream();
+            using var writer = new Utf8JsonWriter(stream, new JsonWriterOptions{ Indented = false });
+
+            WriteJsonArray(writer, list);
+
+            writer.Flush();
+            return Encoding.UTF8.GetString(stream.ToArray());
+        }
+
+        private static void WriteJsonArray(Utf8JsonWriter writer, List<Dictionary<string, string>> items)
+        {
+            writer.WriteStartArray();
+            foreach (var item in items.Where(x => x != null).ToList())
+            {
+                WriteJsonObject(writer, item);
+            }
+            writer.WriteEndArray();
+        }
+
+        private static void WriteJsonObject(Utf8JsonWriter writer, Dictionary<string, string> properties)
+        {
+            writer.WriteStartObject();
+            foreach (var key in properties.Keys)
+            {
+                WritePropertyJsonOrString(writer, key, properties[key]);
+            }
+            writer.WriteEndObject();
+        }
+
+        private static void WritePropertyJsonOrString(Utf8JsonWriter writer, string key, string value)
+        {
+            if (key.EndsWith(".json"))
+            {
+                if (!string.IsNullOrWhiteSpace(value))
+                {
+                    writer.WritePropertyName(key);
+                    writer.WriteRawValue(value);
+                }
+            }
+            else
+            {
+                writer.WriteString(key, value);
+            }
+        }
+
+        private static void WriteJsonOrStringValue(Utf8JsonWriter writer, string key, string value)
+        {
+            if (key.EndsWith(".json"))
+            {
+                if (!string.IsNullOrWhiteSpace(value))
+                {
+                    writer.WriteRawValue(value);
+                }
+            }
+            else
+            {
+                writer.WriteStringValue(value);
+            }
+        }
+
+        private static void WriteJsonObject(Utf8JsonWriter writer, Dictionary<string, List<string>> properties)
+        {
+            writer.WriteStartObject();
+            foreach (var key in properties.Keys)
+            {
+                var values = properties[key].Where(x => !string.IsNullOrEmpty(x));
+                if (values.Count() == 1)
+                {
+                    WritePropertyJsonOrString(writer, key, values.First());
+                    continue;
+                }
+
+                writer.WriteStartArray(key);
+                foreach (var item in values)
+                {
+                    WriteJsonOrStringValue(writer, key, item);
+                }
+                writer.WriteEndArray();
+            }
+            writer.WriteEndObject();
+        }
     }
 }

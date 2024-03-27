@@ -11,8 +11,6 @@ using Azure.AI.CLI.Clients.AzPython;
 using Azure.AI.CLI.Common.Clients;
 using Azure.AI.Details.Common.CLI.Telemetry;
 using Azure.AI.Details.Common.CLI.Telemetry.Events;
-using Azure.Search.Documents;
-
 
 namespace Azure.AI.Details.Common.CLI
 {
@@ -132,11 +130,11 @@ namespace Azure.AI.Details.Common.CLI
         #endregion
 
         #region help command data
-        public string HelpCommandTokens => "wizard;dev;test;init;config;chat;flow;speech;vision;language;search;service;tool;samples;eval;run";
+        public string HelpCommandTokens => "wizard;dev;test;init;config;chat;speech;vision;language;search;service;tool;samples;eval;run";
         #endregion
 
         #region config command data
-        public string ConfigScopeTokens => $"wizard;dev;test;init;chat;flow;speech;vision;language;search;service;tool;samples;eval;run;*";
+        public string ConfigScopeTokens => $"wizard;dev;test;init;chat;speech;vision;language;search;service;tool;samples;eval;run;*";
         #endregion
 
         #region zip option data
@@ -173,7 +171,6 @@ namespace Azure.AI.Details.Common.CLI
             "Microsoft.SemanticKernel.Planning.ActionPlanner.dll",
             "Microsoft.SemanticKernel.Planning.SequentialPlanner.dll",
             "Microsoft.SemanticKernel.Skills.Core.dll",
-            "Newtonsoft.Json.dll",
             "System.Diagnostics.DiagnosticSource.dll",
             "System.Interactive.Async.dll",
             "System.Linq.Async.dll",
@@ -190,7 +187,6 @@ namespace Azure.AI.Details.Common.CLI
             return root switch {
                 "init" => (new InitCommand(values)).RunCommand(),
                 "chat" => (new ChatCommand(values)).RunCommand(),
-                "flow" => (new FlowCommand(values)).RunCommand(),
                 "speech" => (new SpeechCommand(values)).RunCommand(),
                 "vision" => (new VisionCommand(values)).RunCommand(),
                 "language" => (new LanguageCommand(values)).RunCommand(),
@@ -219,7 +215,6 @@ namespace Azure.AI.Details.Common.CLI
                 "init" => InitCommandParser.ParseCommand(tokens, values),
                 "config" => ConfigCommandParser.ParseCommand(tokens, values),
                 "chat" => ChatCommandParser.ParseCommand(tokens, values),
-                "flow" => FlowCommandParser.ParseCommand(tokens, values),
                 "eval" => EvalCommandParser.ParseCommand(tokens, values),
                 "speech" => SpeechCommandParser.ParseCommand(tokens, values),
                 "vision" => VisionCommandParser.ParseCommand(tokens, values),
@@ -245,7 +240,6 @@ namespace Azure.AI.Details.Common.CLI
                 "init" => InitCommandParser.ParseCommandValues(tokens, values),
                 "config" => ConfigCommandParser.ParseCommandValues(tokens, values),
                 "chat" => ChatCommandParser.ParseCommandValues(tokens, values),
-                "flow" => FlowCommandParser.ParseCommandValues(tokens, values),
                 "eval" => EvalCommandParser.ParseCommandValues(tokens, values),
                 "speech" => SpeechCommandParser.ParseCommandValues(tokens, values),
                 "vision" => VisionCommandParser.ParseCommandValues(tokens, values),

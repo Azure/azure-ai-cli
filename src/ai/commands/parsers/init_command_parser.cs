@@ -23,6 +23,10 @@ namespace Azure.AI.Details.Common.CLI
         private static readonly (string name, bool valuesRequired)[] _commands =  {
             ("init.aiservices", false),
             ("init.cognitiveservices", false),
+            ("init.openai.chat", false),
+            ("init.openai.embeddings", false),
+            ("init.openai.evaluations", false),
+            ("init.openai.deployments", false),
             ("init.openai", false),
             ("init.search", false),
             ("init.speech", false),
@@ -35,7 +39,8 @@ namespace Azure.AI.Details.Common.CLI
         };
 
         private static readonly string[] _partialCommands = {
-            "init"
+            "init",
+            "init.openai"
         };
 
         private static INamedValueTokenParser[] GetCommandParsers(ICommandValues values)
@@ -46,6 +51,10 @@ namespace Azure.AI.Details.Common.CLI
                 case "init.aiservices":
                 case "init.cognitiveservices":
                 case "init.openai":
+                case "init.openai.chat":
+                case "init.openai.embeddings":
+                case "init.openai.evaluations":
+                case "init.openai.deployments":
                 case "init.search":
                 case "init.speech":
                 case "init.vision":
@@ -83,9 +92,15 @@ namespace Azure.AI.Details.Common.CLI
                 new NamedValueTokenParser("--sku", "init.service.cognitiveservices.resource.sku", "00001", "1"),
                 new NamedValueTokenParser("--yes", "init.service.cognitiveservices.terms.agree", "00001", "1;0", "true;false", null, "true"),
 
-                new NamedValueTokenParser(null, "init.chat.model.deployment.name", "01010", "1"),
+                new NamedValueTokenParser(null, "init.chat.model.deployment.name", "01010;00010", "1"),
                 new NamedValueTokenParser(null, "init.embeddings.model.deployment.name", "01010", "1"),
                 new NamedValueTokenParser(null, "init.evaluation.model.deployment.name", "01010", "1"),
+
+                new NamedValueTokenParser(null, "init.chat.model.name", "0110;0010", "1"),
+                new NamedValueTokenParser(null, "init.embeddings.model.name", "0110", "1"),
+                new NamedValueTokenParser(null, "init.evaluation.model.name", "0110", "1"),
+
+                new NamedValueTokenParser(null, "init.output.env.file", "0110", "1;0", "true;false", null, "true"),
 
                 new NamedValueTokenParser("--interactive", "init.service.interactive", "001", "1;0", "true;false", null, "true")
 

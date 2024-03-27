@@ -11,11 +11,6 @@
             return ValueTask.CompletedTask;
         }
 
-        public ValueTask InitAsync(CancellationToken token)
-        {
-            return ValueTask.CompletedTask;
-        }
-
         public void LogEvent(ITelemetryEvent evt)
         {
             // Nothing to see here, move along...

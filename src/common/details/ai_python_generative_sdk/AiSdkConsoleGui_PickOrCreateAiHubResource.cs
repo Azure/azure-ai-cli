@@ -7,7 +7,6 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Collections.Generic;
-using Newtonsoft.Json.Linq;
 using Azure.AI.Details.Common.CLI.ConsoleGui;
 using System.Text.Json;
 using System.IO;
@@ -84,7 +83,7 @@ namespace Azure.AI.Details.Common.CLI
                 var sku = values.GetOrDefault("init.service.cognitiveservices.resource.sku", Program.CognitiveServiceResourceSku);
                 var yes = values.GetOrDefault("init.service.cognitiveservices.terms.agree", false);
 
-                var openAiResource = await AzCliConsoleGui.PickOrCreateAndConfigCognitiveServicesOpenAiKindResource(values, true, true, subscription, regionFilter, groupFilter, resourceFilter, kind, sku, yes);
+                var openAiResource = await AzCliConsoleGui.PickOrCreateAndConfigCognitiveServicesOpenAiKindResource(values, true, subscription, regionFilter, groupFilter, resourceFilter, kind, sku, yes);
                 values.Reset("service.openai.deployments.picked", "true");
 
                 ResourceGroupNameToken.Data().Set(values, openAiResource.Group);

@@ -10,7 +10,7 @@ namespace Azure.AI.Details.Common.CLI
 {
     public partial class AzCliConsoleGui
     {
-        public static async Task<(AzCli.CognitiveServicesDeploymentInfo?,bool)> PickOrCreateCognitiveServicesResourceDeployment(bool interactive, bool allowSkipDeployment, string deploymentExtra, string subscriptionId, string groupName, string resourceRegionLocation, string resourceName, string deploymentFilter)
+        public static async Task<(AzCli.CognitiveServicesDeploymentInfo?,bool)> PickOrCreateCognitiveServicesResourceDeployment(bool interactive, bool allowSkipDeployment, string deploymentExtra, string subscriptionId, string groupName, string resourceRegionLocation, string resourceName, string deploymentFilter, string modelFilter)
         {
             bool createdNew = false;
             ConsoleHelpers.WriteLineWithHighlight($"\n`AZURE OPENAI DEPLOYMENT ({deploymentExtra.ToUpper()})`");
@@ -26,7 +26,7 @@ namespace Azure.AI.Details.Common.CLI
             if (deployment != null && deployment.Value.Name == null)
             {
                 createdNew = true;
-                deployment = await TryCreateCognitiveServicesResourceDeployment(interactive, deploymentExtra, subscriptionId, groupName, resourceRegionLocation, resourceName, deploymentFilter);
+                deployment = await TryCreateCognitiveServicesResourceDeployment(interactive, deploymentExtra, subscriptionId, groupName, resourceRegionLocation, resourceName, deploymentFilter, modelFilter);
             }
 
             if (deployment == null)
@@ -102,13 +102,69 @@ namespace Azure.AI.Details.Common.CLI
                 : null;
         }
 
-        public static async Task<AzCli.CognitiveServicesDeploymentInfo?> TryCreateCognitiveServicesResourceDeployment(bool interactive, string deploymentExtra, string subscriptionId, string groupName, string resourceRegionLocation, string resourceName, string deploymentName)
+        public static async Task<AzCli.CognitiveServicesDeploymentInfo?> TryCreateCognitiveServicesResourceDeployment(bool interactive, string deploymentExtra, string subscriptionId, string groupName, string resourceRegionLocation, string resourceName, string deploymentName, string modelFilter)
         {
             ConsoleHelpers.WriteLineWithHighlight($"\n`CREATE DEPLOYMENT ({deploymentExtra.ToUpper()})`");
 
+            var deployableModel = await FindDeployableModel(interactive, deploymentExtra, subscriptionId, resourceRegionLocation, modelFilter);
+            if (deployableModel == null) return null;
+
+            var modelName = deployableModel?.Name;
+            Console.WriteLine($"\rModel: {modelName}");
+
+            var modelFormat = "OpenAI";
+            var modelVersion = deployableModel?.Version;
+            var scaleCapacity = deployableModel?.DefaultCapacity ?? 0;
+
+            Console.Write("\rName: ");
+            if (!string.IsNullOrEmpty(deploymentName))
+            {
+                Console.WriteLine(deploymentName);
+            }
+            else if (interactive)
+            {
+                var choices = new string[] {
+                    $"{modelName}-{modelVersion}",
+                    "(Enter custom name)"
+                };
+                var pick = ListBoxPicker.PickIndexOf(choices);
+                deploymentName = pick switch
+                {
+                    0 => $"{modelName}-{modelVersion}",
+                    1 => AskPromptHelper.AskPrompt("\rName: "),
+                    _ => null
+                };
+                if (pick != choices.Length - 1)
+                {
+                    Console.WriteLine($"\rName: {deploymentName}");
+                }
+            }
+            else
+            {
+                deploymentName = $"{modelName}-{modelVersion}";
+                Console.WriteLine(deploymentName);
+            }
+
+            if (string.IsNullOrEmpty(deploymentName)) return null;
+
+            Console.Write("*** CREATING ***");
+            var response = await Program.CognitiveServicesClient.CreateDeploymentAsync(subscriptionId, groupName, resourceName, deploymentName, modelName, modelVersion, modelFormat, scaleCapacity.ToString(CultureInfo.InvariantCulture), Program.CancelToken);
+
+            Console.Write("\r");
+            response.ThrowOnFail("Creating deployment");
+
+            Console.WriteLine("\r*** CREATED ***  ");
+            return response.Value;
+        }
+
+        private static async Task<AzCli.CognitiveServicesModelInfo?> FindDeployableModel(bool interactive, string deploymentExtra, string subscriptionId, string resourceRegionLocation, string modelFilter)
+        {
             Console.Write("\rModel: *** Loading choices ***");
             var models = await Program.CognitiveServicesClient.GetAllModelsAsync(subscriptionId, resourceRegionLocation, Program.CancelToken);
             var usage = await Program.CognitiveServicesClient.GetAllModelUsageAsync(subscriptionId, resourceRegionLocation, Program.CancelToken);
+
+            models.ThrowOnFail("Loading models");
+            usage.ThrowOnFail("Loading model usage");
 
             var lookForChatCompletionCapable = deploymentExtra.ToLower() == "chat" || deploymentExtra.ToLower() == "evaluation";
             var lookForEmbeddingCapable = deploymentExtra.ToLower() == "embeddings";
@@ -117,22 +173,39 @@ namespace Azure.AI.Details.Common.CLI
                 .Where(x => !lookForEmbeddingCapable || x.IsEmbeddingsCapable)
                 .ToArray();
 
+            Console.Write("\rModel: ");
             var deployableModels = FilterModelsByUsage(capableModels, usage.Value);
 
-            Console.Write("\rModel: ");
+            var exactMatch = modelFilter != null && deployableModels.Count(x => ExactMatchModel(x, modelFilter)) == 1;
+            if (exactMatch) deployableModels = deployableModels.Where(x => ExactMatchModel(x, modelFilter)).ToArray();
+
+            if (deployableModels.Count() == 0)
+            {
+                ConsoleHelpers.WriteLineError(models.Value.Count() > 0
+                    ? $"*** No matching {deploymentExtra} capable models with capacity found ***"
+                    : "*** No deployable models found ***");
+                return null;
+            }
+            else if (deployableModels.Count() == 1 && (!interactive || exactMatch))
+            {
+                var model = deployableModels.First();
+                Console.WriteLine($"{model.Name} (version {model.Version})");
+                return model;
+            }
+            else if (!interactive)
+            {
+                ConsoleHelpers.WriteLineError("*** More than 1 deployable model found ***");
+                Console.WriteLine();
+                DisplayDeployableModels(deployableModels.ToList(), "  ");
+                return null;
+            }
+
             var choices = Program.Debug
                 ? deployableModels.Select(x => x.Name + " (version " + x.Version + ")" + $"{x.DefaultCapacity} capacity").ToArray()
                 : deployableModels.Select(x => x.Name + " (version " + x.Version + ")").ToArray();
 
-            if (choices.Count() == 0)
+            var scanFor = deploymentExtra.ToLower() switch
             {
-                ConsoleHelpers.WriteLineError(models.Value.Count() > 0
-                    ? $"*** No {deploymentExtra} capable models with capacity found ***"
-                    : "*** No deployable models found ***");
-                return null;
-            }
-
-            var scanFor = deploymentExtra.ToLower() switch {
                 "chat" => "gpt",
                 "embeddings" => "embedding",
                 _ => deploymentExtra.ToLower()
@@ -142,37 +215,28 @@ namespace Azure.AI.Details.Common.CLI
             var index = ListBoxPicker.PickIndexOf(choices, select);
             if (index < 0) return null;
 
-            var modelName = deployableModels[index].Name;
-            Console.WriteLine($"\rModel: {modelName}");
+            return deployableModels[index];
+        }
 
-            var modelFormat = "OpenAI";
-            var modelVersion = deployableModels[index].Version;
-            var scaleCapacity = deployableModels[index].DefaultCapacity;
+        private static void DisplayDeployableModels(List<AzCli.CognitiveServicesModelInfo> deployableModels, string prefix)
+        {
+            foreach (var deployableModel in deployableModels)
+            {
+                Console.Write(prefix);
+                DisplayNameAndVersion(deployableModel);
+            }
+            Console.WriteLine();
+        }
 
-            Console.Write("\rName: ");
-            choices = new string[] {
-                $"{modelName}-{modelVersion}",
-                "(Enter custom name)"
-            };
-            var pick = ListBoxPicker.PickIndexOf(choices);
+        private static void DisplayNameAndVersion(AzCli.CognitiveServicesModelInfo deployableModel)
+        {
+            Console.WriteLine($"{deployableModel.Name}-{deployableModel.Version}");
+        }
 
-            deploymentName = pick switch{
-                0 => $"{modelName}-{modelVersion}",
-                1 => AskPromptHelper.AskPrompt("\rName: "),
-                _ => null
-            };
-
-            if (string.IsNullOrEmpty(deploymentName)) return null;
-            if (pick != choices.Length - 1) Console.WriteLine($"\rName: {deploymentName}");
-
-            Console.Write("*** CREATING ***");
-            var response = await Program.CognitiveServicesClient.CreateDeploymentAsync(subscriptionId, groupName, resourceName, deploymentName, modelName, modelVersion, modelFormat, scaleCapacity.ToString(CultureInfo.InvariantCulture), Program.CancelToken);
-            
-            Console.Write("\r");
-            response.ThrowOnFail("Creating deployment");
-
-            Console.WriteLine("\r*** CREATED ***  ");
-            return response.Value;
+        private static bool ExactMatchModel(AzCli.CognitiveServicesModelInfo model, string modelFilter)
+        {
+            var displayName = model.Name + "-" + model.Version;
+            return displayName.ToLower() == modelFilter.ToLower();
         }
 
         private static AzCli.CognitiveServicesModelInfo[] FilterModelsByUsage(AzCli.CognitiveServicesModelInfo[] models, AzCli.CognitiveServicesUsageInfo[] usage)

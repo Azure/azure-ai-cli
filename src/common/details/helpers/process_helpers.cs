@@ -37,7 +37,7 @@ namespace Azure.AI.Details.Common.CLI
                         : null;
         }
 
-        public static Process? StartProcess(string fileName, string arguments, IDictionary<string, string> addToEnvironment = null, bool redirectOutput = true, bool redirectInput = false)
+        public static Process? StartProcess(string fileName, string arguments, IDictionary<string, string>? addToEnvironment = null, bool redirectOutput = true, bool redirectInput = false)
         {
             var start = new ProcessStartInfo(fileName, arguments);
             start.UseShellExecute = false;
@@ -56,7 +56,7 @@ namespace Azure.AI.Details.Common.CLI
             return Process.Start(start);
         }
 
-        public static async Task<ProcessOutput> RunShellScriptAsync(string inlineScriptOrFileName, bool scriptIsBash = false, Dictionary<string, string> addToEnvironment = null, Action<string> stdOutHandler = null, Action<string> stdErrHandler = null, Action<string> mergedOutputHandler = null, bool captureOutput = true, bool interactive = false)
+        public static async Task<ProcessOutput> RunShellScriptAsync(string inlineScriptOrFileName, bool scriptIsBash = false, Dictionary<string, string>? addToEnvironment = null, Action<string>? stdOutHandler = null, Action<string>? stdErrHandler = null, Action<string>? mergedOutputHandler = null, bool captureOutput = true, bool interactive = false)
         {
             ProcessOutput processOutput;
             var useBinBash = !RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
@@ -95,7 +95,7 @@ namespace Azure.AI.Details.Common.CLI
             return processOutput;
         }
 
-        public static async Task<ProcessOutput> RunShellInteractiveAsync(Dictionary<string, string> addToEnvironment = null, Action<string> stdOutHandler = null, Action<string> stdErrHandler = null, Action<string> mergedOutputHandler = null, bool captureOutput = true)
+        public static async Task<ProcessOutput> RunShellInteractiveAsync(Dictionary<string, string>? addToEnvironment = null, Action<string>? stdOutHandler = null, Action<string>? stdErrHandler = null, Action<string>? mergedOutputHandler = null, bool captureOutput = true)
         {
             var interactiveShellFileName = !OS.IsWindows() ? "bash" : "cmd.exe";
             var interactiveShellArguments = !OS.IsWindows() ? "-li" : "/k PROMPT (ai dev shell) %PROMPT%& title (ai dev shell)";
@@ -115,7 +115,7 @@ namespace Azure.AI.Details.Common.CLI
             var sbErr = new StringBuilder();
             var sbMerged = new StringBuilder();
 
-            var stdOutReceived = (string data) => {
+            var stdOutReceived = (string? data) => {
                 if (data != null)
                 {
                     sbOut.AppendLine(data);
@@ -128,7 +128,7 @@ namespace Azure.AI.Details.Common.CLI
                     outDoneSignal.Set();
                 }
             };
-            var stdErrReceived = (string data) => {
+            var stdErrReceived = (string? data) => {
                 if (data != null)
                 {
                     sbErr.AppendLine(data);
@@ -195,7 +195,7 @@ namespace Azure.AI.Details.Common.CLI
             return output;
         }
 
-        private static Process? StartShellCommandProcess(string command, string arguments, IDictionary<string, string> addToEnvironment = null, bool captureOutput = true)
+        private static Process? StartShellCommandProcess(string command, string arguments, IDictionary<string, string>? addToEnvironment = null, bool captureOutput = true)
         {
             var isWindows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
             return  isWindows

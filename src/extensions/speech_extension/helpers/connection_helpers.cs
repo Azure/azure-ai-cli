@@ -4,8 +4,8 @@
 //
 
 using System.Linq;
+using System.Text.Json;
 using Microsoft.CognitiveServices.Speech;
-using Newtonsoft.Json.Linq;
 
 namespace Azure.AI.Details.Common.CLI
 {
@@ -34,13 +34,12 @@ namespace Azure.AI.Details.Common.CLI
 
         private static void SetConnectionMessagePropertyJson(Connection connection, string msg, string property)
         {
-            var properties = JToken.Parse(property).Children()
-                .Where(x => x.Type == JTokenType.Property)
-                .Select(x => x as JProperty);
+            using var document = JsonDocument.Parse(property);
+            var properties = document.RootElement.EnumerateObject();
 
             foreach (var item in properties)
             {
-                var value = item.Value.Type == JTokenType.String ? $"\"{item.Value}\"" : item.Value.ToString();
+                var value = item.Value.ValueKind == JsonValueKind.String ? $"\"{item.Value.GetString()}\"" : item.Value.GetRawText();
                 connection.SetMessageProperty(msg, item.Name, value);
             }
         }
@@ -62,7 +61,7 @@ namespace Azure.AI.Details.Common.CLI
             {
                 try
                 {
-                    JToken.Parse(json);
+                    JsonDocument.Parse(json);
                     return true;
                 }
                 catch

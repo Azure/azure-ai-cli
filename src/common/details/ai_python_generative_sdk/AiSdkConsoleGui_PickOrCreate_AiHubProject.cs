@@ -34,7 +34,6 @@ namespace Azure.AI.Details.Common.CLI
             ICommandValues values,
             AiHubProjectInfo project,
             bool createdProject,
-            bool allowSkipDeployments,
             bool allowSkipSearch,
             string subscription,
             string resourceId,
@@ -63,13 +62,13 @@ namespace Azure.AI.Details.Common.CLI
                 }
                 else if (!string.IsNullOrEmpty(openai?.Name))
                 {
-                    var (chatDeployment, embeddingsDeployment, evaluationDeployment, keys) = await AzCliConsoleGui.PickOrCreateAndConfigCognitiveServicesOpenAiKindResourceDeployments(values, "AZURE OPENAI RESOURCE", true, allowSkipDeployments, subscription, openai);
+                    var (chatDeployment, embeddingsDeployment, evaluationDeployment, keys) = await AzCliConsoleGui.PickOrCreateAndConfigCognitiveServicesOpenAiKindResourceDeployments(values, "AZURE OPENAI RESOURCE", true, subscription, openai);
                     openAiEndpoint = openai.Endpoint;
                     openAiKey = keys.Key1;
                 }
                 else
                 {
-                    var openAiResource = await AzCliConsoleGui.PickOrCreateAndConfigCognitiveServicesOpenAiKindResource(values, true, allowSkipDeployments, subscription);
+                    var openAiResource = await AzCliConsoleGui.PickOrCreateAndConfigCognitiveServicesOpenAiKindResource(values, true, subscription);
                     openAiEndpoint = openAiResource.Endpoint;
                     openAiKey = openAiResource.Key;
                 }
@@ -93,7 +92,6 @@ namespace Azure.AI.Details.Common.CLI
                 }
             }
 
-            // TODO FIXME: Telemetry events should not be sent from this place in the code
             Program.Telemetry.Wrap(
                 () => GetOrCreateAiHubProjectConnections(values, createdProject || createdOrPickedSearch, subscription, project.Group, project.Name, openAiEndpoint, openAiKey, searchEndpoint, searchKey),
                 (outcome, ex, duration) => new InitTelemetryEvent(InitStage.Connections)
@@ -258,9 +256,9 @@ namespace Azure.AI.Details.Common.CLI
                 var message = createSearchConnection ? "\r*** CREATED ***  " : null;
                 if (checkForExistingOpenAiConnection)
                 {
-                    var parsed = !string.IsNullOrEmpty(connectionJson) ? JToken.Parse(connectionJson) : null;
-                    var connection = parsed?.Type == JTokenType.Object ? parsed?["connection"] : null;
-                    var target = connection?.Type == JTokenType.Object ? connection?["target"]?.ToString() : null;
+                    var parsed = !string.IsNullOrEmpty(connectionJson) ? JsonDocument.Parse(connectionJson) : null;
+                    var connection = parsed?.GetPropertyElementOrNull("connection");
+                    var target = connection?.GetPropertyStringOrNull("target");
 
                     var endpointOk = !string.IsNullOrEmpty(openAiEndpoint);
                     var targetOk = !string.IsNullOrEmpty(target);
@@ -298,9 +296,9 @@ namespace Azure.AI.Details.Common.CLI
                 var message = createSearchConnection ? "\r*** CREATED ***  " : null;
                 if (checkForExistingSearchConnection)
                 {
-                    var parsed = !string.IsNullOrEmpty(connectionJson) ? JToken.Parse(connectionJson) : null;
-                    var connection = parsed?.Type == JTokenType.Object ? parsed?["connection"] : null;
-                    var target = connection?.Type == JTokenType.Object ? connection?["target"]?.ToString() : null;
+                    var parsed = !string.IsNullOrEmpty(connectionJson) ? JsonDocument.Parse(connectionJson) : null;
+                    var connection = parsed?.GetPropertyElementOrNull("connection");
+                    var target = connection?.GetPropertyStringOrNull("target");
 
                     var targetOk = !string.IsNullOrEmpty(target);
                     var endpointOk = !string.IsNullOrEmpty(searchEndpoint);

@@ -23,10 +23,10 @@ set INSTALLER_FILE=Setup-%TARGET_PLATFORM%.exe
 set PACKAGE_URL=https://csspeechstorage.blob.core.windows.net/drop/private/ai/Azure.AI.CLI.%PACKAGE_VERSION%.nupkg
 
 REM Dependencies (note: do NOT use redirecting URLs like aka.ms)
-set AZURE_CLI_VERSION=2.57.0
+set AZURE_CLI_VERSION=2.58.0
 set AZURE_CLI_INSTALLER=azure-cli-%AZURE_CLI_VERSION%-%TARGET_PLATFORM%.msi
 set AZURE_CLI_URL=https://azcliprod.blob.core.windows.net/msi/%AZURE_CLI_INSTALLER%
-set DOTNET_VERSION=8.0.201
+set DOTNET_VERSION=8.0.202
 set DOTNET_INSTALLER=dotnet-sdk-%DOTNET_VERSION%-win-%TARGET_PLATFORM%.exe
 set DOTNET_URL=https://dotnetcli.azureedge.net/dotnet/Sdk/%DOTNET_VERSION%/%DOTNET_INSTALLER%
 set VCRT_VERSION=14.38.33135

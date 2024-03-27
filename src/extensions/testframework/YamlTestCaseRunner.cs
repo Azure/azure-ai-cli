@@ -11,12 +11,11 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Runtime.InteropServices;
 using System.Text;
+using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Adapter;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using YamlDotNet.RepresentationModel;
 
 namespace Azure.AI.Details.Common.CLI.TestFramework
@@ -121,14 +120,14 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
         {
             var testResultDisplayName = testDisplayName;
 
-            if(JToken.Parse(foreachItem).Type == JTokenType.Object)
+            var document = JsonDocument.Parse(foreachItem);
+            if(document.RootElement.ValueKind == JsonValueKind.Object)
             {
-                // get JObject properties
-                JObject foreachItemObject = JObject.Parse(foreachItem);
-                foreach(var property in foreachItemObject.Properties())
+                var foreachItemObject = document.RootElement;
+                foreach(var property in foreachItemObject.EnumerateObject())
                 {
                     var keys = property.Name.Split(new char[] { '\t' });
-                    var values = property.Value.Value<string>().Split(new char[] { '\t' });
+                    var values = property.Value.GetString().Split(new char[] { '\t' });
 
                     for (int i = 0; i < keys.Length; i++)
                     {
@@ -152,43 +151,39 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
         // Finds "token" in foreach key and redacts its value
         private static string RedactSensitiveDataFromForeachItem(string foreachItem)
         {
-            var foreachObject = JObject.Parse(foreachItem);
-            
-            var sb = new StringBuilder();
-            var sw = new StringWriter(sb);
+            using var stream = new MemoryStream();
+            using var writer = new Utf8JsonWriter(stream, new JsonWriterOptions{ Indented = false });
+            writer.WriteStartObject();
 
-            using (JsonWriter writer = new JsonTextWriter(sw){Formatting = Formatting.None})
+            var foreachObject = JsonDocument.Parse(foreachItem).RootElement;
+            foreach (var item in foreachObject.EnumerateObject())
             {
-                writer.WriteStartObject();
-                foreach (var item in foreachObject)
+                if (string.IsNullOrWhiteSpace(item.Value.ToString()))
                 {
-                    if (string.IsNullOrWhiteSpace(item.Value.ToString()))
-                    {
-                        continue;
-                    }
-                    var keys = item.Key.ToLower().Split(new char[] {'\t'});
-                    
-                    // find index of "token" in foreach key and redact its value to avoid getting it displayed
-                    var tokenIndex = Array.IndexOf(keys, "token");
-                    var valueString = item.Value;
-                    
-                    if (tokenIndex >= 0)
-                    {
-                        var values = item.Value.ToString().Split(new char[] {'\t'});
-                        if (values.Count() == keys.Count())
-                        {
-                            values[tokenIndex] = "***";
-                            valueString = string.Join("\t", values);
-                        }
-                    }
-                    writer.WritePropertyName(item.Key);
-                    writer.WriteValue(valueString);
+                    continue;
                 }
-
-                writer.WriteEndObject();
+                var keys = item.Name.ToLower().Split(new char[] {'\t'});
+                
+                //find index of "token" in foreach key and redact its value to avoid getting it displayed
+                var tokenIndex = Array.IndexOf(keys, "token");
+                var valueString = item.Value.GetRawText();
+                
+                if (tokenIndex >= 0)
+                {
+                    var values = item.Value.ToString().Split(new char[] {'\t'});
+                    if (values.Count() == keys.Count())
+                    {
+                        values[tokenIndex] = "***";
+                        valueString = string.Join("\t", values);
+                    }
+                }
+                writer.WritePropertyName(item.Name);
+                writer.WriteRawValue(valueString);
             }
 
-            return sb.ToString();
+            writer.WriteEndObject();
+
+            return Encoding.UTF8.GetString(stream.ToArray());
         }
 
         private static IEnumerable<string> ExpandForEachGroups(string @foreach)
@@ -208,7 +203,14 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
                     .ToList();
             }
 
-            return dicts.Select(d => JsonConvert.SerializeObject(d));
+            return dicts.Select(d =>
+            {
+                var options = new JsonSerializerOptions
+                {
+                    WriteIndented = false
+                };
+                return JsonSerializer.Serialize(d, options);
+            });
         }
 
         private static Dictionary<string, string> DupAndAdd(Dictionary<string, string> d, string key, string value)
@@ -344,23 +346,24 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
             if (!string.IsNullOrEmpty(json))
             {
                 Logger.Log($"KeyValuePairsFromJson: 'json'='{json}'");
-                var parsed = JToken.Parse(json);
-                if (parsed.Type == JTokenType.String && allowSimpleString)
+                using JsonDocument document = JsonDocument.Parse(json);
+                var parsed = document.RootElement;
+                if (parsed.ValueKind == JsonValueKind.String && allowSimpleString)
                 {
                     // if it's a simple string, there is no "key" for the argument... pass it as value with an empty string as key
                     // this will ensure that an additional '--' isn't emitted preceding the string-only arguments
-                    kvs.Add(new KeyValuePair<string, string>("", parsed.Value<string>()));
+                    kvs.Add(new KeyValuePair<string, string>("", parsed.GetString()));
                 }
-                else if (parsed.Type != JTokenType.Object)
+                else if (parsed.ValueKind != JsonValueKind.Object)
                 {
                     // if it's not a simple string, it must be an object... if it's not, we'll just log and continue
                     Logger.Log("KeyValuePairsFromJson: Invalid json (only supports `\"string\"`, or `{\"mapItem1\": \"value1\", \"...\": \"...\"}`!");
                 }
                 else
                 {
-                    foreach (var item in parsed as JObject)
+                    foreach (var item in parsed.EnumerateObject())
                     {
-                        kvs.Add(new KeyValuePair<string, string>(item.Key, item.Value.Value<string>()));
+                        kvs.Add(new KeyValuePair<string, string>(item.Name, item.Value.GetString()));
                     }
                 }
             }
