@@ -26,12 +26,9 @@ namespace Azure.AI.Details.Common.CLI
 
             Console.Write("\rRegion: *** Loading choices ***");
             var allRegions = await Program.SubscriptionClient.GetAllRegionsAsync(subscriptionId, Program.CancelToken);
+            
             Console.Write("\rRegion: ");
-
-            if (!allRegions.IsSuccess)
-            {
-                throw new ApplicationException($"ERROR: Loading resource region/locations\n{allRegions.ErrorDetails}");
-            }
+            allRegions.ThrowOnFail("reource region/locations");
 
             var regions = allRegions.Value
                 .Where(x => MatchRegionLocationFilter(x, regionFilter))

@@ -70,7 +70,7 @@ namespace Azure.AI.Details.Common.CLI
             Console.Write($"\r{subscriptionLabel}: *** Loading choices ***");
             var subsResult = await Program.SubscriptionClient.GetAllSubscriptionsAsync(Program.CancelToken);
 
-            if (!subsResult.IsSuccess)
+            if (subsResult.IsError)
             {
                 if ((subsResult.ErrorDetails?.Contains(" not ") | subsResult.ErrorDetails?.Contains("No such file")) == true)
                 {

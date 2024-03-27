@@ -4,69 +4,153 @@ using Azure.AI.Details.Common.CLI;
 
 namespace Azure.AI.CLI.Common.Clients.Models
 {
+    /// <summary>
+    /// Enumerates the possible outcomes of a client operation
+    /// </summary>
     public enum ClientOutcome
     {
+        /// <summary>
+        /// The operation failed
+        /// </summary>
         Failed = int.MinValue,
+
+        /// <summary>
+        /// The operation timed out
+        /// </summary>
         TimedOut = -3,
+
+        /// <summary>
+        /// The operation was canceled
+        /// </summary>
         Canceled = -2,
+
+        /// <summary>
+        /// The operation requires login. The user should run `az login` and try again. This
+        /// can happen if the login was required, and we failed to log in as well
+        /// </summary>
         LoginNeeded = -1,
+
+        /// <summary>
+        /// The operation status was unknown. This is the default value
+        /// </summary>
         Unknown = 0,
+
+        /// <summary>
+        /// The operation was successful
+        /// </summary>
         Success,
     }
 
+    /// <summary>
+    /// Represents the result of a client operation
+    /// </summary>
     public interface IClientResult
     {
+        /// <summary>
+        /// The outcome of the operation
+        /// </summary>
         ClientOutcome Outcome { get; }
 
+        /// <summary>
+        /// (Optional) Details about the error that occurred
+        /// </summary>
         string? ErrorDetails { get; }
 
+        /// <summary>
+        /// (Optional) The exception that occurred
+        /// </summary>
         Exception? Exception { get; }
 
+        /// <summary>
+        /// Indicates if the operation was successful
+        /// </summary>
         bool IsSuccess => !IsError;
 
+        /// <summary>
+        /// Indicates if the operation failed
+        /// </summary>
         bool IsError { get; }
 
+        /// <summary>
+        /// Throws an exception if the operation failed
+        /// </summary>
+        /// <param name="message">(Optional) The message to include in the exception message</param>
         void ThrowOnFail(string? message = null);
     }
 
+    /// <summary>
+    /// Represents the result of a client operation with a value
+    /// </summary>
+    /// <typeparam name="TValue">The type of the value</typeparam>
     public interface IClientResult<out TValue> : IClientResult
     {
+        /// <summary>
+        /// The value of the operation
+        /// </summary>
         public TValue Value { get; }
     }
 
+    /// <summary>
+    /// Represents the result of a client operation
+    /// </summary>
     public readonly partial struct ClientResult : IClientResult
     {
+        /// <inheritdoc />
         public ClientOutcome Outcome { get; init; }
 
+        /// <inheritdoc />
         public string? ErrorDetails { get; init; }
 
+        /// <inheritdoc />
         public Exception? Exception { get; init; }
 
+        /// <inheritdoc />
         public bool IsSuccess => !IsError;
 
+        /// <inheritdoc />
         public bool IsError => CheckIsError(Outcome, ErrorDetails, Exception);
 
+        /// <inheritdoc />
         public void ThrowOnFail(string? message = null) => ThrowOnFail(Outcome, message, ErrorDetails, Exception);
 
+        /// <summary>
+        /// Converts the result to a string
+        /// </summary>
+        /// <returns>A string representation of the result</returns>
         public override string ToString() => ToString(this);
     }
 
+    /// <summary>
+    /// Represents the result of a client operation with a value
+    /// </summary>
+    /// <typeparam name="TValue">The type of the value</typeparam>
     public readonly struct ClientResult<TValue> : IClientResult<TValue>
     {
+        /// <inheritdoc />
         public ClientOutcome Outcome { get; init; }
 
+        /// <inheritdoc />
         public TValue Value { get; init; }
 
+        /// <inheritdoc />
         public string? ErrorDetails { get; init; }
 
+        /// <inheritdoc />
         public Exception? Exception { get; init; }
 
+        /// <inheritdoc />
         public bool IsSuccess => !IsError;
 
+        /// <inheritdoc />
         public bool IsError => ClientResult.CheckIsError(Outcome, ErrorDetails, Exception);
 
+        /// <inheritdoc />
         public void ThrowOnFail(string? message = null) => ClientResult.ThrowOnFail(Outcome, message, ErrorDetails, Exception);
 
+        /// <summary>
+        /// Converts the result to a string
+        /// </summary>
+        /// <returns>A string representation of the result</returns>
         public override string ToString() => ClientResult.ToString(this);
     }
 

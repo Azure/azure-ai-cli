@@ -13,9 +13,16 @@ namespace Azure.AI.CLI.Common.Clients.Models.Utils
     {
         private readonly ResourceKind _defaultKind;
 
+        /// <summary>
+        /// Creates a new instance
+        /// </summary>
         public ResourceKindJsonConverter() : this(ResourceKind.Unknown)
         { }
 
+        /// <summary>
+        /// Creates a new instance with the kind to use should parsing the resource kind fail
+        /// </summary>
+        /// <param name="fallback">The fallback <see cref="ResourceKind"/> to use</param>
         public ResourceKindJsonConverter(ResourceKind fallback)
         {
             _defaultKind = fallback;

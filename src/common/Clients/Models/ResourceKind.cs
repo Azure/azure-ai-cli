@@ -29,7 +29,7 @@ namespace Azure.AI.Details.Common.CLI.AzCli
         AIServices,
 
         /// <summary>
-        /// A "legacy" ai resource (Speech, vision, etc...). Note this has no OpenAI support
+        /// A "legacy" AI resource (Speech, vision, etc...). Note this has no OpenAI support
         /// </summary>
         CognitiveServices,
 

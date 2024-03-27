@@ -15,6 +15,7 @@ namespace Azure.AI.CLI.Common.Clients.Models.Utils
         private delegate void Setter(object? instance, object? value);
         private static readonly BindingFlags ALL_INSTANCE_MEMBERS = BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic;
 
+        /// <inheritdoc />
         public override object ReadJson(JsonReader reader, Type objectType, object? existingValue, JsonSerializer serializer)
         {
             var json = JToken.Load(reader);

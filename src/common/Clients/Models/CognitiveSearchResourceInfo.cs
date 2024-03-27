@@ -1,10 +1,10 @@
 ﻿#nullable enable
 
-using Azure.AI.CLI.Common.Clients.Models.Utils;
-using Newtonsoft.Json;
-
 namespace Azure.AI.Details.Common.CLI.AzCli
 {
+    /// <summary>
+    /// Represents a Cognitive Search resource
+    /// </summary>
     public class CognitiveSearchResourceInfo : ResourceInfoBase
     {
         /// <inheritdoc />
@@ -14,6 +14,9 @@ namespace Azure.AI.Details.Common.CLI.AzCli
             init => _ = value; // do nothing
         }
 
+        /// <summary>
+        /// The endpoint for this search resource
+        /// </summary>
         public string Endpoint =>
             // TODO: Need to find official way of getting this
             $"https://{Name}.search.windows.net";

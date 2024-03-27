@@ -22,7 +22,7 @@ namespace Azure.AI.Details.Common.CLI.AzCli
         public string Name { get; init; }
 
         /// <summary>
-        /// The user name of the owner of this subscription (e.g. john.doe@contoso.com)
+        /// The user name of the currently logged in user (e.g. john.doe@contoso.com)
         /// </summary>
         [JsonProperty("user.name")]
         public string UserName { get; init; }
