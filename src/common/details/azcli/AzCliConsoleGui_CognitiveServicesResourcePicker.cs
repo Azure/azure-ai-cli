@@ -111,7 +111,7 @@ namespace Azure.AI.Details.Common.CLI
         {
             ConsoleHelpers.WriteLineWithHighlight("\n`RESOURCE GROUP`");
 
-            var regionLocation = !string.IsNullOrEmpty(regionLocationFilter) ? await FindRegionAsync(interactive, subscriptionId, regionLocationFilter, true) : new AccountRegionLocationInfo();
+            var regionLocation = !string.IsNullOrEmpty(regionLocationFilter) ? await FindRegionAsync(interactive, subscriptionId, regionLocationFilter, true) : new AzCli.AccountRegionLocationInfo();
             if (regionLocation == null) return null;
 
             var (group, createdNew) = await PickOrCreateResourceGroup(interactive, subscriptionId, regionLocation?.Name, groupFilter);
@@ -139,7 +139,6 @@ namespace Azure.AI.Details.Common.CLI
             if (!agreeTerms && !CheckAgreeTerms(createKind)) return null;
 
             Console.Write("*** CREATING ***");
-            
             var response = await Program.CognitiveServicesClient.CreateResourceAsync(
                 createKind, subscriptionId, group.Name, group.Region, name, sku, Program.CancelToken);
             Console.Write("\r");

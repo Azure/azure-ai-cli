@@ -373,6 +373,25 @@ namespace Azure.AI.Details.Common.CLI
             DisplayException(ex);
         }
 
+        private static void TryCatchErrorOrException(ICommandValues values, Action action)
+        {
+            if (System.Diagnostics.Debugger.IsAttached)
+            {
+                action();
+            }
+            else
+            {
+                try
+                {
+                    action();
+                }
+                catch (Exception ex)
+                {
+                    DisplayErrorOrException(values, ex);
+                }
+            }
+        }
+
         private static bool RunCommand(ICommandValues values)
         {
             string errorInfo = null;

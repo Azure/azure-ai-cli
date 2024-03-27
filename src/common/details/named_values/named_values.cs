@@ -228,7 +228,17 @@ namespace Azure.AI.Details.Common.CLI
     {
         public void Add(string name, string value)
         {
-            _values[name] = value;
+            var exists = _values.ContainsKey(name);
+            var current = exists ? _values[name] : null;
+
+            var matches = exists && current == value;
+            if (matches) return;
+
+            var remove = exists && string.IsNullOrWhiteSpace(current);
+            if (remove) _values.Remove(name);
+
+            _values.Add(name, value);
+            _names.Add(name);
         }
 
         public bool Contains(string name, bool checkDefault = true)
@@ -238,14 +248,13 @@ namespace Azure.AI.Details.Common.CLI
 
         public string Get(string name, bool checkDefault = true)
         {
-            return _values.TryGetValue(name, out var value)
-                ? value
-                : null;
+            return Contains(name, checkDefault) ? _values[name] : null;
         }
 
         public void Reset(string name, string value = null)
         {
             _values.Remove(name);
+            _names.Remove(name);
             if (value != null)
             {
                 Add(name, value);
@@ -260,8 +269,15 @@ namespace Azure.AI.Details.Common.CLI
             }
         }
 
-        public IEnumerable<string> Names => _values.Keys;
+        public IEnumerable<string> Names
+        {
+            get
+            {
+                return _names;
+            }
+        }
 
         private Dictionary<string, string> _values = new Dictionary<string, string>();
+        private List<string> _names = new List<string>();
     }
 }

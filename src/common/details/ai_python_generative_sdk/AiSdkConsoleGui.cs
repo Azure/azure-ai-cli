@@ -3,8 +3,6 @@
 // Licensed under the MIT license. See LICENSE.md file in the project root for full license information.
 //
 
-#nullable enable
-
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
@@ -55,7 +53,7 @@ namespace Azure.AI.Details.Common.CLI
 
     public partial class AiSdkConsoleGui
     {
-        public static async Task<(string?, AzCli.CognitiveServicesResourceInfo?, AzCli.CognitiveSearchResourceInfo?)> VerifyResourceConnections(ICommandValues values, string subscription, string groupName, string projectName)
+        public static async Task<(string, AzCli.CognitiveServicesResourceInfo?, AzCli.CognitiveSearchResourceInfo?)> VerifyResourceConnections(ICommandValues values, string subscription, string groupName, string projectName)
         {
             try
             {
@@ -99,7 +97,7 @@ namespace Azure.AI.Details.Common.CLI
                 return null;
             }
 
-            Func<string?, string?, bool> match = (a, b) => {
+            Func<string, string, bool> match = (a, b) => {
                 return a == b ||
                     a?.Replace(".openai.azure.com/", ".cognitiveservices.azure.com/") == b ||
                     b?.Replace(".openai.azure.com/", ".cognitiveservices.azure.com/") == a;
