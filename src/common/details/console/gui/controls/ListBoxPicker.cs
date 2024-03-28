@@ -19,9 +19,9 @@ namespace Azure.AI.Details.Common.CLI.ConsoleGui
 
         public static int PickIndexOf(string[] lines, int width, int height, Colors normal, Colors selected, int select = 0)
         {
-            if (StdInOutServerHelpers.IsStdInOutServer)
+            if (InOutPipeServer.IsInOutPipeServer)
             {
-                return StdInOutServerHelpers.QuickPick(lines, select);
+                return InOutPipeServer.GetSelectionFromUser(lines, select);
             }
 
             if (height > lines.Length + 2) height = lines.Length + 2;

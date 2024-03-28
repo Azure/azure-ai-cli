@@ -16,9 +16,9 @@ namespace Azure.AI.Details.Common.CLI
     {
         public static string? ReadLineOrDefault(string defaultOnEmpty = "", string? defaultOnEndOfRedirectedInput = null)
         {
-            if (StdInOutServerHelpers.IsStdInOutServer)
+            if (InOutPipeServer.IsInOutPipeServer)
             {
-                var line = StdInOutServerHelpers.QuickInput(string.Empty, defaultOnEmpty);
+                var line = InOutPipeServer.GetInputFromUser(string.Empty, defaultOnEmpty);
                 Console.WriteLine(line);
                 return line;
             }
