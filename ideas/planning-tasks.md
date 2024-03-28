@@ -10,8 +10,6 @@
 🚫 ⏹️ `ai chat evaluate`: wrap python SDK  
 🟩 ⏹️ `ai chat evaluate`: `@file`/`--save` can read/write yaml  
 
-🟩 ⏹️ `ai flow ...`: wrap `pf` CLI  
-
 🟩 ⏹️ `ai dev shell`: populate environment, run bash/cmd  
 
 ## installation/docker

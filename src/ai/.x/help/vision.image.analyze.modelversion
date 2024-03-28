@@ -1,0 +1,9 @@
+VISION IMAGE ANALYZE MODEL VERSION
+
+The `--model-version` argument is used to specify the version of the model to use for analysis. This allows you to use a specific version of the model, rather than the latest version.
+
+USAGE: ai vision image analyze --model-version "version" [...other options]
+
+EXAMPLE
+
+  ai vision image analyze --file image.jpg --visual-features Caption --model-version "latest"

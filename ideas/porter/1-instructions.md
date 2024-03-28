@@ -20,30 +20,33 @@ You are an AI assistant that ports code from C# to Python.
 
 ## Scenario description
 
-I have a C# project in this directory (*.cs, and *.csproj) that I want to make an exact copy of in Python (*.py, requirements.txt). 
+I have a sample implemented in both C# and Python that show the basic set of capabilities of our SDK in both languages.
+* Base C# example: In the `{sample1}-cs` directory, you'll find C# source code and project files that demonstrate the basic set of capabilities of our C# SDK.
+* Base Python example: In the `{sample1}-py` directory, you'll find Python source code and project files that demonstrate the exact same basic set of capabilities of our corresponding Python SDK.
 
-Your job is to help me, by doing the following:
-1. You **must** read all the C# files in the current directory
-2. You **must** create a corresponding python module for each corresponding C# file
-3. Each module you create **must** have the same functionality as the C# file it was created from
-4. Each module you create **must** be named similarly, but using Python naming conventions
-5. Each module you create **must** have the same class names and method names, but using Python naming conventions
-6. Each function you create **must** have the same functionality as the C# function it was created from
+I also have a new sample that shows a new set of features we have created that sample to show.
+* New C# example: In the `{sample2}-cs` directory, you'll find C# source code and project files that demonstrate a NEW set of features we have created that sample to show.
+
+I need you to port the new C# example to Python, following these detailed instructions:
+1. First, you **must** read all the C# and Python files in the `{sample1}-cs` and `{sample1}-py` directory to understand the basic capabilities, and how we have demonstrated them in the C# and Python SDK samples.
+2. Next, you **must** read all the C# files in the `{sample2}-cs` to understand how we have demonstrated the new set of features in the C# SDK sample.
+3. Then, you **must** create a new directory for the new Python source code files following the naming convention: `{sample2}-py`
+4. Next, you **must** create a corresponding python module for each corresponding C# file
+5. Each module you create **must** have the same functionality as the C# file it was created from
+6. Each module you create **must** be named similarly, but using Python naming conventions                                                      
+7. Each module you create **must** have the same class names and method names, but using Python naming conventions
+8. Each function you create **must** have the same functionality as the C# function it was created from
 
 ## Do it now
 Task you must perform:
-1. Please begin, by reading each C# source file.
-2. Please create a corresponding python module for each C# source file.
-3. Some of the modules have already been ported; you only hve to do these
-   * HelperFunctionDescriptionAttribute.cs
-   * HelperFunctionFactory.cs
-   * HelperFunctionFactoryExtensions.cs
-   * HelperFunctionParameterDescriptionAttribute.cs
+1. If I forgot to tell you the directory names (would have curly brackets around them if I didn't give them to you), you **must** ask me for them.
+2. Please begin, by reading each C# and python source code files from Sample 1, 2, and 3.
+3. Analyze the source code and understand the functionality of each file.
+4. Create a new directory for the new Python source code files.
+5. Create a corresponding python module for each C# source file.
 
 ## Bonus
 If you do it perfectly, I'll give you a $100 tip. 
 
 ## Time to begin
 Don't show me the code, just create the files. Do it now. 
-
-

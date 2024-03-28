@@ -1,0 +1,161 @@
+{
+  "Entries": [
+    {
+      "RequestUri": "https://fakeendpoint/v3-flatcontainer/azure.ai.cli/index.json",
+      "RequestMethod": "GET",
+      "RequestHeaders": {
+        "Connection": "close",
+        "X-Forwarded-For": "127.0.0.1",
+        "X-Forwarded-Proto": "https",
+        "X-Real-IP": "127.0.0.1"
+      },
+      "RequestBody": null,
+      "StatusCode": 200,
+      "ResponseHeaders": {
+        "Accept-Ranges": "bytes",
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Expose-Headers": "x-ms-request-id,Server,x-ms-version,Content-Type,Cache-Control,Last-Modified,ETag,x-ms-lease-status,x-ms-blob-type,Content-Length,Date,Transfer-Encoding",
+        "Cache-Control": "no-store",
+        "Connection": "close",
+        "Content-Length": "289",
+        "Content-Type": "application/json",
+        "Date": "Fri, 01 Mar 2024 22:01:31 GMT",
+        "ETag": "0x8DC2F70EE1F211A",
+        "Last-Modified": "Sat, 17 Feb 2024 04:28:45 GMT",
+        "Strict-Transport-Security": "max-age=31536000; includeSubDomains",
+        "x-azure-ref": "20240301T220131Z-72bsb853eh2496u74rgmy1u4rn000000039000000000kv2r",
+        "X-Cache": "PRIVATE_NOSTORE",
+        "X-Content-Type-Options": "nosniff",
+        "x-fd-int-roxy-purgeid": "0",
+        "x-ms-blob-type": "BlockBlob",
+        "x-ms-lease-status": "unlocked",
+        "x-ms-request-id": "99708994-c01e-000d-0824-6c7523000000",
+        "x-ms-version": "2009-09-19"
+      },
+      "ResponseBody": {
+        "versions": [
+          "1.0.0-preview-20231115.3",
+          "1.0.0-preview-20231116.1",
+          "1.0.0-preview-20231205.4",
+          "1.0.0-preview-20231208.1",
+          "1.0.0-preview-20231214.1",
+          "1.0.0-preview-20240207.1",
+          "1.0.0-preview-20240215.1",
+          "1.0.0-preview-20240216.1"
+        ]
+      }
+    },
+    {
+      "RequestUri": "https://fakeendpoint/v3-flatcontainer/azure.ai.cli/index.json",
+      "RequestMethod": "GET",
+      "RequestHeaders": {
+        "Connection": "close",
+        "X-Forwarded-For": "127.0.0.1",
+        "X-Forwarded-Proto": "https",
+        "X-Real-IP": "127.0.0.1"
+      },
+      "RequestBody": null,
+      "StatusCode": 200,
+      "ResponseHeaders": {
+        "Accept-Ranges": "bytes",
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Expose-Headers": "x-ms-request-id,Server,x-ms-version,Content-Type,Cache-Control,Last-Modified,ETag,x-ms-lease-status,x-ms-blob-type,Content-Length,Date,Transfer-Encoding",
+        "Cache-Control": "no-store",
+        "Connection": "close",
+        "Content-Length": "289",
+        "Content-Type": "application/json",
+        "Date": "Fri, 01 Mar 2024 22:01:31 GMT",
+        "ETag": "0x8DC2F70EE1F211A",
+        "Last-Modified": "Sat, 17 Feb 2024 04:28:45 GMT",
+        "Strict-Transport-Security": "max-age=31536000; includeSubDomains",
+        "x-azure-ref": "20240301T220131Z-5hesgcvam938v0tfafb14akgf800000001c0000000001f04",
+        "X-Cache": "PRIVATE_NOSTORE",
+        "X-Content-Type-Options": "nosniff",
+        "x-fd-int-roxy-purgeid": "0",
+        "x-ms-blob-type": "BlockBlob",
+        "x-ms-lease-status": "unlocked",
+        "x-ms-request-id": "5515ddb0-b01e-0028-6324-6cdc5f000000",
+        "x-ms-version": "2009-09-19"
+      },
+      "ResponseBody": {
+        "versions": [
+          "1.0.0-preview-20231115.3",
+          "1.0.0-preview-20231116.1",
+          "1.0.0-preview-20231205.4",
+          "1.0.0-preview-20231208.1",
+          "1.0.0-preview-20231214.1",
+          "1.0.0-preview-20240207.1",
+          "1.0.0-preview-20240215.1",
+          "1.0.0-preview-20240216.1"
+        ]
+      }
+    },
+    {
+      "RequestUri": "https://fakeendpoint/computervision/imageanalysis:analyze?features=smartCrops\u0026api-version=2023-10-01\u0026smartcrops-aspect-ratios=0.9%2C1.78",
+      "RequestMethod": "POST",
+      "RequestHeaders": {
+        "Accept": "application/json",
+        "Connection": "close",
+        "Content-Length": "56",
+        "Content-Type": "application/json",
+        "Ocp-Apim-Subscription-Key": "00000000-0000-0000-0000-000000000000",
+        "User-Agent": "azsdk-net-AI.Vision.ImageAnalysis/1.0.0-beta.2 (.NET 8.0.2; Microsoft Windows 10.0.22621)",
+        "X-Forwarded-For": "127.0.0.1",
+        "X-Forwarded-Proto": "https",
+        "x-ms-client-request-id": "a591a8b3-d4f8-4a03-be57-ffa6bc5d5dbd",
+        "x-ms-return-client-request-id": "true",
+        "X-Real-IP": "127.0.0.1"
+      },
+      "RequestBody": {
+        "url": "https://aka.ms/azsdk/image-analysis/sample.jpg"
+      },
+      "StatusCode": 200,
+      "ResponseHeaders": {
+        "api-supported-versions": "4.0-pre1,2022-07-31-preview,2022-10-12-preview,2023-02-01-preview,2023-04-01-preview,2023-06-01-preview,2023-07-01-preview,2023-10-01,2024-02-01",
+        "apim-request-id": "5a5c7bd7-e273-4267-aa6c-91673641dafd",
+        "Connection": "close",
+        "Content-Length": "233",
+        "Content-Type": "application/json; charset=utf-8",
+        "CSP-Billing-Usage": "CognitiveServices.ComputerVision.Transaction=1",
+        "Date": "Fri, 01 Mar 2024 22:01:32 GMT",
+        "ms-vision-response-time-input-processed": "235",
+        "ms-vision-response-time-input-received": "12",
+        "request-id": "5a5c7bd7-e273-4267-aa6c-91673641dafd",
+        "Strict-Transport-Security": "max-age=31536000; includeSubDomains; preload",
+        "X-Content-Type-Options": "nosniff",
+        "x-envoy-upstream-service-time": "249",
+        "x-ms-region": "East US"
+      },
+      "ResponseBody": {
+        "modelVersion": "2023-10-01",
+        "metadata": {
+          "width": 864,
+          "height": 576
+        },
+        "smartCropsResult": {
+          "values": [
+            {
+              "aspectRatio": 0.9,
+              "boundingBox": {
+                "x": 238,
+                "y": 0,
+                "w": 511,
+                "h": 568
+              }
+            },
+            {
+              "aspectRatio": 1.78,
+              "boundingBox": {
+                "x": 27,
+                "y": 108,
+                "w": 781,
+                "h": 438
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "Variables": {}
+}

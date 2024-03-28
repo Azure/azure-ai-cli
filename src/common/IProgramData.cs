@@ -3,8 +3,7 @@
 // Licensed under the MIT license. See LICENSE.md file in the project root for full license information.
 //
 
-using System;
-// using Azure.AI.OpenAI;
+using Azure.AI.Details.Common.CLI.Telemetry;
 
 namespace Azure.AI.Details.Common.CLI
 {
@@ -50,5 +49,7 @@ namespace Azure.AI.Details.Common.CLI
         bool DisplayKnownErrors(ICommandValues values, Exception ex);
 
         IEventLoggerHelpers EventLoggerHelpers { get; }
+
+        ITelemetry Telemetry { get; }
     }
 }

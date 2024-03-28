@@ -22,16 +22,17 @@ set TARGET_PLATFORM=x64
 set INSTALLER_FILE=Setup-%TARGET_PLATFORM%.exe
 set PACKAGE_URL=https://csspeechstorage.blob.core.windows.net/drop/private/ai/Azure.AI.CLI.%PACKAGE_VERSION%.nupkg
 
-REM Dependencies
-set AZURE_CLI_VERSION=2.57.0
+REM Dependencies (note: do NOT use redirecting URLs like aka.ms)
+set AZURE_CLI_VERSION=2.58.0
 set AZURE_CLI_INSTALLER=azure-cli-%AZURE_CLI_VERSION%-%TARGET_PLATFORM%.msi
 set AZURE_CLI_URL=https://azcliprod.blob.core.windows.net/msi/%AZURE_CLI_INSTALLER%
-set DOTNET_VERSION=8.0.201
+set DOTNET_VERSION=8.0.202
 set DOTNET_INSTALLER=dotnet-sdk-%DOTNET_VERSION%-win-%TARGET_PLATFORM%.exe
 set DOTNET_URL=https://dotnetcli.azureedge.net/dotnet/Sdk/%DOTNET_VERSION%/%DOTNET_INSTALLER%
 set VCRT_VERSION=14.38.33135
 set VCRT_INSTALLER=VC_redist.%TARGET_PLATFORM%.exe
-set VCRT_URL=https://aka.ms/vs/17/release/%VCRT_VERSION%/%VCRT_INSTALLER%
+REM Below URL as redirected from https://aka.ms/vs/17/release/vc_redist.x64.exe while 14.38.33135 is the latest version.
+set VCRT_URL=https://download.visualstudio.microsoft.com/download/pr/c7707d68-d6ce-4479-973e-e2a3dc4341fe/1AD7988C17663CC742B01BEF1A6DF2ED1741173009579AD50A94434E54F56073/%VCRT_INSTALLER%
 
 REM Check for WiX toolset
 where candle.exe >nul 2>&1

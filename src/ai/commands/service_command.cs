@@ -1,4 +1,4 @@
-﻿//
+//
 // Copyright (c) Microsoft. All rights reserved.
 // Licensed under the MIT license. See LICENSE.md file in the project root for full license information.
 //
@@ -15,7 +15,6 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Threading;
 using System.Threading.Tasks;
-using Newtonsoft.Json.Linq;
 
 namespace Azure.AI.Details.Common.CLI
 {
@@ -262,8 +261,8 @@ namespace Azure.AI.Details.Common.CLI
 
         private void CheckWriteOutputValueFromJson(string part1, string part2, string json, string valueKey = null)
         {
-            var parsed = !string.IsNullOrEmpty(json) ? JToken.Parse(json) : null;
-            var value = !string.IsNullOrEmpty(valueKey) ? parsed?[valueKey]?.ToString() : json;
+            var parsed = !string.IsNullOrEmpty(json) ? JsonDocument.Parse(json) : null;
+            var value = !string.IsNullOrEmpty(valueKey) ? parsed?.GetPropertyStringOrNull(valueKey) : json;
             CheckWriteOutputValue(part1, part2, value);
         }
 

@@ -1,3 +1,8 @@
+//
+// Copyright (c) Microsoft. All rights reserved.
+// Licensed under the MIT license. See LICENSE.md file in the project root for full license information.
+//
+
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -6,12 +11,11 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Runtime.InteropServices;
 using System.Text;
+using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Adapter;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using YamlDotNet.RepresentationModel;
 
 namespace Azure.AI.Details.Common.CLI.TestFramework
@@ -74,6 +78,7 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
             var expect = YamlTestProperties.Get(test, "expect");
             var expectGpt = YamlTestProperties.Get(test, "expect-gpt");
             var notExpect = YamlTestProperties.Get(test, "not-expect");
+            var env = YamlTestProperties.Get(test, "env");
             var workingDirectory = YamlTestProperties.Get(test, "working-directory");
             var timeout = int.Parse(YamlTestProperties.Get(test, "timeout"));
             var simulate = YamlTestProperties.Get(test, "simulate");
@@ -92,8 +97,8 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
                 var start = DateTime.Now;
 
                 var outcome = string.IsNullOrEmpty(simulate)
-                    ? RunTestCase(test, skipOnFailure, cli, command, script, scriptIsBash, foreachItem, arguments, input, expect, expectGpt, notExpect, workingDirectory, timeout, out string stdOut, out string stdErr, out string errorMessage, out string stackTrace, out string additional, out string debugTrace)
-                    : SimulateTestCase(test, simulate, cli, command, script, scriptIsBash, foreachItem, arguments, input, expect, expectGpt, notExpect, workingDirectory, out stdOut, out stdErr, out errorMessage, out stackTrace, out additional, out debugTrace);
+                    ? RunTestCase(test, skipOnFailure, cli, command, script, scriptIsBash, foreachItem, arguments, input, expect, expectGpt, notExpect, env, workingDirectory, timeout, out string stdOut, out string stdErr, out string errorMessage, out string stackTrace, out string additional, out string debugTrace)
+                    : SimulateTestCase(test, simulate, cli, command, script, scriptIsBash, foreachItem, arguments, input, expect, expectGpt, notExpect, env, workingDirectory, out stdOut, out stdErr, out errorMessage, out stackTrace, out additional, out debugTrace);
 
                 // #if DEBUG
                 // additional += outcome == TestOutcome.Failed ? $"\nEXTRA: {ExtraDebugInfo()}" : "";
@@ -115,14 +120,14 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
         {
             var testResultDisplayName = testDisplayName;
 
-            if(JToken.Parse(foreachItem).Type == JTokenType.Object)
+            var document = JsonDocument.Parse(foreachItem);
+            if(document.RootElement.ValueKind == JsonValueKind.Object)
             {
-                // get JObject properties
-                JObject foreachItemObject = JObject.Parse(foreachItem);
-                foreach(var property in foreachItemObject.Properties())
+                var foreachItemObject = document.RootElement;
+                foreach(var property in foreachItemObject.EnumerateObject())
                 {
                     var keys = property.Name.Split(new char[] { '\t' });
-                    var values = property.Value.Value<string>().Split(new char[] { '\t' });
+                    var values = property.Value.GetString().Split(new char[] { '\t' });
 
                     for (int i = 0; i < keys.Length; i++)
                     {
@@ -146,43 +151,39 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
         // Finds "token" in foreach key and redacts its value
         private static string RedactSensitiveDataFromForeachItem(string foreachItem)
         {
-            var foreachObject = JObject.Parse(foreachItem);
-            
-            var sb = new StringBuilder();
-            var sw = new StringWriter(sb);
+            using var stream = new MemoryStream();
+            using var writer = new Utf8JsonWriter(stream, new JsonWriterOptions{ Indented = false });
+            writer.WriteStartObject();
 
-            using (JsonWriter writer = new JsonTextWriter(sw){Formatting = Formatting.None})
+            var foreachObject = JsonDocument.Parse(foreachItem).RootElement;
+            foreach (var item in foreachObject.EnumerateObject())
             {
-                writer.WriteStartObject();
-                foreach (var item in foreachObject)
+                if (string.IsNullOrWhiteSpace(item.Value.ToString()))
                 {
-                    if (string.IsNullOrWhiteSpace(item.Value.ToString()))
-                    {
-                        continue;
-                    }
-                    var keys = item.Key.ToLower().Split(new char[] {'\t'});
-                    
-                    // find index of "token" in foreach key and redact its value to avoid getting it displayed
-                    var tokenIndex = Array.IndexOf(keys, "token");
-                    var valueString = item.Value;
-                    
-                    if (tokenIndex >= 0)
-                    {
-                        var values = item.Value.ToString().Split(new char[] {'\t'});
-                        if (values.Count() == keys.Count())
-                        {
-                            values[tokenIndex] = "***";
-                            valueString = string.Join("\t", values);
-                        }
-                    }
-                    writer.WritePropertyName(item.Key);
-                    writer.WriteValue(valueString);
+                    continue;
                 }
-
-                writer.WriteEndObject();
+                var keys = item.Name.ToLower().Split(new char[] {'\t'});
+                
+                //find index of "token" in foreach key and redact its value to avoid getting it displayed
+                var tokenIndex = Array.IndexOf(keys, "token");
+                var valueString = item.Value.GetRawText();
+                
+                if (tokenIndex >= 0)
+                {
+                    var values = item.Value.ToString().Split(new char[] {'\t'});
+                    if (values.Count() == keys.Count())
+                    {
+                        values[tokenIndex] = "***";
+                        valueString = string.Join("\t", values);
+                    }
+                }
+                writer.WritePropertyName(item.Name);
+                writer.WriteRawValue(valueString);
             }
 
-            return sb.ToString();
+            writer.WriteEndObject();
+
+            return Encoding.UTF8.GetString(stream.ToArray());
         }
 
         private static IEnumerable<string> ExpandForEachGroups(string @foreach)
@@ -202,7 +203,14 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
                     .ToList();
             }
 
-            return dicts.Select(d => JsonConvert.SerializeObject(d));
+            return dicts.Select(d =>
+            {
+                var options = new JsonSerializerOptions
+                {
+                    WriteIndented = false
+                };
+                return JsonSerializer.Serialize(d, options);
+            });
         }
 
         private static Dictionary<string, string> DupAndAdd(Dictionary<string, string> d, string key, string value)
@@ -212,7 +220,7 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
             return dup;
         }
 
-        private static TestOutcome RunTestCase(TestCase test, bool skipOnFailure, string cli, string command, string script, bool scriptIsBash, string @foreach, string arguments, string input, string expect, string expectGpt, string notExpect, string workingDirectory, int timeout, out string stdOut, out string stdErr, out string errorMessage, out string stackTrace, out string additional, out string debugTrace)
+        private static TestOutcome RunTestCase(TestCase test, bool skipOnFailure, string cli, string command, string script, bool scriptIsBash, string @foreach, string arguments, string input, string expect, string expectGpt, string notExpect, string env, string workingDirectory, int timeout, out string stdOut, out string stdErr, out string errorMessage, out string stackTrace, out string additional, out string debugTrace)
         {
             var outcome = TestOutcome.None;
 
@@ -251,6 +259,7 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
                     RedirectStandardOutput = true,
                     WorkingDirectory = workingDirectory
                 };
+                UpdateEnvironment(startInfo, env);
                 UpdatePathEnvironment(startInfo);
 
                 var process = Process.Start(startInfo);
@@ -337,23 +346,24 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
             if (!string.IsNullOrEmpty(json))
             {
                 Logger.Log($"KeyValuePairsFromJson: 'json'='{json}'");
-                var parsed = JToken.Parse(json);
-                if (parsed.Type == JTokenType.String && allowSimpleString)
+                using JsonDocument document = JsonDocument.Parse(json);
+                var parsed = document.RootElement;
+                if (parsed.ValueKind == JsonValueKind.String && allowSimpleString)
                 {
                     // if it's a simple string, there is no "key" for the argument... pass it as value with an empty string as key
                     // this will ensure that an additional '--' isn't emitted preceding the string-only arguments
-                    kvs.Add(new KeyValuePair<string, string>("", parsed.Value<string>()));
+                    kvs.Add(new KeyValuePair<string, string>("", parsed.GetString()));
                 }
-                else if (parsed.Type != JTokenType.Object)
+                else if (parsed.ValueKind != JsonValueKind.Object)
                 {
                     // if it's not a simple string, it must be an object... if it's not, we'll just log and continue
                     Logger.Log("KeyValuePairsFromJson: Invalid json (only supports `\"string\"`, or `{\"mapItem1\": \"value1\", \"...\": \"...\"}`!");
                 }
                 else
                 {
-                    foreach (var item in parsed as JObject)
+                    foreach (var item in parsed.EnumerateObject())
                     {
-                        kvs.Add(new KeyValuePair<string, string>(item.Key, item.Value.Value<string>()));
+                        kvs.Add(new KeyValuePair<string, string>(item.Name, item.Value.GetString()));
                     }
                 }
             }
@@ -594,6 +604,18 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
             return new string[]{ "" };
         }
 
+        private static void UpdateEnvironment(ProcessStartInfo startInfo, string envAsMultiLineString)
+        {
+            var ok = !string.IsNullOrEmpty(envAsMultiLineString);
+            if (!ok) return;
+            
+            var env = YamlEnvHelpers.GetEnvironmentFromMultiLineString(envAsMultiLineString);
+            foreach (var item in env)
+            {
+                startInfo.Environment[item.Key] = item.Value;
+            }
+        }
+
         static void UpdatePathEnvironment(ProcessStartInfo startInfo)
         {
             var cli = new FileInfo(startInfo.FileName);
@@ -785,7 +807,7 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
             return args.ToString().TrimEnd();
         }
 
-        private static TestOutcome SimulateTestCase(TestCase test, string simulate, string cli, string command, string script, bool scriptIsBash, string @foreach, string arguments, string input, string expect, string expectGpt, string notExpect, string workingDirectory, out string stdOut, out string stdErr, out string errorMessage, out string stackTrace, out string additional, out string debugTrace)
+        private static TestOutcome SimulateTestCase(TestCase test, string simulate, string cli, string command, string script, bool scriptIsBash, string @foreach, string arguments, string input, string expect, string expectGpt, string notExpect, string env, string workingDirectory, out string stdOut, out string stdErr, out string errorMessage, out string stackTrace, out string additional, out string debugTrace)
         {
             var sb = new StringBuilder();
             sb.AppendLine($"cli='{cli?.Replace("\n", "\\n")}'");

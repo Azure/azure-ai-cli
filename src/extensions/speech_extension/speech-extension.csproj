@@ -1,0 +1,28 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <AssemblyName>Azure.AI.CLI.Extensions.Speech</AssemblyName>
+    <TargetFramework>net8.0</TargetFramework>
+    <RootNamespace>Azure.AI.Details.Common.CLI.Extensions.Speech</RootNamespace>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <SuppressTfmSupportBuildWarnings>true</SuppressTfmSupportBuildWarnings>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="JmesPath.Net" Version="1.0.308" />
+    <PackageReference Include="Microsoft.Bot.Schema" Version="4.12.2" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+    <PackageReference Include="System.Interactive.Async" Version="6.0.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\common\common.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+  </ItemGroup>
+
+  <Import Project="BuildCommon.targets" />
+
+</Project>

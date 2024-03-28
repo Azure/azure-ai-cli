@@ -7,7 +7,6 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Collections.Generic;
-using Newtonsoft.Json.Linq;
 using Azure.AI.Details.Common.CLI.ConsoleGui;
 using System.Text.Json;
 using System.IO;
@@ -39,18 +38,18 @@ namespace Azure.AI.Details.Common.CLI
             try
             {
                 var projectJson = PythonSDKWrapper.ListProjects(values, subscription);
-                var projects = JObject.Parse(projectJson)["projects"] as JArray;
-                var project = projects.FirstOrDefault(x => x["name"].ToString() == projectName);
+                var projects = JsonDocument.Parse(projectJson).GetPropertyArrayOrNull("projects");
+                var project = projects?.FirstOrDefault(x => x.GetProperty("name").ToString() == projectName);
                 if (project == null) return (null, null, null);
 
-                var hub = project["workspace_hub"].ToString();
+                var hub = project?.GetPropertyStringOrNull("workspace_hub");
                 var hubName = hub.Split('/').Last();
 
                 var json = PythonSDKWrapper.ListConnections(values, subscription, groupName, projectName);
                 if (string.IsNullOrEmpty(json)) return (null, null, null);
 
-                var connections = JObject.Parse(json)["connections"] as JArray;
-                if (connections.Count == 0) return (null, null, null);
+                var connections = JsonDocument.Parse(json).GetPropertyArrayOrEmpty("connections");
+                if (connections.Count() == 0) return (null, null, null);
 
                 var foundOpenAiResource = await FindAndVerifyOpenAiResourceConnection(subscription, connections);
                 var foundSearchResource = await FindAndVerifySearchResourceConnection(subscription, connections);
@@ -64,13 +63,12 @@ namespace Azure.AI.Details.Common.CLI
             }
         }
 
-        private static async Task<AzCli.CognitiveServicesResourceInfo?> FindAndVerifyOpenAiResourceConnection(string subscription, JArray connections)
+        private static async Task<AzCli.CognitiveServicesResourceInfo?> FindAndVerifyOpenAiResourceConnection(string subscription, JsonElement[] connections)
         {
-            var openaiConnection = connections.FirstOrDefault(x => x["name"].ToString().Contains("Default_AzureOpenAI") && x["type"].ToString() == "azure_open_ai");
+            var openaiConnection = connections.FirstOrDefault(x => x.GetPropertyStringOrNull("name").Contains("Default_AzureOpenAI") && x.GetPropertyStringOrNull("type") == "azure_open_ai");
+            if (string.IsNullOrEmpty(openaiConnection.GetPropertyStringOrNull("name"))) return null;
 
-            if (openaiConnection == null) return null;
-
-            var openaiEndpoint = openaiConnection?["target"].ToString();
+            var openaiEndpoint = openaiConnection.GetPropertyStringOrNull("target");
             if (string.IsNullOrEmpty(openaiEndpoint)) return null;
 
             var responseOpenAi = await AzCli.ListCognitiveServicesResources(subscription, "OpenAI");
@@ -89,12 +87,12 @@ namespace Azure.AI.Details.Common.CLI
             return matchOpenAiEndpoint.First();
         }
 
-        private static async Task<AzCli.CognitiveSearchResourceInfo?> FindAndVerifySearchResourceConnection(string subscription, JArray connections)
+        private static async Task<AzCli.CognitiveSearchResourceInfo?> FindAndVerifySearchResourceConnection(string subscription, JsonElement[] connections)
         {
-            var searchConnection = connections.FirstOrDefault(x => x["name"].ToString().Contains("AzureAISearch") && x["type"].ToString() == "cognitive_search");
-            if (searchConnection == null) return null;
+            var searchConnection = connections.FirstOrDefault(x => x.GetPropertyStringOrNull("name").Contains("AzureAISearch") && x.GetPropertyStringOrNull("type") == "cognitive_search");
+            if (string.IsNullOrEmpty(searchConnection.GetPropertyStringOrNull("name"))) return null;
 
-            var searchEndpoint = searchConnection?["target"].ToString();
+            var searchEndpoint = searchConnection.GetPropertyStringOrNull("target");
             if (string.IsNullOrEmpty(searchEndpoint)) return null;
 
             var responseSearch = await AzCli.ListSearchResources(subscription, null);

@@ -12,7 +12,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 using System.Net;
-using Newtonsoft.Json.Linq;
 using Azure.AI.Details.Common.CLI.ConsoleGui;
 
 namespace Azure.AI.Details.Common.CLI
@@ -58,14 +57,8 @@ namespace Azure.AI.Details.Common.CLI
         {
             var allowCreateResource = !string.IsNullOrEmpty(allowCreateResourceOption);
 
-            Console.Write("\rName: *** Loading choices ***");
-            var response = await AzCli.ListCognitiveServicesResources(subscriptionId, kinds);
-
-            Console.Write("\rName: ");
-            if (string.IsNullOrEmpty(response.Output.StdOutput) && !string.IsNullOrEmpty(response.Output.StdError))
-            {
-                throw new ApplicationException($"ERROR: Loading Cognitive Services resources: {response.Output.StdError}");
-            }
+            var listResourcesFunc = async () => await AzCli.ListCognitiveServicesResources(subscriptionId, kinds);
+            var response = await LoginHelpers.GetResponseOnLogin<AzCli.CognitiveServicesResourceInfo[]>(interactive, "resource", listResourcesFunc);
 
             var resources = response.Payload
                 .Where(x => MatchResourceFilter(x, regionLocationFilter, groupFilter, resourceFilter))

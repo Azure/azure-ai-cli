@@ -6,7 +6,6 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
-using Newtonsoft.Json;
 
 namespace Azure.AI.Details.Common.CLI
 {
@@ -94,6 +93,7 @@ namespace Azure.AI.Details.Common.CLI
         public CommonNamedValueTokenParsers(bool includeKeyAndRegion = true) : base(
 
             new NamedValueTokenParser("--help",       "--?", "1", "0", null, null, "true", "display.help"),
+            new NamedValueTokenParser("--version",       "--v", "1", "0", null, null, "true", "display.version"),
             new NamedValueTokenParser("--cls",        "x.cls", "01", "1;0", "true;false", null, "true"),
             new NamedValueTokenParser("--pause",      "x.pause", "01", "1;0", "true;false", null, "true"),
             new NamedValueTokenParser("--quiet",      "x.quiet", "01", "1;0", "true;false", null, "true"),

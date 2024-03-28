@@ -13,7 +13,6 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using Newtonsoft.Json.Linq;
 using Microsoft.SemanticKernel;
 using Microsoft.SemanticKernel.Memory;
 using Microsoft.SemanticKernel.Connectors.Memory.AzureCognitiveSearch;
@@ -116,7 +115,7 @@ namespace Azure.AI.Details.Common.CLI
             StartCommand();
 
             var subscription = await AzCliConsoleGui.PickSubscriptionAsync(true, true);
-            var openAiResource = await AzCliConsoleGui.PickOrCreateAndConfigCognitiveServicesOpenAiKindResource(true, false, subscription.Id);
+            var openAiResource = await AzCliConsoleGui.PickOrCreateAndConfigCognitiveServicesOpenAiKindResource(null, true, subscription.Id, skipChat: false, skipEmbeddings: false, skipEvaluations: true);
             var cogSearchResource = await AzCliConsoleGui.PickOrCreateAndConfigCogSearchResource(false, subscription.Id, openAiResource.RegionLocation, openAiResource.Group);
             // var aiHubResource = await AiSdkConsoleGui.PickOrCreateAiHubResource(_values, subscription.Id);
             // var aiHubProject = AiSdkConsoleGui.PickOrCreateAndConfigAiHubProject(true, true, _values, subscription.Id, aiHubResource.Id, openAiResource.Group, openAiResource.Endpoint, openAiResource.Key, cogSearchResource.Endpoint, cogSearchResource.Key);
@@ -385,6 +384,7 @@ namespace Azure.AI.Details.Common.CLI
             return (picked == 0);
         }
 
+#nullable enable
         private IKernel? CreateSemanticKernel(string searchEndpoint, string searchApiKey, string embeddingsEndpoint, string embeddingsDeployment, string embeddingsApiKey)
         {
             var store = new AzureCognitiveSearchMemoryStore(searchEndpoint, searchApiKey);
@@ -395,6 +395,7 @@ namespace Azure.AI.Details.Common.CLI
 
             return kernelWithACS;
         }
+#nullable disable
 
         private static async Task StoreMemoryAsync(IKernel kernel, string index, IEnumerable<KeyValuePair<string, string>> kvps)
         {

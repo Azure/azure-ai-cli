@@ -8,6 +8,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.IO;
+using System.ComponentModel;
+using System.Xml.Linq;
 
 namespace Azure.AI.Details.Common.CLI
 {
@@ -54,6 +56,25 @@ namespace Azure.AI.Details.Common.CLI
                 throw new Exception(values["error"]);
             }
             return value;
+        }
+
+        public static TVal GetOrAdd<TVal>(this INamedValues values, string name, Func<TVal> creator)
+        {
+            var converter = TypeDescriptor.GetConverter(typeof(TVal));
+
+            // TODO Should we have a TryGet pattern instead to avoid double lookups?
+            if (values.Contains(name, true))
+            {
+                string stringValue = values[name];
+                return (TVal)converter.ConvertFromInvariantString(stringValue);
+            }
+            else
+            {
+                TVal val = creator();
+                string stringValue = converter.ConvertToInvariantString(val);
+                values.Add(name, stringValue);
+                return val;
+            }
         }
 
         public static string ReplaceValues(this string s, INamedValues values)
@@ -147,6 +168,11 @@ namespace Azure.AI.Details.Common.CLI
             values.Add("display.help", "true");
         }
 
+        public static void AddDisplayVersionRequest(this INamedValues values)
+        {
+            values.Add("display.version", "true");
+        }
+
         public static void AddExpandHelpRequest(this INamedValues values, bool value = true)
         {
             values.Add("display.help.expand", value ? "true" : "false");
@@ -155,6 +181,16 @@ namespace Azure.AI.Details.Common.CLI
         public static void AddDumpHelpRequest(this INamedValues values, bool value = true)
         {
             values.Add("display.help.dump", value ? "true" : "false");
+        }
+
+        public static bool DisplayVersionRequested(this INamedValues values)
+        {
+            return values.GetOrDefault("display.version", false);
+        }
+
+        public static bool DisplayUpdateRequested(this INamedValues values)
+        {
+            return values.GetOrDefault("display.update", false);
         }
 
         public static bool DisplayHelpRequested(this INamedValues values)

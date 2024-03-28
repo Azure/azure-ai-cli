@@ -1,3 +1,8 @@
+//
+// Copyright (c) Microsoft. All rights reserved.
+// Licensed under the MIT license. See LICENSE.md file in the project root for full license information.
+//
+
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Adapter;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
@@ -18,7 +23,7 @@ namespace Azure.AI.Details.Common.CLI.RecordedTestAdapter
     {
         public void RunTests(IEnumerable<TestCase> tests, IRunContext runContext, IFrameworkHandle frameworkHandle)
         {
-            Logger.Log(frameworkHandle);
+            Logger.Log(new YamlTestFrameworkTestAdapterMessageLogger(frameworkHandle));
             Logger.Log($"RecordingExecutor.RunTests(IEnumerable<TestCase>(): ENTER");
             Logger.Log($"RecordingExecutor.RunTests(IEnumerable<TestCase>(): count={tests.Count()}");
             RecordedTestAdapter.RunTests(tests, runContext, frameworkHandle);
@@ -27,7 +32,7 @@ namespace Azure.AI.Details.Common.CLI.RecordedTestAdapter
 
         public void RunTests(IEnumerable<string> sources, IRunContext runContext, IFrameworkHandle frameworkHandle)
         {
-            Logger.Log(frameworkHandle);
+            Logger.Log(new YamlTestFrameworkTestAdapterMessageLogger(frameworkHandle));
             Logger.Log($"RecordingExecutor.RunTests(IEnumerable<string>(): ENTER");
             Logger.Log($"RecordingExecutor.RunTests(IEnumerable<string>(): count={sources.Count()}");
             RunTests(RecordedTestAdapter.GetTestsFromFiles(sources), runContext, frameworkHandle);

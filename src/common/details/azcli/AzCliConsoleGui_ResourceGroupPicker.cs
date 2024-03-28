@@ -12,7 +12,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 using System.Net;
-using Newtonsoft.Json.Linq;
 using Azure.AI.Details.Common.CLI.ConsoleGui;
 
 namespace Azure.AI.Details.Common.CLI
@@ -45,14 +44,8 @@ namespace Azure.AI.Details.Common.CLI
         {
             var allowCreateGroup = !string.IsNullOrEmpty(allowCreateGroupOption);
 
-            Console.Write("\rGroup: *** Loading choices ***");
-            var response = await AzCli.ListResourceGroups(subscription, regionLocation);
-
-            Console.Write("\rGroup: ");
-            if (string.IsNullOrEmpty(response.Output.StdOutput) && !string.IsNullOrEmpty(response.Output.StdError))
-            {
-                throw new ApplicationException($"ERROR: Loading resource groups: {response.Output.StdError}");
-            }
+            var listResourcesFunc = async () => await AzCli.ListResourceGroups(subscription, regionLocation);
+            var response = await LoginHelpers.GetResponseOnLogin<AzCli.ResourceGroupInfo[]>(interactive, "group", listResourcesFunc, "Group");
 
             var groups = response.Payload
                 .Where(x => MatchGroupFilter(x, groupFilter))

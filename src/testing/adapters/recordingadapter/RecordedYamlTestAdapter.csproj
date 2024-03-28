@@ -11,11 +11,11 @@
   </ItemGroup>
 
   <ItemGroup>
-      <None Include="..\recordings\*.json">
+      <None Include="..\..\..\..\tests\recordings\*.json">
           <Link>Recordings\%(RecursiveDir)%(Filename)%(Extension)</Link>
           <CopyToOutputDirectory>Never</CopyToOutputDirectory>
       </None>
-      <None Include="..\*.yaml">
+      <None Include="..\..\..\..\tests\*.yaml">
           <Link>Tests\%(RecursiveDir)%(Filename)%(Extension)</Link>
           <CopyToOutputDirectory>Never</CopyToOutputDirectory>
       </None>

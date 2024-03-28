@@ -1,4 +1,4 @@
-﻿//
+//
 // Copyright (c) Microsoft. All rights reserved.
 // Licensed under the MIT license. See LICENSE.md file in the project root for full license information.
 //
@@ -15,7 +15,6 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Threading;
 using System.Threading.Tasks;
-using Newtonsoft.Json.Linq;
 
 namespace Azure.AI.Details.Common.CLI
 {
@@ -53,8 +52,42 @@ namespace Azure.AI.Details.Common.CLI
         {
             CheckPath();
 
-            switch (command)
+            var check = string.Join(".", command
+                .Split('.')
+                .Take(2)
+                .ToArray());
+
+            switch (check)
             {
+                case "speech.synthesize":
+                    new SynthesizeCommand(_values).RunCommand();
+                    break;
+
+                case "speech.recognize":
+                    new RecognizeCommand(_values).RunCommand();
+                    break;
+
+                case "speech.intent":
+                    new IntentCommand(_values).RunCommand();
+                    break;
+
+                case "speech.translate":
+                    new TranslateCommand(_values).RunCommand();
+                    break;
+
+                case "speech.batch":
+                    new BatchCommand(_values).RunCommand();
+                    break;
+
+                case "speech.csr":
+                    new CustomSpeechRecognitionCommand(_values).RunCommand();
+                    break;
+
+                case "speech.profile":
+                case "speech.speaker":
+                    new ProfileCommand(_values).RunCommand();
+                    break;
+
                 default:
                     _values.AddThrowError("WARNING:", $"'{command.Replace('.', ' ')}' NOT YET IMPLEMENTED!!");
                     break;

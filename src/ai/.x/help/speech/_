@@ -1,25 +1,23 @@
-   ___ ____  ___  _____   ___ ___  ___ ___ ____ __ __
-  / _ /_  / / _ |/_  _/  / __/ _ \/ __/ __/ ___/ // /
- / __ |/ /_/ __ |_/ /_  _\ \/ ___/ _// _// /__/ _  /  
-/_/ |_/___/_/ |_/____/ /___/_/  /___/___/\___/_//_/   
+   ___  _____   ___ ___  ___ ___ ____ __ __
+  / _ |/_  _/  / __/ _ \/ __/ __/ ___/ // /
+ / __ |_/ /_  _\ \/ ___/ _// _// /__/ _  /  
+/_/ |_/____/ /___/_/  /___/___/\___/_//_/   
 
 USAGE: ai speech <command> [...]
 
 COMMANDS
 
-`#e_;*` ai speech recognize [...]       (see: ai help speech recognize)
-`#e_;*` ai speech synthesize [...]      (see: ai help speech synthesize)
+  ai speech recognize [...]       (see: ai help speech recognize)
+  ai speech synthesize [...]      (see: ai help speech synthesize)
 
-`#e_;*` ai speech intent [...]          (see: ai help speech intent)
-`#e_;*` ai speech translate [...]       (see: ai help speech translate)
+  ai speech intent [...]          (see: ai help speech intent)
+  ai speech translate [...]       (see: ai help speech translate)
 
-`#e_;*` ai speech batch [...]           (see: ai help speech batch)
-`#e_;*` ai speech csr [...]             (see: ai help speech csr)
+  ai speech batch [...]           (see: ai help speech batch)
+  ai speech csr [...]             (see: ai help speech csr)
 
-`#e_;*` ai speech profile [...]         (see: ai help speech profile)
-`#e_;*` ai speech speaker [...]         (see: ai help speech speaker)
-
-`#e_;* - COMING SOON`
+  ai speech profile [...]         (see: ai help speech profile)
+  ai speech speaker [...]         (see: ai help speech speaker)
 
 ADDITIONAL TOPICS
 

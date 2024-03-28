@@ -1,3 +1,8 @@
+//
+// Copyright (c) Microsoft. All rights reserved.
+// Licensed under the MIT license. See LICENSE.md file in the project root for full license information.
+//
+
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Adapter;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
@@ -22,7 +27,7 @@ namespace Azure.AI.Details.Common.CLI.RecordedTestAdapter
         {
             try
             {
-                Logger.Log(logger);
+                Logger.Log(new YamlTestFrameworkTestAdapterMessageLogger(logger));
                 Logger.Log($"RecordingDiscoverer.DiscoverTests(): ENTER");
                 Logger.Log($"RecordingDiscoverer.DiscoverTests(): count={sources.Count()}");
                 foreach (var test in RecordedTestAdapter.GetTestsFromFiles(sources))

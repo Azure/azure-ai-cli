@@ -7,7 +7,6 @@ using System;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
-using Newtonsoft.Json.Linq;
 using Azure.AI.Details.Common.CLI;
 using System.Collections.Generic;
 
@@ -74,6 +73,17 @@ namespace Azure.AI.Details.Common.CLI
             public string Key;
         }
 
+        public struct CognitiveServicesVisionResourceInfo
+        {
+            public string Id;
+            public string Group;
+            public string Name;
+            public string Kind;
+            public string RegionLocation;
+            public string Endpoint;
+
+            public string Key;
+        }
 
         public struct CognitiveServicesKeyInfo
         {
@@ -156,19 +166,19 @@ namespace Azure.AI.Details.Common.CLI
             var deviceCodePart = useDeviceCode ? "--use-device-code" : "";
             var queryPart = $"--query \"[?state=='Enabled'].{{Name:name,Id:id,IsDefault:isDefault,UserName:user.name}}\"";
 
-            var parsed = await ProcessHelpers.ParseShellCommandJson<JArray>("az", $"login --output json {queryPart} {deviceCodePart}", GetUserAgentEnv(), null, stdErrHandler);
+            var parsed = await ProcessHelpers.ParseShellCommandJson("az", $"login --output json {queryPart} {deviceCodePart}", GetUserAgentEnv(), null, stdErrHandler);
             var accounts = parsed.Payload;
 
             var x = new ParsedJsonProcessOutput<SubscriptionInfo[]>(parsed.Output);
-            x.Payload = new SubscriptionInfo[accounts.Count];
+            x.Payload = new SubscriptionInfo[accounts.GetArrayLength()];
 
             var i = 0;
-            foreach (var account in accounts)
+            foreach (var account in accounts.EnumerateArray())
             {
-                x.Payload[i].Id = account["Id"].Value<string>();
-                x.Payload[i].Name = account["Name"].Value<string>();
-                x.Payload[i].IsDefault = account["IsDefault"].Value<bool>();
-                x.Payload[i].UserName = account["UserName"].Value<string>();
+                x.Payload[i].Id = account.GetPropertyStringOrEmpty("Id");
+                x.Payload[i].Name = account.GetPropertyStringOrEmpty("Name");
+                x.Payload[i].IsDefault = account.GetPropertyBool("IsDefault", false);
+                x.Payload[i].UserName = account.GetPropertyStringOrEmpty("UserName");
                 i++;
             }
 
@@ -177,19 +187,19 @@ namespace Azure.AI.Details.Common.CLI
 
         public static async Task<ParsedJsonProcessOutput<SubscriptionInfo[]>> ListAccounts()
         {
-            var parsed = await ProcessHelpers.ParseShellCommandJson<JArray>("az", "account list --refresh --output json --query \"[?state=='Enabled'].{Name:name,Id:id,IsDefault:isDefault,UserName:user.name}\"", GetUserAgentEnv());
+            var parsed = await ProcessHelpers.ParseShellCommandJson("az", "account list --refresh --output json --query \"[?state=='Enabled'].{Name:name,Id:id,IsDefault:isDefault,UserName:user.name}\"", GetUserAgentEnv());
             var accounts = parsed.Payload;
 
             var x = new ParsedJsonProcessOutput<SubscriptionInfo[]>(parsed.Output);
-            x.Payload = new SubscriptionInfo[accounts.Count];
+            x.Payload = new SubscriptionInfo[accounts.GetArrayLength()];
 
             var i = 0;
-            foreach (var account in accounts)
+            foreach (var account in accounts.EnumerateArray())
             {
-                x.Payload[i].Id = account["Id"].Value<string>();
-                x.Payload[i].Name = account["Name"].Value<string>();
-                x.Payload[i].IsDefault = account["IsDefault"].Value<bool>();
-                x.Payload[i].UserName = account["UserName"].Value<string>();
+                x.Payload[i].Id = account.GetPropertyStringOrEmpty("Id");
+                x.Payload[i].Name = account.GetPropertyStringOrEmpty("Name");
+                x.Payload[i].IsDefault = account.GetPropertyBool("IsDefault", false);
+                x.Payload[i].UserName = account.GetPropertyStringOrEmpty("UserName");
                 i++;
             }
 
@@ -198,7 +208,7 @@ namespace Azure.AI.Details.Common.CLI
 
         public static async Task<ParsedJsonProcessOutput<string>> SetAccount(string subscriptionId)
         {
-            var parsed = await ProcessHelpers.ParseShellCommandJson<JObject>("az", $"account set --output json --subscription {subscriptionId}", GetUserAgentEnv());
+            var parsed = await ProcessHelpers.ParseShellCommandJson("az", $"account set --output json --subscription {subscriptionId}", GetUserAgentEnv());
 
             var x = new ParsedJsonProcessOutput<string>(parsed.Output);
             x.Payload = subscriptionId;
@@ -210,19 +220,19 @@ namespace Azure.AI.Details.Common.CLI
         {
             var supportedRegions = await ListSupportedResourceRegions();
 
-            var parsed = await ProcessHelpers.ParseShellCommandJson<JArray>("az", "account list-locations --output json --query \"[].{Name:name,RegionalDisplayName:regionalDisplayName,DisplayName:displayName}\"", GetUserAgentEnv());
+            var parsed = await ProcessHelpers.ParseShellCommandJson("az", "account list-locations --output json --query \"[].{Name:name,RegionalDisplayName:regionalDisplayName,DisplayName:displayName}\"", GetUserAgentEnv());
             var regionLocations = parsed.Payload;
 
             var list = new List<AccountRegionLocationInfo>();
-            foreach (var regionLocation in regionLocations)
+            foreach (var regionLocation in regionLocations.EnumerateArray())
             {
-                if (supportedRegions.Count == 0 || supportedRegions.Contains(regionLocation["Name"].Value<string>().ToLower()))
+                if (supportedRegions.Count == 0 || supportedRegions.Contains(regionLocation.GetPropertyStringOrEmpty("Name").ToLower()))
                 {
                     list.Add(new AccountRegionLocationInfo()
                     {
-                        Name = regionLocation["Name"].Value<string>(),
-                        DisplayName = regionLocation["DisplayName"].Value<string>(),
-                        RegionalDisplayName = regionLocation["RegionalDisplayName"].Value<string>()
+                        Name = regionLocation.GetPropertyStringOrEmpty("Name"),
+                        DisplayName = regionLocation.GetPropertyStringOrEmpty("DisplayName"),
+                        RegionalDisplayName = regionLocation.GetPropertyStringOrEmpty("RegionalDisplayName")
                     });
                 }
             }
@@ -241,18 +251,18 @@ namespace Azure.AI.Details.Common.CLI
             var queryPart2 = regionLocation != null ? $"? location=='{regionLocation}'" : "";
             var queryPart3 = $"].{{Id:id,Name:name,Location:location}}\"";
 
-            var parsed = await ProcessHelpers.ParseShellCommandJson<JArray>("az", $"{cmdPart} --output json {subPart} {queryPart1}{queryPart2}{queryPart3}", GetUserAgentEnv());
+            var parsed = await ProcessHelpers.ParseShellCommandJson("az", $"{cmdPart} --output json {subPart} {queryPart1}{queryPart2}{queryPart3}", GetUserAgentEnv());
             var groups = parsed.Payload;
 
             var x = new ParsedJsonProcessOutput<ResourceGroupInfo[]>(parsed.Output);
-            x.Payload = new ResourceGroupInfo[groups.Count];
+            x.Payload = new ResourceGroupInfo[groups.GetArrayLength()];
 
             var i = 0;
-            foreach (var resource in groups)
+            foreach (var resource in groups.EnumerateArray())
             {
-                x.Payload[i].Id = resource["Id"].Value<string>();
-                x.Payload[i].Name = resource["Name"].Value<string>();
-                x.Payload[i].RegionLocation = resource["Location"].Value<string>();
+                x.Payload[i].Id = resource.GetPropertyStringOrEmpty("Id");
+                x.Payload[i].Name = resource.GetPropertyStringOrEmpty("Name");
+                x.Payload[i].RegionLocation = resource.GetPropertyStringOrEmpty("Location");
                 i++;
             }
 
@@ -278,21 +288,21 @@ namespace Azure.AI.Details.Common.CLI
                 _ => kinds != null ? $"? kind == '{lookForKind}' || kind == 'CognitiveServices' || kind == 'AIServices'" : null
             };
 
-            var parsed = await ProcessHelpers.ParseShellCommandJson<JArray>("az", $"{cmdPart} --output json {subPart} {groupPart} --query \"[{condPart}].{{Id:id,Name:name,Location: location,Kind:kind,Group:resourceGroup,Endpoint:properties.endpoint}}\"", GetUserAgentEnv());
+            var parsed = await ProcessHelpers.ParseShellCommandJson("az", $"{cmdPart} --output json {subPart} {groupPart} --query \"[{condPart}].{{Id:id,Name:name,Location: location,Kind:kind,Group:resourceGroup,Endpoint:properties.endpoint}}\"", GetUserAgentEnv());
             var resources = parsed.Payload;
 
             var x = new ParsedJsonProcessOutput<CognitiveServicesResourceInfo[]>(parsed.Output);
-            x.Payload = new CognitiveServicesResourceInfo[resources.Count];
+            x.Payload = new CognitiveServicesResourceInfo[resources.GetArrayLength()];
 
             var i = 0;
-            foreach (var resource in resources)
+            foreach (var resource in resources.EnumerateArray())
             {
-                x.Payload[i].Id = resource["Id"]?.Value<string>();
-                x.Payload[i].Group = resource["Group"].Value<string>();
-                x.Payload[i].Name = resource["Name"].Value<string>();
-                x.Payload[i].Kind = resource["Kind"].Value<string>();
-                x.Payload[i].RegionLocation = resource["Location"].Value<string>();
-                x.Payload[i].Endpoint = resource["Endpoint"].Value<string>();
+                x.Payload[i].Id = resource.GetPropertyStringOrEmpty("Id");
+                x.Payload[i].Group = resource.GetPropertyStringOrEmpty("Group");
+                x.Payload[i].Name = resource.GetPropertyStringOrEmpty("Name");
+                x.Payload[i].Kind = resource.GetPropertyStringOrEmpty("Kind");
+                x.Payload[i].RegionLocation = resource.GetPropertyStringOrEmpty("Location");
+                x.Payload[i].Endpoint = resource.GetPropertyStringOrEmpty("Endpoint");
                 i++;
             }
 
@@ -304,20 +314,20 @@ namespace Azure.AI.Details.Common.CLI
             var cmdPart = "cognitiveservices account deployment list";
             var subPart = subscriptionId != null ? $"--subscription {subscriptionId}" : "";
 
-            var parsed = await ProcessHelpers.ParseShellCommandJson<JArray>("az", $"{cmdPart} --output json {subPart}  -g {group} -n {resourceName} --query \"[].{{Name:name,Location: location,Group:resourceGroup,Endpoint:properties.endpoint,Model:properties.model.name,Format:properties.model.format,ChatCompletionCapable:properties.capabilities.chatCompletion,EmbeddingsCapable:properties.capabilities.embeddings}}\"", GetUserAgentEnv());
+            var parsed = await ProcessHelpers.ParseShellCommandJson("az", $"{cmdPart} --output json {subPart}  -g {group} -n {resourceName} --query \"[].{{Name:name,Location: location,Group:resourceGroup,Endpoint:properties.endpoint,Model:properties.model.name,Format:properties.model.format,ChatCompletionCapable:properties.capabilities.chatCompletion,EmbeddingsCapable:properties.capabilities.embeddings}}\"", GetUserAgentEnv());
             var deployments = parsed.Payload;
 
             var x = new ParsedJsonProcessOutput<CognitiveServicesDeploymentInfo[]>(parsed.Output);
-            x.Payload = new CognitiveServicesDeploymentInfo[deployments.Count];
+            x.Payload = new CognitiveServicesDeploymentInfo[deployments.GetArrayLength()];
 
             var i = 0;
-            foreach (var deployment in deployments)
+            foreach (var deployment in deployments.EnumerateArray())
             {
-                x.Payload[i].Name = deployment["Name"].Value<string>();
-                x.Payload[i].ModelFormat = deployment["Format"].Value<string>();
-                x.Payload[i].ModelName = deployment["Model"].Value<string>();
-                x.Payload[i].ChatCompletionCapable = deployment["ChatCompletionCapable"].Value<string>() == "true";
-                x.Payload[i].EmbeddingsCapable = deployment["EmbeddingsCapable"].Value<string>() == "true";
+                x.Payload[i].Name = deployment.GetPropertyStringOrEmpty("Name");
+                x.Payload[i].ModelFormat = deployment.GetPropertyStringOrEmpty("Format");
+                x.Payload[i].ModelName = deployment.GetPropertyStringOrEmpty("Model");
+                x.Payload[i].ChatCompletionCapable = deployment.GetPropertyStringOrEmpty("ChatCompletionCapable") == "true";
+                x.Payload[i].EmbeddingsCapable = deployment.GetPropertyStringOrEmpty("EmbeddingsCapable") == "true";
                 i++;
             }
 
@@ -329,21 +339,21 @@ namespace Azure.AI.Details.Common.CLI
             var cmdPart = "cognitiveservices model list";
             var subPart = subscriptionId != null ? $"--subscription {subscriptionId}" : "";
 
-            var parsed = await ProcessHelpers.ParseShellCommandJson<JArray>("az", $"{cmdPart} --output json {subPart} -l {regionLocation} --query \"[].{{Name:model.name,Format:model.format,Version:model.version,DefaultCapacity:model.skus[0].capacity.default,ChatCompletionCapable:model.capabilities.chatCompletion,EmbeddingsCapable:model.capabilities.embeddings}}\"", GetUserAgentEnv());
+            var parsed = await ProcessHelpers.ParseShellCommandJson("az", $"{cmdPart} --output json {subPart} -l {regionLocation} --query \"[].{{Name:model.name,Format:model.format,Version:model.version,DefaultCapacity:model.skus[0].capacity.default,ChatCompletionCapable:model.capabilities.chatCompletion,EmbeddingsCapable:model.capabilities.embeddings}}\"", GetUserAgentEnv());
             var models = parsed.Payload;
 
             var x = new ParsedJsonProcessOutput<CognitiveServicesModelInfo[]>(parsed.Output);
-            x.Payload = new CognitiveServicesModelInfo[models.Count];
+            x.Payload = new CognitiveServicesModelInfo[models.GetArrayLength()];
 
             var i = 0;
-            foreach (var model in models)
+            foreach (var model in models.EnumerateArray())
             {
-                x.Payload[i].Name = model["Name"].Value<string>();
-                x.Payload[i].Format = model["Format"].Value<string>();
-                x.Payload[i].Version = model["Version"].Value<string>();
-                x.Payload[i].DefaultCapacity = model["DefaultCapacity"].Value<string>();
-                x.Payload[i].ChatCompletionCapable = model["ChatCompletionCapable"].Value<string>() == "true";
-                x.Payload[i].EmbeddingsCapable = model["EmbeddingsCapable"].Value<string>() == "true";
+                x.Payload[i].Name = model.GetPropertyStringOrEmpty("Name");
+                x.Payload[i].Format = model.GetPropertyStringOrEmpty("Format");
+                x.Payload[i].Version = model.GetPropertyStringOrEmpty("Version");
+                x.Payload[i].DefaultCapacity = model.GetPropertyStringOrEmpty("DefaultCapacity");
+                x.Payload[i].ChatCompletionCapable = model.GetPropertyStringOrEmpty("ChatCompletionCapable") == "true";
+                x.Payload[i].EmbeddingsCapable = model.GetPropertyStringOrEmpty("EmbeddingsCapable") == "true";
                 i++;
             }
 
@@ -355,18 +365,18 @@ namespace Azure.AI.Details.Common.CLI
             var cmdPart = "cognitiveservices usage list";
             var subPart = subscriptionId != null ? $"--subscription {subscriptionId}" : "";
 
-            var parsed = await ProcessHelpers.ParseShellCommandJson<JArray>("az", $"{cmdPart} --output json {subPart} -l {regionLocation} --query \"[].{{Name:name.value,Current:currentValue,Limit:limit}}\"", GetUserAgentEnv());
+            var parsed = await ProcessHelpers.ParseShellCommandJson("az", $"{cmdPart} --output json {subPart} -l {regionLocation} --query \"[].{{Name:name.value,Current:currentValue,Limit:limit}}\"", GetUserAgentEnv());
             var models = parsed.Payload;
 
             var x = new ParsedJsonProcessOutput<CognitiveServicesUsageInfo[]>(parsed.Output);
-            x.Payload = new CognitiveServicesUsageInfo[models.Count];
+            x.Payload = new CognitiveServicesUsageInfo[models.GetArrayLength()];
 
             var i = 0;
-            foreach (var model in models)
+            foreach (var model in models.EnumerateArray())
             {
-                x.Payload[i].Name = model["Name"].Value<string>();
-                x.Payload[i].Current = model["Current"].Value<string>();
-                x.Payload[i].Limit = model["Limit"].Value<string>();
+                x.Payload[i].Name = model.GetPropertyStringOrEmpty("Name");
+                x.Payload[i].Current = model.GetPropertyStringOrEmpty("Current");
+                x.Payload[i].Limit = model.GetPropertyStringOrEmpty("Limit");
                 i++;
             }
 
@@ -379,18 +389,18 @@ namespace Azure.AI.Details.Common.CLI
             var subPart = subscriptionId != null ? $"--subscription {subscriptionId}" : "";
 
             var createKind = kinds.Split(';').Last();
-            var parsed = await ProcessHelpers.ParseShellCommandJson<JObject>("az", $"{cmdPart} --output json {subPart} --kind {createKind} --location {regionLocation} --sku {sku} -g {group} -n {name} --custom-domain {name}", GetUserAgentEnv());
+            var parsed = await ProcessHelpers.ParseShellCommandJson("az", $"{cmdPart} --output json {subPart} --kind {createKind} --location {regionLocation} --sku {sku} -g {group} -n {name} --custom-domain {name}", GetUserAgentEnv());
             var resource = parsed.Payload;
 
             var x = new ParsedJsonProcessOutput<CognitiveServicesResourceInfo?>(parsed.Output);
             x.Payload = new CognitiveServicesResourceInfo()
             {
-                Id = resource?["id"]?.Value<string>(),
-                Group = resource?["resourceGroup"]?.Value<string>(),
-                Name = resource?["name"]?.Value<string>(),
-                Kind = resource?["kind"]?.Value<string>(),
-                RegionLocation = resource?["location"]?.Value<string>(),
-                Endpoint = resource?["properties"]?["endpoint"].Value<string>()
+                Id = resource.GetPropertyStringOrEmpty("id"),
+                Group = resource.GetPropertyStringOrEmpty("resourceGroup"),
+                Name = resource.GetPropertyStringOrEmpty("name"),
+                Kind = resource.GetPropertyStringOrEmpty("kind"),
+                RegionLocation = resource.GetPropertyStringOrEmpty("location"),
+                Endpoint = resource.GetPropertyElementOrNull("properties")?.GetPropertyStringOrEmpty("endpoint")
             };
 
             return x;
@@ -401,15 +411,15 @@ namespace Azure.AI.Details.Common.CLI
             var cmdPart = "group create";
             var subPart = subscriptionId != null ? $"--subscription {subscriptionId}" : "";
 
-            var parsed = await ProcessHelpers.ParseShellCommandJson<JObject>("az", $"{cmdPart} --output json {subPart} -l {regionLocation} -n {name}", GetUserAgentEnv());
+            var parsed = await ProcessHelpers.ParseShellCommandJson("az", $"{cmdPart} --output json {subPart} -l {regionLocation} -n {name}", GetUserAgentEnv());
             var resource = parsed.Payload;
 
             var x = new ParsedJsonProcessOutput<ResourceGroupInfo>(parsed.Output);
             x.Payload = new ResourceGroupInfo()
             {
-                Id = resource?["id"]?.Value<string>(),
-                Name = resource?["name"]?.Value<string>(),
-                RegionLocation = resource?["location"]?.Value<string>()
+                Id = resource.GetPropertyStringOrEmpty("id"),
+                Name = resource.GetPropertyStringOrEmpty("name"),
+                RegionLocation = resource.GetPropertyStringOrEmpty("location")
             };
 
             return x;
@@ -420,17 +430,17 @@ namespace Azure.AI.Details.Common.CLI
             var cmdPart = "cognitiveservices account deployment create";
             var subPart = subscriptionId != null ? $"--subscription {subscriptionId}" : "";
 
-            var parsed = await ProcessHelpers.ParseShellCommandJson<JObject>("az", $"{cmdPart} --output json {subPart} -g {group} -n {resourceName} --deployment-name {deploymentName} --model-name {modelName} --model-version {modelVersion} --model-format {modelFormat} --sku-capacity {scaleCapacity} --sku-name \"Standard\"", GetUserAgentEnv());
+            var parsed = await ProcessHelpers.ParseShellCommandJson("az", $"{cmdPart} --output json {subPart} -g {group} -n {resourceName} --deployment-name {deploymentName} --model-name {modelName} --model-version {modelVersion} --model-format {modelFormat} --sku-capacity {scaleCapacity} --sku-name \"Standard\"", GetUserAgentEnv());
             var resource = parsed.Payload;
 
             var x = new ParsedJsonProcessOutput<CognitiveServicesDeploymentInfo>(parsed.Output);
             x.Payload = new CognitiveServicesDeploymentInfo()
             {
-                Name = resource?["name"]?.Value<string>(),
-                ModelFormat = resource?["kind"]?.Value<string>(),
+                Name = resource.GetPropertyStringOrEmpty("name"),
+                ModelFormat = resource.GetPropertyStringOrEmpty("kind"),
                 ModelName = modelName,
-                ChatCompletionCapable = resource?["properties"]?["capabilities"]?["chatCompletion"]?.Value<bool>() ?? false,
-                EmbeddingsCapable = resource?["properties"]?["capabilities"]?["embeddings"]?.Value<bool>() ?? false
+                ChatCompletionCapable = resource.GetPropertyElementOrNull("properties")?.GetPropertyElementOrNull("capabilities")?.GetPropertyBool("chatCompletion", false) ?? false,
+                EmbeddingsCapable = resource.GetPropertyElementOrNull("properties")?.GetPropertyElementOrNull("capabilities")?.GetPropertyBool("embeddings", false) ?? false
             };
 
             return x;
@@ -441,14 +451,14 @@ namespace Azure.AI.Details.Common.CLI
             var cmdPart = "cognitiveservices account keys list";
             var subPart = subscriptionId != null ? $"--subscription {subscriptionId}" : "";
 
-            var parsed = await ProcessHelpers.ParseShellCommandJson<JObject>("az", $"{cmdPart} --output json {subPart} -g {group} -n {name}", GetUserAgentEnv());
+            var parsed = await ProcessHelpers.ParseShellCommandJson("az", $"{cmdPart} --output json {subPart} -g {group} -n {name}", GetUserAgentEnv());
             var keys = parsed.Payload;
 
             var x = new ParsedJsonProcessOutput<CognitiveServicesKeyInfo>(parsed.Output);
             x.Payload = new CognitiveServicesKeyInfo()
             {
-                Key1 = keys?["key1"]?.Value<string>(),
-                Key2 = keys?["key2"]?.Value<string>()
+                Key1 = keys.GetPropertyStringOrEmpty("key1"),
+                Key2 = keys.GetPropertyStringOrEmpty("key2")
             };
 
             return x;
@@ -459,16 +469,16 @@ namespace Azure.AI.Details.Common.CLI
             var cmdPart = "search service create";
             var subPart = subscriptionId != null ? $"--subscription {subscriptionId}" : "";
 
-            var parsed = await ProcessHelpers.ParseShellCommandJson<JObject>("az", $"{cmdPart} --output json {subPart} -g {group} -l {regionLocation} -n {name} --sku {sku}", GetUserAgentEnv());
+            var parsed = await ProcessHelpers.ParseShellCommandJson("az", $"{cmdPart} --output json {subPart} -g {group} -l {regionLocation} -n {name} --sku {sku}", GetUserAgentEnv());
             var resource = parsed.Payload;
 
             var x = new ParsedJsonProcessOutput<CognitiveSearchResourceInfo>(parsed.Output);
             x.Payload = new CognitiveSearchResourceInfo()
             {
-                Id = resource?["id"]?.Value<string>(),
+                Id = resource.GetPropertyStringOrEmpty("id"),
                 Name = name,
-                Group = resource?["resourceGroup"]?.Value<string>(),
-                RegionLocation = resource?["location"]?.Value<string>(),
+                Group = resource.GetPropertyStringOrEmpty("resourceGroup"),
+                RegionLocation = resource.GetPropertyStringOrEmpty("location"),
                 Endpoint = $"https://{name}.search.windows.net"             // TODO: Need to find official way of getting this
             };
 
@@ -480,14 +490,14 @@ namespace Azure.AI.Details.Common.CLI
             var cmdPart = "search admin-key show";
             var subPart = subscriptionId != null ? $"--subscription {subscriptionId}" : "";
 
-            var parsed = await ProcessHelpers.ParseShellCommandJson<JObject>("az", $"{cmdPart} --output json {subPart} -g {group} --service-name {name}", GetUserAgentEnv());
+            var parsed = await ProcessHelpers.ParseShellCommandJson("az", $"{cmdPart} --output json {subPart} -g {group} --service-name {name}", GetUserAgentEnv());
             var keys = parsed.Payload;
 
             var x = new ParsedJsonProcessOutput<CognitiveSearchKeyInfo>(parsed.Output);
             x.Payload = new CognitiveSearchKeyInfo()
             {
-                Key1 = keys?["primaryKey"]?.Value<string>(),
-                Key2 = keys?["secondaryKey"]?.Value<string>()
+                Key1 = keys.GetPropertyStringOrEmpty("primaryKey"),
+                Key2 = keys.GetPropertyStringOrEmpty("secondaryKey")
             };
 
             return x;
@@ -502,19 +512,19 @@ namespace Azure.AI.Details.Common.CLI
             var queryPart1 = string.IsNullOrEmpty(regionLocation) ? "" : $"--location {regionLocation}";
             var queryPart2 = "--query \"[].{Name:name,Id:id,Group:resourceGroup,Location:location}\"";
 
-            var parsed = await ProcessHelpers.ParseShellCommandJson<JArray>("az", $"{cmdPart} --output json {subPart} {groupPart} {queryPart1} {queryPart2} --resource-type Microsoft.Search/searchServices", GetUserAgentEnv());
+            var parsed = await ProcessHelpers.ParseShellCommandJson("az", $"{cmdPart} --output json {subPart} {groupPart} {queryPart1} {queryPart2} --resource-type Microsoft.Search/searchServices", GetUserAgentEnv());
             var groups = parsed.Payload;
 
             var x = new ParsedJsonProcessOutput<CognitiveSearchResourceInfo[]>(parsed.Output);
-            x.Payload = new CognitiveSearchResourceInfo[groups.Count];
+            x.Payload = new CognitiveSearchResourceInfo[groups.GetArrayLength()];
 
             var i = 0;
-            foreach (var resource in groups)
+            foreach (var resource in groups.EnumerateArray())
             {
-                x.Payload[i].Id = resource["Id"].Value<string>();
-                x.Payload[i].Name = resource["Name"].Value<string>();
-                x.Payload[i].Group = resource["Group"].Value<string>();
-                x.Payload[i].RegionLocation = resource["Location"].Value<string>();
+                x.Payload[i].Id = resource.GetPropertyStringOrEmpty("Id");
+                x.Payload[i].Name = resource.GetPropertyStringOrEmpty("Name");
+                x.Payload[i].Group = resource.GetPropertyStringOrEmpty("Group");
+                x.Payload[i].RegionLocation = resource.GetPropertyStringOrEmpty("Location");
                 x.Payload[i].Endpoint = $"https://{x.Payload[i].Name}.search.windows.net"; // TODO: Need to find official way of getting this
                 i++;
             }
@@ -525,11 +535,11 @@ namespace Azure.AI.Details.Common.CLI
         private static async Task<List<string>> ListSupportedResourceRegions()
         {
             // TODO: What kind should we use here?
-            var process2 = await ProcessHelpers.ParseShellCommandJson<JArray>("az", $"cognitiveservices account list-skus --output json --kind {Program.CognitiveServiceResourceKind} --query \"[].{{Name:locations[0]}}\"", GetUserAgentEnv());
+            var process2 = await ProcessHelpers.ParseShellCommandJson("az", $"cognitiveservices account list-skus --output json --kind {Program.CognitiveServiceResourceKind} --query \"[].{{Name:locations[0]}}\"", GetUserAgentEnv());
             var supportedRegions = new List<string>();
-            foreach (var regionLocation in process2.Payload)
+            foreach (var regionLocation in process2.Payload.EnumerateArray())
             {
-                supportedRegions.Add(regionLocation["Name"].Value<string>().ToLower());
+                supportedRegions.Add(regionLocation.GetPropertyStringOrEmpty("Name").ToLower());
             }
 
             return supportedRegions;

@@ -1,8 +1,13 @@
+//
+// Copyright (c) Microsoft. All rights reserved.
+// Licensed under the MIT license. See LICENSE.md file in the project root for full license information.
+//
+
 using System.Reflection;
 using Azure.AI.OpenAI;
 using System.Collections;
-using Newtonsoft.Json.Linq;
-using Newtonsoft.Json;
+using System.Text;
+using System.Text.Json;
 
 public class FunctionFactory
 {
@@ -106,7 +111,7 @@ public class FunctionFactory
 
     private static string? CallFunction(MethodInfo methodInfo, FunctionDefinition functionDefinition, string argumentsAsJson)
     {
-        var jObject = JObject.Parse(argumentsAsJson);
+        var parsed = JsonDocument.Parse(argumentsAsJson).RootElement;
         var arguments = new List<object>();
 
         var parameters = methodInfo.GetParameters();
@@ -115,11 +120,14 @@ public class FunctionFactory
             var parameterName = parameter.Name;
             if (parameterName == null) continue;
 
-            var parameterValue = jObject[parameterName]?.ToString();
-            if (parameterValue == null) continue;
+            if (parsed.ValueKind == JsonValueKind.Object && parsed.TryGetProperty(parameterName, out var value))
+            {
+                var parameterValue = value.ValueKind == JsonValueKind.String ? value.GetString() : value.GetRawText();
+                if (parameterValue == null) continue;
 
-            var parsed = ParseParameterValue(parameterValue, parameter.ParameterType);
-            arguments.Add(parsed);
+                var argument = ParseParameterValue(parameterValue, parameter.ParameterType);
+                arguments.Add(argument);
+            }
         }
 
         var args = arguments.ToArray();
@@ -168,13 +176,17 @@ public class FunctionFactory
     {
         if (result is IEnumerable enumerable && !(result is string))
         {
-            var array = new JArray();
+            using var stream = new MemoryStream();
+            using var writer = new Utf8JsonWriter(stream, new JsonWriterOptions { Indented = false });
+            writer.WriteStartArray();
             foreach (var item in enumerable)
             {
                 var str = item.ToString();
-                array.Add(str);
+                writer.WriteStringValue(str);
             }
-            return array.ToString();
+            writer.WriteEndArray();
+            writer.Flush();
+            return Encoding.UTF8.GetString(stream.ToArray());
         }
         return result?.ToString();
     }
@@ -220,14 +232,17 @@ public class FunctionFactory
 
     private static object CreateGenericCollectionFromJsonArray(string parameterValue, Type collectionType, Type elementType)
     {
-        var array = JArray.Parse(parameterValue);
+        var root = JsonDocument.Parse(parameterValue).RootElement;
+        var array = root.ValueKind == JsonValueKind.Array
+            ? root.EnumerateArray().ToArray()
+            : Array.Empty<JsonElement>();
 
         if (collectionType == typeof(Array))
         {
-            var collection = Array.CreateInstance(elementType, array.Count);
-            for (int i = 0; i < array.Count; i++)
+            var collection = Array.CreateInstance(elementType, array.Length);
+            for (int i = 0; i < array.Length; i++)
             {
-                var parsed = ParseParameterValue(array[i].ToString(), elementType);
+                var parsed = ParseParameterValue(array[i].GetRawText(), elementType);
                 if (parsed != null) collection.SetValue(parsed, i);
             }
             return collection;
@@ -238,7 +253,7 @@ public class FunctionFactory
             var list = collection as IList;
             foreach (var item in array)
             {
-                var parsed = ParseParameterValue(item.ToString(), elementType);
+                var parsed = ParseParameterValue(item.GetRawText(), elementType);
                 if (parsed != null) list!.Add(parsed);
             }
             return collection!;
@@ -251,10 +266,14 @@ public class FunctionFactory
     {
         var list = new List<object>();
 
-        var array = JArray.Parse(parameterValue);
+        var root = JsonDocument.Parse(parameterValue).RootElement;
+        var array = root.ValueKind == JsonValueKind.Array
+            ? root.EnumerateArray().ToArray()
+            : Array.Empty<JsonElement>();
+
         foreach (var item in array)
         {
-            var parsed = ParseParameterValue(item.ToString(), elementType);
+            var parsed = ParseParameterValue(item.GetRawText(), elementType);
             if (parsed != null) list!.Add(parsed);
         }
 
@@ -274,34 +293,44 @@ public class FunctionFactory
 
     private static string GetMethodParametersJsonSchema(MethodInfo method)
     {
-        var schema = new JObject();
-        schema["type"] = "object";
+        using var stream = new MemoryStream();
+        using var writer = new Utf8JsonWriter(stream, new JsonWriterOptions { Indented = false });
+        writer.WriteStartObject();
 
-        var properties = new JObject();
-        schema["properties"] = properties;
+        var requiredParameters = new List<string>();
 
-        var required = new JArray();
+        writer.WriteString("type", "object");
+        writer.WriteStartObject("properties");
         foreach (var parameter in method.GetParameters())
         {
             if (parameter.Name == null) continue;
 
-            properties[parameter.Name] = GetJsonSchemaForParameterWithDescription(parameter);
             if (!parameter.IsOptional)
             {
-                required.Add(parameter.Name);
+                requiredParameters.Add(parameter.Name);
             }
+
+            writer.WritePropertyName(parameter.Name);
+            WriteJsonSchemaForParameterWithDescription(writer, parameter);
         }
+        writer.WriteEndObject();
 
-        schema["required"] = required;
+        writer.WriteStartArray("required");
+        foreach (var requiredParameter in requiredParameters)
+        {
+            writer.WriteStringValue(requiredParameter);
+        }
+        writer.WriteEndArray();
 
-        return schema.ToString(Formatting.None);
+        writer.WriteEndObject();
+        writer.Flush();
+
+        return Encoding.UTF8.GetString(stream.ToArray());
     }
 
-    private static JToken GetJsonSchemaForParameterWithDescription(ParameterInfo parameter)
+    private static void WriteJsonSchemaForParameterWithDescription(Utf8JsonWriter writer, ParameterInfo parameter)
     {
-        var schema = GetJsonSchemaForType(parameter.ParameterType);
-        schema["description"] = GetParameterDescription(parameter);
-        return schema;
+        WriteJsonSchemaType(writer, parameter.ParameterType, GetParameterDescription(parameter));
     }
 
     private static string GetParameterDescription(ParameterInfo parameter)
@@ -311,34 +340,52 @@ public class FunctionFactory
         return  paramDescriptionAttrib?.Description ?? $"The {parameter.Name} parameter";
     }
 
-    private static JObject GetJsonSchemaForType(Type t)
+    private static void WriteJsonSchemaType(Utf8JsonWriter writer, Type t, string? parameterDescription = null)
     {
-        return IsJsonArrayEquivalentType(t)
-            ? GetJsonArraySchemaFromType(t)
-            : GetJsonPrimativeSchemaFromType(t);
+        if (IsJsonArrayEquivalentType(t))
+        {
+            WriteJsonArraySchemaType(writer, t, parameterDescription);
+        }
+        else
+        {
+            WriteJsonPrimitiveSchemaType(writer, t, parameterDescription);
+        }
     }
 
-    private static JObject GetJsonArraySchemaFromType(Type containerType)
+    private static void WriteJsonArraySchemaType(Utf8JsonWriter writer, Type containerType, string? parameterDescription = null)
     {
-        var schema = new JObject();
-        schema["type"] = "array";
-        schema["items"] = GetJsonArrayItemSchemaFromType(containerType);
-        return schema;
+        writer.WriteStartObject();
+        writer.WriteString("type", "array");
+
+        writer.WritePropertyName("items");
+        WriteJsonArrayItemSchemaType(writer, containerType);
+
+        if (!string.IsNullOrEmpty(parameterDescription))
+        {
+            writer.WriteString("description", parameterDescription);
+        }
+
+        writer.WriteEndObject();
     }
 
-    private static JObject GetJsonArrayItemSchemaFromType(Type containerType)
+    private static void WriteJsonArrayItemSchemaType(Utf8JsonWriter writer, Type containerType)
     {
-        var itemType = containerType.IsArray
+        WriteJsonSchemaType(writer, containerType.IsArray
             ? containerType.GetElementType()!
-            : containerType.GetGenericArguments()[0];
-        return GetJsonSchemaForType(itemType);
+            : containerType.GetGenericArguments()[0]);
     }
 
-    private static JObject GetJsonPrimativeSchemaFromType(Type primativeType)
+    private static void WriteJsonPrimitiveSchemaType(Utf8JsonWriter writer, Type primativeType, string? parameterDescription = null)
     {
-        var schema = new JObject();
-        schema["type"] = GetJsonTypeFromPrimitiveType(primativeType);
-        return schema;
+        writer.WriteStartObject();
+        writer.WriteString("type", GetJsonTypeFromPrimitiveType(primativeType));
+        
+        if (!string.IsNullOrEmpty(parameterDescription))
+        {
+            writer.WriteString("description", parameterDescription);
+        }
+        
+        writer.WriteEndObject();
     }
 
     private static string GetJsonTypeFromPrimitiveType(Type primativeType)

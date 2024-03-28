@@ -3,31 +3,46 @@
 // Licensed under the MIT license. See LICENSE.md file in the project root for full license information.
 //
 
-using System;
-using System.Linq;
-using System.Threading.Tasks;
-using System.Collections.Generic;
-using Newtonsoft.Json.Linq;
-using Azure.AI.Details.Common.CLI.ConsoleGui;
-using System.Text.Json;
-using System.IO;
 using System.Text;
+using System.Text.Json;
+using Azure.AI.Details.Common.CLI.ConsoleGui;
+using Azure.AI.Details.Common.CLI.Telemetry;
+using Azure.AI.Details.Common.CLI.Telemetry.Events;
+using Newtonsoft.Json.Linq;
 
 namespace Azure.AI.Details.Common.CLI
 {
     public partial class AiSdkConsoleGui
     {
-        public static async Task<AiHubProjectInfo> PickOrCreateAndConfigAiHubProject(bool allowCreate, bool allowPick, bool allowSkipDeployments, bool allowSkipSearch, ICommandValues values, string subscription, string resourceId, string groupName, string openAiEndpoint, string openAiKey, string searchEndpoint, string searchKey)
+        public static AiHubProjectInfo PickOrCreateAiHubProject(bool allowCreate, bool allowPick, ICommandValues values, string subscription, string resourceId, out bool createdProject)
         {
-            var createdProject = false;
-            var project = allowCreate && allowPick
-                ? PickOrCreateAiHubProject(values, subscription, resourceId, out createdProject)
-                : allowCreate
-                    ? CreateAiHubProject(values, subscription, resourceId)
-                    : allowPick
-                        ? PickAiHubProject(values, subscription, resourceId)
-                        : throw new ApplicationException($"CANCELED: No project selected");
+            createdProject = false;
+            if (allowCreate && allowPick)
+                return PickOrCreateAiHubProject(values, subscription, resourceId, out createdProject);
+            else if (allowCreate)
+            {
+                createdProject = true;
+                return CreateAiHubProject(values, subscription, resourceId);
+            }
+            else if (allowPick)
+                return PickAiHubProject(values, subscription, resourceId);
+            else
+                throw new ApplicationException($"CANCELED: No project selected");
+        }
 
+        public static async Task<AiHubProjectInfo> ConfigAiHubProject(
+            ICommandValues values,
+            AiHubProjectInfo project,
+            bool createdProject,
+            bool allowSkipSearch,
+            string subscription,
+            string resourceId,
+            string groupName,
+            string openAiEndpoint,
+            string openAiKey,
+            string searchEndpoint,
+            string searchKey)
+        {
             var createdOrPickedSearch = false;
             if (!createdProject)
             {
@@ -47,13 +62,13 @@ namespace Azure.AI.Details.Common.CLI
                 }
                 else if (!string.IsNullOrEmpty(openai?.Name))
                 {
-                    var (chatDeployment, embeddingsDeployment, evaluationDeployment, keys) = await AzCliConsoleGui.PickOrCreateAndConfigCognitiveServicesOpenAiKindResourceDeployments("AZURE OPENAI RESOURCE", true, allowSkipDeployments, subscription, openai.Value);
+                    var (chatDeployment, embeddingsDeployment, evaluationDeployment, keys) = await AzCliConsoleGui.PickOrCreateAndConfigCognitiveServicesOpenAiKindResourceDeployments(values, "AZURE OPENAI RESOURCE", true, subscription, openai.Value);
                     openAiEndpoint = openai.Value.Endpoint;
                     openAiKey = keys.Key1;
                 }
                 else
                 {
-                    var openAiResource = await AzCliConsoleGui.PickOrCreateAndConfigCognitiveServicesOpenAiKindResource(true, allowSkipDeployments, subscription);
+                    var openAiResource = await AzCliConsoleGui.PickOrCreateAndConfigCognitiveServicesOpenAiKindResource(values, true, subscription);
                     openAiEndpoint = openAiResource.Endpoint;
                     openAiKey = openAiResource.Key;
                 }
@@ -77,8 +92,28 @@ namespace Azure.AI.Details.Common.CLI
                 }
             }
 
-            GetOrCreateAiHubProjectConnections(values, createdProject || createdOrPickedSearch, subscription, project.Group, project.Name, openAiEndpoint, openAiKey, searchEndpoint, searchKey);
-            CreateAiHubProjectConfigJsonFile(subscription, project.Group, project.Name);
+            Program.Telemetry.Wrap(
+                () => GetOrCreateAiHubProjectConnections(values, createdProject || createdOrPickedSearch, subscription, project.Group, project.Name, openAiEndpoint, openAiKey, searchEndpoint, searchKey),
+                (outcome, ex, duration) => new InitTelemetryEvent(InitStage.Connections)
+                {
+                    Outcome = outcome,
+                    // TODO set selected?
+                    RunId = values.GetOrDefault("telemetry.init.run_id", null),
+                    RunType = values.GetOrDefault("telemetry.init.run_type", null),
+                    DurationInMs = duration.TotalMilliseconds,
+                    Error = ex?.Message
+                });
+
+            Program.Telemetry.Wrap(
+                () => CreateAiHubProjectConfigJsonFile(subscription, project.Group, project.Name),
+                (outcome, ex, duration) => new InitTelemetryEvent(InitStage.Save)
+                {
+                    Outcome = outcome,
+                    RunId = values.GetOrDefault("telemetry.init.run_id", null),
+                    RunType = values.GetOrDefault("telemetry.init.run_type", null),
+                    DurationInMs = duration.TotalMilliseconds,
+                    Error = ex?.Message
+                });
 
             return project;
         }
@@ -107,27 +142,29 @@ namespace Azure.AI.Details.Common.CLI
             var json = PythonSDKWrapper.ListProjects(values, subscription);
             if (Program.Debug) Console.WriteLine(json);
 
-            var parsed = !string.IsNullOrEmpty(json) ? JToken.Parse(json) : null;
-            var items = parsed?.Type == JTokenType.Object ? parsed["projects"] : new JArray();
+            var parsed = !string.IsNullOrEmpty(json) ? JsonDocument.Parse(json) : default;
+            var items = parsed?.GetPropertyArrayOrEmpty("projects") ?? Array.Empty<JsonElement>();
 
             var choices = new List<string>();
-            var itemJTokens = new List<JToken>();
+            var itemJsonElements = new List<JsonElement>();
             foreach (var item in items)
             {
-                var hub = item["workspace_hub"]?.Value<string>();
+                if (item.TryGetProperty("workspace_hub", out var workspaceHubElement))
+                {
+                    var hub = workspaceHubElement.GetString();
+                    var hubOk = string.IsNullOrEmpty(resourceId) || hub == resourceId;
+                    if (!hubOk) continue;
 
-                var hubOk = string.IsNullOrEmpty(resourceId) || hub == resourceId;
-                if (!hubOk) continue;
+                    itemJsonElements.Add(item);
 
-                itemJTokens.Add(item);
+                    var name = item.GetProperty("name").GetString();
+                    var location = item.GetProperty("location").GetString();
+                    var displayName = item.GetProperty("display_name").GetString();
 
-                var name = item["name"].Value<string>();
-                var location = item["location"].Value<string>();
-                var displayName = item["display_name"].Value<string>();
-
-                choices.Add(string.IsNullOrEmpty(displayName)
-                    ? $"{name} ({location})"
-                    : $"{displayName} ({location})");
+                    choices.Add(string.IsNullOrEmpty(displayName)
+                        ? $"{name} ({location})"
+                        : $"{displayName} ({location})");
+                }
             }
 
             if (allowCreate)
@@ -149,8 +186,8 @@ namespace Azure.AI.Details.Common.CLI
 
             Console.WriteLine($"\rName: {choices[picked]}");
             var project = allowCreate
-                ? (picked > 0 ? itemJTokens[picked - 1] : null)
-                : itemJTokens[picked];
+                ? (picked > 0 ? itemJsonElements[picked - 1] : default(JsonElement?))
+                : itemJsonElements[picked];
 
             createNew = allowCreate && picked == 0;
             if (createNew)
@@ -161,7 +198,7 @@ namespace Azure.AI.Details.Common.CLI
             return AiHubProjectInfoFromToken(values, project);
         }
 
-        private static JToken TryCreateAiHubProjectInteractive(ICommandValues values, string subscription, string resourceId)
+        private static JsonElement? TryCreateAiHubProjectInteractive(ICommandValues values, string subscription, string resourceId)
         {
             var group = ResourceGroupNameToken.Data().GetOrDefault(values);
             var location = RegionLocationToken.Data().GetOrDefault(values, "");
@@ -174,22 +211,22 @@ namespace Azure.AI.Details.Common.CLI
             return TryCreateAiHubProjectInteractive(values, subscription, resourceId, group, location, ref displayName, ref description, smartName, smartNameKind);
         }
 
-        private static AiHubProjectInfo AiHubProjectInfoFromToken(ICommandValues values, JToken project)
+        private static AiHubProjectInfo AiHubProjectInfoFromToken(ICommandValues values, JsonElement? project)
         {
             var aiHubProject = new AiHubProjectInfo
             {
-                Id = project["id"].Value<string>(),
-                Group = project["resource_group"].Value<string>(),
-                Name = project["name"].Value<string>(),
-                DisplayName = project["display_name"].Value<string>(),
-                RegionLocation = project["location"].Value<string>(),
-                HubId = project["workspace_hub"].Value<string>(),
+                Id = project?.GetPropertyStringOrNull("id"),
+                Group = project?.GetPropertyStringOrNull("resource_group"),
+                Name = project?.GetPropertyStringOrNull("name"),
+                DisplayName = project?.GetPropertyStringOrNull("display_name"),
+                RegionLocation = project?.GetPropertyStringOrNull("location"),
+                HubId = project?.GetPropertyStringOrNull("workspace_hub"),
             };
 
             return aiHubProject;
         }
 
-        private static JToken TryCreateAiHubProjectInteractive(ICommandValues values, string subscription, string resourceId, string group, string location, ref string displayName, ref string description, string smartName = null, string smartNameKind = null)
+        private static JsonElement? TryCreateAiHubProjectInteractive(ICommandValues values, string subscription, string resourceId, string group, string location, ref string displayName, ref string description, string smartName = null, string smartNameKind = null)
         {
             ConsoleHelpers.WriteLineWithHighlight($"\n`CREATE AZURE AI PROJECT`");
 
@@ -208,8 +245,8 @@ namespace Azure.AI.Details.Common.CLI
 
             Console.WriteLine("\r*** CREATED ***  ");
 
-            var parsed = !string.IsNullOrEmpty(json) ? JToken.Parse(json) : null;
-            return parsed["project"];
+            var parsed = !string.IsNullOrEmpty(json) ? JsonDocument.Parse(json) : null;
+            return parsed?.GetPropertyElementOrNull("projects");
         }
 
         public static void GetOrCreateAiHubProjectConnections(ICommandValues values, bool create, string subscription, string groupName, string projectName, string openAiEndpoint, string openAiKey, string searchEndpoint, string searchKey)
@@ -242,9 +279,9 @@ namespace Azure.AI.Details.Common.CLI
                 var message = createSearchConnection ? "\r*** CREATED ***  " : null;
                 if (checkForExistingOpenAiConnection)
                 {
-                    var parsed = !string.IsNullOrEmpty(connectionJson) ? JToken.Parse(connectionJson) : null;
-                    var connection = parsed?.Type == JTokenType.Object ? parsed?["connection"] : null;
-                    var target = connection?.Type == JTokenType.Object ? connection?["target"]?.ToString() : null;
+                    var parsed = !string.IsNullOrEmpty(connectionJson) ? JsonDocument.Parse(connectionJson) : null;
+                    var connection = parsed?.GetPropertyElementOrNull("connection");
+                    var target = connection?.GetPropertyStringOrNull("target");
 
                     var endpointOk = !string.IsNullOrEmpty(openAiEndpoint);
                     var targetOk = !string.IsNullOrEmpty(target);
@@ -282,9 +319,9 @@ namespace Azure.AI.Details.Common.CLI
                 var message = createSearchConnection ? "\r*** CREATED ***  " : null;
                 if (checkForExistingSearchConnection)
                 {
-                    var parsed = !string.IsNullOrEmpty(connectionJson) ? JToken.Parse(connectionJson) : null;
-                    var connection = parsed?.Type == JTokenType.Object ? parsed?["connection"] : null;
-                    var target = connection?.Type == JTokenType.Object ? connection?["target"]?.ToString() : null;
+                    var parsed = !string.IsNullOrEmpty(connectionJson) ? JsonDocument.Parse(connectionJson) : null;
+                    var connection = parsed?.GetPropertyElementOrNull("connection");
+                    var target = connection?.GetPropertyStringOrNull("target");
 
                     var targetOk = !string.IsNullOrEmpty(target);
                     var endpointOk = !string.IsNullOrEmpty(searchEndpoint);
@@ -332,7 +369,7 @@ namespace Azure.AI.Details.Common.CLI
 
             var configJson = JsonSerializer.Serialize(configJsonData, new JsonSerializerOptions { WriteIndented = true });
             var configJsonFile = new FileInfo("config.json");
-            FileHelpers.WriteAllText(configJsonFile.FullName, configJson + "\n", new UTF8Encoding(false));
+            FileHelpers.WriteAllText(configJsonFile.FullName, configJson, new UTF8Encoding(false));
 
             Console.WriteLine($"{configJsonFile.Name} (saved at {configJsonFile.Directory})\n");
             Console.WriteLine("  " + configJson.Replace("\n", "\n  "));

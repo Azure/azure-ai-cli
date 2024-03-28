@@ -793,13 +793,11 @@ namespace Azure.AI.Details.Common.CLI
             if (IsStandardInputReference(fileName)) return;
             if (IsStandardOutputReference(fileName)) return;
 
-            var s1 = fileName.LastIndexOf(Path.DirectorySeparatorChar);
-            var s2 = fileName.LastIndexOf(Path.AltDirectorySeparatorChar);
-            var sep = Math.Max(s1, s2);
-            if (sep <= 0) return;
-
-            var dir = fileName.Substring(0, sep);
-            if (!Directory.Exists(dir)) Directory.CreateDirectory(dir);
+            string dir = Path.GetDirectoryName(fileName);
+            if (!string.IsNullOrEmpty(dir) && !Directory.Exists(dir))
+            {
+                Directory.CreateDirectory(dir);
+            }
         }
 
         public static void CopyFile(string path1, string file1, string path2, string file2 = null, bool verbose = true)
@@ -1376,7 +1374,7 @@ namespace Azure.AI.Details.Common.CLI
             return CheckDotDirectory(GetAppDataDir(), mustExist, createIfDoesnt);
         }
 
-        private static string GetUserConfigDotDir(bool mustExist = true, bool createIfDoesnt = false)
+        internal static string GetUserConfigDotDir(bool mustExist = true, bool createIfDoesnt = false)
         {
             return CheckDotDirectory(GetAppUserDir(), mustExist, createIfDoesnt);
         }
