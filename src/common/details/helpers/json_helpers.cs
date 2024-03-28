@@ -33,12 +33,12 @@ namespace Azure.AI.Details.Common.CLI
             return string.Empty;
         }
 
-        public static string GetPropertyStringOrNull(this JsonDocument document, string name)
+        public static string? GetPropertyStringOrNull(this JsonDocument document, string name)
         {
             return document.RootElement.GetPropertyStringOrNull(name);
         }
         
-        public static string GetPropertyStringOrNull(this JsonElement element, string name)
+        public static string? GetPropertyStringOrNull(this JsonElement element, string name)
         {
             if (element.ValueKind == JsonValueKind.Object && element.TryGetProperty(name, out var value))
             {

@@ -1,5 +1,7 @@
 ﻿#nullable enable
 
+using System.Text.Json.Serialization;
+
 namespace Azure.AI.Details.Common.CLI.AzCli
 {
     /// <summary>
@@ -8,6 +10,7 @@ namespace Azure.AI.Details.Common.CLI.AzCli
     public class CognitiveSearchResourceInfo : ResourceInfoBase
     {
         /// <inheritdoc />
+        [JsonIgnore]
         public override ResourceKind Kind
         {
             get => ResourceKind.Search;

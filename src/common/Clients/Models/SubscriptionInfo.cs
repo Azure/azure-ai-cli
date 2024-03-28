@@ -1,14 +1,12 @@
 ﻿#nullable enable
 
 using Azure.AI.CLI.Common.Clients.Models.Utils;
-using Newtonsoft.Json;
 
 namespace Azure.AI.Details.Common.CLI.AzCli
 {
     /// <summary>
     /// Information about an Azure subscription
     /// </summary>
-    [JsonConverter(typeof(JPathJsonConverter))]
     public readonly struct SubscriptionInfo
     {
         /// <summary>
@@ -24,7 +22,7 @@ namespace Azure.AI.Details.Common.CLI.AzCli
         /// <summary>
         /// The user name of the currently logged in user (e.g. john.doe@contoso.com)
         /// </summary>
-        [JsonProperty("user.name")]
+        [JsonPathPropertyName("user.name")]
         public string UserName { get; init; }
 
         /// <summary>

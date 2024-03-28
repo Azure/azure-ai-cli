@@ -1,14 +1,13 @@
 ﻿#nullable enable
 
+using System.Text.Json.Serialization;
 using Azure.AI.CLI.Common.Clients.Models.Utils;
-using Newtonsoft.Json;
 
 namespace Azure.AI.Details.Common.CLI.AzCli
 {
     /// <summary>
     /// Base class for information about Azure resource
     /// </summary>
-    [JsonConverter(typeof(JPathJsonConverter))]
     public abstract class ResourceInfoBase
     {
         private string? _key;
@@ -34,13 +33,13 @@ namespace Azure.AI.Details.Common.CLI.AzCli
         /// The name of the resource group this subscription belongs to
         /// </summary>
         // TODO FIXME: rename to ResourceGroup
-        [JsonProperty("resourceGroup")]
+        [JsonPropertyName("resourceGroup")]
         public string Group { get; init; } = string.Empty;
 
         /// <summary>
         /// The short name of the region this resource is in
         /// </summary>
-        [JsonProperty("location")]
+        [JsonPropertyName("location")]
         // TODO FIXME: rename to Region
         public string RegionLocation { get; init; } = string.Empty;
 

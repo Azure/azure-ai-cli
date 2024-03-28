@@ -1,7 +1,6 @@
 ﻿#nullable enable
 
 using Azure.AI.CLI.Common.Clients.Models.Utils;
-using Newtonsoft.Json;
 
 namespace Azure.AI.Details.Common.CLI.AzCli
 {
@@ -15,14 +14,14 @@ namespace Azure.AI.Details.Common.CLI.AzCli
         /// <summary>
         /// (Optional) The URI of the endpoint for this resource (e.g. https://{name}.cognitiveservices.azure.com/)
         /// </summary>
-        [JsonProperty("properties.endpoint")]
+        [JsonPathPropertyName("properties.endpoint")]
         public string? Endpoint { get; init; }
 
         /// <summary>
         /// Any additional endpoints associated with this resource. Will be empty if there are no additional
         /// endpoints
         /// </summary>
-        [JsonProperty("properties.endpoints")]
+        [JsonPathPropertyName("properties.endpoints")]
         public IReadOnlyDictionary<string, string> Endpoints { get; init; } = EMPTY;
     }
 }

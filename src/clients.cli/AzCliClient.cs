@@ -1,11 +1,11 @@
-﻿using Azure.AI.CLI.Common.Clients;
+﻿using System.Text.Json;
+using System.Text.Json.Serialization;
+using Azure.AI.CLI.Common.Clients;
 using Azure.AI.CLI.Common.Clients.Models;
 using Azure.AI.CLI.Common.Clients.Models.Utils;
 using Azure.AI.Details.Common.CLI;
 using Azure.AI.Details.Common.CLI.AzCli;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
-using Newtonsoft.Json.Serialization;
+
 
 namespace Azure.AI.CLI.Clients.AzPython
 {
@@ -14,15 +14,21 @@ namespace Azure.AI.CLI.Clients.AzPython
     /// </summary>
     public class AzCliClient : LoginHelpers, ISubscriptionsClient, ICognitiveServicesClient, ISearchClient
     {
-        private static readonly JsonSerializerSettings JSON_SETTINGS = new JsonSerializerSettings()
+        private static readonly System.Text.Json.JsonSerializerOptions JSON_OPTIONS = new System.Text.Json.JsonSerializerOptions()
         {
-            DateFormatHandling = DateFormatHandling.IsoDateFormat,
-            NullValueHandling = NullValueHandling.Ignore,
-            DefaultValueHandling = DefaultValueHandling.Populate,
-            DateTimeZoneHandling = DateTimeZoneHandling.Utc,
-            ContractResolver = new DefaultContractResolver()
+            NumberHandling = JsonNumberHandling.AllowReadingFromString | JsonNumberHandling.AllowNamedFloatingPointLiterals,
+            PropertyNameCaseInsensitive = true,
+            DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
+            PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+            Converters =
             {
-                NamingStrategy = new CamelCaseNamingStrategy()
+                // for support JPath expressions for property deserialization
+                new JsonPathConverterFactory(),
+                // for deserializing strings into an Enum
+                new JsonStringEnumConverter(),
+                // for deserializing strings into a bool or bool?
+                new StringToBoolJsonConverter(),
+                new StringToNullableBoolJsonConverter(),
             }
         };
 
@@ -496,10 +502,11 @@ namespace Azure.AI.CLI.Clients.AzPython
                 },
                 json =>
                 {
-                    var keys = JObject.Parse(json ?? "{}");
+                    using var doc = JsonDocument.Parse(json ?? "{}");
                     return (
-                        keys?["key1"]?.Value<string>() ?? string.Empty,
-                        keys?["key2"]?.Value<string>());
+                        doc.RootElement.GetPropertyStringOrEmpty("key1"),
+                        doc.RootElement.GetPropertyStringOrNull("key2")
+                    );
                 },
                 () => (string.Empty, null),
                 token);
@@ -634,10 +641,11 @@ namespace Azure.AI.CLI.Clients.AzPython
                 },
                 json =>
                 {
-                    var keys = JObject.Parse(json ?? "{}");
+                    using var doc = JsonDocument.Parse(json ?? "{}");
                     return (
-                        keys?["primaryKey"]?.Value<string>() ?? string.Empty,
-                        keys?["secondaryKey"]?.Value<string>());
+                        doc.GetPropertyStringOrEmpty("primaryKey"),
+                        doc.GetPropertyStringOrNull("secondaryKey")
+                    );
                 },
                 () => (string.Empty, null),
                 token);
@@ -669,13 +677,16 @@ namespace Azure.AI.CLI.Clients.AzPython
             };
 
         private static TValue? DeserializeJson<TValue>(string? json)
+            => DeserializeJson<TValue>(json, JSON_OPTIONS);
+
+        private static TValue? DeserializeJson<TValue>(string? json, JsonSerializerOptions options)
         {
             if (string.IsNullOrWhiteSpace(json))
             {
                 return default;
             }
 
-            return JsonConvert.DeserializeObject<TValue>(json, JSON_SETTINGS);
+            return JsonSerializer.Deserialize<TValue>(json, options);
         }
 
         private Task<ClientResult<TValue[]>> RunOrLoginArrayAsync<TValue>(

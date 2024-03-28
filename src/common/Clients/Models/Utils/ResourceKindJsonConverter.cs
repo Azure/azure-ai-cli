@@ -1,7 +1,8 @@
 ﻿#nullable enable
 
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using Azure.AI.Details.Common.CLI.AzCli;
-using Newtonsoft.Json;
 
 namespace Azure.AI.CLI.Common.Clients.Models.Utils
 {
@@ -29,16 +30,16 @@ namespace Azure.AI.CLI.Common.Clients.Models.Utils
         }
 
         /// <inheritdoc />
-        public override ResourceKind ReadJson(JsonReader reader, Type objectType, ResourceKind existingValue, bool hasExistingValue, JsonSerializer serializer)
+        public override ResourceKind Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
         {
-            string? strValue = reader.Value as string;
+            string? strValue = reader.GetString();
             return ResourceKindHelpers.ParseString(strValue) ?? _defaultKind;
         }
 
         /// <inheritdoc />
-        public override void WriteJson(JsonWriter writer, ResourceKind value, JsonSerializer serializer)
+        public override void Write(Utf8JsonWriter writer, ResourceKind value, JsonSerializerOptions options)
         {
-            writer.WriteValue(ResourceKindHelpers.AsJsonString(value));
+            writer.WriteStringValue(ResourceKindHelpers.AsJsonString(value));
         }
     }
 }

@@ -1,6 +1,6 @@
 ﻿#nullable enable
 
-using Newtonsoft.Json;
+using System.Text.Json.Serialization;
 
 namespace Azure.AI.Details.Common.CLI.AzCli
 {
@@ -22,7 +22,7 @@ namespace Azure.AI.Details.Common.CLI.AzCli
         /// <summary>
         /// The short name of the region this resource group is in (e.g. westcentralus)
         /// </summary>
-        [JsonProperty("location")]
+        [JsonPropertyName("location")]
         public string Region { get; init; }
     }
 }
