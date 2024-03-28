@@ -42,7 +42,7 @@ namespace Azure.AI.Details.Common.CLI
 
         private bool RunWebJobCommand()
         {
-            DoCommand(_values.GetCommand());
+            DoCommand(_values.GetCommandOrEmpty());
             return _values.GetOrDefault("passed", true);
         }
 
@@ -147,7 +147,7 @@ namespace Azure.AI.Details.Common.CLI
 
             ReadWritePrintJson(response);
 
-            var location = response.Headers["Location"];
+            var location = response.Headers["Location"]!;
             var id = location[(location.LastIndexOf('/') + 1)..];
             DoStatus(name, id);
         }
@@ -250,7 +250,7 @@ namespace Azure.AI.Details.Common.CLI
         /// </example>
         private void DoDelete()
         {
-            GetDeleteParameters(out string path, out string name, out string nameAction, out string message);
+            GetDeleteParameters(out var path, out var name, out var nameAction, out string message);
 
             if (!_quiet) Console.WriteLine(message);
 
@@ -327,7 +327,7 @@ namespace Azure.AI.Details.Common.CLI
             path = $"api/triggeredwebjobs";
         }
 
-        private void GetStatusParameters(out string path, ref string name, out string nameAction, ref string id, out string message)
+        private void GetStatusParameters(out string path, ref string? name, out string nameAction, ref string? id, out string message)
         {
             nameAction = "history";
             name = DemandWebJobName(name);
@@ -359,7 +359,7 @@ namespace Azure.AI.Details.Common.CLI
                 file = ".";
             }
 
-            url = _values.GetOrDefault("webjob.download.url", file);
+            url = _values.GetOrDefault("webjob.download.url", file)!;
             if (!url.StartsWith("http"))
             {
                 url = $"vfs/";
@@ -374,7 +374,7 @@ namespace Azure.AI.Details.Common.CLI
                 : $"Downloading {message} ... ";
         }
 
-        private void GetDeleteParameters(out string path, out string name, out string nameAction, out string message)
+        private void GetDeleteParameters(out string path, out string name, out string? nameAction, out string message)
         {
             nameAction = null;
             name = DemandWebJobName();
@@ -399,7 +399,7 @@ namespace Azure.AI.Details.Common.CLI
                         "USE:", $"{Program.Name} webjob [...] --id ID"));
         }
 
-        private HttpWebRequest CreateWebRequest(string method, string path, string? name = null, string nameAction = null, string? id = null, string? contentType = null)
+        private HttpWebRequest CreateWebRequest(string method, string path, string? name = null, string? nameAction = null, string? id = null, string? contentType = null)
         {
             var endpoint = _values.GetOrEmpty("webjob.config.endpoint").Trim('\r', '\n');
             var userName = _values.GetOrEmpty("webjob.config.username").Trim('\r', '\n');
@@ -428,7 +428,7 @@ namespace Azure.AI.Details.Common.CLI
             return request;
         }
 
-        private string GetWebJobUrl(string endpoint, string path, string? name = null, string nameAction = null, string? id = null)
+        private string GetWebJobUrl(string endpoint, string path, string? name = null, string? nameAction = null, string? id = null)
         {
             if (path.StartsWith("http")) return path;
 
@@ -450,7 +450,7 @@ namespace Azure.AI.Details.Common.CLI
             return $"{endpoint}/{pathPart}{namePart}{nameActionPart}{idPart}";
         }
 
-        private string CheckWriteOutputRequest(HttpWebRequest request, string payload = null, bool append = false)
+        private string? CheckWriteOutputRequest(HttpWebRequest request, string? payload = null, bool append = false)
         {
             var output = _values.GetOrEmpty("webjob.output.request.file");
             if (!string.IsNullOrEmpty(output))
@@ -479,7 +479,7 @@ namespace Azure.AI.Details.Common.CLI
             return json;
         }
 
-        private string? ReadWritePrintResponse(HttpWebResponse response, string defaultFileName = null)
+        private string? ReadWritePrintResponse(HttpWebResponse response, string? defaultFileName = null)
         {
             var saveAs = HttpHelpers.GetOutputDataFileName(defaultFileName, response, _values, "webjob", out bool isText, out bool isJson);
 

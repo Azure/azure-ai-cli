@@ -43,7 +43,7 @@ namespace Azure.AI.Details.Common.CLI
 
         private bool RunSpeakerCommand()
         {
-            DoCommand(_values.GetCommand());
+            DoCommand(_values.GetCommandOrEmpty());
             return _values.GetOrDefault("passed", true);
         }
 
@@ -181,7 +181,7 @@ namespace Azure.AI.Details.Common.CLI
             foreach (var token in array)
             {
                 var id = token.GetPropertyStringOrNull(key);
-                ids.Add(id); 
+                if (id != null) ids.Add(id); 
             }
 
             return ids;
@@ -230,7 +230,7 @@ namespace Azure.AI.Details.Common.CLI
 
         private VoiceProfileType GetVoiceProfileType()
         {
-            var kind = _values.GetOrDefault("profile.kind", "TextIndependentIdentification");
+            var kind = _values.GetOrDefault("profile.kind", "TextIndependentIdentification")!;
             return kind.Equals("TextDependentVerification", StringComparison.OrdinalIgnoreCase) ?
                 VoiceProfileType.TextDependentVerification : kind.Equals("TextIndependentVerification", StringComparison.OrdinalIgnoreCase) ?
                 VoiceProfileType.TextIndependentVerification : VoiceProfileType.TextIndependentIdentification;
@@ -384,7 +384,7 @@ namespace Azure.AI.Details.Common.CLI
             return json;
         }
 
-        private void CheckWriteOutputId(string id)
+        private void CheckWriteOutputId(string? id)
         {
             var idOk = !string.IsNullOrEmpty(id);
 
@@ -405,7 +405,7 @@ namespace Azure.AI.Details.Common.CLI
             }
         }
 
-        private string CheckWriteOutputSelf(string json, string key)
+        private string? CheckWriteOutputSelf(string json, string key)
         {
             var parsed = JsonDocument.Parse(json);
             var id = parsed.GetPropertyStringOrNull(key);
@@ -457,7 +457,7 @@ namespace Azure.AI.Details.Common.CLI
                 if (string.IsNullOrEmpty(_file))
                 {
                     var command = _values.GetCommandForDisplay();
-                    var action = _values.GetCommand().Split('.').LastOrDefault();
+                    var action = _values.GetCommandOrEmpty().Split('.').LastOrDefault();
                     _values.AddThrowError(
                         "WARNING:", $"Cannot {action}; file not found!",
                                     "",
@@ -465,7 +465,7 @@ namespace Azure.AI.Details.Common.CLI
                                     "",
                             "SEE:", $"{Program.Name} help {command}");
                 }
-                audioConfig = AudioHelpers.CreateAudioConfigFromFile(_file, null);
+                audioConfig = AudioHelpers.CreateAudioConfigFromFile(_file!, null);
             }
             return audioConfig;
         }

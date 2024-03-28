@@ -31,7 +31,7 @@ namespace Azure.AI.Details.Common.CLI
 
         private static IEnumerable<INamedValueTokenParser> GetCommandParsers(ICommandValues values)
         {
-            var commandName = values.GetCommand();
+            var commandName = values.GetCommandOrEmpty();
             foreach (var command in _commands)
             {
                 if (commandName == command.name)

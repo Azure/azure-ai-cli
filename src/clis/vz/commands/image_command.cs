@@ -364,9 +364,8 @@ namespace Azure.AI.Details.Common.CLI
             return input;
         }
 
-        private string GetVisionInputFileFromId(string id)
+        private string? GetVisionInputFileFromId(string id)
         {
-            string file;
             var existing = FileHelpers.FindFileInDataPath(id, _values);
             if (existing == null) existing = FileHelpers.FindFileInDataPath(id + ".png", _values);
             if (existing == null) existing = FileHelpers.FindFileInDataPath(id + ".jpg", _values);
@@ -381,7 +380,7 @@ namespace Azure.AI.Details.Common.CLI
                 }
             }
 
-            file = existing;
+            var file = existing;
             _values.Add("vision.input.file", file);
             return file;
         }

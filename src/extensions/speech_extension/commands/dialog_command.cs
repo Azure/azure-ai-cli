@@ -138,7 +138,7 @@ namespace Azure.AI.Details.Common.CLI
                 _values.AddThrowError("ERROR:", $"Creating DialogServiceConfig; requires one of: key or token.");
             }
 
-            var dialogType = _values.GetCommand() == "dialog.customcommands"
+            var dialogType = _values.GetCommandOrEmpty() == "dialog.customcommands"
                                 ? DialogType.CustomCommands
                                 : DialogType.Bot;
             DialogServiceConfig config;

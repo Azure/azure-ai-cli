@@ -73,14 +73,14 @@ namespace Azure.AI.Details.Common.CLI
             return config;
         }
 
-        public static AudioConfig? CreateAudioConfig(ICommandValues values)
+        public static AudioConfig CreateAudioConfig(ICommandValues values)
         {
             var input = values["audio.input.type"];
             var file = values["audio.input.file"];
             var format = values["audio.input.format"];
             var device = values["audio.input.microphone.device"];
 
-            AudioConfig audioConfig;
+            AudioConfig? audioConfig = null;
             if (input == "microphone" || string.IsNullOrEmpty(input))
             {
                 audioConfig = AudioHelpers.CreateMicrophoneAudioConfig(device);
@@ -93,10 +93,9 @@ namespace Azure.AI.Details.Common.CLI
             else
             {
                 values.AddThrowError("WARNING:", $"'audio.input.type={input}' NOT YET IMPLEMENTED!!");
-                return null;
             }
 
-            return audioConfig;
+            return audioConfig!;
         }
 
         public static void SetEndpointParams(SpeechConfig config, string endpointParams)

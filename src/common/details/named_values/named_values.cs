@@ -52,7 +52,7 @@ namespace Azure.AI.Details.Common.CLI
             return !string.IsNullOrEmpty(value) && bool.TryParse(value, out returnValue) ? returnValue : defaultValue;
         }
 
-        public static string DemandGetOrDefault(this INamedValues values, string name, string defaultValue, string error)
+        public static string DemandGetOrDefault(this INamedValues values, string name, string? defaultValue, string error)
         {
             var value = values.GetOrDefault(name, defaultValue);
             if (string.IsNullOrEmpty(value))
@@ -214,19 +214,29 @@ namespace Azure.AI.Details.Common.CLI
             return values.GetOrDefault("display.help.dump", false);
         }
 
-        public static string? GetCommand(this INamedValues values, string defaultValue = "")
+        public static string GetCommandOrEmpty(this INamedValues values)
+        {
+            return values.GetOrDefault("x.command", string.Empty)!;
+        }
+
+        public static string? GetCommandOrDefault(this INamedValues values, string? defaultValue = null)
         {
             return values.GetOrDefault("x.command", defaultValue);
         }
 
-        public static string? GetCommandRoot(this INamedValues values, string defaultValue = "")
+        public static string GetCommandRootOrEmpty(this INamedValues values)
         {
-            return values.GetCommand(defaultValue)?.Split('.').FirstOrDefault() ?? string.Empty;
+            return values.GetCommandOrEmpty().Split('.').First();
+        }
+
+        public static string? GetCommandRootOrDefault(this INamedValues values, string? defaultValue = null)
+        {
+            return values.GetCommandOrDefault(defaultValue)?.Split('.').FirstOrDefault();
         }
 
         public static string? GetCommandForDisplay(this INamedValues values)
         {
-            return values.GetCommand()?.Replace('.', ' ');
+            return values.GetCommandOrEmpty()?.Replace('.', ' ');
         }
     }
 

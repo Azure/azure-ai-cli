@@ -22,6 +22,7 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using System.Text.Json.Nodes;
+using System.Threading;
 
 namespace Azure.AI.Details.Common.CLI
 {
@@ -35,7 +36,7 @@ namespace Azure.AI.Details.Common.CLI
 
         internal bool RunCommand()
         {
-            DoCommand(_values.GetCommand());
+            DoCommand(_values.GetCommandOrEmpty());
             return _values.GetOrDefault("passed", true);
         }
 
@@ -571,6 +572,7 @@ namespace Azure.AI.Details.Common.CLI
 
         private void DisplayAssistantPromptTextStreaming(string text)
         {
+            Thread.Sleep(30);
             // do "tab" indentation when not quiet
             Console.Write(!_quiet
                 ? text.Replace("\n", "\n           ")

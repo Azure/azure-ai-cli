@@ -25,7 +25,7 @@ namespace Azure.AI.Details.Common.CLI
 
         internal bool RunCommand()
         {
-            DoCommand(_values.GetCommand());
+            DoCommand(_values.GetCommandOrEmpty());
             return _values.GetOrDefault("passed", true);
         }
 

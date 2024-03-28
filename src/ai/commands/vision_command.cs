@@ -37,7 +37,7 @@ namespace Azure.AI.Details.Common.CLI
 
         private bool RunVisionCommand()
         {
-            DoCommand(_values.GetCommand());
+            DoCommand(_values.GetCommandOrEmpty());
             return _values.GetOrDefault("passed", true);
         }
 

@@ -66,7 +66,7 @@ namespace Azure.AI.Details.Common.CLI
 
         public static INamedValueTokenParser[] GetCommandParsers(ICommandValues values)
         {
-            var commandName = string.Join('.', values.GetCommand()
+            var commandName = string.Join('.', values.GetCommandOrEmpty()
                 .Split('.')
                 .SkipWhile(x => x == "speech")
                 .ToArray());

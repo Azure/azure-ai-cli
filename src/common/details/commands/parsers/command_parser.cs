@@ -71,7 +71,7 @@ namespace Azure.AI.Details.Common.CLI
     {
         protected static bool ParseCommandValues(string commandName, IEnumerable<INamedValueTokenParser> parsers, INamedValueTokens tokens, ICommandValues values)
         {
-            return commandName != null && values.GetCommand()!.StartsWith(commandName) && ParseAllCommandValues(parsers, tokens, values);
+            return commandName != null && values.GetCommandOrEmpty()!.StartsWith(commandName) && ParseAllCommandValues(parsers, tokens, values);
         }
 
         protected static bool ParseCommand(string commandName, IEnumerable<INamedValueTokenParser> parsers, INamedValueTokens tokens, ICommandValues values)
@@ -84,7 +84,7 @@ namespace Azure.AI.Details.Common.CLI
         protected static bool ParseCommands(IEnumerable<(string commandName, bool valuesRequired)> commands, IEnumerable<string> partials, INamedValueTokens tokens, ICommandValues values, Func<ICommandValues, IEnumerable<INamedValueTokenParser>> parsers)
         {
             return ParseCommandName(commands, partials, tokens, values) &&
-                   ParseCommandDefaults(values.GetCommand()!, parsers(values), tokens, values) &&
+                   ParseCommandDefaults(values.GetCommandOrEmpty()!, parsers(values), tokens, values) &&
                    ParseAllCommandValues(parsers(values), tokens, values);
         }
 
@@ -124,7 +124,7 @@ namespace Azure.AI.Details.Common.CLI
 
         protected static bool ParseCommandName(string commandName, INamedValueTokens tokens, ICommandValues values, bool requireCommandValues = true)
         {
-            if (commandName == values.GetCommand()) return true;
+            if (commandName == values.GetCommandOrEmpty()) return true;
 
             var parsedDotName = commandName.Contains(".") && ParseCommandDotName(commandName, tokens, values, requireCommandValues);
             var parsed = parsedDotName || ParseCommandName1(commandName, tokens, values, requireCommandValues);
@@ -152,7 +152,7 @@ namespace Azure.AI.Details.Common.CLI
                 values.Add("x.command", commandName);
             }
 
-            return values.Contains("x.command") && values.GetCommand() == commandName;
+            return values.Contains("x.command") && values.GetCommandOrEmpty() == commandName;
         }
 
         protected static bool ParseCommandDotName(string commandName, INamedValueTokens tokens, ICommandValues values, bool requireCommandValues = true)

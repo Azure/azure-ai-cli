@@ -50,13 +50,17 @@ namespace Azure.AI.Details.Common.CLI
             var region = _values["service.config.region"];
             var endpoint = _values["service.config.endpoint.uri"];
 
+            if (string.IsNullOrEmpty(endpoint) && string.IsNullOrEmpty(region) && string.IsNullOrEmpty(host))
+            {
+                _values.AddThrowError("ERROR:", $"Creating voice name list URL; requires one of: region, endpoint, or host.");
+            }
+
             var url = !string.IsNullOrEmpty(endpoint)
                 ? endpoint
                 : !string.IsNullOrEmpty(host)
                     ? $"{host}/cognitiveservices/voices/list"
-                    : !string.IsNullOrEmpty(region)
-                        ? $"https://{region}.tts.speech.microsoft.com/cognitiveservices/voices/list"
-                        : null;
+                    : $"https://{region}.tts.speech.microsoft.com/cognitiveservices/voices/list";
+
             return url;
         }
 
@@ -116,7 +120,7 @@ namespace Azure.AI.Details.Common.CLI
             while (true)
             {
                 Console.Write("Enter text: ");
-                var text = ConsoleHelpers.ReadLineOrDefault("", "exit");
+                var text = ConsoleHelpers.ReadLineOrDefault("", "exit")!;
 
                 if (text.ToLower() == "") break;
                 if (text.ToLower() == "stop") break;
@@ -171,7 +175,7 @@ namespace Azure.AI.Details.Common.CLI
 
         private void SynthesizeSsmlFile()
         {
-            var fileName = _values.GetOrDefault("synthesizer.input.ssml.file", _values.GetOrEmpty("synthesizer.input.text.file"));
+            var fileName = _values.GetOrDefault("synthesizer.input.ssml.file", _values.GetOrEmpty("synthesizer.input.text.file"))!;
             var existing = FileHelpers.DemandFindFileInDataPath(fileName, _values, "ssml input");
             var content = FileHelpers.ReadAllText(existing, Encoding.Default);
 
@@ -206,8 +210,8 @@ namespace Azure.AI.Details.Common.CLI
 
         private SpeechSynthesizer CreateSpeechSynthesizer()
         {
-            SpeechConfig config = CreateSpeechConfig();
-            AudioConfig audioConfig = CreateAudioConfig();
+            var config = CreateSpeechConfig();
+            var audioConfig = CreateAudioConfig();
 
             var synthesizer = audioConfig != null
                 ? new SpeechSynthesizer(config, audioConfig)
@@ -457,9 +461,8 @@ namespace Azure.AI.Details.Common.CLI
             return input;
         }
 
-        private string GetInputFileFromId(string id)
+        private string? GetInputFileFromId(string id)
         {
-            string file;
             var existing = FileHelpers.FindFileInDataPath(id, _values);
             if (existing == null) existing = FileHelpers.FindFileInDataPath(id + ".txt", _values);
             if (existing == null) existing = FileHelpers.FindFileInDataPath(id + ".ssml", _values);
@@ -474,17 +477,17 @@ namespace Azure.AI.Details.Common.CLI
                 }
             }
 
-            file = existing;
-            _values.Add(existing.EndsWith(".txt") ? "synthesizer.input.text.file" : "synthesizer.input.ssml.file", file);
+            var file = existing;
+            _values.Add(existing?.EndsWith(".txt") ?? true ? "synthesizer.input.text.file" : "synthesizer.input.ssml.file", file);
             return file;
         }
 
-        private AudioConfig? CreateAudioConfig()
+        private AudioConfig CreateAudioConfig()
         {
             var output = _values["audio.output.type"];
             var file = _values["audio.output.file"];
 
-            AudioConfig audioConfig = null;
+            AudioConfig? audioConfig = null;
             if (output == "speaker" || string.IsNullOrEmpty(output))
             {
                 audioConfig = AudioOutputHelpers.CreateAudioConfigForSpeaker();
@@ -499,7 +502,7 @@ namespace Azure.AI.Details.Common.CLI
                 _values.AddThrowError("WARNING:", $"'audio.output.type={output}' NOT YET IMPLEMENTED!!");
             }
 
-            return audioConfig;
+            return audioConfig!;
         }
 
         private void SynthesisStarted(object? sender, SpeechSynthesisEventArgs e)
@@ -560,7 +563,7 @@ namespace Azure.AI.Details.Common.CLI
             _output = new OutputHelper(_values);
             _output!.StartOutput();
 
-            var id = _values["synthesizer.input.id"];
+            var id = _values["synthesizer.input.id"]!;
             _output!.EnsureOutputAll("synthesizer.input.id", id);
             _output!.EnsureOutputEach("synthesizer.input.id", id);
 

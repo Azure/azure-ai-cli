@@ -38,7 +38,7 @@ namespace Azure.AI.Details.Common.CLI
         {
             try
             {
-                await DoCommand(_values.GetCommand());
+                await DoCommand(_values.GetCommandOrEmpty());
                 return _values.GetOrDefault("passed", true);
             }
             catch (ApplicationException ex)
