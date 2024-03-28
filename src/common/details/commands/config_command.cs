@@ -16,6 +16,10 @@ namespace Azure.AI.Details.Common.CLI
 {
     public class ConfigCommand : Command
     {
+        internal ConfigCommand(ICommandValues values) : base(values)
+        {
+        }
+
         internal static bool RunCommand(ICommandValues values)
         {
             var atFile = values.GetOrDefault("x.config.command.at.file", null);
@@ -37,7 +41,7 @@ namespace Azure.AI.Details.Common.CLI
             return DoAtFile($"{Program.Name}.defaults", values);
         }
 
-        private static bool DoSetValue(string setValue, string fileName, ICommandValues values)
+        private static bool DoSetValue(string setValue, string? fileName, ICommandValues values)
         {
             if (!string.IsNullOrEmpty(fileName))
             {
@@ -67,7 +71,7 @@ namespace Azure.AI.Details.Common.CLI
             return false;
         }
 
-        private static bool DoAddValue(string addValue, string fileName, ICommandValues values)
+        private static bool DoAddValue(string addValue, string? fileName, ICommandValues values)
         {
             if (!string.IsNullOrEmpty(fileName))
             {
@@ -97,9 +101,9 @@ namespace Azure.AI.Details.Common.CLI
             return false;
         }
 
-        private static bool DoShowValue(string path, string verbPhrase, ICommandValues values = null)
+        private static bool DoShowValue(string path, string verbPhrase, ICommandValues? values = null)
         {
-            var quiet = values.GetOrDefault("x.quiet", false);
+            var quiet = values != null && values.GetOrDefault("x.quiet", false)!;
 
             if (!quiet)
             {
@@ -159,7 +163,7 @@ namespace Azure.AI.Details.Common.CLI
             return true;
         }
 
-        private static bool DoClearValue(string clearValue, string atFile, ICommandValues values)
+        private static bool DoClearValue(string clearValue, string? atFile, ICommandValues values)
         {
             var fileName = !string.IsNullOrEmpty(atFile)
                 ? atFile.TrimStart('@') 
@@ -201,8 +205,8 @@ namespace Azure.AI.Details.Common.CLI
                         "SEE:", $"{Program.Name} help config");
             }
 
-            DoShowValue(existing, "deleted from", values);
-            File.Delete(existing);
+            DoShowValue(existing!, "deleted from", values);
+            File.Delete(existing!);
             return true;
         }
 
@@ -241,13 +245,13 @@ namespace Azure.AI.Details.Common.CLI
             return AdjustOutputFileNameScope(fileName, regionScope, commandScope, values);
         }
 
-        private static string AdjustOutputFileNameScope(string fileName, string region, string command, ICommandValues values)
+        private static string AdjustOutputFileNameScope(string fileName, string? region, string? command, ICommandValues values)
         {
             fileName = AdjustFileNameScope(fileName, region, command);
             return FileHelpers.GetOutputConfigFileName(fileName, values);
         }
 
-        private static string AdjustFileNameScope(string fileName, string region, string command)
+        private static string AdjustFileNameScope(string fileName, string? region, string? command)
         {
             fileName = fileName.TrimStart('@');
             if (!string.IsNullOrEmpty(command)) fileName = $"{command}.{fileName}";

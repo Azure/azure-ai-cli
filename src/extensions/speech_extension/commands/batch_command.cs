@@ -22,9 +22,8 @@ namespace Azure.AI.Details.Common.CLI
 {
     public class BatchCommand : Command
     {
-        public BatchCommand(ICommandValues values)
+        public BatchCommand(ICommandValues values) : base(values)
         {
-            _values = values.ReplaceValues();
             _quiet = _values.GetOrDefault("x.quiet", false);
             _verbose = _values.GetOrDefault("x.verbose", true);
         }
@@ -100,7 +99,7 @@ namespace Azure.AI.Details.Common.CLI
                 batchPaths.AppendLine(batchPath);
             }
 
-            var output = _values.GetOrDefault("batch.transcription.onprem.outfile", "");
+            var output = _values.GetOrEmpty("batch.transcription.onprem.outfile");
             if (!string.IsNullOrEmpty(output))
             {
                 var batchPathsFile = FileHelpers.GetOutputDataFileName(output, _values);
@@ -113,7 +112,7 @@ namespace Azure.AI.Details.Common.CLI
         {
             RunOnPremBatchkitIdempotent();
 
-            var id = _values.GetOrDefault("batch.transcription.onprem.id", "");
+            var id = _values.GetOrEmpty("batch.transcription.onprem.id");
 
             var message = $"Deleting onprem transcription batch '{id}' ...";
             if (!_quiet) Console.WriteLine(message);
@@ -137,7 +136,7 @@ namespace Azure.AI.Details.Common.CLI
         {
             RunOnPremBatchkitIdempotent();
 
-            string id = _values.GetOrDefault("batch.transcription.onprem.id", "");
+            string id = _values.GetOrEmpty("batch.transcription.onprem.id");
             int waitTimeout = _values.GetOrDefault("batch.transcription.onprem.status.waitms", 0);
 
             var message = waitTimeout <= 0 ? 
@@ -167,7 +166,7 @@ namespace Azure.AI.Details.Common.CLI
 
             var json = ReadWritePrintJson(response);
 
-            var output = _values.GetOrDefault("batch.transcription.onprem.outfile", "");
+            var output = _values.GetOrEmpty("batch.transcription.onprem.outfile");
             if (!string.IsNullOrEmpty(output))
             {
                 var statusFile = FileHelpers.GetOutputDataFileName(output, _values);
@@ -184,16 +183,16 @@ namespace Azure.AI.Details.Common.CLI
             var batchSpec = new Dictionary<string, object>();
             batchSpec["type"] = "SpeechSDKBatchRequest";
 
-            var filepaths = _values.GetOrDefault("batch.transcription.onprem.create.files", "");
+            var filepaths = _values.GetOrEmpty("batch.transcription.onprem.create.files");
             batchSpec["files"] = filepaths.Split(",;\r\n".ToCharArray()).ToList();
 
-            batchSpec["language"] = _values.GetOrDefault("batch.transcription.onprem.create.language", "en-US");
-            batchSpec["diarization"] = _values.GetOrDefault("batch.transcription.onprem.create.diarization", "None");
-            batchSpec["nbest"] = Int32.Parse(_values.GetOrDefault("batch.transcription.onprem.create.nbest", "1"));
-            batchSpec["profanity"] = _values.GetOrDefault("batch.transcription.onprem.create.profanity", "Masked");
-            batchSpec["allow_resume"] = _values.GetOrDefault("batch.transcription.onprem.create.resume", "true");
+            batchSpec["language"] = _values.GetOrDefault("batch.transcription.onprem.create.language", "en-US")!;
+            batchSpec["diarization"] = _values.GetOrDefault("batch.transcription.onprem.create.diarization", "None")!;
+            batchSpec["nbest"] = Int32.Parse(_values.GetOrDefault("batch.transcription.onprem.create.nbest", "1")!);
+            batchSpec["profanity"] = _values.GetOrDefault("batch.transcription.onprem.create.profanity", "Masked")!;
+            batchSpec["allow_resume"] = _values.GetOrDefault("batch.transcription.onprem.create.resume", "true")!;
             if ((string)batchSpec["allow_resume"] == "") { batchSpec["allow_resume"] = "true"; }
-            batchSpec["combine_results"] = _values.GetOrDefault("batch.transcription.onprem.create.combine", "false");
+            batchSpec["combine_results"] = _values.GetOrDefault("batch.transcription.onprem.create.combine", "false")!;
             if ((string)batchSpec["combine_results"] == "") { batchSpec["combine_results"] = "true"; }
             batchSpec["sentiment"] = "false";
 
@@ -213,7 +212,7 @@ namespace Azure.AI.Details.Common.CLI
 
             var json = ReadWritePrintJson(response);
 
-            var output = _values.GetOrDefault("batch.transcription.onprem.outfile", "");
+            var output = _values.GetOrEmpty("batch.transcription.onprem.outfile");
             if (!string.IsNullOrEmpty(output))
             {
                 var statusFile = FileHelpers.GetOutputDataFileName(output, _values);
@@ -223,7 +222,7 @@ namespace Azure.AI.Details.Common.CLI
 
         private void DoApplyOnPremEndpoints() 
         {
-            var config = _values.GetOrDefault("batch.transcription.onprem.endpoints.config", "");
+            var config = _values.GetOrEmpty("batch.transcription.onprem.endpoints.config");
             if (string.IsNullOrEmpty(config))
             {
                 _values.AddThrowError(
@@ -342,9 +341,9 @@ namespace Azure.AI.Details.Common.CLI
             UrlHelpers.CheckWriteOutputUrlsOrIds(json, "values", "self", _values, "batch");
         }
 
-        private string DoDownload()
+        private string? DoDownload()
         {
-            var url = _values.GetOrDefault("batch.download.url", "");
+            var url = _values.GetOrEmpty("batch.download.url");
             var urlOk = !string.IsNullOrEmpty(url);
             if (urlOk) return DownloadUrl(url);
 
@@ -375,7 +374,7 @@ namespace Azure.AI.Details.Common.CLI
 
         private void DoCreateTranscription()
         {
-            var name = _values.GetOrDefault("batch.transcription.name", "");
+            var name = _values.GetOrEmpty("batch.transcription.name");
             if (string.IsNullOrEmpty(name))
             {
                 _values.AddThrowError(
@@ -400,7 +399,7 @@ namespace Azure.AI.Details.Common.CLI
 
         private void DoUpdateTranscription()
         {
-            var id = _values.GetOrDefault("batch.transcription.id", "");
+            var id = _values.GetOrEmpty("batch.transcription.id");
 
             var message = $"Updating transcription '{id}' ...";
             if (!_quiet) Console.WriteLine(message);
@@ -416,7 +415,7 @@ namespace Azure.AI.Details.Common.CLI
 
         private void DoDeleteTranscription()
         {
-            var id = _values.GetOrDefault("batch.transcription.id", "");
+            var id = _values.GetOrEmpty("batch.transcription.id");
 
             var message = $"Deleting transcription '{id}' ...";
             if (!_quiet) Console.WriteLine(message);
@@ -432,7 +431,7 @@ namespace Azure.AI.Details.Common.CLI
 
         private void DoTranscriptionStatus()
         {
-            var id = _values.GetOrDefault("batch.transcription.id", "");
+            var id = _values.GetOrEmpty("batch.transcription.id");
 
             var message = $"Getting status for transcription {id} ...";
             if (!_quiet) Console.WriteLine(message);
@@ -455,7 +454,7 @@ namespace Azure.AI.Details.Common.CLI
             var listLanguages = _values.GetOrDefault("batch.list.languages", false);
             var languageKind = _values.GetOrDefault("batch.list.languages.kind", listLanguages ? kind.TrimEnd('s') : "");
 
-            var listId = _values.GetOrDefault("download.list.id", "");
+            var listId = _values.GetOrEmpty("download.list.id");
             var transcriptionId = IdHelpers.GetIdFromNamedValue(_values, "batch.transcription.id", listId);
             var transcriptionFiles = _values.GetOrDefault("batch.list.transcription.files", false);
             if (transcriptionFiles && string.IsNullOrEmpty(transcriptionId))
@@ -489,8 +488,8 @@ namespace Azure.AI.Details.Common.CLI
                         "SEE:", $"{Program.Name} help batch transcription");
             }
 
-            var top = _values.GetOrDefault("batch.top", "");
-            var skip = _values.GetOrDefault("batch.skip", "");
+            var top = _values.GetOrEmpty("batch.top");
+            var skip = _values.GetOrEmpty("batch.skip");
 
             query = "";
             if (!string.IsNullOrEmpty(skip)) query += $"&skip={skip}";
@@ -515,7 +514,7 @@ namespace Azure.AI.Details.Common.CLI
 
         private void CheckDownloadFile(ref string path, ref string message)
         {
-            var file = _values.GetOrDefault("batch.download.file", "");
+            var file = _values.GetOrEmpty("batch.download.file");
             var fileOk = !string.IsNullOrEmpty(file) && file.StartsWith("http");
 
             if (fileOk)
@@ -530,10 +529,10 @@ namespace Azure.AI.Details.Common.CLI
 
         private void CheckDownloadTranscriptionFile(ref string path, ref string message)
         {
-            var transcriptionFile = _values.GetOrDefault("batch.transcription.file.id", "");
+            var transcriptionFile = _values.GetOrEmpty("batch.transcription.file.id");
             var transcriptionFileOk = !string.IsNullOrEmpty(transcriptionFile) && transcriptionFile.StartsWith("http");
 
-            var downloadId = _values.GetOrDefault("batch.download.id", "");
+            var downloadId = _values.GetOrEmpty("batch.download.id");
             var transcriptionId = IdHelpers.GetIdFromNamedValue(_values, "batch.transcription.id", downloadId);
             var transcriptionFileId = IdHelpers.GetIdFromNamedValue(_values, "batch.transcription.file.id");
 
@@ -554,22 +553,22 @@ namespace Azure.AI.Details.Common.CLI
 
         private string GetCreateTranscriptionPostJson(string name)
         {
-            var projectId = _values.GetOrDefault("batch.project.id", "");
+            var projectId = _values.GetOrEmpty("batch.project.id");
 
-            var region = _values.GetOrDefault("service.config.region", "");
+            var region = _values.GetOrEmpty("service.config.region");
             var projectUrl = GetCustomSpeechUrl(region, "projects", projectId);
             var projectRef = !string.IsNullOrEmpty(projectId) ? $"\"project\": {{ \"self\": \"{projectUrl}\" }}," : "";
 
-            var modelId = _values.GetOrDefault("batch.transcription.create.model.id", "");
+            var modelId = _values.GetOrEmpty("batch.transcription.create.model.id");
             var modelUrl = GetCustomSpeechUrl(region, "models", modelId);
             var modelRef = !string.IsNullOrEmpty(modelId) ? $"\"model\": {{ \"self\": \"{modelUrl}\" }}, " : "";
 
-            var datasetId = _values.GetOrDefault("batch.transcription.create.dataset.id", "");
+            var datasetId = _values.GetOrEmpty("batch.transcription.create.dataset.id");
             var datasetUrl = GetCustomSpeechUrl(region, "datasets", datasetId);
             var datasetRef = !string.IsNullOrEmpty(datasetId) ? $"\"dataset\": {{ \"self\": \"{datasetUrl}\" }}, " : "";
 
             StringBuilder sb = new StringBuilder();
-            var urls = _values.GetOrDefault("batch.transcription.create.content.urls", _values.GetOrDefault("batch.transcription.create.content.url", ""));
+            var urls = _values.GetOrDefault("batch.transcription.create.content.urls", _values.GetOrEmpty("batch.transcription.create.content.url"));
             var urlList = urls.Split(";\r\n".ToCharArray()).ToList();
             Predicate<string> fileLikeUrl = url => !url.StartsWith("@") && !url.StartsWith("http");
             
@@ -595,28 +594,28 @@ namespace Azure.AI.Details.Common.CLI
             var contentUrlRefs = contentUrls.Length > 0 ? $"\"contentUrls\": [ {contentUrls} ]," : "";
 
             var language = _values.GetOrDefault("batch.transcription.language", "en-US");
-            var description = _values.GetOrDefault("batch.transcription.description", "");
+            var description = _values.GetOrEmpty("batch.transcription.description");
 
             return $"{{ {projectRef} {modelRef} {datasetRef} {contentUrlRefs} \"locale\": \"{language}\", \"displayName\": \"{name}\", \"description\": \"{description}\" }}";
         }
 
         private string GetUpdateTranscriptionPostJson()
         {
-            var name = _values.GetOrDefault("batch.transcription.name", "");
-            var description = _values.GetOrDefault("batch.transcription.description", "");
+            var name = _values.GetOrEmpty("batch.transcription.name");
+            var description = _values.GetOrEmpty("batch.transcription.description");
 
-            var region = _values.GetOrDefault("service.config.region", "");
-            var projectId = _values.GetOrDefault("batch.project.id", "");
+            var region = _values.GetOrEmpty("service.config.region");
+            var projectId = _values.GetOrEmpty("batch.project.id");
             var projectUrl = GetCustomSpeechUrl(region, "projects", projectId);
             var projectRef = !string.IsNullOrEmpty(projectId) ? $"\"project\": {{ \"self\": \"{projectUrl}\" }}," : "";
 
             return $"{{ {projectRef} \"displayName\": \"{name}\", \"description\": \"{description}\" }}";
         }
 
-        private HttpWebRequest CreateWebRequest(string method, string path, string id = null, string query = null, string contentType = null)
+        private HttpWebRequest CreateWebRequest(string method, string path, string? id = null, string? query = null, string? contentType = null)
         {
-            var key = _values.GetOrDefault("service.config.key", "");
-            var region = _values.GetOrDefault("service.config.region", "");
+            var key = _values.GetOrEmpty("service.config.key");
+            var region = _values.GetOrEmpty("service.config.region");
             var timeout = _values.GetOrDefault("batch.wait.timeout", 100000);
 
             if (string.IsNullOrEmpty(region) || string.IsNullOrEmpty(key))
@@ -654,7 +653,7 @@ namespace Azure.AI.Details.Common.CLI
             return url;
         }
 
-        private string GetCustomSpeechUrl(string region, string path, string id = null, string query = null)
+        private string GetCustomSpeechUrl(string region, string path, string? id = null, string? query = null)
         {
             if (path.StartsWith("http")) return path;
 
@@ -673,7 +672,7 @@ namespace Azure.AI.Details.Common.CLI
 
         private string CheckWriteOutputRequest(HttpWebRequest request, string payload = null, bool append = false)
         {
-            var output = _values.GetOrDefault("batch.output.request.file", "");
+            var output = _values.GetOrEmpty("batch.output.request.file");
             if (!string.IsNullOrEmpty(output))
             {
                 var fileName = FileHelpers.GetOutputDataFileName(output, _values);
@@ -689,7 +688,7 @@ namespace Azure.AI.Details.Common.CLI
             return HttpHelpers.CheckWaitForComplete(created, statusJson, createWebRequest, _values, domain, message, _quiet, _verbose);
         }
 
-        private string DownloadUrl(string url, string defaultFileName = null)
+        private string? DownloadUrl(string url, string defaultFileName = null)
         {
             var message = url.Substring(0, Math.Min(100, url.Length));
             message = url.Length > 100
@@ -706,7 +705,7 @@ namespace Azure.AI.Details.Common.CLI
             return ReadWritePrintResponse(response, defaultFileName);
         }
 
-        private string ReadWritePrintResponse(HttpWebResponse response, string defaultFileName = null)
+        private string? ReadWritePrintResponse(HttpWebResponse response, string defaultFileName = null)
         {
             var saveAs = HttpHelpers.GetOutputDataFileName(defaultFileName, response, _values, "batch", out _, out bool isJson);
 

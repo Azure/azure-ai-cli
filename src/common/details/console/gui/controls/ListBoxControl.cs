@@ -10,7 +10,7 @@ namespace Azure.AI.Details.Common.CLI.ConsoleGui
 {
     public class ListBoxControl : VirtualListBoxControl
     {
-        public ListBoxControl(Window parent, Rect rect, Colors colorNormal, Colors colorSelected, string border = null, bool fEnabled = true) : base(parent, rect, colorNormal, colorSelected, border, fEnabled)
+        public ListBoxControl(Window? parent, Rect rect, Colors colorNormal, Colors colorSelected, string? border = null, bool fEnabled = true) : base(parent, rect, colorNormal, colorSelected, border, fEnabled)
         {
         }
 
@@ -34,7 +34,7 @@ namespace Azure.AI.Details.Common.CLI.ConsoleGui
         public override int GetNumRows()
         {
             return _rows < 0
-                ? _rows = (Items != null ? Items.Length : 0)
+                ? _rows = Items.Length
                 : _rows;
         }
 
@@ -65,7 +65,7 @@ namespace Azure.AI.Details.Common.CLI.ConsoleGui
 
         private int _rows = -1;
         private int _columns = -1;
-        private string[] _items = null;
+        private string[] _items = Array.Empty<string>();
 
         #endregion
     }

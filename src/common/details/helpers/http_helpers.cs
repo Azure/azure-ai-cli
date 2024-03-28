@@ -21,7 +21,7 @@ namespace Azure.AI.Details.Common.CLI
             return DownloadFile(url, $"Downloading {url}...", null);
         }
 
-        public static string DownloadFile(string url, string message, INamedValues values)
+        public static string DownloadFile(string url, string message, INamedValues? values)
         {
             var verbose = values != null && values.GetOrDefault("x.verbose", true);
             if (verbose && !string.IsNullOrEmpty(message)) Console.WriteLine(message);
@@ -49,7 +49,7 @@ namespace Azure.AI.Details.Common.CLI
             var invalidSaveAs = saveAs == null || File.Exists(saveAs) ||
                 saveAs.IndexOfAny(Path.GetInvalidFileNameChars()) >= 0;
             if (invalidSaveAs) saveAs = Path.GetTempFileName();
-            var fileStream = FileHelpers.Create(saveAs);
+            var fileStream = FileHelpers.Create(saveAs!);
 
             int read = 0;
             while ((read = stream.Read(buffer, 0, bufferSize)) != 0) 
@@ -63,12 +63,12 @@ namespace Azure.AI.Details.Common.CLI
 
             if (verbose && !string.IsNullOrEmpty(message)) Console.WriteLine($"{message} Done!\n");
 
-            return saveAs;
+            return saveAs!;
         }
 
-        public static string DownloadFileWithRetry(string url, int timeOutRetries = 10)
+        public static string? DownloadFileWithRetry(string url, int timeOutRetries = 10)
         {
-            string downloaded = null;
+            string? downloaded = null;
             TryCatchHelpers.TryCatchRetry<WebException>(
                 () => downloaded = DownloadFile(url),
                 (ex) => ex.Message.Contains("timed") && ex.Message.Contains("out"),
@@ -76,9 +76,9 @@ namespace Azure.AI.Details.Common.CLI
             return downloaded;
         }
 
-        public static string DownloadFileWithRetry(string url, string message, INamedValues values, int timeOutRetries = 10)
+        public static string? DownloadFileWithRetry(string url, string message, INamedValues values, int timeOutRetries = 10)
         {
-            string downloaded = null;
+            string? downloaded = null;
             TryCatchHelpers.TryCatchRetry<WebException>(
                 () => downloaded = DownloadFile(url, message, values),
                 (ex) => ex.Message.Contains("timed") && ex.Message.Contains("out"),
@@ -100,7 +100,7 @@ namespace Azure.AI.Details.Common.CLI
             return sb.ToString();
         }
 
-        public static string WriteOutputRequest(HttpWebRequest request, string filename, string payload = null, bool append = false)
+        public static string? WriteOutputRequest(HttpWebRequest request, string filename, string? payload = null, bool append = false)
         {
             var text = GetWebRequestNoBodyAsString(request);
 
@@ -108,7 +108,7 @@ namespace Azure.AI.Details.Common.CLI
             if (append) FileHelpers.AppendAllText(filename, text, Encoding.UTF8);
 
             var payloadOk = !string.IsNullOrEmpty(payload);
-            if (payloadOk) FileHelpers.AppendAllText(filename, payload, Encoding.UTF8);
+            if (payloadOk) FileHelpers.AppendAllText(filename, payload!, Encoding.UTF8);
             return payload;
         }
 
@@ -122,7 +122,7 @@ namespace Azure.AI.Details.Common.CLI
             return payload;
         }
 
-        public static HttpWebResponse GetWebResponse(HttpWebRequest request, string payload = null)
+        public static HttpWebResponse GetWebResponse(HttpWebRequest request, string? payload = null)
         {
             if (!string.IsNullOrEmpty(payload))
             {
@@ -183,9 +183,9 @@ namespace Azure.AI.Details.Common.CLI
                 var response = HttpHelpers.GetWebResponse(request);
 
                 var json = HttpHelpers.ReadWriteJson(response, values, domain);
-                var parsed = JsonDocument.Parse(json);
+                var parsed = json != null ? JsonDocument.Parse(json) : null;
 
-                var status = parsed.GetPropertyStringOrNull("status");
+                var status = parsed?.GetPropertyStringOrNull("status");
                 switch (status)
                 {
                     case "success":
@@ -226,7 +226,7 @@ namespace Azure.AI.Details.Common.CLI
             return passed;
         }
 
-        public static string ReadWriteJson(WebResponse response, INamedValues values, string domain, bool skipWrite = false)
+        public static string? ReadWriteJson(WebResponse? response, INamedValues values, string domain, bool skipWrite = false)
         {
             if (response == null) return null;
 
@@ -237,7 +237,7 @@ namespace Azure.AI.Details.Common.CLI
             return isJson ? text : null;
         }
 
-        public static string GetOutputDataFileName(string defaultFileName, HttpWebResponse response, ICommandValues values, string domain, out bool isText, out bool isJson)
+        public static string? GetOutputDataFileName(string? defaultFileName, HttpWebResponse response, ICommandValues values, string domain, out bool isText, out bool isJson)
         {
             isText = response.ContentType.Contains("text/plain");
             isJson = response.ContentType.Contains("application/json");
@@ -248,13 +248,13 @@ namespace Azure.AI.Details.Common.CLI
                     : HttpHelpers.GetFileNameFromResponse(response, values);
             }
 
-            var fileName = values.GetOrDefault($"{domain}.output.file", defaultFileName);
+            var fileName = values.GetOrDefault($"{domain}.output.file", defaultFileName)!;
             return FileHelpers.GetOutputDataFileName(fileName, values);
         }
 
         public static string GetFileNameFromResponse(WebResponse response, INamedValues values)
         {
-            var runtime = values.GetOrDefault("x.run.time", "");
+            var runtime = values.GetOrEmpty("x.run.time");
             var defaultFileName = $"{runtime}.downloaded";
 
             var path = response.ResponseUri.LocalPath;
@@ -265,14 +265,14 @@ namespace Azure.AI.Details.Common.CLI
             return lastPartValid ? lastPart : defaultFileName;
         }
 
-        public static string ReadWriteResponse(WebResponse response, string fileName, string message, bool returnAsText)
+        public static string? ReadWriteResponse(WebResponse response, string fileName, string message, bool returnAsText)
         {
             Stream stream;
             using (stream = response.GetResponseStream())
             return FileHelpers.ReadWriteAllStream(stream, fileName, message, returnAsText);
         }
 
-        public static string GetLatestVersionInfo(INamedValues values, string domain)
+        public static string? GetLatestVersionInfo(INamedValues values, string domain)
         {
             try
             {
@@ -281,10 +281,10 @@ namespace Azure.AI.Details.Common.CLI
                 request.Method = WebRequestMethods.Http.Get;
                 var response = HttpHelpers.GetWebResponse(request);
                 var json = HttpHelpers.ReadWriteJson(response, values, domain);
-                var info = JsonDocument.Parse(json);
-                var versionList = info.GetPropertyArrayOrEmpty("versions");
+                var info = !string.IsNullOrEmpty(json) ? JsonDocument.Parse(json) : null;
+                var versionList = info?.GetPropertyArrayOrEmpty("versions");
 
-                return versionList.Last().GetString();
+                return versionList?.Last().GetString();
             }
             catch (Exception)
             {

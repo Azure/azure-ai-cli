@@ -102,7 +102,7 @@ namespace Azure.AI.Details.Common.CLI.ConsoleGui
 
         #region protected methods
 
-        protected TextViewerControl(Window parent, Rect rect, Colors colorNormal, Colors colorSelected, string border = null, bool fEnabled = true) : base(parent, rect, colorNormal, colorSelected, border, fEnabled)
+        protected TextViewerControl(Window? parent, Rect rect, Colors colorNormal, Colors colorSelected, string? border = null, bool fEnabled = true) : base(parent, rect, colorNormal, colorSelected, border, fEnabled)
         {
         }
 

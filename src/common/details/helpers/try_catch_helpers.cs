@@ -10,22 +10,22 @@ namespace Azure.AI.Details.Common.CLI
 {
     public class TryCatchHelpers
     {
-        public static Exception TryCatchRetryNoThrow(Action action, int retryTimes = 10)
+        public static Exception? TryCatchRetryNoThrow(Action action, int retryTimes = 10)
         {
             return TryCatchRetryNoThrow<Exception>(action, null, retryTimes);
         }
 
-        public static Exception TryCatchRetryNoThrow(Action action, Func<Exception, bool> retryIf, int retryTimes = 10)
+        public static Exception? TryCatchRetryNoThrow(Action action, Func<Exception, bool> retryIf, int retryTimes = 10)
         {
             return TryCatchRetryNoThrow<Exception>(action, retryIf, retryTimes);
         }
 
-        public static ExceptionType TryCatchRetryNoThrow<ExceptionType>(Action action, int retryTimes = 10) where ExceptionType : Exception
+        public static ExceptionType? TryCatchRetryNoThrow<ExceptionType>(Action action, int retryTimes = 10) where ExceptionType : Exception
         {
             return TryCatchRetryNoThrow<ExceptionType>(action, null, retryTimes);
         }
 
-        public static ExceptionType TryCatchRetryNoThrow<ExceptionType>(Action action, Func<ExceptionType, bool> retryIf = null, int retryTimes = 10) where ExceptionType : Exception
+        public static ExceptionType? TryCatchRetryNoThrow<ExceptionType>(Action action, Func<ExceptionType, bool>? retryIf = null, int retryTimes = 10) where ExceptionType : Exception
         {
             var retry = 0;
             while (retry <= retryTimes)
@@ -64,13 +64,13 @@ namespace Azure.AI.Details.Common.CLI
             if (ex != null) throw ex;
         }
 
-        public static void TryCatchRetry<ExceptionType>(Action action, Func<ExceptionType, bool> retryIf = null, int retryTimes = 10) where ExceptionType : Exception
+        public static void TryCatchRetry<ExceptionType>(Action action, Func<ExceptionType, bool>? retryIf = null, int retryTimes = 10) where ExceptionType : Exception
         {
             var ex = TryCatchRetryNoThrow<ExceptionType>(action, retryIf, retryTimes);
             if (ex != null) throw ex;
         }
 
-        public static T TryCatchNoThrow<T>(Func<T> function, T defaultResult, out Exception functionThrewException)
+        public static T TryCatchNoThrow<T>(Func<T> function, T defaultResult, out Exception? functionThrewException)
         {
             functionThrewException = null;
             try

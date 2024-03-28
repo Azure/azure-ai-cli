@@ -7,7 +7,7 @@ namespace Azure.AI.Details.Common.CLI
 {
     public class NamedValueTokenParserHelpers
     {
-        public static bool MatchShortName(string shortName, INamedValueTokens tokens, INamedValues values, out int nameTokenCount)
+        public static bool MatchShortName(string? shortName, INamedValueTokens tokens, INamedValues values, out int nameTokenCount)
         {
             nameTokenCount = 0;
 
@@ -85,7 +85,7 @@ namespace Azure.AI.Details.Common.CLI
             return false;
         }
 
-        public static bool ValueMatchesValidValue(string validValues, string peekToken, string peekTokenValue, bool skipAtAt = false)
+        public static bool ValueMatchesValidValue(string? validValues, string? peekToken, string? peekTokenValue, bool skipAtAt = false)
         {
             if (peekToken == null) return false;
             if (peekTokenValue == null) return false;
@@ -117,7 +117,7 @@ namespace Azure.AI.Details.Common.CLI
             return false;
         }
 
-        private static void SetWild(INamedValues values, string fullNamePart, string tokenPart)
+        private static void SetWild(INamedValues values, string fullNamePart, string? tokenPart)
         {
             values.Reset(fullNamePart);
             values.Add(fullNamePart, tokenPart);

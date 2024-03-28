@@ -17,7 +17,7 @@ namespace Azure.AI.Details.Common.CLI
                       "TRY:", $"{Program.Name} {command} {option}",
                       "SEE:", $"{Program.Name} help {command}");
             }
-            return value;
+            return value!;
         }
     }
 }

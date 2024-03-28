@@ -29,13 +29,13 @@ namespace Azure.AI.Details.Common.CLI
 
     public class CaptionHelper
     {
-        public static IEnumerable<Caption> GetCaptions(string language, int maxWidth, int maxHeight, IEnumerable<object> results)
+        public static IEnumerable<Caption> GetCaptions(string? language, int maxWidth, int maxHeight, IEnumerable<object> results)
         {
             var helper = new CaptionHelper(language, maxWidth, maxHeight, results);
             return helper.GetCaptions();
         }
 
-        public CaptionHelper(string language, int maxWidth, int maxHeight, IEnumerable<object> results)
+        public CaptionHelper(string? language, int maxWidth, int maxHeight, IEnumerable<object> results)
         {
             this._language = language;
 
@@ -65,7 +65,7 @@ namespace Azure.AI.Details.Common.CLI
         public IEnumerable<Caption> GetCaptions()
         {
             EnsureCaptions();
-            return _captions;
+            return _captions!;
         }
 
         private void EnsureCaptions()
@@ -90,7 +90,7 @@ namespace Azure.AI.Details.Common.CLI
             }
         }
 
-        private string GetTextOrTranslation(RecognitionResult result)
+        private string? GetTextOrTranslation(RecognitionResult result)
         {
             if (_language == null) return result.Text;
 
@@ -122,7 +122,7 @@ namespace Azure.AI.Details.Common.CLI
                     var captionText = string.Join('\n', captionLines.ToArray());
                     captionLines.Clear();
 
-                    var captionSequence = _captions.Count + 1;
+                    var captionSequence = _captions!.Count + 1;
                     var isFirstCaption = captionStartsAt == 0;
 
                     (var captionBegin, var captionEnd) = isFirstCaption && isLastCaption
@@ -212,13 +212,13 @@ namespace Azure.AI.Details.Common.CLI
 
         private static bool IsFinalResult(object result)
         {
-            RecognitionResult final = result as RecognitionResult;
+            var final = result as RecognitionResult;
             return final?.Reason == ResultReason.RecognizedSpeech ||
                    final?.Reason == ResultReason.RecognizedIntent ||
                    final?.Reason == ResultReason.TranslatedSpeech;
         }
 
-        private readonly string _language;
+        private readonly string? _language;
         private readonly string[] _firstPassTerminators;
         private readonly string[] _secondPassTerminators;
 
@@ -226,6 +226,6 @@ namespace Azure.AI.Details.Common.CLI
         private readonly int _maxHeight;
         private readonly IEnumerable<object> _results;
 
-        private List<Caption> _captions;
+        private List<Caption>? _captions;
     }
 }

@@ -27,9 +27,9 @@ namespace Azure.AI.Details.Common.CLI
         /// <param name="pinnedValue">The default value, unless pinnedValueKey is non-null, then the value passed to a property with the name whose value is pinnedValueKey</param>
         /// <param name="pinnedValueKey">The name of the property value pinnedValue will be set to.</param>
         public NamedValueTokenParser(
-                    string name, string fullName, string requiredParts,
-                    string valueCount, string validValues = null, string valueKey = null,
-                    string pinnedValue = null, string pinnedValueKey = null)
+                    string? name, string fullName, string requiredParts,
+                    string valueCount, string? validValues = null, string? valueKey = null,
+                    string? pinnedValue = null, string? pinnedValueKey = null)
         {
             ShortName = name;
             FullName = fullName;
@@ -128,12 +128,12 @@ namespace Azure.AI.Details.Common.CLI
                 else if (count == 1 && ValueMatchesValidValue(peekToken1, peekToken1Value, true))
                 {
                     tokens.SkipTokens(skipNameTokens);
-                    parsed = AddValue(values, ValueKey, tokens.PopNextTokenValue(values));
+                    parsed = AddValue(values, ValueKey, tokens.PopNextTokenValue(values)!);
                 }
                 else if (count == 1 && ValueMatchesValidValue(peekToken1, peekToken1Value, false))
                 {
                     tokens.SkipTokens(skipNameTokens);
-                    parsed = AddValue(values, ValueKey, tokens.PopNextToken().TrimStart('='));
+                    parsed = AddValue(values, ValueKey, tokens.PopNextToken()!.TrimStart('='));
                 }
                 else if (count == 2 && ValueMatchesValidValue(peekToken1, peekToken1Value) && peekToken2Value != null)
                 {
@@ -155,12 +155,12 @@ namespace Azure.AI.Details.Common.CLI
                 else if (count == 1 && ValueMatchesValidValue(peekToken1, peekToken1Value, true))
                 {
                     tokens.SkipTokens(skipNameTokens);
-                    parsed = AddValue(values, ValueKey, tokens.PopNextTokenValue(values));
+                    parsed = AddValue(values, ValueKey, tokens.PopNextTokenValue(values)!);
                 }
                 else if (count == 1 && ValueMatchesValidValue(peekToken1, peekToken1Value, false))
                 {
                     tokens.SkipTokens(skipNameTokens);
-                    parsed = AddValue(values, ValueKey, tokens.PopNextToken().TrimStart('='));
+                    parsed = AddValue(values, ValueKey, tokens.PopNextToken()!.TrimStart('='));
                 }
             }
             else // if (PinnedValueKey != null && PinnedValue != null)
@@ -168,21 +168,21 @@ namespace Azure.AI.Details.Common.CLI
                 if (count == 0)
                 {
                     tokens.SkipTokens(skipNameTokens);
-                    parsed = AddValue(values, PinnedValueKey, PinnedValue);
+                    parsed = AddValue(values, PinnedValueKey!, PinnedValue!);
                 }
                 else if (count == 1 && ValueMatchesValidValue(peekToken1, peekToken1Value, true))
                 {
                     tokens.SkipTokens(skipNameTokens);
 
-                    parsed = AddValue(values, ValueKey, tokens.PopNextTokenValue(values));
-                    parsed = parsed && AddValue(values, PinnedValueKey, PinnedValue);
+                    parsed = AddValue(values, ValueKey, tokens.PopNextTokenValue(values)!);
+                    parsed = parsed && AddValue(values, PinnedValueKey!, PinnedValue!);
                 }
                 else if (count == 1 && ValueMatchesValidValue(peekToken1, peekToken1Value, false))
                 {
                     tokens.SkipTokens(skipNameTokens);
 
-                    parsed = AddValue(values, ValueKey, tokens.PopNextToken().TrimStart('='));
-                    parsed = parsed && AddValue(values, PinnedValueKey, PinnedValue);
+                    parsed = AddValue(values, ValueKey, tokens.PopNextToken()!.TrimStart('='));
+                    parsed = parsed && AddValue(values, PinnedValueKey!, PinnedValue!);
                 }
                 else if (count == 2 && ValueMatchesValidValue(peekToken1, peekToken1Value) && peekToken2Value != null)
                 {
@@ -192,14 +192,14 @@ namespace Azure.AI.Details.Common.CLI
                     value += "=" + tokens.PopNextTokenValue(values);
 
                     parsed = AddValue(values, ValueKey, value.TrimStart('='));
-                    parsed = parsed && AddValue(values, PinnedValueKey, PinnedValue);
+                    parsed = parsed && AddValue(values, PinnedValueKey!, PinnedValue!);
                 }
             }
 
             return parsed;
         }
 
-        private bool ValueMatchesValidValue(string peekToken, string peekTokenValue, bool skipAtAt = false)
+        private bool ValueMatchesValidValue(string? peekToken, string? peekTokenValue, bool skipAtAt = false)
         {
             return NamedValueTokenParserHelpers.ValueMatchesValidValue(ValidValues, peekToken, peekTokenValue, skipAtAt);
         }
@@ -278,16 +278,16 @@ namespace Azure.AI.Details.Common.CLI
 
         #region protected / private data
 
-        protected string ShortName; // e.g. "--file"
+        protected string? ShortName; // e.g. "--file"
         protected string FullName; // e.g. "audio.input.push.stream.file"
         protected string RequiredParts; // e.g. "00100"
 
         protected string ValueCount; // e.g. "0" or "1" or "2" or "2;1" or ...
-        protected string ValidValues; // e.g. "file;blob;microphone"
+        protected string? ValidValues; // e.g. "file;blob;microphone"
         protected string ValueKey; // e.g. "audio.input.type"
 
-        protected string PinnedValue;
-        protected string PinnedValueKey;
+        protected string? PinnedValue;
+        protected string? PinnedValueKey;
 
         #endregion
     }

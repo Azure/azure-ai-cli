@@ -31,31 +31,41 @@ namespace Azure.AI.Details.Common.CLI
             Console.WriteLine();
 
             int maxLabelWidth = 0;
-            var actions = new List<Action<int>>(new Action<int>[] {
-                ConfigSetLambda("@services.endpoint", endpoint, "Endpoint (AIServices)", endpoint, ref maxLabelWidth),
-                ConfigSetLambda("@services.key", key, "Key (AIServices)", key.Substring(0, 4) + "****************************", ref maxLabelWidth),
-                ConfigSetLambda("@services.region", region, "Region (AIServices)", region, ref maxLabelWidth),
+            var actions = new List<Action<int>>();
 
-                ConfigSetLambda("@chat.key", key, "Key (chat)", key.Substring(0, 4) + "****************************", ref maxLabelWidth),
-                ConfigSetLambda("@chat.region", region, "Region (chat)", region, ref maxLabelWidth),
-                ConfigSetLambda("@chat.endpoint", endpoint, "Endpoint (chat)", endpoint, ref maxLabelWidth),
-                chatDeployment.HasValue ? ConfigSetLambda("@chat.deployment", chatDeployment.Value.Name, "Deployment (chat)", chatDeployment.Value.Name, ref maxLabelWidth) : null,
-                chatDeployment.HasValue ? ConfigSetLambda("@chat.model", chatDeployment.Value.ModelName, "Model Name (chat)", chatDeployment.Value.ModelName, ref maxLabelWidth) : null,
+            actions.Add(ConfigSetLambda("@services.endpoint", endpoint, "Endpoint (AIServices)", endpoint, ref maxLabelWidth));
+            actions.Add(ConfigSetLambda("@services.key", key, "Key (AIServices)", key.Substring(0, 4) + "****************************", ref maxLabelWidth));
+            actions.Add(ConfigSetLambda("@services.region", region, "Region (AIServices)", region, ref maxLabelWidth));
 
-                ConfigSetLambda("@search.embedding.key", key, "Key (embedding)", key.Substring(0, 4) + "****************************", ref maxLabelWidth),
-                ConfigSetLambda("@search.embedding.endpoint", endpoint, "Endpoint (embedding)", endpoint, ref maxLabelWidth),
-                embeddingsDeployment.HasValue ? ConfigSetLambda("@search.embedding.model.deployment.name", embeddingsDeployment.Value.Name, "Deployment (embedding)", embeddingsDeployment.Value.Name, ref maxLabelWidth) : null,
-                embeddingsDeployment.HasValue ? ConfigSetLambda("@search.embedding.model.name", embeddingsDeployment.Value.ModelName, "Model Name (embedding)", embeddingsDeployment.Value.ModelName, ref maxLabelWidth) : null,
+            actions.Add(ConfigSetLambda("@chat.key", key, "Key (chat)", key.Substring(0, 4) + "****************************", ref maxLabelWidth));
+            actions.Add(ConfigSetLambda("@chat.region", region, "Region (chat)", region, ref maxLabelWidth));
+            actions.Add(ConfigSetLambda("@chat.endpoint", endpoint, "Endpoint (chat)", endpoint, ref maxLabelWidth));
+            if (chatDeployment != null)
+            {
+                actions.Add(ConfigSetLambda("@chat.deployment", chatDeployment.Value.Name, "Deployment (chat)", chatDeployment.Value.Name, ref maxLabelWidth));
+                actions.Add(ConfigSetLambda("@chat.model", chatDeployment.Value.ModelName, "Model Name (chat)", chatDeployment.Value.ModelName, ref maxLabelWidth));
+            }
 
-                ConfigSetLambda("@chat.evaluation.key", key, "Key (evaluation)", key.Substring(0, 4) + "****************************", ref maxLabelWidth),
-                ConfigSetLambda("@chat.evaluation.endpoint", endpoint, "Endpoint (evaluation)", endpoint, ref maxLabelWidth),
-                evaluationDeployment.HasValue ? ConfigSetLambda("@chat.evaluation.model.deployment.name", evaluationDeployment.Value.Name, "Deployment (evaluation)", evaluationDeployment.Value.Name, ref maxLabelWidth) : null,
-                evaluationDeployment.HasValue ? ConfigSetLambda("@chat.evaluation.model.name", evaluationDeployment.Value.ModelName, "Model Name (evaluation)", evaluationDeployment.Value.ModelName, ref maxLabelWidth) : null,
+            actions.Add(ConfigSetLambda("@search.embedding.key", key, "Key (embedding)", key.Substring(0, 4) + "****************************", ref maxLabelWidth));
+            actions.Add(ConfigSetLambda("@search.embedding.endpoint", endpoint, "Endpoint (embedding)", endpoint, ref maxLabelWidth));
+            if (embeddingsDeployment != null)
+            {
+                actions.Add(ConfigSetLambda("@search.embedding.model.deployment.name", embeddingsDeployment.Value.Name, "Deployment (embedding)", embeddingsDeployment.Value.Name, ref maxLabelWidth));
+                actions.Add(ConfigSetLambda("@search.embedding.model.name", embeddingsDeployment.Value.ModelName, "Model Name (embedding)", embeddingsDeployment.Value.ModelName, ref maxLabelWidth));
+            }
 
-                ConfigSetLambda("@speech.endpoint", endpoint, "Endpoint (speech)", endpoint, ref maxLabelWidth),
-                ConfigSetLambda("@speech.key", key, "Key (speech)", key.Substring(0, 4) + "****************************", ref maxLabelWidth),
-                ConfigSetLambda("@speech.region", region, "Region (speech)", region, ref maxLabelWidth),
-            });
+            actions.Add(ConfigSetLambda("@chat.evaluation.key", key, "Key (evaluation)", key.Substring(0, 4) + "****************************", ref maxLabelWidth));
+            actions.Add(ConfigSetLambda("@chat.evaluation.endpoint", endpoint, "Endpoint (evaluation)", endpoint, ref maxLabelWidth));
+            if (evaluationDeployment != null)
+            {
+                actions.Add(ConfigSetLambda("@chat.evaluation.model.deployment.name", evaluationDeployment.Value.Name, "Deployment (evaluation)", evaluationDeployment.Value.Name, ref maxLabelWidth));
+                actions.Add(ConfigSetLambda("@chat.evaluation.model.name", evaluationDeployment.Value.ModelName, "Model Name (evaluation)", evaluationDeployment.Value.ModelName, ref maxLabelWidth));
+            }
+
+            actions.Add(ConfigSetLambda("@speech.endpoint", endpoint, "Endpoint (speech)", endpoint, ref maxLabelWidth));
+            actions.Add(ConfigSetLambda("@speech.key", key, "Key (speech)", key.Substring(0, 4) + "****************************", ref maxLabelWidth));
+            actions.Add(ConfigSetLambda("@speech.region", region, "Region (speech)", region, ref maxLabelWidth));
+
             actions.ForEach(x => x?.Invoke(maxLabelWidth));
         }
 
@@ -83,24 +93,34 @@ namespace Azure.AI.Details.Common.CLI
             Console.WriteLine();
 
             int maxLabelWidth = 0;
-            var actions = new List<Action<int>>(new Action<int>[] {
-                ConfigSetLambda("@chat.key", key, "Key (chat)", key.Substring(0, 4) + "****************************", ref maxLabelWidth),
-                ConfigSetLambda("@chat.endpoint", endpoint, "Endpoint (chat)", endpoint, ref maxLabelWidth),
-                chatDeployment.HasValue ? ConfigSetLambda("@chat.deployment", chatDeployment.Value.Name, "Deployment (chat)", chatDeployment.Value.Name, ref maxLabelWidth) : null,
-                chatDeployment.HasValue ? ConfigSetLambda("@chat.model", chatDeployment.Value.ModelName, "Model Name (chat)", chatDeployment.Value.ModelName, ref maxLabelWidth) : null,
+            var actions = new List<Action<int>>();
 
-                ConfigSetLambda("@search.embedding.key", key, "Key (embedding)", key.Substring(0, 4) + "****************************", ref maxLabelWidth),
-                ConfigSetLambda("@search.embedding.endpoint", endpoint, "Endpoint (embedding)", endpoint, ref maxLabelWidth),
-                embeddingsDeployment.HasValue ? ConfigSetLambda("@search.embedding.model.deployment.name", embeddingsDeployment.Value.Name, "Deployment (embedding)", embeddingsDeployment.Value.Name, ref maxLabelWidth) : null,
-                embeddingsDeployment.HasValue ? ConfigSetLambda("@search.embedding.model.name", embeddingsDeployment.Value.ModelName, "Model Name (embedding)", embeddingsDeployment.Value.ModelName, ref maxLabelWidth) : null,
+            actions.Add(ConfigSetLambda("@chat.key", key, "Key (chat)", key.Substring(0, 4) + "****************************", ref maxLabelWidth));
+            actions.Add(ConfigSetLambda("@chat.endpoint", endpoint, "Endpoint (chat)", endpoint, ref maxLabelWidth));
+            if (chatDeployment != null)
+            {
+                actions.Add(ConfigSetLambda("@chat.deployment", chatDeployment.Value.Name, "Deployment (chat)", chatDeployment.Value.Name, ref maxLabelWidth));
+                actions.Add(ConfigSetLambda("@chat.model", chatDeployment.Value.ModelName, "Model Name (chat)", chatDeployment.Value.ModelName, ref maxLabelWidth));
+            }
 
-                ConfigSetLambda("@chat.evaluation.key", key, "Key (evaluation)", key.Substring(0, 4) + "****************************", ref maxLabelWidth),
-                ConfigSetLambda("@chat.evaluation.endpoint", endpoint, "Endpoint (evaluation)", endpoint, ref maxLabelWidth),
-                evaluationDeployment.HasValue ? ConfigSetLambda("@chat.evaluation.model.deployment.name", evaluationDeployment.Value.Name, "Deployment (evaluation)", evaluationDeployment.Value.Name, ref maxLabelWidth) : null,
-                evaluationDeployment.HasValue ? ConfigSetLambda("@chat.evaluation.model.name", evaluationDeployment.Value.ModelName, "Model Name (evaluation)", evaluationDeployment.Value.ModelName, ref maxLabelWidth) : null,
+            actions.Add(ConfigSetLambda("@search.embedding.key", key, "Key (embedding)", key.Substring(0, 4) + "****************************", ref maxLabelWidth));
+            actions.Add(ConfigSetLambda("@search.embedding.endpoint", endpoint, "Endpoint (embedding)", endpoint, ref maxLabelWidth));
+            if (embeddingsDeployment != null)
+            {
+                actions.Add(ConfigSetLambda("@search.embedding.model.deployment.name", embeddingsDeployment.Value.Name, "Deployment (embedding)", embeddingsDeployment.Value.Name, ref maxLabelWidth));
+                actions.Add(ConfigSetLambda("@search.embedding.model.name", embeddingsDeployment.Value.ModelName, "Model Name (embedding)", embeddingsDeployment.Value.ModelName, ref maxLabelWidth));
+            }
 
-                ConfigSetLambda("@chat.region", region, "Region", region, ref maxLabelWidth),
-            });
+            actions.Add(ConfigSetLambda("@chat.evaluation.key", key, "Key (evaluation)", key.Substring(0, 4) + "****************************", ref maxLabelWidth));
+            actions.Add(ConfigSetLambda("@chat.evaluation.endpoint", endpoint, "Endpoint (evaluation)", endpoint, ref maxLabelWidth));
+            if (evaluationDeployment != null)
+            {
+                actions.Add(ConfigSetLambda("@chat.evaluation.model.deployment.name", evaluationDeployment.Value.Name, "Deployment (evaluation)", evaluationDeployment.Value.Name, ref maxLabelWidth));
+                actions.Add(ConfigSetLambda("@chat.evaluation.model.name", evaluationDeployment.Value.ModelName, "Model Name (evaluation)", evaluationDeployment.Value.ModelName, ref maxLabelWidth));
+            }
+
+            actions.Add(ConfigSetLambda("@chat.region", region, "Region", region, ref maxLabelWidth));
+
             actions.ForEach(x => x?.Invoke(maxLabelWidth));
         }
 

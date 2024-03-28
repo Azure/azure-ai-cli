@@ -53,10 +53,9 @@ namespace Azure.AI.Details.Common.CLI
 
     public class ImageCommand : Command
     {
-        internal ImageCommand(ICommandValues values)
+        internal ImageCommand(ICommandValues values) : base(values)
         {
-            _values = values.ReplaceValues();
-            _quiet = _values.GetOrDefault("x.quiet", false);
+           _quiet = _values.GetOrDefault("x.quiet", false);
             _verbose = _values.GetOrDefault("x.verbose", true);
         }
 
@@ -153,7 +152,7 @@ namespace Azure.AI.Details.Common.CLI
             // _disposeAfterStop.Add(visionSource);
             _disposeAfterStop.Add(analyzer);
 
-            // _output.EnsureCachePropertyCollection("recognizer", recognizer.Properties);
+            // _output!.EnsureCachePropertyCollection("recognizer", recognizer.Properties);
 
             return analyzer;
         }
@@ -189,10 +188,10 @@ namespace Azure.AI.Details.Common.CLI
                 _values.AddThrowError("ERROR:", $"Creating VisionServiceOptions; requires one of: key or token.");
             }
 
-            // var stringProperty = values.GetOrDefault("config.string.property", "");
+            // var stringProperty = values.GetOrEmpty("config.string.property");
             // if (!string.IsNullOrEmpty(stringProperty)) ConfigHelpers.SetStringProperty(config, stringProperty);
 
-            // var stringProperties = values.GetOrDefault("config.string.properties", "");
+            // var stringProperties = values.GetOrEmpty("config.string.properties");
             // if (!string.IsNullOrEmpty(stringProperties)) ConfigHelpers.SetStringProperties(config, stringProperties);
 
             return serviceOptions;
@@ -233,7 +232,7 @@ namespace Azure.AI.Details.Common.CLI
 
         private ImageAnalysisOptions CreateImageAnalysisOptions()
         {
-            var featuresRequested = _values.GetOrDefault("vision.image.visual.features", "");
+            var featuresRequested = _values.GetOrEmpty("vision.image.visual.features");
             var features = string.IsNullOrEmpty(featuresRequested)
                 ? GetDefaultImageAnalysisFeatures()
                 : GetImageAnalysisFeatures(featuresRequested);
@@ -276,11 +275,11 @@ namespace Azure.AI.Details.Common.CLI
             return features;
         }
 
-        private void Analyzed(object sender, ImageAnalysisEventArgs e)
+        private void Analyzed(object? sender, ImageAnalysisEventArgs e)
         {
-            _display.DisplayAnalyzed(e);
-            // _output.Recognized(e);
-            _lock.ExitReaderLockOnce(ref _expectAnalyzed);
+            _display!.DisplayAnalyzed(e);
+            // _output!.Recognized(e);
+            _lock!.ExitReaderLockOnce(ref _expectAnalyzed);
         }
 
         private void CheckVisionInput()
@@ -408,7 +407,7 @@ namespace Azure.AI.Details.Common.CLI
             var log = _values["diagnostics.config.log.file"];
             if (!string.IsNullOrEmpty(log))
             {
-                var id = _values.GetOrDefault("vision.input.id", "");
+                var id = _values.GetOrEmpty("vision.input.id");
                 if (log.Contains("{id}")) log = log.Replace("{id}", id);
 
                 var pid = Process.GetCurrentProcess().Id.ToString();
@@ -417,7 +416,7 @@ namespace Azure.AI.Details.Common.CLI
                 var time = DateTime.Now.ToFileTime().ToString();
                 if (log.Contains("{time}")) log = log.Replace("{time}", time);
 
-                var runTime = _values.GetOrDefault("x.run.time", "");
+                var runTime = _values.GetOrEmpty("x.run.time");
                 if (log.Contains("{run.time}")) log = log.Replace("{run.time}", runTime);
 
                 log = FileHelpers.GetOutputDataFileName(log, _values);
@@ -443,15 +442,15 @@ namespace Azure.AI.Details.Common.CLI
             _display = new DisplayHelper(_values);
 
             // _output = new OutputHelper(_values);
-            // _output.StartOutput();
+            // _output!.StartOutput();
 
             // var id = _values["vision.input.id"];
-            // _output.EnsureOutputAll("vision.input.id", id);
-            // _output.EnsureOutputEach("vision.input.id", id);
-            // _output.EnsureCacheProperty("vision.input.id", id);
+            // _output!.EnsureOutputAll("vision.input.id", id);
+            // _output!.EnsureOutputEach("vision.input.id", id);
+            // _output!.EnsureCacheProperty("vision.input.id", id);
 
             // var file = _values["vision.input.file"];
-            // _output.EnsureCacheProperty("vision.input.file", file);
+            // _output!.EnsureCacheProperty("vision.input.file", file);
 
             _lock = new SpinLock();
             _lock.StartLock();
@@ -463,13 +462,13 @@ namespace Azure.AI.Details.Common.CLI
 
         private void StopCommand()
         {
-            _lock.StopLock(5000);
+            _lock!.StopLock(5000);
 
             // This shouldn't really be here, but since there is no session stopped event it hast to be here
             _stopEvent.Set();
 
-            // _output.CheckOutput();
-            // _output.StopOutput();
+            // _output!.CheckOutput();
+            // _output!.StopOutput();
         }
 
         private bool _quiet = false;
@@ -479,12 +478,12 @@ namespace Azure.AI.Details.Common.CLI
         // private bool _connect = false;
         // private bool _disconnect = false;
 
-        private SpinLock _lock = null;
+        private SpinLock? _lock = null;
         private int _expectAnalyzed = 0;
         // private int _expectSessionStopped = 0;
         // private int _expectDisconnected = 0;
 
-        // OutputHelper _output = null;
-        DisplayHelper _display = null;
+        // OutputHelper? _output = null;
+        DisplayHelper? _display = null;
     }
 }

@@ -22,9 +22,8 @@ namespace Azure.AI.Details.Common.CLI
 {
     public class ScenarioWizardCommand : Command
     {
-        internal ScenarioWizardCommand(ICommandValues values)
+        internal ScenarioWizardCommand(ICommandValues values) : base(values)
         {
-            _values = values.ReplaceValues();
             _quiet = _values.GetOrDefault("x.quiet", false);
             _verbose = _values.GetOrDefault("x.verbose", true);
         }
@@ -422,7 +421,7 @@ namespace Azure.AI.Details.Common.CLI
             // _display = new DisplayHelper(_values);
 
             // _output = new OutputHelper(_values);
-            // _output.StartOutput();
+            // _output!.StartOutput();
 
             _lock = new SpinLock();
             _lock.StartLock();
@@ -430,16 +429,16 @@ namespace Azure.AI.Details.Common.CLI
 
         private void StopCommand()
         {
-            _lock.StopLock(5000);
+            _lock!.StopLock(5000);
 
             // LogHelpers.EnsureStopLogFile(_values);
-            // _output.CheckOutput();
-            // _output.StopOutput();
+            // _output!.CheckOutput();
+            // _output!.StopOutput();
 
             _stopEvent.Set();
         }
 
-        private SpinLock _lock = null;
+        private SpinLock? _lock = null;
         private readonly bool _quiet = false;
         private readonly bool _verbose = false;
     }

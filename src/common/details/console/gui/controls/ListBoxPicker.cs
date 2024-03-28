@@ -46,13 +46,13 @@ namespace Azure.AI.Details.Common.CLI.ConsoleGui
             return picker._picked;
         }
 
-        public static string PickString(string[] choices, int select = 0)
+        public static string? PickString(string[] choices, int select = 0)
         {
             var width = Math.Max(choices.Max(x => x.Length) + 4, 29);
             return ListBoxPicker.PickString(choices, width, 30, new Colors(ConsoleColor.White, ConsoleColor.Blue), new Colors(ConsoleColor.White, ConsoleColor.Red), select);
         }
 
-        public static string PickString(string[] lines, int width, int height, Colors normal, Colors selected, int select = 0)
+        public static string? PickString(string[] lines, int width, int height, Colors normal, Colors selected, int select = 0)
         {
             var picked = PickIndexOf(lines, width, height, normal, selected, select);
             return picked >= 0 && picked < lines.Length
@@ -89,7 +89,7 @@ namespace Azure.AI.Details.Common.CLI.ConsoleGui
 
         #region protected methods
 
-        protected ListBoxPicker(Window parent, Rect rect, Colors colorNormal, Colors colorSelected, string border = null, bool fEnabled = true) : base(parent, rect, colorNormal, colorSelected, border, fEnabled)
+        protected ListBoxPicker(Window? parent, Rect rect, Colors colorNormal, Colors colorSelected, string? border = null, bool fEnabled = true) : base(parent, rect, colorNormal, colorSelected, border, fEnabled)
         {
         }
 

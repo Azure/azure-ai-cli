@@ -267,7 +267,7 @@ namespace Azure.AI.Details.Common.CLI.Extensions.Templates
             return parameters;
         }
 
-        private static void UpdateParameters(string? jsonFile, Dictionary<string, string> parameters)
+        private static void UpdateParameters(string jsonFile, Dictionary<string, string> parameters)
         {
             var json = FileHelpers.ReadAllText(jsonFile, new UTF8Encoding(false));
             foreach (var item in JsonDocument.Parse(json).RootElement.EnumerateObject())
@@ -304,7 +304,7 @@ namespace Azure.AI.Details.Common.CLI.Extensions.Templates
             {
                 if (!file.StartsWith(root)) throw new Exception("Invalid file name");
                 var outputFile = file.Substring(root.Length + templateName.Length + 1);
-                var outputFileWithPath = PathHelpers.Combine(outputDirectory, outputFile);
+                var outputFileWithPath = PathHelpers.Combine(outputDirectory, outputFile)!;
 
                 var isBinary = file.EndsWith(".png") || file.EndsWith(".ico");
                 if (!isBinary)

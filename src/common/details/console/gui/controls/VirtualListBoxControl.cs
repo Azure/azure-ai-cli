@@ -9,7 +9,7 @@ namespace Azure.AI.Details.Common.CLI.ConsoleGui
 {
     abstract public class VirtualListBoxControl : ScrollingControl
     {
-        protected VirtualListBoxControl(Window parent, Rect rect, Colors colorNormal, Colors colorSelected, string border = null, bool fEnabled = true) : base(parent, rect, colorNormal, border, fEnabled)
+        protected VirtualListBoxControl(Window? parent, Rect rect, Colors colorNormal, Colors colorSelected, string? border = null, bool fEnabled = true) : base(parent, rect, colorNormal, border, fEnabled)
         {
             this.colorsSelected = colorSelected;
         }

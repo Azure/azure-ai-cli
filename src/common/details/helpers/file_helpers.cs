@@ -17,7 +17,7 @@ namespace Azure.AI.Details.Common.CLI
 {
     public class PathHelpers
     {
-        public static string Combine(string path1, string path2)
+        public static string? Combine(string path1, string path2)
         {
             try
             {
@@ -29,7 +29,7 @@ namespace Azure.AI.Details.Common.CLI
             }
         }
 
-        public static string Combine(string path1, string path2, string path3)
+        public static string? Combine(string path1, string path2, string path3)
         {
             try
             {
@@ -46,8 +46,11 @@ namespace Azure.AI.Details.Common.CLI
             var list = new List<string>();
             foreach (var path2 in path2s)
             {
+                var combined = PathHelpers.Combine(path1, path2);
+                if (combined == null) continue;
+
                 list.Add(!string.IsNullOrEmpty(path2)
-                    ? PathHelpers.Combine(path1, path2)
+                    ? combined
                     : path1);
             }
             return list;
@@ -67,10 +70,10 @@ namespace Azure.AI.Details.Common.CLI
     {
         public static void UpdatePaths(INamedValues values)
         {
-            var outputPath = values.GetOrDefault("x.output.path", "");
+            var outputPath = values.GetOrEmpty("x.output.path");
             SetOutputPath(outputPath);
 
-            var inputPath = values.GetOrDefault("x.input.path", outputPath);
+            var inputPath = values.GetOrDefault("x.input.path", outputPath)!;
             SetInputPath(inputPath);
         }
 
@@ -79,15 +82,19 @@ namespace Azure.AI.Details.Common.CLI
             if (IsStandardInputReference(fileName) || IsStandardOutputReference(fileName)) return fileName;
 
             var file = new FileInfo(fileName);
-            return Path.Combine(file.DirectoryName, $"{Path.GetFileNameWithoutExtension(file.FullName)}{appendBeforeExtension}{file.Extension}{appendAfterExtension}");
+            var dirName = file.DirectoryName ?? string.Empty;
+            return Path.Combine(dirName, $"{Path.GetFileNameWithoutExtension(file.FullName)}{appendBeforeExtension}{file.Extension}{appendAfterExtension}");
         }
 
-        public static IEnumerable<string> FindFiles(string path, string pattern, INamedValues values = null, bool checkOverrides = true, bool checkResources = true)
+        public static IEnumerable<string> FindFiles(string path, string pattern, INamedValues? values = null, bool checkOverrides = true, bool checkResources = true)
         {
-            return FindFiles(PathHelpers.Combine(path, pattern), values, checkOverrides, checkResources);
+            var combined = PathHelpers.Combine(path, pattern);
+            return combined != null
+                ? FindFiles(combined, values, checkOverrides, checkResources)
+                : Enumerable.Empty<string>();
         }
 
-        public static IEnumerable<string> FindFiles(string fileNames, INamedValues values = null, bool checkOverrides = true, bool checkResources = true)
+        public static IEnumerable<string> FindFiles(string fileNames, INamedValues? values = null, bool checkOverrides = true, bool checkResources = true)
         {
             var currentDir = Directory.GetCurrentDirectory();
             foreach (var item in fileNames.Split(new char[] { ';', '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries))
@@ -122,7 +129,7 @@ namespace Azure.AI.Details.Common.CLI
                 var path = !hasPath ? currentDir : item.Substring(0, pathLen);
                 var pattern = !hasPath ? item : item.Substring(pathLen + 1);
 
-                EnumerationOptions recursiveOptions = null;
+                EnumerationOptions? recursiveOptions = null;
                 if (path.EndsWith("**"))
                 {
                     path = path.Substring(0, path.Length - 2).TrimEnd('/', '\\');
@@ -232,7 +239,7 @@ namespace Azure.AI.Details.Common.CLI
             return found;
         }
 
-        public static IEnumerable<string> FindFilesInTemplatePath(string fileNames, INamedValues values)
+        public static IEnumerable<string> FindFilesInTemplatePath(string fileNames, INamedValues? values)
         {
             if (Program.Debug) Console.WriteLine($"DEBUG: Searching for TEMPLATE '{fileNames}'\n");
 
@@ -243,7 +250,7 @@ namespace Azure.AI.Details.Common.CLI
             return found;
         }
 
-        private static IEnumerable<string> FindFilesInPath(string fileNames, INamedValues values, string searchPath)
+        private static IEnumerable<string> FindFilesInPath(string fileNames, INamedValues? values, string searchPath)
         {
             var commandActual = values?.GetCommand();
             var commandScope = values?.GetOrDefault("x.config.scope.command", commandActual == "config" ? "" : commandActual);
@@ -285,8 +292,8 @@ namespace Azure.AI.Details.Common.CLI
                 var fi = exists ? new FileInfo(item) : null;
 
                 var i = item.LastIndexOfAny(slash);
-                var name = exists ? fi.Name : item.Substring(i + 1);
-                var location = exists ? fi.DirectoryName : item.Substring(0, i > 0 ? i : item.Length);
+                var name = exists ? fi?.Name : item.Substring(i + 1);
+                var location = exists ? fi?.DirectoryName : item.Substring(0, i > 0 ? i : item.Length);
 
                 if (!quiet && location != lastLocation && showLocation)
                 {
@@ -392,7 +399,7 @@ namespace Azure.AI.Details.Common.CLI
                         ? $"Cannot find input file: \"{fileName}\""
                         : $"Cannot find {fileKind} file: \"{fileName}\"");
             }
-            return existing;
+            return existing!;
         }
 
         private static string CheckStripDotSlash(string check)
@@ -402,7 +409,7 @@ namespace Azure.AI.Details.Common.CLI
                 : check;
         }
 
-        public static string FindFileInConfigPath(string fileName, INamedValues values)
+        public static string? FindFileInConfigPath(string fileName, INamedValues values)
         {
             if (Program.Debug) Console.WriteLine($"DEBUG: CONFIG '{fileName}' EXIST?\n");
 
@@ -413,7 +420,7 @@ namespace Azure.AI.Details.Common.CLI
             return found;
         }
 
-        public static string FindFileInDataPath(string fileName, INamedValues values)
+        public static string? FindFileInDataPath(string fileName, INamedValues values)
         {
             if (Program.Debug) Console.WriteLine($"DEBUG: DATA '{fileName}' EXIST?\n");
 
@@ -424,7 +431,7 @@ namespace Azure.AI.Details.Common.CLI
             return found;
         }
 
-        public static string FindFileInTemplatePath(string fileName, INamedValues values)
+        public static string? FindFileInTemplatePath(string fileName, INamedValues values)
         {
             if (Program.Debug) Console.WriteLine($"DEBUG: TEMPLATE '{fileName}' EXIST?\n");
 
@@ -435,7 +442,7 @@ namespace Azure.AI.Details.Common.CLI
             return found;
         }
 
-        public static string FindFileInHelpPath(string fileName)
+        public static string? FindFileInHelpPath(string fileName)
         {
             if (Program.Debug) Console.WriteLine($"DEBUG: HELP '{fileName}' EXIST?\n");
 
@@ -446,7 +453,7 @@ namespace Azure.AI.Details.Common.CLI
             return found;
         }
 
-        public static string FindFileInOsPath(string fileName)
+        public static string? FindFileInOsPath(string fileName)
         {
             return FindFilesInOsPath(fileName).FirstOrDefault();
         }
@@ -468,7 +475,7 @@ namespace Azure.AI.Details.Common.CLI
             return found;
         }
 
-        private static string FindFileInPath(string fileName, INamedValues values, string searchPaths)
+        private static string? FindFileInPath(string fileName, INamedValues? values, string searchPaths)
         {
             if (IsStandardInputReference(fileName)) return fileName;
 
@@ -484,13 +491,13 @@ namespace Azure.AI.Details.Common.CLI
             foreach (string path in paths)
             {
                 var existing = FindFileInScope(regionScope, commandScope, path, fileName, values);
-                if (FileExists(existing)) return CheckStripDotSlash(existing);
+                if (FileExists(existing)) return CheckStripDotSlash(existing!);
             }
 
             return null;
         }
 
-        public static bool FileExistsInConfigPath(string fileName, INamedValues values)
+        public static bool FileExistsInConfigPath(string fileName, INamedValues? values)
         {
             return FileExistsInPath(fileName, values, GetConfigPath(values));
         }
@@ -516,17 +523,17 @@ namespace Azure.AI.Details.Common.CLI
             return existing != null;
         }
 
-        private static bool FileExistsInPath(string fileName, INamedValues values, string searchPath)
+        private static bool FileExistsInPath(string fileName, INamedValues? values, string searchPath)
         {
             var existing = FindFileInPath(fileName, values, searchPath);
             return existing != null;
         }
 
-        public static string ExpandAtFileValue(string atFileValue, INamedValues values = null)
+        public static string ExpandAtFileValue(string atFileValue, INamedValues? values = null)
         {
             if (atFileValue.StartsWith("@") && FileHelpers.FileExistsInConfigPath(atFileValue[1..], values))
             {
-                return FileHelpers.ReadAllText(FileHelpers.DemandFindFileInConfigPath(atFileValue[1..], values, "configuration"), Encoding.UTF8);
+                return FileHelpers.ReadAllText(FileHelpers.DemandFindFileInConfigPath(atFileValue[1..], values!, "configuration"), Encoding.UTF8);
             }
             else if (atFileValue.StartsWith("@") && FileHelpers.IsStandardInputReference(atFileValue[1..]))
             {
@@ -551,17 +558,15 @@ namespace Azure.AI.Details.Common.CLI
 
         public static string ReadAllText(string fileName, Encoding encoding)
         {
-            var text = IsStandardInputReference(fileName)
-                ? ConsoleHelpers.ReadAllStandardInputText()
-                : IsOverride(fileName)
-                    ? ReadAllOverrideText(fileName)
-                    : IsResource(fileName)
-                        ? ReadAllResourceText(fileName, encoding ?? Encoding.Default)
-                        : File.ReadAllText(fileName, encoding ?? Encoding.Default);
+            string? text = null;
+            if (text == null && IsStandardInputReference(fileName)) text = ConsoleHelpers.ReadAllStandardInputText();
+            if (text == null && IsOverride(fileName)) text = ReadAllOverrideText(fileName);
+            if (text == null && IsResource(fileName)) text = ReadAllResourceText(fileName, encoding ?? Encoding.Default);
+            if (text == null) text = File.ReadAllText(fileName, encoding ?? Encoding.Default);
             return text.Trim('\r', '\n');
         }
 
-        public static string GetOutputConfigFileName(string file, INamedValues values = null)
+        public static string GetOutputConfigFileName(string file, INamedValues? values = null)
         {
             file = file.TrimStart('@');
 
@@ -578,9 +583,8 @@ namespace Azure.AI.Details.Common.CLI
             return fileName == "-" || fileName == "stdout";
         }
 
-        public static string GetOutputDataFileName(string file, INamedValues values = null)
+        public static string GetOutputDataFileName(string file, INamedValues? values = null)
         {
-            if (file == null) return null;
             if (file.StartsWith("@")) return GetOutputConfigFileName(file, values);
             if (IsStandardOutputReference(file)) return file;
             
@@ -589,8 +593,10 @@ namespace Azure.AI.Details.Common.CLI
             var hasPath = i1 >= 0 || i2 >= 0;
             var pathLen = hasPath ? Math.Max(i1, i2) : 0;
 
-            var outputDir = values != null ? values.GetOrDefault("x.output.path", _outputPath) : _outputPath;
-            var outputFile = !hasPath ? PathHelpers.Combine(outputDir, file) : file;
+            var outputDir = values != null ? values.GetOrDefault("x.output.path", _outputPath)! : _outputPath;
+            var outputFile = !hasPath
+                ? PathHelpers.Combine(outputDir, file) ?? file
+                : file;
 
             if (Program.Debug) Console.WriteLine($"DEBUG: Output DATA file '{file}'='{outputFile}'");
 
@@ -734,7 +740,7 @@ namespace Azure.AI.Details.Common.CLI
             return text;
         }
 
-        public static string ReadWriteAllStream(Stream stream, string fileName, string message, bool returnAsText)
+        public static string? ReadWriteAllStream(Stream stream, string fileName, string? message, bool returnAsText)
         {
             // we need to know if we're writing to standard output 
             var isStandardOutput = IsStandardOutputReference(fileName);
@@ -754,7 +760,7 @@ namespace Azure.AI.Details.Common.CLI
             }
 
             // get the file stream
-            var fileStream = FileHelpers.Create(fileName);
+            var fileStream = FileHelpers.Create(fileName!);
 
             // copy data from the source stream to the file stream
             int read;
@@ -766,7 +772,7 @@ namespace Azure.AI.Details.Common.CLI
             }
 
             // if we need to return the text, or we need to print to stdout
-            string text = null;
+            string? text = null;
             if (returnAsText || isStandardOutput)
             {
                 // seek back and read the text
@@ -779,7 +785,7 @@ namespace Azure.AI.Details.Common.CLI
 
             // dispose the file stream, and delete the temporary file
             fileStream.Dispose();
-            if (useTemp) File.Delete(fileName);
+            if (useTemp) File.Delete(fileName!);
 
             // print the "I'm done" message...
             if (message != null) Console.WriteLine($"{message} Done!\n");
@@ -793,32 +799,35 @@ namespace Azure.AI.Details.Common.CLI
             if (IsStandardInputReference(fileName)) return;
             if (IsStandardOutputReference(fileName)) return;
 
-            string dir = Path.GetDirectoryName(fileName);
+            var dir = Path.GetDirectoryName(fileName);
             if (!string.IsNullOrEmpty(dir) && !Directory.Exists(dir))
             {
                 Directory.CreateDirectory(dir);
             }
         }
 
-        public static void CopyFile(string path1, string file1, string path2, string file2 = null, bool verbose = true)
+        public static bool TryCopyFile(string path1, string file1, string path2, string? file2 = null, bool verbose = true)
         {
             if (file2 == null) file2 = file1;
 
             var source = PathHelpers.Combine(path1, file1);
             if (!FileExists(source)) source = PathHelpers.Combine(path1, ".." + Path.DirectorySeparatorChar + file1);
             if (!FileExists(source)) source = PathHelpers.Combine(path1, ".." + Path.DirectorySeparatorChar + ".." + Path.DirectorySeparatorChar + file1);
-            if (!FileExists(source)) return;
+            if (!FileExists(source)) return false;
 
             if (verbose) Console.WriteLine($"  Saving {file2} ... ");
             
             var dest = PathHelpers.Combine(path2, file2);
-            FileHelpers.EnsureDirectoryForFileExists(dest);
+            if (dest == null) return false;
 
-            File.Copy(source, dest, true);
+            FileHelpers.EnsureDirectoryForFileExists(dest);
+            File.Copy(source!, dest, true);
+            return true;
         }
 
-        public static void CopyFiles(IEnumerable<string> sourceLocations, string[] files, string destinationLocation, string dllNewPrefix, string dllNewSuffix, bool verbose)
+        public static void TryCopyFiles(IEnumerable<string> sourceLocations, string[] files, string destinationLocation, string? dllNewPrefix, string? dllNewSuffix, bool verbose)
         {
+            var count = 0;
             var remapDlls = !string.IsNullOrEmpty(dllNewPrefix) && !string.IsNullOrEmpty(dllNewSuffix);
             foreach (var location in sourceLocations)
             {
@@ -828,7 +837,7 @@ namespace Azure.AI.Details.Common.CLI
                         ? $"{dllNewPrefix}{file.Substring(0, file.Length - 4)}{dllNewSuffix}"
                         : file;
 
-                    FileHelpers.CopyFile(location, fileName, destinationLocation, null, verbose);
+                    count += FileHelpers.TryCopyFile(location, fileName, destinationLocation, null, verbose) ? 1 : 0;
                 }
             }
         }
@@ -838,11 +847,12 @@ namespace Azure.AI.Details.Common.CLI
             // GetAssembly.Location always returns empty when the project is built as 
             // a single-file app (which we do when publishing the Dependency package),
             // warning IL3000
-            string assemblyPath = Assembly.GetAssembly(type).Location;
+            var assembly = Assembly.GetAssembly(type);
+            string assemblyPath = assembly?.Location ?? string.Empty;
             if (assemblyPath == string.Empty)
             {
                 assemblyPath = AppContext.BaseDirectory;
-                assemblyPath += Assembly.GetAssembly(type).GetName().Name + ".dll";
+                assemblyPath += assembly?.GetName().Name + ".dll";
             }
             return new FileInfo(assemblyPath);
         }
@@ -851,7 +861,7 @@ namespace Azure.AI.Details.Common.CLI
         {
             var file = $"exception.{{run.time}}.{{pid}}.{{time}}.{Program.Name}.error.log";
 
-            var runTime = values.GetOrDefault("x.run.time", "");
+            var runTime = values.GetOrEmpty("x.run.time");
             file = file.Replace("{run.time}", runTime);
 
             var pid = Process.GetCurrentProcess().Id.ToString();
@@ -864,7 +874,7 @@ namespace Azure.AI.Details.Common.CLI
             FileHelpers.WriteAllText(file, ex.ToString(), Encoding.UTF8);
         }
 
-        public static bool FileExists(string fileName)
+        public static bool FileExists(string? fileName)
         {
             if (string.IsNullOrEmpty(fileName)) return false;
 
@@ -933,7 +943,7 @@ namespace Azure.AI.Details.Common.CLI
             yield break;            
         }
 
-        private static string ReadAllOverrideText(string fileName)
+        private static string? ReadAllOverrideText(string fileName)
         {
             if (!IsOverride(fileName)) return null;
 
@@ -1062,7 +1072,7 @@ namespace Azure.AI.Details.Common.CLI
             return _origDotXfileNamesDictionary;
         }
 
-        private static Stream GetResourceStream(string fileName)
+        private static Stream? GetResourceStream(string fileName)
         {
             var resource = ResourceNameFromFileName(fileName);
             return Program.ResourceAssembly.GetManifestResourceStream(resource)
@@ -1071,7 +1081,7 @@ namespace Azure.AI.Details.Common.CLI
 
         private static string ReadAllResourceText(string fileName, Encoding encoding)
         {
-            var stream = GetResourceStream(fileName);
+            var stream = GetResourceStream(fileName)!;
             var length = stream.Length;
 
             byte[] buffer = new byte[length];
@@ -1085,7 +1095,7 @@ namespace Azure.AI.Details.Common.CLI
 
         private static byte[] ReadAllResourceBytes(string fileName)
         {
-            var stream = GetResourceStream(fileName);
+            var stream = GetResourceStream(fileName)!;
             var length = stream.Length;
 
             byte[] buffer = new byte[length];
@@ -1123,13 +1133,7 @@ namespace Azure.AI.Details.Common.CLI
 
         }
 
-        private static void FindFilesInScope(List<string> files, string region, string command, string path1, string path2, string fileName, INamedValues values)
-        {
-            var path = PathHelpers.Combine(path1, path2);
-            FindFilesInScope(files, region, command, path, fileName, values);
-        }
-
-        private static void FindFilesInScope(List<string> files, string region, string command, string path, string fileName, INamedValues values)
+        private static void FindFilesInScope(List<string> files, string? region, string? command, string path, string fileName, INamedValues? values)
         {
             if (!string.IsNullOrEmpty(region) && !string.IsNullOrEmpty(command))
             {
@@ -1152,50 +1156,44 @@ namespace Azure.AI.Details.Common.CLI
             files.AddRange(FindFiles(path, fileName, values));
         }
 
-        private static string FindFileInScope(string region, string command, string path1, string path2, string fileName, INamedValues values)
-        {
-            var path = PathHelpers.Combine(path1, path2);
-            return FindFileInScope(region, command, path, fileName, values);
-        }
-
-        private static string FindFileInScope(string region, string command, string path, string fileName, INamedValues values)
+        private static string? FindFileInScope(string? region, string? command, string path, string fileName, INamedValues? values)
         {
             fileName = fileName.ReplaceValues(values);
             return FindFileInScope(region, command, path, fileName);
         }
 
-        private static string FindFileInScope(string region, string command, string path, string fileName)
+        private static string? FindFileInScope(string? region, string? command, string path, string fileName)
         {
             if (!string.IsNullOrEmpty(region) && !string.IsNullOrEmpty(command))
             {
                 var scoped = PathHelpers.Combine(path, $"{region}.{command}.{fileName}");
-                if (FileExists(scoped)) return CheckStripDotSlash(scoped);
+                if (FileExists(scoped)) return CheckStripDotSlash(scoped!);
             }
 
             if (!string.IsNullOrEmpty(region))
             {
                 var scoped = PathHelpers.Combine(path, $"{region}.{fileName}");
-                if (FileExists(scoped)) return CheckStripDotSlash(scoped);
+                if (FileExists(scoped)) return CheckStripDotSlash(scoped!);
             }
 
             if (!string.IsNullOrEmpty(command))
             {
                 var scoped = PathHelpers.Combine(path, $"{command}.{fileName}");
-                if (FileExists(scoped)) return CheckStripDotSlash(scoped);
+                if (FileExists(scoped)) return CheckStripDotSlash(scoped!);
             }
 
-            fileName = PathHelpers.Combine(path, fileName);
-            if (FileExists(fileName)) return CheckStripDotSlash(fileName);
+            fileName = PathHelpers.Combine(path, fileName) ?? string.Empty;
+            if (FileExists(fileName)) return CheckStripDotSlash(fileName!);
 
             return null;
         }
 
-        private static string ExistingPathOrNull(string check, string root = null, int checkParentDepth = 4)
+        private static string? ExistingPathOrNull(string check, string? root = null, int checkParentDepth = 4)
         {
             if (Directory.Exists(check)) return check;
             if (Path.IsPathFullyQualified(check)) return null;
 
-            var combined = Path.Combine(root, check);
+            var combined = Path.Combine(root ?? string.Empty, check);
             if (Directory.Exists(combined)) return combined;
 
             var parent = checkParentDepth > 0 && root != null ? Directory.GetParent(root) : null;
@@ -1229,7 +1227,7 @@ namespace Azure.AI.Details.Common.CLI
             }
         }
 
-        private static string GetConfigPath(INamedValues values = null)
+        private static string GetConfigPath(INamedValues? values = null)
         {
             var cwd = Directory.GetCurrentDirectory();
             if (_configPathCalculatedFrom != cwd)
@@ -1255,7 +1253,7 @@ namespace Azure.AI.Details.Common.CLI
             return _configPath;
         }
 
-        private static void CheckScopedConfigPath(INamedValues values)
+        private static void CheckScopedConfigPath(INamedValues? values)
         {
             if (_configPathScoped != null) return;
 
@@ -1285,7 +1283,7 @@ namespace Azure.AI.Details.Common.CLI
             return path0.TrimEnd(';') + ";" + sb.ToString().TrimEnd(';');
         }
 
-        public static string GetConfigOutputDir(INamedValues values = null)
+        public static string GetConfigOutputDir(INamedValues? values = null)
         {
             CheckScopedConfigOutputDir(values);
             if (!string.IsNullOrEmpty(_configOutputDirScoped)) return _configOutputDirScoped;
@@ -1304,7 +1302,7 @@ namespace Azure.AI.Details.Common.CLI
             return _configOutputDir;
         }
 
-        private static void CheckScopedConfigOutputDir(INamedValues values)
+        private static void CheckScopedConfigOutputDir(INamedValues? values)
         {
             if (_configOutputDirScoped != null) return;
 
@@ -1341,7 +1339,7 @@ namespace Azure.AI.Details.Common.CLI
             return dotdir;
         }
 
-        public static string HiveFromFileName(string fileName)
+        public static string? HiveFromFileName(string fileName)
         {
             fileName = fileName.Replace('/', '\\');
             var system = GetAssemblyConfigDotDir(false, false).Replace('/', '\\');
@@ -1447,12 +1445,12 @@ namespace Azure.AI.Details.Common.CLI
 
         private const string defaultDataPath = @";./;../;../../;../../../;../../../../;{config.path};";
         
-        private static string _configPathCalculatedFrom = null;
-        private static string _configPath = null;
-        private static string _configPathScoped = null;
+        private static string? _configPathCalculatedFrom = null;
+        private static string? _configPath = null;
+        private static string? _configPathScoped = null;
 
-        private static string _configOutputDir = null;
-        private static string _configOutputDirScoped = null;
+        private static string? _configOutputDir = null;
+        private static string? _configOutputDirScoped = null;
 
         private static string _dataPath = defaultDataPath;
         private static string _outputPath = "";
@@ -1460,6 +1458,6 @@ namespace Azure.AI.Details.Common.CLI
         private static readonly string dotDirectory = $".{Program.Name}/";
 
         private static ReaderWriterLockSlim _lockSlim = new ReaderWriterLockSlim();
-        private static Dictionary<string, string> _origDotXfileNamesDictionary;
+        private static Dictionary<string, string>? _origDotXfileNamesDictionary;
     }
 }

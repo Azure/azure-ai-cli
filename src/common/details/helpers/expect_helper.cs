@@ -24,8 +24,8 @@ namespace Azure.AI.Details.Common.CLI
         {
             // use the existing (unhooked) console output, for auto expect
             Action<string> writeLine = Console.WriteLine;
-            Action<string> autoExpectOutput = autoExpect ? writeLine : null;
-            TextWriter echoStdOutWriter = echoStdOut ? Console.Out : null;
+            Action<string>? autoExpectOutput = autoExpect ? writeLine : null;
+            TextWriter? echoStdOutWriter = echoStdOut ? Console.Out : null;
 
             // instance the helper, and await it's completion
             var helper = new ExpectHelper(lines, expected, unexpected, autoExpectOutput, echoStdOutWriter, Console.Out);
@@ -48,15 +48,15 @@ namespace Azure.AI.Details.Common.CLI
 
             // use the original console output, for auto expect and echoing output
             Action<string> writeLine = oldStdOut.WriteLine;
-            Action<string> autoExpectOutput = autoExpect ? writeLine : null;
-            TextWriter echoStdOutWriter = echoStdOut ? oldStdOut : null;
+            Action<string>? autoExpectOutput = autoExpect ? writeLine : null;
+            TextWriter? echoStdOutWriter = echoStdOut ? oldStdOut : null;
 
             // instance the helper, and start the ExpectAsync task
             var helper = new ExpectHelper(allLines, expected, unexpected, autoExpectOutput, echoStdOutWriter, oldStdOut);
             var expectTask = helper.ExpectAsync();
 
             // run the function, safely
-            var funcResult = TryCatchHelpers.TryCatchNoThrow<bool>(consoleOutputProducingFunction, false, out Exception functionThrewException);
+            var funcResult = TryCatchHelpers.TryCatchNoThrow<bool>(consoleOutputProducingFunction, false, out var functionThrewException);
 
             // now ... close the console output, restoring the original
             // this will trigger the end of expectation input
@@ -95,8 +95,8 @@ namespace Azure.AI.Details.Common.CLI
 
             // use the existing (unhooked) console output, for auto expect and echoing output
             Action<string> writeLine = Console.WriteLine;
-            Action<string> autoExpectOutput = autoExpect ? writeLine : null;
-            TextWriter echoStdOutWriter = echoStdOut ? Console.Out : null;
+            Action<string>? autoExpectOutput = autoExpect ? writeLine : null;
+            TextWriter? echoStdOutWriter = echoStdOut ? Console.Out : null;
 
             // instance the helper, and await it's completion
             var helper = new ExpectHelper(allLines, expected, unexpected, autoExpectOutput, echoStdOutWriter, Console.Out);
@@ -105,7 +105,7 @@ namespace Azure.AI.Details.Common.CLI
 
         #region private methods
 
-        private ExpectHelper(IAsyncEnumerable<string> lines, IEnumerable<string> expected, IEnumerable<string> unexpected, Action<string> autoExpectOutput, TextWriter echoStdOutWriter, TextWriter errorWriter)
+        private ExpectHelper(IAsyncEnumerable<string> lines, IEnumerable<string> expected, IEnumerable<string> unexpected, Action<string>? autoExpectOutput, TextWriter? echoStdOutWriter, TextWriter errorWriter)
         {
             this.allLines = lines;
             this.expected = expected != null ? new Queue<string>(expected) : null;
@@ -130,7 +130,7 @@ namespace Azure.AI.Details.Common.CLI
             if (!allExpectedFound && errorWriter != null)
             {
                 ColorHelpers.SetErrorColors();
-                errorWriter.WriteLine($"UNEXPECTED: Couldn't find '{expected.Peek()}' in:\n```\n{unmatchedInput}```");
+                errorWriter.WriteLine($"UNEXPECTED: Couldn't find '{expected!.Peek()}' in:\n```\n{unmatchedInput}```");
                 ColorHelpers.ResetColor();
             }
 
@@ -144,13 +144,13 @@ namespace Azure.AI.Details.Common.CLI
                 .Replace(".", "\\.").Replace("?", "\\?")
                 .Replace("[", "\\[").Replace("]", "\\]")
                 .Replace("(", "\\(").Replace(")", "\\)");
-            autoExpectOutput($"^{regexEscapedLine}\\r?$\\n");
+            autoExpectOutput!($"^{regexEscapedLine}\\r?$\\n");
         }
 
         private void CheckExpected(string line)
         {
             unmatchedInput.AppendLine(line);
-            while (expected.Count > 0)
+            while (expected!.Count > 0)
             {
                 var pattern = expected.Peek();
                 var check = unmatchedInput.ToString();
@@ -165,7 +165,7 @@ namespace Azure.AI.Details.Common.CLI
 
         private void CheckUnexpected(string line)
         {
-            foreach (var pattern in unexpected)
+            foreach (var pattern in unexpected!)
             {
                 var match = Regex.Match(line, pattern);
                 if (!match.Success) continue; // check more patterns
@@ -187,33 +187,33 @@ namespace Azure.AI.Details.Common.CLI
         private StringBuilder unmatchedInput = new StringBuilder();
         private IAsyncEnumerable<string> allLines;
 
-        private Queue<string> expected;
-        private List<string> unexpected;
+        private Queue<string>? expected;
+        private List<string>? unexpected;
         bool foundUnexpected = false;
 
-        private Action<string> autoExpectOutput;
-        private TextWriter echoStdOutWriter;
-        private TextWriter errorWriter;
+        private Action<string>? autoExpectOutput;
+        private TextWriter? echoStdOutWriter;
+        private TextWriter? errorWriter;
 
         #endregion
 
         #region future
 
-        public static async Task<bool> ExpectAsync(Func<Task<string>> input, IEnumerable<string> expected, IEnumerable<string> unexpected, Action<string> autoExpectOutput)
-        {
-            var expectedItems = expected != null ? new Queue<string>(expected) : null;
-            var unexpectedItems = unexpected != null ? new List<string>(unexpected) : null;
-            var helper = new ExpectHelper(input, expectedItems, unexpectedItems, autoExpectOutput);
-            return await helper.ExpectAsync();
-        }
+        // public static async Task<bool> ExpectAsync(Func<Task<string>> input, IEnumerable<string>? expected, IEnumerable<string>? unexpected, Action<string>? autoExpectOutput)
+        // {
+        //     var expectedItems = expected != null ? new Queue<string>(expected) : null;
+        //     var unexpectedItems = unexpected != null ? new List<string>(unexpected) : null;
+        //     var helper = new ExpectHelper(input, expectedItems, unexpectedItems, autoExpectOutput);
+        //     return await helper.ExpectAsync();
+        // }
 
-        private ExpectHelper(Func<Task<string>> input, Queue<string> expected, List<string> unexpected, Action<string> autoExpectOutput)
-        {
-            // this.readAllLinesAsync = input;
-            // this.expected = expected;
-            // this.unexpected = unexpected;
-            // this.autoExpectOutput = autoExpectOutput;
-        }
+        // private ExpectHelper(Func<Task<string>> input, Queue<string>? expected, List<string>? unexpected, Action<string>? autoExpectOutput)
+        // {
+        //     // this.readAllLinesAsync = input;
+        //     // this.expected = expected;
+        //     // this.unexpected = unexpected;
+        //     // this.autoExpectOutput = autoExpectOutput;
+        // }
 
         #endregion
     }

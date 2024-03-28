@@ -19,9 +19,8 @@ namespace Azure.AI.Details.Common.CLI
 {
     public class WebJobCommand : Command
     {
-        internal WebJobCommand(ICommandValues values)
+        internal WebJobCommand(ICommandValues values) : base(values)
         {
-            _values = values.ReplaceValues();
             _quiet = _values.GetOrDefault("x.quiet", false);
             _verbose = _values.GetOrDefault("x.verbose", true);
         }
@@ -164,7 +163,7 @@ namespace Azure.AI.Details.Common.CLI
         ///     --output request FILE/-
         ///     --output json FILE/-
         /// </example>
-        private void DoStatus(string name = null, string id = null)
+        private void DoStatus(string? name = null, string? id = null)
         {
             GetStatusParameters(out string path, ref name, out string nameAction, ref id, out string message);
 
@@ -224,7 +223,7 @@ namespace Azure.AI.Details.Common.CLI
         ///     --output request FILE/-
         ///     --output file FILE/-
         /// </example>
-        private string DoDownload()
+        private string? DoDownload()
         {
             GetDownloadParameters(out string url, out string message);
 
@@ -266,8 +265,8 @@ namespace Azure.AI.Details.Common.CLI
 
         private void GetListParameters(out string path, out string name, out string nameAction, out string id, out string message, out string arrayName, out string urlName, out IdKind kind)
         {
-            name = _values.GetOrDefault("webjob.job.name", "");
-            id = _values.GetOrDefault("webjob.job.id", "");
+            name = _values.GetOrEmpty("webjob.job.name");
+            id = _values.GetOrEmpty("webjob.job.id");
 
             var nameOk = !string.IsNullOrEmpty(name);
             var idOk = nameOk && !string.IsNullOrEmpty(id);
@@ -300,8 +299,8 @@ namespace Azure.AI.Details.Common.CLI
             message = "Uploading webjob ...";
             path = $"api/triggeredwebjobs";
 
-            jobName = _values.GetOrDefault("webjob.job.name", "");
-            fileName = _values.GetOrDefault("webjob.upload.job.file", "");
+            jobName = _values.GetOrEmpty("webjob.job.name");
+            fileName = _values.GetOrEmpty("webjob.upload.job.file");
             fileName = FileHelpers.DemandFindFileInDataPath(fileName, _values, "webjob upload");
 
             var fileNameOk = !string.IsNullOrEmpty(fileName);
@@ -340,7 +339,7 @@ namespace Azure.AI.Details.Common.CLI
 
         private void GetDownloadParameters(out string url, out string message)
         {
-            var jobid = _values.GetOrDefault("webjob.job.id", "");
+            var jobid = _values.GetOrEmpty("webjob.job.id");
             if (!StringHelpers.SplitNameValue(jobid, out string job, out string id))
             {
                 job = "";
@@ -354,7 +353,7 @@ namespace Azure.AI.Details.Common.CLI
                 id = "";
             }
 
-            var file = _values.GetOrDefault("webjob.download.file", "");
+            var file = _values.GetOrEmpty("webjob.download.file");
             if (string.IsNullOrEmpty(file))
             {
                 file = ".";
@@ -384,7 +383,7 @@ namespace Azure.AI.Details.Common.CLI
             path = $"api/triggeredwebjobs";
         }
 
-        private string DemandWebJobName(string name = null)
+        private string DemandWebJobName(string? name = null)
         {
             return _values.DemandGetOrDefault("webjob.job.name", name,
                 ErrorHelpers.CreateMessage(
@@ -392,7 +391,7 @@ namespace Azure.AI.Details.Common.CLI
                         "USE:", $"{Program.Name} webjob [...] --name NAME"));
         }
 
-        private string DemandWebJobId(string id = null)
+        private string DemandWebJobId(string? id = null)
         {
             return _values.DemandGetOrDefault("webjob.job.id", id, 
                 ErrorHelpers.CreateMessage(
@@ -400,11 +399,11 @@ namespace Azure.AI.Details.Common.CLI
                         "USE:", $"{Program.Name} webjob [...] --id ID"));
         }
 
-        private HttpWebRequest CreateWebRequest(string method, string path, string name = null, string nameAction = null, string id = null, string contentType = null)
+        private HttpWebRequest CreateWebRequest(string method, string path, string? name = null, string nameAction = null, string? id = null, string? contentType = null)
         {
-            var endpoint = _values.GetOrDefault("webjob.config.endpoint", "").Trim('\r', '\n');
-            var userName = _values.GetOrDefault("webjob.config.username", "").Trim('\r', '\n');
-            var password = _values.GetOrDefault("webjob.config.password", "").Trim('\r', '\n');
+            var endpoint = _values.GetOrEmpty("webjob.config.endpoint").Trim('\r', '\n');
+            var userName = _values.GetOrEmpty("webjob.config.username").Trim('\r', '\n');
+            var password = _values.GetOrEmpty("webjob.config.password").Trim('\r', '\n');
             var timeout = _values.GetOrDefault("webjob.timeout", 100000);
 
             if (string.IsNullOrEmpty(endpoint) || string.IsNullOrEmpty(userName) || string.IsNullOrEmpty(password))
@@ -429,7 +428,7 @@ namespace Azure.AI.Details.Common.CLI
             return request;
         }
 
-        private string GetWebJobUrl(string endpoint, string path, string name = null, string nameAction = null, string id = null)
+        private string GetWebJobUrl(string endpoint, string path, string? name = null, string nameAction = null, string? id = null)
         {
             if (path.StartsWith("http")) return path;
 
@@ -453,7 +452,7 @@ namespace Azure.AI.Details.Common.CLI
 
         private string CheckWriteOutputRequest(HttpWebRequest request, string payload = null, bool append = false)
         {
-            var output = _values.GetOrDefault("webjob.output.request.file", "");
+            var output = _values.GetOrEmpty("webjob.output.request.file");
             if (!string.IsNullOrEmpty(output))
             {
                 var fileName = FileHelpers.GetOutputDataFileName(output, _values);
@@ -464,7 +463,7 @@ namespace Azure.AI.Details.Common.CLI
 
         private byte[] CheckWriteOutputRequest(HttpWebRequest request, byte[] payload)
         {
-            var output = _values.GetOrDefault("webjob.output.request.file", "");
+            var output = _values.GetOrEmpty("webjob.output.request.file");
             if (!string.IsNullOrEmpty(output))
             {
                 var fileName = FileHelpers.GetOutputDataFileName(output, _values);
@@ -480,7 +479,7 @@ namespace Azure.AI.Details.Common.CLI
             return json;
         }
 
-        private string ReadWritePrintResponse(HttpWebResponse response, string defaultFileName = null)
+        private string? ReadWritePrintResponse(HttpWebResponse response, string defaultFileName = null)
         {
             var saveAs = HttpHelpers.GetOutputDataFileName(defaultFileName, response, _values, "webjob", out bool isText, out bool isJson);
 

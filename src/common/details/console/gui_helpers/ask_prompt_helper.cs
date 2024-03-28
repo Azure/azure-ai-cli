@@ -10,7 +10,7 @@ namespace Azure.AI.Details.Common.CLI
 {
     public class AskPromptHelper
     {
-        public static string AskPrompt(string prompt, string value = null, bool useEditBox = false)
+        public static string? AskPrompt(string prompt, string? value = null, bool useEditBox = false)
         {
             Console.Write(prompt);
 

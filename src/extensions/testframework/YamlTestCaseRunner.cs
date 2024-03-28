@@ -80,11 +80,11 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
             var notExpect = YamlTestProperties.Get(test, "not-expect");
             var env = YamlTestProperties.Get(test, "env");
             var workingDirectory = YamlTestProperties.Get(test, "working-directory");
-            var timeout = int.Parse(YamlTestProperties.Get(test, "timeout"));
+            var timeout = int.Parse(YamlTestProperties.Get(test, "timeout", YamlTestFramework.DefaultTimeout)!);
             var simulate = YamlTestProperties.Get(test, "simulate");
             var skipOnFailure = YamlTestProperties.Get(test, "skipOnFailure") switch { "true" => true, _ => false };
 
-            var basePath = new FileInfo(test.CodeFilePath).DirectoryName;
+            var basePath = new FileInfo(test.CodeFilePath).DirectoryName!;
             workingDirectory = Path.Combine(basePath, workingDirectory ?? "");
             var tryCreateWorkingDirectory = !string.IsNullOrEmpty(workingDirectory) && !Directory.Exists(workingDirectory);
             if (tryCreateWorkingDirectory) Directory.CreateDirectory(workingDirectory);
@@ -127,7 +127,7 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
                 foreach(var property in foreachItemObject.EnumerateObject())
                 {
                     var keys = property.Name.Split(new char[] { '\t' });
-                    var values = property.Value.GetString().Split(new char[] { '\t' });
+                    var values = property.Value.GetString()!.Split(new char[] { '\t' });
 
                     for (int i = 0; i < keys.Length; i++)
                     {
@@ -186,7 +186,7 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
             return Encoding.UTF8.GetString(stream.ToArray());
         }
 
-        private static IEnumerable<string> ExpandForEachGroups(string @foreach)
+        private static IEnumerable<string> ExpandForEachGroups(string? @foreach)
         {
             var kvs = KeyValuePairsFromJson(@foreach, false)
                 .Select(kv => new KeyValuePair<string, IEnumerable<string>>(
@@ -220,15 +220,15 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
             return dup;
         }
 
-        private static TestOutcome RunTestCase(TestCase test, bool skipOnFailure, string cli, string command, string script, bool scriptIsBash, string @foreach, string arguments, string input, string expect, string expectGpt, string notExpect, string env, string workingDirectory, int timeout, out string stdOut, out string stdErr, out string errorMessage, out string stackTrace, out string additional, out string debugTrace)
+        private static TestOutcome RunTestCase(TestCase test, bool skipOnFailure, string cli, string? command, string? script, bool scriptIsBash, string @foreach, string? arguments, string? input, string? expect, string? expectGpt, string? notExpect, string? env, string workingDirectory, int timeout, out string stdOut, out string stdErr, out string errorMessage, out string stackTrace, out string additional, out string debugTrace)
         {
             var outcome = TestOutcome.None;
 
             additional = $"START TIME: {DateTime.Now}";
             debugTrace = "";
-            stackTrace = script;
+            stackTrace = script ?? string.Empty;
 
-            List<string> filesToDelete = null;
+            List<string>? filesToDelete = null;
 
             var sbOut = new StringBuilder();
             var sbErr = new StringBuilder();
@@ -263,6 +263,8 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
                 UpdatePathEnvironment(startInfo);
 
                 var process = Process.Start(startInfo);
+                if (process == null) throw new Exception("Process.Start() returned null!");
+
                 process.StandardInput.WriteLine(input ?? string.Empty);
                 process.StandardInput.Close();
 
@@ -321,7 +323,7 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
                 : outcome;
         }
 
-        private static List<KeyValuePair<string, string>> ConvertValuesToAtArgs(List<KeyValuePair<string, string>> kvs, ref List<string> files)
+        private static List<KeyValuePair<string, string>> ConvertValuesToAtArgs(List<KeyValuePair<string, string>> kvs, ref List<string>? files)
         {
             var newList = new List<KeyValuePair<string, string>>();
             foreach (var item in kvs)
@@ -340,7 +342,7 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
             return newList;
         }
 
-        private static List<KeyValuePair<string, string>> KeyValuePairsFromJson(string json, bool allowSimpleString)
+        private static List<KeyValuePair<string, string>> KeyValuePairsFromJson(string? json, bool allowSimpleString)
         {
             var kvs = new List<KeyValuePair<string, string>>();
             if (!string.IsNullOrEmpty(json))
@@ -352,7 +354,7 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
                 {
                     // if it's a simple string, there is no "key" for the argument... pass it as value with an empty string as key
                     // this will ensure that an additional '--' isn't emitted preceding the string-only arguments
-                    kvs.Add(new KeyValuePair<string, string>("", parsed.GetString()));
+                    kvs.Add(new KeyValuePair<string, string>("", parsed.GetString() ?? string.Empty));
                 }
                 else if (parsed.ValueKind != JsonValueKind.Object)
                 {
@@ -363,14 +365,14 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
                 {
                     foreach (var item in parsed.EnumerateObject())
                     {
-                        kvs.Add(new KeyValuePair<string, string>(item.Name, item.Value.GetString()));
+                        kvs.Add(new KeyValuePair<string, string>(item.Name, item.Value.GetString() ?? string.Empty));
                     }
                 }
             }
             return kvs;
         }
 
-        private static string UpdateStackTrace(string stackTrace, string command, List<KeyValuePair<string, string>> kvs)
+        private static string UpdateStackTrace(string stackTrace, string? command, List<KeyValuePair<string, string>> kvs)
         {
             if (command?.EndsWith("dev shell") ?? false)
             {
@@ -381,7 +383,7 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
                         : kv.Value));
                 if (!string.IsNullOrEmpty(devShellRunBashScriptArguments))
                 {
-                    stackTrace = $"{stackTrace ?? string.Empty}\n{devShellRunBashScriptArguments}".Trim('\r', '\n', ' ');
+                    stackTrace = $"{stackTrace}\n{devShellRunBashScriptArguments}".Trim('\r', '\n', ' ');
                 }
             }
             else if (command != null)
@@ -390,14 +392,14 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
                     .Where(kv => !string.IsNullOrEmpty(kv.Key))
                     .Select(kv => $"{kv.Key}:\n{kv.Value.Replace("\n", "\n  ")}"));
                 stackTrace = !string.IsNullOrEmpty(commandArguments)
-                    ? $"{stackTrace ?? string.Empty}\nCOMMAND: {command}\n{commandArguments}".Trim('\r', '\n', ' ')
-                    : $"{stackTrace ?? string.Empty}\nCOMMAND: {command}".Trim('\r', '\n', ' ');
+                    ? $"{stackTrace}\nCOMMAND: {command}\n{commandArguments}".Trim('\r', '\n', ' ')
+                    : $"{stackTrace}\nCOMMAND: {command}".Trim('\r', '\n', ' ');
             }
 
             return stackTrace;
         }
 
-        private static string WriteMultilineTsvToTempFile(string text, ref List<string> files)
+        private static string WriteMultilineTsvToTempFile(string text, ref List<string>? files)
         {
             files ??= new List<string>();
 
@@ -421,7 +423,7 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
                         continue;
                     }
 
-                    var newValue = WriteTextToTempFile(value.Replace('\f', '\n'));
+                    var newValue = WriteTextToTempFile(value.Replace('\f', '\n'))!;
                     files.Add(newValue);
 
                     newValues.Add($"@{newValue}");
@@ -432,11 +434,11 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
 
             var newText = string.Join("\n", newLines);
             var file = WriteTextToTempFile(newText);
-            files.Add(file);
-            return file;
+            files.Add(file!);
+            return file!;
         }
 
-        private static string WriteTextToTempFile(string text, string extension = null)
+        private static string? WriteTextToTempFile(string? text, string? extension = null)
         {
             if (!string.IsNullOrEmpty(text))
             {
@@ -489,7 +491,7 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
             }
         }
 
-        private static string FindCliOrNull(string cli)
+        private static string? FindCliOrNull(string cli)
         {
             var dll = $"{cli}.dll";
             var exe = RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? $"{cli}.exe" : cli;
@@ -521,15 +523,15 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
             return null;
         }
 
-        private static string FindCliDllOrNull(string cli, string dll)
+        private static string? FindCliDllOrNull(string cli, string dll)
         {
             var fi = new FileInfo(cli);
             if (!fi.Exists) return null;
 
-            var check = Path.Combine(fi.DirectoryName, dll);
+            var check = Path.Combine(fi.DirectoryName!, dll);
             if (File.Exists(check)) return check;
 
-            var matches = fi.Directory.GetFiles(dll, SearchOption.AllDirectories);
+            var matches = fi.Directory!.GetFiles(dll, SearchOption.AllDirectories);
             if (matches.Length == 1) return matches.First().FullName;
 
             return null;
@@ -548,9 +550,9 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
             return cli;
         }
 
-        private static string PickCliOrNull(IEnumerable<string> clis)
+        private static string? PickCliOrNull(IEnumerable<string> clis)
         {
-            var cliOrNulls = new List<string>();
+            var cliOrNulls = new List<string?>();
             foreach (var cli in clis)
             {
                 cliOrNulls.Add(FindCliOrNull(cli));
@@ -604,12 +606,12 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
             return new string[]{ "" };
         }
 
-        private static void UpdateEnvironment(ProcessStartInfo startInfo, string envAsMultiLineString)
+        private static void UpdateEnvironment(ProcessStartInfo startInfo, string? envAsMultiLineString)
         {
             var ok = !string.IsNullOrEmpty(envAsMultiLineString);
             if (!ok) return;
             
-            var env = YamlEnvHelpers.GetEnvironmentFromMultiLineString(envAsMultiLineString);
+            var env = YamlEnvHelpers.GetEnvironmentFromMultiLineString(envAsMultiLineString!);
             foreach (var item in env)
             {
                 startInfo.Environment[item.Key] = item.Value;
@@ -624,8 +626,8 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
                 var dll = FindCliDllOrNull(cli.FullName, cli.Name.Replace(".exe", "") + ".dll");
                 if (dll != null)
                 {
-                    var cliPath = cli.Directory.FullName;
-                    var dllPath = new FileInfo(dll).Directory.FullName;
+                    var cliPath = cli.Directory!.FullName;
+                    var dllPath = new FileInfo(dll).Directory!.FullName;
 
                     var isWindows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
                     var pathVar = isWindows ? "PATH" : "LD_LIBRARY_PATH";
@@ -702,7 +704,7 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
             return completed;
         }
 
-        private static void GetStartInfoArgs(out string startProcess, out string startArgs,string cli, string command, string script, bool scriptIsBash, List<KeyValuePair<string, string>> kvs, string expect, string notExpect, ref List<string> files)
+        private static void GetStartInfoArgs(out string startProcess, out string startArgs,string cli, string? command, string? script, bool scriptIsBash, List<KeyValuePair<string, string>> kvs, string? expect, string? notExpect, ref List<string>? files)
         {
             startProcess = FindCacheCli(cli);
 
@@ -714,7 +716,7 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
                 var hasExpectations = !string.IsNullOrEmpty(expect) || !string.IsNullOrEmpty(notExpect);
                 if (hasExpectations) 
                 {
-                    command = WriteTextToTempFile(command);
+                    command = WriteTextToTempFile(command)!;
                     files ??= new List<string>();
                     files.Add(command);
 
@@ -769,7 +771,7 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
             return found.Where(x => x.ToLower().Contains("git")).FirstOrDefault() ?? "bash.exe";
         }
 
-        private static string GetAtArgs(string expect, string notExpect)
+        private static string GetAtArgs(string? expect, string? notExpect)
         {
             var atArgs = $"";
             if (!string.IsNullOrEmpty(expect)) atArgs += $" --expect @{expect}";
@@ -807,7 +809,7 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
             return args.ToString().TrimEnd();
         }
 
-        private static TestOutcome SimulateTestCase(TestCase test, string simulate, string cli, string command, string script, bool scriptIsBash, string @foreach, string arguments, string input, string expect, string expectGpt, string notExpect, string env, string workingDirectory, out string stdOut, out string stdErr, out string errorMessage, out string stackTrace, out string additional, out string debugTrace)
+        private static TestOutcome SimulateTestCase(TestCase test, string simulate, string cli, string? command, string? script, bool scriptIsBash, string @foreach, string? arguments, string? input, string? expect, string? expectGpt, string? notExpect, string? env, string workingDirectory, out string stdOut, out string stdErr, out string errorMessage, out string stackTrace, out string additional, out string debugTrace)
         {
             var sb = new StringBuilder();
             sb.AppendLine($"cli='{cli?.Replace("\n", "\\n")}'");
@@ -831,9 +833,9 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
             var outcome = OutcomeFromString(simulate);
             if (outcome == TestOutcome.Passed)
             {
-                stdErr = null;
-                debugTrace = null;
-                errorMessage = null;
+                stdErr = string.Empty;
+                debugTrace = string.Empty;
+                errorMessage = string.Empty;
             }
 
             return outcome;
@@ -909,7 +911,7 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
 
             var variables = Environment.GetEnvironmentVariables();
             var keys = new List<string>(variables.Count);
-            foreach (var key in variables.Keys) keys.Add(key as string);
+            foreach (var key in variables.Keys) keys.Add((key as string)!);
 
             keys.Sort();
             foreach (var key in keys)
@@ -948,7 +950,7 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
             question.AppendLine("You **must always** answer \"PASS\" if the expectation is met.");
             question.AppendLine("You **must always** answer \"FAIL\" if the expectation is not met.");
             question.AppendLine("You **must only** answer \"PASS\" or \"FAIL\".");
-            var questionTempFile = WriteTextToTempFile(question.ToString());
+            var questionTempFile = WriteTextToTempFile(question.ToString())!;
 
             try
             {
@@ -965,6 +967,7 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
 
                 Logger.Log($"ExpectGptOutcome: Process.Start('{startProcess} {startArgs}')");
                 var process = Process.Start(startInfo);
+                if (process == null) throw new Exception("Process.Start() returned null!");
                 process.StandardInput.Close();
 
                 var outDoneSignal = new ManualResetEvent(false);

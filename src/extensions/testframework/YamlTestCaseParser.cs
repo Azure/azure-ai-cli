@@ -18,16 +18,16 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
     {
         public static IEnumerable<TestCase> TestCasesFromYaml(string source, FileInfo file)
         {
-            var defaultTags = YamlTagHelpers.FindAndGetDefaultTags(file.Directory);
+            var defaultTags = YamlTagHelpers.FindAndGetDefaultTags(file.Directory!);
 
             var workingDirectory = GetScalarString(null, defaultTags, "workingDirectory");
-            workingDirectory = UpdateWorkingDirectory(file.Directory.FullName, workingDirectory);
+            workingDirectory = UpdateWorkingDirectory(file.Directory!.FullName, workingDirectory);
 
             var context = new YamlTestCaseParseContext() {
                 Source = source,
                 File = file,
                 Area = GetRootArea(file),
-                Class = GetScalarString(null, defaultTags, "class", defaultClassName),
+                Class = GetScalarString(null, defaultTags, "class", defaultClassName)!,
                 Tags = defaultTags,
                 Environment = YamlEnvHelpers.GetDefaultEnvironment(true, workingDirectory),
                 WorkingDirectory = workingDirectory
@@ -42,7 +42,11 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
         private static IEnumerable<TestCase> TestCasesFromYamlStream(YamlTestCaseParseContext context, YamlStream parsed)
         {
             var tests = new List<TestCase>();
-            foreach (var document in parsed?.Documents)
+
+            var docs = parsed?.Documents;
+            if (docs == null) return tests;
+
+            foreach (var document in docs)
             {
                 var fromDocument = TestCasesFromYamlDocumentRootNode(context, document.RootNode);
                 if (fromDocument != null)
@@ -53,14 +57,14 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
             return tests;
         }
 
-        private static IEnumerable<TestCase> TestCasesFromYamlDocumentRootNode(YamlTestCaseParseContext context, YamlNode node)
+        private static IEnumerable<TestCase>? TestCasesFromYamlDocumentRootNode(YamlTestCaseParseContext context, YamlNode node)
         {
             return node is YamlMappingNode
-                ? TestCasesFromYamlMapping(context, node as YamlMappingNode)
+                ? TestCasesFromYamlMapping(context, (node as YamlMappingNode)!)
                 : TestCasesFromYamlSequence(context, node as YamlSequenceNode);
         }
 
-        private static IEnumerable<TestCase> TestCasesFromYamlMapping(YamlTestCaseParseContext context, YamlMappingNode mapping)
+        private static IEnumerable<TestCase>? TestCasesFromYamlMapping(YamlTestCaseParseContext context, YamlMappingNode mapping)
         {
             var children = CheckForChildren(context, mapping);
             if (children != null)
@@ -77,7 +81,7 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
             return null;
         }
 
-        private static IEnumerable<TestCase> TestCasesFromYamlSequence(YamlTestCaseParseContext context, YamlSequenceNode sequence)
+        private static IEnumerable<TestCase>? TestCasesFromYamlSequence(YamlTestCaseParseContext context, YamlSequenceNode? sequence)
         {
             var tests = new List<TestCase>();
             if (sequence == null) return tests;
@@ -102,19 +106,21 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
             return tests;
         }
 
-        private static TestCase GetTestFromNode(YamlTestCaseParseContext context, YamlMappingNode mapping, int stepNumber = 0)
+        private static TestCase? GetTestFromNode(YamlTestCaseParseContext context, YamlMappingNode? mapping, int stepNumber = 0)
         {
-            string cli = GetScalarString(mapping, context.Tags, "cli");
-            string parallelize = GetScalarString(mapping, context.Tags, "parallelize");
-            string skipOnFailure = GetScalarString(mapping, context.Tags, "skipOnFailure");
-            string workingDirectory = UpdateWorkingDirectory(mapping, context.WorkingDirectory);
+            if (mapping == null) return null;
 
-            string simulate = GetScalarString(mapping, "simulate");
-            string command = GetScalarString(mapping, "command");
-            string script = GetScalarString(mapping, "script");
-            string bash = GetScalarString(mapping, "bash");
+            var cli = GetScalarString(mapping, context.Tags, "cli");
+            var parallelize = GetScalarString(mapping, context.Tags, "parallelize");
+            var skipOnFailure = GetScalarString(mapping, context.Tags, "skipOnFailure");
+            string workingDirectory = UpdateWorkingDirectory(mapping!, context.WorkingDirectory);
 
-            string fullyQualifiedName = command == null && script == null && bash == null
+            var simulate = GetScalarString(mapping, "simulate");
+            var command = GetScalarString(mapping, "command");
+            var script = GetScalarString(mapping, "script");
+            var bash = GetScalarString(mapping, "bash");
+
+            var fullyQualifiedName = command == null && script == null && bash == null
                 ? GetFullyQualifiedNameAndCommandFromShortForm(mapping, context.Area, context.Class, ref command, stepNumber)
                 : GetFullyQualifiedName(mapping, context.Area, context.Class, stepNumber);
             fullyQualifiedName ??= GetFullyQualifiedName(context.Area, context.Class, $"Expected YAML node ('name') at {context.File.FullName}({mapping.Start.Line})", 0);
@@ -167,11 +173,11 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
             return test;
         }
 
-        private static IEnumerable<TestCase> CheckForChildren(YamlTestCaseParseContext context, YamlMappingNode mapping)
+        private static IEnumerable<TestCase>? CheckForChildren(YamlTestCaseParseContext context, YamlMappingNode mapping)
         {
             if (mapping.Children.ContainsKey("steps") && mapping.Children["steps"] is YamlSequenceNode stepsSequence)
             {
-                context.Class = GetScalarString(mapping, "class", context.Class);
+                context.Class = GetScalarString(mapping, "class", context.Class)!;
                 context.Area = UpdateArea(mapping, context.Area);
                 context.Tags = YamlTagHelpers.UpdateCopyTags(context.Tags, mapping);
                 context.Environment = YamlEnvHelpers.UpdateCopyEnvironment(context.Environment, mapping);
@@ -182,13 +188,13 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
 
             if (mapping.Children.ContainsKey("tests") && mapping.Children["tests"] is YamlSequenceNode testsSequence)
             {
-                context.Class = GetScalarString(mapping, "class", context.Class);
+                context.Class = GetScalarString(mapping, "class", context.Class)!;
                 context.Area = UpdateArea(mapping, context.Area);
                 context.Tags = YamlTagHelpers.UpdateCopyTags(context.Tags, mapping);
                 context.Environment = YamlEnvHelpers.UpdateCopyEnvironment(context.Environment, mapping);
                 context.WorkingDirectory = UpdateWorkingDirectory(mapping, context.WorkingDirectory);
 
-                return TestCasesFromYamlSequence(context, testsSequence).ToList();
+                return TestCasesFromYamlSequence(context, testsSequence)?.ToList();
             }
 
             return null;
@@ -225,6 +231,7 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
         {
             foreach (YamlScalarNode key in mapping.Children.Keys)
             {
+                if (key.Value == null) continue;
                 if (!IsValidTestCaseNode(key.Value) && !test.DisplayName.EndsWith(key.Value))
                 {
                     var error = $"Error parsing YAML: Unexpected YAML key/value ('{key.Value}', '{test.DisplayName}') in {context.File.FullName}({mapping[key].Start.Line})";
@@ -234,18 +241,18 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
             }
         }
 
-        private static bool IsValidTestCaseNode(string value)
+        private static bool IsValidTestCaseNode(string? value)
         {
-            return ";area;class;name;cli;command;script;bash;timeout;foreach;arguments;input;expect;expect-gpt;not-expect;parallelize;simulate;skipOnFailure;tag;tags;workingDirectory;env;sanitize;".IndexOf($";{value};") >= 0;
+            return !string.IsNullOrEmpty(value) && ";area;class;name;cli;command;script;bash;timeout;foreach;arguments;input;expect;expect-gpt;not-expect;parallelize;simulate;skipOnFailure;tag;tags;workingDirectory;env;sanitize;".IndexOf($";{value};") >= 0;
         }
 
         private static void SetTestCaseProperty(TestCase test, string propertyName, YamlMappingNode mapping, string mappingName)
         {
-            string value = GetScalarString(mapping, mappingName);
+            var value = GetScalarString(mapping, mappingName);
             SetTestCaseProperty(test, propertyName, value);
         }
 
-        private static void SetTestCaseProperty(TestCase test, string propertyName, string value)
+        private static void SetTestCaseProperty(TestCase test, string propertyName, string? value)
         {
             if (value != null)
             {
@@ -272,34 +279,35 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
             var argumentsNode = testNode.Children[mappingName];
             if (argumentsNode == null) return;
 
-            if (argumentsNode is YamlScalarNode)
+            if (argumentsNode is YamlScalarNode asScalar)
             {
-                var value = (argumentsNode as YamlScalarNode).Value;
+                var value = asScalar.Value;
                 SetTestCaseProperty(test, propertyName, $"\"{value}\"");
             }
-            else if (argumentsNode is YamlMappingNode)
+            else if (argumentsNode is YamlMappingNode asMapping)
             {
-                var asMapping = argumentsNode as YamlMappingNode;
                 SetTestCasePropertyMap(test, propertyName, asMapping
                     .Select(x => NormalizeToScalarKeyValuePair(test, x, workingDirectory)));
             }
-            else if (argumentsNode is YamlSequenceNode)
+            else if (argumentsNode is YamlSequenceNode asSequence)
             {
-                var asSequence = argumentsNode as YamlSequenceNode;
-
                 SetTestCasePropertyMap(test, propertyName, asSequence
                     .Select(mapping => (mapping as YamlMappingNode)?
                         .Select(x => NormalizeToScalarKeyValuePair(test, x, workingDirectory))));
             }
         }
 
-        private static void SetTestCasePropertyMap(TestCase test, string propertyName, IEnumerable<IEnumerable<KeyValuePair<YamlNode, YamlNode>>> kvss)
+        private static void SetTestCasePropertyMap(TestCase test, string propertyName, IEnumerable<IEnumerable<KeyValuePair<YamlNode, YamlNode>>?> kvss)
         {
             // flatten the kvs
-            var kvs = kvss.SelectMany(x => x);
+            var kvs = kvss.Where(x => x != null).SelectMany(x => x!);
 
             // ensure all keys are unique, if not, transform appropriately
-            var keys = kvs.GroupBy(kv => (kv.Key as YamlScalarNode)?.Value).Select(g => g.Key).ToArray();
+            var keys = kvs
+                .GroupBy(kv => (kv.Key as YamlScalarNode)?.Value)
+                .Where(g => g?.Key != null)
+                .Select(g => g.Key!)
+                .ToArray();
             if (keys.Length < kvs.Count())
             {
                 Logger.Log($"keys.Length={keys.Length}, kvs.Count={kvs.Count()}");
@@ -308,8 +316,9 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
                 var values = new List<string>();
                 foreach (var items in kvss)
                 {
-                    var map = new YamlMappingNode(items);
-                    values.Add(map.ConvertScalarMapToTsvString(keys));
+                    var map = new YamlMappingNode(items!);
+                    var tsv = map.ConvertScalarMapToTsvString(keys);
+                    if (tsv != null) values.Add(tsv);
                 }
 
                 var combinedKey = new YamlScalarNode(string.Join("\t", keys));
@@ -327,7 +336,7 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
             SetTestCaseProperty(test, propertyName, newMap.ToJsonString());
         }
 
-        private static KeyValuePair<YamlNode, YamlNode> NormalizeToScalarKeyValuePair(TestCase test, KeyValuePair<YamlNode, YamlNode> item, string workingDirectory = null)
+        private static KeyValuePair<YamlNode, YamlNode> NormalizeToScalarKeyValuePair(TestCase test, KeyValuePair<YamlNode, YamlNode> item, string workingDirectory)
         {
             var key = item.Key;
             var keyOk = key is YamlScalarNode;
@@ -335,7 +344,7 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
             var valueOk = value is YamlScalarNode;
             if (keyOk && valueOk) return item;
 
-            string[] keys = null;
+            string[]? keys = null;
             if (!keyOk)
             {
                 var text = key.ConvertScalarSequenceToTsvString();
@@ -353,7 +362,7 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
 
             if (!valueOk)
             {
-                value = value.ConvertScalarSequenceToMultiLineTsvScalarNode(test, keys);
+                value = value.ConvertScalarSequenceToMultiLineTsvScalarNode(test, keys!);
             }
             else
             {
@@ -363,12 +372,12 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
                     value = fileContent;
                     if (!(value is YamlScalarNode))
                     {
-                        value = value.ConvertScalarSequenceToMultiLineTsvScalarNode(test, keys);
+                        value = value.ConvertScalarSequenceToMultiLineTsvScalarNode(test, keys!);
                     }
                 }
             }
 
-            Logger.Log($"YamlTestCaseParser.NormalizeToScalarKeyValuePair: key='{(key as YamlScalarNode).Value}', value='{(value as YamlScalarNode).Value}'");
+            Logger.Log($"YamlTestCaseParser.NormalizeToScalarKeyValuePair: key='{(key as YamlScalarNode)?.Value}', value='{(value as YamlScalarNode)?.Value}'");
             return new KeyValuePair<YamlNode, YamlNode>(key, value);
         }
 
@@ -398,7 +407,7 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
             return false;
         }
 
-        private static string GetScalarString(YamlMappingNode mapping, Dictionary<string, List<string>> tags, string mappingName, string defaultValue = null)
+        private static string? GetScalarString(YamlMappingNode? mapping, Dictionary<string, List<string>> tags, string mappingName, string? defaultValue = null)
         {
             var value = GetScalarString(mapping, mappingName, null);
             if (value != null) return value;
@@ -411,24 +420,13 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
             return value ?? defaultValue;
         }
 
-        private static string GetScalarString(YamlMappingNode mapping, string mappingName, string defaultValue = null)
+        private static string? GetScalarString(YamlMappingNode? mapping, string mappingName, string? defaultValue = null)
         {
             var ok = mapping != null && mapping.Children.ContainsKey(mappingName);
             if (!ok) return defaultValue;
 
-            var node = mapping.Children[mappingName] as YamlScalarNode;
+            var node = mapping!.Children[mappingName] as YamlScalarNode;
             var value = node?.Value;
-
-            return value ?? defaultValue;
-        }
-
-        private static string GetYamlNodeAsString(YamlMappingNode mapping, string nodeName, string defaultValue = null)
-        {
-            var ok = mapping.Children.ContainsKey(nodeName);
-            if (!ok) return defaultValue;
-
-            var node = mapping.Children[nodeName];
-            var value = node?.ToYamlString();
 
             return value ?? defaultValue;
         }
@@ -446,29 +444,29 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
                 : $"{area}.{subArea}";
         }
 
-        private static string GetFullyQualifiedName(YamlMappingNode mapping, string area, string @class, int stepNumber)
+        private static string? GetFullyQualifiedName(YamlMappingNode mapping, string area, string @class, int stepNumber)
         {
             var name = GetScalarString(mapping, "name");
             if (name == null) return null;
 
             area = UpdateArea(mapping, area);
-            @class = GetScalarString(mapping, "class", @class);
+            @class = GetScalarString(mapping, "class", @class)!;
 
             return GetFullyQualifiedName(area, @class, name, stepNumber);
         }
 
-        private static string GetFullyQualifiedNameAndCommandFromShortForm(YamlMappingNode mapping, string area, string @class, ref string command, int stepNumber)
+        private static string? GetFullyQualifiedNameAndCommandFromShortForm(YamlMappingNode mapping, string area, string @class, ref string? command, int stepNumber)
         {
             // if there's only one invalid mapping node, we'll treat it's key as "name" and value as "command"
-            var invalid = mapping.Children.Keys.Where(key => !IsValidTestCaseNode((key as YamlScalarNode).Value));
+            var invalid = mapping.Children.Keys.Where(key => !IsValidTestCaseNode((key as YamlScalarNode)?.Value));
             if (invalid.Count() == 1 && command == null)
             {
-                var name = (invalid.FirstOrDefault() as YamlScalarNode).Value;
+                var name = (invalid.FirstOrDefault() as YamlScalarNode)?.Value;
                 if (name == null) return null;
 
                 command = GetScalarString(mapping, name);
                 area = UpdateArea(mapping, area);
-                @class = GetScalarString(mapping, "class", @class);
+                @class = GetScalarString(mapping, "class", @class)!;
 
                 return GetFullyQualifiedName(area, @class, name, stepNumber);
             }
@@ -500,11 +498,10 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
             return UpdateWorkingDirectory(currentWorkingDirectory, workingDirectory);
         }
 
-        private static string UpdateWorkingDirectory(string currentWorkingDirectory, string workingDirectory)
+        private static string UpdateWorkingDirectory(string currentWorkingDirectory, string? workingDirectory)
         {
-            return string.IsNullOrEmpty(workingDirectory)
-                ? currentWorkingDirectory
-                : PathHelpers.Combine(currentWorkingDirectory, workingDirectory);
+            if (string.IsNullOrEmpty(workingDirectory)) return currentWorkingDirectory;
+            return PathHelpers.Combine(currentWorkingDirectory, workingDirectory) ?? currentWorkingDirectory;
         }
 
         private const string defaultClassName = "TestCases";

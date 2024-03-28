@@ -22,9 +22,8 @@ namespace Azure.AI.Details.Common.CLI
 {
     public class InitCommand : Command
     {
-        public InitCommand(ICommandValues values)
+        public InitCommand(ICommandValues values) : base(values)
         {
-            _values = values.ReplaceValues();
             _quiet = _values.GetOrDefault("x.quiet", false);
             _verbose = _values.GetOrDefault("x.verbose", true);
         }
@@ -533,20 +532,20 @@ namespace Azure.AI.Details.Common.CLI
         private async Task DoInitOpenAi(bool interactive, bool skipChat = false, bool allowSkipChat = true, bool skipEmbeddings = false, bool allowSkipEmbeddings = true, bool skipEvaluations = false, bool allowSkipEvaluations = true)
         {
             var subscriptionId = SubscriptionToken.Data().GetOrDefault(_values, "");
-            var regionFilter = _values.GetOrDefault("init.service.resource.region.name", "");
-            var groupFilter = _values.GetOrDefault("init.service.resource.group.name", "");
-            var resourceFilter = _values.GetOrDefault("init.service.cognitiveservices.resource.name", "");
+            var regionFilter = _values.GetOrEmpty("init.service.resource.region.name");
+            var groupFilter = _values.GetOrEmpty("init.service.resource.group.name");
+            var resourceFilter = _values.GetOrEmpty("init.service.cognitiveservices.resource.name");
             var kind = _values.GetOrDefault("init.service.cognitiveservices.resource.kind", "OpenAI;AIServices");
             var sku = _values.GetOrDefault("init.service.cognitiveservices.resource.sku", Program.CognitiveServiceResourceSku);
             var yes = _values.GetOrDefault("init.service.cognitiveservices.terms.agree", false);
 
-            var chatDeploymentFilter = _values.GetOrDefault("init.chat.model.deployment.name", "");
-            var embeddingsDeploymentFilter = _values.GetOrDefault("init.embeddings.model.deployment.name", "");
-            var evaluationsDeploymentFilter = _values.GetOrDefault("init.evaluation.model.deployment.name", "");
+            var chatDeploymentFilter = _values.GetOrEmpty("init.chat.model.deployment.name");
+            var embeddingsDeploymentFilter = _values.GetOrEmpty("init.embeddings.model.deployment.name");
+            var evaluationsDeploymentFilter = _values.GetOrEmpty("init.evaluation.model.deployment.name");
 
-            var chatModelFilter = _values.GetOrDefault("init.chat.model.name", "");
-            var embeddingsModelFilter = _values.GetOrDefault("init.embeddings.model.name", "");
-            var evaluationsModelFilter = _values.GetOrDefault("init.evaluation.model.name", "");
+            var chatModelFilter = _values.GetOrEmpty("init.chat.model.name");
+            var embeddingsModelFilter = _values.GetOrEmpty("init.embeddings.model.name");
+            var evaluationsModelFilter = _values.GetOrEmpty("init.evaluation.model.name");
             
             var resource = await AzCliConsoleGui.PickOrCreateAndConfigCognitiveServicesOpenAiKindResource(_values, interactive, subscriptionId, regionFilter, groupFilter, resourceFilter, kind, sku, yes, skipChat, allowSkipChat, skipEmbeddings, allowSkipEmbeddings, skipEvaluations, allowSkipEvaluations, chatDeploymentFilter, embeddingsDeploymentFilter, evaluationsDeploymentFilter, chatModelFilter, embeddingsModelFilter, evaluationsModelFilter);
             _values.Reset("service.openai.deployments.picked", "true");
@@ -571,10 +570,10 @@ namespace Azure.AI.Details.Common.CLI
 
         private async Task DoInitCognitiveServicesAIServicesKind(bool interactive)
         {
-            var subscriptionId = SubscriptionToken.Data().GetOrDefault(_values, "");
-            var regionFilter = _values.GetOrDefault("init.service.resource.region.name", "");
-            var groupFilter = _values.GetOrDefault("init.service.resource.group.name", "");
-            var resourceFilter = _values.GetOrDefault("init.service.cognitiveservices.resource.name", "");
+            var subscriptionId = SubscriptionToken.Data().GetOrDefault(_values);
+            var regionFilter = _values.GetOrEmpty("init.service.resource.region.name");
+            var groupFilter = _values.GetOrEmpty("init.service.resource.group.name");
+            var resourceFilter = _values.GetOrEmpty("init.service.cognitiveservices.resource.name");
             var kind = _values.GetOrDefault("init.service.cognitiveservices.resource.kind", "AIServices");
             var sku = _values.GetOrDefault("init.service.cognitiveservices.resource.sku", Program.CognitiveServiceResourceSku);
             var yes = _values.GetOrDefault("init.service.cognitiveservices.terms.agree", false);
@@ -602,9 +601,9 @@ namespace Azure.AI.Details.Common.CLI
         private async Task DoInitCognitiveServicesCognitiveServicesKind(bool interactive)
         {
             var subscriptionId = SubscriptionToken.Data().GetOrDefault(_values, "");
-            var regionFilter = _values.GetOrDefault("init.service.resource.region.name", "");
-            var groupFilter = _values.GetOrDefault("init.service.resource.group.name", "");
-            var resourceFilter = _values.GetOrDefault("init.service.cognitiveservices.resource.name", "");
+            var regionFilter = _values.GetOrEmpty("init.service.resource.region.name");
+            var groupFilter = _values.GetOrEmpty("init.service.resource.group.name");
+            var resourceFilter = _values.GetOrEmpty("init.service.cognitiveservices.resource.name");
             var kind = _values.GetOrDefault("init.service.cognitiveservices.resource.kind", "CognitiveServices");
             var sku = _values.GetOrDefault("init.service.cognitiveservices.resource.sku", Program.CognitiveServiceResourceSku);
             var yes = _values.GetOrDefault("init.service.cognitiveservices.terms.agree", false);
@@ -630,7 +629,7 @@ namespace Azure.AI.Details.Common.CLI
         private async Task DoInitSearch(bool interactive, bool allowSkipSearch = true)
         {
             var subscription = SubscriptionToken.Data().GetOrDefault(_values, "");
-            var location = _values.GetOrDefault("service.resource.region.name", "");
+            var location = _values.GetOrEmpty("service.resource.region.name");
             var groupName = ResourceGroupNameToken.Data().GetOrDefault(_values, "");
 
             var smartName = ResourceNameToken.Data().GetOrDefault(_values);
@@ -656,9 +655,9 @@ namespace Azure.AI.Details.Common.CLI
         private async Task DoInitSpeech(bool interactive)
         {
             var subscriptionId = SubscriptionToken.Data().GetOrDefault(_values, "");
-            var regionFilter = _values.GetOrDefault("init.service.resource.region.name", "");
-            var groupFilter = _values.GetOrDefault("init.service.resource.group.name", "");
-            var resourceFilter = _values.GetOrDefault("init.service.cognitiveservices.resource.name", "");
+            var regionFilter = _values.GetOrEmpty("init.service.resource.region.name");
+            var groupFilter = _values.GetOrEmpty("init.service.resource.group.name");
+            var resourceFilter = _values.GetOrEmpty("init.service.cognitiveservices.resource.name");
             var kind = _values.GetOrDefault("init.service.cognitiveservices.resource.kind", "SpeechServices");
             var sku = _values.GetOrDefault("init.service.cognitiveservices.resource.sku", "S0");
             var yes = _values.GetOrDefault("init.service.cognitiveservices.terms.agree", false);
@@ -671,9 +670,9 @@ namespace Azure.AI.Details.Common.CLI
         private async Task DoInitVision(bool interactive)
         {
             var subscriptionId = SubscriptionToken.Data().GetOrDefault(_values, "");
-            var regionFilter = _values.GetOrDefault("init.service.resource.region.name", "");
-            var groupFilter = _values.GetOrDefault("init.service.resource.group.name", "");
-            var resourceFilter = _values.GetOrDefault("init.service.cognitiveservices.resource.name", "");
+            var regionFilter = _values.GetOrEmpty("init.service.resource.region.name");
+            var groupFilter = _values.GetOrEmpty("init.service.resource.group.name");
+            var resourceFilter = _values.GetOrEmpty("init.service.cognitiveservices.resource.name");
             var kind = _values.GetOrDefault("init.service.cognitiveservices.resource.kind", "ComputerVision");
             var sku = _values.GetOrDefault("init.service.cognitiveservices.resource.sku", "S0");
             var yes = _values.GetOrDefault("init.service.cognitiveservices.terms.agree", false);
@@ -712,7 +711,7 @@ namespace Azure.AI.Details.Common.CLI
             // _display = new DisplayHelper(_values);
 
             // _output = new OutputHelper(_values);
-            // _output.StartOutput();
+            // _output!.StartOutput();
 
             _lock = new SpinLock();
             _lock.StartLock();
@@ -720,16 +719,16 @@ namespace Azure.AI.Details.Common.CLI
 
         private void StopCommand()
         {
-            _lock.StopLock(5000);
+            _lock!.StopLock(5000);
 
             // LogHelpers.EnsureStopLogFile(_values);
-            // _output.CheckOutput();
-            // _output.StopOutput();
+            // _output!.CheckOutput();
+            // _output!.StopOutput();
 
             _stopEvent.Set();
         }
 
-        private SpinLock _lock = null;
+        private SpinLock? _lock = null;
         private readonly bool _quiet = false;
         private readonly bool _verbose = false;
     }

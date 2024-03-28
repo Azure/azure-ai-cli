@@ -56,7 +56,7 @@ namespace Azure.AI.Details.Common.CLI
                 FlushOutputAllCache();
                 FlushOutputPropertyCache();
                 FlushOutputZipFile();
-                _lock.StopLock();
+                _lock!.StopLock();
             }
         }
 
@@ -65,15 +65,15 @@ namespace Azure.AI.Details.Common.CLI
             return false; // TODO
         }
 
-        public void EnsureCacheProperty(string name, string value)
+        public void EnsureCacheProperty(string name, string? value)
         {
-            if (ShouldCacheProperty()) CacheProperty(name, value);
+            if (ShouldCacheProperty() && value != null) CacheProperty(name, value);
         }
 
         private void CacheProperty(string name, string value)
         {
             EnsureInitPropertyCache();
-            _propertyCache.Add(name, value);
+            _propertyCache!.Add(name, value);
         }
 
         private void EnsureInitPropertyCache()
@@ -127,7 +127,7 @@ namespace Azure.AI.Details.Common.CLI
             EnsureOutputAll('\n', name, "{0}", value);
         }
 
-        public string GetAllOutput(string name, string defaultValue = null)
+        public string? GetAllOutput(string name, string? defaultValue = null)
         {
             if (_outputAllCache == null || !_outputAllCache.ContainsKey(name)) return defaultValue;
             
@@ -197,7 +197,7 @@ namespace Azure.AI.Details.Common.CLI
         {
             var file = _values.GetOrDefault("output.all.file.name", "output.{run.time}." + GetOutputAllFileType());
 
-            var id = _values.GetOrDefault("audio.input.id", "");
+            var id = _values.GetOrEmpty("audio.input.id");
             if (file.Contains("{id}")) file = file.Replace("{id}", id);
 
             var pid = Process.GetCurrentProcess().Id.ToString();
@@ -206,7 +206,7 @@ namespace Azure.AI.Details.Common.CLI
             var time = DateTime.Now.ToFileTime().ToString();
             if (file.Contains("{time}")) file = file.Replace("{time}", time);
 
-            var runTime = _values.GetOrDefault("x.run.time", "");
+            var runTime = _values.GetOrEmpty("x.run.time");
             if (file.Contains("{run.time}")) file = file.Replace("{run.time}", runTime);
 
             return file.ReplaceValues(_values);
@@ -259,7 +259,7 @@ namespace Azure.AI.Details.Common.CLI
             StringBuilder sb = new StringBuilder();
             foreach (var column in columns)
             {
-                var value = GetAllOutput(column, "");
+                var value = GetAllOutput(column, "")!;
                 sb.Append(EncodeOutputValue(value));
                 sb.Append('\t');
             }
@@ -309,7 +309,7 @@ namespace Azure.AI.Details.Common.CLI
         private void AddOutputEachCache(string name, string value)
         {
             EnsureInitOutputEachCache();
-            _outputEachCache[name] = value;
+            _outputEachCache![name] = value;
         }
 
         private void EnsureInitOutputEachCache()
@@ -340,7 +340,7 @@ namespace Azure.AI.Details.Common.CLI
             if (!_outputEach) return;
 
             overwrite = overwrite && _values.GetOrDefault("output.overwrite", false);
-            if (overwrite) File.Delete(_outputEachFileName);
+            if (overwrite) File.Delete(_outputEachFileName!);
 
             switch (_outputEachFileType)
             {
@@ -361,7 +361,7 @@ namespace Azure.AI.Details.Common.CLI
         {
             var file = _values.GetOrDefault("output.each.file.name", "each.{run.time}." + GetOutputEachFileType());
 
-            var id = _values.GetOrDefault("audio.input.id", "");
+            var id = _values.GetOrEmpty("audio.input.id");
             if (file.Contains("{id}")) file = file.Replace("{id}", id);
 
             var pid = Process.GetCurrentProcess().Id.ToString();
@@ -370,7 +370,7 @@ namespace Azure.AI.Details.Common.CLI
             var time = DateTime.Now.ToFileTime().ToString();
             if (file.Contains("{time}")) file = file.Replace("{time}", time);
 
-            var runTime = _values.GetOrDefault("x.run.time", "");
+            var runTime = _values.GetOrEmpty("x.run.time");
             if (file.Contains("{run.time}")) file = file.Replace("{run.time}", runTime);
 
             return file.ReplaceValues(_values);
@@ -392,15 +392,15 @@ namespace Azure.AI.Details.Common.CLI
 
         private void OutputEachJsonFile()
         {
-            var json = JsonHelpers.GetJsonArrayText(_outputEachCache2) + Environment.NewLine;
-            FileHelpers.AppendAllText(_outputEachFileName, json, Encoding.UTF8);
+            var json = JsonHelpers.GetJsonArrayText(_outputEachCache2!) + Environment.NewLine;
+            FileHelpers.AppendAllText(_outputEachFileName!, json, Encoding.UTF8);
         }
 
         private void OutputEachTsvFile()
         {
             var columns = GetOutputEachColumns();
-            EnsureOutputEachTsvFileHeader(_outputEachFileName, columns);
-            OutputEachTsvFileRow(_outputEachFileName, columns);
+            EnsureOutputEachTsvFileHeader(_outputEachFileName!, columns);
+            OutputEachTsvFileRow(_outputEachFileName!, columns);
         }
 
         private void EnsureOutputEachTsvFileHeader(string file, string[] columns)
@@ -448,7 +448,7 @@ namespace Azure.AI.Details.Common.CLI
         {
             if (!_outputAll && !_outputEach) return;
 
-            var zipFileName = _values.GetOrDefault("output.zip.file", "");
+            var zipFileName = _values.GetOrEmpty("output.zip.file");
             if (string.IsNullOrEmpty(zipFileName)) return;
 
             TryCatchHelpers.TryCatchRetry(() =>
@@ -481,7 +481,7 @@ namespace Azure.AI.Details.Common.CLI
 
         private SpinLock _lock = new SpinLock();
 
-        private Dictionary<string, string> _propertyCache = null;
+        private Dictionary<string, string>? _propertyCache = null;
 
         private bool _outputAll = false;
         private string _outputAllFileName = null;
@@ -491,9 +491,9 @@ namespace Azure.AI.Details.Common.CLI
 
         private bool _outputEach = false;
         private bool _overwriteEach = false;
-        private string _outputEachFileName = null;
-        private string _outputEachFileType = null;
-        private Dictionary<string, string> _outputEachCache;
-        private List<Dictionary<string, string>> _outputEachCache2;
+        private string? _outputEachFileName = null;
+        private string? _outputEachFileType = null;
+        private Dictionary<string, string>? _outputEachCache;
+        private List<Dictionary<string, string>>? _outputEachCache2;
     }
 }

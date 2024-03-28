@@ -19,9 +19,8 @@ namespace Azure.AI.Details.Common.CLI
 {
     public class TranslateCommand : Command
     {
-        public TranslateCommand(ICommandValues values)
+        public TranslateCommand(ICommandValues values) : base(values)
         {
-            _values = values.ReplaceValues();
         }
 
         public bool RunCommand()
@@ -30,7 +29,7 @@ namespace Azure.AI.Details.Common.CLI
             return _values.GetOrDefault("passed", true);
         }
 
-        private void Recognize(string recognize)
+        private void Recognize(string? recognize)
         {
             switch (recognize)
             {
@@ -170,7 +169,7 @@ namespace Azure.AI.Details.Common.CLI
             _disposeAfterStop.Add(audioConfig);
             _disposeAfterStop.Add(recognizer);
 
-            _output.EnsureCachePropertyCollection("recognizer", recognizer.Properties);
+            _output!.EnsureCachePropertyCollection("recognizer", recognizer.Properties);
 
             return recognizer;
         }
@@ -272,7 +271,7 @@ namespace Azure.AI.Details.Common.CLI
             var categoryId = _values["service.config.category.id"];
             if (!string.IsNullOrEmpty(categoryId)) config.SetServiceProperty("categoryId", categoryId, ServicePropertyChannel.UriQueryParameter);
 
-            var needDetailedText = _output.NeedsLexicalText() || _output.NeedsItnText();
+            var needDetailedText = _output != null && (_output.NeedsLexicalText() || _output.NeedsItnText());
             if (needDetailedText) config.OutputFormat = OutputFormat.Detailed;
 
             var profanity = _values["service.output.config.profanity.option"];
@@ -289,10 +288,10 @@ namespace Azure.AI.Details.Common.CLI
             var trafficType = _values.GetOrDefault("service.config.endpoint.traffic.type", "spx");
             config.SetServiceProperty("traffictype", trafficType, ServicePropertyChannel.UriQueryParameter);
 
-            var endpointParam = _values.GetOrDefault("service.config.endpoint.query.string", "");
+            var endpointParam = _values.GetOrEmpty("service.config.endpoint.query.string");
             if (!string.IsNullOrEmpty(endpointParam)) ConfigHelpers.SetEndpointParams(config, endpointParam);
 
-            var httpHeader = _values.GetOrDefault("service.config.endpoint.http.header", "");
+            var httpHeader = _values.GetOrEmpty("service.config.endpoint.http.header");
             if (!string.IsNullOrEmpty(httpHeader)) SetHttpHeaderProperty(config, httpHeader);
 
             var rtf = _values.GetOrDefault("audio.input.real.time.factor", -1);
@@ -301,10 +300,10 @@ namespace Azure.AI.Details.Common.CLI
             var fastLane = _values.GetOrDefault("audio.input.fast.lane", rtf >= 0 ? 0 : -1);
             if (fastLane >= 0) config.SetProperty("SPEECH-TransmitLengthBeforThrottleMs", fastLane.ToString());
 
-            var stringProperty = _values.GetOrDefault("config.string.property", "");
+            var stringProperty = _values.GetOrEmpty("config.string.property");
             if (!string.IsNullOrEmpty(stringProperty)) ConfigHelpers.SetStringProperty(config, stringProperty);
 
-            var stringProperties = _values.GetOrDefault("config.string.properties", "");
+            var stringProperties = _values.GetOrEmpty("config.string.properties");
             if (!string.IsNullOrEmpty(stringProperties)) ConfigHelpers.SetStringProperties(config, stringProperties);
 
             CheckNotYetImplementedConfigProperties();
@@ -368,7 +367,7 @@ namespace Azure.AI.Details.Common.CLI
             _microphone = (input == "microphone" || string.IsNullOrEmpty(input));
         }
 
-        private string GetIdFromAudioInputFile(string input, string file)
+        private string GetIdFromAudioInputFile(string? input, string file)
         {
             string id;
             if (input == "microphone" || string.IsNullOrEmpty(input))
@@ -389,7 +388,7 @@ namespace Azure.AI.Details.Common.CLI
             return id;
         }
 
-        private string GetAudioInputFromId(string id)
+        private string? GetAudioInputFromId(string id)
         {
             string input;
             if (id == "microphone")
@@ -414,9 +413,8 @@ namespace Azure.AI.Details.Common.CLI
             return input;
         }
 
-        private string GetAudioInputFileFromId(string id)
+        private string? GetAudioInputFileFromId(string id)
         {
-            string file;
             var existing = FileHelpers.FindFileInDataPath(id, _values);
             if (existing == null) existing = FileHelpers.FindFileInDataPath(id + ".wav", _values);
 
@@ -430,14 +428,14 @@ namespace Azure.AI.Details.Common.CLI
                 }
             }
 
-            file = existing;
+            var file = existing;
             _values.Add("audio.input.file", file);
             return file;
         }
 
         private KeywordRecognitionModel LoadKeywordModel()
         {
-            var fileName = _values["recognize.keyword.file"];
+            var fileName = _values["recognize.keyword.file"]!;
             var existing = FileHelpers.DemandFindFileInDataPath(fileName, _values, "keyword model");
 
             var keywordModel = KeywordRecognitionModel.FromFile(existing);
@@ -497,70 +495,70 @@ namespace Azure.AI.Details.Common.CLI
 
         private void RecognizerConnectionDisconnect(TranslationRecognizer recognizer)
         {
-            _lock.EnterReaderLockOnce(ref _expectDisconnected);
+            _lock!.EnterReaderLockOnce(ref _expectDisconnected);
 
             var connection = Connection.FromRecognizer(recognizer);
             connection.Close();
         }
 
-        private void Connected(object sender, ConnectionEventArgs e)
+        private void Connected(object? sender, ConnectionEventArgs e)
         {
-            _display.DisplayConnected(e);
-            _output.Connected(e);
+            _display!.DisplayConnected(e);
+            _output!.Connected(e);
         }
 
-        private void Disconnected(object sender, ConnectionEventArgs e)
+        private void Disconnected(object? sender, ConnectionEventArgs e)
         {
-            _display.DisplayDisconnected(e);
-            _output.Disconnected(e);
+            _display!.DisplayDisconnected(e);
+            _output!.Disconnected(e);
 
-            _lock.ExitReaderLockOnce(ref _expectDisconnected);
+            _lock!.ExitReaderLockOnce(ref _expectDisconnected);
         }
 
-        private void ConnectionMessageReceived(object sender, ConnectionMessageEventArgs e)
+        private void ConnectionMessageReceived(object? sender, ConnectionMessageEventArgs e)
         {
-            _display.DisplayMessageReceived(e);
-            _output.ConnectionMessageReceived(e);
+            _display!.DisplayMessageReceived(e);
+            _output!.ConnectionMessageReceived(e);
         }
 
-        private void SessionStarted(object sender, SessionEventArgs e)
+        private void SessionStarted(object? sender, SessionEventArgs e)
         {
-            _lock.EnterReaderLockOnce(ref _expectSessionStopped);
+            _lock!.EnterReaderLockOnce(ref _expectSessionStopped);
             _stopEvent.Reset();
 
-            _display.DisplaySessionStarted(e);
-            _output.SessionStarted(e);
+            _display!.DisplaySessionStarted(e);
+            _output!.SessionStarted(e);
         }
 
-        private void SessionStopped(object sender, SessionEventArgs e)
+        private void SessionStopped(object? sender, SessionEventArgs e)
         {
-            _display.DisplaySessionStopped(e);
-            _output.SessionStopped(e);
+            _display!.DisplaySessionStopped(e);
+            _output!.SessionStopped(e);
 
             _stopEvent.Set();
-            _lock.ExitReaderLockOnce(ref _expectSessionStopped);
+            _lock!.ExitReaderLockOnce(ref _expectSessionStopped);
         }
 
-        private void Recognizing(object sender, TranslationRecognitionEventArgs e)
+        private void Recognizing(object? sender, TranslationRecognitionEventArgs e)
         {
-            _lock.EnterReaderLockOnce(ref _expectRecognized);
+            _lock!.EnterReaderLockOnce(ref _expectRecognized);
 
-            _display.DisplayRecognizing(e);
-            _output.Recognizing(e);
+            _display!.DisplayRecognizing(e);
+            _output!.Recognizing(e);
         }
 
-        private void Recognized(object sender, TranslationRecognitionEventArgs e)
+        private void Recognized(object? sender, TranslationRecognitionEventArgs e)
         {
-            _display.DisplayRecognized(e);
-            _output.Recognized(e);
+            _display!.DisplayRecognized(e);
+            _output!.Recognized(e);
 
-            _lock.ExitReaderLockOnce(ref _expectRecognized);
+            _lock!.ExitReaderLockOnce(ref _expectRecognized);
         }
 
-        private void Canceled(object sender, TranslationRecognitionCanceledEventArgs e)
+        private void Canceled(object? sender, TranslationRecognitionCanceledEventArgs e)
         {
-            _display.DisplayCanceled(e);
-            _output.Canceled(e);
+            _display!.DisplayCanceled(e);
+            _output!.Canceled(e);
             _canceledEvent.Set();
         }
 
@@ -621,15 +619,15 @@ namespace Azure.AI.Details.Common.CLI
             _display = new DisplayHelper(_values);
 
             _output = new OutputHelper(_values);
-            _output.StartOutput();
+            _output!.StartOutput();
 
-            var id = _values["audio.input.id"];
-            _output.EnsureOutputAll("audio.input.id", id);
-            _output.EnsureOutputEach("audio.input.id", id);
-            _output.EnsureCacheProperty("audio.input.id", id);
+            var id = _values["audio.input.id"]!;
+            _output!.EnsureOutputAll("audio.input.id", id);
+            _output!.EnsureOutputEach("audio.input.id", id);
+            _output!.EnsureCacheProperty("audio.input.id", id);
 
             var file = _values["audio.input.file"];
-            _output.EnsureCacheProperty("audio.input.file", file);
+            _output!.EnsureCacheProperty("audio.input.file", file);
 
             _lock = new SpinLock();
             _lock.StartLock();
@@ -641,22 +639,22 @@ namespace Azure.AI.Details.Common.CLI
 
         private void StopCommand()
         {
-            _lock.StopLock(5000);
+            _lock!.StopLock(5000);
 
-            _output.CheckOutput();
-            _output.StopOutput();
+            _output!.CheckOutput();
+            _output!.StopOutput();
         }
 
         private bool _microphone = false;
         private bool _connect = false;
         private bool _disconnect = false;
 
-        private SpinLock _lock = null;
+        private SpinLock? _lock = null;
         private int _expectRecognized = 0;
         private int _expectSessionStopped = 0;
         private int _expectDisconnected = 0;
 
-        OutputHelper _output = null;
-        DisplayHelper _display = null;
+        OutputHelper? _output = null;
+        DisplayHelper? _display = null;
     }
 }

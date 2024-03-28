@@ -22,7 +22,7 @@ namespace Azure.AI.Details.Common.CLI
                 var time = DateTime.Now.ToFileTime().ToString();
                 if (log.Contains("{time}")) log = log.Replace("{time}", time);
 
-                var runTime = values.GetOrDefault("x.run.time", "");
+                var runTime = values.GetOrEmpty("x.run.time");
                 if (log.Contains("{run.time}")) log = log.Replace("{run.time}", runTime);
 
                 try
