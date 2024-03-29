@@ -13,3 +13,5 @@ testresults/**
 openai-webpage-js/node_modules/**
 openai-webpage-js/package-lock.json
 openai-webpage-js/dist/main.js
+openai-chat-streaming-js/node_modules/**
+openai-chat-streaming-js/package-lock.json

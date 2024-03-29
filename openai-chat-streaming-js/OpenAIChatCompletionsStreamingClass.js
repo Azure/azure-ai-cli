@@ -1,10 +1,14 @@
-const { OpenAIClient, AzureKeyCredential } = require("@azure/openai");
+const { OpenAI } = require('openai');
 
 class OpenAIChatCompletionsStreamingClass {
-  constructor(openAIEndpoint, openAIKey, openAIChatDeploymentName, openAISystemPrompt) {
+  constructor(openAIKey, openAIOrganization, openAIModelName, openAISystemPrompt) {
     this.openAISystemPrompt = openAISystemPrompt;
-    this.openAIChatDeploymentName = openAIChatDeploymentName;
-    this.client = new OpenAIClient(openAIEndpoint, new AzureKeyCredential(openAIKey));
+    this.openAIModelName = openAIModelName;
+    this.client = new OpenAI({
+      apiKey: openAIKey,
+      organization: openAIOrganization,
+    });
+    
     this.clearConversation();
   }
 
@@ -18,13 +22,17 @@ class OpenAIChatCompletionsStreamingClass {
     this.messages.push({ role: 'user', content: userInput });
 
     let contentComplete = '';
-    const events = await this.client.streamChatCompletions(this.openAIChatDeploymentName, this.messages);
+    const events = await this.client.chat.completions.create({
+      model: this.openAIModelName,
+      messages: this.messages,
+      stream: true
+    });
 
     for await (const event of events) {
       for (const choice of event.choices) {
 
         let content = choice.delta?.content;
-        if (choice.finishReason === 'length') {
+        if (choice.finish_reason === 'length') {
           content = `${content}\nERROR: Exceeded token limit!`;
         }
 

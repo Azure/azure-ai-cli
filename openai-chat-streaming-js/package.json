@@ -4,12 +4,12 @@
     "description": "",
     "main": "Main.js",
     "scripts": {
-      "test": "echo \"Error: no test specified\" && exit 1"
+        "test": "echo \"Error: no test specified\" && exit 1"
     },
     "author": "",
     "license": "MIT",
     "dependencies": {
-      "@azure/openai": "1.0.0-beta.10"
+        "@azure/openai": "1.0.0-beta.10",
+        "openai": "^4.0.0"
     }
-  }
-  
+}

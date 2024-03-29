@@ -8,12 +8,12 @@ const rl = readline.createInterface({
 
 async function main() {
 
-  const openAIEndpoint = process.env["AZURE_OPENAI_ENDPOINT"] || "<insert your OpenAI endpoint here>";
-  const openAIKey = process.env["AZURE_OPENAI_KEY"] || "<insert your OpenAI API key here>";
-  const openAIChatDeploymentName = process.env["AZURE_OPENAI_CHAT_DEPLOYMENT"] || "<insert your OpenAI chat deployment name here>" ;
-  const openAISystemPrompt = process.env["AZURE_OPENAI_SYSTEM_PROMPT"] || "You are a helpful AI assistant." ;
+  const openAIKey = "YOUR-KEY-HERE";
+  const openAIOrganization = null;
+  const openAIModel = "gpt-4-turbo-preview";
+  const openAISystemPrompt = "You are a helpful AI assistant.";
 
-  const chat = new OpenAIChatCompletionsStreamingClass(openAIEndpoint, openAIKey, openAIChatDeploymentName, openAISystemPrompt);
+  const chat = new OpenAIChatCompletionsStreamingClass(openAIKey, openAIOrganization, openAIModel, openAISystemPrompt);
 
   while (true) {
 
