@@ -117,6 +117,9 @@ namespace Azure.AI.Details.Common.CLI
             var dataFile = FileHelpers.DemandFindFileInDataPath(data, _values, "chat data");
             var lines = File.ReadAllLines(dataFile);
 
+            var parameterFile = InputChatParameterFileToken.Data().GetOrDefault(_values);
+            if (!string.IsNullOrEmpty(parameterFile)) SetValuesFromParameterFile(parameterFile);
+
             var client = CreateOpenAIClient(out var deployment);
             var options = CreateChatCompletionOptions(deployment);
             var funcContext = CreateFunctionFactoryAndCallContext(options);
@@ -440,6 +443,9 @@ namespace Azure.AI.Details.Common.CLI
             var kernel = CreateSemanticKernel(out var acsIndex);
             if (kernel != null && doSK) await StoreMemoryAsync(kernel, acsIndex);
 
+            var parameterFile = InputChatParameterFileToken.Data().GetOrDefault(_values);
+            if (!string.IsNullOrEmpty(parameterFile)) SetValuesFromParameterFile(parameterFile);
+
             var client = CreateOpenAIClient(out var deployment);
             var options = CreateChatCompletionOptions(deployment);
             var funcContext = CreateFunctionFactoryAndCallContext(options);
@@ -691,16 +697,14 @@ namespace Azure.AI.Details.Common.CLI
 
             var textFile = _values["chat.message.history.text.file"];
             var jsonFile = InputChatHistoryJsonFileToken.Data().GetOrDefault(_values);
-            var parameterFile = InputChatParameterFileToken.Data().GetOrDefault(_values);
 
-            if(!string.IsNullOrEmpty(jsonFile) && !string.IsNullOrEmpty(textFile) && !string.IsNullOrEmpty(parameterFile))
+            if(!string.IsNullOrEmpty(jsonFile) && !string.IsNullOrEmpty(textFile))
             {
                 _values.AddThrowError("chat.message.history.text.file", "chat.message.history.json.file", "Only one of these options can be specified");
             }
 
             if (!string.IsNullOrEmpty(jsonFile)) options.ReadChatHistoryFromFile(jsonFile);
             if (!string.IsNullOrEmpty(textFile)) AddChatMessagesFromTextFile(options.Messages, textFile);
-            if (!string.IsNullOrEmpty(parameterFile)) SetValuesFromParameterFile(parameterFile);
 
             var maxTokens = _values["chat.options.max.tokens"];
             var temperature = _values["chat.options.temperature"];
@@ -967,7 +971,7 @@ namespace Azure.AI.Details.Common.CLI
             var text = FileHelpers.ReadAllText(existing, Encoding.Default);
             string[] sections = text.Split("---\n");
             var deserializer = new DeserializerBuilder()
-                .WithNamingConvention(CamelCaseNamingConvention.Instance)
+                .WithNamingConvention(UnderscoredNamingConvention.Instance)
                 .Build();
 
             if (sections.Length > 2)
@@ -981,17 +985,58 @@ namespace Azure.AI.Details.Common.CLI
                 {
                     // default assumption for templating language is jinja2
                     case "jinja2":
-                    default:
+                    case "":
                         parsedText = ParseJinja(chatTemplate, templateInputs);
                         break;
+                    default:
+                        parsedText = "";
+                        _values.AddThrowError("ERROR:", $"parsing {parameterFile}; {obj.Template} parser not implemented.");
+                        break;
                 }
-                Console.WriteLine(parsedText);
+                if (!String.IsNullOrEmpty(parsedText))
+                {
+                    // set values
+
+                    if (!string.IsNullOrEmpty(obj.Model.AzureDeployment)) ConfigDeploymentToken.Data().Set(_values, obj.Model.AzureDeployment);
+                    if (!string.IsNullOrEmpty(obj.Model.AzureEndpoint)) ConfigEndpointUriToken.Data().Set(_values, obj.Model.AzureEndpoint);
+                    string systemPrompt = "";
+                    string[] separators = { "\n", "\r\n"};
+                    var textlines = parsedText.Split(separators, StringSplitOptions.None);
+                    if (textlines[0].ToLower().Equals("system:"))
+                    {
+                        parsedText = "";
+                        var systemPromptEnded = false;
+                        foreach (var line in textlines[1..])
+                        {
+                            if (string.IsNullOrEmpty(line)) systemPromptEnded = true;
+                            if (systemPromptEnded)
+                            {
+                                parsedText += $"{line}\n";
+                            }
+                            else
+                            {
+                                systemPrompt += $"{line}\n";
+                            }
+                        };
+                        if (!string.IsNullOrEmpty(systemPrompt)) _values.Reset("chat.message.system.prompt", systemPrompt);
+                    }
+                    if (!string.IsNullOrEmpty(parsedText)) _values.Reset("chat.message.user.prompt", parsedText);
+
+                    if (obj.Parameters != null)
+                    {
+                        var modelParams = obj.Parameters;
+                        if (modelParams.Temperature != 0) _values.Reset("chat.options.temperature", modelParams.Temperature.ToString());
+                        if (modelParams.MaxTokens != 0) _values.Reset("chat.options.max.tokens", modelParams.MaxTokens.ToString());
+                        if (modelParams.FrequencyPenalty != 0) _values.Reset("chat.options.frequency.penalty", modelParams.FrequencyPenalty.ToString());
+                        if (modelParams.PresencePenalty != 0) _values.Reset("chat.options.presence.penalty", modelParams.PresencePenalty.ToString());
+                        if (modelParams.Stop != null) _values.Reset("chat.options.stop.sequence", modelParams.Stop.ToString());
+                    }
+                }
             }
             else
             { 
                 _values.AddThrowError("ERROR:", $"parsing {parameterFile}; unable to parse, incorrect yaml format.");
             }
-            //TODO: parse parameter file (prompty format) and set values accordingly
         }
 
         private string ParseJinja(string chatTemplate, Dictionary<string, object> inputs)
