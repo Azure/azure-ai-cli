@@ -10,3 +10,6 @@ ideas/website/node_modules/**
 testresults/**
 **/launchSettings.json
 *.user
+openai-webpage-js/node_modules/**
+openai-webpage-js/package-lock.json
+openai-webpage-js/dist/main.js
