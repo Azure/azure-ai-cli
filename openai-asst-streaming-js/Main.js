@@ -11,10 +11,15 @@ async function main() {
   const openAIKey = "YOUR-KEY-HERE";
   const openAIOrganization = null;
   const openAIAssistantId = "asst_W6RbXQnkqkmSMWT0QYzA88hH";
-  const openAIAssistantThreadId = null;
+  const openAIAssistantThreadId = process.argv[2] || null;
 
   const assistant = new OpenAIAssistantsStreamingClass(openAIKey, openAIOrganization, openAIAssistantId);
-  assistant.getOrCreateThread(openAIAssistantThreadId);
+  await assistant.getOrCreateThread(openAIAssistantThreadId);
+
+  await assistant.getThreadMessages((role, content) => {
+    role = role.charAt(0).toUpperCase() + role.slice(1);
+    process.stdout.write(`${role}: ${content}`);
+  });
 
   while (true) {
 
@@ -29,7 +34,7 @@ async function main() {
     process.stdout.write('\n\n');
   }
 
-  console.log('Bye!');
+  console.log(`Bye! (threadId: ${assistant.thread.id})`);
   process.exit();
 }
 

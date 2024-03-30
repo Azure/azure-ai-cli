@@ -17,6 +17,17 @@ class OpenAIAssistantsStreamingClass {
     return this.thread;
   }
 
+  async getThreadMessages(callback) {
+
+    const messages = await this.openai.beta.threads.messages.list(this.thread.id);
+    messages.data.reverse();
+
+    for (const message of messages.data) {
+      let content = message.content.map(item => item.text.value).join('') + '\n\n';
+      callback(message.role, content);
+    }
+  }
+
   async getResponse(userInput, callback) {
 
     if (this.thread == null) {
