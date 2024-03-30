@@ -1,4 +1,4 @@
-const { OpenAIChatCompletionsStreamingClass } = require("./OpenAIChatCompletionsStreamingClass");
+const { OpenAIAssistantsStreamingClass } = require("./OpenAIAssistantsStreamingClass");
 
 const readline = require('readline');
 const rl = readline.createInterface({
@@ -10,10 +10,11 @@ async function main() {
 
   const openAIKey = "YOUR-KEY-HERE";
   const openAIOrganization = null;
-  const openAIModel = "gpt-4-turbo-preview";
-  const openAISystemPrompt = "You are a helpful AI assistant.";
+  const openAIAssistantId = "asst_W6RbXQnkqkmSMWT0QYzA88hH";
+  const openAIAssistantThreadId = null;
 
-  const chat = new OpenAIChatCompletionsStreamingClass(openAIKey, openAIOrganization, openAIModel, openAISystemPrompt);
+  const assistant = new OpenAIAssistantsStreamingClass(openAIKey, openAIOrganization, openAIAssistantId);
+  assistant.getOrCreateThread(openAIAssistantThreadId);
 
   while (true) {
 
@@ -21,7 +22,7 @@ async function main() {
     if (input === 'exit' || input === '') break;
 
     process.stdout.write('\nAssistant: ');
-    await chat.getResponse(input, (content) => {
+    await assistant.getResponse(input, (content) => {
       process.stdout.write(content);
     });
 
