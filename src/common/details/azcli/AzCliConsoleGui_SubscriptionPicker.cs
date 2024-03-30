@@ -45,30 +45,33 @@ namespace Azure.AI.Details.Common.CLI
 
         public static async Task<AzCli.SubscriptionInfo?> ValidateSubscriptionAsync(bool allowInteractiveLogin, string subscriptionId)
         {
-            string prefix = "  Subscription: ";
-            Console.Write($"{prefix}*** Validating ***");
+            var getSubscription = () => Program.SubscriptionClient.GetSubscriptionAsync(subscriptionId, Program.CancelToken);
+            var result = await LoginHelpers.GetResponseOnLogin(Program.LoginManager, getSubscription, Program.CancelToken, "  SUBSCRIPTION", "*** Validating ***");
 
-            AzCli.SubscriptionInfo? subscription = (await Program.SubscriptionClient.GetSubscriptionAsync(subscriptionId, Program.CancelToken))
-                .Value;
+            AzCli.SubscriptionInfo? subscription = result.Value;
 
             bool found = subscription != null;
             if (found)
             {
-                Console.WriteLine($"{prefix}{subscription?.Name} ({subscription?.Id})");
+                Console.WriteLine($"{subscription?.Name} ({subscription?.Id})");
                 CacheSubscriptionUserName(subscription.Value);
                 return subscription;
             }
             else
             {
-                ConsoleHelpers.WriteLineWithHighlight($"{prefix}`#e_;WARNING: Could not find subscription {subscriptionId}!`");
+                ConsoleHelpers.WriteLineWithHighlight($"`#e_;WARNING: Could not find subscription {subscriptionId}!`");
+                Console.WriteLine();
                 return null;
             }
         }
 
         private static async Task<AzCli.SubscriptionInfo?> FindSubscriptionAsync(bool allowInteractiveLogin, bool allowInteractivePickSubscription, string subscriptionFilter = null, string subscriptionLabel = "Subscription")
         {
-            Console.Write($"\r{subscriptionLabel}: *** Loading choices ***");
-            var subsResult = await Program.SubscriptionClient.GetAllSubscriptionsAsync(Program.CancelToken);
+            var subsResult = await LoginHelpers.GetResponseOnLogin(
+                Program.LoginManager,
+                () => Program.SubscriptionClient.GetAllSubscriptionsAsync(Program.CancelToken),
+                Program.CancelToken,
+                subscriptionLabel);
 
             if (subsResult.IsError)
             {
@@ -78,7 +81,7 @@ namespace Azure.AI.Details.Common.CLI
                 }
                 else
                 {
-                    subsResult.ThrowOnFail();
+                    subsResult.ThrowOnFail("Loading subscriptions");
                 }
             }
 

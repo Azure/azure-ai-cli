@@ -43,7 +43,7 @@ namespace Azure.AI.Details.Common.CLI
             string embeddingsModelFilter = null,
             string evaluationsModelFilter = null)
         {
-            kinds ??= "OpenAI;AIServices";
+            kinds ??= "AIServices;OpenAI";
             var sectionHeader = "AZURE OPENAI RESOURCE";
 
             var regionLocation = !string.IsNullOrEmpty(regionFilter) ? await AzCliConsoleGui.PickRegionLocationAsync(interactive, subscriptionId, regionFilter) : new AzCli.AccountRegionLocationInfo();

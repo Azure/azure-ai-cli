@@ -12,9 +12,9 @@ namespace Azure.AI.CLI.Clients.AzPython
     /// <summary>
     /// A client for Azure subscriptions that uses the AZ CLI
     /// </summary>
-    public class AzCliClient : LoginHelpers, ISubscriptionsClient, ICognitiveServicesClient, ISearchClient
+    public class AzCliClient : ISubscriptionsClient, ICognitiveServicesClient, ISearchClient
     {
-        private static readonly System.Text.Json.JsonSerializerOptions JSON_OPTIONS = new System.Text.Json.JsonSerializerOptions()
+        private static readonly JsonSerializerOptions JSON_OPTIONS = new JsonSerializerOptions()
         {
             NumberHandling = JsonNumberHandling.AllowReadingFromString | JsonNumberHandling.AllowNamedFloatingPointLiterals,
             PropertyNameCaseInsensitive = true,
@@ -37,23 +37,16 @@ namespace Azure.AI.CLI.Clients.AzPython
         /// <summary>
         /// Creates a new instance
         /// </summary>
-        /// <param name="loginManager">The instance to use for logging in to Azure</param>
-        /// <param name="getIsInteractive">Used to retrieve whether or not we are running interactive</param>
         /// <param name="userAgent">The user agent string to add to all HTTP/HTTPS requests</param>
-        public AzCliClient(ILoginManager loginManager, Func<bool> getIsInteractive, string? userAgent)
-            : base(loginManager, getIsInteractive)
+        public AzCliClient(IDictionary<string, string>? cliEnvironmentVariables = null)
         {
-            _cliEnv = new Dictionary<string, string>();
-            if (!string.IsNullOrWhiteSpace(userAgent))
-            {
-                _cliEnv["AZURE_HTTP_USER_AGENT"] = userAgent;
-            }
+            _cliEnv = cliEnvironmentVariables ?? new Dictionary<string, string>();
         }
 
         /// <inheritdoc />
         public Task<ClientResult<SubscriptionInfo[]>> GetAllSubscriptionsAsync(CancellationToken token)
         {
-            return RunOrLoginArrayAsync<SubscriptionInfo>(
+            return ParseArrayAsync<SubscriptionInfo>(
                 () => ProcessHelpers.RunShellCommandAsync(
                     "az",
                     "account list"
@@ -71,14 +64,12 @@ namespace Azure.AI.CLI.Clients.AzPython
             {
                 ValidateString(subscriptionId, nameof(subscriptionId));
 
-                var cmdOut = await GetResponseOnLogin(
-                    () => ProcessHelpers.RunShellCommandAsync(
+                var cmdOut = await ProcessHelpers.RunShellCommandAsync(
                         "az",
                         $"account show"
                         + $" --subscription {subscriptionId}"
                         + $" --output json",
-                        _cliEnv),
-                    token);
+                        _cliEnv);
                 if (cmdOut.HasError)
                 {
                     // special case: check if the error indicates the subscription does not exist
@@ -111,7 +102,7 @@ namespace Azure.AI.CLI.Clients.AzPython
                 // 2 step process, first see the regions where we can have OpenAI resources, and query for all possible regions
                 // and filter that list. The second call is needed to get more details about the regions
 
-                var csRegionsOutput = await RunOrLoginArrayAsync<string>(
+                var csRegionsOutput = await ParseArrayAsync<string>(
                     () => ProcessHelpers.RunShellCommandAsync(
                         "az",
                         $"cognitiveservices account list-skus" +
@@ -137,7 +128,7 @@ namespace Azure.AI.CLI.Clients.AzPython
                     csRegionsOutput.Value ?? Array.Empty<string>(),
                     StringComparer.OrdinalIgnoreCase);
 
-                var allRegionsOutput = await RunOrLoginArrayAsync<AccountRegionLocationInfo>(
+                var allRegionsOutput = await ParseArrayAsync<AccountRegionLocationInfo>(
                     () => ProcessHelpers.RunShellCommandAsync(
                         "az",
                         "account list-locations" +
@@ -163,7 +154,7 @@ namespace Azure.AI.CLI.Clients.AzPython
         /// <inheritdoc />
         public Task<ClientResult<ResourceGroupInfo[]>> GetAllResourceGroupsAsync(string subscriptionId, CancellationToken token)
         {
-            return RunOrLoginArrayAsync<ResourceGroupInfo>(
+            return ParseArrayAsync<ResourceGroupInfo>(
                 () =>
                 {
                     ValidateString(subscriptionId, nameof(subscriptionId));
@@ -182,7 +173,7 @@ namespace Azure.AI.CLI.Clients.AzPython
         public Task<ClientResult<ResourceGroupInfo>> CreateResourceGroupAsync(
             string subscriptionId, string regionName, string name, CancellationToken token)
         {
-            return RunOrLoginAsync<ResourceGroupInfo>(
+            return ParseAsync<ResourceGroupInfo>(
                 () =>
                 {
                     ValidateString(subscriptionId, nameof(subscriptionId));
@@ -204,7 +195,7 @@ namespace Azure.AI.CLI.Clients.AzPython
         /// <inheritdoc />
         public  Task<ClientResult> DeleteResourceGroupAsync(string subscriptionId, string resourceGroup, CancellationToken token)
         {
-            return RunOrLoginAsync(
+            return ParseAsync(
                 () =>
                 {
                     ValidateString(subscriptionId, nameof(subscriptionId));
@@ -226,7 +217,7 @@ namespace Azure.AI.CLI.Clients.AzPython
         public Task<ClientResult<CognitiveServicesResourceInfo[]>> GetAllResourcesAsync(
             string subscriptionId, CancellationToken token, ResourceKind? filter = null)
         {
-            return RunOrLoginArrayAsync<CognitiveServicesResourceInfo>(
+            return ParseArrayAsync<CognitiveServicesResourceInfo>(
                 () =>
                 {
                     ValidateString(subscriptionId, nameof(subscriptionId));
@@ -268,16 +259,14 @@ namespace Azure.AI.CLI.Clients.AzPython
                 ValidateString(resourceGroup, nameof(resourceGroup));
                 ValidateString(name, nameof(name));
 
-                var cmdOut = await GetResponseOnLogin(
-                    () => ProcessHelpers.RunShellCommandAsync(
-                        "az",
-                        $"cognitiveservices account show" +
-                        $" --output json" +
-                        $" --subscription {subscriptionId}" +
-                        $" -g {resourceGroup}" +
-                        $" -n {name}",
-                        _cliEnv),
-                    token);
+                var cmdOut = await ProcessHelpers.RunShellCommandAsync(
+                    "az",
+                    $"cognitiveservices account show" +
+                    $" --output json" +
+                    $" --subscription {subscriptionId}" +
+                    $" -g {resourceGroup}" +
+                    $" -n {name}",
+                    _cliEnv);
                 if (cmdOut.HasError)
                 {
                     // special case: check if the error indicates the subscription does not exist
@@ -304,7 +293,7 @@ namespace Azure.AI.CLI.Clients.AzPython
         public Task<ClientResult<CognitiveServicesResourceInfo>> CreateResourceAsync(
             ResourceKind kind, string subscriptionId, string resourceGroup, string region, string name, string sku, CancellationToken token)
         {
-            return RunOrLoginAsync<CognitiveServicesResourceInfo>(
+            return ParseAsync<CognitiveServicesResourceInfo>(
                 () =>
                 {
                     if (!IsCognitiveServicesResourceKind(kind))
@@ -337,7 +326,7 @@ namespace Azure.AI.CLI.Clients.AzPython
         /// <inheritdoc />
         public Task<ClientResult> DeleteResourceAsync(string subscriptionId, string resourceGroup, string resourceName, CancellationToken token)
         {
-            return RunOrLoginAsync(
+            return ParseAsync(
                 () =>
                 {
                     ValidateString(subscriptionId, nameof(subscriptionId));
@@ -360,7 +349,7 @@ namespace Azure.AI.CLI.Clients.AzPython
         public Task<ClientResult<CognitiveServicesDeploymentInfo[]>> GetAllDeploymentsAsync(
             string subscriptionId, string resourceGroup, string resourceName, CancellationToken token)
         {
-            return RunOrLoginArrayAsync<CognitiveServicesDeploymentInfo>(
+            return ParseArrayAsync<CognitiveServicesDeploymentInfo>(
                 () =>
                 {
                     ValidateString(subscriptionId, nameof(subscriptionId));
@@ -383,7 +372,7 @@ namespace Azure.AI.CLI.Clients.AzPython
         public Task<ClientResult<CognitiveServicesModelInfo[]>> GetAllModelsAsync(
             string subscriptionId, string regionName, CancellationToken token)
         {
-            return RunOrLoginArrayAsync<CognitiveServicesModelInfo>(
+            return ParseArrayAsync<CognitiveServicesModelInfo>(
                 () =>
                 {
                     ValidateString(subscriptionId, nameof(subscriptionId));
@@ -404,7 +393,7 @@ namespace Azure.AI.CLI.Clients.AzPython
         public Task<ClientResult<CognitiveServicesUsageInfo[]>> GetAllModelUsageAsync(
             string subscriptionId, string regionName, CancellationToken token)
         {
-            return RunOrLoginArrayAsync<CognitiveServicesUsageInfo>(
+            return ParseArrayAsync<CognitiveServicesUsageInfo>(
                 () =>
                 {
                     ValidateString(subscriptionId, nameof(subscriptionId));
@@ -427,7 +416,7 @@ namespace Azure.AI.CLI.Clients.AzPython
             string deploymentName, string modelName, string modelVersion,
             string modelFormat, string scaleCapacity, CancellationToken token)
         {
-            return RunOrLoginAsync<CognitiveServicesDeploymentInfo>(
+            return ParseAsync<CognitiveServicesDeploymentInfo>(
                 () =>
                 {
                     ValidateString(subscriptionId, nameof(subscriptionId));
@@ -459,7 +448,7 @@ namespace Azure.AI.CLI.Clients.AzPython
 
         public Task<ClientResult> DeleteDeploymentAsync(string subscriptionId, string resourceGroup, string resourceName, string deploymentName, CancellationToken token)
         {
-            return RunOrLoginAsync(
+            return ParseAsync(
                 () =>
                 {
                     ValidateString(subscriptionId, nameof(subscriptionId));
@@ -484,7 +473,7 @@ namespace Azure.AI.CLI.Clients.AzPython
         public Task<ClientResult<(string, string?)>> GetResourceKeysFromNameAsync(
             string subscriptionId, string resourceGroup, string resourceName, CancellationToken token)
         {
-            return RunOrLoginAsync(
+            return ParseAsync(
                 () =>
                 {
                     ValidateString(subscriptionId, nameof(subscriptionId));
@@ -515,7 +504,7 @@ namespace Azure.AI.CLI.Clients.AzPython
         Task<ClientResult<CognitiveSearchResourceInfo[]>> ISearchClient.GetAllAsync(
             string subscriptionId, string? regionName, CancellationToken token)
         {
-            return RunOrLoginArrayAsync<CognitiveSearchResourceInfo>(
+            return ParseArrayAsync<CognitiveSearchResourceInfo>(
                 () =>
                 {
                     ValidateString(subscriptionId, nameof(subscriptionId));
@@ -541,16 +530,14 @@ namespace Azure.AI.CLI.Clients.AzPython
                 ValidateString(resourceGroup, nameof(resourceGroup));
                 ValidateString(name, nameof(name));
 
-                var cmdOut = await GetResponseOnLogin(
-                    () => ProcessHelpers.RunShellCommandAsync(
-                        "az",
-                        $"search service show" +
-                        $" --output json" +
-                        $" --subscription {subscriptionId}" +
-                        $" -g {resourceGroup}" +
-                        $" -n {name}",
-                        _cliEnv),
-                    token);
+                var cmdOut = await ProcessHelpers.RunShellCommandAsync(
+                    "az",
+                    $"search service show" +
+                    $" --output json" +
+                    $" --subscription {subscriptionId}" +
+                    $" -g {resourceGroup}" +
+                    $" -n {name}",
+                        _cliEnv);
                 if (cmdOut.HasError)
                 {
                     // special case: check if the error indicates the subscription does not exist
@@ -576,7 +563,7 @@ namespace Azure.AI.CLI.Clients.AzPython
         Task<ClientResult<CognitiveSearchResourceInfo>> ISearchClient.CreateAsync(
             string subscriptionId, string resourceGroup, string regionName, string name, CancellationToken token)
         {
-            return RunOrLoginAsync<CognitiveSearchResourceInfo>(
+            return ParseAsync<CognitiveSearchResourceInfo>(
                 () =>
                 {
                     ValidateString(subscriptionId, nameof(subscriptionId));
@@ -600,22 +587,22 @@ namespace Azure.AI.CLI.Clients.AzPython
 
         Task<ClientResult> ISearchClient.DeleteAsync(string subscriptionId, string resourceGroup, string resourceName, CancellationToken token)
         {
-            return RunOrLoginAsync(
-            () =>
-            {
-                ValidateString(subscriptionId, nameof(subscriptionId));
-                ValidateString(resourceGroup, nameof(resourceGroup));
-                ValidateString(resourceName, nameof(resourceName));
+            return ParseAsync(
+                () =>
+                {
+                    ValidateString(subscriptionId, nameof(subscriptionId));
+                    ValidateString(resourceGroup, nameof(resourceGroup));
+                    ValidateString(resourceName, nameof(resourceName));
 
-                return ProcessHelpers.RunShellCommandAsync(
-                    "az",
-                    $"search service delete" +
-                    $" --output json" +
-                    $" --subscription {subscriptionId}" +
-                    $" -g {resourceGroup}" +
-                    $" -n {resourceName}" +
-                    $" --yes",
-                    _cliEnv);
+                    return ProcessHelpers.RunShellCommandAsync(
+                        "az",
+                        $"search service delete" +
+                        $" --output json" +
+                        $" --subscription {subscriptionId}" +
+                        $" -g {resourceGroup}" +
+                        $" -n {resourceName}" +
+                        $" --yes",
+                        _cliEnv);
                 },
                 token);
         }
@@ -623,7 +610,7 @@ namespace Azure.AI.CLI.Clients.AzPython
         Task<ClientResult<(string, string?)>> ISearchClient.GetKeysAsync(
             string subscriptionId, string resourceGroup, string name, CancellationToken token)
         {
-            return RunOrLoginAsync(
+            return ParseAsync(
                 () =>
                 {
                     ValidateString(subscriptionId, nameof(subscriptionId));
@@ -689,32 +676,32 @@ namespace Azure.AI.CLI.Clients.AzPython
             return JsonSerializer.Deserialize<TValue>(json, options);
         }
 
-        private Task<ClientResult<TValue[]>> RunOrLoginArrayAsync<TValue>(
+        private Task<ClientResult<TValue[]>> ParseArrayAsync<TValue>(
             Func<Task<ProcessOutput>> func,
             CancellationToken token,
             Func<TValue[]>? @default = null)
         {
             @default ??= Array.Empty<TValue>;
 
-            return RunOrLoginAsync(
+            return ParseAsync(
                 func,
                 DeserializeJson<TValue[]>,
                 @default,
                 token);
         }
 
-        private Task<ClientResult<TValue>> RunOrLoginAsync<TValue>(
+        private Task<ClientResult<TValue>> ParseAsync<TValue>(
             Func<Task<ProcessOutput>> func,
             CancellationToken token)
         {
-            return RunOrLoginAsync(
+            return ParseAsync(
                 func,
                 DeserializeJson<TValue>,
                 () => default!,
                 token);
         }
 
-        private async Task<ClientResult<TValue>> RunOrLoginAsync<TValue>(
+        private async Task<ClientResult<TValue>> ParseAsync<TValue>(
             Func<Task<ProcessOutput>> func,
             Func<string?, TValue?> conv,
             Func<TValue> @default,
@@ -722,7 +709,7 @@ namespace Azure.AI.CLI.Clients.AzPython
         {
             try
             {
-                ProcessOutput cmdOut = await GetResponseOnLogin(func, token);
+                ProcessOutput cmdOut = await func();
                 if (cmdOut.HasError)
                 {
                     return ClientResult.From(cmdOut, @default());
@@ -738,13 +725,13 @@ namespace Azure.AI.CLI.Clients.AzPython
             }
         }
 
-        private async Task<ClientResult> RunOrLoginAsync(
+        private async Task<ClientResult> ParseAsync(
             Func<Task<ProcessOutput>> func,
             CancellationToken token)
         {
             try
             {
-                ProcessOutput cmdOut = await GetResponseOnLogin(func, token);
+                ProcessOutput cmdOut = await func();
                 return ClientResult.From(cmdOut);
             }
             catch (Exception ex)

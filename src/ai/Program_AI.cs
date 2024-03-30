@@ -90,12 +90,13 @@ namespace Azure.AI.Details.Common.CLI
                 () => TelemetryHelpers.InstantiateFromConfig(this),
                 System.Threading.LazyThreadSafetyMode.ExecutionAndPublication);
 
-            LoginManager = new AzConsoleLoginManager(TelemetryUserAgent);
-            var azCliClient = new AzCliClient(
-                LoginManager,
-                () => Values?.GetOrDefault("init.service.interactive", true) ?? true,
-                TelemetryUserAgent);
+            var environmentVariables = LegacyAzCli.GetUserAgentEnv();
 
+            LoginManager = new AzConsoleLoginManager(
+                () => Values?.GetOrDefault("init.service.interactive", true) ?? true,
+                environmentVariables);
+            
+            var azCliClient = new AzCliClient(environmentVariables);
             SubscriptionsClient = azCliClient;
             CognitiveServicesClient = azCliClient;
             SearchClient = azCliClient;

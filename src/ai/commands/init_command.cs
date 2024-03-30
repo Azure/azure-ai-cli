@@ -187,18 +187,19 @@ namespace Azure.AI.Details.Common.CLI
 
             ConsoleHelpers.WriteLineWithHighlight("\n  `ATTACHED SERVICES AND RESOURCES`\n");
 
-            var message = "    Validating...";
-            Console.Write(message);
+            string indent = "    ";
+            using var cw = new ConsoleTempWriter($"{indent}Validating...");
 
             var (hubName, openai, search) = await AiSdkConsoleGui.VerifyResourceConnections(_values, validated?.Id, groupName, projectName);
             if (openai != null && search != null)
             {
-                Console.Write($"\r{new string(' ', message.Length)}\r");
                 return (hubName, openai, search);
             }
             else
             {
-                ConsoleHelpers.WriteLineWithHighlight($"\r{message} `#e_;WARNING: Configuration could not be validated!`");
+                cw.Clear();
+                Console.Write(indent);
+                ConsoleHelpers.WriteLineWithHighlight($"`#e_;WARNING: Configuration could not be validated!`");
                 Console.WriteLine();
                 return (null, null, null);
             }
@@ -536,7 +537,7 @@ namespace Azure.AI.Details.Common.CLI
             var regionFilter = _values.GetOrDefault("init.service.resource.region.name", "");
             var groupFilter = _values.GetOrDefault("init.service.resource.group.name", "");
             var resourceFilter = _values.GetOrDefault("init.service.cognitiveservices.resource.name", "");
-            var kind = _values.GetOrDefault("init.service.cognitiveservices.resource.kind", "OpenAI;AIServices");
+            var kind = _values.GetOrDefault("init.service.cognitiveservices.resource.kind", "AIServices;OpenAI");
             var sku = _values.GetOrDefault("init.service.cognitiveservices.resource.sku", Program.CognitiveServiceResourceSku);
             var yes = _values.GetOrDefault("init.service.cognitiveservices.terms.agree", false);
 

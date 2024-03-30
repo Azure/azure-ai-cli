@@ -163,27 +163,24 @@ namespace Azure.AI.CLI.Common.Clients.Models
             || Exception != null
             || !string.IsNullOrWhiteSpace(ErrorDetails);
 
+        internal static Exception GenerateException(ClientOutcome outcome, string? message = null, string? errorDetails = null, Exception? ex = null)
+            => outcome switch
+            {
+                ClientOutcome.Canceled => new OperationCanceledException(CreateExceptionMessage("CANCELED", message, errorDetails), ex),
+                ClientOutcome.Failed or ClientOutcome.Unknown => new ApplicationException(CreateExceptionMessage("FAILED", message, errorDetails), ex),
+                ClientOutcome.LoginNeeded => new ApplicationException(CreateExceptionMessage("LOGIN REQUIRED", message, errorDetails), ex),
+                ClientOutcome.TimedOut => new TimeoutException(CreateExceptionMessage("TIMED OUT", message, errorDetails), ex),
+                _ => new ApplicationException(CreateExceptionMessage("FAILED", message, errorDetails), ex),
+            };
+
         internal static void ThrowOnFail(ClientOutcome outcome, string? message, string? errorDetails, Exception? ex)
         {
-            switch (outcome)
+            if (ClientOutcome.Success == outcome)
             {
-                case ClientOutcome.Canceled:
-                    throw new OperationCanceledException(CreateExceptionMessage("CANCELED", message, errorDetails), ex);
-
-                case ClientOutcome.Failed:
-                case ClientOutcome.Unknown:
-                    throw new ApplicationException(CreateExceptionMessage("FAILED", message, errorDetails), ex);
-
-                case ClientOutcome.LoginNeeded:
-                    throw new ApplicationException(CreateExceptionMessage("LOGIN REQUIRED", message, errorDetails), ex);
-
-                case ClientOutcome.Success:
-                    // nothing to do
-                    return;
-
-                case ClientOutcome.TimedOut:
-                    throw new TimeoutException(CreateExceptionMessage("TIMED OUT", message, errorDetails), ex);
+                return;
             }
+
+            throw GenerateException(outcome, message, errorDetails, ex);
         }
 
         private static string CreateExceptionMessage(string typeStr, string? messageStr, string? detailsStr)
@@ -239,27 +236,45 @@ namespace Azure.AI.CLI.Common.Clients.Models
 
         internal static ClientResult From(ProcessOutput output)
         {
-            bool hasError = output.HasError;
+            ClientOutcome outcome = ClientOutcome.Success;
+            if (HasLoginError(output.StdError))
+            {
+                outcome = ClientOutcome.LoginNeeded;
+            }
+            else if (output.HasError)
+            {
+                outcome = ClientOutcome.Failed;
+            }
+
             return new ClientResult
             {
                 ErrorDetails = string.IsNullOrWhiteSpace(output.StdError) ? null : output.StdError,
-                Exception = hasError
+                Exception = outcome != ClientOutcome.Success
                     ? new ApplicationException($"Process failed with exit code {output.ExitCode}. Details: {output.StdError}")
                     : null,
-                Outcome = hasError ? ClientOutcome.Failed : ClientOutcome.Success,
+                Outcome = outcome,
             };
         }
 
         internal static ClientResult<TValue> From<TValue>(ProcessOutput output, TValue value)
         {
-            bool hasError = output.HasError;
+            ClientOutcome outcome = ClientOutcome.Success;
+            if (HasLoginError(output.StdError))
+            {
+                outcome = ClientOutcome.LoginNeeded;
+            }
+            else if (output.HasError)
+            {
+                outcome = ClientOutcome.Failed;
+            }
+
             return new ClientResult<TValue>
             {
                 ErrorDetails = string.IsNullOrWhiteSpace(output.StdError) ? null : output.StdError,
-                Exception = hasError
+                Exception = outcome != ClientOutcome.Success
                     ? new ApplicationException($"Process failed with exit code {output.ExitCode}. Details: {output.StdError}")
                     : null,
-                Outcome = hasError ? ClientOutcome.Failed : ClientOutcome.Success,
+                Outcome = outcome,
                 Value = value
             };
         }
@@ -290,6 +305,10 @@ namespace Azure.AI.CLI.Common.Clients.Models
                 ErrorDetails = ex.Message,
                 Value = result
             };
+
+        private static bool HasLoginError(string? errorMessage)
+            => errorMessage != null
+                && (errorMessage.Split('\'', '"').Contains("az login") || errorMessage.Contains("refresh token"));
     }
 
     #endregion

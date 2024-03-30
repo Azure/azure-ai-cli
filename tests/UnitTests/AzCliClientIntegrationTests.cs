@@ -835,11 +835,15 @@ namespace Azure.AI.CLI.Test.UnitTests
 
         #region helper methods and classes
 
-            private AzCliClient CreateClient()
+        private AzCliClient CreateClient()
         {
-            string userAgent = "ai-integration-tests";
-            var login = new AzConsoleLoginManager(userAgent);
-            return new AzCliClient(login, () => false, userAgent);
+            var environmentVariables = new Dictionary<string, string>()
+            {
+                { "AZURE_HTTP_USER_AGENT", "ai-integration-tests" },
+                // TODO add HTTP_PROXY, HTTPS_PROXY, and REQUESTS_CA_BUNDLE to enable the use of the Test proxy at a later point
+            };
+
+            return new AzCliClient(environmentVariables);
         }
 
         private static void HasException<TException>(IClientResult result, ClientOutcome expectedOutcome = ClientOutcome.Failed)

@@ -39,9 +39,9 @@ namespace Azure.AI.Details.Common.CLI
         }
     }
 
-    public class LegacyAzCli
+    public static class LegacyAzCli
     {
-        private static Dictionary<string, string> GetUserAgentEnv()
+        public static Dictionary<string, string> GetUserAgentEnv()
         {
             var dict = new Dictionary<string, string>();
             dict.Add("AZURE_HTTP_USER_AGENT", Program.TelemetryUserAgent);

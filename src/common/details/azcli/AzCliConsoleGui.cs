@@ -39,7 +39,7 @@ namespace Azure.AI.Details.Common.CLI
             Console.Write("\rName: *** Loading choices ***");
 
             var response = await Program.SearchClient.GetAllAsync(subscription, location, Program.CancelToken);
-            response.ThrowOnFail("Listing search resources");
+            response.ThrowOnFail("Loading search resources");
 
             var resources = response.Value.OrderBy(x => x.Name).ToList();
             var choices = resources.Select(x => $"{x.Name} ({x.RegionLocation})").ToList();

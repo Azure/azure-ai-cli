@@ -26,9 +26,9 @@ namespace Azure.AI.Details.Common.CLI
 
             Console.Write("\rRegion: *** Loading choices ***");
             var allRegions = await Program.SubscriptionClient.GetAllRegionsAsync(subscriptionId, Program.CancelToken);
-            
+
             Console.Write("\rRegion: ");
-            allRegions.ThrowOnFail("reource region/locations");
+            allRegions.ThrowOnFail("resource region/locations");
 
             var regions = allRegions.Value
                 .Where(x => MatchRegionLocationFilter(x, regionFilter))
@@ -38,6 +38,7 @@ namespace Azure.AI.Details.Common.CLI
             var exactMatches = regionFilter == null
                 ? Array.Empty<AzCli.AccountRegionLocationInfo>()
                 : regions.Where(x => ExactMatchRegionLocation(x, regionFilter)).ToArray();
+            if (exactMatches.Length == 1) regions = regions.Where(x => ExactMatchRegionLocation(x, regionFilter)).ToArray();
 
             if (regions.Count() == 0)
             {
@@ -93,7 +94,7 @@ namespace Azure.AI.Details.Common.CLI
 
         static bool ExactMatchRegionLocation(AzCli.AccountRegionLocationInfo regionLocation, string regionLocationFilter)
         {
-            return regionLocation.Name.ToLower() == regionLocationFilter || regionLocation.DisplayName == regionLocationFilter || regionLocation.RegionalDisplayName == regionLocationFilter;
+            return regionLocation.Name.ToLowerInvariant() == regionLocationFilter || regionLocation.DisplayName == regionLocationFilter || regionLocation.RegionalDisplayName == regionLocationFilter;
         }
 
         private static bool MatchRegionLocationFilter(AzCli.AccountRegionLocationInfo regionLocation, string regionLocationFilter)
@@ -103,8 +104,8 @@ namespace Azure.AI.Details.Common.CLI
                 return true;
             }
 
-            var displayName = regionLocation.DisplayName.ToLower();
-            var regionalName = regionLocation.RegionalDisplayName.ToLower();
+            var displayName = regionLocation.DisplayName.ToLowerInvariant();
+            var regionalName = regionLocation.RegionalDisplayName.ToLowerInvariant();
 
             return displayName.Contains(regionLocationFilter) || StringHelpers.ContainsAllCharsInOrder(displayName, regionLocationFilter) ||
                 regionalName.Contains(regionLocationFilter) || StringHelpers.ContainsAllCharsInOrder(regionalName, regionLocationFilter);

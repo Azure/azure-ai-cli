@@ -41,7 +41,8 @@ namespace Azure.AI.Details.Common.CLI
         {
             var allowCreateDeployment = !string.IsNullOrEmpty(allowCreateDeploymentOption);
 
-            var response = await Program.CognitiveServicesClient.GetAllDeploymentsAsync(subscriptionId, groupName, resourceName, Program.CancelToken);
+            var listDeploymentsFunc = () => Program.CognitiveServicesClient.GetAllDeploymentsAsync(subscriptionId, groupName, resourceName, Program.CancelToken);
+            var response = await LoginHelpers.GetResponseOnLogin(Program.LoginManager, listDeploymentsFunc, Program.CancelToken);
             response.ThrowOnFail("Loading Cognitive Services deployments");
 
             var lookForChatCompletionCapable = deploymentExtra.ToLower() == "chat" || deploymentExtra.ToLower() == "evaluation";

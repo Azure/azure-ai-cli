@@ -1,14 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Azure.AI.Details.Common.CLI.details.console
+﻿namespace Azure.AI.Details.Common.CLI
 {
     public struct ConsoleTempWriter : IDisposable
     {
         private int _tempCount;
+
+        public ConsoleTempWriter()
+        { }
+
+        public ConsoleTempWriter(string message)
+        {
+            WriteTemp(message ?? string.Empty);
+        }
 
         public void WriteTemp(string message) => Overwrite(message, Console.Write);
 
@@ -32,7 +34,7 @@ namespace Azure.AI.Details.Common.CLI.details.console
             try
             {
                 // 1. Go back to the start of temp string (does not delete anything just moves the caret so to speak)
-                Console.WriteLine(new string('\b', _tempCount));
+                Console.Write(new string('\b', _tempCount));
 
                 // 2. Write out new message
                 writer(message);

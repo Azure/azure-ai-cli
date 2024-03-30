@@ -45,12 +45,14 @@ namespace Azure.AI.Details.Common.CLI
         {
             var allowCreateGroup = !string.IsNullOrEmpty(allowCreateGroupOption);
 
-            var allResGroups = await Program.SubscriptionClient.GetAllResourceGroupsAsync(subscription, Program.CancelToken);
-            allResGroups.ThrowOnFail("Loading resource groups");
+            var listResourcesFunc = () => Program.SubscriptionClient.GetAllResourceGroupsAsync(subscription, Program.CancelToken);
+            var response = await LoginHelpers.GetResponseOnLogin(Program.LoginManager, listResourcesFunc, Program.CancelToken, "Group");
+            response.ThrowOnFail("Loading resource groups");
 
-            var groups = allResGroups.Value
-                .Where(x => MatchGroupFilter(x, groupFilter))
-                .OrderBy(x => x.Name)
+            var groups = response.Value
+                .Where(rg => regionLocation == null || string.Equals(regionLocation, rg.Region, StringComparison.OrdinalIgnoreCase))
+                .Where(rg => MatchGroupFilter(rg, groupFilter))
+                .OrderBy(rg => rg.Name)
                 .ToList();
 
             var exactMatch = groupFilter != null && groups.Count(x => ExactMatchGroup(x, groupFilter)) == 1;
@@ -60,7 +62,7 @@ namespace Azure.AI.Details.Common.CLI
             {
                 if  (!allowCreateGroup)
                 {
-                    ConsoleHelpers.WriteLineError(allResGroups.Value.Count() > 0
+                    ConsoleHelpers.WriteLineError(response.Value.Count() > 0
                         ? $"*** No matching resource groups found ***"
                         : $"*** No resource groups found ***");
                     return null;

@@ -64,7 +64,9 @@ namespace Azure.AI.Details.Common.CLI
 
             // TODO FIXME: Switch to ResourceKind as flags instead of passing strings?
             ResourceKind? kind = ResourceKindHelpers.ParseString(kinds, ';');
-            var response = await Program.CognitiveServicesClient.GetAllResourcesAsync(subscriptionId, Program.CancelToken, kind);
+
+            var listResourcesFunc = () => Program.CognitiveServicesClient.GetAllResourcesAsync(subscriptionId, Program.CancelToken, kind);
+            var response = await LoginHelpers.GetResponseOnLogin(Program.LoginManager, listResourcesFunc, Program.CancelToken);
             response.ThrowOnFail("Loading Cognitive Services resources");
             
             var resources = response.Value
@@ -164,7 +166,7 @@ namespace Azure.AI.Details.Common.CLI
             if (hasP0 && picked == 0)
             {
                 Console.WriteLine(p0);
-                return new AzCli.CognitiveServicesResourceInfo();
+                return new AzCli.CognitiveServicesResourceInfo() { Name = null! }; // Explicitly set name to null since this is how we detect "new" vs "canceled" (latter returns null)
             }
 
             if (hasP0) picked--;
