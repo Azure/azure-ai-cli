@@ -1,5 +1,4 @@
 const { OpenAIAssistantsStreamingClass } = require("./OpenAIAssistantsStreamingClass");
-const util = require('util');
 
 const readline = require('readline');
 const rl = readline.createInterface({
@@ -18,15 +17,16 @@ async function main() {
   const openAIOrganization = process.env["OPENAI_ORG_ID"] || null;
 
   // Connection info and authentication for Azure OpenAI API
-  const azureOpenAIAPIVersion = "2024-03-01-preview";
+  const azureOpenAIAPIVersion = "2024-03-01-preview"; // process.env["AZURE_OPENAI_API_VERSION"] || "2024-03-01-preview";
   const azureOpenAIEndpoint = process.env["AZURE_OPENAI_ENDPOINT"] || "<insert your Azure OpenAI endpoint here>";
   const azureOpenAIKey = process.env["AZURE_OPENAI_API_KEY"] || "<insert your Azure OpenAI API key here>";
   const azureOpenAIChatDeploymentName = process.env["AZURE_OPENAI_CHAT_DEPLOYMENT"] || "<insert your Azure OpenAI chat deployment name here>";
-  
+
   // Create the right one based on what is available
-  const assistant = !azureOpenAIEndpoint?.startsWith("https://")
-    ? OpenAIAssistantsStreamingClass.createUsingOpenAI(openAIKey, openAIOrganization, openAIAssistantId)
-    : OpenAIAssistantsStreamingClass.createUsingAzure(azureOpenAIAPIVersion, azureOpenAIEndpoint, azureOpenAIKey, azureOpenAIChatDeploymentName, openAIAssistantId);
+  const useAzure = azureOpenAIEndpoint?.startsWith("https://");
+  const assistant = useAzure
+    ? OpenAIAssistantsStreamingClass.createUsingAzure(azureOpenAIAPIVersion, azureOpenAIEndpoint, azureOpenAIKey, azureOpenAIChatDeploymentName, openAIAssistantId)
+    : OpenAIAssistantsStreamingClass.createUsingOpenAI(openAIKey, openAIOrganization, openAIAssistantId);
 
   // Get or create the thread, and display the messages if any
   await assistant.getOrCreateThread(openAIAssistantThreadId);

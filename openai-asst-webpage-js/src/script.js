@@ -1,17 +1,18 @@
 const marked = require("marked");
 const hljs = require("highlight.js");
 
-const { OpenAIChatCompletionsStreamingClass } = require('./OpenAIChatCompletionsStreamingClass');
-let streamingChatCompletions;
+const { OpenAIAssistantsStreamingClass } = require("./OpenAIAssistantsStreamingClass");
+let assistant;
 
-function streamingChatCompletionsInit() {
 
-  // What's the system prompt
-  const openAISystemPrompt = process.env.AZURE_OPENAI_SYSTEM_PROMPT || "You are a helpful AI assistant.";
+async function streamingChatCompletionsInit() {
+
+  // Which assistant, and what thread to use
+  const openAIAssistantId = "asst_W6RbXQnkqkmSMWT0QYzA88hH";
+  const openAIAssistantThreadId = "thread_Mq9IlZbFdHfa1UMnsdxijklA";
 
   // Connection info and authentication for OpenAI API
   const openAIKey = process.env.OPENAI_API_KEY || "YOUR-KEY-HERE";
-  const openAIModelName = process.env.OPENAI_MODEL_NAME || "gpt-4-turbo-preview";
   const openAIOrganization = process.env.OPENAI_ORG_ID || null;
 
   // Connection info and authentication for Azure OpenAI API
@@ -22,13 +23,22 @@ function streamingChatCompletionsInit() {
 
   // Create the right one based on what is available
   const useAzure = azureOpenAIEndpoint?.startsWith("https://");
-  streamingChatCompletions = useAzure
-    ? OpenAIChatCompletionsStreamingClass.createUsingAzure(azureOpenAIAPIVersion, azureOpenAIEndpoint, azureOpenAIKey, azureOpenAIChatDeploymentName, openAISystemPrompt)
-    : OpenAIChatCompletionsStreamingClass.createUsingOpenAI(openAIKey, openAIModelName, openAISystemPrompt, openAIOrganization);
+  assistant = useAzure
+    ? OpenAIAssistantsStreamingClass.createUsingAzure(azureOpenAIAPIVersion, azureOpenAIEndpoint, azureOpenAIKey, azureOpenAIChatDeploymentName, openAIAssistantId)
+    : OpenAIAssistantsStreamingClass.createUsingOpenAI(openAIKey, openAIOrganization, openAIAssistantId);
+
+  // Get or create the thread, and display the messages if any
+  await assistant.getOrCreateThread(openAIAssistantThreadId);
+  await assistant.getThreadMessages((role, content) => {
+    let html = markdownToHtml(content) || content.replace(/\n/g, '<br/>');
+    role = role === 'user' ? 'user' : 'computer';
+    console.log(`role: ${role}, content: ${content}`);
+    chatPanelAppendMessage(role, html);
+  });
 }
 
 function streamingChatCompletionsClear() {
-  streamingChatCompletions.clearConversation();
+  assistant.getOrCreateThread();
 }
 
 async function streamingChatCompletionsProcessInput(userInput) {
@@ -37,7 +47,7 @@ async function streamingChatCompletionsProcessInput(userInput) {
   let newMessage = chatPanelAppendMessage('computer', blackVerticalRectangle);
   let completeResponse = "";
 
-  let computerResponse = await streamingChatCompletions.getResponse(userInput, function (response) {
+  let computerResponse = await assistant.getResponse(userInput, function (response) {
     let atBottomBeforeUpdate = chatPanelIsScrollAtBottom();
 
     completeResponse += response;
@@ -271,13 +281,17 @@ function sendMessage() {
   }
 }
 
-themeInit();
-markdownInit();
-userInputTextAreaInit();
-varsInit();
-streamingChatCompletionsInit();
-userInputTextAreaFocus();
+async function init() {
+  themeInit();
+  markdownInit();
+  userInputTextAreaInit();
+  varsInit();
+  await streamingChatCompletionsInit();
+  userInputTextAreaFocus();
 
-window.sendMessage = sendMessage;
-window.toggleTheme = toggleTheme;
-window.newChat = newChat;
+  window.sendMessage = sendMessage;
+  window.toggleTheme = toggleTheme;
+  window.newChat = newChat;
+}
+
+init();

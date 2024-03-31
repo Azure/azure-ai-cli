@@ -11,6 +11,7 @@ class OpenAIAssistantsStreamingClass {
         baseURL: `${azureOpenAIEndpoint.replace(/\/+$/, '')}/openai`,
         defaultQuery: { 'api-version': azureOpenAIAPIVersion },
         defaultHeaders: { 'api-key': azureOpenAIKey },
+        dangerouslyAllowBrowser: true
         }),
       30);
   }
@@ -22,6 +23,7 @@ class OpenAIAssistantsStreamingClass {
       new OpenAI({
         apiKey: openAIKey,
         organization: openAIOrganization,
+        dangerouslyAllowBrowser: true
       }));
   }
 
@@ -38,6 +40,7 @@ class OpenAIAssistantsStreamingClass {
     this.thread = threadId == null
       ? await this.openai.beta.threads.create()
       : await this.openai.beta.threads.retrieve(threadId);
+    console.log(`Thread ID: ${this.thread.id}`);
     return this.thread;
   }
 
@@ -75,7 +78,7 @@ class OpenAIAssistantsStreamingClass {
           if (this.simulateTypingDelay > 0) {
             await new Promise(r => setTimeout(r, this.simulateTypingDelay));
           }
-        }
+      }
         response += content;
       }
     });

@@ -15,3 +15,8 @@ openai-webpage-js/package-lock.json
 openai-webpage-js/dist/main.js
 openai-chat-streaming-js/node_modules/**
 openai-chat-streaming-js/package-lock.json
+openai-asst-streaming-js/node_modules/**
+openai-asst-streaming-js/package-lock.json
+openai-asst-webpage-js/node_modules/**
+openai-asst-webpage-js/dist/main.js
+openai-asst-webpage-js/package-lock.json

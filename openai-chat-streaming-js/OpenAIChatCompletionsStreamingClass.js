@@ -11,7 +11,8 @@ class OpenAIChatCompletionsStreamingClass {
         baseURL: `${azureOpenAIEndpoint.replace(/\/+$/, '')}/openai/deployments/${azureOpenAIDeploymentName}`,
         defaultQuery: { 'api-version': azureOpenAIAPIVersion },
         defaultHeaders: { 'api-key': azureOpenAIKey },
-      }));
+        }),
+      30);
   }
 
   // Create the class using the OpenAI API and an optional organization
@@ -25,7 +26,8 @@ class OpenAIChatCompletionsStreamingClass {
   }
 
   // Constructor
-  constructor(openAIModelOrDeploymentName, systemPrompt, openai) {
+  constructor(openAIModelOrDeploymentName, systemPrompt, openai, simulateTypingDelay = 0) {
+    this.simulateTypingDelay = simulateTypingDelay;
     this.systemPrompt = systemPrompt;
     this.openAIModelOrDeploymentName = openAIModelOrDeploymentName;
     this.openai = openai;
@@ -40,7 +42,7 @@ class OpenAIChatCompletionsStreamingClass {
     ];
   }
 
-  // Get the response from the Assistant
+  // Get the response from Chat Completions
   async getResponse(userInput, callback) {
     this.messages.push({ role: 'user', content: userInput });
 
@@ -62,6 +64,9 @@ class OpenAIChatCompletionsStreamingClass {
         if (content != null) {
           if(callback != null) {
             callback(content);
+            if (this.simulateTypingDelay > 0) {
+              await new Promise(r => setTimeout(r, this.simulateTypingDelay));
+            }
           }
           response += content;
         }
