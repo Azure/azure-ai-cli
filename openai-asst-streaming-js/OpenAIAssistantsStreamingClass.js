@@ -1,13 +1,27 @@
 const { OpenAI } = require('openai');
 
 class OpenAIAssistantsStreamingClass {
-  constructor(openAIKey, openAIOrganization, openAIAssistantId) {
-    this.openAIAssistantId = openAIAssistantId;
-    this.thread = null;
-    this.openai = new OpenAI({
+
+  static createUsingAzure(azureOpenAIAPIVersion, azureOpenAIEndpoint, azureOpenAIKey, azureOpenAIDeploymentName, openAIAssistantId) {
+    return new OpenAIAssistantsStreamingClass(openAIAssistantId, new OpenAI({
+      apiKey: azureOpenAIKey,
+      baseURL: `${azureOpenAIEndpoint.replace(/\/+$/, '')}/openai`,
+      defaultQuery: { 'api-version': azureOpenAIAPIVersion },
+      defaultHeaders: { 'api-key': azureOpenAIKey },
+    }));
+  }
+
+  static createUsingOpenAI(openAIKey, openAIOrganization, openAIAssistantId) {
+    return new OpenAIAssistantsStreamingClass(openAIAssistantId, new OpenAI({
       apiKey: openAIKey,
       organization: openAIOrganization,
-    });
+    }));
+  }
+
+  constructor(openAIAssistantId, openai) {
+    this.openAIAssistantId = openAIAssistantId;
+    this.thread = null;
+    this.openai = openai;
   }
 
   async getOrCreateThread(threadId = null) {

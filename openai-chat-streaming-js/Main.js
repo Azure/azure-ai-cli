@@ -10,12 +10,12 @@ async function main() {
 
   const openAISystemPrompt = process.env["AZURE_OPENAI_SYSTEM_PROMPT"] || "You are a helpful AI assistant.";
 
-  // OpenAI API
+  // Connection info and authentication for OpenAI API
   const openAIKey = process.env["OPENAI_API_KEY"] || "YOUR-KEY-HERE";
   const openAIModelName = process.env["OPENAI_MODEL_NAME"] || "gpt-4-turbo-preview";
   const openAIOrganization = process.env["OPENAI_ORG_ID"] || null;
 
-  // Azure OpenAI API
+  // Connection info and authentication for Azure OpenAI API
   const azureOpenAIAPIVersion = process.env["AZURE_OPENAI_API_VERSION"] || "2024-03-01-preview";
   const azureOpenAIEndpoint = process.env["AZURE_OPENAI_ENDPOINT"] || "<insert your Azure OpenAI endpoint here>";
   const azureOpenAIKey = process.env["AZURE_OPENAI_API_KEY"] || "<insert your Azure OpenAI API key here>";
@@ -26,7 +26,7 @@ async function main() {
     ? OpenAIChatCompletionsStreamingClass.createUsingOpenAI(openAIKey, openAIModelName, openAISystemPrompt, openAIOrganization)
     : OpenAIChatCompletionsStreamingClass.createUsingAzure(azureOpenAIAPIVersion, azureOpenAIEndpoint, azureOpenAIKey, azureOpenAIChatDeploymentName, openAISystemPrompt);
 
-  // Start the conversation, and loop until the user types 'exit'
+  // Loop until the user types 'exit'
   while (true) {
 
     // Get user input

@@ -1,4 +1,5 @@
 const { OpenAIAssistantsStreamingClass } = require("./OpenAIAssistantsStreamingClass");
+const util = require('util');
 
 const readline = require('readline');
 const rl = readline.createInterface({
@@ -8,24 +9,40 @@ const rl = readline.createInterface({
 
 async function main() {
 
-  const openAIKey = "YOUR-KEY-HERE";
-  const openAIOrganization = null;
+  // Which assistant, and what thread to use
   const openAIAssistantId = "asst_W6RbXQnkqkmSMWT0QYzA88hH";
   const openAIAssistantThreadId = process.argv[2] || null;
 
-  const assistant = new OpenAIAssistantsStreamingClass(openAIKey, openAIOrganization, openAIAssistantId);
-  await assistant.getOrCreateThread(openAIAssistantThreadId);
+  // Connection info and authentication for OpenAI API
+  const openAIKey = process.env["OPENAI_API_KEY"] || "YOUR-KEY-HERE";
+  const openAIOrganization = process.env["OPENAI_ORG_ID"] || null;
 
+  // Connection info and authentication for Azure OpenAI API
+  const azureOpenAIAPIVersion = "2024-03-01-preview";
+  const azureOpenAIEndpoint = process.env["AZURE_OPENAI_ENDPOINT"] || "<insert your Azure OpenAI endpoint here>";
+  const azureOpenAIKey = process.env["AZURE_OPENAI_API_KEY"] || "<insert your Azure OpenAI API key here>";
+  const azureOpenAIChatDeploymentName = process.env["AZURE_OPENAI_CHAT_DEPLOYMENT"] || "<insert your Azure OpenAI chat deployment name here>";
+  
+  // Create the right one based on what is available
+  const assistant = !azureOpenAIEndpoint?.startsWith("https://")
+    ? OpenAIAssistantsStreamingClass.createUsingOpenAI(openAIKey, openAIOrganization, openAIAssistantId)
+    : OpenAIAssistantsStreamingClass.createUsingAzure(azureOpenAIAPIVersion, azureOpenAIEndpoint, azureOpenAIKey, azureOpenAIChatDeploymentName, openAIAssistantId);
+
+  // Get or create the thread, and display the messages if any
+  await assistant.getOrCreateThread(openAIAssistantThreadId);
   await assistant.getThreadMessages((role, content) => {
     role = role.charAt(0).toUpperCase() + role.slice(1);
     process.stdout.write(`${role}: ${content}`);
   });
 
+  // Loop until the user types 'exit'
   while (true) {
 
+    // Get user input
     const input = await new Promise(resolve => rl.question('User: ', resolve));
     if (input === 'exit' || input === '') break;
 
+    // Get the Assistant's response
     process.stdout.write('\nAssistant: ');
     await assistant.getResponse(input, (content) => {
       process.stdout.write(content);
