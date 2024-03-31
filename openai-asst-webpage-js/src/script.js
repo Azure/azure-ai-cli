@@ -9,7 +9,7 @@ async function streamingChatCompletionsInit() {
 
   // Which assistant, and what thread to use
   const openAIAssistantId = "asst_W6RbXQnkqkmSMWT0QYzA88hH";
-  const openAIAssistantThreadId = "thread_Mq9IlZbFdHfa1UMnsdxijklA";
+  const openAIAssistantThreadId = null;
 
   // Connection info and authentication for OpenAI API
   const openAIKey = process.env.OPENAI_API_KEY || "YOUR-KEY-HERE";
@@ -27,14 +27,7 @@ async function streamingChatCompletionsInit() {
     ? OpenAIAssistantsStreamingClass.createUsingAzure(azureOpenAIAPIVersion, azureOpenAIEndpoint, azureOpenAIKey, azureOpenAIChatDeploymentName, openAIAssistantId)
     : OpenAIAssistantsStreamingClass.createUsingOpenAI(openAIKey, openAIOrganization, openAIAssistantId);
 
-  // Get or create the thread, and display the messages if any
-  await assistant.getOrCreateThread(openAIAssistantThreadId);
-  await assistant.getThreadMessages((role, content) => {
-    let html = markdownToHtml(content) || content.replace(/\n/g, '<br/>');
-    role = role === 'user' ? 'user' : 'computer';
-    console.log(`role: ${role}, content: ${content}`);
-    chatPanelAppendMessage(role, html);
-  });
+  await getOrCreateAndDisplayThread(openAIAssistantThreadId);
 }
 
 function streamingChatCompletionsClear() {
@@ -65,6 +58,16 @@ async function streamingChatCompletionsProcessInput(userInput) {
 
   newMessage.innerHTML = markdownToHtml(computerResponse) || computerResponse.replace(/\n/g, '<br/>');
   chatPanel.scrollTop = chatPanel.scrollHeight;
+}
+
+async function getOrCreateAndDisplayThread(openAIAssistantThreadId) {
+  await assistant.getOrCreateThread(openAIAssistantThreadId);
+  await assistant.getThreadMessages((role, content) => {
+    let html = markdownToHtml(content) || content.replace(/\n/g, '<br/>');
+    role = role === 'user' ? 'user' : 'computer';
+    console.log(`role: ${role}, content: ${content}`);
+    chatPanelAppendMessage(role, html);
+  });
 }
 
 function chatPanelGetElement() {
@@ -265,6 +268,12 @@ function newChat() {
   logoShow();
   userInputTextAreaFocus();
   streamingChatCompletionsClear();
+}
+
+function loadThread(threadId) {
+  chatPanelClear();
+  getOrCreateAndDisplayThread(threadId);
+  userInputTextAreaFocus();
 }
 
 function sendMessage() {
