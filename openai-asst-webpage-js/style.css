@@ -2,7 +2,7 @@
     --header-height: 0px;
     --input-height: 0px;
     --send-button-width: 36px;
-    --left-side-width: 250px;
+    --left-side-width: 275px;
     --right-side-width: 0px;
     --right-side-max-width: 768px;
     --max-textarea-height: 200px;
@@ -61,7 +61,7 @@ body.light-theme #header {
 #newChatButton {
     border: none;
     cursor: pointer;
-    border-radius: var(--border-radius);
+    /* border-radius: var(--border-radius); */
     /* background-co  lor: #557CB4; */
     width: calc(var(--left-side-width) - 16px);
     margin-top: 16px;
@@ -117,6 +117,33 @@ body.light-theme #header {
     max-height: var(--max-textarea-height);
     border-radius: var(--border-radius);
     border-width: 2px;
+}
+
+div.threadsOnDate {
+    margin-top: 8px;
+    margin-bottom: 8px;
+}
+
+div.threadOnDate {
+    margin-left: 24px;
+    margin-right: 16px;
+    margin-top: 32px;
+    margin-bottom: 8px;
+    text-align: left;
+    font-size: small;
+    color: #9b9b9b;
+}
+
+button.thread {
+    width: 100%;
+}
+
+button.thread div {
+    float: left !important;
+}
+
+i.threadIcon {
+    width: 32px;
 }
 
 textarea {

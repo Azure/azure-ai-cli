@@ -23,20 +23,61 @@
 
       <!-- Thread Panel -->
       <div id="threadPanel">
-        <div class="threadsOnDate" style="margin-top:32px">
-          <div class="w3-dark-gray w3-center" style="margin-left:16px;margin-right:16px">Today</div>
-          <button id="thread_XTqDWuGXPjsddI1xctQ2ZD4B" class="thread w3-button w3-center" style="width: 100%" onclick="loadThread(this.id)">
-            <div class="w3-left"><i class="fa fa-comment" style="width: 32px"></i>Skeleton joke</div>
-          </button>
-          <button id="thread_wzmGKFC22PKKcvoDs2zrYLD7" class="thread w3-button w3-center" style="width: 100%" onclick="loadThread(this.id)">
-            <div class="w3-left"><i class="fa fa-comment" style="width: 32px"></i>Why is the sky blue?</div>
-          </button>
-          <button id="thread_IAxIrq4YJmFflA1fraw7iEcI" class="thread w3-button w3-center" style="width: 100%" onclick="loadThread(this.id)">
-            <div class="w3-left"><i class="fa fa-comment" style="width: 32px"></i>Hello world in C#</div>
-          </button>
-          <button id="thread_RAgQWZFf3B3MWjVIpSO6JiRi" class="thread w3-button w3-center" style="width: 100%" onclick="loadThread(this.id)">
-            <div class="w3-left"><i class="fa fa-comment" style="width: 32px"></i>Thread stuff</div>
-          </button>
+        <div class="threadsOnDate">
+
+          <!-- Example for "Today" (when date == today.subtractDays(0)) -->
+          <div class="threadOnDate">Today</div>
+          <div id="threads">
+            <button id="thread_XTqDWuGXPjsddI1xctQ2ZD4B" class="thread w3-button" onclick="loadThread(this.id)">
+              <div><i class="threadIcon fa fa-comment"></i>Skeleton joke</div>
+            </button>
+            <button id="thread_wzmGKFC22PKKcvoDs2zrYLD7" class="thread w3-button" onclick="loadThread(this.id)">
+              <div><i class="threadIcon fa fa-comment"></i>Why is the sky blue?</div>
+            </button>
+            <button id="thread_IAxIrq4YJmFflA1fraw7iEcI" class="thread w3-button" onclick="loadThread(this.id)">
+              <div><i class="threadIcon fa fa-comment"></i>Hello world in C#</div>
+            </button>
+            <button id="thread_RAgQWZFf3B3MWjVIpSO6JiRi" class="thread w3-button" onclick="loadThread(this.id)">
+              <div><i class="threadIcon fa fa-comment"></i>Thread stuff</div>
+            </button>
+          </div>
+          
+          <!-- Example for "Yesterday" (when date == today.subtractDays(1)) -->
+          <div class="threadOnDate">Yesterday</div>
+          <div id="threads">
+            <button id="thread_XTqDWuGXPjsddI1xctQ2ZD4B1" class="thread w3-button" onclick="loadThread(this.id)">
+              <div><i class="threadIcon fa fa-comment"></i>Some other thread 1</div>
+            </button>
+          </div>
+
+          <!-- Example for "Friday" (when date >= today.subtractDays(6) -->
+          <div class="threadOnDate">Friday</div>
+          <div id="threads">
+            <button id="thread_XTqDWuGXPjsddI1xctQ2ZD4B1" class="thread w3-button" onclick="loadThread(this.id)">
+              <div><i class="threadIcon fa fa-comment"></i>Some other thread 2</div>
+            </button>
+            <button id="thread_XTqDWuGXPjsddI1xctQ2ZD4B1" class="thread w3-button" onclick="loadThread(this.id)">
+              <div><i class="threadIcon fa fa-comment"></i>Some other thread 3</div>
+            </button>
+          </div>
+
+          <!-- Example for "Sunday, March 24, 2024" (when getLastChangedDate(threadId) < today().subtractDays(6) -->
+          <div class="threadOnDate">Sunday, March 24, 2024</div>
+          <div id="threads">
+            <button id="thread_XTqDWuGXPjsddI1xctQ2ZD4B1" class="thread w3-button" onclick="loadThread(this.id)">
+              <div><i class="threadIcon fa fa-comment"></i>Some other thread 4</div>
+            </button>
+            <button id="thread_XTqDWuGXPjsddI1xctQ2ZD4B1" class="thread w3-button" onclick="loadThread(this.id)">
+              <div><i class="threadIcon fa fa-comment"></i>Some other thread 5</div>
+            </button>
+            <button id="thread_XTqDWuGXPjsddI1xctQ2ZD4B1" class="thread w3-button" onclick="loadThread(this.id)">
+              <div><i class="threadIcon fa fa-comment"></i>Some other thread 6</div>
+            </button>
+            <button id="thread_XTqDWuGXPjsddI1xctQ2ZD4B1" class="thread w3-button" onclick="loadThread(this.id)">
+              <div><i class="threadIcon fa fa-comment"></i>Some other thread 7</div>
+            </button>
+          </div>
+
         </div>
       </div>
 
