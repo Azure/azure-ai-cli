@@ -6,7 +6,7 @@ authors:
   - jietong
 api: chat
 model:
-  azure_deployment: gpt-35-turbo
+  azure_deployment: gpt-4-32k-0613
 inputs:
   firstName: Jane
   lastName: Doe
