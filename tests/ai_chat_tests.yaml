@@ -190,3 +190,23 @@
       expect: FindAllFilesInCurrentDirectory
       bash: |
         ai chat --question "What was the last function call you made using your allowed functions?" --input-chat-history-file ../tests/chat-history-function.jsonl
+
+- area: Test AI Chat using Prompty
+  tags:
+    recordable: true
+    _sanitize:
+      - headers:
+        - name: api-key
+          value: 00000000-0000-0000-0000-000000000000
+      - uri:
+        - regex: https://(?<host>[^/]+)/
+          value: https://fakeendpoint/
+  steps:
+    - name: Test AI Chat with input parameter file (prompty)
+      expect: Jane Doe
+      bash: |
+        ai chat --input-parameter-file ../tests/basic-no-inputs.prompty
+    - name: Test AI Chat with input parameter file and nested input file (prompty)
+      expect: Jane Doe
+      bash: |
+        ai chat --input-parameter-file ../tests/basic.prompty
