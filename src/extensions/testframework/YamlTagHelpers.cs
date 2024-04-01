@@ -13,7 +13,7 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
 {
     public class YamlTagHelpers
     {
-        public static FileInfo FindDefaultTagsFile(DirectoryInfo directory)
+        public static FileInfo? FindDefaultTagsFile(DirectoryInfo directory)
         {
             var found = directory.GetFiles(YamlTestFramework.YamlDefaultTagsFileName);
             return found.Length == 1
@@ -58,7 +58,7 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
             return UpdateCopyTags(tags, tagNode, tagsNode);
         }
 
-        private static Dictionary<string, List<string>> UpdateCopyTags(Dictionary<string, List<string>> tags, YamlNode tagNode, YamlNode tagsNode)
+        private static Dictionary<string, List<string>> UpdateCopyTags(Dictionary<string, List<string>> tags, YamlNode? tagNode, YamlNode? tagsNode)
         {
             // make a copy that we'll update and return
             tags = new Dictionary<string, List<string>>(tags);
@@ -75,7 +75,7 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
             return tags;
         }
 
-        private static void AddOptionalTag(Dictionary<string, List<string>> tags, string name, string value)
+        private static void AddOptionalTag(Dictionary<string, List<string>> tags, string name, string? value)
         {
             if (!string.IsNullOrEmpty(name) && !string.IsNullOrEmpty(value))
             {
@@ -87,7 +87,7 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
             }
         }
 
-        private static void AddOptionalCommaSeparatedTags(Dictionary<string, List<string>> tags, string values)
+        private static void AddOptionalCommaSeparatedTags(Dictionary<string, List<string>> tags, string? values)
         {
             if (values != null)
             {
@@ -98,7 +98,7 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
             }
         }
 
-        private static void AddOptionalNameValueTags(Dictionary<string, List<string>> tags, YamlMappingNode mapping, string keyPrefix = "")
+        private static void AddOptionalNameValueTags(Dictionary<string, List<string>> tags, YamlMappingNode? mapping, string keyPrefix = "")
         {
             var children = mapping?.Children;
             if (children == null) return;
@@ -107,9 +107,9 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
             {
                 var key = keyPrefix + (child.Key as YamlScalarNode)?.Value;
 
-                if (child.Value is YamlScalarNode)
+                if (child.Value is YamlScalarNode asScalar)
                 {
-                    var value = (child.Value as YamlScalarNode)?.Value;
+                    var value = asScalar.Value;
                     AddOptionalTag(tags, key, value);
                 }
                 else if (child.Value is YamlSequenceNode || child.Value is YamlMappingNode)
@@ -117,29 +117,29 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
                     var value = child.Value.ToJsonString();
                     AddOptionalTag(tags, key, value);
                 }
-                else if(child.Value is YamlMappingNode)
+                else if(child.Value is YamlMappingNode asMapping)
                 {
-                    AddOptionalNameValueTags(tags, child.Value as YamlMappingNode, $"{key}.");
+                    AddOptionalNameValueTags(tags, asMapping, $"{key}.");
                 }
             }
         }
 
-        private static void AddOptionalTagsForEachChild(Dictionary<string, List<string>> tags, YamlSequenceNode sequence)
+        private static void AddOptionalTagsForEachChild(Dictionary<string, List<string>> tags, YamlSequenceNode? sequence)
         {
             var children = sequence?.Children;
             if (children == null) return;
 
             foreach (var child in children)
             {
-                if (child is YamlScalarNode)
+                if (child is YamlScalarNode asScalar)
                 {
-                    AddOptionalTag(tags, "tag", (child as YamlScalarNode).Value);
+                    AddOptionalTag(tags, "tag", asScalar.Value);
                     continue;
                 }
 
-                if (child is YamlMappingNode)
+                if (child is YamlMappingNode asMapping)
                 {
-                    AddOptionalNameValueTags(tags, child as YamlMappingNode);
+                    AddOptionalNameValueTags(tags, asMapping);
                     continue;
                 }
             }

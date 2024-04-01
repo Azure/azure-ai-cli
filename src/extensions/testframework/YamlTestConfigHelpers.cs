@@ -10,7 +10,7 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
 {
     public class YamlTestConfigHelpers
     {
-        public static FileInfo FindTestConfigFile(DirectoryInfo checkHereAndParents)
+        public static FileInfo? FindTestConfigFile(DirectoryInfo checkHereAndParents)
         {
             Logger.Log($"YamlTestConfigHelpers.GetTestConfigFile: Looking for test config file in {checkHereAndParents.FullName}");
 
@@ -38,9 +38,9 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
                     var testDirectory = tags["testDirectory"].FirstOrDefault();
                     if (testDirectory != null)
                     {
-                        testDirectory = PathHelpers.Combine(file.Directory.FullName, testDirectory);
+                        testDirectory = PathHelpers.Combine(file.Directory!.FullName, testDirectory);
                         Logger.Log($"YamlTestConfigHelpers.GetTestDirectory: Found test directory in config file at {testDirectory}");
-                        return new DirectoryInfo(testDirectory);
+                        return new DirectoryInfo(testDirectory!);
                     }
                 }
             }
@@ -54,9 +54,9 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
                     var testDirectory = tags["testDirectory"].FirstOrDefault();
                     if (testDirectory != null)
                     {
-                        testDirectory = PathHelpers.Combine(file.Directory.FullName, testDirectory);
+                        testDirectory = PathHelpers.Combine(file.Directory!.FullName, testDirectory);
                         Logger.Log($"YamlTestConfigHelpers.GetTestDirectory: Found test directory in default tags file at {testDirectory}");
-                        return new DirectoryInfo(testDirectory);
+                        return new DirectoryInfo(testDirectory!);
                     }
                 }
             }

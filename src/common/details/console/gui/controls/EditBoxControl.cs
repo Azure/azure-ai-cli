@@ -9,12 +9,12 @@ namespace Azure.AI.Details.Common.CLI.ConsoleGui
 {
     public class EditBoxControl : ScrollingControl
     {
-        public EditBoxControl(Window parent, Rect rect, Colors color, string text, int uiMaxTextLengthParam, string picture, string pszBorder, bool fEnabled = true) :
+        public EditBoxControl(Window? parent, Rect rect, Colors color, string? text, int uiMaxTextLengthParam, string? picture, string? pszBorder, bool fEnabled = true) :
             base(parent, rect, color, pszBorder, fEnabled)
         {
             uiMaxTextLength = uiMaxTextLengthParam;
 
-            _text = text;
+            _text = text ?? string.Empty;
             _picture = picture;
 
             cursor.Save();
@@ -476,7 +476,7 @@ namespace Azure.AI.Details.Common.CLI.ConsoleGui
 
         string _text;
         int uiMaxTextLength;
-        string _picture;
+        string? _picture;
 
         Cursor cursor = new Cursor();
 

@@ -129,6 +129,6 @@ namespace Azure.AI.CLI.Common.Clients
         /// <param name="resourceName">The name of the Cognitive Services resource</param>
         /// <param name="token">Cancellation token to use</param>
         /// <returns>Asynchronous task that gets the resource keys</returns>
-        Task<ClientResult<(string, string?)>> GetResourceKeysFromNameAsync(string subscriptionId, string resourceGroup, string resourceName, CancellationToken token);
+        Task<ClientResult<(string, string)>> GetResourceKeysFromNameAsync(string subscriptionId, string resourceGroup, string resourceName, CancellationToken token);
     }
 }

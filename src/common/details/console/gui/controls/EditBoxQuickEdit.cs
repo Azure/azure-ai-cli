@@ -10,7 +10,7 @@ namespace Azure.AI.Details.Common.CLI.ConsoleGui
 {
     public class EditBoxQuickEdit : EditBoxControl
     {
-        public static string Edit(int width, int height, Colors normal, string text = "", int maxCch = 1024, string picture = null, string border = null)
+        public static string? Edit(int width, int height, Colors normal, string? text = "", int maxCch = 1024, string? picture = null, string? border = null)
         {
             var rect = Screen.Current.MakeSpaceAtCursor(width, height);
             var editBox = new EditBoxQuickEdit(null, rect, normal, text, maxCch, picture, border);
@@ -20,7 +20,7 @@ namespace Azure.AI.Details.Common.CLI.ConsoleGui
 
         #region protected methods
 
-        protected EditBoxQuickEdit(Window parent, Rect rect, Colors colorNormal, string text = "", int maxCch = 1024, string picture = null, string border = null) : base(parent, rect, colorNormal, text, maxCch, picture, border, true)
+        protected EditBoxQuickEdit(Window? parent, Rect rect, Colors colorNormal, string? text = "", int maxCch = 1024, string? picture = null, string? border = null) : base(parent, rect, colorNormal, text, maxCch, picture, border, true)
         {
         }
 
@@ -53,7 +53,7 @@ namespace Azure.AI.Details.Common.CLI.ConsoleGui
 
         #region private data
 
-        private string _finalText;
+        private string? _finalText = null;
 
         #endregion
     }

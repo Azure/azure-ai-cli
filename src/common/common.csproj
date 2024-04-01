@@ -5,6 +5,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <AssemblyName>Azure.AI.CLI.Common</AssemblyName>
     <RootNamespace>Azure.AI.CLI.Common</RootNamespace>
+    <Nullable>enable</Nullable>
   </PropertyGroup>
 
   <ItemGroup>

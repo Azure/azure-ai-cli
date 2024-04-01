@@ -105,7 +105,7 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
             return filterable;
         }
 
-        private static object GetPropertyValue(TestCase test, string name)
+        private static object? GetPropertyValue(TestCase test, string name)
         {
             switch (name.ToLower())
             {
@@ -147,7 +147,7 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
             return test.DisplayName.Contains(text)
                 || test.FullyQualifiedName.Contains(text)
                 || test.Traits.Any(x => x.Name == text || x.Value.Contains(text))
-                || supportedFilterProperties.Any(property => GetPropertyValue(test, property)?.ToString().Contains(text) == true);
+                || supportedFilterProperties.Any(property => GetPropertyValue(test, property)?.ToString()?.Contains(text) == true);
         }
 
 

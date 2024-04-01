@@ -19,7 +19,7 @@ namespace Azure.AI.Details.Common.CLI
 {
     public partial class AzCliConsoleGui
     {
-        public static async Task<(AzCli.ResourceGroupInfo, bool createdNew)> PickOrCreateResourceGroup(bool interactive, string subscriptionId, string regionFilter = null, string groupFilter = null)
+        public static async Task<(AzCli.ResourceGroupInfo, bool createdNew)> PickOrCreateResourceGroup(bool interactive, string subscriptionId, string? regionFilter = null, string? groupFilter = null)
         {
             var createdNew = false;
             var createNewItem = !string.IsNullOrEmpty(groupFilter)
@@ -41,7 +41,7 @@ namespace Azure.AI.Details.Common.CLI
             return (group.Value, createdNew);
         }
 
-        public static async Task<AzCli.ResourceGroupInfo?> FindGroupAsync(bool interactive, string subscription, string regionLocation = null, string groupFilter = null, string allowCreateGroupOption = null)
+        public static async Task<AzCli.ResourceGroupInfo?> FindGroupAsync(bool interactive, string subscription, string? regionLocation = null, string? groupFilter = null, string? allowCreateGroupOption = null)
         {
             var allowCreateGroup = !string.IsNullOrEmpty(allowCreateGroupOption);
 
@@ -90,7 +90,7 @@ namespace Azure.AI.Details.Common.CLI
             return ListBoxPickResourceGroup(groups.ToArray(), allowCreateGroupOption);
         }
 
-        private static async Task<AzCli.ResourceGroupInfo?> TryCreateResourceGroup(bool interactive, string subscriptionId, string regionLocationFilter, string groupName)
+        private static async Task<AzCli.ResourceGroupInfo?> TryCreateResourceGroup(bool interactive, string subscriptionId, string? regionLocationFilter, string? groupName)
         {
             ConsoleHelpers.WriteLineWithHighlight("\n`CREATE RESOURCE GROUP`");
 
@@ -110,12 +110,12 @@ namespace Azure.AI.Details.Common.CLI
             return response.Value;
         }
 
-        private static AzCli.ResourceGroupInfo? ListBoxPickResourceGroup(AzCli.ResourceGroupInfo[] groups, string p0)
+        private static AzCli.ResourceGroupInfo? ListBoxPickResourceGroup(AzCli.ResourceGroupInfo[] groups, string? p0)
         {
             var list = groups.Select(x => x.Name).ToList();
 
             var hasP0 = !string.IsNullOrEmpty(p0);
-            if (hasP0) list.Insert(0, p0);
+            if (hasP0) list.Insert(0, p0!);
 
             var picked = ListBoxPicker.PickIndexOf(list.ToArray());
             if (picked < 0)
@@ -134,12 +134,12 @@ namespace Azure.AI.Details.Common.CLI
             return groups[picked];
         }
 
-        static bool ExactMatchGroup(AzCli.ResourceGroupInfo group, string groupFilter)
+        static bool ExactMatchGroup(AzCli.ResourceGroupInfo group, string? groupFilter)
         {
             return group.Id == groupFilter || group.Name.ToLower() == groupFilter;
         }
 
-        private static bool MatchGroupFilter(AzCli.ResourceGroupInfo group, string groupFilter)
+        private static bool MatchGroupFilter(AzCli.ResourceGroupInfo group, string? groupFilter)
         {
             if (groupFilter == null || ExactMatchGroup(group, groupFilter))
             {

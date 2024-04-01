@@ -20,21 +20,23 @@ namespace Azure.AI.Details.Common.CLI
             var vars = Environment.GetEnvironmentVariables();
             foreach (var key in vars.Keys)
             {
-                if (key.ToString().ToLower().StartsWith($"{Program.Name}_"))
+                var ks = key.ToString() ?? string.Empty;
+                var nameAndPrefix = $"{Program.Name}_";
+                if (ks.ToLower().StartsWith(nameAndPrefix))
                 {
-                    var name = key.ToString().Substring(4).Replace("_", ".").ToLower();
-                    var value = vars[key].ToString();
+                    var name = ks.Substring(nameAndPrefix.Length).Replace("_", ".").ToLower();
+                    var value = vars[key]!.ToString();
                     _values.Add(name, value);
                 }
             }
         }
 
-        public string this[string name] => Get(name, true);
+        public string? this[string name] => Get(name, true);
         public IEnumerable<string> Names => _values.Names;
-        public void Add(string name, string value) => _values.Add(name, value);
+        public void Add(string name, string? value) => _values.Add(name, value);
         public bool Contains(string name, bool checkDefault = true) => _values.Contains(name, checkDefault);
-        public string Get(string name, bool checkDefault = true) => _values.Get(name, checkDefault);
-        public void Reset(string name, string value = null) => _values.Reset(name, value);
+        public string? Get(string name, bool checkDefault = true) => _values.Get(name, checkDefault);
+        public void Reset(string name, string? value = null) => _values.Reset(name, value);
 
         private INamedValues _values;
     }

@@ -192,7 +192,7 @@ namespace Azure.AI.Details.Common.CLI
                 }
             }
 
-            return version;
+            return version ?? string.Empty;
         }
 
         private static void DisplayCommandHelp(INamedValueTokens tokens, INamedValues values)
@@ -259,7 +259,7 @@ namespace Azure.AI.Details.Common.CLI
                 if (key == "display.help") continue;
                 if (key == "display.version") continue;
 
-                var value = values[key];
+                var value = values[key]!;
                 var obfuscateValue = key.EndsWith(passwordPostfix) ||
                     (key.Length > subKeyPostfix.Length && key.EndsWith(subKeyPostfix) &&
                      ((value.Length == validSubKeyLength && Guid.TryParse(value, out Guid result)) ||
@@ -271,7 +271,7 @@ namespace Azure.AI.Details.Common.CLI
 
                 var lines = value.Split(delimeters.ToArray()).Where(x => x.Trim().Length > 0);
                 int chars = value.Length - maxValueLength;
-                value = lines.FirstOrDefault();
+                value = lines.FirstOrDefault() ?? string.Empty;
 
                 var truncated = "";
                 if (lines.Count() > 1)
@@ -321,7 +321,7 @@ namespace Azure.AI.Details.Common.CLI
             return false;
         }
 
-        private static int DisplayParseErrorHelpOrException(INamedValueTokens tokens, ICommandValues values, Exception ex, bool displayBanner)
+        private static int DisplayParseErrorHelpOrException(INamedValueTokens tokens, ICommandValues values, Exception? ex, bool displayBanner)
         {
             if (values.Contains("error"))
             {
@@ -394,7 +394,7 @@ namespace Azure.AI.Details.Common.CLI
 
         private static bool RunCommand(ICommandValues values)
         {
-            string errorInfo = null;
+            string? errorInfo = null;
             var outcome = Outcome.Unknown;
 
             try
@@ -428,7 +428,7 @@ namespace Azure.AI.Details.Common.CLI
             {
                 _data?.Telemetry?.LogEvent(new CommandTelemetryEvent()
                 {
-                    Type = values.GetCommand("unknown"),
+                    Type = values.GetCommand("unknown")!,
                     Outcome = outcome,
                     ErrorInfo = errorInfo
                 });
@@ -437,50 +437,50 @@ namespace Azure.AI.Details.Common.CLI
             return outcome == Outcome.Success;
         }
 
-        private static IProgramData _data;
+        private static IProgramData? _data;
 
-        public static string Name => _data?.Name;
+        public static string Name => _data?.Name!;
 
-        public static string DisplayName => _data?.DisplayName;
+        public static string DisplayName => _data?.DisplayName!;
 
-        public static string WarningBanner => _data?.WarningBanner;
+        public static string WarningBanner => _data?.WarningBanner!;
 
-        public static string TelemetryUserAgent => _data?.TelemetryUserAgent;
+        public static string TelemetryUserAgent => _data?.TelemetryUserAgent!;
 
-        public static string Exe => _data?.Exe;
+        public static string Exe => _data?.Exe!;
 
-        public static string Dll => _data?.Dll;
+        public static string Dll => _data?.Dll!;
 
-        public static Type ResourceAssemblyType => _data?.ResourceAssemblyType;
+        public static Type ResourceAssemblyType => _data?.ResourceAssemblyType!;
 
-        public static Assembly ResourceAssembly => _data?.ResourceAssemblyType.Assembly;
+        public static Assembly ResourceAssembly => _data?.ResourceAssemblyType.Assembly!;
 
-        public static Type BindingAssemblySdkType => _data?.BindingAssemblySdkType;
+        public static Type BindingAssemblySdkType => _data?.BindingAssemblySdkType!;
 
-        public static string SERVICE_RESOURCE_DISPLAY_NAME_ALL_CAPS => _data?.SERVICE_RESOURCE_DISPLAY_NAME_ALL_CAPS;
+        public static string SERVICE_RESOURCE_DISPLAY_NAME_ALL_CAPS => _data?.SERVICE_RESOURCE_DISPLAY_NAME_ALL_CAPS!;
 
-        public static string CognitiveServiceResourceKind => _data?.CognitiveServiceResourceKind;
+        public static string CognitiveServiceResourceKind => _data?.CognitiveServiceResourceKind!;
 
-        public static string CognitiveServiceResourceSku => _data?.CognitiveServiceResourceSku;
+        public static string CognitiveServiceResourceSku => _data?.CognitiveServiceResourceSku!;
 
         public static bool InitConfigsEndpoint => _data != null && _data.InitConfigsEndpoint;
 
         public static bool InitConfigsSubscription => _data != null && _data.InitConfigsSubscription;
 
-        public static string HelpCommandTokens => _data?.HelpCommandTokens;
+        public static string HelpCommandTokens => _data?.HelpCommandTokens!;
 
-        public static string ConfigScopeTokens => _data?.ConfigScopeTokens;
+        public static string ConfigScopeTokens => _data?.ConfigScopeTokens!;
 
-        public static string[] ZipIncludes => _data?.ZipIncludes;
+        public static string[] ZipIncludes => _data?.ZipIncludes!;
 
         public static bool DispatchRunCommand(ICommandValues values) => _data != null && _data.DispatchRunCommand(values);
         public static bool DispatchParseCommand(INamedValueTokens tokens, ICommandValues values) => _data != null && _data.DispatchParseCommand(tokens, values);
         public static bool DispatchParseCommandValues(INamedValueTokens tokens, ICommandValues values) => _data != null && _data.DispatchParseCommandValues(tokens, values);
         public static bool DisplayKnownErrors(ICommandValues values, Exception ex) => _data != null && _data.DisplayKnownErrors(values, ex);
 
-        public static IEventLoggerHelpers EventLoggerHelpers => _data?.EventLoggerHelpers;
+        public static IEventLoggerHelpers EventLoggerHelpers => _data?.EventLoggerHelpers!;
 
-        public static ITelemetry Telemetry => _data.Telemetry;
+        public static ITelemetry Telemetry => _data?.Telemetry ?? NoOpTelemetry.Instance;
         public static ILoginManager LoginManager => _data.LoginManager;
         public static ISubscriptionsClient SubscriptionClient => _data.SubscriptionsClient;
         public static ICognitiveServicesClient CognitiveServicesClient => _data.CognitiveServicesClient;

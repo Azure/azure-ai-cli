@@ -88,13 +88,13 @@ namespace Azure.AI.Details.Common.CLI.Telemetry.Events
         /// A unique identifier for this particular run of the init command. This can be used to uniquely identify
         /// a single sequence of events
         /// </summary>
-        public string RunId { get; init; }
+        public string? RunId { get; init; }
 
         /// <summary>
         /// The type of init run we are doing. Due to subtle differences in the various options, there are currently
         /// 3 kinds: new, existing, standalone_{resType}
         /// </summary>
-        public string RunType { get; init; }
+        public string? RunType { get; init; }
 
         /// <summary>
         /// The outcome of this step
@@ -104,7 +104,7 @@ namespace Azure.AI.Details.Common.CLI.Telemetry.Events
         /// <summary>
         /// (Optional) Some additional information about what was selected (e.g. new, existing, skipped)
         /// </summary>
-        public string Selected { get; init; }
+        public string? Selected { get; init; }
 
         /// <summary>
         /// How long the user spent in that particular stage
@@ -114,6 +114,6 @@ namespace Azure.AI.Details.Common.CLI.Telemetry.Events
         /// <summary>
         /// (Optional) Any error information encountered that lead to a failed outcome
         /// </summary>
-        public string Error { get; init; }
+        public string? Error { get; init; }
     }
 }

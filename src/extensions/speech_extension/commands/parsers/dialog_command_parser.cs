@@ -44,7 +44,8 @@ namespace Azure.AI.Details.Common.CLI
                     return ccCommandParsers;
             }
 
-            return null;
+            values.AddThrowError("ERROR:", $"Unknown command: {commandName}");
+            return Array.Empty<INamedValueTokenParser>();
         }
 
         #region private data

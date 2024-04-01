@@ -15,6 +15,10 @@ namespace Azure.AI.Details.Common.CLI
 {
     public class RecognizeCommandBase : Command
     {
+        internal RecognizeCommandBase(ICommandValues values) : base(values)
+        {
+        }
+
         protected void StartCommand()
         {
             CheckPath();
@@ -23,15 +27,15 @@ namespace Azure.AI.Details.Common.CLI
             _display = new DisplayHelper(_values);
 
             _output = new OutputHelper(_values);
-            _output.StartOutput();
+            _output!.StartOutput();
 
-            var id = _values["audio.input.id"];
-            _output.EnsureOutputAll("audio.input.id", id);
-            _output.EnsureOutputEach("audio.input.id", id);
-            _output.EnsureCacheProperty("audio.input.id", id);
+            var id = _values["audio.input.id"]!;
+            _output!.EnsureOutputAll("audio.input.id", id);
+            _output!.EnsureOutputEach("audio.input.id", id);
+            _output!.EnsureCacheProperty("audio.input.id", id);
 
             var file = _values["audio.input.file"];
-            _output.EnsureCacheProperty("audio.input.file", file);
+            _output!.EnsureCacheProperty("audio.input.file", file);
 
             _lock = new SpinLock();
             _lock.StartLock();
@@ -43,15 +47,15 @@ namespace Azure.AI.Details.Common.CLI
 
         protected void StopCommand()
         {
-            _lock.StopLock(5000);
+            _lock!.StopLock(5000);
 
-            _output.CheckOutput();
-            _output.StopOutput();
+            _output!.CheckOutput();
+            _output!.StopOutput();
         }
 
         protected KeywordRecognitionModel LoadKeywordModel()
         {
-            var fileName = _values["recognize.keyword.file"];
+            var fileName = _values["recognize.keyword.file"]!;
             var existing = FileHelpers.DemandFindFileInDataPath(fileName, _values, "keyword model");
 
             var keywordModel = KeywordRecognitionModel.FromFile(existing);
@@ -103,44 +107,44 @@ namespace Azure.AI.Details.Common.CLI
         }
 
         #region Event Handlers
-        protected void SessionStarted(object sender, SessionEventArgs e)
+        protected void SessionStarted(object? sender, SessionEventArgs e)
         {
-            _lock.EnterReaderLockOnce(ref _expectSessionStopped);
+            _lock!.EnterReaderLockOnce(ref _expectSessionStopped);
             _stopEvent.Reset();
 
-            _display.DisplaySessionStarted(e);
-            _output.SessionStarted(e);
+            _display!.DisplaySessionStarted(e);
+            _output!.SessionStarted(e);
         }
 
-        protected void SessionStopped(object sender, SessionEventArgs e)
+        protected void SessionStopped(object? sender, SessionEventArgs e)
         {
-            _display.DisplaySessionStopped(e);
-            _output.SessionStopped(e);
+            _display!.DisplaySessionStopped(e);
+            _output!.SessionStopped(e);
 
             _stopEvent.Set();
-            _lock.ExitReaderLockOnce(ref _expectSessionStopped);
+            _lock!.ExitReaderLockOnce(ref _expectSessionStopped);
         }
 
-        protected void Recognizing(object sender, SpeechRecognitionEventArgs e)
+        protected void Recognizing(object? sender, SpeechRecognitionEventArgs e)
         {
-            _lock.EnterReaderLockOnce(ref _expectRecognized);
+            _lock!.EnterReaderLockOnce(ref _expectRecognized);
 
-            _display.DisplayRecognizing(e);
-            _output.Recognizing(e);
+            _display!.DisplayRecognizing(e);
+            _output!.Recognizing(e);
         }
 
-        protected void Recognized(object sender, SpeechRecognitionEventArgs e)
+        protected void Recognized(object? sender, SpeechRecognitionEventArgs e)
         {
-            _display.DisplayRecognized(e);
-            _output.Recognized(e);
+            _display!.DisplayRecognized(e);
+            _output!.Recognized(e);
 
-            _lock.ExitReaderLockOnce(ref _expectRecognized);
+            _lock!.ExitReaderLockOnce(ref _expectRecognized);
         }
 
-        protected void Canceled(object sender, SpeechRecognitionCanceledEventArgs e)
+        protected void Canceled(object? sender, SpeechRecognitionCanceledEventArgs e)
         {
-            _display.DisplayCanceled(e);
-            _output.Canceled(e);
+            _display!.DisplayCanceled(e);
+            _output!.Canceled(e);
             _canceledEvent.Set();
         }
         #endregion
@@ -182,7 +186,7 @@ namespace Azure.AI.Details.Common.CLI
             _microphone = (input == "microphone" || string.IsNullOrEmpty(input));
         }
 
-        private string GetIdFromAudioInputFile(string input, string file)
+        private string GetIdFromAudioInputFile(string? input, string file)
         {
             string id;
             if (input == "microphone" || string.IsNullOrEmpty(input))
@@ -203,7 +207,7 @@ namespace Azure.AI.Details.Common.CLI
             return id;
         }
 
-        private string GetAudioInputFromId(string id)
+        private string? GetAudioInputFromId(string id)
         {
             string input;
             if (id == "microphone")
@@ -228,9 +232,8 @@ namespace Azure.AI.Details.Common.CLI
             return input;
         }
 
-        private string GetAudioInputFileFromId(string id)
+        private string? GetAudioInputFileFromId(string id)
         {
-            string file;
             var existing = FileHelpers.FindFileInDataPath(id, _values);
             if (existing == null) existing = FileHelpers.FindFileInDataPath(id + ".wav", _values);
 
@@ -244,10 +247,11 @@ namespace Azure.AI.Details.Common.CLI
                 }
             }
 
-            file = existing;
+            var file = existing;
             _values.Add("audio.input.file", file);
             return file;
         }
+
         #endregion
 
         #region private backing methods
@@ -285,12 +289,12 @@ namespace Azure.AI.Details.Common.CLI
         protected bool _connect = false;
         protected bool _disconnect = false;
 
-        protected SpinLock _lock = null;
+        protected SpinLock? _lock = null;
         protected int _expectRecognized = 0;
         protected int _expectSessionStopped = 0;
         protected int _expectDisconnected = 0;
 
-        OutputHelper _output = null;
-        DisplayHelper _display = null;
+        OutputHelper? _output = null;
+        DisplayHelper? _display = null;
     }
 }

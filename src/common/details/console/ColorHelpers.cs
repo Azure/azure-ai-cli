@@ -56,7 +56,7 @@ namespace Azure.AI.Details.Common.CLI
             return new Colors(colors[3], colors[2]);
         }
 
-        public static bool TryParseColorStyleText(string text, out Colors parsedStyle, out string parsedText)
+        public static bool TryParseColorStyleText(string text, out Colors? parsedStyle, out string? parsedText)
         {
             if (text.Length > 2 && text[0] == '#')
             {

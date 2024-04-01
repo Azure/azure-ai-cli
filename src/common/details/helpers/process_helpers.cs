@@ -219,13 +219,11 @@ namespace Azure.AI.Details.Common.CLI
             }
 
             var kvps = new List<string>();
-            if (dictionary != null)
+            foreach (var kvp in dictionary)
             {
-                foreach (var kvp in dictionary)
-                {
-                    kvps.Add($"{kvp.Key}={kvp.Value}");
-                }
+                kvps.Add($"{kvp.Key}={kvp.Value}");
             }
+
             return string.Join(' ', kvps);
         }
 

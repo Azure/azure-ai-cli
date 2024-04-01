@@ -15,19 +15,24 @@ namespace Azure.AI.Details.Common.CLI
 {
     public interface INamedValues
     {
-        void Add(string name, string value);
+        void Add(string name, string? value);
         bool Contains(string name, bool checkDefault = true);
-        string Get(string name, bool checkDefault = true);
+        string? Get(string name, bool checkDefault = true);
 
-        void Reset(string name, string value = null);
+        void Reset(string name, string? value = null);
 
-        string this[string name] { get; }
+        string? this[string name] { get; }
         IEnumerable<string> Names { get; }
     }
 
     public static class NamedValueExtensions
     {
-        public static string GetOrDefault(this INamedValues values, string name, string defaultValue)
+        public static string GetOrEmpty(this INamedValues values, string name)
+        {
+            return values.GetOrDefault(name, string.Empty)!;
+        }
+
+        public static string? GetOrDefault(this INamedValues values, string name, string? defaultValue)
         {
             var value = values[name];
             return !string.IsNullOrEmpty(value) ? value : defaultValue;
@@ -65,22 +70,23 @@ namespace Azure.AI.Details.Common.CLI
             // TODO Should we have a TryGet pattern instead to avoid double lookups?
             if (values.Contains(name, true))
             {
-                string stringValue = values[name];
-                return (TVal)converter.ConvertFromInvariantString(stringValue);
+                var stringValue = values[name]!;
+                return (TVal)converter.ConvertFromInvariantString(stringValue)!;
             }
             else
             {
                 TVal val = creator();
-                string stringValue = converter.ConvertToInvariantString(val);
+                string stringValue = converter.ConvertToInvariantString(val)!;
                 values.Add(name, stringValue);
                 return val;
             }
         }
 
-        public static string ReplaceValues(this string s, INamedValues values)
+        public static string ReplaceValues(this string s, INamedValues? values)
         {
-            if (s == null || !s.Contains("{") || !s.Contains("}")) return s;
-            if (values is ICommandValues) return s.ReplaceValues(values as ICommandValues);
+            if (values == null) return s;
+            if (!s.Contains("{") || !s.Contains("}")) return s;
+            if (values is ICommandValues) return s.ReplaceValues((values as ICommandValues)!);
 
             StringBuilder sb = new StringBuilder();
             for (int i = 0; i < s.Length; i++)
@@ -105,7 +111,7 @@ namespace Azure.AI.Details.Common.CLI
         {
             foreach (var name in values.Names)
             {
-                var value0 = values[name];
+                var value0 = values[name]!;
                 var value1 = value0.ReplaceValues(values);
                 if (value0 != value1)
                 {
@@ -116,24 +122,24 @@ namespace Azure.AI.Details.Common.CLI
             return values;
         }
 
-        public static string SaveAs(this INamedValues values, string fileName = null)
+        public static string SaveAs(this INamedValues values, string? fileName = null)
         {
             return values.SaveAs(values.Names, fileName);
         }
 
-        public static string SaveAs(this INamedValues values, IEnumerable<string> names, string fileName = null)
+        public static string SaveAs(this INamedValues values, IEnumerable<string> names, string? fileName = null)
         {
             fileName = fileName == null
                 ? Path.GetTempFileName()
                 : FileHelpers.GetOutputDataFileName(fileName, values);
 
-            string allFileNames = fileName;
+            string allFileNames = fileName!;
 
             List<string> lines = new List<string>();
             foreach (var name in names)
             {
                 var value = values[name];
-                if (value.Contains('\n') || value.Contains('\t'))
+                if (value != null && (value.Contains('\n') || value.Contains('\t')))
                 {
                     var additionalFile = fileName + "." + name;
                     FileHelpers.WriteAllText(additionalFile, value, Encoding.UTF8);
@@ -146,7 +152,7 @@ namespace Azure.AI.Details.Common.CLI
                 }
             }
 
-            FileHelpers.WriteAllLines(fileName, lines, new UTF8Encoding(false));
+            FileHelpers.WriteAllLines(fileName!, lines, new UTF8Encoding(false));
             return allFileNames;
         }
 
@@ -208,25 +214,25 @@ namespace Azure.AI.Details.Common.CLI
             return values.GetOrDefault("display.help.dump", false);
         }
 
-        public static string GetCommand(this INamedValues values, string defaultValue = "")
+        public static string? GetCommand(this INamedValues values, string defaultValue = "")
         {
             return values.GetOrDefault("x.command", defaultValue);
         }
 
-        public static string GetCommandRoot(this INamedValues values, string defaultValue = "")
+        public static string? GetCommandRoot(this INamedValues values, string defaultValue = "")
         {
-            return values.GetCommand(defaultValue).Split('.').FirstOrDefault();
+            return values.GetCommand(defaultValue)?.Split('.').FirstOrDefault() ?? string.Empty;
         }
 
-        public static string GetCommandForDisplay(this INamedValues values)
+        public static string? GetCommandForDisplay(this INamedValues values)
         {
-            return values.GetCommand().Replace('.', ' ');
+            return values.GetCommand()?.Replace('.', ' ');
         }
     }
 
     public class NamedValues : INamedValues
     {
-        public void Add(string name, string value)
+        public void Add(string name, string? value)
         {
             var exists = _values.ContainsKey(name);
             var current = exists ? _values[name] : null;
@@ -246,12 +252,12 @@ namespace Azure.AI.Details.Common.CLI
             return _values.ContainsKey(name);
         }
 
-        public string Get(string name, bool checkDefault = true)
+        public string? Get(string name, bool checkDefault = true)
         {
             return Contains(name, checkDefault) ? _values[name] : null;
         }
 
-        public void Reset(string name, string value = null)
+        public void Reset(string name, string? value = null)
         {
             _values.Remove(name);
             _names.Remove(name);
@@ -261,7 +267,7 @@ namespace Azure.AI.Details.Common.CLI
             }
         }
 
-        public string this[string name]
+        public string? this[string name]
         {
             get
             {
@@ -277,7 +283,7 @@ namespace Azure.AI.Details.Common.CLI
             }
         }
 
-        private Dictionary<string, string> _values = new Dictionary<string, string>();
+        private Dictionary<string, string?> _values = new Dictionary<string, string?>();
         private List<string> _names = new List<string>();
     }
 }

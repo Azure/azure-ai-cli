@@ -14,7 +14,7 @@ namespace Azure.AI.Details.Common.CLI
 {
     class ConfigHelpers
     {
-        public static SpeechConfig CreateSpeechConfig(ICommandValues values, string key=null, string region = null)
+        public static SpeechConfig CreateSpeechConfig(ICommandValues values, string? key = null, string? region = null)
         {
             key = string.IsNullOrEmpty(key) ? values["service.config.key"] : key;
             region = string.IsNullOrEmpty(region) ? values["service.config.region"] : region;
@@ -64,16 +64,16 @@ namespace Azure.AI.Details.Common.CLI
 
             SetupLogFile(config, values);
 
-            var stringProperty = values.GetOrDefault("config.string.property", "");
+            var stringProperty = values.GetOrEmpty("config.string.property");
             if (!string.IsNullOrEmpty(stringProperty)) ConfigHelpers.SetStringProperty(config, stringProperty);
 
-            var stringProperties = values.GetOrDefault("config.string.properties", "");
+            var stringProperties = values.GetOrEmpty("config.string.properties");
             if (!string.IsNullOrEmpty(stringProperties)) ConfigHelpers.SetStringProperties(config, stringProperties);
 
             return config;
         }
 
-        public static AudioConfig CreateAudioConfig(ICommandValues values)
+        public static AudioConfig? CreateAudioConfig(ICommandValues values)
         {
             var input = values["audio.input.type"];
             var file = values["audio.input.file"];
@@ -138,7 +138,7 @@ namespace Azure.AI.Details.Common.CLI
             var log = values["diagnostics.config.log.file"];
             if (!string.IsNullOrEmpty(log))
             {
-                var id = values.GetOrDefault("audio.input.id", "");
+                var id = values.GetOrEmpty("audio.input.id");
                 if (log.Contains("{id}")) log = log.Replace("{id}", id);
 
                 var pid = Process.GetCurrentProcess().Id.ToString();
@@ -147,7 +147,7 @@ namespace Azure.AI.Details.Common.CLI
                 var time = DateTime.Now.ToFileTime().ToString();
                 if (log.Contains("{time}")) log = log.Replace("{time}", time);
 
-                var runTime = values.GetOrDefault("x.run.time", "");
+                var runTime = values.GetOrEmpty("x.run.time");
                 if (log.Contains("{run.time}")) log = log.Replace("{run.time}", runTime);
 
                 log = FileHelpers.GetOutputDataFileName(log, values);

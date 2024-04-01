@@ -47,7 +47,7 @@ namespace Azure.AI.Details.Common.CLI
                 if (peekToken.StartsWith(prefix)) break;
 
                 var peekTokenValue = tokens.ValueFromToken(peekToken, values);
-                queue.Enqueue(peekTokenValue);
+                queue.Enqueue(peekTokenValue!);
 
                 iPeekToken++;
             }

@@ -66,7 +66,7 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
         public static Dictionary<string, string> GetCurrentProcessEnvironment()
         {
             var env = Environment.GetEnvironmentVariables();
-            return env.Keys.Cast<string>().ToDictionary(key => key, key => env[key].ToString());
+            return env.Keys.Cast<string>().ToDictionary(key => key, key => env[key]?.ToString() ?? string.Empty);
         }
 
         public static Dictionary<string, string> UpdateCopyEnvironment(Dictionary<string, string> environment, YamlMappingNode mapping)

@@ -9,7 +9,7 @@ namespace Azure.AI.Details.Common.CLI
 {
     public partial class AzCliConsoleGui
     {
-        public static async Task<AzCli.AccountRegionLocationInfo> PickRegionLocationAsync(bool interactive, string subscriptionId, string regionFilter = null, bool allowAnyRegionOption = true)
+        public static async Task<AzCli.AccountRegionLocationInfo> PickRegionLocationAsync(bool interactive, string subscriptionId, string? regionFilter = null, bool allowAnyRegionOption = true)
         {
             var regionLocation = await FindRegionAsync(interactive, subscriptionId, regionFilter, allowAnyRegionOption);
             if (regionLocation == null)
@@ -19,7 +19,7 @@ namespace Azure.AI.Details.Common.CLI
             return regionLocation.Value;
         }
 
-        public static async Task<AzCli.AccountRegionLocationInfo?> FindRegionAsync(bool interactive, string subscriptionId, string regionFilter = null, bool allowAnyRegionOption = false)
+        public static async Task<AzCli.AccountRegionLocationInfo?> FindRegionAsync(bool interactive, string subscriptionId, string? regionFilter = null, bool allowAnyRegionOption = false)
         {
             var p0 = allowAnyRegionOption ? "(Any region/location)" : null;
             var hasP0 = !string.IsNullOrEmpty(p0);
@@ -66,7 +66,7 @@ namespace Azure.AI.Details.Common.CLI
                 : null;
         }
 
-        private static AzCli.AccountRegionLocationInfo? ListBoxPickAccountRegionLocation(AzCli.AccountRegionLocationInfo[] items, string p0)
+        private static AzCli.AccountRegionLocationInfo? ListBoxPickAccountRegionLocation(AzCli.AccountRegionLocationInfo[] items, string? p0)
         {
             var list = items.Select(x => x.RegionalDisplayName).ToList();
 
@@ -92,12 +92,12 @@ namespace Azure.AI.Details.Common.CLI
             return regionLocation;
         }
 
-        static bool ExactMatchRegionLocation(AzCli.AccountRegionLocationInfo regionLocation, string regionLocationFilter)
+        static bool ExactMatchRegionLocation(AzCli.AccountRegionLocationInfo regionLocation, string? regionLocationFilter)
         {
             return regionLocation.Name.ToLowerInvariant() == regionLocationFilter || regionLocation.DisplayName == regionLocationFilter || regionLocation.RegionalDisplayName == regionLocationFilter;
         }
 
-        private static bool MatchRegionLocationFilter(AzCli.AccountRegionLocationInfo regionLocation, string regionLocationFilter)
+        private static bool MatchRegionLocationFilter(AzCli.AccountRegionLocationInfo regionLocation, string? regionLocationFilter)
         {
             if (regionLocationFilter == null || ExactMatchRegionLocation(regionLocation, regionLocationFilter))
             {

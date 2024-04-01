@@ -470,7 +470,7 @@ namespace Azure.AI.CLI.Clients.AzPython
         }
 
         /// <inheritdoc />
-        public Task<ClientResult<(string, string?)>> GetResourceKeysFromNameAsync(
+        public Task<ClientResult<(string, string)>> GetResourceKeysFromNameAsync(
             string subscriptionId, string resourceGroup, string resourceName, CancellationToken token)
         {
             return ParseAsync(
@@ -494,10 +494,10 @@ namespace Azure.AI.CLI.Clients.AzPython
                     using var doc = JsonDocument.Parse(json ?? "{}");
                     return (
                         doc.RootElement.GetPropertyStringOrEmpty("key1"),
-                        doc.RootElement.GetPropertyStringOrNull("key2")
+                        doc.RootElement.GetPropertyStringOrEmpty("key2")
                     );
                 },
-                () => (string.Empty, null),
+                () => (string.Empty, string.Empty),
                 token);
         }
 
@@ -607,7 +607,7 @@ namespace Azure.AI.CLI.Clients.AzPython
                 token);
         }
 
-        Task<ClientResult<(string, string?)>> ISearchClient.GetKeysAsync(
+        Task<ClientResult<(string, string)>> ISearchClient.GetKeysAsync(
             string subscriptionId, string resourceGroup, string name, CancellationToken token)
         {
             return ParseAsync(
@@ -631,10 +631,10 @@ namespace Azure.AI.CLI.Clients.AzPython
                     using var doc = JsonDocument.Parse(json ?? "{}");
                     return (
                         doc.GetPropertyStringOrEmpty("primaryKey"),
-                        doc.GetPropertyStringOrNull("secondaryKey")
+                        doc.GetPropertyStringOrEmpty("secondaryKey")
                     );
                 },
-                () => (string.Empty, null),
+                () => (string.Empty, string.Empty),
                 token);
         }
 

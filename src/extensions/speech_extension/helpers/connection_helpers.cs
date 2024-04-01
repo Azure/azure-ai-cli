@@ -20,11 +20,11 @@ namespace Azure.AI.Details.Common.CLI
             SetConnectionMessageProperty(connection, "speech.context", uspContext);
         }
 
-        private static void SetConnectionMessageProperty(Connection connection, string msg, string property)
+        private static void SetConnectionMessageProperty(Connection connection, string msg, string? property)
         {
             if (IsJson(property))
             {
-                SetConnectionMessagePropertyJson(connection, msg, property);
+                SetConnectionMessagePropertyJson(connection, msg, property!);
             }
             else if (!string.IsNullOrEmpty(property))
             {
@@ -55,7 +55,7 @@ namespace Azure.AI.Details.Common.CLI
             }
         }
 
-        private static bool IsJson(string json)
+        private static bool IsJson(string? json)
         {
             if (!string.IsNullOrEmpty(json))
             {

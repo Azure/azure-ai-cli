@@ -37,17 +37,17 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
             return new YamlScalarNode(text);
         }
 
-        public static string ConvertScalarSequenceToMultilineTsvString(this YamlNode node, string[] keys = null)
+        public static string? ConvertScalarSequenceToMultilineTsvString(this YamlNode node, string[] keys)
         {
             // ensure it's a sequence
             var ok = node is YamlSequenceNode;
             if (!ok) return null;
 
             var lines = new List<string>();
-            foreach (var item in (node as YamlSequenceNode).Children)
+            foreach (var item in (node as YamlSequenceNode)!.Children)
             {
                 var line = item is YamlScalarNode
-                    ? (item as YamlScalarNode).Value
+                    ? (item as YamlScalarNode)?.Value
                     : item is YamlSequenceNode
                         ? item.ConvertScalarSequenceToTsvString(keys)
                         : item.ConvertScalarMapToTsvString(keys);
@@ -57,12 +57,12 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
                 Logger.LogIf(invalidItem, $"Invalid item at ({item.Start.Line},{item.Start.Column})");
                 if (invalidItem) return null; 
 
-                lines.Add(line);
+                lines.Add(line!);
             }
             return string.Join("\n", lines);
         }
 
-        public static string ConvertScalarSequenceToTsvString(this YamlNode node, string[] keys = null)
+        public static string? ConvertScalarSequenceToTsvString(this YamlNode node, string[]? keys = null)
         {
             // ensure it's a sequence (list/array)
             var sequence = node as YamlSequenceNode;
@@ -75,7 +75,7 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
 
             // join the scalar children separated by tabs
             var tsv = string.Join("\t", sequence.Children
-                .Select(x => (x as YamlScalarNode).Value));
+                .Select(x => (x as YamlScalarNode)?.Value));
 
             // if we don't have enough items, append empty string columns (count of items == count of tabs + 1)
             while (tsv.Count(x => x == '\t') + 1 < keys?.Length)
@@ -88,7 +88,7 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
             return tsv;
         }
 
-        public static string ConvertScalarMapToTsvString(this YamlNode node, string[] keys)
+        public static string? ConvertScalarMapToTsvString(this YamlNode node, string[] keys)
         {
             // ensure it's a mapping node and we have keys
             var mapping = node as YamlMappingNode;
@@ -100,14 +100,14 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
             if (count > 0) return null;
 
             // ensure the key specified is in the list of keys
-            count = mapping.Count(x => !keys.Contains((x.Key as YamlScalarNode).Value));
+            count = mapping.Count(x => !keys.Contains((x.Key as YamlScalarNode)?.Value));
             Logger.LogIf(count > 0, $"Invalid: key not found count({count}) > 0");
             if (count > 0) return null;
 
             // join the scalar children ordered by keys, separated by tabs
             var tsv = string.Join("\t", keys
                 .Select(key => mapping.Children.ContainsKey(key)
-                    ? (mapping.Children[key] as YamlScalarNode).Value
+                    ? (mapping.Children[key] as YamlScalarNode)?.Value
                     : ""));
 
             tsv = tsv.Replace('\n', '\f');

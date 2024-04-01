@@ -15,7 +15,7 @@ namespace Azure.AI.Details.Common.CLI.ConsoleGui
     {
         #region protected methods
 
-        protected SpeedSearchListBoxControl(Window parent, Rect rect, Colors colorNormal, Colors colorSelected, string border = null, bool fEnabled = true) : base(parent, rect, colorNormal, colorSelected, border, fEnabled)
+        protected SpeedSearchListBoxControl(Window? parent, Rect rect, Colors colorNormal, Colors colorSelected, string? border = null, bool fEnabled = true) : base(parent, rect, colorNormal, colorSelected, border, fEnabled)
         {
         }
 
@@ -24,12 +24,12 @@ namespace Azure.AI.Details.Common.CLI.ConsoleGui
             bool processed = base.ProcessKey(key);
             if (IsSpeedSearchOpen()) 
             {
-                _speedSearchBox.DisplayCursor();
+                _speedSearchBox!.DisplayCursor();
             }
             return processed;
         }
 
-        protected override void PaintWindow(Colors colors, string border = null)
+        protected override void PaintWindow(Colors colors, string? border = null)
         {
             base.PaintWindow(colors, border);
             if (border != null)
@@ -43,7 +43,7 @@ namespace Azure.AI.Details.Common.CLI.ConsoleGui
             return _speedSearchBox != null && _speedSearchBox.IsOpen();
         }
 
-        protected bool OpenSpeedSearch(string text = null)
+        protected bool OpenSpeedSearch(string? text = null)
         {
             if (_speedSearchBox == null)
             {
@@ -110,7 +110,7 @@ namespace Azure.AI.Details.Common.CLI.ConsoleGui
 
         protected virtual string GetSpeedSearchText()
         {
-            return _speedSearchBox?.GetText();
+            return _speedSearchBox?.GetText() ?? string.Empty;
         }
 
         protected bool ProcessSpeedSearchKey(ConsoleKeyInfo key)
@@ -119,7 +119,7 @@ namespace Azure.AI.Details.Common.CLI.ConsoleGui
             {
                 _speedSearchBox.Close();
                 _speedSearchBox = null;
-                PaintWindow(Colors, $"{Border.Substring(0, 4)}{(char)0}{Border.Substring(5)}");
+                PaintWindow(Colors, $"{Border?.Substring(0, 4)}{(char)0}{Border?.Substring(5)}");
                 return true;
             }
 
@@ -144,9 +144,9 @@ namespace Azure.AI.Details.Common.CLI.ConsoleGui
             if (key.IsAscii())
             {
                 OpenSpeedSearch();
-                _speedSearchBox.End();
+                _speedSearchBox!.End();
 
-                if (_speedSearchBox.ProcessKey(key))
+                if (_speedSearchBox!.ProcessKey(key))
                 {
                     return SelectRowContaining(GetSpeedSearchText(), SelectedRow, true, true, true, true, +1);
                 }
@@ -256,10 +256,10 @@ namespace Azure.AI.Details.Common.CLI.ConsoleGui
         protected bool RowContainsRegex(int row, string searchFor, out int col, out int width)
         {
             var text = GetSpeedSearchText(row).ToLower();
-            var matches = TryCatchHelpers.TryCatchNoThrow<MatchCollection>(() => Regex.Matches(text, searchFor), null, out _);
+            var matches = TryCatchHelpers.TryCatchNoThrow<MatchCollection?>(() => Regex.Matches(text, searchFor), null, out _);
 
             var maxIndex = matches?.Count() > 0 ? matches?.Max(match => match.Index) : null;
-            var match = maxIndex.HasValue ? matches.Where(match => match.Index == maxIndex).Last() : null;
+            var match = maxIndex.HasValue ? matches?.Where(match => match.Index == maxIndex).Last() : null;
            
             col = match != null && match.Success ? match.Index : -1;
             width = match != null && match.Success ? match.Length : -1;
@@ -290,7 +290,7 @@ namespace Azure.AI.Details.Common.CLI.ConsoleGui
 
             if (IsSpeedSearchOpen())
             {
-                _speedSearchBox.DisplayCursor();
+                _speedSearchBox!.DisplayCursor();
             }
 
             return selected;
@@ -300,7 +300,7 @@ namespace Azure.AI.Details.Common.CLI.ConsoleGui
 
         #region private data
 
-        private EditBoxControl _speedSearchBox;
+        private EditBoxControl? _speedSearchBox;
 
         #endregion
     }

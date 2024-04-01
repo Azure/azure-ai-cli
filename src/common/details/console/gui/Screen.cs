@@ -239,8 +239,8 @@ namespace Azure.AI.Details.Common.CLI.ConsoleGui
 
         public void WriteChar(int x, int y, char ch, int count = 1)
         {
-            Cursor saved1 = null;
-            Cursor saved2 = null;
+            Cursor? saved1 = null;
+            Cursor? saved2 = null;
             if (x + count > GetRightColumn())
             {
                 saved1 = new Cursor(GetLeftColumn(), GetTopRow());
@@ -280,11 +280,11 @@ namespace Azure.AI.Details.Common.CLI.ConsoleGui
             var colorOn = false;
             foreach (var part in text.Split(delimiter))
             {
-                if (colorOn && ColorHelpers.TryParseColorStyleText(part, out Colors parsed, out text))
+                if (colorOn && ColorHelpers.TryParseColorStyleText(part, out var parsedColor, out var parsedText))
                 {
-                    WriteText(parsed, x, y, text, cch);
-                    cch -= text.Length;
-                    x += text.Length;
+                    WriteText(parsedColor!, x, y, parsedText!, cch);
+                    cch -= parsedText!.Length;
+                    x += parsedText!.Length;
                 }
                 else
                 {

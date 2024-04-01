@@ -14,7 +14,7 @@ namespace Azure.AI.Details.Common.CLI.ConsoleGui
             public static string SingleLine = "\U0000250C\U00002500\U00002510\U00002502 \U00002502\U00002514\U00002500\U00002518";
         }
 
-        public Window(Window parent, Rect rect, Colors colors, string border = null)
+        public Window(Window? parent, Rect rect, Colors colors, string? border = null)
         {
             this._parent = parent;
 
@@ -26,7 +26,7 @@ namespace Azure.AI.Details.Common.CLI.ConsoleGui
 
         #region parent and position
 
-        public Window GetParent()
+        public Window? GetParent()
         {
             return _parent;
         }
@@ -70,7 +70,7 @@ namespace Azure.AI.Details.Common.CLI.ConsoleGui
             return _border != null;
         }
 
-        public string Border
+        public string? Border
         {
             get { return _border; }
         }
@@ -271,7 +271,7 @@ namespace Azure.AI.Details.Common.CLI.ConsoleGui
 
         #region protected methods
 
-        protected virtual void PaintWindow(Colors colors, string border = null)
+        protected virtual void PaintWindow(Colors colors, string? border = null)
         {
             if (border != null && border.Length == 9)
             {
@@ -325,7 +325,7 @@ namespace Azure.AI.Details.Common.CLI.ConsoleGui
 
         #region private methods
 
-         private void SetRect(Rect rect)
+        private void SetRect(Rect rect)
         {
             this._rect = new Rect(
                 rect.X + (_parent == null ? 0 : _parent.ClientRect.X),
@@ -376,11 +376,11 @@ namespace Azure.AI.Details.Common.CLI.ConsoleGui
 
         #region private data
  
-        private Window _parent;
-        private Rect _rect;
-        private Rect _rectClient;
+        private Window? _parent;
+        private Rect _rect = new Rect(0, 0, 0, 0);
+        private Rect _rectClient = new Rect(0, 0, 0, 0);
         private Colors _colors;
-        private string _border;
+        private string? _border;
         private bool _focus = false;
         private bool _open = false;
         private bool _killFocusCursorVisible = true;

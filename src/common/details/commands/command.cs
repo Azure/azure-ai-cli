@@ -44,7 +44,7 @@ namespace Azure.AI.Details.Common.CLI
             return DispatchRunCommand(values, queue, true, true);
         }
 
-        public static bool DispatchRunCommand(ICommandValues values, Queue<ICommandValues> queue, bool expandOk, bool parallelOk)
+        public static bool DispatchRunCommand(ICommandValues values, Queue<ICommandValues>? queue, bool expandOk, bool parallelOk)
         {
             var command = values.GetCommand();
 
@@ -77,7 +77,7 @@ namespace Azure.AI.Details.Common.CLI
 
             if (!zipAsFile.EndsWith(".zip")) zipAsFile = zipAsFile + ".zip";
 
-            var tempDirectory = PathHelpers.Combine(Path.GetTempPath(), zipAsFile + DateTime.Now.ToFileTime().ToString() + ".temp");
+            var tempDirectory = PathHelpers.Combine(Path.GetTempPath(), zipAsFile + DateTime.Now.ToFileTime().ToString() + ".temp")!;
             Directory.CreateDirectory(tempDirectory);
 
             ZipCommand(values, zipAsFile, tempDirectory, verbose);
@@ -94,7 +94,7 @@ namespace Azure.AI.Details.Common.CLI
 
             var isWindows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
 
-            var zipTarget = values.GetOrDefault("x.command.zip.target", "");
+            var zipTarget = values.GetOrEmpty("x.command.zip.target");
             var targetWebJob = zipTarget.ToLower() == "webjob";
 
             // run.cmd or run.sh
@@ -104,7 +104,7 @@ namespace Azure.AI.Details.Common.CLI
             var command = values.GetCommand();
             var commandJob = "./" + command + ".job";
 
-            var runScriptPath = PathHelpers.Combine(tempDirectory, runScript);
+            var runScriptPath = PathHelpers.Combine(tempDirectory, runScript)!;
 
             if (targetWebJob)
             {
@@ -125,7 +125,7 @@ namespace Azure.AI.Details.Common.CLI
                 if (verbose) Console.WriteLine($"  Saving {settingsPath}... ");
 
                 var settingsJson = "{ \"is_in_place\": true }";
-                settingsPath = PathHelpers.Combine(tempDirectory, "settings.job");
+                settingsPath = PathHelpers.Combine(tempDirectory, "settings.job")!;
                 FileHelpers.WriteAllText(settingsPath, settingsJson, Encoding.Default);
             }
 
@@ -133,7 +133,7 @@ namespace Azure.AI.Details.Common.CLI
             var files = values.SaveAs(commandJob).Split(';');
             foreach (var file in files)
             {
-                FileHelpers.CopyFile(".", file, tempDirectory, null, verbose);
+                FileHelpers.TryCopyFile(".", file, tempDirectory, null, verbose);
                 File.Delete(file);
             }
 
@@ -141,33 +141,33 @@ namespace Azure.AI.Details.Common.CLI
             var sourcePath = AppContext.BaseDirectory;
 
             var programExe = OperatingSystem.IsWindows() ? Program.Exe : Program.Exe.Replace(".exe", "");
-            FileHelpers.CopyFile(sourcePath, programExe, tempDirectory, null, verbose);
+            FileHelpers.TryCopyFile(sourcePath, programExe, tempDirectory, null, verbose);
 
             #if NETCOREAPP
-            FileHelpers.CopyFile(sourcePath, Program.Name, tempDirectory, null, verbose);
-            FileHelpers.CopyFile(sourcePath, Program.Dll, tempDirectory, null, verbose);
-            FileHelpers.CopyFile(sourcePath, "runtimeconfig.json", tempDirectory, null, verbose);
-            FileHelpers.CopyFile(sourcePath, $"{Program.Name}.runtimeconfig.json", tempDirectory, null, verbose);
+            FileHelpers.TryCopyFile(sourcePath, Program.Name, tempDirectory, null, verbose);
+            FileHelpers.TryCopyFile(sourcePath, Program.Dll, tempDirectory, null, verbose);
+            FileHelpers.TryCopyFile(sourcePath, "runtimeconfig.json", tempDirectory, null, verbose);
+            FileHelpers.TryCopyFile(sourcePath, $"{Program.Name}.runtimeconfig.json", tempDirectory, null, verbose);
             #endif
 
             var bindingAssembly = FileHelpers.GetAssemblyFileInfo(Program.BindingAssemblySdkType);
-            sourcePath = bindingAssembly.DirectoryName;
-            FileHelpers.CopyFile(sourcePath, bindingAssembly.Name, tempDirectory, null, verbose);
+            sourcePath = bindingAssembly.DirectoryName!;
+            FileHelpers.TryCopyFile(sourcePath, bindingAssembly.Name, tempDirectory, null, verbose);
 
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
             {
                 string[] locations = { "", "runtimes/win-x64/native/", "../runtimes/win-x64/native/" };
-                FileHelpers.CopyFiles(PathHelpers.Combine(sourcePath, locations), Program.ZipIncludes, tempDirectory, null, null, verbose);
+                FileHelpers.TryCopyFiles(PathHelpers.Combine(sourcePath, locations), Program.ZipIncludes, tempDirectory, null, null, verbose);
             }
             else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
             {
                 string[] locations = { "", "runtimes/linux-x64/native/", "../../runtimes/linux-x64/native/" };
-                FileHelpers.CopyFiles(PathHelpers.Combine(sourcePath, locations), Program.ZipIncludes, tempDirectory, "lib", ".so", verbose);
+                FileHelpers.TryCopyFiles(PathHelpers.Combine(sourcePath, locations), Program.ZipIncludes, tempDirectory, "lib", ".so", verbose);
             }
             else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
             {
                 string[] locations = { "", "runtimes/osx-x64/native/", "../../runtimes/osx-x64/native/" };
-                FileHelpers.CopyFiles(PathHelpers.Combine(sourcePath, locations), Program.ZipIncludes, tempDirectory, "lib", ".dylib", verbose);
+                FileHelpers.TryCopyFiles(PathHelpers.Combine(sourcePath, locations), Program.ZipIncludes, tempDirectory, "lib", ".dylib", verbose);
             }
 
             // Dependent type assemblies (Linq Async, System.Interactive.Async and JMESPath)
@@ -176,7 +176,7 @@ namespace Azure.AI.Details.Common.CLI
             foreach (var t in types)
             {
                 var fi = FileHelpers.GetAssemblyFileInfo(t);
-                FileHelpers.CopyFile(fi.DirectoryName, fi.Name, tempDirectory, null, verbose);
+                FileHelpers.TryCopyFile(fi.DirectoryName!, fi.Name, tempDirectory, null, verbose);
             }
 
             File.Delete(zipAsFile);
@@ -188,7 +188,13 @@ namespace Azure.AI.Details.Common.CLI
 
     public class Command
     {
-        public static bool RunCommand(ICommandValues values, Queue<ICommandValues> queue, bool expandOk = true, bool parallelOk = true)
+        public Command(ICommandValues values)
+        {
+            _values = values;
+            _values.ReplaceValues();
+        }
+
+        public static bool RunCommand(ICommandValues values, Queue<ICommandValues>? queue, bool expandOk = true, bool parallelOk = true)
         {
             if (expandOk) return CheckExpandRunCommand(values, queue, expandOk, parallelOk);
             if (parallelOk) return CheckParallelRunCommand(values, queue, expandOk, ref parallelOk);
@@ -196,30 +202,30 @@ namespace Azure.AI.Details.Common.CLI
             return queue != null && CheckExpectedRunInProcAsync(values, queue).Result;
         }
 
-        protected static bool CheckExpandRunCommand(ICommandValues values, Queue<ICommandValues> queue, bool expandOk, bool parallelOk)
+        protected static bool CheckExpandRunCommand(ICommandValues values, Queue<ICommandValues>? queue, bool expandOk, bool parallelOk)
         {
             bool passed = false;
 
-            var fileValueName = values.GetOrDefault("x.command.expand.file.name", "");
-            var files = values.GetOrDefault($"{fileValueName}s", "");
+            var fileValueName = values.GetOrEmpty("x.command.expand.file.name");
+            var files = values.GetOrEmpty($"{fileValueName}s");
 
             var forEachCount = values["foreach.count"];
             var repeat = values["x.command.repeat"];
 
             if (!string.IsNullOrEmpty(files))
             {
-                BlockValues(values, queue, $"{fileValueName}s");
-                passed = CommandRunDispatcher.DispatchRunCommand(values, ExpandQueueForEachFile(queue, fileValueName, files), expandOk, parallelOk);
+                BlockValues(values, queue!, $"{fileValueName}s");
+                passed = CommandRunDispatcher.DispatchRunCommand(values, ExpandQueueForEachFile(queue!, fileValueName, files), expandOk, parallelOk);
             }
             else if (!string.IsNullOrEmpty(forEachCount))
             {
-                BlockValues(values, queue, "foreach.count");
-                passed = CommandRunDispatcher.DispatchRunCommand(values, ExpandQueueForEachTsv(values, queue, forEachCount), expandOk, parallelOk);
+                BlockValues(values, queue!, "foreach.count");
+                passed = CommandRunDispatcher.DispatchRunCommand(values, ExpandQueueForEachTsv(values, queue!, forEachCount), expandOk, parallelOk);
             }
             else if (!string.IsNullOrEmpty(repeat))
             {
-                BlockValues(values, queue, "x.command.repeat");
-                passed = CommandRunDispatcher.DispatchRunCommand(values, ExpandQueueFromRepeatCount(queue, repeat), expandOk, parallelOk);
+                BlockValues(values, queue!, "x.command.repeat");
+                passed = CommandRunDispatcher.DispatchRunCommand(values, ExpandQueueFromRepeatCount(queue!, repeat), expandOk, parallelOk);
             }
             else
             {
@@ -289,7 +295,7 @@ namespace Azure.AI.Details.Common.CLI
             {
                 var forEachTsvFile = $"foreach.{i}.tsv.file";
 
-                var forEachItems = new Queue<string>(tsvOptions.GetOrDefault(forEachTsvFile, "").Split('\n', '\r').Where(x => x.Trim().Length > 0));
+                var forEachItems = new Queue<string>(tsvOptions.GetOrEmpty(forEachTsvFile).Split('\n', '\r').Where(x => x.Trim().Length > 0));
                 BlockValues(tsvOptions, queue, forEachTsvFile);
 
                 var hasHeader = tsvOptions.GetOrDefault(forEachTsvFile + ".has.header", true);
@@ -299,7 +305,7 @@ namespace Azure.AI.Details.Common.CLI
                 BlockValues(tsvOptions, queue, forEachTsvFile + ".skip.header");
 
                 var defaultColumns = hasHeader ? forEachItems.Dequeue() : "audio.input.id\taudio.input.file";
-                var tsvColumns = tsvOptions.GetOrDefault(forEachTsvFile + ".columns", defaultColumns);
+                var tsvColumns = tsvOptions.GetOrDefault(forEachTsvFile + ".columns", defaultColumns)!;
                 BlockValues(tsvOptions, queue, forEachTsvFile + ".columns");
 
                 if (forEachItems.Count() >= 1)
@@ -337,7 +343,7 @@ namespace Azure.AI.Details.Common.CLI
             var names = new List<string>(thisRow.Names);
             foreach (var name in names)
             {
-                var value = thisRow[name];
+                var value = thisRow[name]!;
                 if (value.StartsWith("@@"))
                 {
                     var newValue = FileHelpers.ExpandAtFileValue(value.Substring(1), thisRow);
@@ -371,7 +377,7 @@ namespace Azure.AI.Details.Common.CLI
             return values;
         }
 
-        protected static bool CheckParallelRunCommand(ICommandValues values, Queue<ICommandValues> queue, bool expandOk, ref bool parallelOk)
+        protected static bool CheckParallelRunCommand(ICommandValues values, Queue<ICommandValues>? queue, bool expandOk, ref bool parallelOk)
         {
             bool passed;
             var processCount = values.GetOrDefault("x.command.parallel.process.count", 0);
@@ -380,16 +386,16 @@ namespace Azure.AI.Details.Common.CLI
             if (processCount > 0)
             {
                 var rampEvery = values.GetOrDefault("x.command.parallel.ramp.threads.every", 0);
-                BlockValues(values, queue, "x.command.parallel.ramp.processes.every");
-                BlockValues(values, queue, "x.command.parallel.process.count");
-                passed = CheckExpectedRunOutOfProcAsync(values, queue, processCount, rampEvery).Result;
+                BlockValues(values, queue!, "x.command.parallel.ramp.processes.every");
+                BlockValues(values, queue!, "x.command.parallel.process.count");
+                passed = CheckExpectedRunOutOfProcAsync(values, queue!, processCount, rampEvery).Result;
             }
             else if (threadCount > 0)
             {
                 var rampEvery = values.GetOrDefault("x.command.parallel.ramp.threads.every", 0);
-                BlockValues(values, queue, "x.command.parallel.ramp.threads.every");
-                BlockValues(values, queue, "x.command.parallel.thread.count");
-                passed = CheckExpectedRunOnThreadsAsync(values, queue, threadCount, rampEvery).Result;
+                BlockValues(values, queue!, "x.command.parallel.ramp.threads.every");
+                BlockValues(values, queue!, "x.command.parallel.thread.count");
+                passed = CheckExpectedRunOnThreadsAsync(values, queue!, threadCount, rampEvery).Result;
             }
             else
             {
@@ -408,9 +414,13 @@ namespace Azure.AI.Details.Common.CLI
         protected string DownloadInputFile(string file, string fileValueName, string fileValueDisplayName)
         {
             var downloaded = HttpHelpers.DownloadFileWithRetry(file);
-            if (FileHelpers.FileExistsInDataPath(downloaded, _values))
+            if (downloaded == null)
             {
-                file = downloaded;
+                _values.AddThrowError("ERROR:", $"Cannot download {fileValueDisplayName} file: \"{file}\"");
+            }
+            else if (FileHelpers.FileExistsInDataPath(downloaded!, _values))
+            {
+                file = downloaded!;
                 _values.Reset(fileValueName, file);
                 _delete.Add(file);
             }
@@ -439,7 +449,7 @@ namespace Azure.AI.Details.Common.CLI
 
         protected string ReplaceFileNameValues(string fileName, string idValueName)
         {
-            var id = _values.GetOrDefault(idValueName, "");
+            var id = _values.GetOrEmpty(idValueName);
             if (fileName.Contains("{id}")) fileName = fileName.Replace("{id}", id);
 
             var pid = Process.GetCurrentProcess().Id.ToString();
@@ -448,7 +458,7 @@ namespace Azure.AI.Details.Common.CLI
             var time = DateTime.Now.ToFileTime().ToString();
             if (fileName.Contains("{time}")) fileName = fileName.Replace("{time}", time);
 
-            var runTime = _values.GetOrDefault("x.run.time", "");
+            var runTime = _values.GetOrEmpty("x.run.time");
             if (fileName.Contains("{run.time}")) fileName = fileName.Replace("{run.time}", runTime);
 
             return fileName.ReplaceValues(_values);
@@ -464,7 +474,7 @@ namespace Azure.AI.Details.Common.CLI
                     _disposeAfterStop.Reverse(); // objects should be disposed in reverse order created
                     foreach (var item in _disposeAfterStop)
                     {
-                        item.Dispose();
+                        item?.Dispose();
                     }
                 }
             }
@@ -488,11 +498,11 @@ namespace Azure.AI.Details.Common.CLI
         {
             expectedItems = !string.IsNullOrEmpty(expected)
                 ? expected.Split(new char[] { ';', '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries)
-                : null;
+                : Enumerable.Empty<string>();
             notExpectedItems = !string.IsNullOrEmpty(notExpected)
                 ? notExpected.Split(new char[] { ';', '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries)
-                : null;
-            return expectedItems != null || notExpectedItems != null;
+                : Enumerable.Empty<string>();
+            return expectedItems.Count() + notExpectedItems.Count() > 0;
         }
 
         private static async Task<bool> CheckExpectedLogOutputAsync(IEnumerable<string> expected, IEnumerable<string> notExpected, bool autoExpect, string autoExpectLogFilter, AutoResetEvent signalStop)
@@ -523,13 +533,13 @@ namespace Azure.AI.Details.Common.CLI
 
         private static async Task<bool> CheckExpectedOutputAsync(ICommandValues values, Queue<ICommandValues> queue, Func<bool> func)
         {
-            var expected = values.GetOrDefault("x.command.output.expect", "");
-            var notExpected = values.GetOrDefault("x.command.output.not.expect", "");
+            var expected = values.GetOrEmpty("x.command.output.expect");
+            var notExpected = values.GetOrEmpty("x.command.output.not.expect");
             var autoExpect = values.GetOrDefault("x.command.output.auto.expect", false);
-            var expectedLog = values.GetOrDefault("x.command.diagnostics.log.expect", "");
-            var notExpectedLog = values.GetOrDefault("x.command.diagnostics.log.not.expect", "");
+            var expectedLog = values.GetOrEmpty("x.command.diagnostics.log.expect");
+            var notExpectedLog = values.GetOrEmpty("x.command.diagnostics.log.not.expect");
             var autoExpectLog = values.GetOrDefault("x.command.diagnostics.log.auto.expect", false);
-            var autoExpectLogFilter = values.GetOrDefault("x.command.diagnostics.log.auto.expect.filter", "");
+            var autoExpectLogFilter = values.GetOrEmpty("x.command.diagnostics.log.auto.expect.filter");
             var ignoreCheckFailures = values.GetOrDefault("x.command.output.ignore.check.failures", false);
 
             BlockValues(values, queue, "x.command.output.expect");
@@ -606,7 +616,7 @@ namespace Azure.AI.Details.Common.CLI
                 var start = new ProcessStartInfo(Program.Exe, $"{values.GetCommand()} --nodefaults @{fileName}");
                 start.UseShellExecute = false;
 
-                var process = Process.Start(start);
+                var process = Process.Start(start)!;
                 processes.Add(fileNames, process);
 
                 WaitForProcesses(rampStarted, rampDuration, maxProcesses, processes, ref passed);
@@ -739,7 +749,7 @@ namespace Azure.AI.Details.Common.CLI
         protected ManualResetEvent _stopEvent = new ManualResetEvent(false);
         protected ManualResetEvent _canceledEvent = new ManualResetEvent(false);
 
-        protected List<IDisposable> _disposeAfterStop = new List<IDisposable>();
+        protected List<IDisposable?> _disposeAfterStop = new List<IDisposable?>();
         protected List<string> _delete = new List<string>();
     }
 }

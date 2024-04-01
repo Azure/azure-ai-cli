@@ -59,6 +59,6 @@ namespace Azure.AI.CLI.Common.Clients
         /// <param name="name">The name of the resource to retrieve keys for</param>
         /// <param name="token">Cancellation token to use</param>
         /// <returns>Asynchronous task that retrieves the keys</returns>
-        Task<ClientResult<(string, string?)>> GetKeysAsync(string subscriptionId, string resourceGroup, string name, CancellationToken token);
+        Task<ClientResult<(string, string)>> GetKeysAsync(string subscriptionId, string resourceGroup, string name, CancellationToken token);
     }
 }

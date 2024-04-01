@@ -44,7 +44,7 @@ namespace Azure.AI.Details.Common.CLI.Telemetry
         /// <param name="duration">How long the function or work took</param>
         /// <returns>The telemetry event to raise, or null to not raise an event</returns>
         public delegate ITelemetryEvent CreateTelemetryEvent(
-            Outcome outcome, Exception exception, TimeSpan duration);
+            Outcome outcome, Exception? exception, TimeSpan duration);
 
         /// <summary>
         /// Creates a telemetry event
@@ -56,7 +56,7 @@ namespace Azure.AI.Details.Common.CLI.Telemetry
         /// <param name="duration">How long the function or work took</param>
         /// <returns>The telemetry event to raise, or null to not raise an event</returns>
         public delegate ITelemetryEvent CreateTelemetryEvent<TResult>(
-            Outcome outcome, TResult result, Exception exception, TimeSpan duration);
+            Outcome outcome, TResult? result, Exception? exception, TimeSpan duration);
 
         #endregion
 
@@ -154,8 +154,8 @@ namespace Azure.AI.Details.Common.CLI.Telemetry
             CreateTelemetryEvent<TResult> createTelemetryEvent)
         {
             var outcome = Outcome.Unknown;
-            TResult res = default;
-            Exception exception = null;
+            TResult? res = default;
+            Exception? exception = null;
 
             var stopwatch = Stopwatch.StartNew();
             try
@@ -268,8 +268,8 @@ namespace Azure.AI.Details.Common.CLI.Telemetry
             CreateTelemetryEvent<TResult> createTelemetryEvent)
         {
             var outcome = Outcome.Unknown;
-            TResult res = default;
-            Exception exception = null;
+            TResult? res = default;
+            Exception? exception = null;
 
             var stopwatch = Stopwatch.StartNew();
             try
@@ -296,7 +296,7 @@ namespace Azure.AI.Details.Common.CLI.Telemetry
 
         [DebuggerNonUserCode]
         private static CreateTelemetryEvent<TResult> Wrap<TResult>(CreateTelemetryEvent creator) =>
-            (Outcome outcome, TResult _, Exception ex, TimeSpan duration) => creator(outcome, ex, duration);
+            (Outcome outcome, TResult? _, Exception? ex, TimeSpan duration) => creator(outcome, ex, duration);
 
         [DebuggerNonUserCode]
         private static Exception FlattenException(Exception ex)

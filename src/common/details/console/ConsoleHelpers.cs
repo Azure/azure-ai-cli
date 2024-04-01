@@ -14,7 +14,7 @@ namespace Azure.AI.Details.Common.CLI
 {
     public static class ConsoleHelpers
     {
-        public static string ReadLineOrDefault(string defaultOnEmpty = "", string defaultOnEndOfRedirectedInput = null)
+        public static string? ReadLineOrDefault(string defaultOnEmpty = "", string? defaultOnEndOfRedirectedInput = null)
         {
             if (Console.IsInputRedirected)
             {
@@ -120,11 +120,11 @@ namespace Azure.AI.Details.Common.CLI
                     ColorHelpers.ResetColor();
                     Console.Write(part);
                 }
-                else if (ColorHelpers.TryParseColorStyleText(part, out var colors, out text))
+                else if (ColorHelpers.TryParseColorStyleText(part, out var colors, out var parsed))
                 {
-                    Console.ForegroundColor = colors.Foreground;
-                    Console.BackgroundColor = colors.Background;
-                    Console.Write(text);
+                    Console.ForegroundColor = colors!.Foreground;
+                    Console.BackgroundColor = colors!.Background;
+                    Console.Write(parsed);
                 }
                 else
                 {
@@ -140,7 +140,7 @@ namespace Azure.AI.Details.Common.CLI
             Console.WriteLine();
         }
 
-        private static string stdinText = null;
-        private static byte[] stdinBytes = null;
+        private static string? stdinText = null;
+        private static byte[]? stdinBytes = null;
     }
 }

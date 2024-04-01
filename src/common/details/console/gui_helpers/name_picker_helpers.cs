@@ -13,7 +13,7 @@ namespace Azure.AI.Details.Common.CLI
 {
     public class NameGenHelper
     {
-        public static string GenerateName(string userName = null, int maxCch = 24)
+        public static string GenerateName(string? userName = null, int maxCch = 24)
         {
             EnsureLoaded();
 
@@ -30,9 +30,9 @@ namespace Azure.AI.Details.Common.CLI
 
                 for (int i = 0; i < maxTries; i++)
                 {
-                    var animal = GetRandomElement(_animals);
-                    var color = GetRandomElement(_colors);
-                    var adjective = GetRandomElement(_adjectives);
+                    var animal = GetRandomElement(_animals!);
+                    var color = GetRandomElement(_colors!);
+                    var adjective = GetRandomElement(_adjectives!);
 
                     var name = approach switch
                     {
@@ -73,9 +73,9 @@ namespace Azure.AI.Details.Common.CLI
             }
         }
 
-        private static string[] LoadFrom(string fileName)
+        private static string[] LoadFrom(string fromFileName)
         {
-            fileName = $"help/include.text.{fileName}";
+            var fileName = $"help/include.text.{fromFileName}";
             fileName = FileHelpers.FindFileInHelpPath(fileName);
 
             var text = !string.IsNullOrEmpty(fileName)
@@ -91,23 +91,23 @@ namespace Azure.AI.Details.Common.CLI
             return array[index];
         }
 
-        private static string[] _adjectives = null;
-        private static string[] _colors = null;
-        private static string[] _animals = null;
+        private static string[]? _adjectives = null;
+        private static string[]? _colors = null;
+        private static string[]? _animals = null;
 
         private static readonly Random _random = new Random();
     }
 
     public class NamePickerHelper
     {
-        public static string DemandPickOrEnterName(string namePrompt, string nameOutKind, string nameIn = null, string nameInKind = null, string userName = null, int maxCch = 32)
+        public static string? DemandPickOrEnterName(string namePrompt, string nameOutKind, string? nameIn = null, string? nameInKind = null, string? userName = null, int maxCch = 32)
         {
             var choices = GetNameChoices(nameIn, nameInKind, nameOutKind, userName, maxCch);
             var usePicker = choices != null && choices.Count() > 1;
 
             while (usePicker)
             {
-                choices.Insert(0, "(Regenerate choices)");
+                choices!.Insert(0, "(Regenerate choices)");
 
                 Console.Write(namePrompt);
                 var pick = ListBoxPicker.PickIndexOf(choices.ToArray());
@@ -134,13 +134,13 @@ namespace Azure.AI.Details.Common.CLI
             while (true)
             {
                 var name = DemandAskPrompt(namePrompt);
-                if (name.Length > maxCch)
+                if (name?.Length > maxCch)
                 {
                     Console.WriteLine($"*** WARNING: Name is too long. Max length is {maxCch}.\n");
                     continue;
                 }
 
-                if (name.Count(x => !char.IsLetterOrDigit(x) && x != '-') > 0)
+                if (name?.Count(x => !char.IsLetterOrDigit(x) && x != '-') > 0)
                 {
                     Console.WriteLine($"*** WARNING: Name contains invalid characters. Only letters, digits, and dashes are allowed.\n");
                     continue;
@@ -150,29 +150,29 @@ namespace Azure.AI.Details.Common.CLI
             }
         }
 
-        private static List<string> GetNameChoices(string nameIn, string nameInKind, string nameOutKind, string userName, int maxCch)
+        private static List<string> GetNameChoices(string? nameIn, string? nameInKind, string nameOutKind, string? userName, int maxCch)
         {
             var choices = new List<string>();
 
             var nameInOk = !string.IsNullOrEmpty(nameIn) && !string.IsNullOrEmpty(nameInKind);
             if (nameInOk)
             {
-                nameIn = nameIn.Trim().Replace("_", "-");
+                nameIn = nameIn!.Trim().Replace("_", "-");
             }
 
-            if (nameInOk && nameIn.StartsWith($"{nameInKind}-"))
+            if (nameInOk && nameIn!.StartsWith($"{nameInKind}-"))
             {
-                var nameBase = nameIn.Substring(nameInKind.Length + 1);
+                var nameBase = nameIn.Substring(nameInKind!.Length + 1);
                 choices.Add($"{nameOutKind}-{nameBase}");
             }
 
-            if (nameInOk && nameIn.EndsWith($"-{nameInKind}"))
+            if (nameInOk && nameIn!.EndsWith($"-{nameInKind}"))
             {
-                var nameBase = nameIn.Substring(0, nameIn.Length - nameInKind.Length - 1);
+                var nameBase = nameIn.Substring(0, nameIn.Length - nameInKind!.Length - 1);
                 choices.Add($"{nameBase}-{nameOutKind}");
             }
 
-            if (nameInOk && nameIn.Contains($"-{nameInKind}-"))
+            if (nameInOk && nameIn!.Contains($"-{nameInKind}-"))
             {
                 var nameBase = nameIn.Replace($"-{nameInKind}-", $"-{nameOutKind}-");
                 choices.Add(nameBase);
@@ -199,7 +199,7 @@ namespace Azure.AI.Details.Common.CLI
             return choices;
         }
 
-        private static string DemandAskPrompt(string prompt, string value = null, bool useEditBox = false)
+        private static string? DemandAskPrompt(string prompt, string? value = null, bool useEditBox = false)
         {
             var answer = AskPromptHelper.AskPrompt(prompt, value, useEditBox);
             if (string.IsNullOrEmpty(answer))

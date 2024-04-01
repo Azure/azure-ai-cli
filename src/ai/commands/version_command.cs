@@ -17,9 +17,8 @@ namespace Azure.AI.Details.Common.CLI
 {
     public class VersionCommand : Command
     {
-        internal VersionCommand(ICommandValues values)
+        internal VersionCommand(ICommandValues values) : base(values)
         {
-            _values = values.ReplaceValues();
             _quiet = _values.GetOrDefault("x.quiet", false);
             _verbose = _values.GetOrDefault("x.verbose", true);
         }
@@ -59,11 +58,11 @@ namespace Azure.AI.Details.Common.CLI
             // _display = new DisplayHelper(_values);
 
             // _output = new OutputHelper(_values);
-            // _output.StartOutput();
+            // _output!.StartOutput();
 
             // var id = _values["chat.input.id"];
-            // _output.EnsureOutputAll("chat.input.id", id);
-            // _output.EnsureOutputEach("chat.input.id", id);
+            // _output!.EnsureOutputAll("chat.input.id", id);
+            // _output!.EnsureOutputEach("chat.input.id", id);
 
             _lock = new SpinLock();
             _lock.StartLock();
@@ -71,23 +70,23 @@ namespace Azure.AI.Details.Common.CLI
 
         private void StopCommand()
         {
-            _lock.StopLock(5000);
+            _lock!.StopLock(5000);
 
             LogHelpers.EnsureStopLogFile(_values);
-            // _output.CheckOutput();
-            // _output.StopOutput();
+            // _output!.CheckOutput();
+            // _output!.StopOutput();
 
             _stopEvent.Set();
         }
 
-        private SpinLock _lock = null;
+        private SpinLock? _lock = null;
         private readonly bool _quiet = false;
         private readonly bool _verbose = false;
 
         // private AzureEventSourceListener _azureEventSourceListener;
 
-        // OutputHelper _output = null;
-        // DisplayHelper _display = null;
+        // OutputHelper? _output = null;
+        // DisplayHelper? _display = null;
 
         private void DoVersionUpdate()
         {

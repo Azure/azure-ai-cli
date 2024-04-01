@@ -33,7 +33,7 @@ namespace Azure.AI.Details.Common.CLI
             return keys;
         }
 
-        public static async Task<AzCli.CognitiveSearchResourceInfo?> PickOrCreateCognitiveSearchResource(bool allowSkip, string subscription, string location, string groupName, string smartName = null, string smartNameKind = null)
+        public static async Task<AzCli.CognitiveSearchResourceInfo?> PickOrCreateCognitiveSearchResource(bool allowSkip, string subscription, string location, string groupName, string? smartName = null, string? smartNameKind = null)
         {
             ConsoleHelpers.WriteLineWithHighlight($"\n`AI SEARCH RESOURCE`");
             Console.Write("\rName: *** Loading choices ***");
@@ -74,7 +74,7 @@ namespace Azure.AI.Details.Common.CLI
             return resource;
         }
 
-        private static async Task<AzCli.CognitiveSearchResourceInfo> TryCreateSearchInteractive(string subscription, string locationName, string groupName, string smartName = null, string smartNameKind = null)
+        private static async Task<AzCli.CognitiveSearchResourceInfo> TryCreateSearchInteractive(string subscription, string locationName, string groupName, string? smartName = null, string? smartNameKind = null)
         {
             var sectionHeader = "\n`CREATE SEARCH RESOURCE`";
             ConsoleHelpers.WriteLineWithHighlight(sectionHeader);
@@ -103,7 +103,7 @@ namespace Azure.AI.Details.Common.CLI
             var name = NamePickerHelper.DemandPickOrEnterName("Name: ", "search", smartName, smartNameKind, AzCliConsoleGui.GetSubscriptionUserName(subscription));
 
             Console.Write("*** CREATING ***");
-            var response = await Program.SearchClient.CreateAsync(subscription, groupName, locationName, name, Program.CancelToken);
+            var response = await Program.SearchClient.CreateAsync(subscription, groupName, locationName, name ?? string.Empty, Program.CancelToken);
 
             Console.Write("\r");
             response.ThrowOnFail("Creating search resource");
