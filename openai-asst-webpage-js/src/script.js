@@ -2,14 +2,13 @@ const marked = require("marked");
 const hljs = require("highlight.js");
 
 const { OpenAIAssistantsStreamingClass } = require("./OpenAIAssistantsStreamingClass");
+
+// Which assistant, and what thread to use
+let openAIAssistantId = "asst_W6RbXQnkqkmSMWT0QYzA88hH";
+let openAIAssistantThreadId = null;
 let assistant;
 
-
-async function streamingChatCompletionsInit() {
-
-  // Which assistant, and what thread to use
-  const openAIAssistantId = "asst_W6RbXQnkqkmSMWT0QYzA88hH";
-  const openAIAssistantThreadId = null;
+async function assistantInit() {
 
   // Connection info and authentication for OpenAI API
   const openAIKey = process.env.OPENAI_API_KEY || "YOUR-KEY-HERE";
@@ -30,11 +29,7 @@ async function streamingChatCompletionsInit() {
   await getOrCreateAndDisplayThread(openAIAssistantThreadId);
 }
 
-function streamingChatCompletionsClear() {
-  assistant.getOrCreateThread();
-}
-
-async function streamingChatCompletionsProcessInput(userInput) {
+async function assistantProcessInput(userInput) {
   const blackVerticalRectangle = '\u25AE'; // Black vertical rectangle ('▮') to simulate an insertion point
 
   let newMessage = chatPanelAppendMessage('computer', blackVerticalRectangle);
@@ -214,6 +209,128 @@ function toggleThemeButtonHandleKeyDown() {
   };
 }
 
+function ThreadItem(id, created, metadata) {
+  this.id = id;
+  this.created = created;
+  this.metadata = metadata;
+}
+
+function threadItemGetFormattedDate(timestamp) {
+  const date = new Date(timestamp * 1000); // Convert from UNIX timestamp (seconds) to milliseconds
+  const year = date.getFullYear();
+  const month = ('0' + (date.getMonth() + 1)).slice(-2);
+  const day = ('0' + date.getDate()).slice(-2);
+  return `${year}-${month}-${day}`;
+}
+
+async function threadItemsAddNew(newItem = null, threadItems = null) {
+  if (threadItems === null) {
+    threadItems = threadItemsGet();
+  }
+
+  if (newItem === null) {
+    const today = new Date();
+    const thread = await assistant.getOrCreateThread();
+    newItem = new ThreadItem(thread.id, Math.floor(today / 1000), 'New thread');
+  }
+
+  threadItems.unshift(newItem);
+  localStorage.setItem('threadItems', JSON.stringify(threadItems));
+
+  return threadItems;
+}
+
+function threadItemsGet() {
+  const threadItemsString = localStorage.getItem('threadItems');
+  if (threadItemsString) {
+    return JSON.parse(threadItemsString);
+  } else {
+    return [];
+  }
+}
+
+function threadItemsLoadFakeData() {
+  const today = new Date();
+  const yesterday = new Date(today);
+  yesterday.setDate(today.getDate() - 1);
+  const sevenDaysAgo = new Date(today);
+  sevenDaysAgo.setDate(today.getDate() - 7);
+  const thirtyDaysAgo = new Date(today);
+  thirtyDaysAgo.setDate(today.getDate() - 30);
+
+  const fakeThreadItems = [
+    new ThreadItem('thread_XTqDWuGXPjsddI1xctQ2ZD4B', Math.floor(today / 1000), 'Skeleton joke'),
+    new ThreadItem('thread_wzmGKFC22PKKcvoDs2zrYLD7', Math.floor(yesterday / 1000), 'Why is the sky blue?'),
+    new ThreadItem('thread_IAxIrq4YJmFflA1fraw7iEcI', Math.floor(yesterday / 1000), 'Hello world in C#'),
+    new ThreadItem('thread_RAgQWZFf3B3MWjVIpSO6JiRi', Math.floor(thirtyDaysAgo / 1000), 'Thread stuff'),
+  ];
+  return fakeThreadItems;
+}
+
+function threadItemsGroupByDate(threadItems) {
+  const groupedItems = new Map();
+
+  threadItems.forEach(item => {
+    const date = threadItemGetFormattedDate(item.created);
+    if (!groupedItems.has(date)) {
+      groupedItems.set(date, []);
+    }
+    groupedItems.get(date).push(item);
+  });
+
+  return groupedItems;
+}
+
+async function threadPanelNewThread() {
+  const threadItems = await threadItemsAddNew();
+  threadPanelPopulate(threadItems);
+}
+
+function threadPanelPopulate(threadItems = null) {
+
+  // Clear existing content
+  const threadPanel = document.getElementById('threadPanel');
+  threadPanel.innerHTML = '';
+
+  // Get thread items if not provided
+  if (threadItems === null) {
+    threadItems = threadItemsGet();
+  }
+
+  // Group thread items by date
+  const groupedThreadItems = threadItemsGroupByDate(threadItems);
+
+  // Iterate over grouped items and populate thread panel
+  for (const [date, items] of groupedThreadItems) {
+    const dateHeader = document.createElement('div');
+    dateHeader.classList.add('threadOnDate');
+    dateHeader.textContent = date;
+    threadPanel.appendChild(dateHeader);
+
+    const threadsContainer = document.createElement('div');
+    threadsContainer.id = 'threads';
+    threadPanel.appendChild(threadsContainer);
+
+    items.forEach(item => {
+      const button = document.createElement('button');
+      button.id = item.id;
+      button.classList.add('thread', 'w3-button');
+      button.onclick = function() {
+        loadThread(this.id);
+      };
+
+      const div = document.createElement('div');
+      const icon = document.createElement('i');
+      icon.classList.add('threadIcon', 'fa', 'fa-comment');
+
+      div.appendChild(icon);
+      div.appendChild(document.createTextNode(item.metadata));
+      button.appendChild(div);
+      threadsContainer.appendChild(button);
+    });
+  }
+}
+
 function userInputTextAreaGetElement() {
   return document.getElementById("userInput");
 }
@@ -267,7 +384,7 @@ function newChat() {
   chatPanelClear();
   logoShow();
   userInputTextAreaFocus();
-  streamingChatCompletionsClear();
+  threadPanelNewThread();
 }
 
 function loadThread(threadId) {
@@ -286,21 +403,43 @@ function sendMessage() {
     chatPanelAppendMessage('user', html);
     userInputTextAreaClear();
     varsUpdateHeightsAndWidths();
-    streamingChatCompletionsProcessInput(inputValue);
+    assistantProcessInput(inputValue);
   }
 }
 
 async function init() {
+
+  const urlParams = new URLSearchParams(window.location.search);
+
   themeInit();
   markdownInit();
   userInputTextAreaInit();
   varsInit();
-  await streamingChatCompletionsInit();
+
+  let items;
+  await assistantInit();
+
+  const fake = urlParams.get('fake') === 'true';
+  if (fake) {
+    items = threadItemsLoadFakeData();
+    localStorage.setItem('threadItems', JSON.stringify(items));
+  }
+
+  const clear = urlParams.get('clear') === 'true';
+  if (clear) {
+    localStorage.removeItem('threadItems');
+    items = [];
+  }
+
+  items = items || threadItemsGet();
+  threadPanelPopulate(items);
+
   userInputTextAreaFocus();
 
+  window.newChat = newChat;
+  window.loadThread = loadThread;
   window.sendMessage = sendMessage;
   window.toggleTheme = toggleTheme;
-  window.newChat = newChat;
 }
 
 init();
