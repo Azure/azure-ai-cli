@@ -5,10 +5,9 @@ const { OpenAIAssistantsStreamingClass } = require("./OpenAIAssistantsStreamingC
 
 // Which assistant, and what thread to use
 let openAIAssistantId = "asst_W6RbXQnkqkmSMWT0QYzA88hH";
-let openAIAssistantThreadId = null;
 let assistant;
 
-async function assistantInit() {
+async function assistantInit(threadId = null) {
 
   // Connection info and authentication for OpenAI API
   const openAIKey = process.env.OPENAI_API_KEY || "YOUR-KEY-HERE";
@@ -26,7 +25,7 @@ async function assistantInit() {
     ? OpenAIAssistantsStreamingClass.createUsingAzure(azureOpenAIAPIVersion, azureOpenAIEndpoint, azureOpenAIKey, azureOpenAIChatDeploymentName, openAIAssistantId)
     : OpenAIAssistantsStreamingClass.createUsingOpenAI(openAIKey, openAIOrganization, openAIAssistantId);
 
-  await getOrCreateAndDisplayThread(openAIAssistantThreadId);
+  await assistantCreateOrRetrieveThread(threadId);
 }
 
 async function assistantProcessInput(userInput) {
@@ -53,16 +52,23 @@ async function assistantProcessInput(userInput) {
 
   newMessage.innerHTML = markdownToHtml(computerResponse) || computerResponse.replace(/\n/g, '<br/>');
   chatPanel.scrollTop = chatPanel.scrollHeight;
+
+  threadItemsCheckMoveOrAdd();
 }
 
-async function getOrCreateAndDisplayThread(openAIAssistantThreadId) {
-  await assistant.getOrCreateThread(openAIAssistantThreadId);
-  await assistant.getThreadMessages((role, content) => {
-    let html = markdownToHtml(content) || content.replace(/\n/g, '<br/>');
-    role = role === 'user' ? 'user' : 'computer';
-    console.log(`role: ${role}, content: ${content}`);
-    chatPanelAppendMessage(role, html);
-  });
+async function assistantCreateOrRetrieveThread(threadId = null) {
+ 
+  if (threadId === null) {
+    await assistant.createThread()
+  } else {
+    await assistant.retrieveThread(threadId);
+    await assistant.getThreadMessages((role, content) => {
+      let html = markdownToHtml(content) || content.replace(/\n/g, '<br/>');
+      role = role === 'user' ? 'user' : 'computer';
+      console.log(`role: ${role}, content: ${content}`);
+      chatPanelAppendMessage(role, html);
+    });
+  }
 }
 
 function chatPanelGetElement() {
@@ -223,21 +229,40 @@ function threadItemGetFormattedDate(timestamp) {
   return `${year}-${month}-${day}`;
 }
 
-async function threadItemsAddNew(newItem = null, threadItems = null) {
-  if (threadItems === null) {
-    threadItems = threadItemsGet();
+function threadItemsCheckMoveOrAdd() {
+  let items = threadItemsGet();
+  threadItemsCheckMoveTop(items, assistant.thread.id);
+  threadItemsCheckAddNew(items, assistant.thread.id);
+}
+
+function threadItemsCheckMoveTop(items, threadId) {
+  let item = items.find(item => item.id === threadId);
+  if (item) {
+    threadItemsMoveTop(items, item);
   }
+}
 
-  if (newItem === null) {
-    const today = new Date();
-    const thread = await assistant.getOrCreateThread();
-    newItem = new ThreadItem(thread.id, Math.floor(today / 1000), 'New thread');
+function threadItemsMoveTop(items, item) {
+  var index = items.indexOf(item);
+  if (index !== -1) {
+    items.splice(index, 1);
   }
+  item.created = Math.floor(Date.now() / 1000);
+  items.unshift(item);
+  localStorage.setItem('threadItems', JSON.stringify(items));
+  threadPanelPopulate(items);
+}
 
-  threadItems.unshift(newItem);
-  localStorage.setItem('threadItems', JSON.stringify(threadItems));
+function threadItemsCheckAddNew(items, threadId) {
+  if (items.length === 0 || items[0].id !== threadId) {
+    threadItemsAddNew(items, new ThreadItem(threadId, Math.floor(Date.now() / 1000), 'Untitled'));
+  }
+}
 
-  return threadItems;
+function threadItemsAddNew(items, newItem) {
+  items.unshift(newItem);
+  localStorage.setItem('threadItems', JSON.stringify(items));
+  threadPanelPopulate(items);
 }
 
 function threadItemsGet() {
@@ -281,24 +306,14 @@ function threadItemsGroupByDate(threadItems) {
   return groupedItems;
 }
 
-async function threadPanelNewThread() {
-  const threadItems = await threadItemsAddNew();
-  threadPanelPopulate(threadItems);
-}
-
-function threadPanelPopulate(threadItems = null) {
+function threadPanelPopulate(items) {
 
   // Clear existing content
   const threadPanel = document.getElementById('threadPanel');
   threadPanel.innerHTML = '';
 
-  // Get thread items if not provided
-  if (threadItems === null) {
-    threadItems = threadItemsGet();
-  }
-
   // Group thread items by date
-  const groupedThreadItems = threadItemsGroupByDate(threadItems);
+  const groupedThreadItems = threadItemsGroupByDate(items);
 
   // Iterate over grouped items and populate thread panel
   for (const [date, items] of groupedThreadItems) {
@@ -380,16 +395,16 @@ function varsUpdateHeightsAndWidths() {
   document.documentElement.style.setProperty('--input-height', userInputHeight + 'px');
 }
 
-function newChat() {
+async function newChat() {
   chatPanelClear();
   logoShow();
   userInputTextAreaFocus();
-  threadPanelNewThread();
+  await assistantCreateOrRetrieveThread();
 }
 
-function loadThread(threadId) {
+async function loadThread(threadId) {
   chatPanelClear();
-  getOrCreateAndDisplayThread(threadId);
+  await assistantCreateOrRetrieveThread(threadId);
   userInputTextAreaFocus();
 }
 
