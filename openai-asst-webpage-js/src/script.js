@@ -221,14 +221,6 @@ function ThreadItem(id, created, metadata) {
   this.metadata = metadata;
 }
 
-function threadItemGetFormattedDate(timestamp) {
-  const date = new Date(timestamp * 1000); // Convert from UNIX timestamp (seconds) to milliseconds
-  const year = date.getFullYear();
-  const month = ('0' + (date.getMonth() + 1)).slice(-2);
-  const day = ('0' + date.getDate()).slice(-2);
-  return `${year}-${month}-${day}`;
-}
-
 function threadItemsCheckMoveOrAdd() {
   let items = threadItemsGet();
   threadItemsCheckMoveTop(items, assistant.thread.id);
@@ -292,15 +284,30 @@ function threadItemsLoadFakeData() {
   return fakeThreadItems;
 }
 
+function threadItemsGetGroupName(timestamp) {
+  const now = new Date();
+  const itemDate = new Date(timestamp * 1000);
+  const isToday = itemDate.toDateString() === now.toDateString();
+  const isYesterday = itemDate.toDateString() === new Date(new Date().setDate(now.getDate() - 1)).toDateString();
+  const isThisWeek = itemDate > new Date(new Date().setDate(now.getDate() - 7));
+  const isThisYear = itemDate.getFullYear() === now.getFullYear();
+
+  return isToday ? 'Today'
+    : isYesterday ? 'Yesterday'
+      : isThisWeek ? "Previous 7 days"
+        : isThisYear ? itemDate.toLocaleDateString('en-US', { month: 'long' }) // month name
+          : itemDate.toLocaleDateString('en-US', { year: 'numeric' }); // the year
+}
+
 function threadItemsGroupByDate(threadItems) {
   const groupedItems = new Map();
 
   threadItems.forEach(item => {
-    const date = threadItemGetFormattedDate(item.created);
-    if (!groupedItems.has(date)) {
-      groupedItems.set(date, []);
+    const group = threadItemsGetGroupName(item.created);
+    if (!groupedItems.has(group)) {
+      groupedItems.set(group, []);
     }
-    groupedItems.get(date).push(item);
+    groupedItems.get(group).push(item);
   });
 
   return groupedItems;
