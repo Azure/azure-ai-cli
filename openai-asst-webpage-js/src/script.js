@@ -53,7 +53,7 @@ async function assistantProcessInput(userInput) {
   newMessage.innerHTML = markdownToHtml(computerResponse) || computerResponse.replace(/\n/g, '<br/>');
   chatPanel.scrollTop = chatPanel.scrollHeight;
 
-  threadItemsCheckMoveOrAdd();
+  await threadItemsCheckIfUpdatesNeeded(userInput, computerResponse);
 }
 
 async function assistantCreateOrRetrieveThread(threadId = null) {
@@ -215,14 +215,26 @@ function toggleThemeButtonHandleKeyDown() {
   };
 }
 
+const titleUntitled = 'Untitled';
+
 function ThreadItem(id, created, metadata) {
   this.id = id;
   this.created = created;
   this.metadata = metadata;
 }
 
-function threadItemsCheckMoveOrAdd() {
+function threadItemIsUntitled(item) {
+  return item.metadata === titleUntitled;
+}
+
+async function threadItemsCheckIfUpdatesNeeded(userInput, computerResponse) {
   let items = threadItemsGet();
+  threadItemsCheckMoveOrAdd(items);
+
+  await threadItemsTitleIfUntitled(items, userInput, computerResponse);
+}
+
+function threadItemsCheckMoveOrAdd(items) {
   threadItemsCheckMoveTop(items, assistant.thread.id);
   threadItemsCheckAddNew(items, assistant.thread.id);
 }
@@ -247,7 +259,7 @@ function threadItemsMoveTop(items, item) {
 
 function threadItemsCheckAddNew(items, threadId) {
   if (items.length === 0 || items[0].id !== threadId) {
-    threadItemsAddNew(items, new ThreadItem(threadId, Math.floor(Date.now() / 1000), 'Untitled'));
+    threadItemsAddNew(items, new ThreadItem(threadId, Math.floor(Date.now() / 1000), titleUntitled));
   }
 }
 
@@ -267,16 +279,12 @@ function threadItemsGet() {
 }
 
 function threadItemsLoadFakeData() {
-  const today = new Date();
-  const yesterday = new Date(today);
-  yesterday.setDate(today.getDate() - 1);
-  const sevenDaysAgo = new Date(today);
-  sevenDaysAgo.setDate(today.getDate() - 7);
-  const thirtyDaysAgo = new Date(today);
-  thirtyDaysAgo.setDate(today.getDate() - 30);
+  const now = new Date();
+  const yesterday = new Date(new Date().setDate(now.getDate() - 1));
+  const thirtyDaysAgo = new Date(new Date().setDate(now.getDate() - 30));
 
   const fakeThreadItems = [
-    new ThreadItem('thread_XTqDWuGXPjsddI1xctQ2ZD4B', Math.floor(today / 1000), 'Skeleton joke'),
+    new ThreadItem('thread_XTqDWuGXPjsddI1xctQ2ZD4B', Math.floor(now / 1000), 'Skeleton joke'),
     new ThreadItem('thread_wzmGKFC22PKKcvoDs2zrYLD7', Math.floor(yesterday / 1000), 'Why is the sky blue?'),
     new ThreadItem('thread_IAxIrq4YJmFflA1fraw7iEcI', Math.floor(yesterday / 1000), 'Hello world in C#'),
     new ThreadItem('thread_RAgQWZFf3B3MWjVIpSO6JiRi', Math.floor(thirtyDaysAgo / 1000), 'Thread stuff'),
@@ -311,6 +319,28 @@ function threadItemsGroupByDate(threadItems) {
   });
 
   return groupedItems;
+}
+
+async function threadItemsTitleIfUntitled(items, userInput, computerResponse) {
+  if (threadItemIsUntitled(items[0])) {
+    let messages = [
+      { role: 'system', content: "You are a helpful assistant that answers questions, and on 2nd turn, will suggest a title for the interaction." },
+      { role: 'user', content: userInput },
+      { role: 'assistant', content: computerResponse },
+      { role: 'system', content: "Please suggest a title for this interaction. Don't be cute or humorous in your answer. Answer only with a factual descriptive title. Do not use quotes. Do not prefix with 'Title:' or anything else. Just emit the title." }
+    ];
+
+    const completion = await assistant.openai.chat.completions.create({
+      messages: messages,
+      model: "gpt-4-turbo-preview"
+    });
+
+    var newTitle = completion.choices[0].message.content;
+    items[0].metadata = newTitle;
+
+    localStorage.setItem('threadItems', JSON.stringify(items));
+    threadPanelPopulate(items);
+  }
 }
 
 function threadPanelPopulate(items) {
