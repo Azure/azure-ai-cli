@@ -1062,11 +1062,18 @@ namespace Azure.AI.Details.Common.CLI
             {
                 var existing = FileHelpers.DemandFindFileInDataPath(inputString, _values, "chat parameter");
                 var text = FileHelpers.ReadAllText(existing, Encoding.Default);
-                dictionary = text
-                    .Split(Environment.NewLine)
-                    .Select(part => part.Split(':'))
-                    .Where(part => part.Length == 2)
-                    .ToDictionary(sp => sp[0], sp => sp[1] as object);
+                if (inputString.EndsWith(".json"))
+                {
+                    dictionary = JsonSerializer.Deserialize<Dictionary<string, object>>(text);
+                }
+                else
+                {
+                    dictionary = text
+                        .Split(Environment.NewLine)
+                        .Select(part => part.Split(':'))
+                        .Where(part => part.Length == 2)
+                        .ToDictionary(sp => sp[0], sp => sp[1] as object);
+                }
             }
             return dictionary;
         }
