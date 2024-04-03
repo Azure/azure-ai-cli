@@ -15,19 +15,7 @@ namespace Azure.AI.Details.Common.CLI.ConsoleGui
         public static string? GetInputFromUser(string prompt, string? value = null)
         {
             using var stream = new MemoryStream();
-            using var writer = new Utf8JsonWriter(stream, new JsonWriterOptions{ Indented = false });
-            writer.WriteStartObject();
-
-            writer.WriteString("prompt", prompt);
-            if (value != null)
-            {
-                writer.WriteString("value", value);
-            }
-
-            writer.WriteEndObject();
-            writer.Flush();
-
-            var json = Encoding.UTF8.GetString(stream.ToArray());
+            string json = JsonSerializer.Serialize(new { prompt, value });
             Console.WriteLine($"\n{_inOutPipeServer} GetInputFromUser {json}");
 
             return Console.ReadLine();
@@ -36,19 +24,7 @@ namespace Azure.AI.Details.Common.CLI.ConsoleGui
         public static int GetSelectionFromUser(string[] items, int selected = 0)
         {
             using var stream = new MemoryStream();
-            using var writer = new Utf8JsonWriter(stream, new JsonWriterOptions{ Indented = false });
-            writer.WriteStartObject();
-            writer.WriteStartArray("items");
-            foreach (var line in items)
-            {
-                writer.WriteStringValue(line);
-            }
-            writer.WriteEndArray();
-            writer.WriteNumber("selected", selected);
-            writer.WriteEndObject();
-            writer.Flush();
-
-            var json = Encoding.UTF8.GetString(stream.ToArray());
+            string json = JsonSerializer.Serialize(new { items, selected });
             Console.WriteLine($"\n{_inOutPipeServer} GetSelectionFromUser {json}");
 
             var response = Console.ReadLine();
