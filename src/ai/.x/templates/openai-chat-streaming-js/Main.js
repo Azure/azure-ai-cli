@@ -2,7 +2,11 @@
 <#@ output extension=".js" encoding="utf-8" #>
 <#@ parameter type="System.String" name="ClassName" #>
 <#@ parameter type="System.String" name="AZURE_OPENAI_ENDPOINT" #>
-<#@ parameter type="System.String" name="AZURE_OPENAI_KEY" #>
+<#@ parameter type="System.String" name="OPENAI_API_KEY" #>
+<#@ parameter type="System.String" name="OPENAI_MODEL_NAME" #>
+<#@ parameter type="System.String" name="OPENAI_ORG_ID" #>
+<#@ parameter type="System.String" name="AZURE_OPENAI_API_KEY" #>
+<#@ parameter type="System.String" name="AZURE_OPENAI_API_VERSION" #>
 <#@ parameter type="System.String" name="AZURE_OPENAI_CHAT_DEPLOYMENT" #>
 <#@ parameter type="System.String" name="AZURE_OPENAI_SYSTEM_PROMPT" #>
 const { <#= ClassName #> } = require("./OpenAIChatCompletionsStreamingClass");
@@ -15,23 +19,40 @@ const rl = readline.createInterface({
 
 async function main() {
 
-  const openAIEndpoint = process.env["AZURE_OPENAI_ENDPOINT"] || "<#= AZURE_OPENAI_ENDPOINT #>";
-  const openAIKey = process.env["AZURE_OPENAI_KEY"] || "<#= AZURE_OPENAI_KEY #>";
-  const openAIChatDeploymentName = process.env["AZURE_OPENAI_CHAT_DEPLOYMENT"] || "<#= AZURE_OPENAI_CHAT_DEPLOYMENT #>" ;
-  const openAISystemPrompt = process.env["AZURE_OPENAI_SYSTEM_PROMPT"] || "<#= AZURE_OPENAI_SYSTEM_PROMPT #>" ;
+  // What's the system prompt
+  const openAISystemPrompt = process.env["AZURE_OPENAI_SYSTEM_PROMPT"] || "<#= AZURE_OPENAI_SYSTEM_PROMPT #>";
 
-  const chat = new <#= ClassName #>(openAIEndpoint, openAIKey, openAIChatDeploymentName, openAISystemPrompt);
+  // Connection info and authentication for OpenAI API
+  const openAIKey = process.env["OPENAI_API_KEY"] || "<#= OPENAI_API_KEY #>";
+  const openAIModelName = process.env["OPENAI_MODEL_NAME"] || "<#= OPENAI_MODEL_NAME #>";
+  const openAIOrganization = process.env["OPENAI_ORG_ID"] || null;
 
+  // Connection info and authentication for Azure OpenAI API
+  const azureOpenAIAPIVersion = process.env["AZURE_OPENAI_API_VERSION"] || "<#= AZURE_OPENAI_API_VERSION #>";
+  const azureOpenAIEndpoint = process.env["AZURE_OPENAI_ENDPOINT"] || "<#= AZURE_OPENAI_ENDPOINT #>";
+  const azureOpenAIKey = process.env["AZURE_OPENAI_API_KEY"] || "<#= AZURE_OPENAI_API_KEY #>";
+  const azureOpenAIChatDeploymentName = process.env["AZURE_OPENAI_CHAT_DEPLOYMENT"] || "<#= AZURE_OPENAI_CHAT_DEPLOYMENT #>";
+
+  // Create the right one based on what is available
+  const useAzure = azureOpenAIEndpoint?.startsWith("https://");
+  const chat = useAzure
+    ? <#= ClassName #>.createUsingAzure(azureOpenAIAPIVersion, azureOpenAIEndpoint, azureOpenAIKey, azureOpenAIChatDeploymentName, openAISystemPrompt)
+    : <#= ClassName #>.createUsingOpenAI(openAIKey, openAIModelName, openAISystemPrompt, openAIOrganization);
+
+  // Loop until the user types 'exit'
   while (true) {
 
+    // Get user input
     const input = await new Promise(resolve => rl.question('User: ', resolve));
     if (input === 'exit' || input === '') break;
 
-    let response = await chat.getChatCompletions(input, (content) => {
-      console.log(`assistant-streaming: ${content}`);
+    // Get the Assistant's response
+    process.stdout.write('\nAssistant: ');
+    await chat.getResponse(input, (content) => {
+      process.stdout.write(content);
     });
 
-    console.log(`\nAssistant: ${response}\n`);
+    process.stdout.write('\n\n');
   }
 
   console.log('Bye!');
