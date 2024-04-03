@@ -979,7 +979,7 @@ namespace Azure.AI.Details.Common.CLI
                 var promptyFrontMatterText = sections[1];
                 var chatTemplate = sections[2];
                 var obj = deserializer.Deserialize<PromptyFrontMatter>(promptyFrontMatterText);
-                Dictionary<string, object> templateInputs = ParsePromptyInputs(obj.Inputs);
+                Dictionary<string, object> templateInputs = ParsePromptySample(obj.Sample ?? "sample.json");
                 string parsedText;
                 switch (obj.Template.ToLower())
                 {
@@ -1045,13 +1045,13 @@ namespace Azure.AI.Details.Common.CLI
             return template.Render(inputs);
         }
 
-        private Dictionary<string, object> ParsePromptyInputs(object input)
+        private Dictionary<string, object> ParsePromptySample(object sample)
         {
             var dictionary = new Dictionary<string, object>();
-            var inputString = input as string;
+            var inputString = sample as string;
             if (inputString == null)
             {
-                var inputIter = input as IDictionary<object, object>;
+                var inputIter = sample as IDictionary<object, object>;
 
                 foreach (var kv in inputIter)
                 {

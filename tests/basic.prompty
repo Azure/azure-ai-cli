@@ -7,7 +7,7 @@ authors:
 api: chat
 model:
   azure_deployment: gpt-4-32k-0613
-inputs: inputs.txt
+sample: sample.json
 parameters:
   temperature: 0.0
   max_tokens: 1200

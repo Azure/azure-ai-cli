@@ -7,7 +7,7 @@ authors:
 api: chat
 model:
   azure_deployment: gpt-4-32k-0613
-inputs:
+sample:
   firstName: Jane
   lastName: Doe
   question: What is the name of the customer you are helping?

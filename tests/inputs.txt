@@ -1,3 +1,0 @@
-firstName: Jane
-lastName: Doe
-question: What is the name of the customer you are helping?

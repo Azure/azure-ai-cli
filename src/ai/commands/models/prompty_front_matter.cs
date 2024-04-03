@@ -19,7 +19,9 @@ namespace Azure.AI.Details.Common.CLI
         public List<string> Tags { get; set; }
         public string Base { get; set; }
         public AIModel Model { get; set; }
+        public object Sample { get; set; }
         public object Inputs { get; set; }
+        public object Outputs { get; set; }
         public string Template { get; set; } = "jinja2";
         public ModelParameters Parameters { get; set; }
     }
