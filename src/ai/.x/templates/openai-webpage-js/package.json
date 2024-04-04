@@ -9,9 +9,9 @@
   "author": "",
   "license": "MIT",
   "dependencies": {
-    "@azure/openai": "1.0.0-beta.10",
     "highlight.js": "^11.7.2",
-    "marked": "^4.0.10"
+    "marked": "^4.0.10",
+    "openai": "^4.31.0"
   },
   "keywords": [],
   "devDependencies": {
