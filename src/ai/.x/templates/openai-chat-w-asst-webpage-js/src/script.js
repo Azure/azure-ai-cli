@@ -1,7 +1,18 @@
+<#@ template hostspecific="true" #>
+<#@ output extension=".js" encoding="utf-8" #>
+<#@ parameter type="System.String" name="ClassName" #>
+<#@ parameter type="System.String" name="AZURE_OPENAI_ENDPOINT" #>
+<#@ parameter type="System.String" name="OPENAI_API_KEY" #>
+<#@ parameter type="System.String" name="OPENAI_MODEL_NAME" #>
+<#@ parameter type="System.String" name="OPENAI_ORG_ID" #>
+<#@ parameter type="System.String" name="AZURE_OPENAI_API_KEY" #>
+<#@ parameter type="System.String" name="AZURE_OPENAI_API_VERSION" #>
+<#@ parameter type="System.String" name="AZURE_OPENAI_CHAT_DEPLOYMENT" #>
+<#@ parameter type="System.String" name="AZURE_OPENAI_SYSTEM_PROMPT" #>
 const marked = require("marked");
 const hljs = require("highlight.js");
 
-const { OpenAIAssistantsStreamingClass } = require("./OpenAIAssistantsStreamingClass");
+const { <#= ClassName #> } = require("./OpenAIAssistantsStreamingClass");
 
 // Which assistant, and what thread to use
 let openAIAssistantId = "asst_W6RbXQnkqkmSMWT0QYzA88hH";
@@ -10,14 +21,15 @@ let assistant;
 async function assistantInit(threadId = null) {
 
   // Connection info and authentication for OpenAI API
-  const openAIKey = process.env.OPENAI_API_KEY || "YOUR-KEY-HERE";
+  const openAIKey = process.env.OPENAI_API_KEY || "<#= OPENAI_API_KEY #>";
+  const openAIModelName = process.env.OPENAI_MODEL_NAME || "<#= OPENAI_MODEL_NAME #>";
   const openAIOrganization = process.env.OPENAI_ORG_ID || null;
 
   // Connection info and authentication for Azure OpenAI API
-  const azureOpenAIAPIVersion = "2024-03-01-preview"; // process.env.AZURE_OPENAI_API_VERSION || "2024-03-01-preview";
-  const azureOpenAIEndpoint = process.env.AZURE_OPENAI_ENDPOINT || "<insert your Azure OpenAI endpoint here>";
-  const azureOpenAIKey = process.env.AZURE_OPENAI_API_KEY || "<insert your Azure OpenAI API key here>";
-  const azureOpenAIChatDeploymentName = process.env.AZURE_OPENAI_CHAT_DEPLOYMENT || "<insert your Azure OpenAI chat deployment name here>";
+  const azureOpenAIAPIVersion = process.env.AZURE_OPENAI_API_VERSION || "<#= AZURE_OPENAI_API_VERSION #>";
+  const azureOpenAIEndpoint = process.env.AZURE_OPENAI_ENDPOINT || "<#= AZURE_OPENAI_ENDPOINT #>";
+  const azureOpenAIKey = process.env.AZURE_OPENAI_API_KEY || "<#= AZURE_OPENAI_API_KEY #>";
+  const azureOpenAIChatDeploymentName = process.env.AZURE_OPENAI_CHAT_DEPLOYMENT || "<#= AZURE_OPENAI_CHAT_DEPLOYMENT #>";
 
   // Create the right one based on what is available
   const useAzure = azureOpenAIEndpoint?.startsWith("https://");

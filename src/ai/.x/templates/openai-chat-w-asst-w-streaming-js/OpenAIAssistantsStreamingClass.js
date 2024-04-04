@@ -1,17 +1,19 @@
+<#@ template hostspecific="true" #>
+<#@ output extension=".js" encoding="utf-8" #>
+<#@ parameter type="System.String" name="ClassName" #>
 const { OpenAI } = require('openai');
 
-class OpenAIAssistantsStreamingClass {
+class <#= ClassName #> {
 
   // Create the class using the Azure OpenAI API, which requires a different setup, baseURL, api-key headers, and query parameters
   static createUsingAzure(azureOpenAIAPIVersion, azureOpenAIEndpoint, azureOpenAIKey, azureOpenAIDeploymentName, openAIAssistantId) {
     console.log("Using Azure OpenAI API...");
-    return new OpenAIAssistantsStreamingClass(openAIAssistantId,
+    return new <#= ClassName #>(openAIAssistantId,
       new OpenAI({
         apiKey: azureOpenAIKey,
         baseURL: `${azureOpenAIEndpoint.replace(/\/+$/, '')}/openai`,
         defaultQuery: { 'api-version': azureOpenAIAPIVersion },
         defaultHeaders: { 'api-key': azureOpenAIKey },
-        dangerouslyAllowBrowser: true
         }),
       30);
   }
@@ -19,11 +21,10 @@ class OpenAIAssistantsStreamingClass {
   // Create the class using the OpenAI API and an optional organization
   static createUsingOpenAI(openAIKey, openAIOrganization, openAIAssistantId) {
     console.log("Using OpenAI API...");
-    return new OpenAIAssistantsStreamingClass(openAIAssistantId,
+    return new <#= ClassName #>(openAIAssistantId,
       new OpenAI({
         apiKey: openAIKey,
         organization: openAIOrganization,
-        dangerouslyAllowBrowser: true
       }));
   }
 
@@ -35,17 +36,11 @@ class OpenAIAssistantsStreamingClass {
     this.openai = openai;
   }
 
-  // Create a new the thread
-  async createThread() {
-    this.thread = await this.openai.beta.threads.create();
-    console.log(`Thread ID: ${this.thread.id}`);
-    return this.thread;
-  }
-  
-  // Retrieve an existing thread
-  async retrieveThread(threadId) {
-    this.thread =await this.openai.beta.threads.retrieve(threadId);
-    console.log(`Thread ID: ${this.thread.id}`);
+  // Get or create the thread
+  async getOrCreateThread(threadId = null) {
+    this.thread = threadId == null
+      ? await this.openai.beta.threads.create()
+      : await this.openai.beta.threads.retrieve(threadId);
     return this.thread;
   }
 
@@ -83,7 +78,7 @@ class OpenAIAssistantsStreamingClass {
           if (this.simulateTypingDelay > 0) {
             await new Promise(r => setTimeout(r, this.simulateTypingDelay));
           }
-      }
+        }
         response += content;
       }
     });
@@ -93,4 +88,4 @@ class OpenAIAssistantsStreamingClass {
   }
 }
 
-exports.OpenAIAssistantsStreamingClass = OpenAIAssistantsStreamingClass;
+exports.<#= ClassName #> = <#= ClassName #>;
