@@ -190,7 +190,17 @@ namespace YamlTestAdapter
             var result = await _httpClient.SendAsync(message);
             if (result.StatusCode != HttpStatusCode.OK)
             {
-                throw new Exception($"Failed to add sanitizer {result.StatusCode} {result.Content}");
+                string responseContent = string.Empty;
+                if (result.Content != null)
+                {
+                    try
+                    {
+                        responseContent = await result.Content.ReadAsStringAsync();
+                    }
+                    catch { }
+                }
+
+                throw new Exception($"Failed to add sanitizer {result.StatusCode} {responseContent}");
             }
         }
 

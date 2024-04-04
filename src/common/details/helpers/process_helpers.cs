@@ -9,8 +9,6 @@ using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Text;
-using Azure.AI.CLI.Common.Clients.Models;
-using Newtonsoft.Json.Linq;
 
 namespace Azure.AI.Details.Common.CLI
 {
@@ -21,7 +19,10 @@ namespace Azure.AI.Details.Common.CLI
         public string MergedOutput { get; init; }
         public int ExitCode { get; init; }
 
-        public bool HasError => ExitCode != 0 || !string.IsNullOrWhiteSpace(StdError);
+        public bool HasError => ExitCode != 0
+            || (!string.IsNullOrWhiteSpace(StdError)
+                // Special case to ignore errors when tests are running against the test-proxy
+                && !(StdError.Contains("`subjectAltName`") && StdError.Contains("`commonName`")));
     }
 
     public class ProcessHelpers
