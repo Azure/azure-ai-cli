@@ -27,7 +27,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RecordedYamlTestAdapter", "
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "speech-extension", "src\extensions\speech_extension\speech-extension.csproj", "{CED7C805-0435-4BF7-A42F-9F3BBF14A18F}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "telemetry.aria", "src\telemetry\telemetry.aria.csproj", "{306A3CD6-91C2-450B-9995-79701CE63FE2}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "telemetry.aria", "src\telemetry\aria\telemetry.aria.csproj", "{306A3CD6-91C2-450B-9995-79701CE63FE2}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{68834003-CCC2-44D7-9EA4-F9B6C65CFC99}"
 	ProjectSection(SolutionItems) = preProject

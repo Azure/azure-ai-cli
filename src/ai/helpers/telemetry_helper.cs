@@ -1,4 +1,7 @@
 ﻿using System;
+using System.Globalization;
+using System.Reflection;
+using System.Runtime.Remoting;
 using System.Text;
 using System.Text.Json;
 using Azure.AI.Details.Common.CLI.Telemetry;
@@ -18,22 +21,26 @@ namespace Azure.AI.Details.Common.CLI
 
         internal static ITelemetry Instantiate(TelemetryConfig config, IProgramData programData)
         {
+            ITelemetry? telemetry = null;
             try
             {
-                switch (config.Type)
+                switch (config.Type?.ToLowerInvariant())
                 {
                     case "none":
                     default:
-                        return NoOpTelemetry.Instance;
+                        break;
+
                     case "aria":
-                        return new AriaTelemetry(config.Aria.TenantId, programData);
+                        telemetry = CreateTelemetry("Azure.AI.CLI.Telemetry.Aria.AriaTelemetry", "Azure.AI.CLI.Telemetry.Aria", config.Aria.TenantId, programData?.TelemetryUserAgent);
+                        break;
                 }
+
+                return telemetry ?? NoOpTelemetry.Instance;
             }
             catch (Exception ex)
             {
 #if DEBUG
-                ErrorHelpers.WriteLineMessage(
-                    "WARNING:", "Failed to instantiate telemetry", ex.Message);
+                ErrorHelpers.WriteLineMessage("WARNING:", "Failed to instantiate telemetry", ex.Message);
 #endif
                 return NoOpTelemetry.Instance;
             }
@@ -80,11 +87,17 @@ namespace Azure.AI.Details.Common.CLI
             catch (Exception ex)
             {
 #if DEBUG
-                ErrorHelpers.WriteLineMessage(
-                    "WARNING:", "Failed to load telemetry config", ex.Message);
+                ErrorHelpers.WriteLineMessage("WARNING:", "Failed to load telemetry config", ex.Message);
 #endif
                 return false;
             }
+        }
+
+        internal static ITelemetry CreateTelemetry(string @typeName, string assembly, params object?[]? args)
+        {
+            ObjectHandle? handle = Activator.CreateInstance(
+                assembly, typeName, true, BindingFlags.Public | BindingFlags.Instance, null, args, CultureInfo.InvariantCulture, null);
+            return (ITelemetry)handle?.Unwrap();
         }
 
         public readonly struct TelemetryConfig
