@@ -128,6 +128,7 @@
     <PackageReference Include="Microsoft.SemanticKernel" Version="0.18.230725.3-preview" />
     <PackageReference Include="Microsoft.SemanticKernel.Connectors.Memory.AzureCognitiveSearch" Version="0.18.230725.3-preview" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+    <PackageReference Include="Scriban" Version="5.9.1" />
     <PackageReference Include="System.Interactive.Async" Version="6.0.1" />
     <PackageReference Include="Azure.AI.OpenAI" Version="1.0.0-beta.13" />
   </ItemGroup>
