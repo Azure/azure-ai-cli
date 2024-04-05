@@ -24,6 +24,7 @@
     <PackageProjectUrl>https://learn.microsoft.com/azure/ai-studio/how-to/cli-install</PackageProjectUrl>
     <PackageTags>Azure AI; AI CLI; azureofficial</PackageTags>
     <SuppressTfmSupportBuildWarnings>true</SuppressTfmSupportBuildWarnings>
+    <DefineConstants Condition="'$(AI_CLI_ENABLE_TELEMETRY)' == '1'">$(DefineConstants);TELEMETRY_ENABLED</DefineConstants>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(PublishProfile)' == '' or '$(PublishProfile)' == 'fdd'">

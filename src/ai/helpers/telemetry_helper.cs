@@ -39,7 +39,7 @@ namespace Azure.AI.Details.Common.CLI
             }
             catch (Exception ex)
             {
-#if DEBUG
+#if DEBUG && TELEMETRY_ENABLED
                 ErrorHelpers.WriteLineMessage("WARNING:", "Failed to instantiate telemetry", ex.Message);
 #endif
                 return NoOpTelemetry.Instance;
