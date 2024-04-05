@@ -454,7 +454,7 @@
     - name: pack template
       bash: |
         cd openai-webpage-js
-        npx webpack
+        npm run webpack
 
   - class: dev new openai-webpage (typescript)
     steps:
@@ -467,7 +467,7 @@
     - name: pack template
       bash: |
         cd openai-webpage-ts
-        npx webpack
+        npm run webpack
 
 - area: ai dev new openai-webpage-with-functions
   tests:
@@ -483,7 +483,7 @@
     - name: pack template 
       bash: |
         cd openai-webpage-with-functions-js
-        npx webpack
+        npm run webpack
 
   - class: dev new openai-webpage-with-functions (typescript)
     steps:
@@ -496,7 +496,7 @@
     - name: pack template
       bash: |
         cd openai-webpage-with-functions-ts
-        npx webpack
+        npm run webpack
 
 - area: ai dev new openai-chat-w-asst-w-streaming
   tests:
@@ -529,4 +529,4 @@
     - name: pack template
       bash: |
         cd openai-chat-w-asst-webpage-js
-        npx webpack
+        npm run webpack

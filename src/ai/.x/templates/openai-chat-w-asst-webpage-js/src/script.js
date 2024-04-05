@@ -13,10 +13,10 @@ const marked = require("marked");
 const hljs = require("highlight.js");
 
 const { <#= ClassName #> } = require("./OpenAIAssistantsStreamingClass");
-
-// Which assistant, and what thread to use
-let openAIAssistantId = "asst_W6RbXQnkqkmSMWT0QYzA88hH";
 let assistant;
+
+// NOTE: Never deploy your key in client-side environments like browsers or mobile apps
+//  SEE: https://help.openai.com/en/articles/5112595-best-practices-for-api-key-safety
 
 async function assistantInit(threadId = null) {
 

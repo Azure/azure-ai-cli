@@ -15,6 +15,9 @@ const hljs = require("highlight.js");
 const { <#= ClassName #> } = require("./OpenAIChatCompletionsStreamingClass");
 let streamingChatCompletions;
 
+// NOTE: Never deploy your key in client-side environments like browsers or mobile apps
+//  SEE: https://help.openai.com/en/articles/5112595-best-practices-for-api-key-safety
+
 function streamingChatCompletionsInit() {
 
   // What's the system prompt

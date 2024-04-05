@@ -11,11 +11,14 @@
 <#@ parameter type="System.String" name="AZURE_OPENAI_SYSTEM_PROMPT" #>
 const { <#= ClassName #> } = require("./OpenAIChatCompletionsStreamingClass");
 
-const readline = require('readline');
+const readline = require('node:readline/promises');
 const rl = readline.createInterface({
   input: process.stdin,
   output: process.stdout
 });
+
+// NOTE: Never deploy your key in client-side environments like browsers or mobile apps
+//  SEE: https://help.openai.com/en/articles/5112595-best-practices-for-api-key-safety
 
 async function main() {
 
@@ -43,7 +46,7 @@ async function main() {
   while (true) {
 
     // Get user input
-    const input = await new Promise(resolve => rl.question('User: ', resolve));
+    const input = await rl.question('User: ');
     if (input === 'exit' || input === '') break;
 
     // Get the Assistant's response

@@ -10,7 +10,7 @@ To build the website, run the following commands:
 
 ```bash
 npm install
-npx webpack
+npm run webpack
 ```
 
 To run the website, launch `index.html` in your browser.
