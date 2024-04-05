@@ -5,7 +5,6 @@
 
 using System;
 using System.Linq;
-using System.Text;
 using Azure.AI.Details.Common.CLI;
 
 namespace Azure.AI.Details.Common.CLI.ConsoleGui
@@ -20,6 +19,11 @@ namespace Azure.AI.Details.Common.CLI.ConsoleGui
 
         public static int PickIndexOf(string[] lines, int width, int height, Colors normal, Colors selected, int select = 0)
         {
+            if (InOutPipeServer.IsInOutPipeServer)
+            {
+                return InOutPipeServer.GetSelectionFromUser(lines, select);
+            }
+
             if (height > lines.Length + 2) height = lines.Length + 2;
             if (width == int.MinValue)
             {

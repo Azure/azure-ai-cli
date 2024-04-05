@@ -16,6 +16,13 @@ namespace Azure.AI.Details.Common.CLI
     {
         public static string? ReadLineOrDefault(string defaultOnEmpty = "", string? defaultOnEndOfRedirectedInput = null)
         {
+            if (InOutPipeServer.IsInOutPipeServer)
+            {
+                var line = InOutPipeServer.GetInputFromUser(string.Empty, defaultOnEmpty);
+                Console.WriteLine(line);
+                return line;
+            }
+
             if (Console.IsInputRedirected)
             {
                 var line = Console.ReadLine();
