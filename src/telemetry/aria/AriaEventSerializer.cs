@@ -3,11 +3,13 @@
 // Licensed under the MIT license. See LICENSE.md file in the project root for full license information.
 //
 
+using Azure.AI.Details.Common.CLI.Telemetry;
 using Microsoft.Applications.Events;
 using System.Reflection;
+using PiiKind = Azure.AI.Details.Common.CLI.Telemetry.PiiKind;
 using AriaPii = Microsoft.Applications.Events.PiiKind;
 
-namespace Azure.AI.Details.Common.CLI.Telemetry
+namespace Azure.AI.CLI.Telemetry.Aria
 {
     [System.Diagnostics.DebuggerStepThrough]
     internal class AriaEventSerializer
