@@ -970,6 +970,10 @@ namespace Azure.AI.Details.Common.CLI
             var existing = FileHelpers.DemandFindFileInDataPath(parameterFile, _values, "chat parameter");
             var text = FileHelpers.ReadAllText(existing, Encoding.Default);
             string[] sections = text.Split("---\n");
+            if (sections.Length < 2)
+            {
+                sections = text.Split("---\r\n");
+            }
             var deserializer = new DeserializerBuilder()
                 .WithNamingConvention(UnderscoredNamingConvention.Instance)
                 .Build();
