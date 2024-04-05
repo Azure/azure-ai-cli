@@ -8,7 +8,7 @@
 <#@ parameter type="System.String" name="AZURE_OPENAI_API_KEY" #>
 <#@ parameter type="System.String" name="AZURE_OPENAI_API_VERSION" #>
 <#@ parameter type="System.String" name="AZURE_OPENAI_CHAT_DEPLOYMENT" #>
-<#@ parameter type="System.String" name="AZURE_OPENAI_SYSTEM_PROMPT" #>
+<#@ parameter type="System.String" name="AZURE_OPENAI_ASSISTANT_ID" #>
 const marked = require("marked");
 const hljs = require("highlight.js");
 
@@ -19,6 +19,9 @@ let openAIAssistantId = "asst_W6RbXQnkqkmSMWT0QYzA88hH";
 let assistant;
 
 async function assistantInit(threadId = null) {
+
+  // Which Assistant?
+  const openAIAssistantId = process.env.AZURE_OPENAI_ASSISTANT_ID || "<#= AZURE_OPENAI_ASSISTANT_ID #>";
 
   // Connection info and authentication for OpenAI API
   const openAIKey = process.env.OPENAI_API_KEY || "<#= OPENAI_API_KEY #>";

@@ -497,3 +497,36 @@
       bash: |
         cd openai-webpage-with-functions-ts
         npx webpack
+
+- area: ai dev new openai-chat-w-asst-w-streaming
+  tests:
+  - class: dev new openai-chat-w-asst-w-streaming (javascript)
+    steps:
+    - name: generate template
+      command: ai dev new openai-chat-w-asst-w-streaming --javascript
+    - name: build template
+      bash: |
+        cd openai-chat-w-asst-w-streaming-js
+        npm install
+    - name: run template
+      command: ai dev shell --bash "cd openai-chat-w-asst-w-streaming-js;node Main.js"
+      input: |-
+        Tell me a joke
+        Tell me another joke
+        exit
+      tag: skip
+
+- area: ai dev new openai-chat-w-asst-webpage
+  tests:
+  - class: dev new openai-chat-w-asst-webpage (javascript)
+    steps:
+    - name: generate template
+      command: ai dev new openai-chat-w-asst-webpage --javascript
+    - name: build template
+      bash: |
+        cd openai-chat-w-asst-webpage-js
+        npm install
+    - name: pack template
+      bash: |
+        cd openai-chat-w-asst-webpage-js
+        npx webpack
