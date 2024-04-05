@@ -6,7 +6,6 @@
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Adapter;
 using System;
-using System.Diagnostics;
 using System.Linq;
 using System.Text.Json;
 using System.Threading.Tasks;
@@ -36,7 +35,7 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
 
             if (_mode != RecordedTestMode.Live)
             {
-                Environment.SetEnvironmentVariable("HTTPS_PROXY", "http://localhost:5004");
+                Environment.SetEnvironmentVariable("HTTPS_PROXY", TestProxyClient.BaseUrl);
                 foreach (var trait in testCase.Traits.Where((Trait t) => t.Name.Equals("_sanitize", StringComparison.OrdinalIgnoreCase)))
                 {
                     var sanitizeJson = trait.Value;
@@ -80,7 +79,7 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
                 {
                     foreach (var uri in currentElement.EnumerateArray())
                     {
-                        await TestProxyClient.AddUriSinatizer(uri.GetProperty("regex").GetString(), uri.GetProperty("value").GetString());
+                        await TestProxyClient.AddUriSanitizer(uri.GetProperty("regex").GetString(), uri.GetProperty("value").GetString());
                     }
                 }
                 else if (sanitizeLine.TryGetProperty("body", out currentElement))
@@ -106,12 +105,12 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
                 case RecordedTestMode.Record:
                     TestProxyClient.StopRecording(_id).Wait();
                     Environment.SetEnvironmentVariable("HTTPS_PROXY", null);
-                    TestProxyClient.ClearSanatizers().Wait();
+                    TestProxyClient.ClearSanitizers().Wait();
                     break;
                 case RecordedTestMode.Playback:
                     TestProxyClient.StopPlayback(_id).Wait();
                     Environment.SetEnvironmentVariable("HTTPS_PROXY", null);
-                    TestProxyClient.ClearSanatizers().Wait();
+                    TestProxyClient.ClearSanitizers().Wait();
                     break;
                 case RecordedTestMode.Live:
                     // Live test

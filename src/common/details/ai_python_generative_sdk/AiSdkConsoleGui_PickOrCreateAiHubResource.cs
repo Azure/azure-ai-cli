@@ -39,26 +39,22 @@ namespace Azure.AI.Details.Common.CLI
             var json = PythonSDKWrapper.ListResources(values, subscription);
             if (Program.Debug) Console.WriteLine(json);
 
-            var parsed = !string.IsNullOrEmpty(json) ? JsonDocument.Parse(json) : default;
-            var items = parsed?.GetPropertyArrayOrEmpty("resources") ?? Array.Empty<JsonElement>();
+            var items = JsonHelpers.DeserializePropertyValueOrDefault<IEnumerable<AiHubResourceInfo>>(json, "resources")
+                ?.OrderBy(res => res.DisplayName + " " + res.Name)
+                .ThenBy(res => res.RegionLocation)
+                .ToArray()
+                ?? Array.Empty<AiHubResourceInfo>();
 
             var choices = new List<string>();
-            foreach (var item in items)
-            {
-                var name = item.GetPropertyStringOrNull("name");
-                var location = item.GetPropertyStringOrNull("location");
-                var displayName = item.GetPropertyStringOrNull("display_name");
-
-                choices.Add(string.IsNullOrEmpty(displayName)
-                    ? $"{name} ({location})"
-                    : $"{displayName} ({location})");
-            }
-
             if (allowCreate)
             {
-                choices.Insert(0, "(Create w/ integrated Open AI + AI Services)");
-                choices.Insert(1, "(Create w/ standalone Open AI resource)");
+                choices.Add("(Create w/ integrated Open AI + AI Services)");
+                choices.Add("(Create w/ standalone Open AI resource)");
             }
+
+            choices.AddRange(items
+                .Select(item =>
+                    $"{(string.IsNullOrEmpty(item.DisplayName) ? item.Name : item.DisplayName)} ({item.RegionLocation})"));
 
             if (choices.Count == 0)
             {
@@ -73,9 +69,9 @@ namespace Azure.AI.Details.Common.CLI
             }
 
             Console.WriteLine($"\rName: {choices[picked]}");
-            var resource = allowCreate
-                ? (picked >= 2 ? items.ToArray()[picked - 2] : default(JsonElement?))
-                : items.ToArray()[picked];
+            AiHubResourceInfo resource = allowCreate
+                ? (picked >= 2 ? items[picked - 2] : default)
+                : items[picked];
 
             var byoServices = allowCreate && picked == 1;
             if (byoServices)
@@ -108,7 +104,7 @@ namespace Azure.AI.Details.Common.CLI
             return (FinishPickOrCreateAiHubResource(values, resource), createNewHub);
         }
 
-        private static async Task<JsonElement?> TryCreateAiHubResourceInteractive(ICommandValues values, string subscription)
+        private static async Task<AiHubResourceInfo> TryCreateAiHubResourceInteractive(ICommandValues values, string subscription)
         {
             var locationName = values.GetOrEmpty("service.resource.region.name");
             var groupName = ResourceGroupNameToken.Data().GetOrDefault(values);
@@ -124,25 +120,17 @@ namespace Azure.AI.Details.Common.CLI
             return await TryCreateAiHubResourceInteractive(values, subscription, locationName, groupName, displayName, description, openAiResourceId, openAiResourceKind, smartName, smartNameKind);
         }
 
-        private static AiHubResourceInfo FinishPickOrCreateAiHubResource(ICommandValues values, JsonElement? resource)
+        private static AiHubResourceInfo FinishPickOrCreateAiHubResource(ICommandValues values, AiHubResourceInfo resource)
         {
-            var aiHubResource = new AiHubResourceInfo
-            {
-                Id = resource?.GetPropertyStringOrNull("id"),
-                Group = resource?.GetPropertyStringOrNull("resource_group"),
-                Name = resource?.GetPropertyStringOrNull("name"),
-                RegionLocation = resource?.GetPropertyStringOrNull("location"),
-            };
+            ResourceIdToken.Data().Set(values, resource.Id);
+            ResourceNameToken.Data().Set(values, resource.Name);
+            ResourceGroupNameToken.Data().Set(values, resource.Group);
+            RegionLocationToken.Data().Set(values, resource.RegionLocation);
 
-            ResourceIdToken.Data().Set(values, aiHubResource.Id);
-            ResourceNameToken.Data().Set(values, aiHubResource.Name);
-            ResourceGroupNameToken.Data().Set(values, aiHubResource.Group);
-            RegionLocationToken.Data().Set(values, aiHubResource.RegionLocation);
-
-            return aiHubResource;
+            return resource;
         }
 
-        private static async Task<JsonElement?> TryCreateAiHubResourceInteractive(ICommandValues values, string subscription, string locationName, string groupName, string displayName, string description, string openAiResourceId, string openAiResourceKind, string smartName = null, string smartNameKind = null)
+        private static async Task<AiHubResourceInfo> TryCreateAiHubResourceInteractive(ICommandValues values, string subscription, string locationName, string groupName, string displayName, string description, string openAiResourceId, string openAiResourceKind, string smartName = null, string smartNameKind = null)
         {
             var sectionHeader = $"\n`CREATE AZURE AI RESOURCE`";
             ConsoleHelpers.WriteLineWithHighlight(sectionHeader);
@@ -150,7 +138,7 @@ namespace Azure.AI.Details.Common.CLI
             var groupOk = !string.IsNullOrEmpty(groupName);
             if (!groupOk)
             {
-                var location =  await AzCliConsoleGui.PickRegionLocationAsync(true, locationName, false);
+                var location =  await AzCliConsoleGui.PickRegionLocationAsync(true, subscription, locationName, false);
                 locationName = location.Name;
             }
 
@@ -177,8 +165,7 @@ namespace Azure.AI.Details.Common.CLI
 
             Console.WriteLine("\r*** CREATED ***  ");
 
-            var parsed = !string.IsNullOrEmpty(json) ? JsonDocument.Parse(json) : default;
-            return parsed?.GetPropertyElementOrNull("resource");
+            return JsonHelpers.DeserializePropertyValueOrDefault<AiHubResourceInfo>(json, "resource");
         }
     }
 }

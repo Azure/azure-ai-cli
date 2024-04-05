@@ -18,7 +18,7 @@ namespace Azure.AI.Details.Common.CLI
 {
     public partial class AzCliConsoleGui
     {
-        public static async Task<AzCli.CognitiveServicesSpeechResourceInfo> PickOrCreateAndConfigCognitiveServicesSpeechServicesKindResource(bool interactive, string subscriptionId, string regionFilter = null, string groupFilter = null, string resourceFilter = null, string kinds = null, string sku = null, bool yes = false)
+        public static async Task<AzCli.CognitiveServicesResourceInfo> PickOrCreateAndConfigCognitiveServicesSpeechServicesKindResource(bool interactive, string subscriptionId, string regionFilter = null, string groupFilter = null, string resourceFilter = null, string kinds = null, string sku = null, bool yes = false)
         {
             kinds ??= "SpeechServices";
             var sectionHeader = "SPEECH RESOURCE";
@@ -29,19 +29,11 @@ namespace Azure.AI.Details.Common.CLI
             var keys = await AzCliConsoleGui.LoadCognitiveServicesResourceKeys(sectionHeader, subscriptionId, resource);
 
             ConfigSetHelpers.ConfigSpeechResource(subscriptionId, resource.RegionLocation, resource.Endpoint, keys.Key1);
-
-            return new AzCli.CognitiveServicesSpeechResourceInfo
-            {
-                Id = resource.Id,
-                Group = resource.Group,
-                Name = resource.Name,
-                Kind = resource.Kind,
-                RegionLocation = resource.RegionLocation,
-                Endpoint = resource.Endpoint,
-                Key = keys.Key1,
-            };
+            resource.Key = keys.Key1;
+            return resource;
         }
-        public static async Task<AzCli.CognitiveServicesVisionResourceInfo> PickOrCreateAndConfigCognitiveServicesComputerVisionKindResource(bool interactive, string subscriptionId, string regionFilter = null, string groupFilter = null, string resourceFilter = null, string kinds = null, string sku = null, bool yes = false)
+
+        public static async Task<AzCli.CognitiveServicesResourceInfo> PickOrCreateAndConfigCognitiveServicesComputerVisionKindResource(bool interactive, string subscriptionId, string regionFilter = null, string groupFilter = null, string resourceFilter = null, string kinds = null, string sku = null, bool yes = false)
         {
             kinds ??= "ComputerVision";
             var sectionHeader = "VISION RESOURCE";
@@ -52,17 +44,8 @@ namespace Azure.AI.Details.Common.CLI
             var keys = await AzCliConsoleGui.LoadCognitiveServicesResourceKeys(sectionHeader, subscriptionId, resource);
 
             ConfigSetHelpers.ConfigVisionResource(subscriptionId, resource.RegionLocation, resource.Endpoint, keys.Key1);
-
-            return new AzCli.CognitiveServicesVisionResourceInfo
-            {
-                Id = resource.Id,
-                Group = resource.Group,
-                Name = resource.Name,
-                Kind = resource.Kind,
-                RegionLocation = resource.RegionLocation,
-                Endpoint = resource.Endpoint,
-                Key = keys.Key1,
-            };
+            resource.Key = keys.Key1;
+            return resource;
         }
     }
 }

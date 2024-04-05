@@ -290,6 +290,33 @@ namespace Azure.AI.Details.Common.CLI
 
         #endregion
 
+        /// <summary>
+        /// Helper method to deserialize the value of a specific named property from a JSON string
+        /// </summary>
+        /// <typeparam name="TValue">The type of the value to deserialize</typeparam>
+        /// <param name="json">The JSON string to deserialize</param>
+        /// <param name="propertyName">The name of the property to deserialize</param>
+        /// <returns>The deserialized value, or the default value in the case of errors (e.g. null string,
+        /// property didn't exist, etc...)</returns>
+        public static TValue DeserializePropertyValueOrDefault<TValue>(string json, string propertyName)
+        {
+            TValue value = default;
+
+            try
+            {
+                using JsonDocument node = JsonDocument.Parse(json ?? "{}");
+                if (node.RootElement.TryGetProperty(propertyName ?? string.Empty, out JsonElement property))
+                {
+                    value = property.Deserialize<TValue>();
+                }
+            }
+            catch (Exception)
+            {
+            }
+
+            return value;
+        }
+
         public static void PrintJson(string? text, string indent = "  ", bool naked = false)
         {
             if (!string.IsNullOrWhiteSpace(text))

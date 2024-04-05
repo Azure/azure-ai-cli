@@ -133,6 +133,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\clients.cli\ClientsCLI.csproj" />
     <ProjectReference Include="..\common\common.csproj" />
     <ProjectReference Include="..\extensions\helper_functions_extension\helper_functions_extension.csproj" />
     <ProjectReference Include="..\extensions\speech_extension\speech-extension.csproj" />

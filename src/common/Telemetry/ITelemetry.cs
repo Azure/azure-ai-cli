@@ -28,9 +28,12 @@ namespace Azure.AI.Details.Common.CLI.Telemetry
     /// <summary>
     /// Helper methods to make working with telemetry easier
     /// </summary>
-    [DebuggerStepThrough]
+    [DebuggerNonUserCode]
     public static class TelemetryExtensions
     {
+        // NOTE: To make stepping through the code easier, we've added DebuggerNonUserCode attributes to these methods
+        //       so that the debugger will not step into them
+
         #region delegates
 
         /// <summary>
@@ -66,6 +69,7 @@ namespace Azure.AI.Details.Common.CLI.Telemetry
         /// <param name="doWorkAsync">The async function to call</param>
         /// <param name="createTelemetryEvent">The method to call to create the telemetry event</param>
         /// <returns>Asynchronous task</returns>
+        [DebuggerNonUserCode]
         public static Task WrapAsync(
             this ITelemetry telemetry,
             Func<Task> doWorkAsync,
@@ -73,7 +77,7 @@ namespace Azure.AI.Details.Common.CLI.Telemetry
         {
             return WrapResultAsync(
                 telemetry,
-                async () =>
+                [DebuggerNonUserCode] async () =>
                 {
                     await doWorkAsync().ConfigureAwait(false);
                     return (Outcome.Success, true);
@@ -88,6 +92,7 @@ namespace Azure.AI.Details.Common.CLI.Telemetry
         /// <param name="doWorkAsync">The async function to call</param>
         /// <param name="createTelemetryEvent">The method to call to create the telemetry event</param>
         /// <returns>Asynchronous task</returns>
+        [DebuggerNonUserCode]
         public static async Task<Outcome> WrapAsync(
             this ITelemetry telemetry,
             Func<Task<Outcome>> doWorkAsync,
@@ -95,7 +100,7 @@ namespace Azure.AI.Details.Common.CLI.Telemetry
         {
             var (outcome, _) = await WrapResultAsync(
                 telemetry,
-                async () =>
+                [DebuggerNonUserCode] async () =>
                 {
                     var outcome = await doWorkAsync()
                         .ConfigureAwait(false);
@@ -115,6 +120,7 @@ namespace Azure.AI.Details.Common.CLI.Telemetry
         /// <param name="doWorkAsync">The async function to call</param>
         /// <param name="createTelemetryEvent">The method to call to create the telemetry event</param>
         /// <returns>Asynchronous task</returns>
+        [DebuggerNonUserCode]
         public static async Task<TResult> WrapAsync<TResult>(
             this ITelemetry telemetry,
             Func<Task<TResult>> doWorkAsync,
@@ -122,7 +128,7 @@ namespace Azure.AI.Details.Common.CLI.Telemetry
         {
             var (_, result) = await WrapResultAsync(
                 telemetry,
-                async () =>
+                [DebuggerNonUserCode] async () =>
                 {
                     var result = await doWorkAsync().ConfigureAwait(false);
                     return (Outcome.Success, result);
@@ -141,6 +147,7 @@ namespace Azure.AI.Details.Common.CLI.Telemetry
         /// <param name="doWorkAsync">The async function to call</param>
         /// <param name="createTelemetryEvent">The method to call to create the telemetry event</param>
         /// <returns>Asynchronous task</returns>
+        [DebuggerNonUserCode]
         public static async Task<(Outcome, TResult)> WrapResultAsync<TResult>(
             this ITelemetry telemetry,
             Func<Task<(Outcome, TResult)>> doWorkAsync,
@@ -179,6 +186,7 @@ namespace Azure.AI.Details.Common.CLI.Telemetry
         /// <param name="telemetry">The telemetry instance to use</param>
         /// <param name="doWork">The work to do</param>
         /// <param name="createTelemetryEvent">The method to call to create the telemetry event</param>
+        [DebuggerNonUserCode]
         public static void Wrap(
             this ITelemetry telemetry,
             Action doWork,
@@ -186,7 +194,7 @@ namespace Azure.AI.Details.Common.CLI.Telemetry
         {
             var (outcome, _) = WrapResult<bool>(
                 telemetry,
-                () =>
+                [DebuggerNonUserCode] () =>
                 {
                     doWork();
                     return (Outcome.Success, true);
@@ -201,6 +209,7 @@ namespace Azure.AI.Details.Common.CLI.Telemetry
         /// <param name="doWork">The work to do</param>
         /// <param name="createTelemetryEvent">The method to call to create the telemetry event</param>
         /// <returns>The returned outcome from the work</returns>
+        [DebuggerNonUserCode]
         public static Outcome Wrap(
             this ITelemetry telemetry,
             Func<Outcome> doWork,
@@ -208,7 +217,7 @@ namespace Azure.AI.Details.Common.CLI.Telemetry
         {
             var (outcome, _) = WrapResult<bool>(
                 telemetry,
-                () =>
+                [DebuggerNonUserCode] () =>
                 {
                     var outcome = doWork();
                     return (outcome, true);
@@ -226,6 +235,7 @@ namespace Azure.AI.Details.Common.CLI.Telemetry
         /// <param name="doWork">The work to do</param>
         /// <param name="createTelemetryEvent">The method to call to create the telemetry event</param>
         /// <returns>The returned result from the work</returns>
+        [DebuggerNonUserCode]
         public static TResult Wrap<TResult>(
             this ITelemetry telemetry,
             Func<TResult> doWork,
@@ -233,7 +243,7 @@ namespace Azure.AI.Details.Common.CLI.Telemetry
         {
             var (_, result) = WrapResult<TResult>(
                 telemetry,
-                () =>
+                [DebuggerNonUserCode] () =>
                 {
                     var result = doWork();
                     return (Outcome.Success, result);
@@ -251,6 +261,7 @@ namespace Azure.AI.Details.Common.CLI.Telemetry
         /// <param name="doWork">The work to do</param>
         /// <param name="createTelemetryEvent">The method to call to create the telemetry event</param>
         /// <returns>The returned outcome, and result from the work</returns>
+        [DebuggerNonUserCode]
         public static (Outcome, TResult) WrapResult<TResult>(
             this ITelemetry telemetry,
             Func<(Outcome, TResult)> doWork,
@@ -283,9 +294,11 @@ namespace Azure.AI.Details.Common.CLI.Telemetry
 
         #region helper methods
 
+        [DebuggerNonUserCode]
         private static CreateTelemetryEvent<TResult> Wrap<TResult>(CreateTelemetryEvent creator) =>
             (Outcome outcome, TResult? _, Exception? ex, TimeSpan duration) => creator(outcome, ex, duration);
 
+        [DebuggerNonUserCode]
         private static Exception FlattenException(Exception ex)
         {
             // special case for AggregateExceptions that wrap only a single exception. This can happen for
@@ -300,6 +313,7 @@ namespace Azure.AI.Details.Common.CLI.Telemetry
             }
         }
 
+        [DebuggerNonUserCode]
         private static Outcome ToOutcome(Exception ex) =>
             ex switch
             {
@@ -309,6 +323,7 @@ namespace Azure.AI.Details.Common.CLI.Telemetry
 
             };
 
+        [DebuggerNonUserCode]
         private static void SendEvent(ITelemetry telemetry, Func<ITelemetryEvent> creator)
         {
             if (telemetry != null)

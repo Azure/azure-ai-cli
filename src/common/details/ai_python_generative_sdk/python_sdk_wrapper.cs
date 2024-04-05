@@ -210,17 +210,21 @@ namespace Azure.AI.Details.Common.CLI
 
         private static void CreateResourceGroup(ICommandValues values, string subscription, string location, string group)
         {
+            // TODO FIXME: This method should be made async
+
             var quiet = values.GetOrDefault("x.quiet", false);
 
             var message = $"Creating resource group '{group}'...";
             if (!quiet) Console.WriteLine(message);
 
-            var response = AzCli.CreateResourceGroup(subscription, location, group).Result;
-            if (string.IsNullOrEmpty(response.Output.StdOutput) && !string.IsNullOrEmpty(response.Output.StdError))
+            var response = Program.SubscriptionClient.CreateResourceGroupAsync(subscription, location, group, Program.CancelToken)
+                .Result;
+
+            if (response.IsError)
             {
                 values.AddThrowError(
                     "ERROR:", "Creating resource group",
-                    "OUTPUT:", response.Output.StdError);
+                    "OUTPUT:", response.ErrorDetails);
             }
 
             if (!quiet) Console.WriteLine($"{message} Done!");

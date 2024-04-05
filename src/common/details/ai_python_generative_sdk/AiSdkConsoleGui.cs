@@ -3,32 +3,52 @@
 // Licensed under the MIT license. See LICENSE.md file in the project root for full license information.
 //
 
-using System;
-using System.Linq;
-using System.Threading.Tasks;
-using System.Collections.Generic;
-using Azure.AI.Details.Common.CLI.ConsoleGui;
 using System.Text.Json;
-using System.IO;
+using System.Text.Json.Serialization;
 
 namespace Azure.AI.Details.Common.CLI
 {
     public struct AiHubResourceInfo
     {
-        public string Id;
-        public string Group;
-        public string Name;
-        public string RegionLocation;
+        [JsonPropertyName("id")]
+        public string Id { get; init; }
+
+        [JsonPropertyName("resource_group")]
+        public string Group { get; init; }
+
+        [JsonPropertyName("name")]
+        public string Name { get; init; }
+
+        [JsonPropertyName("location")]
+        public string RegionLocation { get; init; }
+
+        [JsonPropertyName("display_name")]
+        public string DisplayName { get; init; }
+
+        public override string ToString() => $"{DisplayName ?? Name} ({RegionLocation})";
     }
 
     public struct AiHubProjectInfo
     {
-        public string Id;
-        public string Group;
-        public string Name;
-        public string DisplayName;
-        public string RegionLocation;
-        public string HubId;
+        [JsonPropertyName("id")]
+        public string Id { get; init; }
+
+        [JsonPropertyName("resource_group")]
+        public string Group { get; init; }
+
+        [JsonPropertyName("name")]
+        public string Name { get; init; }
+
+        [JsonPropertyName("display_name")]
+        public string DisplayName { get; init; }
+
+        [JsonPropertyName("location")]
+        public string RegionLocation { get; init; }
+
+        [JsonPropertyName("workspace_hub")]
+        public string HubId { get; init; }
+
+        public override string ToString() => $"{DisplayName} ({RegionLocation})";
     }
 
     public partial class AiSdkConsoleGui
@@ -43,7 +63,7 @@ namespace Azure.AI.Details.Common.CLI
                 if (project == null) return (null, null, null);
 
                 var hub = project?.GetPropertyStringOrNull("workspace_hub");
-                var hubName = hub.Split('/').Last();
+                var hubName = hub?.Split('/').LastOrDefault();
 
                 var json = PythonSDKWrapper.ListConnections(values, subscription, groupName, projectName);
                 if (string.IsNullOrEmpty(json)) return (null, null, null);
@@ -71,17 +91,19 @@ namespace Azure.AI.Details.Common.CLI
             var openaiEndpoint = openaiConnection.GetPropertyStringOrNull("target");
             if (string.IsNullOrEmpty(openaiEndpoint)) return null;
 
-            var responseOpenAi = await AzCli.ListCognitiveServicesResources(subscription, "OpenAI");
-            var responseOpenAiOk = !string.IsNullOrEmpty(responseOpenAi.Output.StdOutput) && string.IsNullOrEmpty(responseOpenAi.Output.StdError);
-            if (!responseOpenAiOk) return null;
+            var responseOpenAi =  await Program.CognitiveServicesClient.GetAllResourcesAsync(subscription, Program.CancelToken, AzCli.ResourceKind.OpenAI);
+            if (responseOpenAi.IsError)
+            {
+                return null;
+            }
 
             Func<string, string, bool> match = (a, b) => {
                 return a == b ||
-                    a.Replace(".openai.azure.com/", ".cognitiveservices.azure.com/") == b ||
-                    b.Replace(".openai.azure.com/", ".cognitiveservices.azure.com/") == a;
+                    a?.Replace(".openai.azure.com/", ".cognitiveservices.azure.com/") == b ||
+                    b?.Replace(".openai.azure.com/", ".cognitiveservices.azure.com/") == a;
             };
 
-            var matchOpenAiEndpoint = responseOpenAi.Payload.Where(x => match(x.Endpoint, openaiEndpoint)).ToList();
+            var matchOpenAiEndpoint = responseOpenAi.Value.Where(x => match(x.Endpoint, openaiEndpoint)).ToList();
             if (matchOpenAiEndpoint.Count() != 1) return null;
 
             return matchOpenAiEndpoint.First();
@@ -95,11 +117,10 @@ namespace Azure.AI.Details.Common.CLI
             var searchEndpoint = searchConnection.GetPropertyStringOrNull("target");
             if (string.IsNullOrEmpty(searchEndpoint)) return null;
 
-            var responseSearch = await AzCli.ListSearchResources(subscription, null);
-            var responseSearchOk = !string.IsNullOrEmpty(responseSearch.Output.StdOutput) && string.IsNullOrEmpty(responseSearch.Output.StdError);
-            if (!responseSearchOk) return null;
+            var responseSearch = await Program.SearchClient.GetAllAsync(subscription, null, Program.CancelToken);
+            if (responseSearch.IsError) { return null; }
 
-            var matchSearchEndpoint = responseSearch.Payload.Where(x => x.Endpoint == searchEndpoint).ToList();
+            var matchSearchEndpoint = responseSearch.Value.Where(x => x.Endpoint == searchEndpoint).ToList();
             if (matchSearchEndpoint.Count() != 1) return null;
 
             return matchSearchEndpoint.First();

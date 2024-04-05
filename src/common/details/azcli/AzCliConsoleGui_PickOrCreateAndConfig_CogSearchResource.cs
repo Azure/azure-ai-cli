@@ -23,17 +23,17 @@ namespace Azure.AI.Details.Common.CLI
             var resource = await AzCliConsoleGui.PickOrCreateCognitiveSearchResource(allowSkip, subscription, location, groupName, smartName, smartNameKind);
             if (resource == null) return null;
 
-            var keys = await AzCliConsoleGui.LoadSearchResourceKeys(subscription, resource.Value);
+            var keys = await AzCliConsoleGui.LoadSearchResourceKeys(subscription, resource);
 
-            ConfigSetHelpers.ConfigSearchResource(resource.Value.Endpoint, keys.Key1);
+            ConfigSetHelpers.ConfigSearchResource(resource.Endpoint, keys.Key1);
 
             return new AzCli.CognitiveSearchResourceInfoEx
             {
-                Id = resource.Value.Id,
-                Group = resource.Value.Group,
-                Name = resource.Value.Name,
-                RegionLocation = resource.Value.RegionLocation,
-                Endpoint = resource.Value.Endpoint,
+                Id = resource.Id,
+                Group = resource.Group,
+                Name = resource.Name,
+                RegionLocation = resource.RegionLocation,
+                Endpoint = resource.Endpoint,
                 Key = keys.Key1,
             };
         }

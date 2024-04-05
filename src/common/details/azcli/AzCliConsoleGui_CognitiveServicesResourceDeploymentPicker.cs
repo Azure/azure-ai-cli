@@ -3,6 +3,7 @@
 // Licensed under the MIT license. See LICENSE.md file in the project root for full license information.
 //
 
+using System.Globalization;
 using Azure.AI.Details.Common.CLI.ConsoleGui;
 
 namespace Azure.AI.Details.Common.CLI
@@ -40,13 +41,14 @@ namespace Azure.AI.Details.Common.CLI
         {
             var allowCreateDeployment = !string.IsNullOrEmpty(allowCreateDeploymentOption);
 
-            var listDeploymentsFunc = async () => await AzCli.ListCognitiveServicesDeployments(subscriptionId, groupName, resourceName, "OpenAI");
-            var response = await LoginHelpers.GetResponseOnLogin<AzCli.CognitiveServicesDeploymentInfo[]>(interactive, "deployment", listDeploymentsFunc);
+            var listDeploymentsFunc = () => Program.CognitiveServicesClient.GetAllDeploymentsAsync(subscriptionId, groupName, resourceName, Program.CancelToken);
+            var response = await LoginHelpers.GetResponseOnLogin(Program.LoginManager, listDeploymentsFunc, Program.CancelToken);
+            response.ThrowOnFail("Loading Cognitive Services deployments");
 
             var lookForChatCompletionCapable = deploymentExtra.ToLower() == "chat" || deploymentExtra.ToLower() == "evaluation";
             var lookForEmbeddingCapable = deploymentExtra.ToLower() == "embeddings";
 
-            var deployments = response.Payload
+            var deployments = response.Value
                 .Where(x => MatchDeploymentFilter(x, deploymentFilter))
                 .Where(x => !lookForChatCompletionCapable || x.ChatCompletionCapable)
                 .Where(x => !lookForEmbeddingCapable || x.EmbeddingsCapable)
@@ -113,7 +115,7 @@ namespace Azure.AI.Details.Common.CLI
 
             var modelFormat = "OpenAI";
             var modelVersion = deployableModel?.Version;
-            var scaleCapacity = deployableModel?.DefaultCapacity;
+            var scaleCapacity = deployableModel?.DefaultCapacity ?? 0;
 
             Console.Write("\rName: ");
             if (!string.IsNullOrEmpty(deploymentName))
@@ -147,49 +149,40 @@ namespace Azure.AI.Details.Common.CLI
             if (string.IsNullOrEmpty(deploymentName)) return null;
 
             Console.Write("*** CREATING ***");
-            var response = await AzCli.CreateCognitiveServicesDeployment(subscriptionId, groupName, resourceName, deploymentName, modelName, modelVersion, modelFormat, scaleCapacity);
+            var response = await Program.CognitiveServicesClient.CreateDeploymentAsync(subscriptionId, groupName, resourceName, deploymentName, modelName, modelVersion, modelFormat, scaleCapacity.ToString(CultureInfo.InvariantCulture), Program.CancelToken);
 
             Console.Write("\r");
-            if (string.IsNullOrEmpty(response.Output.StdOutput) && !string.IsNullOrEmpty(response.Output.StdError))
-            {
-                throw new ApplicationException($"ERROR: Creating deployment: {response.Output.StdError}");
-            }
+            response.ThrowOnFail("Creating deployment");
 
             Console.WriteLine("\r*** CREATED ***  ");
-            return response.Payload;
+            return response.Value;
         }
 
         private static async Task<AzCli.CognitiveServicesModelInfo?> FindDeployableModel(bool interactive, string deploymentExtra, string subscriptionId, string resourceRegionLocation, string modelFilter)
         {
             Console.Write("\rModel: *** Loading choices ***");
-            var models = await AzCli.ListCognitiveServicesModels(subscriptionId, resourceRegionLocation);
-            var usage = await AzCli.ListCognitiveServicesUsage(subscriptionId, resourceRegionLocation);
+            var models = await Program.CognitiveServicesClient.GetAllModelsAsync(subscriptionId, resourceRegionLocation, Program.CancelToken);
+            var usage = await Program.CognitiveServicesClient.GetAllModelUsageAsync(subscriptionId, resourceRegionLocation, Program.CancelToken);
 
-            if (string.IsNullOrEmpty(models.Output.StdOutput) && !string.IsNullOrEmpty(models.Output.StdError))
-            {
-                throw new ApplicationException($"ERROR: Loading models\n{models.Output.StdError}");
-            }
-            else if (string.IsNullOrEmpty(usage.Output.StdOutput) && !string.IsNullOrEmpty(usage.Output.StdError))
-            {
-                throw new ApplicationException($"ERROR: Loading model usage\n{usage.Output.StdError}");
-            }
+            models.ThrowOnFail("Loading models");
+            usage.ThrowOnFail("Loading model usage");
 
             var lookForChatCompletionCapable = deploymentExtra.ToLower() == "chat" || deploymentExtra.ToLower() == "evaluation";
             var lookForEmbeddingCapable = deploymentExtra.ToLower() == "embeddings";
-            var capableModels = models.Payload
-                .Where(x => !lookForChatCompletionCapable || x.ChatCompletionCapable)
-                .Where(x => !lookForEmbeddingCapable || x.EmbeddingsCapable)
+            var capableModels = models.Value
+                .Where(x => !lookForChatCompletionCapable || x.IsChatCapable)
+                .Where(x => !lookForEmbeddingCapable || x.IsEmbeddingsCapable)
                 .ToArray();
 
             Console.Write("\rModel: ");
-            var deployableModels = FilterModelsByUsage(capableModels, usage.Payload);
+            var deployableModels = FilterModelsByUsage(capableModels, usage.Value);
 
             var exactMatch = modelFilter != null && deployableModels.Count(x => ExactMatchModel(x, modelFilter)) == 1;
             if (exactMatch) deployableModels = deployableModels.Where(x => ExactMatchModel(x, modelFilter)).ToArray();
 
             if (deployableModels.Count() == 0)
             {
-                ConsoleHelpers.WriteLineError(models.Payload.Count() > 0
+                ConsoleHelpers.WriteLineError(models.Value.Count() > 0
                     ? $"*** No matching {deploymentExtra} capable models with capacity found ***"
                     : "*** No deployable models found ***");
                 return null;
@@ -241,7 +234,6 @@ namespace Azure.AI.Details.Common.CLI
             Console.WriteLine($"{deployableModel.Name}-{deployableModel.Version}");
         }
 
-
         private static bool ExactMatchModel(AzCli.CognitiveServicesModelInfo model, string modelFilter)
         {
             var displayName = model.Name + "-" + model.Version;
@@ -265,18 +257,11 @@ namespace Azure.AI.Details.Common.CLI
             var filteredKeep = new List<AzCli.CognitiveServicesModelInfo>();
             foreach (var model in models)
             {
-                if (!double.TryParse(model.DefaultCapacity, out var defaultCapacityValue))
-                {
-                    defaultCapacityValue = 1;
-                }
+                var defaultCapacityValue = (float)model.DefaultCapacity;
 
-                var checkUsage = usage.Where(x => x.Name.EndsWith(model.Name));
-                var current = checkUsage.Count() > 0
-                    ? checkUsage.Sum(x => double.TryParse(x.Current, out var value) ? value : 0)
-                    : 0;
-                var limit = checkUsage.Count() > 0
-                    ? checkUsage.Sum(x => double.TryParse(x.Limit, out var value) ? value : 0)
-                    : 1;
+                var checkUsage = usage.Where(x => x.Name.Value.EndsWith(model.Name));
+                var current = checkUsage.Sum(x => x.CurrentValue);
+                var limit = checkUsage.Sum(x => x.Limit);
 
                 var available = limit - current;
                 if (available <= 0) continue;
@@ -290,15 +275,7 @@ namespace Azure.AI.Details.Common.CLI
                 var newDefault = available - 1;
                 if (newDefault < 1) newDefault = 1;
 
-                filteredKeep.Add(new AzCli.CognitiveServicesModelInfo()
-                {
-                    Name = model.Name,
-                    Version = model.Version,
-                    Format = model.Format,
-                    DefaultCapacity = newDefault.ToString(),
-                    ChatCompletionCapable = model.ChatCompletionCapable,
-                    EmbeddingsCapable = model.EmbeddingsCapable
-                });
+                filteredKeep.Add(model);
             }
 
             if (filteredKeep.Count() <= models.Count())

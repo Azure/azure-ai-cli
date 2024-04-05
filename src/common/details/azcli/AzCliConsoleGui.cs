@@ -18,32 +18,30 @@ namespace Azure.AI.Details.Common.CLI
 {
     public partial class AzCliConsoleGui
     {
-        public static async Task<AzCli.CognitiveSearchKeyInfo> LoadSearchResourceKeys(string subscriptionId, AzCli.CognitiveSearchResourceInfo resource)
+        public static async Task<AzCli.ResourceKeyInfo> LoadSearchResourceKeys(string subscriptionId, AzCli.CognitiveSearchResourceInfo resource)
         {
             ConsoleHelpers.WriteLineWithHighlight($"\n`AI SEARCH RESOURCE KEYS`");
 
             Console.Write("Keys: *** Loading ***");
-            var keys = await AzCli.ListSearchAdminKeys(subscriptionId, resource.Group, resource.Name);
+            var response = await Program.SearchClient.GetKeysAsync(subscriptionId, resource.Group, resource.Name, Program.CancelToken);
+            var keys = new AzCli.ResourceKeyInfo();
+            (keys.Key1, keys.Key2) = response.Value;
 
             Console.Write("\r");
-            Console.WriteLine($"Key1: {keys.Payload.Key1.Substring(0, 4)}****************************");
-            Console.WriteLine($"Key2: {keys.Payload.Key2.Substring(0, 4)}****************************");
-            return keys.Payload;
+            Console.WriteLine($"Key1: {keys.Key1.Substring(0, 4)}****************************");
+            Console.WriteLine($"Key2: {keys.Key2.Substring(0, 4)}****************************");
+            return keys;
         }
 
-        public static async Task<AzCli.CognitiveSearchResourceInfo?> PickOrCreateCognitiveSearchResource(bool allowSkip, string subscription, string location, string groupName, string smartName = null, string smartNameKind = null)
+        public static async Task<AzCli.CognitiveSearchResourceInfo?> PickOrCreateCognitiveSearchResource(bool allowSkip, string subscription, string location, string groupName, string? smartName = null, string? smartNameKind = null)
         {
             ConsoleHelpers.WriteLineWithHighlight($"\n`AI SEARCH RESOURCE`");
             Console.Write("\rName: *** Loading choices ***");
 
-            var response = await AzCli.ListSearchResources(subscription, location);
-            if (string.IsNullOrEmpty(response.Output.StdOutput) && !string.IsNullOrEmpty(response.Output.StdError))
-            {
-                var output = response.Output.StdError.Replace("\n", "\n  ");
-                throw new ApplicationException($"ERROR: Listing search resources\n  {output}");
-            }
+            var response = await Program.SearchClient.GetAllAsync(subscription, location, Program.CancelToken);
+            response.ThrowOnFail("Loading search resources");
 
-            var resources = response.Payload.OrderBy(x => x.Name).ToList();
+            var resources = response.Value.OrderBy(x => x.Name).ToList();
             var choices = resources.Select(x => $"{x.Name} ({x.RegionLocation})").ToList();
             choices.Insert(0, "(Create new)");
 
@@ -76,7 +74,7 @@ namespace Azure.AI.Details.Common.CLI
             return resource;
         }
 
-        private static async Task<AzCli.CognitiveSearchResourceInfo> TryCreateSearchInteractive(string subscription, string locationName, string groupName, string smartName = null, string smartNameKind = null)
+        private static async Task<AzCli.CognitiveSearchResourceInfo> TryCreateSearchInteractive(string subscription, string locationName, string groupName, string? smartName = null, string? smartNameKind = null)
         {
             var sectionHeader = "\n`CREATE SEARCH RESOURCE`";
             ConsoleHelpers.WriteLineWithHighlight(sectionHeader);
@@ -84,7 +82,7 @@ namespace Azure.AI.Details.Common.CLI
             var groupOk = !string.IsNullOrEmpty(groupName);
             if (!groupOk)
             {
-                var location =  await AzCliConsoleGui.PickRegionLocationAsync(true, locationName, false);
+                var location =  await AzCliConsoleGui.PickRegionLocationAsync(true, subscription, locationName, false);
                 locationName = location.Name;
             }
             
@@ -105,17 +103,13 @@ namespace Azure.AI.Details.Common.CLI
             var name = NamePickerHelper.DemandPickOrEnterName("Name: ", "search", smartName, smartNameKind, AzCliConsoleGui.GetSubscriptionUserName(subscription));
 
             Console.Write("*** CREATING ***");
-            var response = await AzCli.CreateSearchResource(subscription, groupName, locationName, name);
+            var response = await Program.SearchClient.CreateAsync(subscription, groupName, locationName, name ?? string.Empty, Program.CancelToken);
 
             Console.Write("\r");
-            if (string.IsNullOrEmpty(response.Output.StdOutput) && !string.IsNullOrEmpty(response.Output.StdError))
-            {
-                var output = response.Output.StdError.Replace("\n", "\n  ");
-                throw new ApplicationException($"ERROR: Creating resource:\n\n  {output}");
-            }
+            response.ThrowOnFail("Creating search resource");
 
             Console.WriteLine("\r*** CREATED ***  ");
-            return response.Payload;
+            return response.Value;
         }
     }
 }

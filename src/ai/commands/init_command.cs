@@ -139,7 +139,7 @@ namespace Azure.AI.Details.Common.CLI
                     if (openai != null && search != null)
                     {
                         bool? useSaved = await DoInitRootConfirmVerifiedProjectResources(
-                            interactive, subscription, projectName, hubName, openai.Value, search.Value);
+                            interactive, subscription, projectName, hubName, openai, search);
 
                         detail = useSaved.HasValue
                             ? useSaved == true ? "saved_config" : "something_else"
@@ -186,18 +186,19 @@ namespace Azure.AI.Details.Common.CLI
 
             ConsoleHelpers.WriteLineWithHighlight("\n  `ATTACHED SERVICES AND RESOURCES`\n");
 
-            var message = "    Validating...";
-            Console.Write(message);
+            string indent = "    ";
+            using var cw = new ConsoleTempWriter($"{indent}Validating...");
 
             var (hubName, openai, search) = await AiSdkConsoleGui.VerifyResourceConnections(_values, validated?.Id, groupName, projectName);
             if (openai != null && search != null)
             {
-                Console.Write($"\r{new string(' ', message.Length)}\r");
                 return (hubName, openai, search);
             }
             else
             {
-                ConsoleHelpers.WriteLineWithHighlight($"\r{message} `#e_;WARNING: Configuration could not be validated!`");
+                cw.Clear();
+                Console.Write(indent);
+                ConsoleHelpers.WriteLineWithHighlight($"`#e_;WARNING: Configuration could not be validated!`");
                 Console.WriteLine();
                 return (null, null, null);
             }
@@ -292,20 +293,20 @@ namespace Azure.AI.Details.Common.CLI
             int selected = -1;
 
             var outcome = Program.Telemetry.Wrap(() =>
-            {
-                selected = ListBoxPicker.PickIndexOf(choices.Select(e => e.DisplayName).ToArray());
-                if (selected < 0)
                 {
-                    Console.WriteLine($"\r{label}: CANCELED (no selection)");
-                    return Outcome.Canceled;
-                }
+                    selected = ListBoxPicker.PickIndexOf(choices.Select(e => e.DisplayName).ToArray());
+                    if (selected < 0)
+                    {
+                        Console.WriteLine($"\r{label}: CANCELED (no selection)");
+                        return Outcome.Canceled;
+                    }
 
-                Console.Write($"\r{label.Trim()}: {choices.ElementAtOrDefault(selected)?.DisplayName}\n");
-                _values.Reset("telemetry.init.run_type", choices.ElementAtOrDefault(selected)?.Metadata);
+                    Console.Write($"\r{label.Trim()}: {choices.ElementAtOrDefault(selected)?.DisplayName}\n");
+                    _values.Reset("telemetry.init.run_type", choices.ElementAtOrDefault(selected)?.Metadata);
 
-                return Outcome.Success;
-            },
-            (outcome, ex, timeTaken) => choices.ElementAtOrDefault(selected)?.Metadata == "standalone"
+                    return Outcome.Success;
+                },
+                (outcome, ex, timeTaken) => choices.ElementAtOrDefault(selected)?.Metadata == "standalone"
                 ? null
                 : new InitTelemetryEvent(InitStage.Choice)
                 {
@@ -337,11 +338,11 @@ namespace Azure.AI.Details.Common.CLI
 
             var choices = new[]
             {
-                new { DisplayName = "Azure AI Services (v2)", Value = "init-root-cognitiveservices-ai-services-kind-create-or-select", Metadata = "aiservices" },
+                new { DisplayName = "Azure AI Services (v2)",  Value = "init-root-cognitiveservices-ai-services-kind-create-or-select", Metadata = "aiservices" },
                 new { DisplayName = "Azure AI Services (v1)", Value = "init-root-cognitiveservices-cognitiveservices-kind-create-or-select", Metadata ="cognitiveservices" },
                 new { DisplayName = "Azure OpenAI", Value = "init-root-openai-create-or-select", Metadata = "openai" },
                 new { DisplayName = "Azure Search", Value = "init-root-search-create-or-select", Metadata = "search" },
-                new { DisplayName = "Azure Speech", Value = "init-root-speech-create-or-select", Metadata = "speech" }
+                new { DisplayName = "Azure Speech", Value = "init-root-speech-create-or-select", Metadata =  "speech" }
             };
 
             int picked = -1;
@@ -535,7 +536,7 @@ namespace Azure.AI.Details.Common.CLI
             var regionFilter = _values.GetOrEmpty("init.service.resource.region.name");
             var groupFilter = _values.GetOrEmpty("init.service.resource.group.name");
             var resourceFilter = _values.GetOrEmpty("init.service.cognitiveservices.resource.name");
-            var kind = _values.GetOrDefault("init.service.cognitiveservices.resource.kind", "OpenAI;AIServices");
+            var kind = _values.GetOrDefault("init.service.cognitiveservices.resource.kind", "AIServices;OpenAI");
             var sku = _values.GetOrDefault("init.service.cognitiveservices.resource.sku", Program.CognitiveServiceResourceSku);
             var yes = _values.GetOrDefault("init.service.cognitiveservices.terms.agree", false);
 

@@ -3,35 +3,26 @@
 // Licensed under the MIT license. See LICENSE.md file in the project root for full license information.
 //
 
-using System;
-using System.Collections.Generic;
+#nullable enable
+
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
-using System.Threading.Tasks;
-using Azure.AI.Details.Common.CLI;
 using System.Text;
-using System.Text.Json;
 
 namespace Azure.AI.Details.Common.CLI
 {
-    public struct ProcessOutput
+    public readonly struct ProcessOutput
     {
-        public string StdOutput;
-        public string StdError;
-        public string MergedOutput;
-        public int ExitCode;
-    }
+        public string StdOutput { get; init; }
+        public string StdError { get; init; }
+        public string MergedOutput { get; init; }
+        public int ExitCode { get; init; }
 
-    public struct ParsedJsonProcessOutput<T>
-    {
-        public ParsedJsonProcessOutput(ProcessOutput output)
-        {
-            Output = output;
-        }
-
-        public ProcessOutput Output;
-        public T? Payload;
+        public bool HasError => ExitCode != 0
+            || (!string.IsNullOrWhiteSpace(StdError)
+                // Special case to ignore errors when tests are running against the test-proxy
+                && !(StdError.Contains("`subjectAltName`") && StdError.Contains("`commonName`")));
     }
 
     public class ProcessHelpers
@@ -47,7 +38,7 @@ namespace Azure.AI.Details.Common.CLI
                         : null;
         }
 
-        public static Process? StartProcess(string fileName, string arguments, Dictionary<string, string>? addToEnvironment = null, bool redirectOutput = true, bool redirectInput = false)
+        public static Process? StartProcess(string fileName, string arguments, IDictionary<string, string>? addToEnvironment = null, bool redirectOutput = true, bool redirectInput = false)
         {
             var start = new ProcessStartInfo(fileName, arguments);
             start.UseShellExecute = false;
@@ -113,7 +104,7 @@ namespace Azure.AI.Details.Common.CLI
             return await RunShellCommandAsync(interactiveShellFileName, interactiveShellArguments, addToEnvironment, stdOutHandler, stdErrHandler, mergedOutputHandler, captureOutput);
         }
 
-        public static async Task<ProcessOutput> RunShellCommandAsync(string command, string arguments, Dictionary<string, string>? addToEnvironment = null, Action<string>? stdOutHandler = null, Action<string>? stdErrHandler = null, Action<string>? mergedOutputHandler = null, bool captureOutput = true)
+        public static async Task<ProcessOutput> RunShellCommandAsync(string command, string arguments, IDictionary<string, string>? addToEnvironment = null, Action<string>? stdOutHandler = null, Action<string>? stdErrHandler = null, Action<string>? mergedOutputHandler = null, bool captureOutput = true)
         {
             SHELL_DEBUG_TRACE($"COMMAND: {command} {arguments} {DictionaryToString(addToEnvironment)}");
 
@@ -156,6 +147,14 @@ namespace Azure.AI.Details.Common.CLI
             try
             {
                 process = StartShellCommandProcess(command, arguments, addToEnvironment, redirectOutput);
+                if (process == null)
+                {
+                    return new ProcessOutput()
+                    {
+                        ExitCode = -1,
+                        StdError = "Process failed to start"
+                    };
+                }
             }
             catch (Exception processException)
             {
@@ -167,30 +166,29 @@ namespace Azure.AI.Details.Common.CLI
                 };
             }
 
-            if (process != null)
+            if (redirectOutput)
             {
-                if (redirectOutput)
-                {
-                    process.OutputDataReceived += (sender, e) => stdOutReceived(e.Data);
-                    process.ErrorDataReceived += (sender, e) => stdErrReceived(e.Data);
-                    process.BeginOutputReadLine();
-                    process.BeginErrorReadLine();
-                }
-
-                await process.WaitForExitAsync();
-
-                if (redirectOutput)
-                {
-                    outDoneSignal.WaitOne();
-                    errDoneSignal.WaitOne();
-                }
+                process.OutputDataReceived += (sender, e) => stdOutReceived(e.Data);
+                process.ErrorDataReceived += (sender, e) => stdErrReceived(e.Data);
+                process.BeginOutputReadLine();
+                process.BeginErrorReadLine();
             }
 
-            var output = new ProcessOutput();
-            output.StdOutput = sbOut.ToString().Trim(' ', '\r', '\n');
-            output.StdError = sbErr.ToString().Trim(' ', '\r', '\n');
-            output.MergedOutput = sbMerged.ToString().Trim(' ', '\r', '\n');
-            output.ExitCode = process?.ExitCode ?? -1;
+            await process.WaitForExitAsync();
+
+            if (redirectOutput)
+            {
+                outDoneSignal.WaitOne();
+                errDoneSignal.WaitOne();
+            }
+
+            var output = new ProcessOutput()
+            {
+                StdOutput = sbOut.ToString().Trim(),
+                StdError = sbErr.ToString().Trim(),
+                MergedOutput = sbMerged.ToString().Trim(),
+                ExitCode = process.ExitCode,
+            };
 
             if (!string.IsNullOrEmpty(output.StdOutput)) SHELL_DEBUG_TRACE($"---\nSTDOUT\n---\n{output.StdOutput}");
             if (!string.IsNullOrEmpty(output.StdError)) SHELL_DEBUG_TRACE($"---\nSTDERR\n---\n{output.StdError}");
@@ -198,17 +196,7 @@ namespace Azure.AI.Details.Common.CLI
             return output;
         }
 
-        public static async Task<ParsedJsonProcessOutput<JsonElement>> ParseShellCommandJson(string command, string arguments, Dictionary<string, string>? addToEnvironment = null, Action<string>? stdOutHandler = null, Action<string>? stdErrHandler = null)
-        {
-            var processOutput = await RunShellCommandAsync(command, arguments, addToEnvironment, stdOutHandler, stdErrHandler);
-            var stdOutput = processOutput.StdOutput;
-
-            return !string.IsNullOrWhiteSpace(stdOutput)
-                ? new ParsedJsonProcessOutput<JsonElement>(processOutput) { Payload = JsonDocument.Parse(stdOutput).RootElement }
-                : new ParsedJsonProcessOutput<JsonElement>(processOutput);
-        }
-
-        private static Process? StartShellCommandProcess(string command, string arguments, Dictionary<string, string>? addToEnvironment = null, bool captureOutput = true)
+        private static Process? StartShellCommandProcess(string command, string arguments, IDictionary<string, string>? addToEnvironment = null, bool captureOutput = true)
         {
             var isWindows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
             return  isWindows
@@ -224,16 +212,19 @@ namespace Azure.AI.Details.Common.CLI
             AI.DBG_TRACE_INFO(message, line, caller, file);
         }
 
-        private static string DictionaryToString(Dictionary<string, string>? dictionary)
+        private static string DictionaryToString(IDictionary<string, string>? dictionary)
         {
-            var kvps = new List<string>();
-            if (dictionary != null)
+            if (dictionary == null)
             {
-                foreach (var kvp in dictionary)
-                {
-                    kvps.Add($"{kvp.Key}={kvp.Value}");
-                }
+                return string.Empty;
             }
+
+            var kvps = new List<string>();
+            foreach (var kvp in dictionary)
+            {
+                kvps.Add($"{kvp.Key}={kvp.Value}");
+            }
+
             return string.Join(' ', kvps);
         }
 

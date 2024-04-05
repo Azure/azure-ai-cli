@@ -3,15 +3,6 @@
 // Licensed under the MIT license. See LICENSE.md file in the project root for full license information.
 //
 
-using System;
-using System.Diagnostics;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
-using System.Collections.Generic;
-using System.Net;
 using Azure.AI.Details.Common.CLI.ConsoleGui;
 
 namespace Azure.AI.Details.Common.CLI
@@ -47,65 +38,61 @@ namespace Azure.AI.Details.Common.CLI
                 throw new ApplicationException($"CANCELED: No subscription selected.");
             }
 
-            await AzCli.SetAccount(subscription.Value.Id);
+            await LegacyAzCli.SetAccount(subscription.Value.Id);
 
             return subscription.Value;
         }
 
         public static async Task<AzCli.SubscriptionInfo?> ValidateSubscriptionAsync(bool allowInteractiveLogin, string subscriptionId)
         {
-            var allSubscriptions = await LoginHelpers.GetResponseOnLogin(allowInteractiveLogin, "subscription", AzCli.ListAccounts, "  SUBSCRIPTION");
-            var subscription = allSubscriptions
-                .Payload
-                .FirstOrDefault(subs => string.Equals(subs.Id, subscriptionId, StringComparison.OrdinalIgnoreCase));
+            var getSubscription = () => Program.SubscriptionClient.GetSubscriptionAsync(subscriptionId, Program.CancelToken);
+            var result = await LoginHelpers.GetResponseOnLogin(Program.LoginManager, getSubscription, Program.CancelToken, "  SUBSCRIPTION", "*** Validating ***");
 
-            bool found = !string.IsNullOrWhiteSpace(subscription.Id);
+            AzCli.SubscriptionInfo? subscription = result.Value;
+
+            bool found = subscription != null;
             if (found)
             {
-                Console.WriteLine($"{subscription.Name} ({subscription.Id})");
-                CacheSubscriptionUserName(subscription);
+                Console.WriteLine($"{subscription?.Name} ({subscription?.Id})");
+                CacheSubscriptionUserName(subscription.Value);
                 return subscription;
             }
             else
             {
                 ConsoleHelpers.WriteLineWithHighlight($"`#e_;WARNING: Could not find subscription {subscriptionId}!`");
+                Console.WriteLine();
                 return null;
             }
         }
 
         private static async Task<AzCli.SubscriptionInfo?> FindSubscriptionAsync(bool allowInteractiveLogin, bool allowInteractivePickSubscription, string subscriptionFilter = null, string subscriptionLabel = "Subscription")
         {
-            Console.Write($"\r{subscriptionLabel}: *** Loading choices ***");
-            var response = await AzCli.ListAccounts();
+            var subsResult = await LoginHelpers.GetResponseOnLogin(
+                Program.LoginManager,
+                () => Program.SubscriptionClient.GetAllSubscriptionsAsync(Program.CancelToken),
+                Program.CancelToken,
+                subscriptionLabel);
 
-            var noOutput = string.IsNullOrEmpty(response.Output.StdOutput);
-            var hasError = !string.IsNullOrEmpty(response.Output.StdError);
-            var hasErrorNotFound = hasError && (response.Output.StdError.Contains(" not ") || response.Output.StdError.Contains("No such file"));
-
-            Console.Write($"\r{subscriptionLabel}: ");
-            if (noOutput && hasError && hasErrorNotFound)
+            if (subsResult.IsError)
             {
-                throw new ApplicationException("*** Please install the Azure CLI - https://aka.ms/azcli ***\n\nNOTE: If it's already installed ensure it's in the system PATH and working (try: `az account list`)");
-            }
-            else if (noOutput && hasError)
-            {
-                throw new ApplicationException($"*** ERROR: Loading subscriptions ***\n{response.Output.StdError}");
-            }
-
-            var needLogin = response.Output.StdError != null && LoginHelpers.HasLoginError(response.Output.StdError);
-            if (needLogin)
-            {
-                response = await LoginHelpers.AttemptLogin(allowInteractiveLogin, subscriptionLabel);
+                if ((subsResult.ErrorDetails?.Contains(" not ") | subsResult.ErrorDetails?.Contains("No such file")) == true)
+                {
+                    throw new ApplicationException("*** Please install the Azure CLI - https://aka.ms/azcli ***\n\nNOTE: If it's already installed ensure it's in the system PATH and working (try: `az account list`)");
+                }
+                else
+                {
+                    subsResult.ThrowOnFail("Loading subscriptions");
+                }
             }
 
-            var subscriptions = response.Payload
+            var subscriptions = subsResult.Value
                 .Where(x => MatchSubscriptionFilter(x, subscriptionFilter))
                 .OrderBy(x => x.Name)
                 .ToArray();
 
             if (subscriptions.Count() == 0)
             {
-                string error = response.Payload.Count() > 0
+                string error = subsResult.Value.Count() > 0
                     ? "No matching subscriptions found"
                     : "No subscriptions found";
                 ConsoleHelpers.WriteLineError($"*** {error} ***");

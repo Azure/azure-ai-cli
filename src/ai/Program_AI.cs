@@ -7,9 +7,10 @@ using System;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
+using Azure.AI.CLI.Clients.AzPython;
+using Azure.AI.CLI.Common.Clients;
 using Azure.AI.Details.Common.CLI.Telemetry;
 using Azure.AI.Details.Common.CLI.Telemetry.Events;
-
 
 namespace Azure.AI.Details.Common.CLI
 {
@@ -78,6 +79,17 @@ namespace Azure.AI.Details.Common.CLI
             _telemetry = new Lazy<ITelemetry>(
                 () => TelemetryHelpers.InstantiateFromConfig(this),
                 System.Threading.LazyThreadSafetyMode.ExecutionAndPublication);
+
+            var environmentVariables = LegacyAzCli.GetUserAgentEnv();
+
+            LoginManager = new AzConsoleLoginManager(
+                () => Values?.GetOrDefault("init.service.interactive", true) ?? true,
+                environmentVariables);
+            
+            var azCliClient = new AzCliClient(environmentVariables);
+            SubscriptionsClient = azCliClient;
+            CognitiveServicesClient = azCliClient;
+            SearchClient = azCliClient;
         }
 
         #region name data
@@ -182,7 +194,7 @@ namespace Azure.AI.Details.Common.CLI
             var command = values.GetCommand(null) ?? tokens.PeekNextToken();
             var root = command.Split('.').FirstOrDefault();
 
-            return root switch 
+            return root switch
             {
                 "help" => HelpCommandParser.ParseCommand(tokens, values),
                 "init" => InitCommandParser.ParseCommand(tokens, values),
@@ -262,5 +274,11 @@ namespace Azure.AI.Details.Common.CLI
 
         public IEventLoggerHelpers EventLoggerHelpers => new AiEventLoggerHelpers();
         public ITelemetry Telemetry => _telemetry.Value;
+
+        public ILoginManager LoginManager { get; }
+        public ISubscriptionsClient SubscriptionsClient { get; }
+        public ICognitiveServicesClient CognitiveServicesClient { get; }
+        public ISearchClient SearchClient { get; }
+        public ICommandValues Values { get; } = new CommandValues();
     }
 }

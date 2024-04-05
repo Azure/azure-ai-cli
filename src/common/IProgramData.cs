@@ -3,6 +3,7 @@
 // Licensed under the MIT license. See LICENSE.md file in the project root for full license information.
 //
 
+using Azure.AI.CLI.Common.Clients;
 using Azure.AI.Details.Common.CLI.Telemetry;
 
 namespace Azure.AI.Details.Common.CLI
@@ -51,5 +52,11 @@ namespace Azure.AI.Details.Common.CLI
         IEventLoggerHelpers EventLoggerHelpers { get; }
 
         ITelemetry Telemetry { get; }
+
+        ILoginManager LoginManager { get; }
+        ISubscriptionsClient SubscriptionsClient { get; }
+        ICognitiveServicesClient CognitiveServicesClient { get; }
+        ISearchClient SearchClient { get; }
+        ICommandValues Values { get; }
     }
 }

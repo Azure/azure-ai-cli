@@ -1455,7 +1455,7 @@ namespace Azure.AI.Details.Common.CLI
         private static string _dataPath = defaultDataPath;
         private static string _outputPath = "";
 
-        private static readonly string dotDirectory = $".{Program.Name}/";
+        private static readonly string dotDirectory = $".{Program.Name ?? "ai"}/";
 
         private static ReaderWriterLockSlim _lockSlim = new ReaderWriterLockSlim();
         private static Dictionary<string, string>? _origDotXfileNamesDictionary;

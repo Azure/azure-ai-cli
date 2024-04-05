@@ -1,56 +1,54 @@
-//
-// Copyright (c) Microsoft. All rights reserved.
-// Licensed under the MIT license. See LICENSE.md file in the project root for full license information.
-//
+﻿#nullable enable
 
-using System.Runtime.CompilerServices;
-using System.Text;
+using Azure.AI.CLI.Common.Clients;
+using Azure.AI.CLI.Common.Clients.Models;
 using Azure.AI.Details.Common.CLI.ConsoleGui;
 
 namespace Azure.AI.Details.Common.CLI
 {
-    public class LoginHelpers
+    public static class LoginHelpers
     {
-        public static async Task<ParsedJsonProcessOutput<T>> GetResponseOnLogin<T>(bool allowInteractiveLogin, string label, Func<Task<ParsedJsonProcessOutput<T>>> getResponse, string titleLabel = "Name")
+        public static async Task<TResult> GetResponseOnLogin<TResult>(ILoginManager loginManager, Func<Task<TResult>> getResult, CancellationToken token, string prompt = "Name", string loadingMessage = "*** Loading choices ***")
+            where TResult : IClientResult
         {
-            string message = $"\r{titleLabel}: *** Loading choices ***";
-            Console.Write(message);
+            Console.Write($"{prompt}: ");
 
-            var response = await getResponse();
+            using var writer = new ConsoleTempWriter();
+            writer.WriteTemp(loadingMessage);
 
-            Console.Write($"\r{new string(' ', message.Length)}\r{titleLabel}: ");
-            if (string.IsNullOrEmpty(response.Output.StdOutput) && !string.IsNullOrEmpty(response.Output.StdError))
+            var result = await getResult();
+            if (result.Outcome == ClientOutcome.LoginNeeded)
             {
-                if (LoginHelpers.HasLoginError(response.Output.StdError))
+                var loginResponse = await AttemptLogin(loginManager, writer, token);
+                if (loginResponse.IsSuccess)
                 {
-                    var loginResponse = await LoginHelpers.AttemptLogin(allowInteractiveLogin, $"{label}s");
-                    if (!loginResponse.Equals(default(ParsedJsonProcessOutput<AzCli.SubscriptionInfo[]>)))
-                    {
-                        response = await getResponse();
-                    }
+                    writer.WriteTemp(loadingMessage);
+                    result = await getResult();
                 }
-                if (string.IsNullOrEmpty(response.Output.StdOutput) && !string.IsNullOrEmpty(response.Output.StdError))
+                else
                 {
-                    throw new ApplicationException($"ERROR: Loading resource {label}s: {response.Output.StdError}");
+                    writer.Clear();
+                    ConsoleHelpers.WriteLineError("*** Please run `az login` and try again ***");
                 }
             }
-            return response;
+
+            return result;
         }
 
-        public static async Task<ParsedJsonProcessOutput<AzCli.SubscriptionInfo[]>> AttemptLogin(bool allowInteractiveLogin, string label)
+        private static async Task<ClientResult> AttemptLogin(ILoginManager loginManager, ConsoleTempWriter writer, CancellationToken token)
         {
-            bool cancelLogin = !allowInteractiveLogin;
+            bool cancelLogin = !loginManager.CanAttemptLogin;
             bool useDeviceCode = false;
-            if (allowInteractiveLogin)
+            if (loginManager.CanAttemptLogin)
             {
-                ConsoleHelpers.WriteError("*** WARNING: `az login` required ***");
-                Console.Write(" ");
+                writer.WriteErrorTemp("*** WARNING: `az login` required ***");
+                writer.AppendTemp(" ");
 
                 var selection = 0;
                 var choices = new List<string>() {
-                        "LAUNCH: `az login` (interactive device code)",
-                        "CANCEL: `az login ...` (non-interactive)",
-                    };
+                    "LAUNCH: `az login` (interactive device code)",
+                    "CANCEL",
+                };
 
                 if (!OS.IsCodeSpaces())
                 {
@@ -66,17 +64,17 @@ namespace Azure.AI.Details.Common.CLI
 
             if (cancelLogin)
             {
-                Console.Write($"\r{label}: ");
-                ConsoleHelpers.WriteLineError("*** Please run `az login` and try again ***");
-                return default;
+                return new ClientResult()
+                {
+                    Outcome = ClientOutcome.Canceled,
+                };
             }
 
-            Console.Write($"\r{label}: *** Launching `az login` (interactive) ***");
-            var response = await AzCli.Login(useDeviceCode);
-            Console.Write($"\r{label}: ");
+            writer.WriteTemp($"*** Launching `az login` ***");
+            var response = await loginManager.LoginAsync(
+                new() { Mode = useDeviceCode ? LoginMode.UseDeviceCode : LoginMode.UseWebPage },
+                token);
             return response;
         }
-
-        public static bool HasLoginError(string errorMessage) => errorMessage.Split('\'', '"').Contains("az login") || errorMessage.Contains("refresh token");
     }
 }
