@@ -199,7 +199,7 @@ namespace Azure.AI.Details.Common.CLI
 
         private SpeechConfig CreateSpeechConfig(string? key = null, string? region = null)
         {
-            SpeechConfig config = ConfigHelpers.CreateSpeechConfig(_values, key, region);
+            var config = ConfigHelpers.CreateSpeechConfig(_values, key, region);
             SetSpeechConfigProperties(config);
             return config;
         }

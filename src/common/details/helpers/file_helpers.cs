@@ -252,7 +252,7 @@ namespace Azure.AI.Details.Common.CLI
 
         private static IEnumerable<string> FindFilesInPath(string fileNames, INamedValues? values, string searchPath)
         {
-            var commandActual = values?.GetCommand();
+            var commandActual = values?.GetCommandOrEmpty();
             var commandScope = values?.GetOrDefault("x.config.scope.command", commandActual == "config" ? "" : commandActual);
             if (commandScope != null && commandScope.Contains(".")) commandScope = commandScope.Substring(0, commandScope.IndexOf('.'));
 
@@ -480,7 +480,7 @@ namespace Azure.AI.Details.Common.CLI
             if (IsStandardInputReference(fileName)) return fileName;
 
             searchPaths += ";.x";
-            var commandActual = values?.GetCommand();
+            var commandActual = values?.GetCommandOrEmpty();
             var commandScope = values?.GetOrDefault("x.config.scope.command", commandActual == "config" ? "" : commandActual);
             if (commandScope != null && commandScope.Contains(".")) commandScope = commandScope.Substring(0, commandScope.IndexOf('.'));
 

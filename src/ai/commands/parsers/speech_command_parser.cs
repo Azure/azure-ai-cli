@@ -106,7 +106,7 @@ namespace Azure.AI.Details.Common.CLI
 
         private static IEnumerable<INamedValueTokenParser> GetCommandParsers(ICommandValues values)
         {
-            var check = string.Join(".", values.GetCommand()
+            var check = string.Join(".", values.GetCommandOrEmpty()
                 .Split('.')
                 .Take(2)
                 .ToArray());

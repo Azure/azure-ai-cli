@@ -147,12 +147,10 @@ namespace Azure.AI.Details.Common.CLI
 
         private TranslationRecognizer CreateTranslationRecognizer()
         {
-            SpeechTranslationConfig config = CreateSpeechTranslationConfig();
-            AudioConfig audioConfig = ConfigHelpers.CreateAudioConfig(_values);
+            var config = CreateSpeechTranslationConfig();
+            var audioConfig = ConfigHelpers.CreateAudioConfig(_values);
 
-            SourceLanguageConfig language = null;
-            AutoDetectSourceLanguageConfig autoDetect = null;
-            CreateSourceLanguageConfig(config, out language, out autoDetect);
+            CreateSourceLanguageConfig(config, out var language, out var autoDetect);
 
             // var recognizer = autoDetect != null 
             //     ? new TranslationRecognizer(config, autoDetect, audioConfig)
@@ -174,7 +172,7 @@ namespace Azure.AI.Details.Common.CLI
             return recognizer;
         }
 
-        private void CreateSourceLanguageConfig(SpeechConfig config, out SourceLanguageConfig language, out AutoDetectSourceLanguageConfig autoDetect)
+        private void CreateSourceLanguageConfig(SpeechConfig config, out SourceLanguageConfig? language, out AutoDetectSourceLanguageConfig? autoDetect)
         {
             language = null;
             autoDetect = null;
@@ -224,7 +222,7 @@ namespace Azure.AI.Details.Common.CLI
                 _values.AddThrowError("ERROR:", $"Creating SpeechConfig; use of region requires one of: key or token.");
             }
 
-            SpeechTranslationConfig config = null;
+            SpeechTranslationConfig config;
             if (!string.IsNullOrEmpty(endpoint))
             {
                 config = string.IsNullOrEmpty(key)

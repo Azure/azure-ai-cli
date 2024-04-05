@@ -154,7 +154,7 @@ namespace Azure.AI.Details.Common.CLI
 
         public bool DispatchRunCommand(ICommandValues values)
         {
-            var command = values.GetCommand();
+            var command = values.GetCommandOrEmpty();
             var root = command.Split('.').FirstOrDefault();
 
             return root switch {
@@ -179,8 +179,8 @@ namespace Azure.AI.Details.Common.CLI
 
         public bool DispatchParseCommand(INamedValueTokens tokens, ICommandValues values)
         {
-            var command = values.GetCommand(null) ?? tokens.PeekNextToken();
-            var root = command.Split('.').FirstOrDefault();
+            var command = values.GetCommandOrDefault(null) ?? tokens.PeekNextToken();
+            var root = command?.Split('.').FirstOrDefault();
 
             return root switch 
             {
@@ -207,7 +207,7 @@ namespace Azure.AI.Details.Common.CLI
 
         public bool DispatchParseCommandValues(INamedValueTokens tokens, ICommandValues values)
         {
-            var root = values.GetCommandRoot();
+            var root = values.GetCommandRootOrEmpty();
             return root switch
             {
                 "init" => InitCommandParser.ParseCommandValues(tokens, values),

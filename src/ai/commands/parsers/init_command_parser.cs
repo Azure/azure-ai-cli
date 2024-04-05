@@ -45,7 +45,7 @@ namespace Azure.AI.Details.Common.CLI
 
         private static INamedValueTokenParser[] GetCommandParsers(ICommandValues values)
         {
-            var commandName = values.GetCommand();
+            var commandName = values.GetCommandOrEmpty();
             switch (commandName)
             {
                 case "init.aiservices":

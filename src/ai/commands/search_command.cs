@@ -58,7 +58,7 @@ namespace Azure.AI.Details.Common.CLI
 
         private bool RunSearchCommand()
         {
-            DoCommand(_values.GetCommand());
+            DoCommand(_values.GetCommandOrEmpty());
             return _values.GetOrDefault("passed", true);
         }
 

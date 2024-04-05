@@ -407,7 +407,7 @@ namespace Azure.AI.Details.Common.CLI
                 else
                 {
                     outcome = Outcome.Failed;
-                    errorInfo = $"Failed while running '{values.GetCommand()}' command";
+                    errorInfo = $"Failed while running '{values.GetCommandOrEmpty()}' command";
                 }
             }
             catch (OperationCanceledException ex)
@@ -428,7 +428,7 @@ namespace Azure.AI.Details.Common.CLI
             {
                 _data?.Telemetry?.LogEvent(new CommandTelemetryEvent()
                 {
-                    Type = values.GetCommand("unknown")!,
+                    Type = values.GetCommandOrDefault("unknown")!,
                     Outcome = outcome,
                     ErrorInfo = errorInfo
                 });

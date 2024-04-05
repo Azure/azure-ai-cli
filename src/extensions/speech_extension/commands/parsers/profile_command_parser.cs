@@ -38,7 +38,7 @@ namespace Azure.AI.Details.Common.CLI
 
         public static IEnumerable<INamedValueTokenParser> GetCommandParsers(ICommandValues values)
         {
-            var commandName = values.GetCommand();
+            var commandName = values.GetCommandOrEmpty();
             switch (commandName.Replace("speech.", ""))
             {
                 case "profile.list":

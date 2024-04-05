@@ -237,7 +237,7 @@ namespace Azure.AI.Details.Common.CLI
             return isJson ? text : null;
         }
 
-        public static string? GetOutputDataFileName(string? defaultFileName, HttpWebResponse response, ICommandValues values, string domain, out bool isText, out bool isJson)
+        public static string GetOutputDataFileName(string? defaultFileName, HttpWebResponse response, ICommandValues values, string domain, out bool isText, out bool isJson)
         {
             isText = response.ContentType.Contains("text/plain");
             isJson = response.ContentType.Contains("application/json");
@@ -265,7 +265,7 @@ namespace Azure.AI.Details.Common.CLI
             return lastPartValid ? lastPart : defaultFileName;
         }
 
-        public static string? ReadWriteResponse(WebResponse response, string fileName, string message, bool returnAsText)
+        public static string? ReadWriteResponse(WebResponse response, string fileName, string? message, bool returnAsText)
         {
             Stream stream;
             using (stream = response.GetResponseStream())

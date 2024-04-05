@@ -40,7 +40,7 @@ namespace Azure.AI.Details.Common.CLI
 
         private bool RunTestCommand()
         {
-            DoCommand(_values.GetCommand());
+            DoCommand(_values.GetCommandOrEmpty());
             return _values.GetOrDefault("passed", true);
         }
 

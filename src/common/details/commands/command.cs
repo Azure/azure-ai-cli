@@ -46,7 +46,7 @@ namespace Azure.AI.Details.Common.CLI
 
         public static bool DispatchRunCommand(ICommandValues values, Queue<ICommandValues>? queue, bool expandOk, bool parallelOk)
         {
-            var command = values.GetCommand();
+            var command = values.GetCommandOrEmpty();
 
             if (command == "config")
             {
@@ -101,7 +101,7 @@ namespace Azure.AI.Details.Common.CLI
             var runScript = isWindows ? "run.cmd" : "run.sh";
             if (verbose) Console.WriteLine($"  Saving {runScript}... ");
 
-            var command = values.GetCommand();
+            var command = values.GetCommandOrEmpty();
             var commandJob = "./" + command + ".job";
 
             var runScriptPath = PathHelpers.Combine(tempDirectory, runScript)!;
@@ -613,7 +613,7 @@ namespace Azure.AI.Details.Common.CLI
                 var fileNames = values.SaveAs(values.Names, Path.GetTempFileName());
                 var fileName = fileNames.Split(';').First();
 
-                var start = new ProcessStartInfo(Program.Exe, $"{values.GetCommand()} --nodefaults @{fileName}");
+                var start = new ProcessStartInfo(Program.Exe, $"{values.GetCommandOrEmpty()} --nodefaults @{fileName}");
                 start.UseShellExecute = false;
 
                 var process = Process.Start(start)!;

@@ -71,10 +71,10 @@ namespace Azure.AI.Details.Common.CLI
 
         private MeetingTranscriber CreateMeetingTranscriber()
         {
-            SpeechConfig config = CreateSpeechConfig();
-            Meeting meeting = CreateMeeting(config);
+            var config = CreateSpeechConfig();
+            var meeting = CreateMeeting(config);
 
-            AudioConfig audioConfig = ConfigHelpers.CreateAudioConfig(_values);
+            var audioConfig = ConfigHelpers.CreateAudioConfig(_values);
             var transcriber = new MeetingTranscriber(audioConfig);
 
             transcriber.JoinMeetingAsync(meeting).Wait();
@@ -212,7 +212,7 @@ namespace Azure.AI.Details.Common.CLI
             }
         }
 
-        private Meeting CreateMeeting(SpeechConfig config)
+        private Meeting? CreateMeeting(SpeechConfig config)
         {
             var meetingId = _values.GetOrDefault("meeting.id", Guid.NewGuid().ToString());
             var task = Meeting.CreateMeetingAsync(config, meetingId);

@@ -237,7 +237,7 @@ namespace Azure.AI.Details.Common.CLI
         private static bool DisplayHelp(string path, INamedValues values)
         {
             var interactive = values.GetOrDefault("x.help.interactive", true) &&
-                values.GetCommand() == "help" &&
+                values.GetCommandOrEmpty() == "help" &&
                 !Console.IsInputRedirected &&
                 !Console.IsOutputRedirected;
 

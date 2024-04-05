@@ -150,7 +150,7 @@ namespace Azure.AI.Details.Common.CLI
             var config = CreateSpeechConfig();
             var audioConfig = ConfigHelpers.CreateAudioConfig(_values);
 
-            // CreateSourceLanguageConfig(config, out SourceLanguageConfig language, out AutoDetectSourceLanguageConfig autoDetect);
+            // CreateSourceLanguageConfig(config, out SourceLanguageConfig? language, out AutoDetectSourceLanguageConfig? autoDetect);
             // var recognizer = autoDetect != null 
             //     ? new IntentRecognizer(config, autoDetect, audioConfig)
             //     : language != null

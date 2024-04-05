@@ -38,7 +38,7 @@ namespace Azure.AI.Details.Common.CLI
 
         private bool RunDevCommand()
         {
-            DoCommand(_values.GetCommand());
+            DoCommand(_values.GetCommandOrEmpty());
             return _values.GetOrDefault("passed", true);
         }
 
