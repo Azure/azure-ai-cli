@@ -21,7 +21,11 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
+using YamlDotNet.Serialization;
+using YamlDotNet.Serialization.NamingConventions;
 using System.Text.Json.Nodes;
+using System.ComponentModel;
+using Scriban;
 
 namespace Azure.AI.Details.Common.CLI
 {
@@ -111,6 +115,9 @@ namespace Azure.AI.Details.Common.CLI
             var data = InputDataFileToken.Data().Demand(_values, "Running chats", "chat run");
             var dataFile = FileHelpers.DemandFindFileInDataPath(data, _values, "chat data");
             var lines = File.ReadAllLines(dataFile);
+
+            var parameterFile = InputChatParameterFileToken.Data().GetOrDefault(_values);
+            if (!string.IsNullOrEmpty(parameterFile)) SetValuesFromParameterFile(parameterFile);
 
             var client = CreateOpenAIClient(out var deployment);
             var options = CreateChatCompletionOptions(deployment);
@@ -434,6 +441,9 @@ namespace Azure.AI.Details.Common.CLI
 
             var kernel = CreateSemanticKernel(out var acsIndex);
             if (kernel != null && doSK) await StoreMemoryAsync(kernel, acsIndex);
+
+            var parameterFile = InputChatParameterFileToken.Data().GetOrDefault(_values);
+            if (!string.IsNullOrEmpty(parameterFile)) SetValuesFromParameterFile(parameterFile);
 
             var client = CreateOpenAIClient(out var deployment);
             var options = CreateChatCompletionOptions(deployment);
@@ -952,6 +962,123 @@ namespace Azure.AI.Details.Common.CLI
                 return ChatRole.Assistant;
             }
             return currentRole ?? ChatRole.System;
+        }
+
+        private void SetValuesFromParameterFile(string parameterFile)
+        {
+            var existing = FileHelpers.DemandFindFileInDataPath(parameterFile, _values, "chat parameter");
+            var text = FileHelpers.ReadAllText(existing, Encoding.Default);
+            string[] sections = text.Split("---\n");
+            if (sections.Length < 2)
+            {
+                sections = text.Split("---\r\n");
+            }
+            var deserializer = new DeserializerBuilder()
+                .WithNamingConvention(UnderscoredNamingConvention.Instance)
+                .Build();
+
+            if (sections.Length > 2)
+            {
+                var promptyFrontMatterText = sections[1];
+                var chatTemplate = sections[2];
+                var obj = deserializer.Deserialize<PromptyFrontMatter>(promptyFrontMatterText);
+                Dictionary<string, object> templateInputs = ParsePromptySample(obj.Sample ?? "sample.json");
+                string parsedText;
+                switch (obj.Template.ToLower())
+                {
+                    // default assumption for templating language is jinja2
+                    case "jinja2":
+                    case "":
+                        parsedText = ParseJinja(chatTemplate, templateInputs);
+                        break;
+                    default:
+                        parsedText = "";
+                        _values.AddThrowError("ERROR:", $"parsing {parameterFile}; {obj.Template} parser not implemented.");
+                        break;
+                }
+                if (!String.IsNullOrEmpty(parsedText))
+                {
+                    // set values
+
+                    if (!string.IsNullOrEmpty(obj.Model.AzureDeployment)) ConfigDeploymentToken.Data().Set(_values, obj.Model.AzureDeployment);
+                    if (!string.IsNullOrEmpty(obj.Model.AzureEndpoint)) ConfigEndpointUriToken.Data().Set(_values, obj.Model.AzureEndpoint);
+                    string systemPrompt = "";
+                    string[] separators = { "\n", "\r\n"};
+                    var textlines = parsedText.Split(separators, StringSplitOptions.None);
+                    if (textlines[0].ToLower().Equals("system:"))
+                    {
+                        parsedText = "";
+                        var systemPromptEnded = false;
+                        foreach (var line in textlines[1..])
+                        {
+                            if (string.IsNullOrEmpty(line)) systemPromptEnded = true;
+                            if (systemPromptEnded)
+                            {
+                                parsedText += $"{line}\n";
+                            }
+                            else
+                            {
+                                systemPrompt += $"{line}\n";
+                            }
+                        };
+                        if (!string.IsNullOrEmpty(systemPrompt)) _values.Reset("chat.message.system.prompt", systemPrompt);
+                    }
+                    if (!string.IsNullOrEmpty(parsedText)) _values.Reset("chat.message.user.prompt", parsedText);
+
+                    if (obj.Parameters != null)
+                    {
+                        var modelParams = obj.Parameters;
+                        if (modelParams.Temperature != 0) _values.Reset("chat.options.temperature", modelParams.Temperature.ToString());
+                        if (modelParams.MaxTokens != 0) _values.Reset("chat.options.max.tokens", modelParams.MaxTokens.ToString());
+                        if (modelParams.FrequencyPenalty != 0) _values.Reset("chat.options.frequency.penalty", modelParams.FrequencyPenalty.ToString());
+                        if (modelParams.PresencePenalty != 0) _values.Reset("chat.options.presence.penalty", modelParams.PresencePenalty.ToString());
+                        if (modelParams.Stop != null) _values.Reset("chat.options.stop.sequence", modelParams.Stop.ToString());
+                    }
+                }
+            }
+            else
+            { 
+                _values.AddThrowError("ERROR:", $"parsing {parameterFile}; unable to parse, incorrect yaml format.");
+            }
+        }
+
+        private string ParseJinja(string chatTemplate, Dictionary<string, object> inputs)
+        {
+            var template = Template.Parse(chatTemplate);
+            return template.Render(inputs);
+        }
+
+        private Dictionary<string, object> ParsePromptySample(object sample)
+        {
+            var dictionary = new Dictionary<string, object>();
+            var inputString = sample as string;
+            if (inputString == null)
+            {
+                var inputIter = sample as IDictionary<object, object>;
+
+                foreach (var kv in inputIter)
+                {
+                    dictionary.Add(kv.Key.ToString(), kv.Value);
+                }
+            }
+            else
+            {
+                var existing = FileHelpers.DemandFindFileInDataPath(inputString, _values, "chat parameter");
+                var text = FileHelpers.ReadAllText(existing, Encoding.Default);
+                if (inputString.EndsWith(".json"))
+                {
+                    dictionary = JsonSerializer.Deserialize<Dictionary<string, object>>(text);
+                }
+                else
+                {
+                    dictionary = text
+                        .Split(Environment.NewLine)
+                        .Select(part => part.Split(':'))
+                        .Where(part => part.Length == 2)
+                        .ToDictionary(sp => sp[0], sp => sp[1] as object);
+                }
+            }
+            return dictionary;
         }
 
         private void AddChatMessagesFromTextFile(IList<ChatRequestMessage> messages, string textFile)

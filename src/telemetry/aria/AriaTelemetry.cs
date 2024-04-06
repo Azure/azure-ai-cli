@@ -5,9 +5,11 @@
 
 using System.Text;
 using System.Text.Json;
+using Azure.AI.Details.Common.CLI;
+using Azure.AI.Details.Common.CLI.Telemetry;
 using Microsoft.Applications.Events;
 
-namespace Azure.AI.Details.Common.CLI.Telemetry
+namespace Azure.AI.CLI.Telemetry.Aria
 {
     /// <summary>
     /// An implementation that uses Aria for telemetry. See <see cref="https://www.aria.ms/help/FAQs/"/> for more information about Aria
@@ -18,10 +20,9 @@ namespace Azure.AI.Details.Common.CLI.Telemetry
     {
         private ILogger _logger;
         private AriaEventSerializer _serializer;
-        private readonly string _userAgent;
         private readonly AriaUserTelemetryConfig _userConfig;
 
-        public AriaTelemetry(string tenantToken, IProgramData programData)
+        public AriaTelemetry(string tenantToken, string? userAgent)
         {
             if (string.IsNullOrWhiteSpace(tenantToken))
             {
@@ -35,14 +36,13 @@ namespace Azure.AI.Details.Common.CLI.Telemetry
             ValidateStatus(status);
 
             _serializer = new AriaEventSerializer();
-            _userAgent = programData?.TelemetryUserAgent ?? string.Empty;
             _userConfig = GetOrCreateUserConfig();
 
             // set common event properties
             _logger.SetContext("UserId", _userConfig.UserId, Microsoft.Applications.Events.PiiKind.Identity);
-            if (programData?.TelemetryUserAgent != null)
+            if (!string.IsNullOrWhiteSpace(userAgent))
             {
-                _logger.SetContext("UserAgent", _userAgent);
+                _logger.SetContext("UserAgent", userAgent);
             }
         }
 

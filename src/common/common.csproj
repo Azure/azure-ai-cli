@@ -16,7 +16,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <InternalsVisibleTo Include="Azure.AI.CLI.Common.Telemetry.Aria"/>
+    <InternalsVisibleTo Include="Azure.AI.CLI.Telemetry.Aria"/>
   </ItemGroup>
 
   <Import Project="BuildCommon.targets" />

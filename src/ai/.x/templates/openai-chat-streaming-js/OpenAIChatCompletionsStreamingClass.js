@@ -1,48 +1,83 @@
 <#@ template hostspecific="true" #>
 <#@ output extension=".js" encoding="utf-8" #>
 <#@ parameter type="System.String" name="ClassName" #>
-const { OpenAIClient, AzureKeyCredential } = require("@azure/openai");
+const { OpenAI } = require('openai');
 
 class <#= ClassName #> {
-  constructor(openAIEndpoint, openAIKey, openAIChatDeploymentName, openAISystemPrompt) {
-    this.openAISystemPrompt = openAISystemPrompt;
-    this.openAIChatDeploymentName = openAIChatDeploymentName;
-    this.client = new OpenAIClient(openAIEndpoint, new AzureKeyCredential(openAIKey));
+
+  // Create the class using the Azure OpenAI API, which requires a different setup, baseURL, api-key headers, and query parameters
+  static createUsingAzure(azureOpenAIAPIVersion, azureOpenAIEndpoint, azureOpenAIKey, azureOpenAIDeploymentName, systemPrompt) {
+    console.log("Using Azure OpenAI API...");
+    return new OpenAIChatCompletionsStreamingClass(azureOpenAIDeploymentName, systemPrompt,
+      new OpenAI({
+        apiKey: azureOpenAIKey,
+        baseURL: `${azureOpenAIEndpoint.replace(/\/+$/, '')}/openai/deployments/${azureOpenAIDeploymentName}`,
+        defaultQuery: { 'api-version': azureOpenAIAPIVersion },
+        defaultHeaders: { 'api-key': azureOpenAIKey },
+        }),
+      30);
+  }
+
+  // Create the class using the OpenAI API and an optional organization
+  static createUsingOpenAI(openAIKey, openAIModelName, systemPrompt, openAIOrganization = null) {
+    console.log("Using OpenAI API...");
+    return new OpenAIChatCompletionsStreamingClass(openAIModelName, systemPrompt,
+      new OpenAI({
+        apiKey: openAIKey,
+        organization: openAIOrganization,
+      }));
+  }
+
+  // Constructor
+  constructor(openAIModelOrDeploymentName, systemPrompt, openai, simulateTypingDelay = 0) {
+    this.simulateTypingDelay = simulateTypingDelay;
+    this.systemPrompt = systemPrompt;
+    this.openAIModelOrDeploymentName = openAIModelOrDeploymentName;
+    this.openai = openai;
+  
     this.clearConversation();
   }
 
+  // Clear the conversation
   clearConversation() {
     this.messages = [
-      { role: 'system', content: this.openAISystemPrompt }
+      { role: 'system', content: this.systemPrompt }
     ];
   }
 
-  async getChatCompletions(userInput, callback) {
+  // Get the response from Chat Completions
+  async getResponse(userInput, callback) {
     this.messages.push({ role: 'user', content: userInput });
 
-    let contentComplete = '';
-    const events = await this.client.streamChatCompletions(this.openAIChatDeploymentName, this.messages);
+    let response = '';
+    const events = await this.openai.chat.completions.create({
+      model: this.openAIModelOrDeploymentName,
+      messages: this.messages,
+      stream: true
+    });
 
     for await (const event of events) {
       for (const choice of event.choices) {
 
         let content = choice.delta?.content;
-        if (choice.finishReason === 'length') {
+        if (choice.finish_reason === 'length') {
           content = `${content}\nERROR: Exceeded token limit!`;
         }
 
         if (content != null) {
           if(callback != null) {
             callback(content);
+            if (this.simulateTypingDelay > 0) {
+              await new Promise(r => setTimeout(r, this.simulateTypingDelay));
+            }
           }
-          await new Promise(r => setTimeout(r, 50)); // delay to simulate real-time output, word by word
-          contentComplete += content;
+          response += content;
         }
       }
     }
 
-    this.messages.push({ role: 'assistant', content: contentComplete });
-    return contentComplete;
+    this.messages.push({ role: 'assistant', content: response });
+    return response;
   }
 }
 

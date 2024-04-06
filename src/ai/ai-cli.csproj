@@ -24,6 +24,7 @@
     <PackageProjectUrl>https://learn.microsoft.com/azure/ai-studio/how-to/cli-install</PackageProjectUrl>
     <PackageTags>Azure AI; AI CLI; azureofficial</PackageTags>
     <SuppressTfmSupportBuildWarnings>true</SuppressTfmSupportBuildWarnings>
+    <DefineConstants Condition="'$(AI_CLI_ENABLE_TELEMETRY)' == '1'">$(DefineConstants);TELEMETRY_ENABLED</DefineConstants>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(PublishProfile)' == '' or '$(PublishProfile)' == 'fdd'">
@@ -127,6 +128,7 @@
     <PackageReference Include="Microsoft.SemanticKernel" Version="0.18.230725.3-preview" />
     <PackageReference Include="Microsoft.SemanticKernel.Connectors.Memory.AzureCognitiveSearch" Version="0.18.230725.3-preview" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+    <PackageReference Include="Scriban" Version="5.9.1" />
     <PackageReference Include="System.Interactive.Async" Version="6.0.1" />
     <PackageReference Include="Azure.AI.OpenAI" Version="1.0.0-beta.13" />
   </ItemGroup>
@@ -137,7 +139,7 @@
     <ProjectReference Include="..\extensions\speech_extension\speech-extension.csproj" />
     <ProjectReference Include="..\extensions\template_extension\template_extension.csproj" />
     <ProjectReference Include="..\extensions\testframework\YamlTestFramework.csproj" />
-    <ProjectReference Include="..\telemetry\telemetry.aria.csproj" />
+    <ProjectReference Include="..\telemetry\aria\telemetry.aria.csproj" />
   </ItemGroup>
 
   <Import Project="BuildCommon.targets" />
