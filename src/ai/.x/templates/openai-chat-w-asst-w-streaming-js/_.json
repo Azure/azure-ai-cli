@@ -1,9 +1,9 @@
 {
-  "_LongName": "OpenAI Chat Completions (Streaming)",
-  "_ShortName": "openai-chat-streaming",
+  "_LongName": "OpenAI Chat w/ Assistants API (Streaming)",
+  "_ShortName": "openai-chat-w-asst-w-streaming",
   "_Language": "JavaScript",
-  "ClassName": "OpenAIChatCompletionsStreamingClass",
-  "AZURE_OPENAI_SYSTEM_PROMPT": "You are a helpful AI assistant.",
+  "ClassName": "OpenAIAssistantsStreamingClass",
+  "AZURE_OPENAI_ASSISTANT_ID": "<insert your OpenAI assistant ID here>",
   "AZURE_OPENAI_API_KEY": "<insert your Azure OpenAI API key here>",
   "AZURE_OPENAI_API_VERSION": "<insert your Azure OpenAI API version here>",
   "AZURE_OPENAI_ENDPOINT": "<insert your Azure OpenAI endpoint here>",

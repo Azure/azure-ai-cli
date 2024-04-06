@@ -45,13 +45,6 @@ namespace Azure.AI.Details.Common.CLI
 
             // Add "non-standard" AZURE_AI_" prefixed env variables to interop with various SDKs
 
-            // OpenAI's SDK
-            env.Add("OPENAI_ENDPOINT", ReadConfig(values, "chat.endpoint"));
-            env.Add("OPENAI_API_BASE", ReadConfig(values, "chat.endpoint"));
-            env.Add("OPENAI_API_KEY", ReadConfig(values, "chat.key"));
-            env.Add("OPENAI_API_TYPE", "azure");
-            env.Add("OPENAI_API_VERSION", ChatCommand.GetOpenAIClientVersionNumber());
-
             // Cognitive Search SDK
             env.Add("AZURE_COGNITIVE_SEARCH_TARGET", env["AZURE_AI_SEARCH_ENDPOINT"]);
             env.Add("AZURE_COGNITIVE_SEARCH_KEY", env["AZURE_AI_SEARCH_KEY"]);

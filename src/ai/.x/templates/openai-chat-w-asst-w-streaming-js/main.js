@@ -8,8 +8,8 @@
 <#@ parameter type="System.String" name="AZURE_OPENAI_API_KEY" #>
 <#@ parameter type="System.String" name="AZURE_OPENAI_API_VERSION" #>
 <#@ parameter type="System.String" name="AZURE_OPENAI_CHAT_DEPLOYMENT" #>
-<#@ parameter type="System.String" name="AZURE_OPENAI_SYSTEM_PROMPT" #>
-const { <#= ClassName #> } = require("./OpenAIChatCompletionsStreamingClass");
+<#@ parameter type="System.String" name="AZURE_OPENAI_ASSISTANT_ID" #>
+const { <#= ClassName #> } = require("./OpenAIAssistantsStreamingClass");
 
 const readline = require('node:readline/promises');
 const rl = readline.createInterface({
@@ -22,8 +22,9 @@ const rl = readline.createInterface({
 
 async function main() {
 
-  // What's the system prompt
-  const openAISystemPrompt = process.env["AZURE_OPENAI_SYSTEM_PROMPT"] || "<#= AZURE_OPENAI_SYSTEM_PROMPT #>";
+  // Which assistant, and what thread to use
+  const openAIAssistantId = process.env["AZURE_OPENAI_ASSISTANT_ID"] || "<#= AZURE_OPENAI_ASSISTANT_ID #>";
+  const openAIAssistantThreadId = process.argv[2] || null;
 
   // Connection info and authentication for OpenAI API
   const openAIKey = process.env["OPENAI_API_KEY"] || "<#= OPENAI_API_KEY #>";
@@ -38,9 +39,15 @@ async function main() {
 
   // Create the right one based on what is available
   const useAzure = azureOpenAIEndpoint?.startsWith("https://");
-  const chat = useAzure
-    ? <#= ClassName #>.createUsingAzure(azureOpenAIAPIVersion, azureOpenAIEndpoint, azureOpenAIKey, azureOpenAIChatDeploymentName, openAISystemPrompt)
-    : <#= ClassName #>.createUsingOpenAI(openAIKey, openAIModelName, openAISystemPrompt, openAIOrganization);
+  const assistant = useAzure
+    ? <#= ClassName #>.createUsingAzure(azureOpenAIAPIVersion, azureOpenAIEndpoint, azureOpenAIKey, azureOpenAIChatDeploymentName, openAIAssistantId)
+    : <#= ClassName #>.createUsingOpenAI(openAIKey, openAIOrganization, openAIAssistantId);
+  // Get or create the thread, and display the messages if any
+  await assistant.getOrCreateThread(openAIAssistantThreadId);
+  await assistant.getThreadMessages((role, content) => {
+    role = role.charAt(0).toUpperCase() + role.slice(1);
+    process.stdout.write(`${role}: ${content}`);
+  });
 
   // Loop until the user types 'exit'
   while (true) {
@@ -51,14 +58,14 @@ async function main() {
 
     // Get the Assistant's response
     process.stdout.write('\nAssistant: ');
-    await chat.getResponse(input, (content) => {
+    await assistant.getResponse(input, (content) => {
       process.stdout.write(content);
     });
 
     process.stdout.write('\n\n');
   }
 
-  console.log('Bye!');
+  console.log(`Bye! (threadId: ${assistant.thread.id})`);
   process.exit();
 }
 

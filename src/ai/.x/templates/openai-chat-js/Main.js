@@ -7,7 +7,7 @@
 <#@ parameter type="System.String" name="AZURE_OPENAI_SYSTEM_PROMPT" #>
 const { <#= ClassName #> } = require("./OpenAIChatCompletionsClass");
 
-const readline = require('readline');
+const readline = require('node:readline/promises');
 const rl = readline.createInterface({
   input: process.stdin,
   output: process.stdout
@@ -24,7 +24,7 @@ async function main() {
 
   while (true) {
 
-    const input = await new Promise(resolve => rl.question('User: ', resolve));
+    const input = await rl.question('User: ');
     if (input === 'exit' || input === '') break;
 
     let response = await chat.getChatCompletions(input);
