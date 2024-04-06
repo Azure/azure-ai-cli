@@ -2,7 +2,7 @@
 FROM mcr.microsoft.com/cbl-mariner/base/nginx:1.22 as builder  
   
 # Install build dependencies  
-RUN tdnf update && \  
+RUN tdnf update -y && \  
     tdnf install -y tar build-essential pcre-devel openssl-devel zlib-devel dos2unix unzip && \  
     rm -rf /var/lib/apt/lists/*  
   
