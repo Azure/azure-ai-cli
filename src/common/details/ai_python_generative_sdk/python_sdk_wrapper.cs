@@ -3,6 +3,8 @@
 // Licensed under the MIT license. See LICENSE.md file in the project root for full license information.
 //
 
+#if USE_PYTHON_HUB_PROJECT_CONNECTION_OR_RELATED
+
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -237,3 +239,5 @@ namespace Azure.AI.Details.Common.CLI
         }
     }
 }
+
+#endif

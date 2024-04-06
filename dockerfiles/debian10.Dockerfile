@@ -1,7 +1,7 @@
 # BASE layer -----------------------------------------------
 
 # Use the base image for Debian 10 (buster)
-FROM mcr.microsoft.com/devcontainers/python:3.10-buster AS base
+FROM mcr.microsoft.com/devcontainers/python:3.12-buster AS base
 ENV DEBIAN_FRONTEND=noninteractive
 
 # Install dependencies

@@ -16,9 +16,6 @@ tests:
       ls -la
       git log -n 1
 
-  - name: install python dependencies
-    bash: pip install -r requirements.txt
-
   - name: check cli is installed
     command: ai
     expect: |
@@ -103,84 +100,8 @@ tests:
       AZURE_OPENAI_KEY = 
   tag: skip
 
-- name: test python src/run.py --question "which tent is the most waterproof?"
-  command: ai dev shell
-  arguments:
-    bash: |
-      if [ -f /etc/os-release ]; then
-        python3 src/run.py --question "which tent is the most waterproof?"
-      else
-        python src/run.py --question "which tent is the most waterproof?"
-      fi
-  tag: skip
-
-- name: test python src/run.py --question "which tent is the most waterproof?" --implementation promptflow
-  command: ai dev shell
-  arguments:
-    bash: |
-      if [ -f /etc/os-release ]; then
-        python3 src/run.py --question "which tent is the most waterproof?" --implementation promptflow
-      else
-        python src/run.py --question "which tent is the most waterproof?" --implementation promptflow
-      fi
-  tag: skip # doesn't work currently
-
 - name: test ai chat --interactive
   command: ai chat --interactive
   input: |
     which tent is the most waterproof?
   tag: skip
-
-- name: test ai chat --interactive --function src/copilot_aisdk/chat:chat_completion
-  command: ai chat --interactive --function src/copilot_aisdk/chat:chat_completion
-  input: |
-    which tent is the most waterproof?
-  tag: skip
-
-- name: test python src/run.py --evaluate --implementation aisdk
-  command: ai dev shell
-  arguments:
-    bash: |
-      if [ -f /etc/os-release ]; then
-        python3 src/run.py --evaluate --implementation aisdk
-      else
-        python src/run.py --evaluate --implementation aisdk
-      fi
-  expect: |
-    ('(gpt_coherence|gpt_groundedness|gpt_relevance)': .*){3}
-  tag: skip
-
-- name: test ai chat evaluate --input-data src/tests/evaluation_dataset.jsonl
-  command: ai chat evaluate --input-data src/tests/evaluation_dataset.jsonl
-  expect: |
-    Evaluating chats ...
-    ("(gpt_coherence|gpt_groundedness|gpt_relevance)": .*){1}
-    ("(gpt_coherence|gpt_groundedness|gpt_relevance)": .*){1}
-    ("(gpt_coherence|gpt_groundedness|gpt_relevance)": .*){1}
-  tag: skip
-
-- name: test ai chat evaluate --input-data src/tests/evaluation_dataset.jsonl --function src/copilot_aisdk/chat:chat_completion
-  command: ai chat evaluate --input-data src/tests/evaluation_dataset.jsonl --function src/copilot_aisdk/chat:chat_completion
-  expect: |
-    Evaluating chats ...
-    ("(gpt_coherence|gpt_groundedness|gpt_relevance)": .*){1}
-    ("(gpt_coherence|gpt_groundedness|gpt_relevance)": .*){1}
-    ("(gpt_coherence|gpt_groundedness|gpt_relevance)": .*){1}
-  tag: skip
-
-- name: test pytest
-  command: ai dev shell
-  arguments:
-    run: pytest
-  tag: skip # doesn't work currently
-
-- name: test python src/run.py --deploy
-  command: ai dev shell
-  arguments:
-    bash: |
-      if [ -f /etc/os-release ]; then
-        python3 src/run.py --deploy
-      else
-        python src/run.py --deploy
-      fi
-  tag: skip # doesn't work currently (returns exit code 1)

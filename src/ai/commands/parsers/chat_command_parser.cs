@@ -22,8 +22,6 @@ namespace Azure.AI.Details.Common.CLI
         }
 
         private static readonly (string name, bool valuesRequired)[] _commands =  {
-            ("chat.evaluate", true),
-            ("chat.run", true),
             ("chat", true),
         };
 
@@ -37,8 +35,6 @@ namespace Azure.AI.Details.Common.CLI
 
             switch (commandName)
             {
-                case "chat.evaluate": return _chatEvaluateCommandParsers;
-                case "chat.run": return _chatRunCommandParsers;
                 case "chat": return _chatCommandParsers;
             }
 
@@ -73,13 +69,8 @@ namespace Azure.AI.Details.Common.CLI
                     ConfigDeploymentToken.Parser(),
 
                     SearchIndexNameToken.Parser(),
-                    MLIndexNameToken.Parser(),
-                    SKIndexNameToken.Parser(),
-
                     SearchEmbeddingModelDeploymentNameToken.Parser(),
                     SearchEmbeddingModelNameToken.Parser(),
-
-                    FunctionToken.Parser(),
 
                     new NamedValueTokenParser(null,             "service.config.search.api.key", "00101", "1"),
                     new NamedValueTokenParser(null,             "service.config.search.endpoint.uri", "00110;00101", "1"),
@@ -126,18 +117,6 @@ namespace Azure.AI.Details.Common.CLI
             // new TrueFalseRequiredPrefixNamedValueTokenParser("output", "all.answer", "01"),
             // new TrueFalseRequiredPrefixNamedValueTokenParser("output", "each.answer", "11")
 
-        };
-
-        private static INamedValueTokenParser[] _chatRunCommandParsers = {
-
-            new CommonChatNamedValueTokenParsers(),
-            InputDataFileToken.Parser()
-        };
-
-        private static INamedValueTokenParser[] _chatEvaluateCommandParsers = {
-
-            new CommonChatNamedValueTokenParsers(),
-            InputDataFileToken.Parser()
         };
 
         #endregion

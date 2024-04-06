@@ -58,8 +58,6 @@
     ^  ai search \[\.\.\.\]           \(see: ai help search\)\r?$\n
     ^  ai speech \[\.\.\.\]           \(see: ai help speech\)\r?$\n
     ^\r?$\n
-    ^  ai service \[\.\.\.\]          \(see: ai help service\)\r?$\n
-    ^\r?$\n
     ^EXAMPLES\r?$\n
     ^\r?$\n
     ^  ai init\r?$\n

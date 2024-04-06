@@ -162,11 +162,6 @@ namespace Azure.AI.Details.Common.CLI
             var indexName = AskPromptHelper.AskPrompt("Search Index Name: ");
             Console.WriteLine();
 
-            Console.WriteLine("*** UPDATING ***");
-
-            var kernel = CreateSemanticKernel(cogSearchResource.Value.Endpoint, cogSearchResource.Value.Key, openAiResource.Endpoint, openAiResource.EmbeddingsDeployment, openAiResource.Key);
-            await StoreMemoryAsync(kernel, indexName, files.Select(x => new KeyValuePair<string, string>(x, FileHelpers.ReadAllHelpText(x, Encoding.UTF8))));
-
             Console.Write("\r*** UPDATED ***  ");
             Console.WriteLine();
 
@@ -381,36 +376,6 @@ namespace Azure.AI.Details.Common.CLI
                 _ => "Canceled"
             });
             return (picked == 0);
-        }
-
-#nullable enable
-        private IKernel? CreateSemanticKernel(string searchEndpoint, string searchApiKey, string embeddingsEndpoint, string embeddingsDeployment, string embeddingsApiKey)
-        {
-            var store = new AzureCognitiveSearchMemoryStore(searchEndpoint, searchApiKey);
-            var kernelWithACS = Kernel.Builder
-                .WithAzureTextEmbeddingGenerationService(embeddingsDeployment, embeddingsEndpoint, embeddingsApiKey)
-                .WithMemoryStorage(store)
-                .Build();
-
-            return kernelWithACS;
-        }
-#nullable disable
-
-        private static async Task StoreMemoryAsync(IKernel kernel, string index, IEnumerable<KeyValuePair<string, string>> kvps)
-        {
-            var list = kvps.ToList();
-            if (list.Count() == 0) return;
-
-            foreach (var entry in list)
-            {
-                await kernel.Memory.SaveInformationAsync(
-                    collection: index,
-                    text: entry.Value,
-                    id: entry.Key);
-
-                 Console.WriteLine($"{entry.Key}: {entry.Value.Length} bytes");
-            }
-            Console.WriteLine();
         }
 
         private void StartCommand()

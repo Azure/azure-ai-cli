@@ -23,8 +23,6 @@ USAGE: ai <command> [...]
   ai search [...]           (see: ai help search)
   ai speech [...]           (see: ai help speech)
 
-  ai service [...]          (see: ai help service)
-
 `EXAMPLES`
 
   ai init

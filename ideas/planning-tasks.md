@@ -7,9 +7,6 @@
 🚫 ⏹️ `ai init`: how to initialize all that cli needs from config.json?  
 🚫 ⏹️ `ai init`: how to initialize all that cli needs selected project?  
 
-🚫 ⏹️ `ai chat evaluate`: wrap python SDK  
-🟩 ⏹️ `ai chat evaluate`: `@file`/`--save` can read/write yaml  
-
 🟩 ⏹️ `ai dev shell`: populate environment, run bash/cmd  
 
 ## installation/docker
@@ -31,8 +28,6 @@
 🚫 ⏹️ `ai search index`: more scenarios?  
 🚫 ⏹️ `ai search index`: fabric?  
 
-🟩 ⏹️ `ai chat --function`: support additional parameters  
-🟩 ⏹️ `ai chat --function`: support streaming  
 🟩 ⏹️ `ai chat --output-______`: support chat outputs  
 
 🚫 ⏹️ `ai dev new`: Dockerfile  

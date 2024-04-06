@@ -18,7 +18,7 @@ if ! which ai > /dev/null; then
 fi
 
 set -o errexit
-ai run --command "ai" --expect "ai init;ai chat;ai service" 1>&2
+ai run --command "ai" --expect "ai init;ai chat;ai speech" 1>&2
 ai run --command "ai config @defaults" --expect "found at 'ai.exe/.ai/'" 1>&2
 ai run --command "ai config @_test --set TEST" 1>&2
 ai run --command "ai config @_test" --expect "TEST" 1>&2

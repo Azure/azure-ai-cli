@@ -1,7 +1,7 @@
 # BASE layer -----------------------------------------------
 
 # Use the base image for Debian 11 (bullseye)
-FROM mcr.microsoft.com/devcontainers/python:3.10-bullseye AS base
+FROM mcr.microsoft.com/devcontainers/python:3.12-bullseye AS base
 ENV DEBIAN_FRONTEND=noninteractive
 
 # Install dependencies

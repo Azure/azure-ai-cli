@@ -2,7 +2,7 @@
 
 `ai test` is a YAML-based test framework/runner that can be used to run tests on any command-line tool or script. It is designed to be simple to use and understand, and to be able to run tests in parallel.
 
-Examples:
+Example:
 
 ```yaml
 - name: Build search index
@@ -10,11 +10,6 @@ Examples:
   expect: |
     Updating search index 'myindex' ...
     Updating search index 'myindex' ... Done!
-    
-- name: Evaluate chat model
-  command: ai chat evaluate --data-input questions.jsonl
-  expect-gpt: |
-    The GPT coherence score must be at least 4.2
 ```
 
 The test case YAML file contains a list of test cases. Each test case is a dictionary with the following keys:
