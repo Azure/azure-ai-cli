@@ -31,10 +31,12 @@ namespace Azure.AI.Details.Common.CLI
             ("init.search", false),
             ("init.speech", false),
             ("init.vision", false),
+#if USE_PYTHON_HUB_PROJECT_CONNECTION_OR_RELATED
             ("init.project.new", false),
             ("init.project.select", false),
             ("init.project", false),
             ("init.resource", false),
+#endif
             ("init", false)
         };
 
@@ -58,10 +60,12 @@ namespace Azure.AI.Details.Common.CLI
                 case "init.search":
                 case "init.speech":
                 case "init.vision":
+#if USE_PYTHON_HUB_PROJECT_CONNECTION_OR_RELATED
                 case "init.project":
                 case "init.project.new":
                 case "init.project.select":
                 case "init.resource":
+#endif
 
                 case "init":
                     return initCommandParsers;

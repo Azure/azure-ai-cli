@@ -3,6 +3,8 @@
 // Licensed under the MIT license. See LICENSE.md file in the project root for full license information.
 //
 
+#if USE_PYTHON_HUB_PROJECT_CONNECTION_OR_RELATED
+
 using System;
 using System.Diagnostics;
 using System.IO;
@@ -20,7 +22,7 @@ namespace Azure.AI.Details.Common.CLI
             EnsureFindPython();
             if (_pythonBinary == null)
             {
-                ConsoleHelpers.WriteLineError("*** Please install Python 3.10 or above ***");
+                ConsoleHelpers.WriteLineError("*** Please install Python 3.12 or above ***");
                 Console.Write("\nNOTE: If it's already installed ensure it's in the system PATH and working (try: `python --version`)\n");
                 return new ProcessOutput() { ExitCode = -1 };
             }
@@ -271,3 +273,5 @@ namespace Azure.AI.Details.Common.CLI
         }
     }
 }
+
+#endif

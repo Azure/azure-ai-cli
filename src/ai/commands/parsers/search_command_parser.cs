@@ -109,9 +109,6 @@ namespace Azure.AI.Details.Common.CLI
             IndexVectorFieldNameToken.Parser(),
 
             SearchIndexNameToken.Parser(requireIndexPart: false),
-            MLIndexNameToken.Parser(requireIndexPart: false),
-            SKIndexNameToken.Parser(),
-
             SearchEmbeddingModelDeploymentNameToken.Parser(),
             SearchEmbeddingModelNameToken.Parser(),
 

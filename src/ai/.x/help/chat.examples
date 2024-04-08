@@ -22,10 +22,6 @@ CHAT EXAMPLES
     ai chat --index-name contoso_product_index --interactive
     ai config --clear search.index.name
 
-  `EXAMPLE 6`: Chat w/ function a specific python function
-
-    ai chat --function copilot_aisdk:chat_completion --interactive
-
 SEE ALSO
 
   ai help chat

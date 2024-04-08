@@ -95,75 +95,33 @@ namespace Azure.AI.Details.Common.CLI
 
             var output = string.Empty;
 
-            var useIndexer = !string.IsNullOrEmpty(blobContainer);
-            var useSK = !useIndexer && SKIndexNameToken.IsSKIndexKind(_values);
-
-            if (useIndexer)
+            var ok = !string.IsNullOrEmpty(blobContainer);
+            if (!ok)
             {
-                var aiServicesApiKey = AiServicesApiKeyToken.Data().Demand(_values, action, command, checkConfig: "services.key");
-                var searchEndpoint = DemandSearchEndpointUri(action, command);
-                var searchApiKey = DemandSearchApiKey(action, command);
-                var embeddingsEndpoint = DemandEmbeddingsEndpointUri(action, command);
-                var embeddingsApiKey = DemandEmbeddingsApiKey(action, command);
-                var embeddingModelDeployment = SearchEmbeddingModelDeploymentNameToken.Data().Demand(_values, action, command, checkConfig: "embedding.model.deployment.name");
-                var dataSourceConnectionName = SearchIndexerDataSourceConnectionNameToken.Data().GetOrDefault(_values, $"{searchIndexName}-datasource");
-                var skillsetName = SearchIndexerSkillsetNameToken.Data().GetOrDefault(_values, $"{searchIndexName}-skillset");
-                var indexerName = SearchIndexerNameToken.Data().GetOrDefault(_values, $"{searchIndexName}-indexer");
-
-                var idFieldName = IndexIdFieldNameToken.Data().GetOrDefault(_values, "id");
-                var contentFieldName = IndexContentFieldNameToken.Data().GetOrDefault(_values, "content");
-                var vectorFieldName = IndexVectorFieldNameToken.Data().GetOrDefault(_values, "contentVector");
-
-                output = DoIndexUpdateWithAISearch(aiServicesApiKey, searchEndpoint, searchApiKey, embeddingsEndpoint, embeddingModelDeployment, embeddingsApiKey, searchIndexName, dataSourceConnectionName, blobContainer, pattern, skillsetName, indexerName, idFieldName, contentFieldName, vectorFieldName).Result;
-            }
-            else if (useSK)
-            {
-                var searchEndpoint = DemandSearchEndpointUri(action, command);
-                var searchApiKey = DemandSearchApiKey(action, command);
-                var embeddingsEndpoint = DemandEmbeddingsEndpointUri(action, command);
-                var embeddingsDeployment = DemandEmbeddingsDeployment(action, command);
-                var embeddingsApiKey = DemandEmbeddingsApiKey(action, command);
-
-                DoIndexUpdateWithSK(searchEndpoint, searchApiKey, embeddingsEndpoint, embeddingsDeployment, embeddingsApiKey, searchIndexName, pattern);
-            }
-            else // use GenAi
-            {
-                var subscription = SubscriptionToken.Data().Demand(_values, action, command, checkConfig: "subscription");
-                var project = ProjectNameToken.Data().Demand(_values, action, command, checkConfig: "project");
-                var group = ResourceGroupNameToken.Data().Demand(_values, action, command, checkConfig: "group");
-                var searchEndpoint = DemandSearchEndpointUri(action, command);
-                var searchApiKey = DemandSearchApiKey(action, command);
-                var embeddingsEndpoint = DemandEmbeddingsEndpointUri(action, command);
-                var embeddingsApiKey = DemandEmbeddingsApiKey(action, command);
-                var embeddingModelDeployment = SearchEmbeddingModelDeploymentNameToken.Data().Demand(_values, action, command, checkConfig: "embedding.model.deployment.name");
-                var embeddingModelName = SearchEmbeddingModelNameToken.Data().Demand(_values, action, command, checkConfig: "embedding.model.name");
-                var externalSourceUrl = ExternalSourceToken.Data().GetOrDefault(_values);
-
-                output = DoIndexUpdateWithGenAi(subscription, group, project, searchIndexName, embeddingModelDeployment, embeddingModelName, pattern, externalSourceUrl);
-
-                var parsed = !string.IsNullOrEmpty(output) ? JsonDocument.Parse(output) : null;
-                var index = parsed?.GetPropertyElementOrNull("index");
-                if (index == null)
-                {
-                    _values.AddThrowError("ERROR:", $"Failed to update search index '{searchIndexName}'");
-                }
+                _values.AddThrowError("WARNING:", $"Requires blob container.");
             }
 
+            var aiServicesApiKey = AiServicesApiKeyToken.Data().Demand(_values, action, command, checkConfig: "services.key");
+            var searchEndpoint = DemandSearchEndpointUri(action, command);
+            var searchApiKey = DemandSearchApiKey(action, command);
+            var embeddingsEndpoint = DemandEmbeddingsEndpointUri(action, command);
+            var embeddingsApiKey = DemandEmbeddingsApiKey(action, command);
+            var embeddingModelDeployment = SearchEmbeddingModelDeploymentNameToken.Data().Demand(_values, action, command, checkConfig: "embedding.model.deployment.name");
+            var dataSourceConnectionName = SearchIndexerDataSourceConnectionNameToken.Data().GetOrDefault(_values, $"{searchIndexName}-datasource");
+            var skillsetName = SearchIndexerSkillsetNameToken.Data().GetOrDefault(_values, $"{searchIndexName}-skillset");
+            var indexerName = SearchIndexerNameToken.Data().GetOrDefault(_values, $"{searchIndexName}-indexer");
+
+            var idFieldName = IndexIdFieldNameToken.Data().GetOrDefault(_values, "id");
+            var contentFieldName = IndexContentFieldNameToken.Data().GetOrDefault(_values, "content");
+            var vectorFieldName = IndexVectorFieldNameToken.Data().GetOrDefault(_values, "contentVector");
+
+            output = DoIndexUpdateWithAISearch(aiServicesApiKey, searchEndpoint, searchApiKey, embeddingsEndpoint, embeddingModelDeployment, embeddingsApiKey, searchIndexName, dataSourceConnectionName, blobContainer, pattern, skillsetName, indexerName, idFieldName, contentFieldName, vectorFieldName).Result;
             if (!_quiet) Console.WriteLine($"{message} Done!\n");
 
             var fi = new FileInfo(ConfigSetHelpers.ConfigSet("search.index.name", searchIndexName));
             if (!_quiet) Console.WriteLine($"{fi.Name} (saved at {fi.DirectoryName})\n\n  {searchIndexName}\n");
 
             if (!string.IsNullOrEmpty(output)) Console.WriteLine(output);
-        }
-
-        private string DoIndexUpdateWithGenAi(string subscription, string groupName, string projectName, string indexName, string embeddingModelDeployment, string embeddingModelName, string dataFiles, string externalSourceUrl)
-        {
-            // work around issue with Py GenAI SDK needing this var to be set; do not set any additional values... See Hanchi Wang for more info.
-            var env = ConfigEnvironmentHelpers.GetEnvironment(_values);
-            env = new Dictionary<string, string>(env.Where(x => x.Key == "AZURE_OPENAI_KEY"));
-            
-            return PythonSDKWrapper.UpdateMLIndex(_values, subscription, groupName, projectName, indexName, embeddingModelDeployment, embeddingModelName, dataFiles, externalSourceUrl, env);
         }
 
         private async Task<string> DoIndexUpdateWithAISearch(string aiServicesApiKey, string searchEndpoint, string searchApiKey, string embeddingsEndpoint, string embeddingsDeployment, string embeddingsApiKey, string searchIndexName, string dataSourceConnectionName, string blobContainer, string pattern, string skillsetName, string indexerName, string idFieldName, string contentFieldName, string vectorFieldName)
@@ -477,49 +435,6 @@ namespace Azure.AI.Details.Common.CLI
                 },
                 SkillsetName = skillset.Name
             };
-        }
-
-        private void DoIndexUpdateWithSK(string searchEndpoint, string searchApiKey, string embeddingsEndpoint, string embeddingsDeployment, string embeddingsApiKey, string searchIndexName, string pattern)
-        {
-            var files = FileHelpers.FindFilesInDataPath(pattern, _values)
-                .Where(x => File.Exists(x))
-                .Select(x => new FileInfo(x).FullName)
-                .Distinct();
-
-            var kvps = files.Select(x => new KeyValuePair<string, string>(x, File.ReadAllText(x))).ToList();
-
-            var kernel = CreateSemanticKernel(searchEndpoint, searchApiKey, embeddingsEndpoint, embeddingsDeployment, embeddingsApiKey);
-            StoreMemoryAsync(kernel, searchIndexName, kvps).Wait();
-        }
-
-#nullable enable
-        private IKernel? CreateSemanticKernel(string searchEndpoint, string searchApiKey, string embeddingsEndpoint, string embeddingsDeployment, string embeddingsApiKey)
-        {
-            var store = new AzureCognitiveSearchMemoryStore(searchEndpoint, searchApiKey);
-            var kernelWithACS = Kernel.Builder
-                .WithAzureTextEmbeddingGenerationService(embeddingsDeployment, embeddingsEndpoint, embeddingsApiKey)
-                .WithMemoryStorage(store)
-                .Build();
-
-            return kernelWithACS;
-        }
-#nullable disable
-
-        private static async Task StoreMemoryAsync(IKernel kernel, string index, IEnumerable<KeyValuePair<string, string>> kvps)
-        {
-            var list = kvps.ToList();
-            if (list.Count() == 0) return;
-
-            foreach (var entry in list)
-            {
-                await kernel.Memory.SaveInformationAsync(
-                    collection: index,
-                    text: entry.Value,
-                    id: entry.Key);
-
-                Console.WriteLine($"{entry.Key}: {entry.Value.Length} bytes");
-            }
-            Console.WriteLine();
         }
 
         private string DemandSearchEndpointUri(string action, string command)

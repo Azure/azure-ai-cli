@@ -61,7 +61,7 @@ namespace Azure.AI.Details.Common.CLI
 
             switch (command)
             {
-                // case "init": await DoInitServiceCommand(); break;
+#if USE_PYTHON_HUB_PROJECT_CONNECTION_OR_RELATED
                 case "init": await DoInitRootAsync(); break;
 
                 case "init.resource": await DoInitRootHubResource(interactive); break;
@@ -69,10 +69,12 @@ namespace Azure.AI.Details.Common.CLI
                 case "init.project": await DoInitRootProject(interactive, true, true); break;
                 case "init.project.new": await DoInitRootProject(interactive, true, false); break;
                 case "init.project.select": await DoInitRootProject(interactive, false, true); break;
+#endif
 
                 case "init.aiservices": await DoInitRootCognitiveServicesAIServicesKind(interactive); break;
                 case "init.cognitiveservices": await DoInitRootCognitiveServicesCognitiveServicesKind(interactive); break;
 
+                case "init":
                 case "init.openai":
                 case "init.openai.chat": await DoInitRootOpenAi(interactive, false, false, true, true, true, true); break;
                 case "init.openai.embeddings": await DoInitRootOpenAi(interactive, true, true, false, false, true, true); break;
@@ -108,6 +110,7 @@ namespace Azure.AI.Details.Common.CLI
             DeleteTemporaryFiles();
         }
 
+#if USE_PYTHON_HUB_PROJECT_CONNECTION_OR_RELATED
         private async Task DoInitRootAsync()
         {
             var interactive = _values.GetOrDefault("init.service.interactive", true);
@@ -321,6 +324,7 @@ namespace Azure.AI.Details.Common.CLI
                 await DoInitServiceParts(interactive, choices.ElementAtOrDefault(selected)?.Value);
             }
         }
+#endif
 
         private async Task DoInitStandaloneResources(bool interactive)
         {
@@ -381,13 +385,13 @@ namespace Azure.AI.Details.Common.CLI
 
                 var task = operation switch
                 {
-                    "init-root-project-select-or-create" => DoInitRootProject(interactive, true, true),
-                    "init-root-project-select" => DoInitRootProject(interactive, false, true),
-                    "init-root-project-create" => DoInitRootProject(interactive, true, false),
+                    // "init-root-project-select-or-create" => DoInitRootProject(interactive, true, true),
+                    // "init-root-project-select" => DoInitRootProject(interactive, false, true),
+                    // "init-root-project-create" => DoInitRootProject(interactive, true, false),
 
-                    "project-select-or-create" => DoInitProject(interactive, true, true),
-                    "project-select" => DoInitProject(interactive, false, true),
-                    "project-create" => DoInitProject(interactive, true, false),
+                    // "project-select-or-create" => DoInitProject(interactive, true, true),
+                    // "project-select" => DoInitProject(interactive, false, true),
+                    // "project-create" => DoInitProject(interactive, true, false),
 
                     "init-root-standalone-select-or-create" => DoInitStandaloneResources(interactive),
                     "init-root-cognitiveservices-ai-services-kind-create-or-select" => DoInitRootCognitiveServicesAIServicesKind(interactive),
@@ -429,6 +433,7 @@ namespace Azure.AI.Details.Common.CLI
                 });
         }
 
+#if USE_PYTHON_HUB_PROJECT_CONNECTION_OR_RELATED
         private async Task DoInitRootHubResource(bool interactive)
         {
             if (!interactive) ThrowInteractiveNotSupportedApplicationException(); // POST-IGNITE: TODO: Add back non-interactive mode support
@@ -520,6 +525,7 @@ namespace Azure.AI.Details.Common.CLI
             ProjectNameToken.Data().Set(_values, project.Name);
             _values.Reset("service.project.id", project.Id);
         }
+#endif
 
         private async Task DoInitRootOpenAi(bool interactive, bool skipChat = false, bool allowSkipChat = true, bool skipEmbeddings = false, bool allowSkipEmbeddings = true, bool skipEvaluations = false, bool allowSkipEvaluations = true)
         {
