@@ -1,11 +1,14 @@
+<#@ template hostspecific="true" #>
+<#@ output extension=".js" encoding="utf-8" #>
+<#@ parameter type="System.String" name="ClassName" #>
 const { OpenAI } = require('openai');
 
-class OpenAIAssistantsStreamingClass {
+class <#= ClassName #> {
 
   // Create the class using the Azure OpenAI API, which requires a different setup, baseURL, api-key headers, and query parameters
   static createUsingAzure(azureOpenAIAPIVersion, azureOpenAIEndpoint, azureOpenAIKey, azureOpenAIDeploymentName, openAIAssistantId, functionFactory) {
     console.log("Using Azure OpenAI API...");
-    return new OpenAIAssistantsStreamingClass(openAIAssistantId, functionFactory,
+    return new <#= ClassName #>(openAIAssistantId, functionFactory,
       new OpenAI({
         apiKey: azureOpenAIKey,
         baseURL: `${azureOpenAIEndpoint.replace(/\/+$/, '')}/openai`,
@@ -18,7 +21,7 @@ class OpenAIAssistantsStreamingClass {
   // Create the class using the OpenAI API and an optional organization
   static createUsingOpenAI(openAIKey, openAIOrganization, openAIAssistantId, functionFactory) {
     console.log("Using OpenAI API...");
-    return new OpenAIAssistantsStreamingClass(openAIAssistantId, functionFactory,
+    return new <#= ClassName #>(openAIAssistantId, functionFactory,
       new OpenAI({
         apiKey: openAIKey,
         organization: openAIOrganization,
@@ -126,4 +129,4 @@ class OpenAIAssistantsStreamingClass {
   }
 }
 
-exports.OpenAIAssistantsStreamingClass = OpenAIAssistantsStreamingClass;
+exports.<#= ClassName #> = <#= ClassName #>;
