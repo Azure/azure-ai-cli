@@ -14,8 +14,7 @@ class <#= ClassName #> {
         baseURL: `${azureOpenAIEndpoint.replace(/\/+$/, '')}/openai`,
         defaultQuery: { 'api-version': azureOpenAIAPIVersion },
         defaultHeaders: { 'api-key': azureOpenAIKey },
-        }),
-      30);
+      }));
   }
 
   // Create the class using the OpenAI API and an optional organization
@@ -89,6 +88,10 @@ class <#= ClassName #> {
       }
       else if (event.event == 'thread.run.completed') {
         this.resolveRunCompletedPromise();
+      }
+      else if (event.event === 'thread.message.chunk') { // TODO: Remove once AOAI service on same version (per Salman)
+        let content = event.data.delta.content.map(item => item.text.value).join('');
+        callback(content);
       }
     });
   }

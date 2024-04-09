@@ -14,8 +14,7 @@ class <#= ClassName #> {
         baseURL: `${azureOpenAIEndpoint.replace(/\/+$/, '')}/openai`,
         defaultQuery: { 'api-version': azureOpenAIAPIVersion },
         defaultHeaders: { 'api-key': azureOpenAIKey },
-        }),
-      30);
+      }));
   }
 
   // Create the class using the OpenAI API and an optional organization
@@ -70,6 +69,12 @@ class <#= ClassName #> {
       this.thread.id,
       { assistant_id: this.openAIAssistantId }
     )
+    .on('event', async (event) => {
+      if (event.event === 'thread.message.chunk') { // TODO: Remove once AOAI service on same version (per Salman)
+        let content = event.data.delta.content.map(item => item.text.value).join('');
+        callback(content);
+      }
+    })
     .on('textDelta', async (textDelta, snapshot) => {
       let content = textDelta.value;
       if (content != null) {
