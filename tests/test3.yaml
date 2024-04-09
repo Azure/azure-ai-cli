@@ -498,6 +498,23 @@
         cd openai-chat-webpage-with-functions-ts
         npm run webpack
 
+- area: ai dev new openai-asst
+  tests:
+  - class: dev new openai-asst (javascript)
+    steps:
+    - name: generate template
+      command: ai dev new openai-asst --javascript
+    - name: build template
+      bash: |
+        cd openai-asst-js
+        npm install
+    - name: run template
+      command: ai dev shell --bash "cd openai-asst-js;node Main.js"
+      input: |-
+        Tell me a joke
+        Tell me another joke
+        exit
+
 - area: ai dev new openai-asst-streaming
   tests:
   - class: dev new openai-asst-streaming (javascript)
@@ -513,6 +530,24 @@
       input: |-
         Tell me a joke
         Tell me another joke
+        exit
+      tag: skip
+
+- area: ai dev new openai-asst-streaming-with-functions
+  tests:
+  - class: dev new openai-asst-streaming-with-functions (javascript)
+    steps:
+    - name: generate template
+      command: ai dev new openai-asst-streaming-with-functions --javascript
+    - name: build template
+      bash: |
+        cd openai-asst-streaming-with-functions-js
+        npm install
+    - name: run template
+      command: ai dev shell --bash "cd openai-asst-streaming-with-functions-js;node Main.js"
+      input: |-
+        What is the date?
+        What is the time?
         exit
       tag: skip
 
