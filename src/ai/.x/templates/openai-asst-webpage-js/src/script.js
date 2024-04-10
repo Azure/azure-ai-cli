@@ -12,6 +12,7 @@
 const marked = require("marked");
 const hljs = require("highlight.js");
 
+const { CreateOpenAI } = require("./CreateOpenAI");
 const { <#= ClassName #> } = require("./OpenAIAssistantsStreamingClass");
 let assistant;
 
@@ -23,22 +24,20 @@ async function assistantInit(threadId = null) {
   // Which Assistant?
   const openAIAssistantId = process.env.AZURE_OPENAI_ASSISTANT_ID || "<#= AZURE_OPENAI_ASSISTANT_ID #>";
 
-  // Connection info and authentication for OpenAI API
+  // Connection info
   const openAIKey = process.env.OPENAI_API_KEY || "<#= OPENAI_API_KEY #>";
-  const openAIModelName = process.env.OPENAI_MODEL_NAME || "<#= OPENAI_MODEL_NAME #>";
   const openAIOrganization = process.env.OPENAI_ORG_ID || null;
-
-  // Connection info and authentication for Azure OpenAI API
-  const azureOpenAIAPIVersion = process.env.AZURE_OPENAI_API_VERSION || "<#= AZURE_OPENAI_API_VERSION #>";
-  const azureOpenAIEndpoint = process.env.AZURE_OPENAI_ENDPOINT || "<#= AZURE_OPENAI_ENDPOINT #>";
+  const openAIModelName = process.env.OPENAI_MODEL_NAME || "<#= OPENAI_MODEL_NAME #>";
   const azureOpenAIKey = process.env.AZURE_OPENAI_API_KEY || "<#= AZURE_OPENAI_API_KEY #>";
+  const azureOpenAIEndpoint = process.env.AZURE_OPENAI_ENDPOINT || "<#= AZURE_OPENAI_ENDPOINT #>";
+  const azureOpenAIAPIVersion = process.env.AZURE_OPENAI_API_VERSION || "<#= AZURE_OPENAI_API_VERSION #>";
   const azureOpenAIChatDeploymentName = process.env.AZURE_OPENAI_CHAT_DEPLOYMENT || "<#= AZURE_OPENAI_CHAT_DEPLOYMENT #>";
 
-  // Create the right one based on what is available
+  // Create the assistants streaming helper class instance
   const useAzure = azureOpenAIEndpoint?.startsWith("https://");
-  assistant = useAzure
-    ? OpenAIAssistantsStreamingClass.createUsingAzure(azureOpenAIAPIVersion, azureOpenAIEndpoint, azureOpenAIKey, azureOpenAIChatDeploymentName, openAIAssistantId)
-    : OpenAIAssistantsStreamingClass.createUsingOpenAI(openAIKey, openAIOrganization, openAIAssistantId);
+  assistant = new <#= ClassName #>(openAIAssistantId, useAzure
+    ? CreateOpenAI.fromAzureOpenAIKey(azureOpenAIKey, azureOpenAIEndpoint, azureOpenAIAPIVersion)
+    : CreateOpenAI.fromOpenAIKey(openAIKey, openAIOrganization));
 
   await assistantCreateOrRetrieveThread(threadId);
 }

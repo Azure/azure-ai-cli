@@ -5,30 +5,6 @@ const { OpenAI } = require('openai');
 
 class <#= ClassName #> {
 
-  // Create the class using the Azure OpenAI API, which requires a different setup, baseURL, api-key headers, and query parameters
-  static createUsingAzure(azureOpenAIAPIVersion, azureOpenAIEndpoint, azureOpenAIKey, azureOpenAIDeploymentName, openAIAssistantId) {
-    console.log("Using Azure OpenAI API...");
-    return new <#= ClassName #>(openAIAssistantId,
-      new OpenAI({
-        apiKey: azureOpenAIKey,
-        baseURL: `${azureOpenAIEndpoint.replace(/\/+$/, '')}/openai`,
-        defaultQuery: { 'api-version': azureOpenAIAPIVersion },
-        defaultHeaders: { 'api-key': azureOpenAIKey },
-        dangerouslyAllowBrowser: true
-      }));
-  }
-
-  // Create the class using the OpenAI API and an optional organization
-  static createUsingOpenAI(openAIKey, openAIOrganization, openAIAssistantId) {
-    console.log("Using OpenAI API...");
-    return new <#= ClassName #>(openAIAssistantId,
-      new OpenAI({
-        apiKey: openAIKey,
-        organization: openAIOrganization,
-        dangerouslyAllowBrowser: true
-      }));
-  }
-
   // Constructor
   constructor(openAIAssistantId, openai, simulateTypingDelay = 0) {
     this.simulateTypingDelay = simulateTypingDelay;
