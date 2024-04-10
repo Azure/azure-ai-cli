@@ -565,3 +565,18 @@
       bash: |
         cd openai-asst-webpage-js
         npm run webpack
+
+- area: ai dev new openai-asst-webpage-with-functions
+  tests:
+  - class: dev new openai-asst-webpage-with-functions (javascript)
+    steps:
+    - name: generate template
+      command: ai dev new openai-asst-webpage-with-functions --javascript
+    - name: build template
+      bash: |
+        cd openai-asst-webpage-with-functions-js
+        npm install
+    - name: pack template
+      bash: |
+        cd openai-asst-webpage-with-functions-js
+        npm run webpack
