@@ -509,7 +509,7 @@
         cd openai-asst-js
         npm install
     - name: run template
-      command: ai dev shell --bash "cd openai-asst-js;node Main.js"
+      command: ai dev shell --bash "cd openai-asst-js;node main.js"
       input: |-
         Tell me a joke
         Tell me another joke
@@ -526,7 +526,7 @@
         cd openai-asst-streaming-js
         npm install
     - name: run template
-      command: ai dev shell --bash "cd openai-asst-streaming-js;node Main.js"
+      command: ai dev shell --bash "cd openai-asst-streaming-js;node main.js"
       input: |-
         Tell me a joke
         Tell me another joke
@@ -544,7 +544,7 @@
         cd openai-asst-streaming-with-functions-js
         npm install
     - name: run template
-      command: ai dev shell --bash "cd openai-asst-streaming-with-functions-js;node Main.js"
+      command: ai dev shell --bash "cd openai-asst-streaming-with-functions-js;node main.js"
       input: |-
         What is the date?
         What is the time?
