@@ -70,6 +70,7 @@ class <#= ClassName #> {
       else if (event.event === 'thread.message.chunk') { // TODO: Remove once AOAI service on same version (per Salman)
         let content = event.data.delta.content.map(item => item.text.value).join('');
         callback(content);
+        response += content;
       }
     });
   }
