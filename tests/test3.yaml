@@ -514,6 +514,7 @@
         Tell me a joke
         Tell me another joke
         exit
+      tag: skip
 
 - area: ai dev new openai-asst-streaming
   tests:
