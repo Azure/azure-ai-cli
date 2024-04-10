@@ -48,6 +48,7 @@ namespace Azure.AI.Details.Common.CLI
             env.Add("AZURE_COGNITIVE_SEARCH_KEY", env["AZURE_AI_SEARCH_KEY"]);
 
             // Add a few environment variables that `ai` doesn't "control", but will re-populate into the environment
+            env.Add("AZURE_OPENAI_ASSISTANT_ID", null);
             env.Add("AZURE_OPENAI_SYSTEM_PROMPT", null);
             env.Add("OPENAI_API_KEY", null);
             env.Add("OPENAI_MODEL_NAME", null);
