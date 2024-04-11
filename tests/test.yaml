@@ -87,6 +87,11 @@
       ^-+ +-+ +-+\r?$\n
       ^Environment +Variables +\.env *\r?$\n
       ^Helper +Function +Class +Library +helper-functions +C# *\r?$\n
+      ^OpenAI +Assistants +openai-asst +JavaScript *\r?$\n
+      ^OpenAI +Assistants +\(Streaming\) +openai-asst-streaming +JavaScript *\r?$\n
+      ^OpenAI +Assistants +\(w/ +Functions\) +openai-asst-streaming-with-functions +JavaScript *\r?$\n
+      ^OpenAI +Assistants +Webpage +openai-asst-webpage +JavaScript *\r?$\n
+      ^OpenAI +Assistants +Webpage +\(w/ +Functions\) +openai-asst-webpage-with-functions +JavaScript *\r?$\n
       ^OpenAI +Chat +Completions +openai-chat +C#, +Go, +Java, +JavaScript, +Python *\r?$\n
       ^OpenAI +Chat +Completions +\(Streaming\) +openai-chat-streaming +C#, +Go, +Java, +JavaScript, +Python *\r?$\n
       ^OpenAI +Chat +Completions +\(w/ +Data +\+ +AI +Search\) +openai-chat-streaming-with-data +C#, +Go, +Java, +JavaScript, +Python *\r?$\n

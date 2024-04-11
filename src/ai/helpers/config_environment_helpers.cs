@@ -43,11 +43,26 @@ namespace Azure.AI.Details.Common.CLI
             env.Add("AZURE_AI_SPEECH_KEY", ReadConfig(values, "speech.key"));
             env.Add("AZURE_AI_SPEECH_REGION", ReadConfig(values, "speech.region"));
 
-            // Add "non-standard" AZURE_AI_" prefixed env variables to interop with various SDKs
-
-            // Cognitive Search SDK
+            // Cognitive Search SDK (non-standard, will be removed at some point)
             env.Add("AZURE_COGNITIVE_SEARCH_TARGET", env["AZURE_AI_SEARCH_ENDPOINT"]);
             env.Add("AZURE_COGNITIVE_SEARCH_KEY", env["AZURE_AI_SEARCH_KEY"]);
+
+            // Add a few environment variables that `ai` doesn't "control", but will re-populate into the environment
+            env.Add("AZURE_OPENAI_ASSISTANT_ID", null);
+            env.Add("AZURE_OPENAI_SYSTEM_PROMPT", null);
+            env.Add("OPENAI_API_KEY", null);
+            env.Add("OPENAI_MODEL_NAME", null);
+            env.Add("OPENAI_ORG_ID", null);
+
+            // For each key, if it's already in the environment, use that value instead
+            foreach (var key in env.Keys.ToList())
+            {
+                var value = Environment.GetEnvironmentVariable(key);
+                if (!string.IsNullOrEmpty(value))
+                {
+                    env[key] = value;
+                }
+            }
 
             return env.Where(x => !string.IsNullOrEmpty(x.Value)).ToDictionary(x => x.Key, x => x.Value);
         }

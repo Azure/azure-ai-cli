@@ -12,33 +12,32 @@
 const marked = require("marked");
 const hljs = require("highlight.js");
 
+const { CreateOpenAI } = require("./CreateOpenAI");
 const { <#= ClassName #> } = require("./OpenAIAssistantsStreamingClass");
-let assistant;
 
 // NOTE: Never deploy your key in client-side environments like browsers or mobile apps
 //  SEE: https://help.openai.com/en/articles/5112595-best-practices-for-api-key-safety
 
+// Which Assistant?
+const openAIAssistantId = process.env.AZURE_OPENAI_ASSISTANT_ID || "<insert your OpenAI assistant ID here>";
+
+// Connection info
+const openAIKey = process.env.OPENAI_API_KEY || "<insert your OpenAI API key here>";
+const openAIOrganization = process.env.OPENAI_ORG_ID || null;
+const openAIModelName = process.env.OPENAI_MODEL_NAME || "<insert your OpenAI model name here>";
+const azureOpenAIKey = process.env.AZURE_OPENAI_API_KEY || "<insert your Azure OpenAI API key here>";
+const azureOpenAIEndpoint = process.env.AZURE_OPENAI_ENDPOINT || "<insert your Azure OpenAI endpoint here>";
+const azureOpenAIAPIVersion = process.env.AZURE_OPENAI_API_VERSION || "<insert your Azure OpenAI API version here>";
+const azureOpenAIChatDeploymentName = process.env.AZURE_OPENAI_CHAT_DEPLOYMENT || "<insert your Azure OpenAI chat deployment name here>";
+
+const useAzure = azureOpenAIEndpoint?.startsWith("https://");
+
+let assistant;
 async function assistantInit(threadId = null) {
 
-  // Which Assistant?
-  const openAIAssistantId = process.env.AZURE_OPENAI_ASSISTANT_ID || "<#= AZURE_OPENAI_ASSISTANT_ID #>";
-
-  // Connection info and authentication for OpenAI API
-  const openAIKey = process.env.OPENAI_API_KEY || "<#= OPENAI_API_KEY #>";
-  const openAIModelName = process.env.OPENAI_MODEL_NAME || "<#= OPENAI_MODEL_NAME #>";
-  const openAIOrganization = process.env.OPENAI_ORG_ID || null;
-
-  // Connection info and authentication for Azure OpenAI API
-  const azureOpenAIAPIVersion = process.env.AZURE_OPENAI_API_VERSION || "<#= AZURE_OPENAI_API_VERSION #>";
-  const azureOpenAIEndpoint = process.env.AZURE_OPENAI_ENDPOINT || "<#= AZURE_OPENAI_ENDPOINT #>";
-  const azureOpenAIKey = process.env.AZURE_OPENAI_API_KEY || "<#= AZURE_OPENAI_API_KEY #>";
-  const azureOpenAIChatDeploymentName = process.env.AZURE_OPENAI_CHAT_DEPLOYMENT || "<#= AZURE_OPENAI_CHAT_DEPLOYMENT #>";
-
-  // Create the right one based on what is available
-  const useAzure = azureOpenAIEndpoint?.startsWith("https://");
-  assistant = useAzure
-    ? OpenAIAssistantsStreamingClass.createUsingAzure(azureOpenAIAPIVersion, azureOpenAIEndpoint, azureOpenAIKey, azureOpenAIChatDeploymentName, openAIAssistantId)
-    : OpenAIAssistantsStreamingClass.createUsingOpenAI(openAIKey, openAIOrganization, openAIAssistantId);
+  assistant = new <#= ClassName #>(openAIAssistantId, useAzure
+    ? CreateOpenAI.fromAzureOpenAIKey(azureOpenAIKey, azureOpenAIEndpoint, azureOpenAIAPIVersion)
+    : CreateOpenAI.fromOpenAIKey(openAIKey, openAIOrganization));
 
   await assistantCreateOrRetrieveThread(threadId);
 }
@@ -345,7 +344,11 @@ async function threadItemsTitleIfUntitled(items, userInput, computerResponse) {
       { role: 'system', content: "Please suggest a title for this interaction. Don't be cute or humorous in your answer. Answer only with a factual descriptive title. Do not use quotes. Do not prefix with 'Title:' or anything else. Just emit the title." }
     ];
 
-    const completion = await assistant.openai.chat.completions.create({
+    const openai = useAzure
+      ? CreateOpenAI.fromAzureOpenAIKeyAndDeployment(azureOpenAIKey, azureOpenAIEndpoint, azureOpenAIAPIVersion, azureOpenAIChatDeploymentName)
+      : assistant.openai;
+
+    const completion = await openai.chat.completions.create({
       messages: messages,
       model: "gpt-4-turbo-preview"
     });

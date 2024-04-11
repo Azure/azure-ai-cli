@@ -440,93 +440,144 @@
         What is the time?
         exit
 
-- area: ai dev new openai-webpage
+- area: ai dev new openai-chat-webpage
   tests:
 
-  - class: dev new openai-webpage (javascript)
+  - class: dev new openai-chat-webpage (javascript)
     steps:
     - name: generate template
-      command: ai dev new openai-webpage --javascript
+      command: ai dev new openai-chat-webpage --javascript
     - name: build template
       bash: |
-        cd openai-webpage-js
+        cd openai-chat-webpage-js
         npm install
     - name: pack template
       bash: |
-        cd openai-webpage-js
+        cd openai-chat-webpage-js
         npm run webpack
 
-  - class: dev new openai-webpage (typescript)
+  - class: dev new openai-chat-webpage (typescript)
     steps:
     - name: generate template
-      command: ai dev new openai-webpage --typescript
+      command: ai dev new openai-chat-webpage --typescript
     - name: build template
       bash: |
-        cd openai-webpage-ts
+        cd openai-chat-webpage-ts
         npm install
     - name: pack template
       bash: |
-        cd openai-webpage-ts
+        cd openai-chat-webpage-ts
         npm run webpack
 
-- area: ai dev new openai-webpage-with-functions
+- area: ai dev new openai-chat-webpage-with-functions
   tests:
 
-  - class: dev new openai-webpage-with-functions (javascript)
+  - class: dev new openai-chat-webpage-with-functions (javascript)
     steps:
     - name: generate template
-      command: ai dev new openai-webpage-with-functions --javascript  
+      command: ai dev new openai-chat-webpage-with-functions --javascript  
     - name: build template  
       bash: |
-        cd openai-webpage-with-functions-js
+        cd openai-chat-webpage-with-functions-js
         npm install
     - name: pack template 
       bash: |
-        cd openai-webpage-with-functions-js
+        cd openai-chat-webpage-with-functions-js
         npm run webpack
 
-  - class: dev new openai-webpage-with-functions (typescript)
+  - class: dev new openai-chat-webpage-with-functions (typescript)
     steps:
     - name: generate template
-      command: ai dev new openai-webpage-with-functions --typescript
+      command: ai dev new openai-chat-webpage-with-functions --typescript
     - name: build template
       bash: |
-        cd openai-webpage-with-functions-ts
+        cd openai-chat-webpage-with-functions-ts
         npm install
     - name: pack template
       bash: |
-        cd openai-webpage-with-functions-ts
+        cd openai-chat-webpage-with-functions-ts
         npm run webpack
 
-- area: ai dev new openai-chat-w-asst-w-streaming
+- area: ai dev new openai-asst
   tests:
-  - class: dev new openai-chat-w-asst-w-streaming (javascript)
+  - class: dev new openai-asst (javascript)
     steps:
     - name: generate template
-      command: ai dev new openai-chat-w-asst-w-streaming --javascript
+      command: ai dev new openai-asst --javascript
     - name: build template
       bash: |
-        cd openai-chat-w-asst-w-streaming-js
+        cd openai-asst-js
         npm install
     - name: run template
-      command: ai dev shell --bash "cd openai-chat-w-asst-w-streaming-js;node Main.js"
+      command: ai dev shell --bash "cd openai-asst-js;node main.js"
       input: |-
         Tell me a joke
         Tell me another joke
         exit
       tag: skip
 
-- area: ai dev new openai-chat-w-asst-webpage
+- area: ai dev new openai-asst-streaming
   tests:
-  - class: dev new openai-chat-w-asst-webpage (javascript)
+  - class: dev new openai-asst-streaming (javascript)
     steps:
     - name: generate template
-      command: ai dev new openai-chat-w-asst-webpage --javascript
+      command: ai dev new openai-asst-streaming --javascript
     - name: build template
       bash: |
-        cd openai-chat-w-asst-webpage-js
+        cd openai-asst-streaming-js
+        npm install
+    - name: run template
+      command: ai dev shell --bash "cd openai-asst-streaming-js;node main.js"
+      input: |-
+        Tell me a joke
+        Tell me another joke
+        exit
+      tag: skip
+
+- area: ai dev new openai-asst-streaming-with-functions
+  tests:
+  - class: dev new openai-asst-streaming-with-functions (javascript)
+    steps:
+    - name: generate template
+      command: ai dev new openai-asst-streaming-with-functions --javascript
+    - name: build template
+      bash: |
+        cd openai-asst-streaming-with-functions-js
+        npm install
+    - name: run template
+      command: ai dev shell --bash "cd openai-asst-streaming-with-functions-js;node main.js"
+      input: |-
+        What is the date?
+        What is the time?
+        exit
+      tag: skip
+
+- area: ai dev new openai-asst-webpage
+  tests:
+  - class: dev new openai-asst-webpage (javascript)
+    steps:
+    - name: generate template
+      command: ai dev new openai-asst-webpage --javascript
+    - name: build template
+      bash: |
+        cd openai-asst-webpage-js
         npm install
     - name: pack template
       bash: |
-        cd openai-chat-w-asst-webpage-js
+        cd openai-asst-webpage-js
+        npm run webpack
+
+- area: ai dev new openai-asst-webpage-with-functions
+  tests:
+  - class: dev new openai-asst-webpage-with-functions (javascript)
+    steps:
+    - name: generate template
+      command: ai dev new openai-asst-webpage-with-functions --javascript
+    - name: build template
+      bash: |
+        cd openai-asst-webpage-with-functions-js
+        npm install
+    - name: pack template
+      bash: |
+        cd openai-asst-webpage-with-functions-js
         npm run webpack

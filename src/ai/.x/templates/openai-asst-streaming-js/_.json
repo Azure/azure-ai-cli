@@ -1,6 +1,6 @@
 {
-  "_LongName": "OpenAI Chat w/ Assistants Webpage",
-  "_ShortName": "openai-chat-w-asst-webpage",
+  "_LongName": "OpenAI Assistants (Streaming)",
+  "_ShortName": "openai-asst-streaming",
   "_Language": "JavaScript",
   "ClassName": "OpenAIAssistantsStreamingClass",
   "AZURE_OPENAI_ASSISTANT_ID": "<insert your OpenAI assistant ID here>",

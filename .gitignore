@@ -6,7 +6,8 @@
 **/bin/*/net7.0/*
 **/bin/*/net8.0/*
 **/obj/*
-ideas/website/node_modules/**
+**/node_modules/**
 testresults/**
 **/launchSettings.json
+**/package-lock.json
 *.user

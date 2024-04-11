@@ -5,31 +5,6 @@ const { OpenAI } = require('openai');
 
 class <#= ClassName #> {
 
-  // Create the class using the Azure OpenAI API, which requires a different setup, baseURL, api-key headers, and query parameters
-  static createUsingAzure(azureOpenAIAPIVersion, azureOpenAIEndpoint, azureOpenAIKey, azureOpenAIDeploymentName, openAIAssistantId) {
-    console.log("Using Azure OpenAI API...");
-    return new <#= ClassName #>(openAIAssistantId,
-      new OpenAI({
-        apiKey: azureOpenAIKey,
-        baseURL: `${azureOpenAIEndpoint.replace(/\/+$/, '')}/openai`,
-        defaultQuery: { 'api-version': azureOpenAIAPIVersion },
-        defaultHeaders: { 'api-key': azureOpenAIKey },
-        dangerouslyAllowBrowser: true
-        }),
-      30);
-  }
-
-  // Create the class using the OpenAI API and an optional organization
-  static createUsingOpenAI(openAIKey, openAIOrganization, openAIAssistantId) {
-    console.log("Using OpenAI API...");
-    return new <#= ClassName #>(openAIAssistantId,
-      new OpenAI({
-        apiKey: openAIKey,
-        organization: openAIOrganization,
-        dangerouslyAllowBrowser: true
-      }));
-  }
-
   // Constructor
   constructor(openAIAssistantId, openai, simulateTypingDelay = 0) {
     this.simulateTypingDelay = simulateTypingDelay;
@@ -38,17 +13,11 @@ class <#= ClassName #> {
     this.openai = openai;
   }
 
-  // Create a new the thread
-  async createThread() {
-    this.thread = await this.openai.beta.threads.create();
-    console.log(`Thread ID: ${this.thread.id}`);
-    return this.thread;
-  }
-  
-  // Retrieve an existing thread
-  async retrieveThread(threadId) {
-    this.thread =await this.openai.beta.threads.retrieve(threadId);
-    console.log(`Thread ID: ${this.thread.id}`);
+  // Get or create the thread
+  async getOrCreateThread(threadId = null) {
+    this.thread = threadId == null
+      ? await this.openai.beta.threads.create()
+      : await this.openai.beta.threads.retrieve(threadId);
     return this.thread;
   }
 
@@ -78,6 +47,13 @@ class <#= ClassName #> {
       this.thread.id,
       { assistant_id: this.openAIAssistantId }
     )
+    .on('event', async (event) => {
+      if (event.event === 'thread.message.chunk') { // TODO: Remove once AOAI service on same version (per Salman)
+        let content = event.data.delta.content.map(item => item.text.value).join('');
+        callback(content);
+        response += content;
+      }
+    })
     .on('textDelta', async (textDelta, snapshot) => {
       let content = textDelta.value;
       if (content != null) {
@@ -86,7 +62,7 @@ class <#= ClassName #> {
           if (this.simulateTypingDelay > 0) {
             await new Promise(r => setTimeout(r, this.simulateTypingDelay));
           }
-      }
+        }
         response += content;
       }
     });
