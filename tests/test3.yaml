@@ -567,6 +567,19 @@
         cd openai-asst-webpage-js
         npm run webpack
 
+  - class: dev new openai-asst-webpage (typescript)
+    steps:
+    - name: generate template
+      command: ai dev new openai-asst-webpage --typescript
+    - name: build template
+      bash: |
+        cd openai-asst-webpage-ts
+        npm install
+    - name: pack template
+      bash: |
+        cd openai-asst-webpage-ts
+        npm run build
+
 - area: ai dev new openai-asst-webpage-with-functions
   tests:
   - class: dev new openai-asst-webpage-with-functions (javascript)
