@@ -1,0 +1,25 @@
+{
+  "name": "chat-interface",
+  "version": "1.0.0",
+  "description": "Chat Interface with OpenAI",
+  "main": "script.js",
+  "type": "module",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "highlight.js": "^11.7.2",
+    "marked": "^4.0.10",
+    "openai": "^4.31.0"
+  },
+  "keywords": [],
+  "devDependencies": {
+    "@types/marked": "^6.0.0",
+    "vite": "^5.2.8"
+  }
+}
