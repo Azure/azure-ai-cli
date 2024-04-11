@@ -711,12 +711,14 @@ namespace Azure.AI.Details.Common.CLI
 
         public static void WriteAllBytes(string fileName, byte[] bytes)
         {
+            EnsureDirectoryForFileExists(fileName);
             using var fileStream = FileHelpers.Open(fileName, FileMode.OpenOrCreate);
             fileStream.Write(bytes, 0, bytes.Length);
         }
 
         public static void AppendAllBytes(string fileName, byte[] bytes)
         {
+            EnsureDirectoryForFileExists(fileName);
             using var fileStream = FileHelpers.Open(fileName, FileMode.Append);
             fileStream.Write(bytes, 0, bytes.Length);
         }
