@@ -9,10 +9,10 @@ export class <#= ClassName #> {
   private client: OpenAIClient;
   private messages: ChatRequestMessage[] = [];
 
-  constructor(openAIEndpoint: string, openAIKey: string, openAIChatDeploymentName: string, openAISystemPrompt: string) {
+  constructor(openAIEndpoint: string, openAIAPIKey: string, openAIChatDeploymentName: string, openAISystemPrompt: string) {
     this.openAISystemPrompt = openAISystemPrompt;
     this.openAIChatDeploymentName = openAIChatDeploymentName;
-    this.client = new OpenAIClient(openAIEndpoint, new AzureKeyCredential(openAIKey));
+    this.client = new OpenAIClient(openAIEndpoint, new AzureKeyCredential(openAIAPIKey));
     this.clearConversation();
   }
 

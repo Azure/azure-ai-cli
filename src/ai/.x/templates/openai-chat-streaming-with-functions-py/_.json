@@ -2,9 +2,9 @@
   "_LongName": "OpenAI Chat Completions (w/ Functions)",
   "_ShortName": "openai-chat-streaming-with-functions",
   "_Language": "Python",
-  "AZURE_OPENAI_ENDPOINT": "<insert your OpenAI endpoint here>",
-  "AZURE_OPENAI_KEY": "<insert your OpenAI API key here>",
+  "AZURE_OPENAI_API_KEY": "<insert your OpenAI API key here>",
   "AZURE_OPENAI_API_VERSION": "2023-12-01-preview",
+  "AZURE_OPENAI_ENDPOINT": "<insert your OpenAI endpoint here>",
   "AZURE_OPENAI_CHAT_DEPLOYMENT": "<insert your OpenAI chat deployment name here>",
   "AZURE_OPENAI_SYSTEM_PROMPT": "You are a helpful AI assistant."
 }

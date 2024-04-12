@@ -4,10 +4,10 @@
 const { OpenAIClient, AzureKeyCredential } = require("@azure/openai");
 
 class <#= ClassName #> {
-  constructor(openAIEndpoint, openAIKey, openAIChatDeploymentName, openAISystemPrompt, searchEndpoint, searchAPIKey, searchIndexName, openAIEmbeddingsEndpoint) {
+  constructor(openAIEndpoint, openAIAPIKey, openAIChatDeploymentName, openAISystemPrompt, searchEndpoint, searchAPIKey, searchIndexName, openAIEmbeddingsEndpoint) {
     this.openAISystemPrompt = openAISystemPrompt;
     this.openAIChatDeploymentName = openAIChatDeploymentName;
-    this.client = new OpenAIClient(openAIEndpoint, new AzureKeyCredential(openAIKey));
+    this.client = new OpenAIClient(openAIEndpoint, new AzureKeyCredential(openAIAPIKey));
 
     this.azureExtensionOptions = {
       azureExtensionOptions: {
@@ -18,7 +18,7 @@ class <#= ClassName #> {
             key: searchAPIKey,
             indexName: searchIndexName,
             embeddingEndpoint: openAIEmbeddingsEndpoint,
-            embeddingKey: openAIKey,
+            embeddingKey: openAIAPIKey,
             queryType: "vectorSimpleHybrid"
           },
         ],

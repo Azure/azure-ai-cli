@@ -3,13 +3,12 @@
   "_ShortName": "openai-chat-streaming-with-data",
   "_Language": "Java",
   "ClassName": "OpenAIChatCompletionsWithDataStreamingClass",
-  "AZURE_OPENAI_API_VERSION": "<insert your open api version here>",
+  "AZURE_OPENAI_API_KEY": "<insert your OpenAI API key here>",
   "AZURE_OPENAI_ENDPOINT": "<insert your OpenAI endpoint here>",
-  "AZURE_OPENAI_KEY": "<insert your OpenAI API key here>",
   "AZURE_OPENAI_CHAT_DEPLOYMENT": "<insert your OpenAI chat deployment name here>",
   "AZURE_OPENAI_EMBEDDING_DEPLOYMENT": "<insert your OpenAI embeddings deployment name here>",
   "AZURE_OPENAI_SYSTEM_PROMPT": "You are a helpful AI assistant.",
-  "AZURE_AI_SEARCH_ENDPOINT": "<insert your search endpoint here>",
   "AZURE_AI_SEARCH_KEY": "<insert your search api key here>",
+  "AZURE_AI_SEARCH_ENDPOINT": "<insert your search endpoint here>",
   "AZURE_AI_SEARCH_INDEX_NAME": "<insert your search index name here>"
 }

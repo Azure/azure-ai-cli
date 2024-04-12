@@ -25,10 +25,7 @@ These setup steps are also represented in tasks.json and launch.json, so that yo
 | | index.html | HTML file with controls and layout.
 | | style.css | CSS file with layout and styling.
 | | src/script.js | Main JS file with HTML to JS interactions.
-| | src/ChatCompletionsStreaming.js | Main JS file with JS to OpenAI interactions.
-| | |
-| **VS CODE** | .vscode/tasks.json | VS Code tasks to build and run the website.
-| | .vscode/launch.json | VS Code launch configuration to run the website.
+| | src/OpenAIAssistantsFunctionsStreamingClass.js | Main JS file with JS to OpenAI interactions.
 | | |
 | **BUILD + PACKAGING** | .env | Contains the API keys, endpoints, etc.
 | | package.json | Contains the dependencies.

@@ -20,7 +20,7 @@ type <#= ClassName #> struct {
 
 func New<#= ClassName #>(
     openAIEndpoint string,
-    openAIKey string,
+    openAIAPIKey string,
     openAIChatDeploymentName string,
     openAISystemPrompt string,
     azureSearchEndpoint string,
@@ -28,7 +28,7 @@ func New<#= ClassName #>(
     azureSearchIndexName string,
     openAIEmbeddingsDeploymentName string,
     ) (*<#= ClassName #>, error) {
-        keyCredential := azcore.NewKeyCredential(openAIKey)
+        keyCredential := azcore.NewKeyCredential(openAIAPIKey)
 
         client, err := azopenai.NewClientWithKeyCredential(openAIEndpoint, keyCredential, nil)
         if err != nil {

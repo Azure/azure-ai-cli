@@ -34,7 +34,7 @@ public class <#= ClassName #> {
     private String openAISystemPrompt;
 
     public <#= ClassName #> (
-        String openAIKey,
+        String openAIAPIKey,
         String openAIEndpoint,
         String openAIChatDeployment,
         String openAISystemPrompt,
@@ -47,7 +47,7 @@ public class <#= ClassName #> {
         this.openAISystemPrompt = openAISystemPrompt;
         client = new OpenAIClientBuilder()
             .endpoint(openAIEndpoint)
-            .credential(new AzureKeyCredential(openAIKey))
+            .credential(new AzureKeyCredential(openAIAPIKey))
             .buildAsyncClient();
 
         AzureCognitiveSearchChatExtensionConfiguration searchConfiguration =

@@ -13,10 +13,10 @@ export class <#= ClassName #> {
   private functionCallContext: FunctionCallContext | undefined;
   private functionFactory: FunctionFactory;
 
-  constructor(openAIEndpoint: string, openAIKey: string, openAIChatDeploymentName: string, openAISystemPrompt: string, functionFactory: FunctionFactory) {
+  constructor(openAIEndpoint: string, openAIAPIKey: string, openAIChatDeploymentName: string, openAISystemPrompt: string, functionFactory: FunctionFactory) {
     this.openAISystemPrompt = openAISystemPrompt;
     this.openAIChatDeploymentName = openAIChatDeploymentName;
-    this.client = new OpenAIClient(openAIEndpoint, new AzureKeyCredential(openAIKey));
+    this.client = new OpenAIClient(openAIEndpoint, new AzureKeyCredential(openAIAPIKey));
     this.functionFactory = functionFactory;
     this.clearConversation();
   }

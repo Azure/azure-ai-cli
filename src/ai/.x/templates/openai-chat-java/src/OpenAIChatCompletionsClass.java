@@ -21,12 +21,12 @@ public class <#= ClassName #> {
     private String openAIChatDeployment;
     private String openAISystemPrompt;
 
-    public <#= ClassName #> (String openAIKey, String openAIEndpoint, String openAIChatDeployment, String openAISystemPrompt) {
+    public <#= ClassName #> (String openAIAPIKey, String openAIEndpoint, String openAIChatDeployment, String openAISystemPrompt) {
         this.openAIChatDeployment = openAIChatDeployment;
         this.openAISystemPrompt = openAISystemPrompt;
         client = new OpenAIClientBuilder()
             .endpoint(openAIEndpoint)
-            .credential(new AzureKeyCredential(openAIKey))
+            .credential(new AzureKeyCredential(openAIAPIKey))
             .buildClient();
 
         List<ChatRequestMessage> chatMessages = new ArrayList<>();

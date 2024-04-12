@@ -27,9 +27,6 @@ These setup steps are also represented in tasks.json and launch.json, so that yo
 | | src/script.js | Main JS file with HTML to JS interactions.
 | | src/ChatCompletionsStreaming.js | Main JS file with JS to OpenAI interactions.
 | | |
-| **VS CODE** | .vscode/tasks.json | VS Code tasks to build and run the website.
-| | .vscode/launch.json | VS Code launch configuration to run the website.
-| | |
 | **BUILD + PACKAGING** | .env | Contains the API keys, endpoints, etc.
 | | package.json | Contains the dependencies.
 | | webpack.config.js | The webpack config file.
