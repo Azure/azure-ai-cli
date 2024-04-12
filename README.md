@@ -52,13 +52,13 @@ You can install the Azure `ai` CLI locally on your computer:
 2. Install or update the Azure `ai` CLI:
 
     ```bash
-    dotnet tool install -g Azure.AI.CLI
+    dotnet tool install -g Azure.AI.CLI --prerelease
     ```
 
     or
 
     ```bash
-    dotnet tool update -g Azure.AI.CLI
+    dotnet tool update -g Azure.AI.CLI --prerelease
     ```
 
 </div><div class="content" id="content3">
