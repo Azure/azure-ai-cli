@@ -5,10 +5,10 @@ const { OpenAIClient, AzureKeyCredential } = require("@azure/openai");
 const { FunctionCallContext } = require("./FunctionCallContext");
 
 class <#= ClassName #> {
-  constructor(openAIEndpoint, openAIKey, openAIChatDeploymentName, openAISystemPrompt, functionFactory) {
+  constructor(openAIEndpoint, openAIAPIKey, openAIChatDeploymentName, openAISystemPrompt, functionFactory) {
     this.openAISystemPrompt = openAISystemPrompt;
     this.openAIChatDeploymentName = openAIChatDeploymentName;
-    this.client = new OpenAIClient(openAIEndpoint, new AzureKeyCredential(openAIKey));
+    this.client = new OpenAIClient(openAIEndpoint, new AzureKeyCredential(openAIAPIKey));
     this.functionFactory = functionFactory;
     this.clearConversation();
   }

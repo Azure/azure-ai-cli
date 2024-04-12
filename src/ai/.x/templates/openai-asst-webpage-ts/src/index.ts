@@ -15,48 +15,33 @@ let chatPanel: HTMLDivElement | null;
 // SEE: https://help.openai.com/en/articles/5112595-best-practices-for-api-key-safety
 
 // Which Assistant?
-const openAIAssistantId =
-  import.meta.env.AZURE_OPENAI_ASSISTANT_ID ||
-  "<insert your OpenAI assistant ID here>";
+const openAIAssistantId = import.meta.env.ASSISTANT_ID || "<insert your OpenAI assistant ID here>";
 
-// Connection info and authentication for OpenAI API
-const openAIKey =
-  import.meta.env.OPENAI_API_KEY || "<insert your OpenAI API key here>";
+// Connection info
+const azureOpenAIAPIKey = import.meta.env.AZURE_OPENAI_API_KEY || "<insert your Azure OpenAI API key here>";
+const azureOpenAIAPIVersion = import.meta.env.AZURE_OPENAI_API_VERSION || "<insert your Azure OpenAI API version here>";
+const azureOpenAIEndpoint = import.meta.env.AZURE_OPENAI_ENDPOINT || "<insert your Azure OpenAI endpoint here>";
+const azureOpenAIDeploymentName = import.meta.env.AZURE_OPENAI_CHAT_DEPLOYMENT || "<insert your Azure OpenAI chat deployment name here>";
+const openAIAPIKey = import.meta.env.OPENAI_API_KEY || "<insert your OpenAI API key here>";
 const openAIOrganization = import.meta.env.OPENAI_ORG_ID || null;
-const openAIModelName =
-  import.meta.env.AZURE_OPENAI_CHAT_MODEL ||
-  "<insert your OpenAI model name here>";
-
-// Connection info and authentication for Azure OpenAI API
-const azureOpenAIAPIVersion =
-  import.meta.env.AZURE_OPENAI_API_VERSION ||
-  "<insert your Azure OpenAI API version here>";
-const azureOpenAIEndpoint =
-  import.meta.env.AZURE_OPENAI_ENDPOINT ||
-  "<insert your Azure OpenAI endpoint here>";
-const azureOpenAIKey =
-  import.meta.env.AZURE_OPENAI_API_KEY ||
-  "<insert your Azure OpenAI API key here>";
-const azureOpenAIDeploymentName =
-  import.meta.env.AZURE_OPENAI_CHAT_DEPLOYMENT ||
-  "<insert your Azure OpenAI chat deployment name here>";
+const openAIModelName = import.meta.env.OPENAI_MODEL_NAME || "<insert your OpenAI model name here>";
 
 async function assistantInit(threadId = null) {
   // Create the right one based on what is available
   const useAzure = azureOpenAIEndpoint?.startsWith("https://");
   assistant = useAzure
     ? OpenAIAssistantsStreamingClass.createUsingAzure({
+        azureOpenAIAPIKey,
         azureOpenAIAPIVersion,
         azureOpenAIEndpoint,
-        azureOpenAIKey,
         azureOpenAIDeploymentName,
         openAIAssistantId,
       })
     : OpenAIAssistantsStreamingClass.createUsingOpenAI({
-        openAIKey,
+        openAIAPIKey,
         openAIOrganization,
+        openAIModelName,
         openAIAssistantId,
-        azureOpenAIDeploymentName
       });
 
   await assistantCreateOrRetrieveThread(threadId);

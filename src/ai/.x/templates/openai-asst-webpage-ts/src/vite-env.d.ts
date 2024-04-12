@@ -1,17 +1,14 @@
 /// <reference types="vite/client" />
 
 interface ImportMetaEnv {
-    readonly AZURE_OPENAI_API_KEY: String;
-    readonly AZURE_OPENAI_API_VERSION: String;
-    readonly AZURE_OPENAI_CHAT_DEPLOYMENT: String;
-    readonly AZURE_OPENAI_CHAT_MODEL: String;
-    readonly AZURE_OPENAI_EMBEDDING_DEPLOYMENT: String;
-    readonly AZURE_OPENAI_EMBEDDING_MODEL: String;
-    readonly AZURE_OPENAI_ENDPOINT: String;
-    readonly AZURE_OPENAI_EVALUATION_DEPLOYMENT: String;
-    readonly AZURE_OPENAI_EVALUATION_MODEL: String;
-    readonly AZURE_OPENAI_KEY: String;
-    readonly AZURE_OPENAI_ASSISTANT_ID: String;
+    readonly ASSISTANT_ID: string;
+    readonly AZURE_OPENAI_API_KEY: string;
+    readonly AZURE_OPENAI_API_VERSION: string;
+    readonly AZURE_OPENAI_ENDPOINT: string;
+    readonly AZURE_OPENAI_CHAT_DEPLOYMENT: string;
+    readonly OPENAI_API_KEY: string;
+    readonly OPENAI_ORG_ID: string;
+    readonly OPENAI_MODEL_NAME: string;
   }
   
   interface ImportMeta {

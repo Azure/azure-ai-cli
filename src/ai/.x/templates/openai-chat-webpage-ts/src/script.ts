@@ -1,8 +1,8 @@
 <#@ template hostspecific="true" #>
 <#@ output extension=".ts" encoding="utf-8" #>
 <#@ parameter type="System.String" name="ClassName" #>
+<#@ parameter type="System.String" name="AZURE_OPENAI_API_KEY" #>
 <#@ parameter type="System.String" name="AZURE_OPENAI_ENDPOINT" #>
-<#@ parameter type="System.String" name="AZURE_OPENAI_KEY" #>
 <#@ parameter type="System.String" name="AZURE_OPENAI_CHAT_DEPLOYMENT" #>
 <#@ parameter type="System.String" name="AZURE_OPENAI_SYSTEM_PROMPT" #>
 import { marked } from "marked"
@@ -13,22 +13,22 @@ let streamingChatCompletions: <#= ClassName #> | undefined;
 
 function streamingChatCompletionsInit(): void {
 
+  const openAIAPIKey = process.env.AZURE_OPENAI_API_KEY || "<#= AZURE_OPENAI_API_KEY #>";
   const openAIEndpoint = process.env.AZURE_OPENAI_ENDPOINT || "<#= AZURE_OPENAI_ENDPOINT #>";
-  const openAIKey = process.env.AZURE_OPENAI_KEY || "<#= AZURE_OPENAI_KEY #>";
   const openAIChatDeploymentName = process.env.AZURE_OPENAI_CHAT_DEPLOYMENT || "<#= AZURE_OPENAI_CHAT_DEPLOYMENT #>" ;
   const openAISystemPrompt = process.env.AZURE_OPENAI_SYSTEM_PROMPT || "<#= AZURE_OPENAI_SYSTEM_PROMPT #>";
 
+  if (!openAIAPIKey || openAIAPIKey.startsWith('<insert')) {
+    chatPanelAppendMessage('computer', 'Please set AZURE_OPENAI_API_KEY in .env');
+  }
   if (!openAIEndpoint || openAIEndpoint.startsWith('<insert')) {
     chatPanelAppendMessage('computer', 'Please set AZURE_OPENAI_ENDPOINT in .env');
-  }
-  if (!openAIKey || openAIKey.startsWith('<insert')) {
-    chatPanelAppendMessage('computer', 'Please set AZURE_OPENAI_KEY in .env');
   }
   if (!openAIChatDeploymentName || openAIChatDeploymentName.startsWith('<insert')) {
     chatPanelAppendMessage('computer', 'Please set AZURE_OPENAI_CHAT_DEPLOYMENT in .env');
   }
 
-  streamingChatCompletions = new <#= ClassName #>(openAIEndpoint, openAIKey, openAIChatDeploymentName, openAISystemPrompt);
+  streamingChatCompletions = new <#= ClassName #>(openAIEndpoint, openAIAPIKey, openAIChatDeploymentName, openAISystemPrompt);
 }
 
 function streamingChatCompletionsClear(): void {

@@ -4,10 +4,10 @@
 const { OpenAIClient, AzureKeyCredential } = require("@azure/openai");
 
 class <#= ClassName #> {
-  constructor(openAIEndpoint, openAIKey, openAIChatDeploymentName, openAISystemPrompt) {
+  constructor(openAIEndpoint, openAIAPIKey, openAIChatDeploymentName, openAISystemPrompt) {
     this.openAISystemPrompt = openAISystemPrompt;
     this.openAIChatDeploymentName = openAIChatDeploymentName;
-    this.client = new OpenAIClient(openAIEndpoint, new AzureKeyCredential(openAIKey));
+    this.client = new OpenAIClient(openAIEndpoint, new AzureKeyCredential(openAIAPIKey));
     this.clearConversation();
   }
 

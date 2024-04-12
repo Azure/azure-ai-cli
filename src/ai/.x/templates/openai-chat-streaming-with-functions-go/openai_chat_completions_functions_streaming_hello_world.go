@@ -1,10 +1,6 @@
 <#@ template hostspecific="true" #>
 <#@ output extension=".go" encoding="utf-8" #>
 <#@ parameter type="System.String" name="ClassName" #>
-<#@ parameter type="System.String" name="AZURE_OPENAI_ENDPOINT" #>
-<#@ parameter type="System.String" name="AZURE_OPENAI_KEY" #>
-<#@ parameter type="System.String" name="AZURE_OPENAI_CHAT_DEPLOYMENT" #>
-<#@ parameter type="System.String" name="AZURE_OPENAI_SYSTEM_PROMPT" #>
 package main
 
 import (
@@ -23,8 +19,8 @@ type <#= ClassName #> struct {
     functionCallContext *FunctionCallContext
 }
 
-func New<#= ClassName #>(openAIEndpoint string, openAIKey string, openAIChatDeploymentName string, openAISystemPrompt string, functionFactory *FunctionFactory) (*<#= ClassName #>, error) {
-    keyCredential, err := azopenai.NewKeyCredential(openAIKey)
+func New<#= ClassName #>(openAIEndpoint string, openAIAPIKey string, openAIChatDeploymentName string, openAISystemPrompt string, functionFactory *FunctionFactory) (*<#= ClassName #>, error) {
+    keyCredential, err := azopenai.NewKeyCredential(openAIAPIKey)
     if err != nil {
         return nil, err
     }

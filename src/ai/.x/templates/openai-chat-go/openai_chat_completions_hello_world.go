@@ -16,8 +16,8 @@ type <#= ClassName #> struct {
     options  *azopenai.ChatCompletionsOptions
 }
 
-func New<#= ClassName #>(openAIEndpoint string, openAIKey string, openAIChatDeploymentName string, openAISystemPrompt string) (*<#= ClassName #>, error) {
-    keyCredential := azcore.NewKeyCredential(openAIKey)
+func New<#= ClassName #>(openAIEndpoint string, openAIAPIKey string, openAIChatDeploymentName string, openAISystemPrompt string) (*<#= ClassName #>, error) {
+    keyCredential := azcore.NewKeyCredential(openAIAPIKey)
 
     client, err := azopenai.NewClientWithKeyCredential(openAIEndpoint, keyCredential, nil)
     if err != nil {

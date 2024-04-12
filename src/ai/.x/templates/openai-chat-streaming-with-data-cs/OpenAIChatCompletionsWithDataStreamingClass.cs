@@ -16,13 +16,13 @@ using System.Threading.Tasks;
 
 public class <#= ClassName #>
 {
-    public <#= ClassName #>(string openAIEndpoint, string openAIKey, string openAIChatDeploymentName, string openAISystemPrompt, string searchEndpoint, string searchApiKey, string searchIndexName, string embeddingsEndpoint)
+    public <#= ClassName #>(string openAIEndpoint, string openAIAPIKey, string openAIChatDeploymentName, string openAISystemPrompt, string searchEndpoint, string searchApiKey, string searchIndexName, string embeddingsEndpoint)
     {
         _openAISystemPrompt = openAISystemPrompt;
 
-        _client = string.IsNullOrEmpty(openAIKey)
+        _client = string.IsNullOrEmpty(openAIAPIKey)
             ? new OpenAIClient(new Uri(openAIEndpoint), new DefaultAzureCredential())
-            : new OpenAIClient(new Uri(openAIEndpoint), new AzureKeyCredential(openAIKey));
+            : new OpenAIClient(new Uri(openAIEndpoint), new AzureKeyCredential(openAIAPIKey));
 
         var extensionConfig = new AzureCognitiveSearchChatExtensionConfiguration()
         {
@@ -31,7 +31,7 @@ public class <#= ClassName #>
             IndexName = searchIndexName,
             QueryType = AzureCognitiveSearchQueryType.VectorSimpleHybrid, // Use VectorSimpleHybrid to get the best vector and keyword search query types.
             EmbeddingEndpoint = new Uri(embeddingsEndpoint),
-            EmbeddingKey = openAIKey,
+            EmbeddingKey = openAIAPIKey,
         };
         _options = new ChatCompletionsOptions()
         {

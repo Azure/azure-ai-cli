@@ -1,3 +1,3 @@
 export default {
-  envPrefix: ["AZURE_", "OPENAI_"],
+  envPrefix: ["ASSISTANT_ID", "AZURE_", "OPENAI_"],
 };

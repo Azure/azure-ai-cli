@@ -2,7 +2,6 @@
   "_LongName": "Text-to-speech",
   "_ShortName": "text-to-speech",
   "_Language": "C#",
-  "AZURE_AI_SPEECH_ENDPOINT": "<insert your Speech Service endpoint here>",
   "AZURE_AI_SPEECH_KEY": "<insert your Speech Service API key here>",
   "AZURE_AI_SPEECH_REGION": "<insert your Speech Service region here>"
 }

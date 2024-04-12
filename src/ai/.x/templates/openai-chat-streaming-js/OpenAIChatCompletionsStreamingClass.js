@@ -6,24 +6,24 @@ const { OpenAI } = require('openai');
 class <#= ClassName #> {
 
   // Create the class using the Azure OpenAI API, which requires a different setup, baseURL, api-key headers, and query parameters
-  static createUsingAzure(azureOpenAIAPIVersion, azureOpenAIEndpoint, azureOpenAIKey, azureOpenAIDeploymentName, systemPrompt) {
+  static createUsingAzure(azureOpenAIAPIVersion, azureOpenAIEndpoint, azureOpenAIAPIKey, azureOpenAIDeploymentName, systemPrompt) {
     console.log("Using Azure OpenAI API...");
     return new OpenAIChatCompletionsStreamingClass(azureOpenAIDeploymentName, systemPrompt,
       new OpenAI({
-        apiKey: azureOpenAIKey,
+        apiKey: azureOpenAIAPIKey,
         baseURL: `${azureOpenAIEndpoint.replace(/\/+$/, '')}/openai/deployments/${azureOpenAIDeploymentName}`,
         defaultQuery: { 'api-version': azureOpenAIAPIVersion },
-        defaultHeaders: { 'api-key': azureOpenAIKey },
+        defaultHeaders: { 'api-key': azureOpenAIAPIKey },
         }),
       30);
   }
 
   // Create the class using the OpenAI API and an optional organization
-  static createUsingOpenAI(openAIKey, openAIModelName, systemPrompt, openAIOrganization = null) {
+  static createUsingOpenAI(openAIAPIKey, openAIModelName, systemPrompt, openAIOrganization = null) {
     console.log("Using OpenAI API...");
     return new OpenAIChatCompletionsStreamingClass(openAIModelName, systemPrompt,
       new OpenAI({
-        apiKey: openAIKey,
+        apiKey: openAIAPIKey,
         organization: openAIOrganization,
       }));
   }

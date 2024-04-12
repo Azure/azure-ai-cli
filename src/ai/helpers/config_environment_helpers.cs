@@ -18,14 +18,17 @@ namespace Azure.AI.Details.Common.CLI
         {
             var env = new Dictionary<string, string>();
             env.Add("AZURE_SUBSCRIPTION_ID", ReadConfig(values, "subscription"));
+
+#if USE_PYTHON_HUB_PROJECT_CONNECTION_OR_RELATED
             env.Add("AZURE_RESOURCE_GROUP", ReadConfig(values, "group"));
             env.Add("AZURE_AI_PROJECT_NAME", ReadConfig(values, "project"));
             env.Add("AZURE_AI_RESOURCE_NAME", ReadConfig(values, "resource"));
+#endif
 
-            env.Add("AZURE_OPENAI_ENDPOINT", ReadConfig(values, "chat.endpoint"));
             env.Add("AZURE_OPENAI_KEY", ReadConfig(values, "chat.key"));
             env.Add("AZURE_OPENAI_API_KEY", ReadConfig(values, "chat.key"));
             env.Add("AZURE_OPENAI_API_VERSION", ChatCommand.GetOpenAIClientVersionNumber());
+            env.Add("AZURE_OPENAI_ENDPOINT", ReadConfig(values, "chat.endpoint"));
 
             env.Add("AZURE_OPENAI_CHAT_DEPLOYMENT", ReadConfig(values, "chat.deployment"));
             env.Add("AZURE_OPENAI_EVALUATION_DEPLOYMENT", ReadConfig(values, "chat.evaluation.model.deployment.name") ?? ReadConfig(values, "chat.deployment"));
@@ -48,7 +51,7 @@ namespace Azure.AI.Details.Common.CLI
             env.Add("AZURE_COGNITIVE_SEARCH_KEY", env["AZURE_AI_SEARCH_KEY"]);
 
             // Add a few environment variables that `ai` doesn't "control", but will re-populate into the environment
-            env.Add("AZURE_OPENAI_ASSISTANT_ID", null);
+            env.Add("ASSISTANT_ID", null);
             env.Add("AZURE_OPENAI_SYSTEM_PROMPT", null);
             env.Add("OPENAI_API_KEY", null);
             env.Add("OPENAI_MODEL_NAME", null);

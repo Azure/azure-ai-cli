@@ -8,17 +8,17 @@ import { ChatCompletionAssistantMessageParam } from "openai/src/resources/index.
 
 type azureOpenAIType = {
   azureOpenAIAPIVersion: string;
+  azureOpenAIAPIKey: string;
   azureOpenAIEndpoint: string;
-  azureOpenAIKey: string;
   azureOpenAIDeploymentName: string;
   openAIAssistantId: string;
 };
 
 type openAIType = {
-  openAIKey: string;
+  openAIAPIKey: string;
   openAIOrganization: string;
+  openAIModelName?: string;
   openAIAssistantId: string;
-  azureOpenAIDeploymentName?: string;
 };
 
 export class OpenAIAssistantsStreamingClass {
@@ -26,9 +26,9 @@ export class OpenAIAssistantsStreamingClass {
 
   // Create the class using the Azure OpenAI API, which requires a different setup, baseURL, api-key headers, and query parameters
   static createUsingAzure({
+    azureOpenAIAPIKey,
     azureOpenAIAPIVersion,
     azureOpenAIEndpoint,
-    azureOpenAIKey,
     azureOpenAIDeploymentName,
     openAIAssistantId,
   }: azureOpenAIType) {
@@ -38,10 +38,10 @@ export class OpenAIAssistantsStreamingClass {
       openAIAssistantId,
       azureOpenAIDeploymentName,
       new OpenAI({
-        apiKey: azureOpenAIKey,
+        apiKey: azureOpenAIAPIKey,
         baseURL: `${azureOpenAIEndpoint.replace(/\/+$/, "")}/openai`,
         defaultQuery: { "api-version": azureOpenAIAPIVersion },
-        defaultHeaders: { "api-key": azureOpenAIKey },
+        defaultHeaders: { "api-key": azureOpenAIAPIKey },
         //  SEE: https://help.openai.com/en/articles/5112595-best-practices-for-api-key-safety
         dangerouslyAllowBrowser: true,
       }),
@@ -51,17 +51,17 @@ export class OpenAIAssistantsStreamingClass {
 
   // Create the class using the OpenAI API and an optional organization
   static createUsingOpenAI({
-    openAIKey,
+    openAIAPIKey,
     openAIOrganization,
+    openAIModelName,
     openAIAssistantId,
-    azureOpenAIDeploymentName,
   }: openAIType) {
     console.log("Using OpenAI API...");
     return new OpenAIAssistantsStreamingClass(
       openAIAssistantId,
-      azureOpenAIDeploymentName,
+      openAIModelName,
       new OpenAI({
-        apiKey: openAIKey,
+        apiKey: openAIAPIKey,
         organization: openAIOrganization,
         dangerouslyAllowBrowser: true,
       })
@@ -71,11 +71,11 @@ export class OpenAIAssistantsStreamingClass {
   // Constructor
   constructor(
     private readonly openAIAssistantId: string,
-    private readonly azureOpenAIDeploymentName: string | undefined,
+    private readonly modelOrDeploymentName: string | undefined,
     private readonly openai: OpenAI,
     private readonly simulateTypingDelay = 0
   ) {
-    this.azureOpenAIDeploymentName = azureOpenAIDeploymentName;
+    this.modelOrDeploymentName = modelOrDeploymentName;
     this.simulateTypingDelay = simulateTypingDelay;
     this.openAIAssistantId = openAIAssistantId;
     this.thread = null;
@@ -179,10 +179,10 @@ export class OpenAIAssistantsStreamingClass {
     const completion = await this.openai.chat.completions.create(
       {
         messages,
-        model: this.azureOpenAIDeploymentName || 'gpt-3.5-turbo',
+        model: this.modelOrDeploymentName || 'gpt-3.5-turbo',
       },
       {
-        path: `/deployments/${this.azureOpenAIDeploymentName}/chat/completions?api-version=2024-04-01-preview`,
+        path: `/deployments/${this.modelOrDeploymentName}/chat/completions?api-version=2024-04-01-preview`,
       }
     );
 

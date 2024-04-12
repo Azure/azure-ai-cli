@@ -1,6 +1,5 @@
 <#@ template hostspecific="true" #>
 <#@ output extension=".py" encoding="utf-8" #>
-<#@ parameter type="System.String" name="AZURE_AI_SPEECH_ENDPOINT" #>
 <#@ parameter type="System.String" name="AZURE_AI_SPEECH_KEY" #>
 <#@ parameter type="System.String" name="AZURE_AI_SPEECH_REGION" #>
 from concurrent.futures import Future

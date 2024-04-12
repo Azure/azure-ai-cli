@@ -13,14 +13,14 @@ using System;
 
 public class <#= ClassName #>
 {
-    public <#= ClassName #>(string openAIEndpoint, string openAIKey, string openAIChatDeploymentName, string openAISystemPrompt, FunctionFactory factory)
+    public <#= ClassName #>(string openAIEndpoint, string openAIAPIKey, string openAIChatDeploymentName, string openAISystemPrompt, FunctionFactory factory)
     {
         _openAISystemPrompt = openAISystemPrompt;
         _functionFactory = factory;
 
-        _client = string.IsNullOrEmpty(openAIKey)
+        _client = string.IsNullOrEmpty(openAIAPIKey)
             ? new OpenAIClient(new Uri(openAIEndpoint), new DefaultAzureCredential())
-            : new OpenAIClient(new Uri(openAIEndpoint), new AzureKeyCredential(openAIKey));
+            : new OpenAIClient(new Uri(openAIEndpoint), new AzureKeyCredential(openAIAPIKey));
 
         _options = new ChatCompletionsOptions();
         _options.DeploymentName = openAIChatDeploymentName;
