@@ -16,7 +16,7 @@ import (
 )
 
 func main() {
-    openAIAPIKey := os.Getenv("AZURE_OPENAI_API_KEY_KEY")
+    openAIAPIKey := os.Getenv("AZURE_OPENAI_API_KEY")
     if openAIAPIKey == "" {
         openAIAPIKey = "<#= AZURE_OPENAI_API_KEY #>"
     }
