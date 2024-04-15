@@ -34,6 +34,14 @@ const useAzure = azureOpenAIEndpoint?.startsWith("https://");
 
 let assistant;
 async function assistantInit(threadId = null) {
+  
+  // Check the connection info
+  const azureOk = !azureOpenAIAPIKey?.startsWith('<insert') && !azureOpenAIAPIVersion?.startsWith('<insert') && !azureOpenAIEndpoint?.startsWith('<insert') && !azureOpenAIChatDeploymentName?.startsWith('<insert');
+  const openaiOk = !openAIAPIKey?.startsWith('<insert') && !openAIModelName.startsWith('<insert');
+  if (!azureOk && !openaiOk) {
+    chatPanelAppendMessage('computer', markdownToHtml('To use **OpenAI**, set `OPENAI_API_KEY` and `OPENAI_MODEL_NAME` in `.env`'));
+    chatPanelAppendMessage('computer', markdownToHtml('To use **Azure OpenAI**, set `AZURE_OPENAI_API_KEY`, `AZURE_OPENAI_API_VERSION`, `AZURE_OPENAI_ENDPOINT`, and `AZURE_OPENAI_CHAT_DEPLOYMENT` in `.env`'));
+  }
 
   assistant = new <#= ClassName #>(openAIAssistantId, useAzure
     ? CreateOpenAI.fromAzureOpenAIKey(azureOpenAIAPIKey, azureOpenAIEndpoint, azureOpenAIAPIVersion)

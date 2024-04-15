@@ -9,13 +9,13 @@ class FunctionCallContext {
   checkForUpdate(choice) {
     let updated = false;
 
-    const name = choice.delta?.functionCall?.name;
+    const name = choice.delta?.function_call?.name;
     if (name !== undefined) {
       this.function_name = name;
       updated = true;
     }
 
-    const args = choice.delta?.functionCall?.arguments;
+    const args = choice.delta?.function_call?.arguments;
     if (args !== undefined) {
       this.function_arguments = `${this.function_arguments}${args}`;
       updated = true;

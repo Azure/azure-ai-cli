@@ -1,33 +1,44 @@
 <#@ template hostspecific="true" #>
 <#@ output extension=".js" encoding="utf-8" #>
 <#@ parameter type="System.String" name="ClassName" #>
-const { OpenAIClient, AzureKeyCredential } = require("@azure/openai");
+const { OpenAI } = require('openai');
 const { FunctionCallContext } = require("./FunctionCallContext");
 
 class <#= ClassName #> {
-  constructor(openAIEndpoint, openAIAPIKey, openAIChatDeploymentName, openAISystemPrompt, functionFactory) {
-    this.openAISystemPrompt = openAISystemPrompt;
-    this.openAIChatDeploymentName = openAIChatDeploymentName;
-    this.client = new OpenAIClient(openAIEndpoint, new AzureKeyCredential(openAIAPIKey));
+
+  // Constructor
+  constructor(openAIModelOrDeploymentName, systemPrompt, functionFactory, openai, simulateTypingDelay = 0) {
+    this.simulateTypingDelay = simulateTypingDelay;
+    this.systemPrompt = systemPrompt;
+    this.openAIModelOrDeploymentName = openAIModelOrDeploymentName;
+    this.openai = openai;
     this.functionFactory = functionFactory;
+
     this.clearConversation();
   }
 
+  // Clear the conversation
   clearConversation() {
     this.messages = [
-      { role: 'system', content: this.openAISystemPrompt }
+      { role: 'system', content: this.systemPrompt }
     ];
     this.functionCallContext = new FunctionCallContext(this.functionFactory, this.messages);
   }
 
-  async getChatCompletions(userInput, callback) {
+  // Get the response from Chat Completions
+  async getResponse(userInput, callback) {
     this.messages.push({ role: 'user', content: userInput });
 
-    let contentComplete = '';
+    let response = '';
     while (true) {
-      const events = await this.client.streamChatCompletions(this.openAIChatDeploymentName, this.messages, {
+
+      const events = await this.openai.chat.completions.create({
+        model: this.openAIModelOrDeploymentName,
+        messages: this.messages,
         functions: this.functionFactory.getFunctionSchemas(),
+        stream: true
       });
+
 
       for await (const event of events) {
         for (const choice of event.choices) {
@@ -35,14 +46,18 @@ class <#= ClassName #> {
           this.functionCallContext.checkForUpdate(choice);
 
           let content = choice.delta?.content;
-          if (choice.finishReason === 'length') {
+          if (choice.finish_reason === 'length') {
             content = `${content}\nERROR: Exceeded token limit!`;
           }
 
           if (content != null) {
-            callback(content);
-            await new Promise(r => setTimeout(r, 50)); // delay to simulate real-time output, word by word
-            contentComplete += content;
+            if(callback != null) {
+              callback(content);
+              if (this.simulateTypingDelay > 0) {
+                await new Promise(r => setTimeout(r, this.simulateTypingDelay));
+              }
+            }
+            response += content;
           }
         }
       }
@@ -52,8 +67,8 @@ class <#= ClassName #> {
         continue;
       }
 
-      this.messages.push({ role: 'assistant', content: contentComplete });
-      return contentComplete;
+      this.messages.push({ role: 'assistant', content: response });
+      return response;
     }
   }
 }
