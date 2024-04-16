@@ -9,7 +9,7 @@
         "Connection": "close",
         "Content-Length": "4959",
         "Content-Type": "application/json",
-        "User-Agent": "azsdk-net-AI.OpenAI/1.0.0-beta.13 (.NET 8.0.2; Microsoft Windows 10.0.22631)",
+        "User-Agent": "azsdk-net-AI.OpenAI/1.0.0-beta.16 (.NET 8.0.2; Microsoft Windows 10.0.22631)",
         "X-Forwarded-For": "127.0.0.1",
         "X-Forwarded-Proto": "https",
         "x-ms-client-request-id": "91c29020-a26b-4ffd-b059-0e9f6f22a07f",

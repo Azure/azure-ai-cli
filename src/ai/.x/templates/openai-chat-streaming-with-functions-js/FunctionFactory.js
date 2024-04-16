@@ -17,7 +17,11 @@ class FunctionFactory {
       return undefined;
     }
 
-    return function_info.function(function_arguments);
+    var result = function_info.function(function_arguments);
+    process.stdout.write(`\rassistant-function: ${function_name}(${function_arguments}) => ${result}\n`);
+    process.stdout.write('\nAssistant: ');
+
+    return result;
   }
 }
 

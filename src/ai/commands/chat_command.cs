@@ -8,12 +8,8 @@ using Azure.AI.Details.Common.CLI.Extensions.HelperFunctions;
 using Azure.AI.OpenAI;
 using Azure.Core.Diagnostics;
 using Microsoft.CognitiveServices.Speech;
-using Microsoft.SemanticKernel;
-using Microsoft.SemanticKernel.Connectors.Memory.AzureCognitiveSearch;
-using Microsoft.SemanticKernel.Memory;
 using System;
 using System.Text.Json;
-using System.ClientModel.Primitives;
 using System.Collections.Generic;
 using System.Diagnostics.Tracing;
 using System.IO;
@@ -23,8 +19,6 @@ using System.Text;
 using System.Threading.Tasks;
 using YamlDotNet.Serialization;
 using YamlDotNet.Serialization.NamingConventions;
-using System.Text.Json.Nodes;
-using System.ComponentModel;
 using Scriban;
 
 namespace Azure.AI.Details.Common.CLI
@@ -441,42 +435,41 @@ namespace Azure.AI.Details.Common.CLI
                 _values.AddThrowError("ERROR:", $"Creating Azure AI Search extension; requires embedding key, endpoint, and deployment.");
             }
 
-            var queryType = QueryTypeFrom(_values["service.config.search.query.type"]) ?? AzureCognitiveSearchQueryType.VectorSimpleHybrid;
+            var queryType = QueryTypeFrom(_values["service.config.search.query.type"]) ?? AzureSearchQueryType.VectorSimpleHybrid;
 
-            var search = new AzureCognitiveSearchChatExtensionConfiguration()
+            var search = new AzureSearchChatExtensionConfiguration()
             {
+                Authentication = new OnYourDataApiKeyAuthenticationOptions(searchKey),
                 SearchEndpoint = new Uri(searchEndpoint),
-                Key = searchKey,
                 IndexName = indexName,
                 QueryType = queryType,
                 DocumentCount = 16,
-                EmbeddingEndpoint = embeddingEndpoint,
-                EmbeddingKey = embeddingsKey,
+                VectorizationSource = new OnYourDataEndpointVectorizationSource(embeddingEndpoint, new OnYourDataApiKeyAuthenticationOptions(embeddingsKey))
             };
 
             options.AzureExtensionsOptions = new() { Extensions = { search } };
         }
 
-        private static AzureCognitiveSearchQueryType? QueryTypeFrom(string queryType)
+        private static AzureSearchQueryType? QueryTypeFrom(string queryType)
         {
             if (string.IsNullOrEmpty(queryType)) return null;
 
             return queryType.ToLower() switch
             {
-                "semantic" => AzureCognitiveSearchQueryType.Semantic,
-                "simple" => AzureCognitiveSearchQueryType.Simple,
-                "vector" => AzureCognitiveSearchQueryType.Vector,
+                "semantic" => AzureSearchQueryType.Semantic,
+                "simple" => AzureSearchQueryType.Simple,
+                "vector" => AzureSearchQueryType.Vector,
 
                 "hybrid"
                 or "simplehybrid"
                 or "simple-hybrid"
                 or "vectorsimplehybrid"
-                or "vector-simple-hybrid" => AzureCognitiveSearchQueryType.VectorSimpleHybrid,
+                or "vector-simple-hybrid" => AzureSearchQueryType.VectorSimpleHybrid,
 
                 "semantichybrid"
                 or "semantic-hybrid"
                 or "vectorsemantichybrid"
-                or "vector-semantic-hybrid" => AzureCognitiveSearchQueryType.VectorSemanticHybrid,
+                or "vector-semantic-hybrid" => AzureSearchQueryType.VectorSemanticHybrid,
 
                 _ => throw new ArgumentException($"Invalid query type: {queryType}")
             };

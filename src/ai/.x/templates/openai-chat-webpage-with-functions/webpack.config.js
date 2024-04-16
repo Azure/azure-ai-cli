@@ -12,10 +12,14 @@ module.exports = {
   plugins: [
     new Dotenv(),
     new webpack.DefinePlugin({
-      'process.env.ENDPOINT': JSON.stringify(process.env.ENDPOINT),
-      'process.env.AZURE_API_KEY': JSON.stringify(process.env.AZURE_API_KEY),
-      'process.env.DEPLOYMENT_NAME': JSON.stringify(process.env.DEPLOYMENT_NAME),
-      'process.env.SYSTEM_PROMPT': JSON.stringify(process.env.SYSTEM_PROMPT),
+      'process.env.AZURE_OPENAI_API_KEY': JSON.stringify(process.env.AZURE_OPENAI_API_KEY),
+      'process.env.AZURE_OPENAI_API_VERSION': JSON.stringify(process.env.AZURE_OPENAI_API_VERSION),
+      'process.env.AZURE_OPENAI_ENDPOINT': JSON.stringify(process.env.AZURE_OPENAI_ENDPOINT),
+      'process.env.AZURE_OPENAI_CHAT_DEPLOYMENT': JSON.stringify(process.env.AZURE_OPENAI_CHAT_DEPLOYMENT),
+      'process.env.AZURE_OPENAI_SYSTEM_PROMPT': JSON.stringify(process.env.AZURE_OPENAI_SYSTEM_PROMPT),
+      'process.env.OPENAI_API_KEY': JSON.stringify(process.env.OPENAI_API_KEY),
+      'process.env.OPENAI_ORG_ID': JSON.stringify(process.env.OPENAI_ORG_ID),
+      'process.env.OPENAI_MODEL_NAME': JSON.stringify(process.env.OPENAI_MODEL_NAME),
     }),
   ],
 };
