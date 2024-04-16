@@ -1,9 +1,7 @@
 <#@ template hostspecific="true" #>
 <#@ output extension=".js" encoding="utf-8" #>
 <#@ parameter type="System.String" name="ClassName" #>
-const { OpenAI } = require('openai');
-
-class <#= ClassName #> {
+export class <#= ClassName #> {
 
   // Constructor
   constructor(openAIAssistantId, openai, simulateTypingDelay = 0) {
@@ -22,7 +20,7 @@ class <#= ClassName #> {
   
   // Retrieve an existing thread
   async retrieveThread(threadId) {
-    this.thread =await this.openai.beta.threads.retrieve(threadId);
+    this.thread = await this.openai.beta.threads.retrieve(threadId);
     console.log(`Thread ID: ${this.thread.id}`);
     return this.thread;
   }

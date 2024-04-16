@@ -484,10 +484,8 @@ async function init() {
 
   userInputTextAreaFocus();
 
-  window.newChat = newChat;
-  window.loadThread = loadThread;
-  window.sendMessage = sendMessage;
-  window.toggleTheme = toggleTheme;
+  document.querySelector('#sendButton').addEventListener('click', sendMessage);
+  document.querySelector('#newChatButton').addEventListener('click', newChat);
 }
 
-init();
+window.addEventListener('DOMContentLoaded', init);
