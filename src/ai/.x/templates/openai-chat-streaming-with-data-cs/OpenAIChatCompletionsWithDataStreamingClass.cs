@@ -24,14 +24,13 @@ public class <#= ClassName #>
             ? new OpenAIClient(new Uri(openAIEndpoint), new DefaultAzureCredential())
             : new OpenAIClient(new Uri(openAIEndpoint), new AzureKeyCredential(openAIAPIKey));
 
-        var extensionConfig = new AzureCognitiveSearchChatExtensionConfiguration()
+        var extensionConfig = new AzureSearchChatExtensionConfiguration()
         {
+            Authentication = new OnYourDataApiKeyAuthenticationOptions(searchApiKey),
             SearchEndpoint = new Uri(searchEndpoint),
-            Key = searchApiKey,
             IndexName = searchIndexName,
-            QueryType = AzureCognitiveSearchQueryType.VectorSimpleHybrid, // Use VectorSimpleHybrid to get the best vector and keyword search query types.
-            EmbeddingEndpoint = new Uri(embeddingsEndpoint),
-            EmbeddingKey = openAIAPIKey,
+            QueryType = AzureSearchQueryType.VectorSimpleHybrid, // Use VectorSimpleHybrid to get the best vector and keyword search query types.
+            VectorizationSource = new OnYourDataEndpointVectorizationSource(new Uri(embeddingsEndpoint), new OnYourDataApiKeyAuthenticationOptions(openAIAPIKey))
         };
         _options = new ChatCompletionsOptions()
         {
