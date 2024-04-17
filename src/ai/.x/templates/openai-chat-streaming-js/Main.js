@@ -7,8 +7,9 @@
 <#@ parameter type="System.String" name="AZURE_OPENAI_CHAT_DEPLOYMENT" #>
 <#@ parameter type="System.String" name="AZURE_OPENAI_SYSTEM_PROMPT" #>
 <#@ parameter type="System.String" name="OPENAI_API_KEY" #>
-<#@ parameter type="System.String" name="OPENAI_MODEL_NAME" #>
 <#@ parameter type="System.String" name="OPENAI_ORG_ID" #>
+<#@ parameter type="System.String" name="OPENAI_MODEL_NAME" #>
+const { CreateOpenAI } = require("./CreateOpenAI");
 const { <#= ClassName #> } = require("./OpenAIChatCompletionsStreamingClass");
 
 const readline = require('node:readline/promises');
@@ -31,14 +32,19 @@ async function main() {
   const azureOpenAIEndpoint = process.env["AZURE_OPENAI_ENDPOINT"] || "<#= AZURE_OPENAI_ENDPOINT #>";
   const azureOpenAIChatDeploymentName = process.env["AZURE_OPENAI_CHAT_DEPLOYMENT"] || "<#= AZURE_OPENAI_CHAT_DEPLOYMENT #>";
   const openAIAPIKey = process.env["OPENAI_API_KEY"] || "<#= OPENAI_API_KEY #>";
-  const openAIModelName = process.env["OPENAI_MODEL_NAME"] || "<#= OPENAI_MODEL_NAME #>";
   const openAIOrganization = process.env["OPENAI_ORG_ID"] || null;
+  const openAIModelName = process.env["OPENAI_MODEL_NAME"] || "<#= OPENAI_MODEL_NAME #>";
 
-  // Create the right one based on what is available
+  // Create the OpenAI client
   const useAzure = azureOpenAIEndpoint?.startsWith("https://");
-  const chat = useAzure
-    ? <#= ClassName #>.createUsingAzure(azureOpenAIAPIVersion, azureOpenAIEndpoint, azureOpenAIAPIKey, azureOpenAIChatDeploymentName, openAISystemPrompt)
-    : <#= ClassName #>.createUsingOpenAI(openAIAPIKey, openAIModelName, openAISystemPrompt, openAIOrganization);
+  const openai = useAzure
+    ? CreateOpenAI.fromAzureOpenAIKeyAndDeployment(azureOpenAIAPIKey, azureOpenAIEndpoint, azureOpenAIAPIVersion, azureOpenAIChatDeploymentName)
+    : CreateOpenAI.fromOpenAIKey(openAIAPIKey, openAIOrganization);
+
+  // Create the streaming chat completions helper
+  const chat = streamingChatCompletions = useAzure
+    ? new <#= ClassName #>(azureOpenAIChatDeploymentName, openAISystemPrompt, openai, 20)
+    : new <#= ClassName #>(openAIModelName, openAISystemPrompt, openai);
 
   // Loop until the user types 'exit'
   while (true) {
@@ -47,7 +53,7 @@ async function main() {
     const input = await rl.question('User: ');
     if (input === 'exit' || input === '') break;
 
-    // Get the Assistant's response
+    // Get the response
     process.stdout.write('\nAssistant: ');
     await chat.getResponse(input, (content) => {
       process.stdout.write(content);
