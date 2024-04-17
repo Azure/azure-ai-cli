@@ -1,30 +1,42 @@
 <#@ template hostspecific="true" #>
 <#@ output extension=".js" encoding="utf-8" #>
 <#@ parameter type="System.String" name="ClassName" #>
-const { OpenAIClient, AzureKeyCredential } = require("@azure/openai");
+const { OpenAI } = require('openai');
 
 class <#= ClassName #> {
-  constructor(openAIEndpoint, openAIAPIKey, openAIChatDeploymentName, openAISystemPrompt) {
-    this.openAISystemPrompt = openAISystemPrompt;
-    this.openAIChatDeploymentName = openAIChatDeploymentName;
-    this.client = new OpenAIClient(openAIEndpoint, new AzureKeyCredential(openAIAPIKey));
+  // Constructor
+  constructor(openAIModelOrDeploymentName, systemPrompt, openai) {
+    this.systemPrompt = systemPrompt;
+    this.openAIModelOrDeploymentName = openAIModelOrDeploymentName;
+    this.openai = openai;
+
     this.clearConversation();
   }
 
+  // Clear the conversation
   clearConversation() {
     this.messages = [
-      { role: 'system', content: this.openAISystemPrompt }
+      { role: 'system', content: this.systemPrompt }
     ];
   }
 
-  async getChatCompletions(userInput) {
+  // Get the response from Chat Completions
+  async getResponse(userInput) {
     this.messages.push({ role: 'user', content: userInput });
 
-    const result = await this.client.getChatCompletions(this.openAIChatDeploymentName, this.messages);
-    const responseContent = result.choices[0].message.content;
+    const completion = await this.openai.chat.completions.create({
+      model: this.openAIModelOrDeploymentName,
+      messages: this.messages,
+    });
 
-    this.messages.push({ role: 'assistant', content: responseContent });
-    return responseContent;
+    const choice = completion.choices[0];
+    const content = choice.message?.content;
+    if (choice.finish_reason === 'length') {
+      content = `${content}\nERROR: Exceeded token limit!`;
+    }
+
+    this.messages.push({ role: 'assistant', content: content });
+    return content;
   }
 }
 
