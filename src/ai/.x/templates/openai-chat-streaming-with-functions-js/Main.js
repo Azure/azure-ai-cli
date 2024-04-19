@@ -39,7 +39,7 @@ async function main() {
   // Create the OpenAI client
   const useAzure = azureOpenAIEndpoint?.startsWith("https://");
   const openai = useAzure
-    ? CreateOpenAI.fromAzureOpenAIKeyAndDeployment(azureOpenAIAPIKey, azureOpenAIEndpoint, azureOpenAIAPIVersion, azureOpenAIChatDeploymentName)
+    ? await CreateOpenAI.fromAzureOpenAIEndpointAndDeployment(azureOpenAIAPIKey, azureOpenAIEndpoint, azureOpenAIAPIVersion, azureOpenAIChatDeploymentName)
     : CreateOpenAI.fromOpenAIKey(openAIAPIKey, openAIOrganization);
 
   // Create the streaming chat completions helper

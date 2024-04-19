@@ -24,7 +24,7 @@ const rl = readline.createInterface({
 async function main() {
 
   // What's the system prompt
-  const openAISystemPrompt = process.env["AZURE_OPENAI_SYSTEM_PROMPT"] || "You are a helpful AI assistant.";
+  const openAISystemPrompt = process.env["AZURE_OPENAI_SYSTEM_PROMPT"] || "<#= AZURE_OPENAI_SYSTEM_PROMPT #>";
 
   // Connection info
   const azureOpenAIAPIKey = process.env["AZURE_OPENAI_API_KEY"] || "<#= AZURE_OPENAI_API_KEY #>";
@@ -38,7 +38,7 @@ async function main() {
   // Create the OpenAI client
   const useAzure = azureOpenAIEndpoint?.startsWith("https://");
   const openai = useAzure
-    ? CreateOpenAI.fromAzureOpenAIKeyAndDeployment(azureOpenAIAPIKey, azureOpenAIEndpoint, azureOpenAIAPIVersion, azureOpenAIChatDeploymentName)
+    ? await CreateOpenAI.fromAzureOpenAIEndpointAndDeployment(azureOpenAIAPIKey, azureOpenAIEndpoint, azureOpenAIAPIVersion, azureOpenAIChatDeploymentName)
     : CreateOpenAI.fromOpenAIKey(openAIAPIKey, openAIOrganization);
 
   // Create the streaming chat completions helper

@@ -52,6 +52,8 @@ namespace Azure.AI.Details.Common.CLI
 
             // Add a few environment variables that `ai` doesn't "control", but will re-populate into the environment
             env.Add("ASSISTANT_ID", null);
+            env.Add("AZURE_CLIENT_ID", null);
+            env.Add("AZURE_TENANT_ID", null);
             env.Add("AZURE_OPENAI_SYSTEM_PROMPT", null);
             env.Add("OPENAI_API_KEY", null);
             env.Add("OPENAI_MODEL_NAME", null);
