@@ -23,6 +23,8 @@ const { <#= ClassName #> } = require("./OpenAIAssistantsFunctionsStreamingClass"
 const openAIAssistantId = process.env.ASSISTANT_ID || "<insert your OpenAI assistant ID here>";
 
 // Connection info
+const azureClientId = process.env.AZURE_CLIENT_ID || null;
+const azureTenantId = process.env.AZURE_TENANT_ID || null;
 const azureOpenAIAPIKey = process.env.AZURE_OPENAI_API_KEY || "<insert your Azure OpenAI API key here>";
 const azureOpenAIAPIVersion = process.env.AZURE_OPENAI_API_VERSION || "<insert your Azure OpenAI API version here>";
 const azureOpenAIEndpoint = process.env.AZURE_OPENAI_ENDPOINT || "<insert your Azure OpenAI endpoint here>";
@@ -35,18 +37,22 @@ const useAzure = azureOpenAIEndpoint?.startsWith("https://");
 
 let assistant;
 async function assistantInit(threadId = null) {
-
+  
   // Check the connection info
-  const azureOk = !azureOpenAIAPIKey?.startsWith('<insert') && !azureOpenAIAPIVersion?.startsWith('<insert') && !azureOpenAIEndpoint?.startsWith('<insert') && !azureOpenAIChatDeploymentName?.startsWith('<insert');
+  const azureOk = !azureOpenAIAPIVersion?.startsWith('<insert') && !azureOpenAIEndpoint?.startsWith('<insert') && !azureOpenAIChatDeploymentName?.startsWith('<insert');
+  const azureAADOk = azureOk && azureClientId && azureTenantId;
+  const azureKeyOk = azureOk && !azureOpenAIAPIKey?.startsWith('<insert');
   const openaiOk = !openAIAPIKey?.startsWith('<insert') && !openAIModelName.startsWith('<insert');
-  if (!azureOk && !openaiOk) {
+  if (!azureAADOk && !azureKeyOk && !openaiOk) {
     chatPanelAppendMessage('computer', markdownToHtml('To use **OpenAI**, set `OPENAI_API_KEY` and `OPENAI_MODEL_NAME` in `.env`'));
-    chatPanelAppendMessage('computer', markdownToHtml('To use **Azure OpenAI**, set `AZURE_OPENAI_API_KEY`, `AZURE_OPENAI_API_VERSION`, `AZURE_OPENAI_ENDPOINT`, and `AZURE_OPENAI_CHAT_DEPLOYMENT` in `.env`'));
+    chatPanelAppendMessage('computer', markdownToHtml('To use **Azure OpenAI**, set `AZURE_OPENAI_API_VERSION`, `AZURE_OPENAI_ENDPOINT`, and `AZURE_OPENAI_CHAT_DEPLOYMENT` in `.env`'));
+    chatPanelAppendMessage('computer', markdownToHtml('For Azure OpenAI **w/ AAD**,  set `AZURE_CLIENT_ID` and `AZURE_TENANT_ID` in `.env`'));
+    chatPanelAppendMessage('computer', markdownToHtml('For Azure OpenAI **w/ API KEY**, set `AZURE_OPENAI_API_KEY` in `.env`'));
   }
 
   // Create the assistants streaming helper class instance
   assistant = new <#= ClassName #>(openAIAssistantId, factory, useAzure
-    ? CreateOpenAI.fromAzureOpenAIKey(azureOpenAIAPIKey, azureOpenAIEndpoint, azureOpenAIAPIVersion)
+    ? await CreateOpenAI.fromAzureOpenAIEndpoint(azureOpenAIEndpoint, azureOpenAIAPIVersion, azureOpenAIAPIKey, azureClientId, azureTenantId)
     : CreateOpenAI.fromOpenAIKey(openAIAPIKey, openAIOrganization));
 
   await assistantCreateOrRetrieveThread(threadId);
@@ -355,7 +361,7 @@ async function threadItemsTitleIfUntitled(items, userInput, computerResponse) {
     ];
 
     const openai = useAzure
-      ? CreateOpenAI.fromAzureOpenAIKeyAndDeployment(azureOpenAIAPIKey, azureOpenAIEndpoint, azureOpenAIAPIVersion, azureOpenAIChatDeploymentName)
+      ? await CreateOpenAI.fromAzureOpenAIEndpointAndDeployment(azureOpenAIEndpoint, azureOpenAIAPIVersion, azureOpenAIChatDeploymentName, azureOpenAIAPIKey, azureClientId, azureTenantId)
       : assistant.openai;
 
     const completion = await openai.chat.completions.create({
