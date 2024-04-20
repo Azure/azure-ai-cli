@@ -3,6 +3,7 @@
   "_ShortName": "openai-chat-webpage",
   "_Language": "JavaScript",
   "ClassName": "OpenAIChatCompletionsStreamingClass",
+  "ASSISTANT_ID": "<insert your OpenAI assistant ID here>",
   "AZURE_OPENAI_API_KEY": "<insert your Azure OpenAI API key here>",
   "AZURE_OPENAI_API_VERSION": "<insert your Azure OpenAI API version here>",
   "AZURE_OPENAI_ENDPOINT": "<insert your Azure OpenAI endpoint here>",

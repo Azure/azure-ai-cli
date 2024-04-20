@@ -8,7 +8,7 @@ class CreateOpenAI {
     return this.forAPI({ api: 'assistants', dangerouslyAllowBrowser, errorCallback });
   }
 
-  static async forChatCompletionAPI({ dangerouslyAllowBrowser, errorCallback } = {}) {
+  static async forChatCompletionsAPI({ dangerouslyAllowBrowser, errorCallback } = {}) {
     return this.forAPI({ api: 'chat', dangerouslyAllowBrowser, errorCallback });
   }
 

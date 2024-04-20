@@ -8,7 +8,7 @@ class CreateOpenAI {
     return this.forAPI({ api: 'assistants', dangerouslyAllowBrowser, errorCallback });
   }
 
-  static async forChatCompletionAPI({ dangerouslyAllowBrowser, errorCallback } = {}) {
+  static async forChatCompletionsAPI({ dangerouslyAllowBrowser, errorCallback } = {}) {
     return this.forAPI({ api: 'chat', dangerouslyAllowBrowser, errorCallback });
   }
 
@@ -112,8 +112,8 @@ class CreateOpenAI {
     } catch (error) {  
       console.error('Error getting access token:', error);  
       throw error;  
-    }  
-  }  
+    }
+  }
 
   static async getCognitiveServicesTokenFromCredential(credential) {
     const token = await credential.getToken("https://cognitiveservices.azure.com/.default");

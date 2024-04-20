@@ -5,12 +5,14 @@
 <#@ parameter type="System.String" name="AZURE_OPENAI_API_VERSION" #>
 <#@ parameter type="System.String" name="AZURE_OPENAI_ENDPOINT" #>
 <#@ parameter type="System.String" name="AZURE_OPENAI_CHAT_DEPLOYMENT" #>
+<#@ parameter type="System.String" name="AZURE_OPENAI_SYSTEM_PROMPT" #>
 <#@ parameter type="System.String" name="OPENAI_API_KEY" #>
 <#@ parameter type="System.String" name="OPENAI_MODEL_NAME" #>
 class OpenAIEnvInfo {
 
   // NOTE: Never deploy your key in client-side environments like browsers or mobile apps
   //  SEE: https://help.openai.com/en/articles/5112595-best-practices-for-api-key-safety
+
   static ASSISTANT_ID = process.env.ASSISTANT_ID ?? "<#= ASSISTANT_ID #>";
 
   static AZURE_CLIENT_ID = process.env.AZURE_CLIENT_ID ?? null;
@@ -20,6 +22,8 @@ class OpenAIEnvInfo {
   static AZURE_OPENAI_API_VERSION = process.env.AZURE_OPENAI_API_VERSION ?? "<#= AZURE_OPENAI_API_VERSION #>";
   static AZURE_OPENAI_ENDPOINT = process.env.AZURE_OPENAI_ENDPOINT ?? "<#= AZURE_OPENAI_ENDPOINT #>";
   static AZURE_OPENAI_CHAT_DEPLOYMENT = process.env.AZURE_OPENAI_CHAT_DEPLOYMENT ?? "<#= AZURE_OPENAI_CHAT_DEPLOYMENT #>";
+
+  static AZURE_OPENAI_SYSTEM_PROMPT = process.env.AZURE_OPENAI_SYSTEM_PROMPT ?? "<#= AZURE_OPENAI_SYSTEM_PROMPT #>";
 
   static OPENAI_API_KEY = process.env.OPENAI_API_KEY ?? "<#= OPENAI_API_KEY #>";
   static OPENAI_ORG_ID = process.env.OPENAI_ORG_ID ?? null;

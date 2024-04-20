@@ -1,63 +1,27 @@
 <#@ template hostspecific="true" #>
 <#@ output extension=".js" encoding="utf-8" #>
 <#@ parameter type="System.String" name="ClassName" #>
-<#@ parameter type="System.String" name="AZURE_OPENAI_API_KEY" #>
-<#@ parameter type="System.String" name="AZURE_OPENAI_API_VERSION" #>
-<#@ parameter type="System.String" name="AZURE_OPENAI_ENDPOINT" #>
-<#@ parameter type="System.String" name="AZURE_OPENAI_CHAT_DEPLOYMENT" #>
-<#@ parameter type="System.String" name="AZURE_OPENAI_SYSTEM_PROMPT" #>
-<#@ parameter type="System.String" name="OPENAI_API_KEY" #>
-<#@ parameter type="System.String" name="OPENAI_ORG_ID" #>
-<#@ parameter type="System.String" name="OPENAI_MODEL_NAME" #>
 const marked = require("marked");
 const hljs = require("highlight.js");
 
 const { CreateOpenAI } = require("./CreateOpenAI");
+const { OpenAIEnvInfo } = require("./OpenAIEnvInfo");
 const { <#= ClassName #> } = require("./OpenAIChatCompletionsStreamingClass");
-
-// NOTE: Never deploy your key in client-side environments like browsers or mobile apps
-//  SEE: https://help.openai.com/en/articles/5112595-best-practices-for-api-key-safety
-
-// What's the system prompt
-const openAISystemPrompt = process.env.AZURE_OPENAI_SYSTEM_PROMPT || "<#= AZURE_OPENAI_SYSTEM_PROMPT #>";
-
-// Connection info
-const azureClientId = process.env.AZURE_CLIENT_ID || null;
-const azureTenantId = process.env.AZURE_TENANT_ID || null;
-const azureOpenAIAPIKey = process.env.AZURE_OPENAI_API_KEY || "<#= AZURE_OPENAI_API_KEY #>";
-const azureOpenAIAPIVersion = process.env.AZURE_OPENAI_API_VERSION || "<#= AZURE_OPENAI_API_VERSION #>";
-const azureOpenAIEndpoint = process.env.AZURE_OPENAI_ENDPOINT || "<#= AZURE_OPENAI_ENDPOINT #>";
-const azureOpenAIChatDeploymentName = process.env.AZURE_OPENAI_CHAT_DEPLOYMENT || "<#= AZURE_OPENAI_CHAT_DEPLOYMENT #>";
-const openAIAPIKey = process.env.OPENAI_API_KEY || "<#= OPENAI_API_KEY #>";
-const openAIOrganization = process.env.OPENAI_ORG_ID || null;
-const openAIModelName = process.env.OPENAI_MODEL_NAME || "<#= OPENAI_MODEL_NAME #>";
-
-const useAzure = azureOpenAIEndpoint?.startsWith("https://");
 
 let streamingChatCompletions;
 async function streamingChatCompletionsInit() {
 
-  // Check the connection info
-  const azureOk = !azureOpenAIAPIVersion?.startsWith('<insert') && !azureOpenAIEndpoint?.startsWith('<insert') && !azureOpenAIChatDeploymentName?.startsWith('<insert');
-  const azureAADOk = azureOk && azureClientId && azureTenantId;
-  const azureKeyOk = azureOk && !azureOpenAIAPIKey?.startsWith('<insert');
-  const openaiOk = !openAIAPIKey?.startsWith('<insert') && !openAIModelName.startsWith('<insert');
-  if (!azureAADOk && !azureKeyOk && !openaiOk) {
-    chatPanelAppendMessage('computer', markdownToHtml('To use **OpenAI**, set `OPENAI_API_KEY` and `OPENAI_MODEL_NAME` in `.env`'));
-    chatPanelAppendMessage('computer', markdownToHtml('To use **Azure OpenAI**, set `AZURE_OPENAI_API_VERSION`, `AZURE_OPENAI_ENDPOINT`, and `AZURE_OPENAI_CHAT_DEPLOYMENT` in `.env`'));
-    chatPanelAppendMessage('computer', markdownToHtml('For Azure OpenAI **w/ AAD**,  set `AZURE_CLIENT_ID` and `AZURE_TENANT_ID` in `.env`'));
-    chatPanelAppendMessage('computer', markdownToHtml('For Azure OpenAI **w/ API KEY**, set `AZURE_OPENAI_API_KEY` in `.env`'));
-  }
-
   // Create the OpenAI client
-  const openai = useAzure
-    ? await CreateOpenAI.fromAzureOpenAIEndpointAndDeployment(azureOpenAIEndpoint, azureOpenAIAPIVersion, azureOpenAIChatDeploymentName, azureOpenAIAPIKey, azureClientId, azureTenantId)
-    : CreateOpenAI.fromOpenAIKey(openAIAPIKey, openAIOrganization);
-
+  const openai = await CreateOpenAI.forChatCompletionsAPI({
+    errorCallback: text => chatPanelAppendMessage('computer', markdownToHtml(text) || text),
+    dangerouslyAllowBrowser: true
+  });
+  
   // Create the streaming chat completions helper
+  const useAzure = OpenAIEnvInfo.AZURE_OPENAI_ENDPOINT?.startsWith('https://');
   streamingChatCompletions = useAzure
-    ? new <#= ClassName #>(azureOpenAIChatDeploymentName, openAISystemPrompt, openai, 20)
-    : new <#= ClassName #>(openAIModelName, openAISystemPrompt, openai);
+    ? new <#= ClassName #>(OpenAIEnvInfo.AZURE_OPENAI_CHAT_DEPLOYMENT, OpenAIEnvInfo.AZURE_OPENAI_SYSTEM_PROMPT, openai, 20)
+    : new <#= ClassName #>(OpenAIEnvInfo.OPENAI_MODEL_NAME, OpenAIEnvInfo.AZURE_OPENAI_SYSTEM_PROMPT, openai);
 }
 
 function streamingChatCompletionsClear() {
@@ -70,7 +34,7 @@ async function streamingChatCompletionsProcessInput(userInput) {
   let newMessage = chatPanelAppendMessage('computer', blackVerticalRectangle);
   let completeResponse = "";
 
-  let computerResponse = await streamingChatCompletions.getResponse(userInput, function (response) {
+  await streamingChatCompletions.getResponse(userInput, function (response) {
     let atBottomBeforeUpdate = chatPanelIsScrollAtBottom();
 
     completeResponse += response;
@@ -86,7 +50,7 @@ async function streamingChatCompletionsProcessInput(userInput) {
     }
   });
 
-  newMessage.innerHTML = markdownToHtml(computerResponse) || computerResponse.replace(/\n/g, '<br/>');
+  newMessage.innerHTML = markdownToHtml(completeResponse) || completeResponse.replace(/\n/g, '<br/>');
   chatPanel.scrollTop = chatPanel.scrollHeight;
 }
 

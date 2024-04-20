@@ -325,7 +325,7 @@ async function threadItemsTitleIfUntitled(items, userInput, computerResponse) {
       { role: 'system', content: "Please suggest a title for this interaction. Don't be cute or humorous in your answer. Answer only with a factual descriptive title. Do not use quotes. Do not prefix with 'Title:' or anything else. Just emit the title." }
     ];
 
-    const openai = await CreateOpenAI.forChatCompletionAPI({ dangerouslyAllowBrowser: true });
+    const openai = await CreateOpenAI.forChatCompletionsAPI({ dangerouslyAllowBrowser: true });
     const completion = await openai.chat.completions.create({
       messages: messages,
       model: "gpt-4-turbo-preview"
