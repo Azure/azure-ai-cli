@@ -1,57 +1,24 @@
 <#@ template hostspecific="true" #>
 <#@ output extension=".js" encoding="utf-8" #>
 <#@ parameter type="System.String" name="ClassName" #>
-<#@ parameter type="System.String" name="ASSISTANT_ID" #>
-<#@ parameter type="System.String" name="AZURE_OPENAI_API_KEY" #>
-<#@ parameter type="System.String" name="AZURE_OPENAI_API_VERSION" #>
-<#@ parameter type="System.String" name="AZURE_OPENAI_ENDPOINT" #>
-<#@ parameter type="System.String" name="AZURE_OPENAI_CHAT_DEPLOYMENT" #>
-<#@ parameter type="System.String" name="OPENAI_API_KEY" #>
-<#@ parameter type="System.String" name="OPENAI_ORG_ID" #>
-<#@ parameter type="System.String" name="OPENAI_MODEL_NAME" #>
 const marked = require("marked");
 const hljs = require("highlight.js");
 
 const { CreateOpenAI } = require("./CreateOpenAI");
+const { OpenAIEnvInfo } = require("./OpenAIEnvInfo");
 const { <#= ClassName #> } = require("./OpenAIAssistantsStreamingClass");
-
-// NOTE: Never deploy your key in client-side environments like browsers or mobile apps
-//  SEE: https://help.openai.com/en/articles/5112595-best-practices-for-api-key-safety
-
-// Which Assistant?
-const openAIAssistantId = process.env.ASSISTANT_ID || "<insert your OpenAI assistant ID here>";
-
-// Connection info
-const azureClientId = process.env.AZURE_CLIENT_ID || null;
-const azureTenantId = process.env.AZURE_TENANT_ID || null;
-const azureOpenAIAPIKey = process.env.AZURE_OPENAI_API_KEY || "<insert your Azure OpenAI API key here>";
-const azureOpenAIAPIVersion = process.env.AZURE_OPENAI_API_VERSION || "<insert your Azure OpenAI API version here>";
-const azureOpenAIEndpoint = process.env.AZURE_OPENAI_ENDPOINT || "<insert your Azure OpenAI endpoint here>";
-const azureOpenAIChatDeploymentName = process.env.AZURE_OPENAI_CHAT_DEPLOYMENT || "<insert your Azure OpenAI chat deployment name here>";
-const openAIAPIKey = process.env.OPENAI_API_KEY || "<insert your OpenAI API key here>";
-const openAIOrganization = process.env.OPENAI_ORG_ID || null;
-const openAIModelName = process.env.OPENAI_MODEL_NAME || "<insert your OpenAI model name here>";
-
-const useAzure = azureOpenAIEndpoint?.startsWith("https://");
 
 let assistant;
 async function assistantInit(threadId = null) {
   
-  // Check the connection info
-  const azureOk = !azureOpenAIAPIVersion?.startsWith('<insert') && !azureOpenAIEndpoint?.startsWith('<insert') && !azureOpenAIChatDeploymentName?.startsWith('<insert');
-  const azureAADOk = azureOk && azureClientId && azureTenantId;
-  const azureKeyOk = azureOk && !azureOpenAIAPIKey?.startsWith('<insert');
-  const openaiOk = !openAIAPIKey?.startsWith('<insert') && !openAIModelName.startsWith('<insert');
-  if (!azureAADOk && !azureKeyOk && !openaiOk) {
-    chatPanelAppendMessage('computer', markdownToHtml('To use **OpenAI**, set `OPENAI_API_KEY` and `OPENAI_MODEL_NAME` in `.env`'));
-    chatPanelAppendMessage('computer', markdownToHtml('To use **Azure OpenAI**, set `AZURE_OPENAI_API_VERSION`, `AZURE_OPENAI_ENDPOINT`, and `AZURE_OPENAI_CHAT_DEPLOYMENT` in `.env`'));
-    chatPanelAppendMessage('computer', markdownToHtml('For Azure OpenAI **w/ AAD**,  set `AZURE_CLIENT_ID` and `AZURE_TENANT_ID` in `.env`'));
-    chatPanelAppendMessage('computer', markdownToHtml('For Azure OpenAI **w/ API KEY**, set `AZURE_OPENAI_API_KEY` in `.env`'));
-  }
+  // Create the OpenAI client
+  const openai = await CreateOpenAI.forAssistantsAPI({
+    errorCallback: text => chatPanelAppendMessage('computer', markdownToHtml(text) || text),
+    dangerouslyAllowBrowser: true
+  });
 
-  assistant = new <#= ClassName #>(openAIAssistantId, useAzure
-    ? await CreateOpenAI.fromAzureOpenAIEndpoint(azureOpenAIEndpoint, azureOpenAIAPIVersion, azureOpenAIAPIKey, azureClientId, azureTenantId)
-    : CreateOpenAI.fromOpenAIKey(openAIAPIKey, openAIOrganization));
+  // Create the assistants streaming helper class instance
+  assistant = new <#= ClassName #>(OpenAIEnvInfo.ASSISTANT_ID, openai);
 
   await assistantCreateOrRetrieveThread(threadId);
 }
@@ -62,7 +29,7 @@ async function assistantProcessInput(userInput) {
   let newMessage = chatPanelAppendMessage('computer', blackVerticalRectangle);
   let completeResponse = "";
 
-  let computerResponse = await assistant.getResponse(userInput, function (response) {
+  await assistant.getResponse(userInput, function (response) {
     let atBottomBeforeUpdate = chatPanelIsScrollAtBottom();
 
     completeResponse += response;
@@ -78,10 +45,10 @@ async function assistantProcessInput(userInput) {
     }
   });
 
-  newMessage.innerHTML = markdownToHtml(computerResponse) || computerResponse.replace(/\n/g, '<br/>');
+  newMessage.innerHTML = markdownToHtml(completeResponse) || completeResponse.replace(/\n/g, '<br/>');
   chatPanel.scrollTop = chatPanel.scrollHeight;
 
-  await threadItemsCheckIfUpdatesNeeded(userInput, computerResponse);
+  await threadItemsCheckIfUpdatesNeeded(userInput, completeResponse);
 }
 
 async function assistantCreateOrRetrieveThread(threadId = null) {
@@ -358,10 +325,7 @@ async function threadItemsTitleIfUntitled(items, userInput, computerResponse) {
       { role: 'system', content: "Please suggest a title for this interaction. Don't be cute or humorous in your answer. Answer only with a factual descriptive title. Do not use quotes. Do not prefix with 'Title:' or anything else. Just emit the title." }
     ];
 
-    const openai = useAzure
-      ? await CreateOpenAI.fromAzureOpenAIEndpointAndDeployment(azureOpenAIEndpoint, azureOpenAIAPIVersion, azureOpenAIChatDeploymentName, azureOpenAIAPIKey, azureClientId, azureTenantId)
-      : assistant.openai;
-
+    const openai = await CreateOpenAI.forChatCompletionAPI({ dangerouslyAllowBrowser: true });
     const completion = await openai.chat.completions.create({
       messages: messages,
       model: "gpt-4-turbo-preview"

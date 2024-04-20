@@ -67,11 +67,11 @@ class <#= ClassName #> {
   async handleStreamEvents(stream, callback) {
     stream.on('textDelta', async (textDelta, snapshot) => await this.onTextDelta(textDelta, callback));
     stream.on('event', async (event) => {
-      if (event.event == 'thread.run.requires_action') {
-        await this.onThreadRunRequiresAction(event, callback);
-      }
-      else if (event.event == 'thread.run.completed') {
+      if (event.event == 'thread.run.completed') {
         this.resolveRunCompletedPromise();
+      }
+      else if (event.event == 'thread.run.requires_action') {
+        await this.onThreadRunRequiresAction(event, callback);
       }
       else if (event.event === 'thread.message.chunk') { // TODO: Remove once AOAI service on same version (per Salman)
         let content = event.data.delta.content.map(item => item.text.value).join('');

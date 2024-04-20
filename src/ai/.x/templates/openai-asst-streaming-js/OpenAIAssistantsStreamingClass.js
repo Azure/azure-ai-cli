@@ -13,11 +13,15 @@ class <#= ClassName #> {
     this.openai = openai;
   }
 
-  // Get or create the thread
-  async getOrCreateThread(threadId = null) {
-    this.thread = threadId == null
-      ? await this.openai.beta.threads.create()
-      : await this.openai.beta.threads.retrieve(threadId);
+  // Create a new the thread
+  async createThread() {
+    this.thread = await this.openai.beta.threads.create();
+    return this.thread;
+  }
+  
+  // Retrieve an existing thread
+  async retrieveThread(threadId) {
+    this.thread = await this.openai.beta.threads.retrieve(threadId);
     return this.thread;
   }
 
@@ -40,21 +44,36 @@ class <#= ClassName #> {
       await this.getOrCreateThread();
     }
 
-    await this.openai.beta.threads.messages.create(this.thread.id, { role: "user", content: userInput });
+    let runCompletedPromise = new Promise((resolve) => {
+      this.resolveRunCompletedPromise = resolve;
+    });
 
-    let response = '';
-    let stream = await this.openai.beta.threads.runs.createAndStream(
-      this.thread.id,
-      { assistant_id: this.openAIAssistantId }
-    )
-    .on('event', async (event) => {
-      if (event.event === 'thread.message.chunk') { // TODO: Remove once AOAI service on same version (per Salman)
+    let message = await this.openai.beta.threads.messages.create(this.thread.id, { role: "user", content: userInput });
+    let stream = await this.openai.beta.threads.runs.stream(this.thread.id, {
+      assistant_id: this.openAIAssistantId,
+    });
+
+    await this.handleStreamEvents(stream, callback);
+    
+    await runCompletedPromise;
+    runCompletedPromise = null;
+  }
+
+  // Handle the stream events
+  async handleStreamEvents(stream, callback) {
+    stream.on('textDelta', async (textDelta, snapshot) => await this.onTextDelta(textDelta, callback));
+    stream.on('event', async (event) => {
+      if (event.event == 'thread.run.completed') {
+        this.resolveRunCompletedPromise();
+      }
+      else if (event.event === 'thread.message.chunk') { // TODO: Remove once AOAI service on same version (per Salman)
         let content = event.data.delta.content.map(item => item.text.value).join('');
         callback(content);
-        response += content;
       }
-    })
-    .on('textDelta', async (textDelta, snapshot) => {
+    });
+  }
+
+  async onTextDelta(textDelta, callback) {
       let content = textDelta.value;
       if (content != null) {
         if(callback != null) {
@@ -63,12 +82,7 @@ class <#= ClassName #> {
             await new Promise(r => setTimeout(r, this.simulateTypingDelay));
           }
         }
-        response += content;
-      }
-    });
-
-    await stream.finalMessages();
-    return response;
+    }
   }
 }
 

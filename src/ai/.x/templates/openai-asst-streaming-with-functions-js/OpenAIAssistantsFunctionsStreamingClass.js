@@ -14,11 +14,15 @@ class <#= ClassName #> {
     this.openai = openai;
   }
 
-  // Get or create the thread
-  async getOrCreateThread(threadId = null) {
-    this.thread = threadId == null
-      ? await this.openai.beta.threads.create()
-      : await this.openai.beta.threads.retrieve(threadId);
+  // Create a new the thread
+  async createThread() {
+    this.thread = await this.openai.beta.threads.create();
+    return this.thread;
+  }
+  
+  // Retrieve an existing thread
+  async retrieveThread(threadId) {
+    this.thread = await this.openai.beta.threads.retrieve(threadId);
     return this.thread;
   }
 
@@ -61,11 +65,11 @@ class <#= ClassName #> {
   async handleStreamEvents(stream, callback) {
     stream.on('textDelta', async (textDelta, snapshot) => await this.onTextDelta(textDelta, callback));
     stream.on('event', async (event) => {
-      if (event.event == 'thread.run.requires_action') {
-        await this.onThreadRunRequiresAction(event, callback);
-      }
-      else if (event.event == 'thread.run.completed') {
+      if (event.event == 'thread.run.completed') {
         this.resolveRunCompletedPromise();
+      }
+      else if (event.event == 'thread.run.requires_action') {
+        await this.onThreadRunRequiresAction(event, callback);
       }
       else if (event.event === 'thread.message.chunk') { // TODO: Remove once AOAI service on same version (per Salman)
         let content = event.data.delta.content.map(item => item.text.value).join('');
