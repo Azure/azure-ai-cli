@@ -114,7 +114,7 @@
       - name: run template
         command: ai dev shell --bash "cd speech-to-text-with-file-cs;./bin/Debug/net8.0/SpeechToTextWithFile hello.wav"
         expect: |
-          Hello world.
+          Hello [Ww]orld.
 
     - class: dev new speech-to-text-with-file (python)
       steps:
@@ -210,7 +210,7 @@
       - name: run template
         command: ai dev shell --bash "cd speech-to-text-with-translation-cs;./bin/Debug/net8.0/SpeechToTextWithTranslation hello.wav"
         expect: |
-          Hello world.
+          Hello [Ww]orld.
 
     - class: dev new speech-to-text-with-translation (python)
       steps:

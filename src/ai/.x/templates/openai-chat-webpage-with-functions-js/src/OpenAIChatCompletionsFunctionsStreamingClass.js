@@ -39,7 +39,6 @@ class <#= ClassName #> {
         stream: true
       });
 
-
       for await (const event of events) {
         for (const choice of event.choices) {
 

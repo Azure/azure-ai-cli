@@ -12,6 +12,9 @@ module.exports = {
   plugins: [
     new Dotenv(),
     new webpack.DefinePlugin({
+      'process.env.ASSISTANT_ID': JSON.stringify(process.env.ASSISTANT_ID),
+      'process.env.AZURE_CLIENT_ID': JSON.stringify(process.env.AZURE_CLIENT_ID),
+      'process.env.AZURE_TENANT_ID': JSON.stringify(process.env.AZURE_TENANT_ID),
       'process.env.AZURE_OPENAI_API_KEY': JSON.stringify(process.env.AZURE_OPENAI_API_KEY),
       'process.env.AZURE_OPENAI_API_VERSION': JSON.stringify(process.env.AZURE_OPENAI_API_VERSION),
       'process.env.AZURE_OPENAI_ENDPOINT': JSON.stringify(process.env.AZURE_OPENAI_ENDPOINT),

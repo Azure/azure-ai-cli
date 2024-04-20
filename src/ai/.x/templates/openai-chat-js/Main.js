@@ -1,10 +1,8 @@
 <#@ template hostspecific="true" #>
 <#@ output extension=".js" encoding="utf-8" #>
 <#@ parameter type="System.String" name="ClassName" #>
-<#@ parameter type="System.String" name="AZURE_OPENAI_API_KEY" #>
-<#@ parameter type="System.String" name="AZURE_OPENAI_ENDPOINT" #>
-<#@ parameter type="System.String" name="AZURE_OPENAI_CHAT_DEPLOYMENT" #>
-<#@ parameter type="System.String" name="AZURE_OPENAI_SYSTEM_PROMPT" #>
+const { CreateOpenAI } = require("./CreateOpenAI");
+const { OpenAIEnvInfo } = require("./OpenAIEnvInfo");
 const { <#= ClassName #> } = require("./OpenAIChatCompletionsClass");
 
 const readline = require('node:readline/promises');
@@ -15,20 +13,27 @@ const rl = readline.createInterface({
 
 async function main() {
 
-  const openAIAPIKey = process.env["AZURE_OPENAI_API_KEY"] || "<#= AZURE_OPENAI_API_KEY #>";
-  const openAIEndpoint = process.env["AZURE_OPENAI_ENDPOINT"] || "<#= AZURE_OPENAI_ENDPOINT #>";
-  const openAIChatDeploymentName = process.env["AZURE_OPENAI_CHAT_DEPLOYMENT"] || "<#= AZURE_OPENAI_CHAT_DEPLOYMENT #>" ;
-  const openAISystemPrompt = process.env["AZURE_OPENAI_SYSTEM_PROMPT"] || "<#= AZURE_OPENAI_SYSTEM_PROMPT #>" ;
+  // Create the OpenAI client
+  const openai = await CreateOpenAI.forChatCompletionsAPI({
+    errorCallback: text => process.stdout.write(text)
+  });
 
-  const chat = new <#= ClassName #>(openAIEndpoint, openAIAPIKey, openAIChatDeploymentName, openAISystemPrompt);
+  // Create the streaming chat completions helper
+  const useAzure = OpenAIEnvInfo.AZURE_OPENAI_ENDPOINT?.startsWith('https://');
+  const chat = useAzure
+    ? new <#= ClassName #>(OpenAIEnvInfo.AZURE_OPENAI_CHAT_DEPLOYMENT, OpenAIEnvInfo.AZURE_OPENAI_SYSTEM_PROMPT, openai)
+    : new <#= ClassName #>(OpenAIEnvInfo.OPENAI_MODEL_NAME, OpenAIEnvInfo.AZURE_OPENAI_SYSTEM_PROMPT, openai);
 
+  // Loop until the user types 'exit'
   while (true) {
 
+    // Get user input
     const input = await rl.question('User: ');
     if (input === 'exit' || input === '') break;
 
-    let response = await chat.getChatCompletions(input);
-    console.log(`\nAssistant: ${response}\n`);
+    // Get the response
+    const response = await chat.getResponse(input);
+    process.stdout.write(`\nAssistant: ${response}\n\n`);
   }
 
   console.log('Bye!');

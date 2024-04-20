@@ -13,11 +13,15 @@ class <#= ClassName #> {
     this.openai = openai;
   }
 
-  // Get or create the thread
-  async getOrCreateThread(threadId = null) {
-    this.thread = threadId == null
-      ? await this.openai.beta.threads.create()
-      : await this.openai.beta.threads.retrieve(threadId);
+  // Create a new the thread
+  async createThread() {
+    this.thread = await this.openai.beta.threads.create();
+    return this.thread;
+  }
+  
+  // Retrieve an existing thread
+  async retrieveThread(threadId) {
+    this.thread = await this.openai.beta.threads.retrieve(threadId);
     return this.thread;
   }
 

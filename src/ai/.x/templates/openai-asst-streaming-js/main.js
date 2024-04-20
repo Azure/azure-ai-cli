@@ -1,13 +1,8 @@
 <#@ template hostspecific="true" #>
 <#@ output extension=".js" encoding="utf-8" #>
 <#@ parameter type="System.String" name="ClassName" #>
-<#@ parameter type="System.String" name="ASSISTANT_ID" #>
-<#@ parameter type="System.String" name="AZURE_OPENAI_API_KEY" #>
-<#@ parameter type="System.String" name="AZURE_OPENAI_API_VERSION" #>
-<#@ parameter type="System.String" name="AZURE_OPENAI_ENDPOINT" #>
-<#@ parameter type="System.String" name="OPENAI_API_KEY" #>
-<#@ parameter type="System.String" name="OPENAI_ORG_ID" #>
 const { CreateOpenAI } = require("./CreateOpenAI");
+const { OpenAIEnvInfo } = require("./OpenAIEnvInfo");
 const { <#= ClassName #> } = require("./OpenAIAssistantsStreamingClass");
 
 const readline = require('node:readline/promises');
@@ -16,34 +11,29 @@ const rl = readline.createInterface({
   output: process.stdout
 });
 
-// NOTE: Never deploy your key in client-side environments like browsers or mobile apps
-//  SEE: https://help.openai.com/en/articles/5112595-best-practices-for-api-key-safety
-
 async function main() {
 
-  // Which assistant, and which thread
-  const openAIAssistantId = process.env["ASSISTANT_ID"] || "<#= ASSISTANT_ID #>";
-  const openAIAssistantThreadId = process.argv[2] || null;
+  // Which thread
+  const threadId = process.argv[2] || null;
 
-  // Connection info
-  const azureOpenAIAPIKey = process.env["AZURE_OPENAI_API_KEY"] || "<#= AZURE_OPENAI_API_KEY #>";
-  const azureOpenAIAPIVersion = process.env["AZURE_OPENAI_API_VERSION"] || "<#= AZURE_OPENAI_API_VERSION #>";
-  const azureOpenAIEndpoint = process.env["AZURE_OPENAI_ENDPOINT"] || "<#= AZURE_OPENAI_ENDPOINT #>";
-  const openAIAPIKey = process.env["OPENAI_API_KEY"] || "<#= OPENAI_API_KEY #>";
-  const openAIOrganization = process.env["OPENAI_ORG_ID"] || null;
+  // Create the OpenAI client
+  const openai = await CreateOpenAI.forAssistantsAPI({
+    errorCallback: text => process.stdout.write(text)
+  });
 
   // Create the assistants streaming helper class instance
-  const useAzure = azureOpenAIEndpoint?.startsWith("https://");
-  const assistant = new <#= ClassName #>(openAIAssistantId, useAzure
-    ? CreateOpenAI.fromAzureOpenAIKey(azureOpenAIAPIKey, azureOpenAIEndpoint, azureOpenAIAPIVersion)
-    : CreateOpenAI.fromOpenAIKey(openAIAPIKey, openAIOrganization));
+  const assistant = new <#= ClassName #>(OpenAIEnvInfo.ASSISTANT_ID, openai);
 
   // Get or create the thread, and display the messages if any
-  await assistant.getOrCreateThread(openAIAssistantThreadId);
-  await assistant.getThreadMessages((role, content) => {
-    role = role.charAt(0).toUpperCase() + role.slice(1);
-    process.stdout.write(`${role}: ${content}`);
-  });
+  if (threadId === null) {
+    await assistant.createThread()
+  } else {
+    await assistant.retrieveThread(threadId);
+    await assistant.getThreadMessages((role, content) => {
+      role = role.charAt(0).toUpperCase() + role.slice(1);
+      process.stdout.write(`${role}: ${content}`);
+      });
+  }
 
   // Loop until the user types 'exit'
   while (true) {
