@@ -1,6 +1,6 @@
-CHAT ASSISTANT CREATE
+CHAT ASSISTANT DELETE
 
-  The `ai chat assistant create` command deletes an existing OpenAI Assistant.
+  The `ai chat assistant delete` command deletes an existing OpenAI Assistant.
 
 USAGE: ai chat assistant delete [...]
 
