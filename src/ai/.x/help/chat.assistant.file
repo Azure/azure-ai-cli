@@ -1,0 +1,13 @@
+CHAT ASSISTANT FILE
+
+  The `ai chat assistant file` commands manage OpenAI Assistant files.
+
+COMMANDS
+
+  ai chat assistant file upload [...]   (see: ai help chat assistant file upload)
+  ai chat assistant file list [...]     (see: ai help chat assistant file list)
+
+ADDITIONAL TOPICS
+
+  ai help chat assistant examples
+  ai help documentation

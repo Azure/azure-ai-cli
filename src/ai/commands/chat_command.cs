@@ -59,11 +59,16 @@ namespace Azure.AI.Details.Common.CLI
             switch (command)
             {
                 case "chat": DoChat(); break;
+
                 case "chat.assistant": HelpCommandParser.DisplayHelp(_values); break;
                 case "chat.assistant.create": DoChatAssistantCreate().Wait(); break;
                 case "chat.assistant.delete": DoChatAssistantDelete().Wait(); break;
                 case "chat.assistant.get": DoChatAssistantGet().Wait(); break;
                 case "chat.assistant.list": DoChatAssistantList().Wait(); break;
+
+                case "chat.assistant.file": HelpCommandParser.DisplayHelp(_values); break;
+                case "chat.assistant.file.upload": DoChatAssistantFileUpload().Wait(); break;
+                case "chat.assistant.file.list": DoChatAssistantFileList().Wait(); break;
 
                 default:
                     _values.AddThrowError("WARNING:", $"'{command.Replace('.', ' ')}' NOT YET IMPLEMENTED!!");
@@ -1004,6 +1009,54 @@ namespace Azure.AI.Details.Common.CLI
                 foreach (var assistant in assistants)
                 {
                     Console.WriteLine($"  {assistant.Name} ({assistant.Id})");
+                }
+            }
+
+            return true;
+        }
+
+        private async Task<bool> DoChatAssistantFileUpload()
+        {
+            var file = _values["assistant.upload.file"];
+            if (string.IsNullOrEmpty(file))
+            {
+                _values.AddThrowError("ERROR:", $"Uploading assistant file; requires file.");
+            }
+
+            var existing = FileHelpers.DemandFindFileInDataPath(file, _values, "assistant file");
+
+            var message = $"Uploading assistant file ({file}) ...";
+            if (!_quiet) Console.WriteLine(message);
+
+            var client = CreateOpenAIAssistantsClient();
+            var response = await client.UploadFileAsync(existing, OpenAIFilePurpose.Assistants);
+
+            if (!_quiet) Console.WriteLine($"{message} Done!");
+            return true;
+        }
+
+        private async Task<bool> DoChatAssistantFileList()
+        {
+            var message = $"Listing assistant files ...";
+            if (!_quiet) Console.WriteLine(message);
+
+            var client = CreateOpenAIAssistantsClient();
+            var response = await client.GetFilesAsync(OpenAIFilePurpose.Assistants);
+            var list = response.Value;
+
+            if (!_quiet) Console.WriteLine($"{message} Done!\n");
+
+            var files = list.ToList();
+            if (files.Count == 0)
+            {
+                Console.WriteLine("No files found.");
+            }
+            else
+            {
+                Console.WriteLine("Assistant files:\n");
+                foreach (var file in files)
+                {
+                    Console.WriteLine($"  {file.Filename} ({file.Id})");
                 }
             }
 

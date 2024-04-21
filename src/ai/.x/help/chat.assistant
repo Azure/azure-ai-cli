@@ -11,6 +11,10 @@ COMMANDS
   ai chat assistant list [...]        (see: ai help chat assistant list)
   ai chat assistant get [...]         (see: ai help chat assistant get)
 
+SUB-COMMANDS
+
+  ai chat assistant file [...]        (see: ai help chat assistant file)
+
 ADDITIONAL TOPICS
 
   ai help chat assistant examples

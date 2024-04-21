@@ -26,10 +26,11 @@ namespace Azure.AI.Details.Common.CLI
             ("chat.assistant.delete", false),
             ("chat.assistant.get", true ),
             ("chat.assistant.list", false),
-            // ("chat.assistant.file.upload", true),
+            ("chat.assistant.file.upload", true),
             // ("chat.assistant.file.delete", true),
+            ("chat.assistant.file.list", false),
             // ("chat.assistant.file.get", true),
-            // ("chat.assistant.file.list", false),
+            ("chat.assistant.file", true),
             ("chat.assistant", true),
             ("chat", true),
         };
@@ -45,10 +46,14 @@ namespace Azure.AI.Details.Common.CLI
             switch (commandName)
             {
                 case "chat": return _chatCommandParsers;
+
                 case "chat.assistant.create": return _chatAssistantCreateCommandParsers;
                 case "chat.assistant.get": return _chatPlaceHolderParsers;
                 case "chat.assistant.list": return _chatPlaceHolderParsers;
                 case "chat.assistant.delete": return _chatAssistantDeleteCommandParsers;
+
+                case "chat.assistant.file.upload": return _chatAssistantFileUploadCommandParsers;
+                case "chat.assistant.file.list": return _chatPlaceHolderParsers;
             }
 
             foreach (var command in _commands)
@@ -143,6 +148,13 @@ namespace Azure.AI.Details.Common.CLI
 
         private static INamedValueTokenParser[] _chatAssistantDeleteCommandParsers = {
             new CommonChatNamedValueTokenParsers(),
+        };
+
+        private static INamedValueTokenParser[] _chatAssistantFileUploadCommandParsers = {
+            new CommonChatNamedValueTokenParsers(),
+
+            new NamedValueTokenParser("--file",        "assistant.upload.file", "001", "1"),
+            new NamedValueTokenParser("--files",       "assistant.upload.files", "001", "1", null, null, "assistant.upload.file", "x.command.expand.file.name"),
         };
 
         #endregion
