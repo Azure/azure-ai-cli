@@ -25,7 +25,7 @@ namespace Azure.AI.Details.Common.CLI
             ("chat.assistant.create", true),
             ("chat.assistant.delete", false),
             // ("chat.assistant.get", true ),
-            // ("chat.assistant.list", false),
+            ("chat.assistant.list", false),
             // ("chat.assistant.file.upload", true),
             // ("chat.assistant.file.delete", true),
             // ("chat.assistant.file.get", true),
@@ -47,6 +47,7 @@ namespace Azure.AI.Details.Common.CLI
                 case "chat": return _chatCommandParsers;
                 case "chat.assistant.create": return _chatAssistantCreateCommandParsers;
                 case "chat.assistant.delete": return _chatAssistantDeleteCommandParsers;
+                case "chat.assistant.list": return _chatPlaceHolderParsers;
             }
 
             foreach (var command in _commands)

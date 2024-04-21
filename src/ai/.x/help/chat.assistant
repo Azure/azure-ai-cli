@@ -6,6 +6,8 @@ CHAT ASSISTANT
 COMMANDS
 
   ai chat assistant create [...]      (see: ai help chat assistant create)
+  ai chat assistant list [...]        (see: ai help chat assistant list)
+
   ai chat assistant delete [...]      (see: ai help chat assistant delete)
 
 ADDITIONAL TOPICS

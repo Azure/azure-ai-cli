@@ -61,6 +61,7 @@ namespace Azure.AI.Details.Common.CLI
                 case "chat.assistant": HelpCommandParser.DisplayHelp(_values); break;
                 case "chat.assistant.create": DoChatAssistantCreate().Wait(); break;
                 case "chat.assistant.delete": DoChatAssistantDelete().Wait(); break;
+                case "chat.assistant.list": DoChatAssistantList().Wait(); break;
 
                 default:
                     _values.AddThrowError("WARNING:", $"'{command.Replace('.', ' ')}' NOT YET IMPLEMENTED!!");
@@ -937,6 +938,44 @@ namespace Azure.AI.Details.Common.CLI
             var response = await client.DeleteAssistantAsync(id);
 
             if (!_quiet) Console.WriteLine($"{message} Done!");
+            return true;
+        }
+
+        private async Task<bool> DoChatAssistantList()
+        {
+            var message = $"Listing assistants ...";
+            if (!_quiet) Console.WriteLine(message);
+
+            var client = CreateOpenAIAssistantsClient();
+
+            var order = ListSortOrder.Ascending;
+            var response = await client.GetAssistantsAsync(order: order);
+
+            var pageable = response.Value;
+            var assistants = pageable.ToList();
+
+            while (pageable.HasMore)
+            {
+                response = await client.GetAssistantsAsync(after: pageable.LastId, order: order);
+                pageable = response.Value;
+                assistants.AddRange(pageable);
+            }
+
+            if (!_quiet) Console.WriteLine($"{message} Done!\n");
+
+            if (assistants.Count == 0)
+            {
+                Console.WriteLine("No assistants found.");
+            }
+            else
+            {
+                Console.WriteLine("Assistants:\n");
+                foreach (var assistant in assistants)
+                {
+                    Console.WriteLine($"  {assistant.Name} ({assistant.Id})");
+                }
+            }
+
             return true;
         }
 
