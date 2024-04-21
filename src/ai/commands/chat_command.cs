@@ -21,6 +21,7 @@ using System.Threading.Tasks;
 using YamlDotNet.Serialization;
 using YamlDotNet.Serialization.NamingConventions;
 using Scriban;
+using System.ClientModel.Primitives;
 
 namespace Azure.AI.Details.Common.CLI
 {
@@ -61,6 +62,7 @@ namespace Azure.AI.Details.Common.CLI
                 case "chat.assistant": HelpCommandParser.DisplayHelp(_values); break;
                 case "chat.assistant.create": DoChatAssistantCreate().Wait(); break;
                 case "chat.assistant.delete": DoChatAssistantDelete().Wait(); break;
+                case "chat.assistant.get": DoChatAssistantGet().Wait(); break;
                 case "chat.assistant.list": DoChatAssistantList().Wait(); break;
 
                 default:
@@ -938,6 +940,35 @@ namespace Azure.AI.Details.Common.CLI
             var response = await client.DeleteAssistantAsync(id);
 
             if (!_quiet) Console.WriteLine($"{message} Done!");
+            return true;
+        }
+
+        private async Task<bool> DoChatAssistantGet()
+        {
+            var id = _values["chat.assistant.id"];
+            if (string.IsNullOrEmpty(id))
+            {
+                _values.AddThrowError("ERROR:", $"Deleting assistant; requires id.");
+            }
+
+            var message = $"Getting assistant ({id}) ...";
+            if (!_quiet) Console.WriteLine(message);
+
+            var client = CreateOpenAIAssistantsClient();
+            var response = await client.GetAssistantAsync(id);
+
+            var assistant = response.Value;
+            if (!_quiet) Console.WriteLine($"{message} Done!\n");
+
+            var jsonModel = assistant as IJsonModel<Assistant>;
+            if (jsonModel != null)
+            {
+                var writer = new Utf8JsonWriter(Console.OpenStandardOutput());
+                jsonModel.Write(writer, ModelReaderWriterOptions.Json);
+                writer.Flush();
+                Console.WriteLine();
+            }
+
             return true;
         }
 

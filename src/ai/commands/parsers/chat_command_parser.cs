@@ -24,7 +24,7 @@ namespace Azure.AI.Details.Common.CLI
         private static readonly (string name, bool valuesRequired)[] _commands =  {
             ("chat.assistant.create", true),
             ("chat.assistant.delete", false),
-            // ("chat.assistant.get", true ),
+            ("chat.assistant.get", true ),
             ("chat.assistant.list", false),
             // ("chat.assistant.file.upload", true),
             // ("chat.assistant.file.delete", true),
@@ -46,8 +46,9 @@ namespace Azure.AI.Details.Common.CLI
             {
                 case "chat": return _chatCommandParsers;
                 case "chat.assistant.create": return _chatAssistantCreateCommandParsers;
-                case "chat.assistant.delete": return _chatAssistantDeleteCommandParsers;
+                case "chat.assistant.get": return _chatPlaceHolderParsers;
                 case "chat.assistant.list": return _chatPlaceHolderParsers;
+                case "chat.assistant.delete": return _chatAssistantDeleteCommandParsers;
             }
 
             foreach (var command in _commands)
