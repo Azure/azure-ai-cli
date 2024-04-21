@@ -22,10 +22,19 @@ namespace Azure.AI.Details.Common.CLI
         }
 
         private static readonly (string name, bool valuesRequired)[] _commands =  {
+            ("chat.assistant.create", true),
+            // ("chat.asisstant.delete", true),    
+            // ("chat.assistant.get", true )
+            // ("chat.assistant.list", false),
+            // ("chat.assistant.file.upload", true),
+            // ("chat.assistant.file.delete", true)
+            // ("chat.assistant.file.get", true)
+            // ("chat.assistant.file.list", false),
             ("chat", true),
         };
 
         private static readonly string[] _partialCommands = {
+            "chat.assistant",
             "chat",
         };
 
@@ -36,6 +45,7 @@ namespace Azure.AI.Details.Common.CLI
             switch (commandName)
             {
                 case "chat": return _chatCommandParsers;
+                case "chat.assistant.create": return _chatAssistantCreateCommandParsers;
             }
 
             foreach (var command in _commands)
@@ -51,6 +61,7 @@ namespace Azure.AI.Details.Common.CLI
 
 
         #region private data
+
 
         public class CommonChatNamedValueTokenParsers : NamedValueTokenParserList
         {
@@ -76,15 +87,6 @@ namespace Azure.AI.Details.Common.CLI
                     new NamedValueTokenParser(null,             "service.config.search.endpoint.uri", "00110;00101", "1"),
                     new NamedValueTokenParser(null,             "service.config.search.query.type", "00011", "1"),
 
-                    new NamedValueTokenParser(null,             "chat.message.history.json.file", "10110", "1", null, null, "json.file", "chat.history.type"),
-                    new NamedValueTokenParser(null,             "chat.message.history.jsonl.file", "10110", "1", null, null, "jsonl.file", "chat.history.type"),
-                    new NamedValueTokenParser(null,             "chat.message.history.text.file", "10110", "1", null, null, "text.file", "chat.history.type"),
-                    new NamedValueTokenParser(null,             "chat.message.history.type", "1111", "1", "interactive;interactive+;json;jsonl;text;json.file;jsonl.file;text.file"),
-
-                    new NamedValueTokenParser(null,             "chat.message.system.prompt", "0010;0001", "1"),
-                    new NamedValueTokenParser(null,             "chat.message.user.prompt", "0010", "1"),
-                    new NamedValueTokenParser(null,             "chat.message.user.question", "0001", "1", null, "chat.message.user.prompt"),
-
                     new NamedValueTokenParser(null,             "chat.options.max.tokens", "0011", "1"),
                     new NamedValueTokenParser(null,             "chat.options.temperature", "001", "1"),
                     new NamedValueTokenParser(null,             "chat.options.top.p", "0001", "1"),
@@ -107,6 +109,15 @@ namespace Azure.AI.Details.Common.CLI
 
             new CommonChatNamedValueTokenParsers(),
 
+            new NamedValueTokenParser(null, "chat.message.history.json.file", "10110", "1", null, null, "json.file", "chat.history.type"),
+            new NamedValueTokenParser(null, "chat.message.history.jsonl.file", "10110", "1", null, null, "jsonl.file", "chat.history.type"),
+            new NamedValueTokenParser(null, "chat.message.history.text.file", "10110", "1", null, null, "text.file", "chat.history.type"),
+            new NamedValueTokenParser(null, "chat.message.history.type", "1111", "1", "interactive;interactive+;json;jsonl;text;json.file;jsonl.file;text.file"),
+
+            new NamedValueTokenParser(null, "chat.message.system.prompt", "0010;0001", "1"),
+            new NamedValueTokenParser(null, "chat.message.user.prompt", "0010", "1"),
+            new NamedValueTokenParser(null, "chat.message.user.question", "0001", "1", null, "chat.message.user.prompt"),
+
             new TrueFalseNamedValueTokenParser("chat.input.interactive", "001"),
             new TrueFalseNamedValueTokenParser("chat.speech.input", "010"),
 
@@ -116,7 +127,13 @@ namespace Azure.AI.Details.Common.CLI
             InputChatParameterFileToken.Parser(),
             // new TrueFalseRequiredPrefixNamedValueTokenParser("output", "all.answer", "01"),
             // new TrueFalseRequiredPrefixNamedValueTokenParser("output", "each.answer", "11")
+        };
 
+        private static INamedValueTokenParser[] _chatAssistantCreateCommandParsers = {
+            new CommonChatNamedValueTokenParsers(),
+
+            new NamedValueTokenParser(null, "chat.assistant.create.name", "0001", "1"),
+            InstructionsToken.Parser(),
         };
 
         #endregion

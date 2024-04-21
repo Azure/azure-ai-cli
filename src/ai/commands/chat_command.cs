@@ -6,6 +6,7 @@
 using Azure.AI.Details.Common.CLI.ConsoleGui;
 using Azure.AI.Details.Common.CLI.Extensions.HelperFunctions;
 using Azure.AI.OpenAI;
+using Azure.AI.OpenAI.Assistants;
 using Azure.Core.Diagnostics;
 using Microsoft.CognitiveServices.Speech;
 using System;
@@ -44,6 +45,7 @@ namespace Azure.AI.Details.Common.CLI
             switch (command)
             {
                 case "chat": DoChat(); break;
+                case "chat.assistant.create": DoChatAssistantCreate().Wait(); break;
 
                 default:
                     _values.AddThrowError("WARNING:", $"'{command.Replace('.', ' ')}' NOT YET IMPLEMENTED!!");
@@ -866,6 +868,55 @@ namespace Azure.AI.Details.Common.CLI
                 case EventLevel.Verbose:
                     AI.DBG_TRACE_VERBOSE(message, 0, e.EventSource.Name, e.EventName); break;
             }
+        }
+
+
+        private async Task<bool> DoChatAssistantCreate()
+        {
+            var name = _values["chat.assistant.create.name"];
+            var deployment = ConfigDeploymentToken.Data().GetOrDefault(_values);
+            var instructions = InstructionsToken.Data().GetOrDefault(_values);
+
+            if (string.IsNullOrEmpty(name))
+            {
+                _values.AddThrowError("ERROR:", $"Creating assistant; requires name.");
+            }
+            else if (string.IsNullOrEmpty(deployment))
+            {
+                _values.AddThrowError("ERROR:", $"Creating assistant; requires deployment.");
+            }
+            else if (string.IsNullOrEmpty(instructions))
+            {
+                _values.AddThrowError("ERROR:", $"Creating assistant; requires instructions.");
+            }
+
+            var client = CreateOpenAIAssistantsClient();
+
+            var createOptions = new AssistantCreationOptions(deployment) { Name = name, Instructions = instructions };
+            var response = await client.CreateAssistantAsync(createOptions);
+            var assistant = response.Value;
+
+            Console.WriteLine($"Assistant created: {assistant.Id}");
+            return true;
+        }
+
+        private AssistantsClient CreateOpenAIAssistantsClient()
+        {
+            var key = _values["service.config.key"];
+            var endpoint = ConfigEndpointUriToken.Data().GetOrDefault(_values);
+
+            if (string.IsNullOrEmpty(endpoint))
+            {
+                _values.AddThrowError("ERROR:", $"Creating AssistantsClient; requires endpoint.");
+            }
+
+            _azureEventSourceListener = new AzureEventSourceListener((e, message) => EventSourceAiLoggerLog(e, message), System.Diagnostics.Tracing.EventLevel.Verbose);
+
+            var options = new AssistantsClientOptions();
+            options.Diagnostics.IsLoggingContentEnabled = true;
+            options.Diagnostics.IsLoggingEnabled = true;
+
+            return new AssistantsClient(new Uri(endpoint!), new AzureKeyCredential(key), options);
         }
 
         private void StartCommand()
