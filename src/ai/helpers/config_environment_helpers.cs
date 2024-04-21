@@ -46,12 +46,14 @@ namespace Azure.AI.Details.Common.CLI
             env.Add("AZURE_AI_SPEECH_KEY", ReadConfig(values, "speech.key"));
             env.Add("AZURE_AI_SPEECH_REGION", ReadConfig(values, "speech.region"));
 
+            // Assistants API
+            env.Add("ASSISTANT_ID", ReadConfig(values, "assistant.id"));
+
             // Cognitive Search SDK (non-standard, will be removed at some point)
             env.Add("AZURE_COGNITIVE_SEARCH_TARGET", env["AZURE_AI_SEARCH_ENDPOINT"]);
             env.Add("AZURE_COGNITIVE_SEARCH_KEY", env["AZURE_AI_SEARCH_KEY"]);
 
             // Add a few environment variables that `ai` doesn't "control", but will re-populate into the environment
-            env.Add("ASSISTANT_ID", null);
             env.Add("AZURE_CLIENT_ID", null);
             env.Add("AZURE_TENANT_ID", null);
             env.Add("AZURE_OPENAI_SYSTEM_PROMPT", null);

@@ -23,7 +23,7 @@ namespace Azure.AI.Details.Common.CLI
 
         private static readonly (string name, bool valuesRequired)[] _commands =  {
             ("chat.assistant.create", true),
-            ("chat.assistant.delete", true),
+            ("chat.assistant.delete", false),
             // ("chat.assistant.get", true ),
             // ("chat.assistant.list", false),
             // ("chat.assistant.file.upload", true),
@@ -84,6 +84,8 @@ namespace Azure.AI.Details.Common.CLI
                     SearchEmbeddingModelDeploymentNameToken.Parser(),
                     SearchEmbeddingModelNameToken.Parser(),
 
+                    new NamedValueTokenParser(null, "chat.assistant.id", "001", "1"),
+
                     new NamedValueTokenParser(null,             "service.config.search.api.key", "00101", "1"),
                     new NamedValueTokenParser(null,             "service.config.search.endpoint.uri", "00110;00101", "1"),
                     new NamedValueTokenParser(null,             "service.config.search.query.type", "00011", "1"),
@@ -139,7 +141,6 @@ namespace Azure.AI.Details.Common.CLI
 
         private static INamedValueTokenParser[] _chatAssistantDeleteCommandParsers = {
             new CommonChatNamedValueTokenParsers(),
-            new NamedValueTokenParser(null, "chat.assistant.id", "001", "1"),
         };
 
         #endregion

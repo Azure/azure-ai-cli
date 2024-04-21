@@ -914,7 +914,11 @@ namespace Azure.AI.Details.Common.CLI
             var response = await client.CreateAssistantAsync(createOptions);
             var assistant = response.Value;
 
-            if (!_quiet) Console.WriteLine($"{message} Done!\n\nAssistant id: {assistant.Id}");
+            if (!_quiet) Console.WriteLine($"{message} Done!\n");
+
+            var fi = new FileInfo(ConfigSetHelpers.ConfigSet("assistant.id", assistant.Id));
+            if (!_quiet) Console.WriteLine($"{fi.Name} (saved at {fi.DirectoryName})\n\n  {assistant.Id}");
+
             return true;
         }
 
