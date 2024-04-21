@@ -23,18 +23,18 @@ namespace Azure.AI.Details.Common.CLI
 
         private static readonly (string name, bool valuesRequired)[] _commands =  {
             ("chat.assistant.create", true),
-            // ("chat.asisstant.delete", true),    
-            // ("chat.assistant.get", true )
+            ("chat.assistant.delete", true),
+            // ("chat.assistant.get", true ),
             // ("chat.assistant.list", false),
             // ("chat.assistant.file.upload", true),
-            // ("chat.assistant.file.delete", true)
-            // ("chat.assistant.file.get", true)
+            // ("chat.assistant.file.delete", true),
+            // ("chat.assistant.file.get", true),
             // ("chat.assistant.file.list", false),
+            ("chat.assistant", true),
             ("chat", true),
         };
 
         private static readonly string[] _partialCommands = {
-            "chat.assistant",
             "chat",
         };
 
@@ -46,6 +46,7 @@ namespace Azure.AI.Details.Common.CLI
             {
                 case "chat": return _chatCommandParsers;
                 case "chat.assistant.create": return _chatAssistantCreateCommandParsers;
+                case "chat.assistant.delete": return _chatAssistantDeleteCommandParsers;
             }
 
             foreach (var command in _commands)
@@ -134,6 +135,11 @@ namespace Azure.AI.Details.Common.CLI
 
             new NamedValueTokenParser(null, "chat.assistant.create.name", "0001", "1"),
             InstructionsToken.Parser(),
+        };
+
+        private static INamedValueTokenParser[] _chatAssistantDeleteCommandParsers = {
+            new CommonChatNamedValueTokenParsers(),
+            new NamedValueTokenParser(null, "chat.assistant.id", "001", "1"),
         };
 
         #endregion

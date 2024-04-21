@@ -1,0 +1,24 @@
+CHAT ASSISTANT CREATE
+
+  The `ai chat assistant create` command creates a new OpenAI Assistant.
+
+USAGE: ai chat assistant create [...]
+
+  CONNECTION
+    --endpoint ENDPOINT                 (see: ai help chat endpoint)
+    --key KEY                           (see: ai help chat key)
+
+  ASSISTANT
+    --name NAME                         (see: ai help chat name)
+    --deployment DEPLOYMENT             (see: ai help chat deployment)
+    --instructions INSTRUCTIONS         (see: ai help chat instructions)
+
+EXAMPLE
+
+  ai init openai
+  ai chat assistant create --name "My Assistant" --instructions "You are a helpful Assistant."
+
+SEE ALSO
+
+  ai help chat assistant examples
+  ai help find topics chat assistant

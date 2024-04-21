@@ -3,6 +3,7 @@ CHAT
 @include.the.chat.command
 
 USAGE: ai chat [...]
+   OR: ai chat <sub-command> [...]
 
   CONNECTION                            (see: ai help connection)
     --deployment DEPLOYMENT             (see: ai help chat deployment)
@@ -30,10 +31,14 @@ USAGE: ai chat [...]
     --top-p TOP_P                       (see: ai help chat options top-p)
     --n N                               (see: ai help chat options n)
 
+  SUB-COMMANDS
+    ai chat assistant [...]             (see: ai help chat assistant)
+
 EXAMPLEs
 
-  ai chat --system @prompt.txt --interactive
-  ai chat --system @prompt.txt --user "What can you do?"
+  ai init openai
+  ai chat --interactive
+  ai chat --user "What can you do?"
 
 SEE ALSO
 

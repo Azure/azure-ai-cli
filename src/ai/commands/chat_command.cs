@@ -34,7 +34,20 @@ namespace Azure.AI.Details.Common.CLI
 
         internal bool RunCommand()
         {
-            DoCommand(_values.GetCommand());
+            try
+            {
+                DoCommand(_values.GetCommand());
+            }
+            catch (AggregateException ex)
+            {
+                ex.Handle(x => {
+                    var msg = x.Message.Split(new char[] { '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries).FirstOrDefault();
+                    ConsoleHelpers.WriteLineError($"\n  ERROR: {msg}");
+                    return true;
+                });
+                _values.Reset("passed", "false");
+            }
+
             return _values.GetOrDefault("passed", true);
         }
 
@@ -45,7 +58,9 @@ namespace Azure.AI.Details.Common.CLI
             switch (command)
             {
                 case "chat": DoChat(); break;
+                case "chat.assistant": HelpCommandParser.DisplayHelp(_values); break;
                 case "chat.assistant.create": DoChatAssistantCreate().Wait(); break;
+                case "chat.assistant.delete": DoChatAssistantDelete().Wait(); break;
 
                 default:
                     _values.AddThrowError("WARNING:", $"'{command.Replace('.', ' ')}' NOT YET IMPLEMENTED!!");
@@ -890,13 +905,34 @@ namespace Azure.AI.Details.Common.CLI
                 _values.AddThrowError("ERROR:", $"Creating assistant; requires instructions.");
             }
 
+            var message = $"Creating assistant ({name}) ...";
+            if (!_quiet) Console.WriteLine(message);
+
             var client = CreateOpenAIAssistantsClient();
 
             var createOptions = new AssistantCreationOptions(deployment) { Name = name, Instructions = instructions };
             var response = await client.CreateAssistantAsync(createOptions);
             var assistant = response.Value;
 
-            Console.WriteLine($"Assistant created: {assistant.Id}");
+            if (!_quiet) Console.WriteLine($"{message} Done!\n\nAssistant id: {assistant.Id}");
+            return true;
+        }
+
+        private async Task<bool> DoChatAssistantDelete()
+        {
+            var id = _values["chat.assistant.id"];
+            if (string.IsNullOrEmpty(id))
+            {
+                _values.AddThrowError("ERROR:", $"Deleting assistant; requires id.");
+            }
+
+            var message = $"Deleting assistant ({id}) ...";
+            if (!_quiet) Console.WriteLine(message);
+
+            var client = CreateOpenAIAssistantsClient();
+            var response = await client.DeleteAssistantAsync(id);
+
+            if (!_quiet) Console.WriteLine($"{message} Done!");
             return true;
         }
 

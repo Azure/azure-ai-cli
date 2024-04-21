@@ -1,0 +1,14 @@
+CHAT EXAMPLES
+
+  `EXAMPLE 1`: Create or select OpenAI resource and model deployments
+
+    ai init
+
+  `EXAMPLE 2`: Create an OpenAI assistant
+
+    ai chat assistant create --name "My Assistant" --instructions "You are a helpful Assistant."
+
+SEE ALSO
+
+  ai help chat assistant
+  ai help find topics chat assistant

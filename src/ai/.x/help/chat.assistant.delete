@@ -1,0 +1,21 @@
+CHAT ASSISTANT CREATE
+
+  The `ai chat assistant create` command deletes an existing OpenAI Assistant.
+
+USAGE: ai chat assistant delete [...]
+
+  CONNECTION
+    --endpoint ENDPOINT                 (see: ai help chat endpoint)
+    --key KEY                           (see: ai help chat key)
+
+  DELETE
+    --id ID                             (see: ai help chat assistant id)
+
+EXAMPLE
+
+  ai chat assistant delete --id asst_UM1L8Z0yZzGCJoD5mgQYByeZ
+
+SEE ALSO
+
+  ai help chat assistant examples
+  ai help find topics chat assistant
