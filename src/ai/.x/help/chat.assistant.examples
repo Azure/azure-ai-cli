@@ -1,4 +1,4 @@
-CHAT EXAMPLES
+CHAT ASSISTANT EXAMPLES
 
   `EXAMPLE 1`: Create or select OpenAI resource and model deployments
 
@@ -7,6 +7,22 @@ CHAT EXAMPLES
   `EXAMPLE 2`: Create an OpenAI assistant
 
     ai chat assistant create --name "My Assistant" --instructions "You are a helpful Assistant."
+
+  `EXAMPLE 3`: Upload files for use with RETRIEVAL
+
+    ai chat assistant file upload --files **\*.md
+
+  `EXAMPLE 4`: Create an OpenAI assistant w/ RETRIEVAL for specific files
+
+    ai chat assistant create --name "My Assistant 2" --instructions "You are a helpful Assistant." --file-ids id1 id2 ...
+
+  `EXAMPLE 5`: Create sample Node.js source code
+
+    ai dev new openai-asst-streaming --javascript
+
+  `EXAMPLE 6`: Create interactive browser javascript source code 
+
+    ai dev new openai-asst-webpage-with-functions --javascript
 
 SEE ALSO
 

@@ -13,10 +13,17 @@ USAGE: ai chat assistant create [...]
     --deployment DEPLOYMENT
     --instructions INSTRUCTIONS
 
-EXAMPLE
+  RETRIEVAL
+    --file-id ID
+    --file-ids ID1 [...]
+
+EXAMPLEs
 
   ai init openai
   ai chat assistant create --name "My Assistant" --instructions "You are a helpful Assistant."
+
+  ai chat assistant file upload --files **\*.md
+  ai chat assistant create --name "My Assistant 2" --instructions "You are a helpful Assistant." --file-ids id1 id2 ...
 
 SEE ALSO
 
