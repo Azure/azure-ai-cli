@@ -1,8 +1,8 @@
-const { InteractiveBrowserCredential } = require('@azure/identity');
-const { OpenAIEnvInfo } = require('./OpenAIEnvInfo');
-const { OpenAI } = require('openai');
+import { InteractiveBrowserCredential } from '@azure/identity';
+import { OpenAIEnvInfo } from './OpenAIEnvInfo';
+import { OpenAI } from 'openai';
 
-class CreateOpenAI {
+export class CreateOpenAI {
 
   static async forAssistantsAPI({ dangerouslyAllowBrowser, errorCallback } = {}) {
     return this.forAPI({ api: 'assistants', dangerouslyAllowBrowser, errorCallback });
@@ -120,5 +120,3 @@ class CreateOpenAI {
     return token.token;
   }
 }
-
-exports.CreateOpenAI = CreateOpenAI;

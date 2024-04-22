@@ -1,12 +1,12 @@
 <#@ template hostspecific="true" #>
 <#@ output extension=".js" encoding="utf-8" #>
 <#@ parameter type="System.String" name="ClassName" #>
-const marked = require("marked");
-const hljs = require("highlight.js");
+import * as marked from "marked";
+import * as hljs from "highlight.js";
 
-const { CreateOpenAI } = require("./CreateOpenAI");
-const { OpenAIEnvInfo } = require("./OpenAIEnvInfo");
-const { <#= ClassName #> } = require("./OpenAIAssistantsStreamingClass");
+import { CreateOpenAI } from "./CreateOpenAI";
+import { OpenAIEnvInfo } from "./OpenAIEnvInfo";
+import { <#= ClassName #> } from "./OpenAIAssistantsStreamingClass";
 
 let assistant;
 async function assistantInit(threadId = null) {

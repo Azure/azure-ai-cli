@@ -85,5 +85,4 @@ export class <#= ClassName #> {
     }
   }
 }
-
-exports.<#= ClassName #> = <#= ClassName #>;
+  
