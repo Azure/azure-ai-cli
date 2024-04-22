@@ -9,9 +9,9 @@ USAGE: ai chat assistant create [...]
     --key KEY                           (see: ai help chat key)
 
   ASSISTANT
-    --name NAME                         (see: ai help chat name)
-    --deployment DEPLOYMENT             (see: ai help chat deployment)
-    --instructions INSTRUCTIONS         (see: ai help chat instructions)
+    --name NAME
+    --deployment DEPLOYMENT
+    --instructions INSTRUCTIONS
 
 EXAMPLE
 

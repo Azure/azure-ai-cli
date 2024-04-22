@@ -5,6 +5,8 @@ CHAT ASSISTANT FILE
 COMMANDS
 
   ai chat assistant file upload [...]   (see: ai help chat assistant file upload)
+  ai chat assistant file delete [...]   (see: ai help chat assistant file delete)
+
   ai chat assistant file list [...]     (see: ai help chat assistant file list)
 
 ADDITIONAL TOPICS

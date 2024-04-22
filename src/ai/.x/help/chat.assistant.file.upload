@@ -15,7 +15,7 @@ USAGE: ai chat assistant file upload [...]
 EXAMPLE
 
   ai chat assistant file upload --file README.md
-  ai chat assistant file upload --files README.md
+  ai chat assistant file upload --files **\*.md
 
 SEE ALSO
 

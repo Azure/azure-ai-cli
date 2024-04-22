@@ -69,6 +69,7 @@ namespace Azure.AI.Details.Common.CLI
                 case "chat.assistant.file": HelpCommandParser.DisplayHelp(_values); break;
                 case "chat.assistant.file.upload": DoChatAssistantFileUpload().Wait(); break;
                 case "chat.assistant.file.list": DoChatAssistantFileList().Wait(); break;
+                case "chat.assistant.file.delete": DoChatAssistantFileDelete().Wait(); break;
 
                 default:
                     _values.AddThrowError("WARNING:", $"'{command.Replace('.', ' ')}' NOT YET IMPLEMENTED!!");
@@ -1060,6 +1061,24 @@ namespace Azure.AI.Details.Common.CLI
                 }
             }
 
+            return true;
+        }
+
+        private async Task<bool> DoChatAssistantFileDelete()
+        {
+            var id = _values["chat.assistant.file.id"];
+            if (string.IsNullOrEmpty(id))
+            {
+                _values.AddThrowError("ERROR:", $"Deleting assistant file; requires file id.");
+            }
+
+            var message = $"Deleting assistant file ({id}) ...";
+            if (!_quiet) Console.WriteLine(message);
+
+            var client = CreateOpenAIAssistantsClient();
+            var response = await client.DeleteFileAsync(id);
+
+            if (!_quiet) Console.WriteLine($"{message} Done!");
             return true;
         }
 

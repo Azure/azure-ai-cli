@@ -1,19 +1,19 @@
-CHAT ASSISTANT DELETE
+CHAT ASSISTANT FILE DELETE
 
-  The `ai chat assistant delete` command deletes an existing OpenAI Assistant.
+  The `ai chat assistant file delete` command deletes an OpenAI Assistant file.
 
-USAGE: ai chat assistant delete [...]
+USAGE: ai chat assistant file delete [...]
 
   CONNECTION
     --endpoint ENDPOINT                 (see: ai help chat endpoint)
     --key KEY                           (see: ai help chat key)
 
-  DELETE ASSISTANT
+  DELETE FILE
     --id ID
 
 EXAMPLE
 
-  ai chat assistant delete --id asst_UM1L8Z0yZzGCJoD5mgQYByeZ
+  ai chat assistant file delete --id assistant-rWdFtg0oCGtlZFZzZGC3rGhQ
 
 SEE ALSO
 

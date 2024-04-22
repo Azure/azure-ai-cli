@@ -27,7 +27,7 @@ namespace Azure.AI.Details.Common.CLI
             ("chat.assistant.get", true ),
             ("chat.assistant.list", false),
             ("chat.assistant.file.upload", true),
-            // ("chat.assistant.file.delete", true),
+            ("chat.assistant.file.delete", true),
             ("chat.assistant.file.list", false),
             // ("chat.assistant.file.get", true),
             ("chat.assistant.file", true),
@@ -48,12 +48,13 @@ namespace Azure.AI.Details.Common.CLI
                 case "chat": return _chatCommandParsers;
 
                 case "chat.assistant.create": return _chatAssistantCreateCommandParsers;
-                case "chat.assistant.get": return _chatPlaceHolderParsers;
+                case "chat.assistant.get": return _chatAssistantGetCommandParsers;
                 case "chat.assistant.list": return _chatPlaceHolderParsers;
                 case "chat.assistant.delete": return _chatAssistantDeleteCommandParsers;
 
                 case "chat.assistant.file.upload": return _chatAssistantFileUploadCommandParsers;
                 case "chat.assistant.file.list": return _chatPlaceHolderParsers;
+                case "chat.assistant.file.delete": return _chatAssistantFileDeleteCommandParsers;
             }
 
             foreach (var command in _commands)
@@ -91,7 +92,8 @@ namespace Azure.AI.Details.Common.CLI
                     SearchEmbeddingModelDeploymentNameToken.Parser(),
                     SearchEmbeddingModelNameToken.Parser(),
 
-                    new NamedValueTokenParser(null, "chat.assistant.id", "001", "1"),
+                    new NamedValueTokenParser(null, "chat.assistant.id", "111", "1"),
+                    new NamedValueTokenParser(null, "chat.assistant.file.id", "0011", "1"),
 
                     new NamedValueTokenParser(null,             "service.config.search.api.key", "00101", "1"),
                     new NamedValueTokenParser(null,             "service.config.search.endpoint.uri", "00110;00101", "1"),
@@ -146,15 +148,25 @@ namespace Azure.AI.Details.Common.CLI
             InstructionsToken.Parser(),
         };
 
+        private static INamedValueTokenParser[] _chatAssistantGetCommandParsers = {
+            new CommonChatNamedValueTokenParsers(),
+            new NamedValueTokenParser(null, "chat.assistant.id", "001", "1"),
+        };
+
         private static INamedValueTokenParser[] _chatAssistantDeleteCommandParsers = {
             new CommonChatNamedValueTokenParsers(),
+            new NamedValueTokenParser(null, "chat.assistant.id", "001", "1"),
         };
 
         private static INamedValueTokenParser[] _chatAssistantFileUploadCommandParsers = {
             new CommonChatNamedValueTokenParsers(),
-
             new NamedValueTokenParser("--file",        "assistant.upload.file", "001", "1"),
             new NamedValueTokenParser("--files",       "assistant.upload.files", "001", "1", null, null, "assistant.upload.file", "x.command.expand.file.name"),
+        };
+
+        private static INamedValueTokenParser[] _chatAssistantFileDeleteCommandParsers = {
+            new CommonChatNamedValueTokenParsers(),
+            new NamedValueTokenParser(null, "chat.assistant.file.id", "0001", "1"),
         };
 
         #endregion
