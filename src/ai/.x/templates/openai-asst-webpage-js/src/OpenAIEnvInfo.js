@@ -8,26 +8,25 @@
 <#@ parameter type="System.String" name="AZURE_OPENAI_SYSTEM_PROMPT" #>
 <#@ parameter type="System.String" name="OPENAI_API_KEY" #>
 <#@ parameter type="System.String" name="OPENAI_MODEL_NAME" #>
-class OpenAIEnvInfo {
-
+export class OpenAIEnvInfo {
   // NOTE: Never deploy your key in client-side environments like browsers or mobile apps
   //  SEE: https://help.openai.com/en/articles/5112595-best-practices-for-api-key-safety
 
-  static ASSISTANT_ID = process.env.ASSISTANT_ID ?? "<#= ASSISTANT_ID #>";
+  static ASSISTANT_ID = import.meta.env.ASSISTANT_ID ?? "<insert your OpenAI assistant ID here>";
 
-  static AZURE_CLIENT_ID = process.env.AZURE_CLIENT_ID ?? null;
-  static AZURE_TENANT_ID = process.env.AZURE_TENANT_ID ?? null;
+  static AZURE_CLIENT_ID = import.meta.env.AZURE_CLIENT_ID ?? null;
+  static AZURE_TENANT_ID = import.meta.env.AZURE_TENANT_ID ?? null;
 
-  static AZURE_OPENAI_API_KEY = process.env.AZURE_OPENAI_API_KEY ?? "<#= AZURE_OPENAI_API_KEY #>";
-  static AZURE_OPENAI_API_VERSION = process.env.AZURE_OPENAI_API_VERSION ?? "<#= AZURE_OPENAI_API_VERSION #>";
-  static AZURE_OPENAI_ENDPOINT = process.env.AZURE_OPENAI_ENDPOINT ?? "<#= AZURE_OPENAI_ENDPOINT #>";
-  static AZURE_OPENAI_CHAT_DEPLOYMENT = process.env.AZURE_OPENAI_CHAT_DEPLOYMENT ?? "<#= AZURE_OPENAI_CHAT_DEPLOYMENT #>";
+  static AZURE_OPENAI_API_KEY = import.meta.env.AZURE_OPENAI_API_KEY ?? "<insert your Azure OpenAI API key here>";
+  static AZURE_OPENAI_API_VERSION = import.meta.env.AZURE_OPENAI_API_VERSION ?? "<insert your Azure OpenAI API version here>";
+  static AZURE_OPENAI_ENDPOINT = import.meta.env.AZURE_OPENAI_ENDPOINT ?? "<insert your Azure OpenAI endpoint here>";
+  static AZURE_OPENAI_CHAT_DEPLOYMENT = import.meta.env.AZURE_OPENAI_CHAT_DEPLOYMENT ?? "<insert your Azure OpenAI chat deployment name here>";
 
-  static AZURE_OPENAI_SYSTEM_PROMPT = process.env.AZURE_OPENAI_SYSTEM_PROMPT ?? "<#= AZURE_OPENAI_SYSTEM_PROMPT #>";
+  static AZURE_OPENAI_SYSTEM_PROMPT = import.meta.env.AZURE_OPENAI_SYSTEM_PROMPT ?? "You are a helpful AI assistant.";
 
-  static OPENAI_API_KEY = process.env.OPENAI_API_KEY ?? "<#= OPENAI_API_KEY #>";
-  static OPENAI_ORG_ID = process.env.OPENAI_ORG_ID ?? null;
-  static OPENAI_MODEL_NAME = process.env.OPENAI_MODEL_NAME ?? "<#= OPENAI_MODEL_NAME #>";
+  static OPENAI_API_KEY = import.meta.env.OPENAI_API_KEY ?? "<insert your OpenAI API key here>";
+  static OPENAI_ORG_ID = import.meta.env.OPENAI_ORG_ID ?? null;
+  static OPENAI_MODEL_NAME = import.meta.env.OPENAI_MODEL_NAME ?? "<insert your OpenAI model name here>";
 
   static isConnectionInfoOk(errorCallback) {
     const ok = this.isAzureAADConnectionInfoOk() || this.isAzureKeyConnectionInfoOk() || this.isOpenAIConnectionInfoOk();
@@ -71,5 +70,3 @@ class OpenAIEnvInfo {
     return true;
   }
 }
-
-exports.OpenAIEnvInfo = OpenAIEnvInfo;

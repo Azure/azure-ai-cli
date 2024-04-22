@@ -5,7 +5,9 @@
   "main": "script.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "webpack": "webpack"
+    "start": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
   },
   "author": "",
   "license": "MIT",
@@ -17,8 +19,6 @@
   },
   "keywords": [],
   "devDependencies": {
-    "dotenv-webpack": "^7.0.3",
-    "webpack": "^5.89.0",
-    "webpack-cli": "^5.1.4"
+    "vite": "^5.2.8"
   }
 }
