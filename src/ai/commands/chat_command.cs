@@ -1041,7 +1041,9 @@ namespace Azure.AI.Details.Common.CLI
             var client = CreateOpenAIAssistantsClient();
             var response = await client.UploadFileAsync(existing, OpenAIFilePurpose.Assistants);
 
-            if (!_quiet) Console.WriteLine($"{message} Done!");
+            var uploaded = response.Value;
+            if (!_quiet) Console.WriteLine($"{message} Done!\n\n  {uploaded.Filename} ({uploaded.Id})\n");
+
             return true;
         }
 
