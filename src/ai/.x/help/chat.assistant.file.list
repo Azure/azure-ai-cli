@@ -1,0 +1,18 @@
+CHAT ASSISTANT FILE LIST
+
+  The `ai chat assistant file list` command lists OpenAI Assistant files.
+
+USAGE: ai chat assistant file list [...]
+
+  CONNECTION
+    --endpoint ENDPOINT                 (see: ai help chat endpoint)
+    --key KEY                           (see: ai help chat key)
+
+EXAMPLE
+
+  ai chat assistant file list
+
+SEE ALSO
+
+  ai help chat assistant examples
+  ai help find topics chat assistant

@@ -6,6 +6,7 @@
 using Azure.AI.Details.Common.CLI.ConsoleGui;
 using Azure.AI.Details.Common.CLI.Extensions.HelperFunctions;
 using Azure.AI.OpenAI;
+using Azure.AI.OpenAI.Assistants;
 using Azure.Core.Diagnostics;
 using Microsoft.CognitiveServices.Speech;
 using System;
@@ -20,6 +21,7 @@ using System.Threading.Tasks;
 using YamlDotNet.Serialization;
 using YamlDotNet.Serialization.NamingConventions;
 using Scriban;
+using System.ClientModel.Primitives;
 
 namespace Azure.AI.Details.Common.CLI
 {
@@ -33,7 +35,20 @@ namespace Azure.AI.Details.Common.CLI
 
         internal bool RunCommand()
         {
-            DoCommand(_values.GetCommand());
+            try
+            {
+                DoCommand(_values.GetCommand());
+            }
+            catch (AggregateException ex)
+            {
+                ex.Handle(x => {
+                    var msg = x.Message.Split(new char[] { '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries).FirstOrDefault();
+                    ConsoleHelpers.WriteLineError($"\n  ERROR: {msg}");
+                    return true;
+                });
+                _values.Reset("passed", "false");
+            }
+
             return _values.GetOrDefault("passed", true);
         }
 
@@ -44,6 +59,17 @@ namespace Azure.AI.Details.Common.CLI
             switch (command)
             {
                 case "chat": DoChat(); break;
+
+                case "chat.assistant": HelpCommandParser.DisplayHelp(_values); break;
+                case "chat.assistant.create": DoChatAssistantCreate().Wait(); break;
+                case "chat.assistant.delete": DoChatAssistantDelete().Wait(); break;
+                case "chat.assistant.get": DoChatAssistantGet().Wait(); break;
+                case "chat.assistant.list": DoChatAssistantList().Wait(); break;
+
+                case "chat.assistant.file": HelpCommandParser.DisplayHelp(_values); break;
+                case "chat.assistant.file.upload": DoChatAssistantFileUpload().Wait(); break;
+                case "chat.assistant.file.list": DoChatAssistantFileList().Wait(); break;
+                case "chat.assistant.file.delete": DoChatAssistantFileDelete().Wait(); break;
 
                 default:
                     _values.AddThrowError("WARNING:", $"'{command.Replace('.', ' ')}' NOT YET IMPLEMENTED!!");
@@ -866,6 +892,222 @@ namespace Azure.AI.Details.Common.CLI
                 case EventLevel.Verbose:
                     AI.DBG_TRACE_VERBOSE(message, 0, e.EventSource.Name, e.EventName); break;
             }
+        }
+
+
+        private async Task<bool> DoChatAssistantCreate()
+        {
+            var name = _values["chat.assistant.create.name"];
+            var deployment = ConfigDeploymentToken.Data().GetOrDefault(_values);
+            var instructions = InstructionsToken.Data().GetOrDefault(_values);
+
+            if (string.IsNullOrEmpty(name))
+            {
+                _values.AddThrowError("ERROR:", $"Creating assistant; requires name.");
+            }
+            else if (string.IsNullOrEmpty(deployment))
+            {
+                _values.AddThrowError("ERROR:", $"Creating assistant; requires deployment.");
+            }
+            else if (string.IsNullOrEmpty(instructions))
+            {
+                _values.AddThrowError("ERROR:", $"Creating assistant; requires instructions.");
+            }
+
+            var message = $"Creating assistant ({name}) ...";
+            if (!_quiet) Console.WriteLine(message);
+
+            var client = CreateOpenAIAssistantsClient();
+
+            var fileIds = FileIdOptionXToken.GetOptions(_values).ToList();
+            fileIds.AddRange(FileIdsOptionXToken.GetOptions(_values));
+
+            var createOptions = new AssistantCreationOptions(deployment) { Name = name, Instructions = instructions };
+            if (fileIds.Count() > 0)
+            {
+                createOptions.Tools.Add(new RetrievalToolDefinition());
+                fileIds.ForEach(id => createOptions.FileIds.Add(id));
+            }
+
+            var response = await client.CreateAssistantAsync(createOptions);
+            var assistant = response.Value;
+
+            if (!_quiet) Console.WriteLine($"{message} Done!\n");
+
+            var fi = new FileInfo(ConfigSetHelpers.ConfigSet("assistant.id", assistant.Id));
+            if (!_quiet) Console.WriteLine($"{fi.Name} (saved at {fi.DirectoryName})\n\n  {assistant.Id}");
+
+            return true;
+        }
+
+        private async Task<bool> DoChatAssistantDelete()
+        {
+            var id = _values["chat.assistant.id"];
+            if (string.IsNullOrEmpty(id))
+            {
+                _values.AddThrowError("ERROR:", $"Deleting assistant; requires id.");
+            }
+
+            var message = $"Deleting assistant ({id}) ...";
+            if (!_quiet) Console.WriteLine(message);
+
+            var client = CreateOpenAIAssistantsClient();
+            var response = await client.DeleteAssistantAsync(id);
+
+            if (!_quiet) Console.WriteLine($"{message} Done!");
+            return true;
+        }
+
+        private async Task<bool> DoChatAssistantGet()
+        {
+            var id = _values["chat.assistant.id"];
+            if (string.IsNullOrEmpty(id))
+            {
+                _values.AddThrowError("ERROR:", $"Deleting assistant; requires id.");
+            }
+
+            var message = $"Getting assistant ({id}) ...";
+            if (!_quiet) Console.WriteLine(message);
+
+            var client = CreateOpenAIAssistantsClient();
+            var response = await client.GetAssistantAsync(id);
+
+            var assistant = response.Value;
+            if (!_quiet) Console.WriteLine($"{message} Done!\n");
+
+            var jsonModel = assistant as IJsonModel<Assistant>;
+            if (jsonModel != null)
+            {
+                var writer = new Utf8JsonWriter(Console.OpenStandardOutput());
+                jsonModel.Write(writer, ModelReaderWriterOptions.Json);
+                writer.Flush();
+                Console.WriteLine();
+            }
+
+            return true;
+        }
+
+        private async Task<bool> DoChatAssistantList()
+        {
+            var message = $"Listing assistants ...";
+            if (!_quiet) Console.WriteLine(message);
+
+            var client = CreateOpenAIAssistantsClient();
+
+            var order = ListSortOrder.Ascending;
+            var response = await client.GetAssistantsAsync(order: order);
+
+            var pageable = response.Value;
+            var assistants = pageable.ToList();
+
+            while (pageable.HasMore)
+            {
+                response = await client.GetAssistantsAsync(after: pageable.LastId, order: order);
+                pageable = response.Value;
+                assistants.AddRange(pageable);
+            }
+
+            if (!_quiet) Console.WriteLine($"{message} Done!\n");
+
+            if (assistants.Count == 0)
+            {
+                Console.WriteLine("No assistants found.");
+            }
+            else
+            {
+                Console.WriteLine("Assistants:\n");
+                foreach (var assistant in assistants)
+                {
+                    Console.WriteLine($"  {assistant.Name} ({assistant.Id})");
+                }
+            }
+
+            return true;
+        }
+
+        private async Task<bool> DoChatAssistantFileUpload()
+        {
+            var file = _values["assistant.upload.file"];
+            if (string.IsNullOrEmpty(file))
+            {
+                _values.AddThrowError("ERROR:", $"Uploading assistant file; requires file.");
+            }
+
+            var existing = FileHelpers.DemandFindFileInDataPath(file, _values, "assistant file");
+
+            var message = $"Uploading assistant file ({file}) ...";
+            if (!_quiet) Console.WriteLine(message);
+
+            var client = CreateOpenAIAssistantsClient();
+            var response = await client.UploadFileAsync(existing, OpenAIFilePurpose.Assistants);
+
+            if (!_quiet) Console.WriteLine($"{message} Done!");
+            return true;
+        }
+
+        private async Task<bool> DoChatAssistantFileList()
+        {
+            var message = $"Listing assistant files ...";
+            if (!_quiet) Console.WriteLine(message);
+
+            var client = CreateOpenAIAssistantsClient();
+            var response = await client.GetFilesAsync(OpenAIFilePurpose.Assistants);
+            var list = response.Value;
+
+            if (!_quiet) Console.WriteLine($"{message} Done!\n");
+
+            var files = list.ToList();
+            if (files.Count == 0)
+            {
+                Console.WriteLine("No files found.");
+            }
+            else
+            {
+                Console.WriteLine("Assistant files:\n");
+                foreach (var file in files)
+                {
+                    Console.WriteLine($"  {file.Filename} ({file.Id})");
+                }
+            }
+
+            return true;
+        }
+
+        private async Task<bool> DoChatAssistantFileDelete()
+        {
+            var id = _values["chat.assistant.file.id"];
+            if (string.IsNullOrEmpty(id))
+            {
+                _values.AddThrowError("ERROR:", $"Deleting assistant file; requires file id.");
+            }
+
+            var message = $"Deleting assistant file ({id}) ...";
+            if (!_quiet) Console.WriteLine(message);
+
+            var client = CreateOpenAIAssistantsClient();
+            var response = await client.DeleteFileAsync(id);
+
+            if (!_quiet) Console.WriteLine($"{message} Done!");
+            return true;
+        }
+
+        private AssistantsClient CreateOpenAIAssistantsClient()
+        {
+            var key = _values["service.config.key"];
+            var endpoint = ConfigEndpointUriToken.Data().GetOrDefault(_values);
+
+            if (string.IsNullOrEmpty(endpoint))
+            {
+                _values.AddThrowError("ERROR:", $"Creating AssistantsClient; requires endpoint.");
+            }
+
+            _azureEventSourceListener = new AzureEventSourceListener((e, message) => EventSourceAiLoggerLog(e, message), System.Diagnostics.Tracing.EventLevel.Verbose);
+
+            var options = new AssistantsClientOptions();
+            options.Diagnostics.IsLoggingContentEnabled = true;
+            options.Diagnostics.IsLoggingEnabled = true;
+
+            return new AssistantsClient(new Uri(endpoint!), new AzureKeyCredential(key), options);
         }
 
         private void StartCommand()

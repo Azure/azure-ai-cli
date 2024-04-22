@@ -37,7 +37,7 @@ namespace Azure.AI.Details.Common.CLI
             return ParseCommandValues("help", Enumerable.Empty<INamedValueTokenParser>(), tokens, values);
         }
 
-        public static bool DisplayHelp(INamedValueTokens tokens, INamedValues values)
+        public static bool DisplayHelp(INamedValues values)
         {
             var topicSearch = values.GetOrEmpty("display.help.topic");
             if (!string.IsNullOrEmpty(topicSearch)) return DoListHelpTopics(topicSearch, values);

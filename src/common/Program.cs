@@ -195,9 +195,9 @@ namespace Azure.AI.Details.Common.CLI
             return version ?? string.Empty;
         }
 
-        private static void DisplayCommandHelp(INamedValueTokens tokens, INamedValues values)
+        private static void DisplayCommandHelp(INamedValues values)
         {
-            HelpCommandParser.DisplayHelp(tokens, values);
+            HelpCommandParser.DisplayHelp(values);
         }
 
         public static void DisplayVersion(INamedValues values, bool setUpdateMessage = false)
@@ -305,7 +305,7 @@ namespace Azure.AI.Details.Common.CLI
 
             if (values.DisplayHelpRequested())
             {
-                DisplayCommandHelp(tokens, values);
+                DisplayCommandHelp(values);
             }
         }
 
@@ -332,7 +332,7 @@ namespace Azure.AI.Details.Common.CLI
             else if (values.DisplayHelpRequested())
             {
                 if (displayBanner) DisplayBanner(values);
-                DisplayCommandHelp(tokens, values);
+                DisplayCommandHelp(values);
                 return values.GetOrDefault("display.help.exit.code", 0);
             }
             else if (values.DisplayVersionRequested() || values.DisplayUpdateRequested())

@@ -1,0 +1,23 @@
+CHAT ASSISTANT FILE UPLOAD
+
+  The `ai chat assistant file upload` command uploads a new OpenAI Assistant file.
+
+USAGE: ai chat assistant file upload [...]
+
+  CONNECTION
+    --endpoint ENDPOINT                 (see: ai help chat endpoint)
+    --key KEY                           (see: ai help chat key)
+
+  UPLOAD
+    --file FILE
+    --file FILEs
+
+EXAMPLE
+
+  ai chat assistant file upload --file README.md
+  ai chat assistant file upload --files **\*.md
+
+SEE ALSO
+
+  ai help chat assistant examples
+  ai help find topics chat assistant

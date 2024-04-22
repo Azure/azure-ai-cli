@@ -1,0 +1,18 @@
+CHAT ASSISTANT LIST
+
+  The `ai chat assistant list` command lists OpenAI Assistants.
+
+USAGE: ai chat assistant list [...]
+
+  CONNECTION
+    --endpoint ENDPOINT                 (see: ai help chat endpoint)
+    --key KEY                           (see: ai help chat key)
+
+EXAMPLE
+
+  ai chat assistant list
+
+SEE ALSO
+
+  ai help chat assistant examples
+  ai help find topics chat assistant
