@@ -919,7 +919,16 @@ namespace Azure.AI.Details.Common.CLI
 
             var client = CreateOpenAIAssistantsClient();
 
+            var fileIds = FileIdOptionXToken.GetOptions(_values).ToList();
+            fileIds.AddRange(FileIdsOptionXToken.GetOptions(_values));
+
             var createOptions = new AssistantCreationOptions(deployment) { Name = name, Instructions = instructions };
+            if (fileIds.Count() > 0)
+            {
+                createOptions.Tools.Add(new RetrievalToolDefinition());
+                fileIds.ForEach(id => createOptions.FileIds.Add(id));
+            }
+
             var response = await client.CreateAssistantAsync(createOptions);
             var assistant = response.Value;
 
