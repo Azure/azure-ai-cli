@@ -73,10 +73,6 @@ class <#= ClassName #> {
       else if (event.event == 'thread.run.requires_action') {
         await this.onThreadRunRequiresAction(event, callback);
       }
-      else if (event.event === 'thread.message.chunk') { // TODO: Remove once AOAI service on same version (per Salman)
-        let content = event.data.delta.content.map(item => item.text.value).join('');
-        callback(content);
-      }
     });
   }
 

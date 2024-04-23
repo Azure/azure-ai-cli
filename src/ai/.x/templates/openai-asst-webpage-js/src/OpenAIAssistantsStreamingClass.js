@@ -68,10 +68,6 @@ class <#= ClassName #> {
       if (event.event == 'thread.run.completed') {
         this.resolveRunCompletedPromise();
       }
-      else if (event.event === 'thread.message.chunk') { // TODO: Remove once AOAI service on same version (per Salman)
-        let content = event.data.delta.content.map(item => item.text.value).join('');
-        callback(content);
-      }
     });
   }
 
