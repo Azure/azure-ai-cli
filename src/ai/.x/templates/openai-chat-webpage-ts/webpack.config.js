@@ -1,5 +1,4 @@
 const path = require('path');
-const webpack = require('webpack');
 const Dotenv = require('dotenv-webpack');
 
 module.exports = {
@@ -10,12 +9,6 @@ module.exports = {
   },
   plugins: [
     new Dotenv(),
-    new webpack.DefinePlugin({
-      'process.env.ENDPOINT': JSON.stringify(process.env.ENDPOINT),
-      'process.env.AZURE_API_KEY': JSON.stringify(process.env.AZURE_API_KEY),
-      'process.env.DEPLOYMENT_NAME': JSON.stringify(process.env.DEPLOYMENT_NAME),
-      'process.env.SYSTEM_PROMPT': JSON.stringify(process.env.SYSTEM_PROMPT),
-    }),
   ],
   resolve: {
     extensions: [ '.tsx', '.ts', '.js' ],
