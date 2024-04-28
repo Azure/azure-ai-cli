@@ -155,9 +155,9 @@ namespace Azure.AI.Details.Common.CLI
 
         private void CheckGenerateTemplateFileWarnings(string templateName, string language, object check)
         {
-            if (check != null && check is TemplateFactory.Group)
+            if (check != null && check is DevNewTemplateGroup)
             {
-                var group = check as TemplateFactory.Group;
+                var group = check as DevNewTemplateGroup;
                 var groupHasZeroLanguages = string.IsNullOrEmpty(group.Languages);
                 var groupHasMultipleLanguages = group.Languages.Contains(',');
                 var groupHasOneLanguage = !groupHasZeroLanguages && !groupHasMultipleLanguages;
