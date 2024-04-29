@@ -1,11 +1,8 @@
-<#@ template hostspecific="true" #>
-<#@ output extension=".ts" encoding="utf-8" #>
-<#@ parameter type="System.String" name="ClassName" #>
 import { OpenAIClient, AzureKeyCredential, ChatRequestMessage } from "@azure/openai";
 import { FunctionCallContext } from "./FunctionCallContext"
 import { FunctionFactory } from "./FunctionFactory"
 
-export class <#= ClassName #> {
+export class {ClassName} {
   private openAISystemPrompt: string;
   private openAIChatDeploymentName: string;
   private client: OpenAIClient;

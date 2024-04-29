@@ -3,7 +3,6 @@
 // Licensed under the MIT license. See LICENSE.md file in the project root for full license information.
 //
 
-using Mono.TextTemplating;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -58,7 +57,7 @@ namespace Azure.AI.Details.Common.CLI.Extensions.Templates
             return true;
         }
 
-        public static object? GenerateTemplateFiles(string templateName, string language, string instructions, string outputDirectory, bool quiet, bool verbose)
+        public static object? GenerateTemplateFiles(string templateName, string language, string instructions, string outputDirectory, INamedValues values)
         {
             var list = new DevNewTemplateGroupList();
             var filterApplied = list.ApplyFilter(templateName, null, null)
@@ -89,9 +88,11 @@ namespace Azure.AI.Details.Common.CLI.Extensions.Templates
             var message = templateName != outputDirectory
                 ? $"Generating '{templateName}' in '{outputDirectory}' ({files.Count()} files)..."
                 : $"Generating '{templateName}' ({files.Count()} files)...";
+
+            var quiet = values.GetOrDefault("quiet", false);
             if (!quiet) Console.WriteLine($"{message}\n");
 
-            var generated = ProcessTemplates(normalizedTemplateName, files, parameters, outputDirectory);
+            var generated = ProcessTemplates(normalizedTemplateName, files, parameters, outputDirectory, values);
             foreach (var item in generated)
             {
                 var file = item.Replace(outputDirectory, string.Empty).Trim('\\', '/');
@@ -133,14 +134,14 @@ namespace Azure.AI.Details.Common.CLI.Extensions.Templates
             return true;
         }
 
-        private static IEnumerable<string> ProcessTemplates(string templateName, IEnumerable<string> files, Dictionary<string, string> parameters, string outputDirectory)
+        private static IEnumerable<string> ProcessTemplates(string templateName, IEnumerable<string> files, Dictionary<string, string> parameters, string outputDirectory, INamedValues values)
         {
-            var generator = new TemplateGenerator();
+            values = new CommandValues(values);
             foreach (var item in parameters)
             {
                 var name = item.Key;
                 var value = item.Value;
-                generator.AddParameter(string.Empty, string.Empty, name, value);
+                values.Add(name, value);
             }
 
             var root = FileHelpers.FileNameFromResourceName("templates") + "/";
@@ -154,7 +155,7 @@ namespace Azure.AI.Details.Common.CLI.Extensions.Templates
                 var isBinary = file.EndsWith(".png") || file.EndsWith(".ico");
                 if (!isBinary)
                 {
-                    ProcessTemplate(generator, file, outputFileWithPath, out var generatedFileName, out var generatedContent);
+                    ProcessTemplate(file, outputFileWithPath, values, out var generatedFileName, out var generatedContent);
                     FileHelpers.WriteAllText(generatedFileName, generatedContent, new UTF8Encoding(false));
                     yield return generatedFileName;
                 }
@@ -167,16 +168,14 @@ namespace Azure.AI.Details.Common.CLI.Extensions.Templates
             }
         }
 
-        private static void ProcessTemplate(TemplateGenerator generator, string file, string outputFile, out string generatedFileName, out string generatedContent)
+        private static void ProcessTemplate(string file, string outputFile, INamedValues values, out string generatedFileName, out string generatedContent)
         {
             var text = FileHelpers.ReadAllText(file, new UTF8Encoding(false));
             if (Program.Debug) Console.WriteLine($"```{file}\n{text}\n```");
 
-            var parsed = generator.ParseTemplate(file, text);
-            var settings = TemplatingEngine.GetSettings(generator, parsed);
-            settings.CompilerOptions = "-nullable:enable";
+            generatedFileName = outputFile;
+            generatedContent = TemplateHelpers.ProcessTemplate(text, values);
 
-            (generatedFileName, generatedContent) = generator.ProcessTemplateAsync(parsed, file, text, outputFile, settings).Result;
             if (Program.Debug) Console.WriteLine($"```{generatedFileName}\n{generatedContent}\n```");
         }
     }

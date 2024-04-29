@@ -11,7 +11,6 @@
 
   <ItemGroup>
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
-    <PackageReference Include="Mono.TextTemplating" Version="3.0.0-preview-0027-g2711105671" />
   </ItemGroup>
 
   <ItemGroup>

@@ -1,6 +1,3 @@
-<#@ template hostspecific="true" #>
-<#@ output extension=".go" encoding="utf-8" #>
-<#@ parameter type="System.String" name="ClassName" #>
 package main
 
 import (
@@ -12,14 +9,14 @@ import (
     "github.com/Azure/azure-sdk-for-go/sdk/azcore/to"
 )
 
-type <#= ClassName #> struct {
+type {ClassName} struct {
     client              *azopenai.Client
     options             *azopenai.ChatCompletionsOptions
     functionFactory     *FunctionFactory
     functionCallContext *FunctionCallContext
 }
 
-func New<#= ClassName #>(openAIEndpoint string, openAIAPIKey string, openAIChatDeploymentName string, openAISystemPrompt string, functionFactory *FunctionFactory) (*<#= ClassName #>, error) {
+func New{ClassName}(openAIEndpoint string, openAIAPIKey string, openAIChatDeploymentName string, openAISystemPrompt string, functionFactory *FunctionFactory) (*{ClassName}, error) {
     keyCredential, err := azopenai.NewKeyCredential(openAIAPIKey)
     if err != nil {
         return nil, err
@@ -42,18 +39,18 @@ func New<#= ClassName #>(openAIEndpoint string, openAIAPIKey string, openAIChatD
         Functions: functionFactory.GetFunctionSchemas(),
     }
 
-    return &<#= ClassName #>{
+    return &{ClassName}{
         client: client,
         options: options,
         functionCallContext: NewFunctionCallContext(functionFactory, options),
     }, nil
 }
 
-func (chat *<#= ClassName #>) ClearConversation() {
+func (chat *{ClassName}) ClearConversation() {
     chat.options.Messages = chat.options.Messages[:1]
 }
 
-func (chat *<#= ClassName #>) GetChatCompletionsStream(userPrompt string, callback func(content string)) (string, error) {
+func (chat *{ClassName}) GetChatCompletionsStream(userPrompt string, callback func(content string)) (string, error) {
     chat.options.Messages = append(chat.options.Messages, azopenai.ChatMessage{Role: to.Ptr(azopenai.ChatRoleUser), Content: to.Ptr(userPrompt)})
 
     responseContent := ""

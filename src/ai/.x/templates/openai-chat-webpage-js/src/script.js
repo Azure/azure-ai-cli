@@ -1,12 +1,9 @@
-<#@ template hostspecific="true" #>
-<#@ output extension=".js" encoding="utf-8" #>
-<#@ parameter type="System.String" name="ClassName" #>
 const marked = require("marked");
 const hljs = require("highlight.js");
 
 const { CreateOpenAI } = require("./CreateOpenAI");
 const { OpenAIEnvInfo } = require("./OpenAIEnvInfo");
-const { <#= ClassName #> } = require("./OpenAIChatCompletionsStreamingClass");
+const { {ClassName} } = require("./OpenAIChatCompletionsStreamingClass");
 
 let streamingChatCompletions;
 async function streamingChatCompletionsInit() {
@@ -20,8 +17,8 @@ async function streamingChatCompletionsInit() {
   // Create the streaming chat completions helper
   const useAzure = OpenAIEnvInfo.AZURE_OPENAI_ENDPOINT?.startsWith('https://');
   streamingChatCompletions = useAzure
-    ? new <#= ClassName #>(OpenAIEnvInfo.AZURE_OPENAI_CHAT_DEPLOYMENT, OpenAIEnvInfo.AZURE_OPENAI_SYSTEM_PROMPT, openai, 20)
-    : new <#= ClassName #>(OpenAIEnvInfo.OPENAI_MODEL_NAME, OpenAIEnvInfo.AZURE_OPENAI_SYSTEM_PROMPT, openai);
+    ? new {ClassName}(OpenAIEnvInfo.AZURE_OPENAI_CHAT_DEPLOYMENT, OpenAIEnvInfo.AZURE_OPENAI_SYSTEM_PROMPT, openai, 20)
+    : new {ClassName}(OpenAIEnvInfo.OPENAI_MODEL_NAME, OpenAIEnvInfo.AZURE_OPENAI_SYSTEM_PROMPT, openai);
 }
 
 function streamingChatCompletionsClear() {

@@ -1,9 +1,6 @@
-<#@ template hostspecific="true" #>
-<#@ output extension=".js" encoding="utf-8" #>
-<#@ parameter type="System.String" name="ClassName" #>
 const { CreateOpenAI } = require("./CreateOpenAI");
 const { OpenAIEnvInfo } = require("./OpenAIEnvInfo");
-const { <#= ClassName #> } = require("./OpenAIAssistantsStreamingClass");
+const { {ClassName} } = require("./OpenAIAssistantsStreamingClass");
 
 const readline = require('node:readline/promises');
 const rl = readline.createInterface({
@@ -22,7 +19,7 @@ async function main() {
   });
 
   // Create the assistants streaming helper class instance
-  const assistant = new <#= ClassName #>(OpenAIEnvInfo.ASSISTANT_ID, openai);
+  const assistant = new {ClassName}(OpenAIEnvInfo.ASSISTANT_ID, openai);
 
   // Get or create the thread, and display the messages if any
   if (threadId === null) {

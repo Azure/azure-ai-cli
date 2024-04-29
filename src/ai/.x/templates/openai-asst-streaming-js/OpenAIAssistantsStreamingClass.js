@@ -1,9 +1,6 @@
-<#@ template hostspecific="true" #>
-<#@ output extension=".js" encoding="utf-8" #>
-<#@ parameter type="System.String" name="ClassName" #>
 const { OpenAI } = require('openai');
 
-class <#= ClassName #> {
+class {ClassName} {
 
   // Constructor
   constructor(openAIAssistantId, openai, simulateTypingDelay = 0) {
@@ -82,4 +79,4 @@ class <#= ClassName #> {
   }
 }
 
-exports.<#= ClassName #> = <#= ClassName #>;
+exports.{ClassName} = {ClassName};

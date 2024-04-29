@@ -1,6 +1,3 @@
-<#@ template hostspecific="true" #>
-<#@ output extension=".go" encoding="utf-8" #>
-<#@ parameter type="System.String" name="ClassName" #>
 package main
 
 import (
@@ -11,12 +8,12 @@ import (
     "github.com/Azure/azure-sdk-for-go/sdk/azcore/to"
 )
 
-type <#= ClassName #> struct {
+type {ClassName} struct {
     client   *azopenai.Client
     options  *azopenai.ChatCompletionsOptions
 }
 
-func New<#= ClassName #>(openAIEndpoint string, openAIAPIKey string, openAIChatDeploymentName string, openAISystemPrompt string) (*<#= ClassName #>, error) {
+func New{ClassName}(openAIEndpoint string, openAIAPIKey string, openAIChatDeploymentName string, openAISystemPrompt string) (*{ClassName}, error) {
     keyCredential := azcore.NewKeyCredential(openAIAPIKey)
 
     client, err := azopenai.NewClientWithKeyCredential(openAIEndpoint, keyCredential, nil)
@@ -35,17 +32,17 @@ func New<#= ClassName #>(openAIEndpoint string, openAIAPIKey string, openAIChatD
         Messages: messages,
     }
 
-    return &<#= ClassName #> {
+    return &{ClassName} {
         client: client,
         options: options,
     }, nil
 }
 
-func (chat *<#= ClassName #>) ClearConversation() {
+func (chat *{ClassName}) ClearConversation() {
     chat.options.Messages = chat.options.Messages[:1]
 }
 
-func (chat *<#= ClassName #>) GetChatCompletions(userPrompt string) (string, error) {
+func (chat *{ClassName}) GetChatCompletions(userPrompt string) (string, error) {
     chat.options.Messages = append(chat.options.Messages, &azopenai.ChatRequestUserMessage{Content: azopenai.NewChatRequestUserMessageContent(userPrompt)})
 
     resp, err := chat.client.GetChatCompletions(context.TODO(), *chat.options, nil)

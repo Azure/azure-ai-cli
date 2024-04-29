@@ -89,7 +89,7 @@ namespace Azure.AI.Details.Common.CLI
             var outputDirectory = templateName + ProgrammingLanguageToken.GetSuffix(language);
             var instructions = InstructionsToken.Data().GetOrDefault(_values);
 
-            var found = TemplateFactory.GenerateTemplateFiles(templateName, language, instructions, outputDirectory, _quiet, _verbose);
+            var found = TemplateFactory.GenerateTemplateFiles(templateName, language, instructions, outputDirectory, _values);
             CheckGenerateTemplateFileWarnings(templateName, language, found);
         }
 

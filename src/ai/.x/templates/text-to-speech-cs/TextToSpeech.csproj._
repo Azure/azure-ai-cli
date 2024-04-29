@@ -1,5 +1,3 @@
-<#@ template hostspecific="true" #>
-<#@ output extension=".csproj" encoding="utf-8" #>
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
