@@ -5,7 +5,7 @@
 
 using Azure.AI.Details.Common.CLI.Extensions.HelperFunctions;
 
-public static class {ClassName}
+public static class UserNameHelperFunctionClass
 {
     [HelperFunctionDescription("Gets the user's name")]
     public static string GetUsersName()
