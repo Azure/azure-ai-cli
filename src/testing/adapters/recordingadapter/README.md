@@ -10,7 +10,7 @@ Recordable tests are marked with a tag "Recordable" that should be set to true:
 ```
 - name: test ai chat
   command: ai chat --question "Why is the sky blue, what's it called" --index-name @none
-  expect: Rayleigh
+  expect-regex: Rayleigh
   tags: 
     recordable: true
 ```
@@ -71,7 +71,7 @@ To do so, add a _sanitize tag to your yaml:
 ```
 - name: test ai chat
   command: ai chat --question "Why is the sky blue, what's it called" --index-name @none
-  expect: Rayleigh
+  expect-regex: Rayleigh
   tags: 
     recordable: true
     _sanitize:

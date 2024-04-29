@@ -14,18 +14,18 @@
 
 - name: try1b command ... ai run --script "echo hello"
   command: ai run --script "echo hello"
-  expect: hello
+  expect-regex: hello
 
 - name: try2a script ... ai
   script: ai
 
 - name: try2b script ... ai run --script "echo hello"
   script: ai run --script "echo hello"
-  expect: hello
+  expect-regex: hello
 
 - name: simple help test
   script: ai
-  expect: |
+  expect-regex: |
     (?# ---------- BANNER)
     AI - Azure AI CLI, Version [01]\.[0-9].[0-9]
     Copyright \(c\) 2024 Microsoft Corporation\. All Rights Reserved\.
@@ -82,7 +82,7 @@
 - name: dev new list
   command: dev new list
   arguments:
-    expect: |
+    expect-regex: |
       ^Name +Short +Name +Language +\r?$\n
       ^-+ +-+ +-+\r?$\n
       ^Environment +Variables +\.env *\r?$\n

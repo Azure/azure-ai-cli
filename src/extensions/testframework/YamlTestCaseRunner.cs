@@ -75,9 +75,9 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
             var @foreach = YamlTestProperties.Get(test, "foreach");
             var arguments = YamlTestProperties.Get(test, "arguments");
             var input = YamlTestProperties.Get(test, "input");
-            var expect = YamlTestProperties.Get(test, "expect");
-            var expectGpt = YamlTestProperties.Get(test, "expect-gpt");
-            var notExpect = YamlTestProperties.Get(test, "not-expect");
+            var expectGpt = YamlTestProperties.Get(test, "expect");
+            var expectRegex = YamlTestProperties.Get(test, "expect-regex");
+            var notExpectRegex = YamlTestProperties.Get(test, "not-expect-regex");
             var env = YamlTestProperties.Get(test, "env");
             var workingDirectory = YamlTestProperties.Get(test, "working-directory");
             var timeout = int.Parse(YamlTestProperties.Get(test, "timeout", YamlTestFramework.DefaultTimeout)!);
@@ -97,8 +97,8 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
                 var start = DateTime.Now;
 
                 var outcome = string.IsNullOrEmpty(simulate)
-                    ? RunTestCase(test, skipOnFailure, cli, command, script, scriptIsBash, foreachItem, arguments, input, expect, expectGpt, notExpect, env, workingDirectory, timeout, out string stdOut, out string stdErr, out string errorMessage, out string stackTrace, out string additional, out string debugTrace)
-                    : SimulateTestCase(test, simulate, cli, command, script, scriptIsBash, foreachItem, arguments, input, expect, expectGpt, notExpect, env, workingDirectory, out stdOut, out stdErr, out errorMessage, out stackTrace, out additional, out debugTrace);
+                    ? RunTestCase(test, skipOnFailure, cli, command, script, scriptIsBash, foreachItem, arguments, input, expectGpt, expectRegex, notExpectRegex, env, workingDirectory, timeout, out string stdOut, out string stdErr, out string errorMessage, out string stackTrace, out string additional, out string debugTrace)
+                    : SimulateTestCase(test, simulate, cli, command, script, scriptIsBash, foreachItem, arguments, input, expectGpt, expectRegex, notExpectRegex, env, workingDirectory, out stdOut, out stdErr, out errorMessage, out stackTrace, out additional, out debugTrace);
 
                 // #if DEBUG
                 // additional += outcome == TestOutcome.Failed ? $"\nEXTRA: {ExtraDebugInfo()}" : "";
@@ -220,7 +220,7 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
             return dup;
         }
 
-        private static TestOutcome RunTestCase(TestCase test, bool skipOnFailure, string cli, string? command, string? script, bool scriptIsBash, string @foreach, string? arguments, string? input, string? expect, string? expectGpt, string? notExpect, string? env, string workingDirectory, int timeout, out string stdOut, out string stdErr, out string errorMessage, out string stackTrace, out string additional, out string debugTrace)
+        private static TestOutcome RunTestCase(TestCase test, bool skipOnFailure, string cli, string? command, string? script, bool scriptIsBash, string @foreach, string? arguments, string? input, string? expectGpt, string? expectRegex, string? notExpectRegex, string? env, string workingDirectory, int timeout, out string stdOut, out string stdErr, out string errorMessage, out string stackTrace, out string additional, out string debugTrace)
         {
             var outcome = TestOutcome.None;
 
@@ -244,10 +244,10 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
                 var useCmd = !scriptIsBash;
                 script = WriteTextToTempFile(script, useCmd ? "cmd" : null);
 
-                expect = WriteTextToTempFile(expect);
-                notExpect = WriteTextToTempFile(notExpect);
+                expectRegex = WriteTextToTempFile(expectRegex);
+                notExpectRegex = WriteTextToTempFile(notExpectRegex);
 
-                GetStartInfoArgs(out var startProcess, out var startArgs, cli, command, script, scriptIsBash, kvs, expect, notExpect, ref filesToDelete);
+                GetStartInfoArgs(out var startProcess, out var startArgs, cli, command, script, scriptIsBash, kvs, expectRegex, notExpectRegex, ref filesToDelete);
                 stackTrace = $"{startProcess} {startArgs}\n{stackTrace ?? string.Empty}";
 
                 Logger.Log($"Process.Start('{startProcess} {startArgs}')");
@@ -310,8 +310,8 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
             finally
             {
                 if (script != null) File.Delete(script);
-                if (expect != null) File.Delete(expect);
-                if (notExpect != null) File.Delete(notExpect);
+                if (expectRegex != null) File.Delete(expectRegex);
+                if (notExpectRegex != null) File.Delete(notExpectRegex);
                 filesToDelete?.ForEach(x => File.Delete(x));
             }
 
@@ -704,7 +704,7 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
             return completed;
         }
 
-        private static void GetStartInfoArgs(out string startProcess, out string startArgs,string cli, string? command, string? script, bool scriptIsBash, List<KeyValuePair<string, string>> kvs, string? expect, string? notExpect, ref List<string>? files)
+        private static void GetStartInfoArgs(out string startProcess, out string startArgs,string cli, string? command, string? script, bool scriptIsBash, List<KeyValuePair<string, string>> kvs, string? expectRegex, string? notExpectRegex, ref List<string>? files)
         {
             startProcess = FindCacheCli(cli);
 
@@ -713,14 +713,14 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
             {
                 command = $"{command} {GetKeyValueArgs(kvs)}";
 
-                var hasExpectations = !string.IsNullOrEmpty(expect) || !string.IsNullOrEmpty(notExpect);
+                var hasExpectations = !string.IsNullOrEmpty(expectRegex) || !string.IsNullOrEmpty(notExpectRegex);
                 if (hasExpectations) 
                 {
                     command = WriteTextToTempFile(command)!;
                     files ??= new List<string>();
                     files.Add(command);
 
-                    startArgs = $"run --command @{command} {GetAtArgs(expect, notExpect)}";
+                    startArgs = $"run --command @{command} {GetAtArgs(expectRegex, notExpectRegex)}";
                     return;
                 }
 
@@ -733,11 +733,11 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
                 var bash = RuntimeInformation.IsOSPlatform(OSPlatform.Windows) 
                     ? EnsureFindCacheGetBashExe()
                     : "/bin/bash";
-                startArgs = $"run --process \"{bash}\" --pre.script -l --script \"{script}\" {GetKeyValueArgs(kvs)} {GetAtArgs(expect, notExpect)}";
+                startArgs = $"run --process \"{bash}\" --pre.script -l --script \"{script}\" {GetKeyValueArgs(kvs)} {GetAtArgs(expectRegex, notExpectRegex)}";
                 return;
             }
 
-            startArgs = $"run --cmd --script \"{script}\" {GetKeyValueArgs(kvs)} {GetAtArgs(expect, notExpect)}";
+            startArgs = $"run --cmd --script \"{script}\" {GetKeyValueArgs(kvs)} {GetAtArgs(expectRegex, notExpectRegex)}";
             return;
         }
 
@@ -771,11 +771,11 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
             return found.Where(x => x.ToLower().Contains("git")).FirstOrDefault() ?? "bash.exe";
         }
 
-        private static string GetAtArgs(string? expect, string? notExpect)
+        private static string GetAtArgs(string? expectRegex, string? notExpectRegex)
         {
             var atArgs = $"";
-            if (!string.IsNullOrEmpty(expect)) atArgs += $" --expect @{expect}";
-            if (!string.IsNullOrEmpty(notExpect)) atArgs += $" --not expect @{notExpect}";
+            if (!string.IsNullOrEmpty(expectRegex)) atArgs += $" --expect @{expectRegex}";
+            if (!string.IsNullOrEmpty(notExpectRegex)) atArgs += $" --not-expect @{notExpectRegex}";
             return atArgs.TrimStart(' ');
         }
 
@@ -809,7 +809,7 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
             return args.ToString().TrimEnd();
         }
 
-        private static TestOutcome SimulateTestCase(TestCase test, string simulate, string cli, string? command, string? script, bool scriptIsBash, string @foreach, string? arguments, string? input, string? expect, string? expectGpt, string? notExpect, string? env, string workingDirectory, out string stdOut, out string stdErr, out string errorMessage, out string stackTrace, out string additional, out string debugTrace)
+        private static TestOutcome SimulateTestCase(TestCase test, string simulate, string cli, string? command, string? script, bool scriptIsBash, string @foreach, string? arguments, string? input, string? expectGpt, string? expectRegex, string? notExpectRegex, string? env, string workingDirectory, out string stdOut, out string stdErr, out string errorMessage, out string stackTrace, out string additional, out string debugTrace)
         {
             var sb = new StringBuilder();
             sb.AppendLine($"cli='{cli?.Replace("\n", "\\n")}'");
@@ -819,8 +819,9 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
             sb.AppendLine($"foreach='{@foreach?.Replace("\n", "\\n")}'");
             sb.AppendLine($"arguments='{arguments?.Replace("\n", "\\n")}'");
             sb.AppendLine($"input='{input?.Replace("\n", "\\n")}'");
-            sb.AppendLine($"expect='{expect?.Replace("\n", "\\n")}'");
-            sb.AppendLine($"not-expect='{notExpect?.Replace("\n", "\\n")}'");
+            sb.AppendLine($"expect-gpt='{expectGpt?.Replace("\n", "\\n")}'");
+            sb.AppendLine($"expect-regex='{expectRegex?.Replace("\n", "\\n")}'");
+            sb.AppendLine($"not-expect-regex='{notExpectRegex?.Replace("\n", "\\n")}'");
             sb.AppendLine($"working-directory='{workingDirectory}'");
 
             stdOut = sb.ToString();
@@ -928,15 +929,15 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
             var outcome = ExpectGptOutcome(output, expectGpt, workingDirectory, out var gptStdOut, out var gptStdErr, out var gptMerged);
             if (outcome == TestOutcome.Failed)
             {
-                if (!string.IsNullOrEmpty(gptStdOut)) stdOut = $"{stdOut}\n--expect-gpt--\n{gptStdOut}\n".Trim('\n');
-                if (!string.IsNullOrEmpty(gptStdErr)) stdErr = $"{stdErr}\n--expect-gpt--\n{gptStdErr}\n".Trim('\n');
+                if (!string.IsNullOrEmpty(gptStdOut)) stdOut = $"{stdOut}\n--expect--\n{gptStdOut}\n".Trim('\n');
+                if (!string.IsNullOrEmpty(gptStdErr)) stdErr = $"{stdErr}\n--expect--\n{gptStdErr}\n".Trim('\n');
             }
             return outcome;
         }
 
-        private static TestOutcome ExpectGptOutcome(string output, string expect, string workingDirectory, out string gptStdOut, out string gptStdErr, out string gptMerged)
+        private static TestOutcome ExpectGptOutcome(string output, string expectGpt, string workingDirectory, out string gptStdOut, out string gptStdErr, out string gptMerged)
         {
-            Logger.Log($"ExpectGptOutcome: Checking for {expect} in '{output}'");
+            Logger.Log($"ExpectGptOutcome: Checking for {expectGpt} in '{output}'");
 
             var outcome = TestOutcome.None;
 
@@ -946,7 +947,7 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
 
             var question = new StringBuilder();
             question.AppendLine($"Here's the console output:\n\n{output}\n");
-            question.AppendLine($"Here's the expectation:\n\n{expect}\n");
+            question.AppendLine($"Here's the expectation:\n\n{expectGpt}\n");
             question.AppendLine("You **must always** answer \"PASS\" if the expectation is met.");
             question.AppendLine("You **must always** answer \"FAIL\" if the expectation is not met.");
             question.AppendLine("You **must only** answer \"PASS\" or \"FAIL\".");

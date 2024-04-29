@@ -164,8 +164,8 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
             SetTestCasePropertyMap(test, "input", mapping, "input", workingDirectory);
 
             SetTestCaseProperty(test, "expect", mapping, "expect");
-            SetTestCaseProperty(test, "expect-gpt", mapping, "expect-gpt");
-            SetTestCaseProperty(test, "not-expect", mapping, "not-expect");
+            SetTestCaseProperty(test, "expect-regex", mapping, "expect-regex");
+            SetTestCaseProperty(test, "not-expect-regex", mapping, "not-expect-regex");
 
             SetTestCaseTagsAsTraits(test, YamlTagHelpers.UpdateCopyTags(context.Tags, mapping));
 
@@ -243,7 +243,7 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
 
         private static bool IsValidTestCaseNode(string? value)
         {
-            return !string.IsNullOrEmpty(value) && ";area;class;name;cli;command;script;bash;timeout;foreach;arguments;input;expect;expect-gpt;not-expect;parallelize;simulate;skipOnFailure;tag;tags;workingDirectory;env;sanitize;".IndexOf($";{value};") >= 0;
+            return !string.IsNullOrEmpty(value) && ";area;class;name;cli;command;script;bash;timeout;foreach;arguments;input;expect;expect-regex;not-expect-regex;parallelize;simulate;skipOnFailure;tag;tags;workingDirectory;env;sanitize;".IndexOf($";{value};") >= 0;
         }
 
         private static void SetTestCaseProperty(TestCase test, string propertyName, YamlMappingNode mapping, string mappingName)
