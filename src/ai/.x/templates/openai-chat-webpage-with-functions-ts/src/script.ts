@@ -1,24 +1,17 @@
-<#@ template hostspecific="true" #>
-<#@ output extension=".ts" encoding="utf-8" #>
-<#@ parameter type="System.String" name="ClassName" #>
-<#@ parameter type="System.String" name="AZURE_OPENAI_API_KEY" #>
-<#@ parameter type="System.String" name="AZURE_OPENAI_ENDPOINT" #>
-<#@ parameter type="System.String" name="AZURE_OPENAI_CHAT_DEPLOYMENT" #>
-<#@ parameter type="System.String" name="AZURE_OPENAI_SYSTEM_PROMPT" #>
 import { marked } from "marked"
 import hljs from "highlight.js";
 
 import { factory } from './OpenAIChatCompletionsCustomFunctions';
 
-import { <#= ClassName #> } from './OpenAIChatCompletionsFunctionsStreamingClass';
-let streamingChatCompletions: <#= ClassName #> | undefined;
+import { {ClassName} } from './OpenAIChatCompletionsFunctionsStreamingClass';
+let streamingChatCompletions: {ClassName} | undefined;
 
 function streamingChatCompletionsInit(): void {
 
-  const openAIAPIKey = process.env.AZURE_OPENAI_API_KEY || "<#= AZURE_OPENAI_API_KEY #>";
-  const openAIEndpoint = process.env.AZURE_OPENAI_ENDPOINT || "<#= AZURE_OPENAI_ENDPOINT #>";
-  const openAIChatDeploymentName = process.env.AZURE_OPENAI_CHAT_DEPLOYMENT || "<#= AZURE_OPENAI_CHAT_DEPLOYMENT #>" ;
-  const openAISystemPrompt = process.env.AZURE_OPENAI_SYSTEM_PROMPT || "<#= AZURE_OPENAI_SYSTEM_PROMPT #>";
+  const openAIAPIKey = process.env.AZURE_OPENAI_API_KEY || "{AZURE_OPENAI_API_KEY}";
+  const openAIEndpoint = process.env.AZURE_OPENAI_ENDPOINT || "{AZURE_OPENAI_ENDPOINT}";
+  const openAIChatDeploymentName = process.env.AZURE_OPENAI_CHAT_DEPLOYMENT || "{AZURE_OPENAI_CHAT_DEPLOYMENT}" ;
+  const openAISystemPrompt = process.env.AZURE_OPENAI_SYSTEM_PROMPT || "{AZURE_OPENAI_SYSTEM_PROMPT}";
 
   if (!openAIAPIKey || openAIAPIKey.startsWith('<insert')) {
     chatPanelAppendMessage('computer', 'Please set AZURE_OPENAI_API_KEY in .env');
@@ -30,7 +23,7 @@ function streamingChatCompletionsInit(): void {
     chatPanelAppendMessage('computer', 'Please set AZURE_OPENAI_CHAT_DEPLOYMENT in .env');
   }
 
-  streamingChatCompletions = new <#= ClassName #>(openAIEndpoint, openAIAPIKey, openAIChatDeploymentName, openAISystemPrompt, factory);
+  streamingChatCompletions = new {ClassName}(openAIEndpoint, openAIAPIKey, openAIChatDeploymentName, openAISystemPrompt, factory);
 }
 
 function streamingChatCompletionsClear(): void {

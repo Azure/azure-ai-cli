@@ -1,9 +1,6 @@
-<#@ template hostspecific="true" #>
-<#@ output extension=".js" encoding="utf-8" #>
-<#@ parameter type="System.String" name="ClassName" #>
 const { OpenAI } = require('openai');
 
-class <#= ClassName #> {
+class {ClassName} {
 
   // Constructor
   constructor(openAIAssistantId, openai, simulateTypingDelay = 0) {
@@ -68,10 +65,6 @@ class <#= ClassName #> {
       if (event.event == 'thread.run.completed') {
         this.resolveRunCompletedPromise();
       }
-      else if (event.event === 'thread.message.chunk') { // TODO: Remove once AOAI service on same version (per Salman)
-        let content = event.data.delta.content.map(item => item.text.value).join('');
-        callback(content);
-      }
     });
   }
 
@@ -88,4 +81,4 @@ class <#= ClassName #> {
   }
 }
 
-exports.<#= ClassName #> = <#= ClassName #>;
+exports.{ClassName} = {ClassName};

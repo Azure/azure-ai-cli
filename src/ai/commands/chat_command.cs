@@ -1018,7 +1018,9 @@ namespace Azure.AI.Details.Common.CLI
                 Console.WriteLine("Assistants:\n");
                 foreach (var assistant in assistants)
                 {
-                    Console.WriteLine($"  {assistant.Name} ({assistant.Id})");
+                    var assistantName = assistant.Name;
+                    if (string.IsNullOrEmpty(assistantName)) assistantName = "(no name)";
+                    Console.WriteLine($"  {assistantName} ({assistant.Id})");
                 }
             }
 
@@ -1041,7 +1043,9 @@ namespace Azure.AI.Details.Common.CLI
             var client = CreateOpenAIAssistantsClient();
             var response = await client.UploadFileAsync(existing, OpenAIFilePurpose.Assistants);
 
-            if (!_quiet) Console.WriteLine($"{message} Done!");
+            var uploaded = response.Value;
+            if (!_quiet) Console.WriteLine($"{message} Done!\n\n  {uploaded.Filename} ({uploaded.Id})\n");
+
             return true;
         }
 
@@ -1066,7 +1070,9 @@ namespace Azure.AI.Details.Common.CLI
                 Console.WriteLine("Assistant files:\n");
                 foreach (var file in files)
                 {
-                    Console.WriteLine($"  {file.Filename} ({file.Id})");
+                    var fileName = file.Filename;
+                    if (string.IsNullOrEmpty(fileName)) fileName = "(no name)";
+                    Console.WriteLine($"  {fileName} ({file.Id})");
                 }
             }
 

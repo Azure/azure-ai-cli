@@ -1,6 +1,3 @@
-<#@ template hostspecific="true" #>
-<#@ output extension=".java" encoding="utf-8" #>
-<#@ parameter type="System.String" name="ClassName" #>
 import com.azure.ai.openai.OpenAIClient;
 import com.azure.ai.openai.OpenAIClientBuilder;
 import com.azure.ai.openai.models.ChatRequestAssistantMessage;
@@ -14,14 +11,14 @@ import com.azure.core.credential.AzureKeyCredential;
 import java.util.ArrayList;
 import java.util.List;
 
-public class <#= ClassName #> {
+public class {ClassName} {
 
     private OpenAIClient client;
     private ChatCompletionsOptions options;
     private String openAIChatDeployment;
     private String openAISystemPrompt;
 
-    public <#= ClassName #> (String openAIAPIKey, String openAIEndpoint, String openAIChatDeployment, String openAISystemPrompt) {
+    public {ClassName} (String openAIAPIKey, String openAIEndpoint, String openAIChatDeployment, String openAISystemPrompt) {
         this.openAIChatDeployment = openAIChatDeployment;
         this.openAISystemPrompt = openAISystemPrompt;
         client = new OpenAIClientBuilder()

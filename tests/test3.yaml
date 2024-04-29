@@ -454,6 +454,7 @@
     - name: pack template
       bash: |
         cd openai-chat-webpage-js
+        ai dev new .env
         npm run webpack
 
   - class: dev new openai-chat-webpage (typescript)
@@ -467,6 +468,7 @@
     - name: pack template
       bash: |
         cd openai-chat-webpage-ts
+        ai dev new .env
         npm run webpack
 
 - area: ai dev new openai-chat-webpage-with-functions
@@ -483,6 +485,7 @@
     - name: pack template 
       bash: |
         cd openai-chat-webpage-with-functions-js
+        ai dev new .env
         npm run webpack
 
   - class: dev new openai-chat-webpage-with-functions (typescript)
@@ -496,6 +499,7 @@
     - name: pack template
       bash: |
         cd openai-chat-webpage-with-functions-ts
+        ai dev new .env
         npm run webpack
 
 - area: ai dev new openai-asst
@@ -565,6 +569,7 @@
     - name: pack template
       bash: |
         cd openai-asst-webpage-js
+        ai dev new .env
         npm run webpack
 
   - class: dev new openai-asst-webpage (typescript)
@@ -593,4 +598,5 @@
     - name: pack template
       bash: |
         cd openai-asst-webpage-with-functions-js
+        ai dev new .env
         npm run webpack

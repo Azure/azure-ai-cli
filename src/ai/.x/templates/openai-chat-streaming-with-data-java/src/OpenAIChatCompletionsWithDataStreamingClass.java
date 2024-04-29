@@ -1,6 +1,3 @@
-<#@ template hostspecific="true" #>
-<#@ output extension=".java" encoding="utf-8" #>
-<#@ parameter type="System.String" name="ClassName" #>
 import com.azure.ai.openai.OpenAIAsyncClient;
 import com.azure.ai.openai.OpenAIClientBuilder;
 import com.azure.ai.openai.models.AzureCognitiveSearchChatExtensionConfiguration;
@@ -26,14 +23,14 @@ import java.util.Arrays;
 import java.util.function.Consumer;
 import java.util.List;
 
-public class <#= ClassName #> {
+public class {ClassName} {
 
     private OpenAIAsyncClient client;
     private ChatCompletionsOptions options;
     private String openAIChatDeployment;
     private String openAISystemPrompt;
 
-    public <#= ClassName #> (
+    public {ClassName} (
         String openAIAPIKey,
         String openAIEndpoint,
         String openAIChatDeployment,

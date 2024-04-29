@@ -1,6 +1,3 @@
-<#@ template hostspecific="true" #>
-<#@ output extension=".csproj" encoding="utf-8" #>
-<#@ parameter name="AICLIExtensionReferencePath" type="System.String" #>
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>

@@ -1,10 +1,3 @@
-<#@ template hostspecific="true" #>
-<#@ output extension=".java" encoding="utf-8" #>
-<#@ parameter type="System.String" name="ClassName" #>
-<#@ parameter type="System.String" name="AZURE_OPENAI_API_KEY" #>
-<#@ parameter type="System.String" name="AZURE_OPENAI_ENDPOINT" #>
-<#@ parameter type="System.String" name="AZURE_OPENAI_CHAT_DEPLOYMENT" #>
-<#@ parameter type="System.String" name="AZURE_OPENAI_SYSTEM_PROMPT" #>
 import java.util.Scanner;
 import reactor.core.publisher.Flux;
 import com.azure.ai.openai.models.ChatCompletions;
@@ -17,7 +10,7 @@ public class Main {
         String openAIChatDeployment = (System.getenv("AZURE_OPENAI_CHAT_DEPLOYMENT") != null) ? System.getenv("AZURE_OPENAI_CHAT_DEPLOYMENT") : "<insert your OpenAI chat deployment name here>";
         String openAISystemPrompt = (System.getenv("AZURE_OPENAI_SYSTEM_PROMPT") != null) ? System.getenv("AZURE_OPENAI_SYSTEM_PROMPT") : "You are a helpful AI assistant.";
 
-        <#= ClassName #> chat = new <#= ClassName #>(openAIAPIKey, openAIEndpoint, openAIChatDeployment, openAISystemPrompt);
+        {ClassName} chat = new {ClassName}(openAIAPIKey, openAIEndpoint, openAIChatDeployment, openAISystemPrompt);
 
         Scanner scanner = new Scanner(System.in);
         while (true) {
