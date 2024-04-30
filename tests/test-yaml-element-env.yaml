@@ -7,7 +7,7 @@ tests:
   bash: |
     echo $ENV1
     echo $ENV2
-  expect: |
+  expect-regex: |
     VAL1
     VAL2
 
@@ -17,7 +17,7 @@ tests:
   bash: |
     echo $ENV1
     echo $ENV2
-  expect: |
+  expect-regex: |
     VAL3
     VAL2
 
@@ -27,7 +27,7 @@ tests:
   bash: |
     echo $ENV1
     echo $ENV2
-  expect: |
+  expect-regex: |
     VAL1
     VAL4
 
@@ -37,7 +37,7 @@ tests:
   bash: |
     echo $ENV1
     echo $ENV2
-  expect: |
+  expect-regex: |
     VAL1
     VAL1;VAL2;hello
     

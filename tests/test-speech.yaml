@@ -113,7 +113,7 @@
         command: ai speech synthesize --text "Hello world" --audio-output "speech-to-text-with-file-cs/hello.wav"
       - name: run template
         command: ai dev shell --bash "cd speech-to-text-with-file-cs;./bin/Debug/net8.0/SpeechToTextWithFile hello.wav"
-        expect: |
+        expect-regex: |
           Hello [Ww]orld.
 
     - class: dev new speech-to-text-with-file (python)
@@ -209,7 +209,7 @@
         command: ai speech synthesize --text "Hello world" --audio-output "speech-to-text-with-translation-cs/hello.wav"
       - name: run template
         command: ai dev shell --bash "cd speech-to-text-with-translation-cs;./bin/Debug/net8.0/SpeechToTextWithTranslation hello.wav"
-        expect: |
+        expect-regex: |
           Hello [Ww]orld.
 
     - class: dev new speech-to-text-with-translation (python)

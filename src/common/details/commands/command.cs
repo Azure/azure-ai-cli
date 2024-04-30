@@ -533,22 +533,22 @@ namespace Azure.AI.Details.Common.CLI
 
         private static async Task<bool> CheckExpectedOutputAsync(ICommandValues values, Queue<ICommandValues> queue, Func<bool> func)
         {
-            var expected = values.GetOrEmpty("x.command.output.expect");
-            var notExpected = values.GetOrEmpty("x.command.output.not.expect");
-            var autoExpect = values.GetOrDefault("x.command.output.auto.expect", false);
-            var expectedLog = values.GetOrEmpty("x.command.diagnostics.log.expect");
-            var notExpectedLog = values.GetOrEmpty("x.command.diagnostics.log.not.expect");
-            var autoExpectLog = values.GetOrDefault("x.command.diagnostics.log.auto.expect", false);
-            var autoExpectLogFilter = values.GetOrEmpty("x.command.diagnostics.log.auto.expect.filter");
+            var expected = values.GetOrEmpty("x.command.output.expect.regex");
+            var notExpected = values.GetOrEmpty("x.command.output.not.expect.regex");
+            var autoExpect = values.GetOrDefault("x.command.output.auto.expect.regex", false);
+            var expectedLog = values.GetOrEmpty("x.command.diagnostics.log.expect.regex");
+            var notExpectedLog = values.GetOrEmpty("x.command.diagnostics.log.not.expect.regex");
+            var autoExpectLog = values.GetOrDefault("x.command.diagnostics.log.auto.expect.regex", false);
+            var autoExpectLogFilter = values.GetOrEmpty("x.command.diagnostics.log.auto.expect.regex.filter");
             var ignoreCheckFailures = values.GetOrDefault("x.command.output.ignore.check.failures", false);
 
-            BlockValues(values, queue, "x.command.output.expect");
-            BlockValues(values, queue, "x.command.output.not.expect");
-            BlockValues(values, queue, "x.command.output.auto.expect");
-            BlockValues(values, queue, "x.command.diagnostics.log.expect");
-            BlockValues(values, queue, "x.command.diagnostics.log.not.expect");
-            BlockValues(values, queue, "x.command.diagnostics.log.auto.expect");
-            BlockValues(values, queue, "x.command.diagnostics.log.auto.expect.filter");
+            BlockValues(values, queue, "x.command.output.expect.regex");
+            BlockValues(values, queue, "x.command.output.not.expect.regex");
+            BlockValues(values, queue, "x.command.output.auto.expect.regex");
+            BlockValues(values, queue, "x.command.diagnostics.log.expect.regex");
+            BlockValues(values, queue, "x.command.diagnostics.log.not.expect.regex");
+            BlockValues(values, queue, "x.command.diagnostics.log.auto.expect.regex");
+            BlockValues(values, queue, "x.command.diagnostics.log.auto.expect.regex.filter");
 
             // if we're supposed to check the log, start checking the log (this must happen before we start checking the function console output)
             var signalStop = new AutoResetEvent(false);

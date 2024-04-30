@@ -144,9 +144,9 @@ namespace Azure.AI.Details.Common.CLI
 
             var retries = _values.GetOrDefault("run.retries", 0);
             var timeout = _values.GetOrDefault("run.timeout", 86400000);
-            var expected = _values.GetOrEmpty("run.output.expect");
-            var notExpected = _values.GetOrEmpty("run.output.not.expect");
-            var autoExpect = _values.GetOrDefault("run.output.auto.expect", false);
+            var expected = _values.GetOrEmpty("run.output.expect.regex");
+            var notExpected = _values.GetOrEmpty("run.output.not.expect.regex");
+            var autoExpect = _values.GetOrDefault("run.output.auto.expect.regex", false);
 
             return DoRunJob(start.Trim(), startArgs.Trim(), startPath, expected, notExpected, autoExpect, timeout, retries);
         }

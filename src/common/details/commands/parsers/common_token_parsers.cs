@@ -134,9 +134,9 @@ namespace Azure.AI.Details.Common.CLI
         }
 
         public ExpectConsoleOutputTokenParser(string prefix) : base(
-            new NamedValueTokenParser(null, $"{prefix}.output.expect", $"{NotRequired(prefix)}01", "1"),
-            new NamedValueTokenParser(null, $"{prefix}.output.not.expect", $"{NotRequired(prefix)}011", "1"),
-            new NamedValueTokenParser(null, $"{prefix}.output.auto.expect", $"{NotRequired(prefix)}011", "1;0", "true;false", null, "true"),
+            new NamedValueTokenParser(null, $"{prefix}.output.expect.regex", $"{NotRequired(prefix)}010", "1"),
+            new NamedValueTokenParser(null, $"{prefix}.output.not.expect.regex", $"{NotRequired(prefix)}0110", "1"),
+            new NamedValueTokenParser(null, $"{prefix}.output.auto.expect.regex", $"{NotRequired(prefix)}0110", "1;0", "true;false", null, "true"),
             new NamedValueTokenParser(null, $"{prefix}.output.ignore.check.failures", $"{NotRequired(prefix)}0111", "1;0", null, null, "true", "x.command.output.ignore.check.failures")
         ) {}
     }
@@ -148,10 +148,10 @@ namespace Azure.AI.Details.Common.CLI
         }
 
         public ExpectDiagnosticOutputTokenParser(string prefix) : base(
-            new NamedValueTokenParser(null, $"{prefix}.diagnostics.log.expect", $"{NotRequired(prefix)}011", "1"),
-            new NamedValueTokenParser(null, $"{prefix}.diagnostics.log.not.expect", $"{NotRequired(prefix)}0111", "1"),
-            new NamedValueTokenParser(null, $"{prefix}.diagnostics.log.auto.expect.filter", $"{NotRequired(prefix)}01111", "1", null, null, "true", "x.command.diagnostics.log.auto.expect"),
-            new NamedValueTokenParser(null, $"{prefix}.diagnostics.log.auto.expect", $"{NotRequired(prefix)}0111", "1;0", "true;false", null, "true")
+            new NamedValueTokenParser(null, $"{prefix}.diagnostics.log.expect.regex", $"{NotRequired(prefix)}0110", "1"),
+            new NamedValueTokenParser(null, $"{prefix}.diagnostics.log.not.expect.regex", $"{NotRequired(prefix)}01110", "1"),
+            new NamedValueTokenParser(null, $"{prefix}.diagnostics.log.auto.expect.regex.filter", $"{NotRequired(prefix)}011101", "1", null, null, "true", "x.command.diagnostics.log.auto.expect.regex"),
+            new NamedValueTokenParser(null, $"{prefix}.diagnostics.log.auto.expect.regex", $"{NotRequired(prefix)}01110", "1;0", "true;false", null, "true")
         ) {}
     }
 

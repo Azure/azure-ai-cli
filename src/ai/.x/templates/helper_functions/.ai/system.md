@@ -22,7 +22,7 @@ You **must always** follow the rules for writing helper functions:
 ```csharp
 using Azure.AI.Details.Common.CLI.Extensions.HelperFunctions;
 
-public static class HelperFunctionClass
+public static class UserNameHelperFunctionClass
 {
     [HelperFunctionDescription("Gets the user's name")]
     public static string GetUsersName()
