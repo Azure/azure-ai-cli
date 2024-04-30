@@ -17,14 +17,18 @@ namespace Azure.AI.Details.Common.CLI.Extensions.Templates
     {
         public static string ProcessTemplate(string template, INamedValues values)
         {
+            var calculator = new ExpressionCalculator();
+
             Func<string, string> interpolate = (line) => line.ReplaceValues(values);
             Func<string, bool> evaluateCondition = (condition) =>
             {
-                var value = condition.ReplaceValues(values);
-                return value switch
+                condition = condition.ReplaceValues(values).Trim();
+                return condition switch
                 {
+                    "" => false,
                     "true" => true,
-                    _ => false
+                    "false" => false,
+                    _ => calculator.Evaluate(condition)
                 };
             };
 
@@ -74,6 +78,7 @@ namespace Azure.AI.Details.Common.CLI.Extensions.Templates
                     inTrueBranchNow.Push(evaluated);
                     skipElseBranches.Pop();
                     skipElseBranches.Push(evaluated);
+                    continue;
                 }
                 else if (trimmedLine.StartsWith("{{else}}"))
                 {
@@ -93,6 +98,7 @@ namespace Azure.AI.Details.Common.CLI.Extensions.Templates
                     inTrueBranchNow.Push(true);
                     skipElseBranches.Pop();
                     skipElseBranches.Push(true);
+                    continue;
                 }
                 else if (trimmedLine.StartsWith("{{endif}}"))
                 {
