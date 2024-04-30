@@ -74,6 +74,7 @@ namespace Azure.AI.Details.Common.CLI.Extensions.Templates
                     inTrueBranchNow.Push(evaluated);
                     skipElseBranches.Pop();
                     skipElseBranches.Push(evaluated);
+                    continue;
                 }
                 else if (trimmedLine.StartsWith("{{else}}"))
                 {

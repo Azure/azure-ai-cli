@@ -3,6 +3,7 @@
   "_ShortName": "openai-asst",
   "_Language": "JavaScript",
   "ClassName": "OpenAIAssistantsClass",
+  "zUSE_AZURE_OPENAI_API_KEY": "true",
   "ASSISTANT_ID": "<insert your OpenAI assistant ID here>",
   "AZURE_OPENAI_API_KEY": "<insert your Azure OpenAI API key here>",
   "AZURE_OPENAI_API_VERSION": "<insert your Azure OpenAI API version here>",
