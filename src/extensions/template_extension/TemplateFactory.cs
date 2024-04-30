@@ -140,6 +140,11 @@ namespace Azure.AI.Details.Common.CLI.Extensions.Templates
             foreach (var item in parameters)
             {
                 var name = item.Key;
+
+                var checkReplacement = $"replace.var.{name}=";
+                var nameAlreadyAdded = values.Contains(name) || values.Contains(checkReplacement) || values.Names.Any(x => x.StartsWith(checkReplacement));
+                if (nameAlreadyAdded) continue;
+
                 var value = item.Value;
                 values.Add(name, value);
             }
