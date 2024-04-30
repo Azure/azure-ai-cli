@@ -47,21 +47,21 @@
           value: https://fakeendpoint/
   steps:
     - name: test ai IA caption
-      expect: woman wearing a mask sitting at a table
-      not-expect: ERROR
+      expect-regex: woman wearing a mask sitting at a table
+      not-expect-regex: ERROR
       command: ai vision image analyze
       arguments:
         url: https://aka.ms/azsdk/image-analysis/sample.jpg
         visual-features: caption
     - name: test ai IA caption (Visual Features are case insensitive)
-      expect: woman wearing a mask sitting at a table
-      not-expect: ERROR
+      expect-regex: woman wearing a mask sitting at a table
+      not-expect-regex: ERROR
       command: ai vision image analyze
       arguments:
         url: https://aka.ms/azsdk/image-analysis/sample.jpg
         visual-features: CaPtiOn
     - name: test ai IA Multiple Visual Features
-      expect: |
+      expect-regex: |
         Metadata: Model:
         woman wearing a mask sitting at a table
         Dense Captions:
@@ -71,60 +71,60 @@
         Read:
         Line:
         Word:
-      not-expect: ERROR
+      not-expect-regex: ERROR
       command: ai vision image analyze
       arguments:
         url: https://aka.ms/azsdk/image-analysis/sample.jpg
         visual-features: caption,objects,densecaptions,tags,read,people
     - name: test ai IA caption (gender neutral)
-      expect: person wearing a mask sitting at a table
-      not-expect: ERROR
+      expect-regex: person wearing a mask sitting at a table
+      not-expect-regex: ERROR
       command: ai vision image analyze
       arguments:
         url: https://aka.ms/azsdk/image-analysis/sample.jpg
         visual-features: caption
         gender-neutral-captions: true
     - name: test ai IA Model selection
-      expect: Invalid model version.
+      expect-regex: Invalid model version.
       command: ai vision image analyze
       arguments:
         url: https://aka.ms/azsdk/image-analysis/sample.jpg
         visual-features: caption
         model-version: badmodel
     - name: test ai IA from file
-      expect: woman wearing a mask sitting at a table
-      not-expect: ERROR
+      expect-regex: woman wearing a mask sitting at a table
+      not-expect-regex: ERROR
       command: ai vision image analyze
       arguments:
         file: ../tests/image-analysis-sample.jpg
         visual-features: caption
     - name: test ai IA smart crop (single)
-      expect: |
+      expect-regex: |
         Aspect ratio: 0.92, Bounding box: Top:
-      not-expect: ERROR
+      not-expect-regex: ERROR
       command: ai vision image analyze
       arguments:
         url: https://aka.ms/azsdk/image-analysis/sample.jpg
         visual-features: smartcrops
         smart-crop-aspect-ratios: 0.92
     - name: test ai IA smart crop (multiple)
-      expect: |
+      expect-regex: |
         Aspect ratio: 0.9, Bounding box: Top:
         Aspect ratio: 1.78, Bounding box: Top:
-      not-expect: ERROR
+      not-expect-regex: ERROR
       command: ai vision image analyze
       arguments:
         url: https://aka.ms/azsdk/image-analysis/sample.jpg
         visual-features: smartcrops
         smart-crop-aspect-ratios: 0.9,1.78
     - name: test ai IA caption (JSON)
-      expect: |
+      expect-regex: |
         {
         "captionResult":
         "text":
         woman wearing a mask sitting at a table
         }
-      not-expect: ERROR
+      not-expect-regex: ERROR
       command: ai vision image analyze
       arguments:
         url: https://aka.ms/azsdk/image-analysis/sample.jpg

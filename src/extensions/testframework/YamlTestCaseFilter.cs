@@ -125,8 +125,8 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
                 case "input": return YamlTestProperties.Get(test, "input");
 
                 case "expect": return YamlTestProperties.Get(test, "expect");
-                case "expect-gpt": return YamlTestProperties.Get(test, "expect-gpt");
-                case "not-expect": return YamlTestProperties.Get(test, "not-expect");
+                case "expect-regex": return YamlTestProperties.Get(test, "expect-regex");
+                case "not-expect-regex": return YamlTestProperties.Get(test, "not-expect-regex");
 
                 case "parallelize": return YamlTestProperties.Get(test, "parallelize");
                 case "simulate": return YamlTestProperties.Get(test, "simulate");
@@ -151,6 +151,6 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
         }
 
 
-        private static readonly string[] supportedFilterProperties = { "DisplayName", "FullyQualifiedName", "Category", "cli", "command", "script", "bash", "foreach", "arguments", "input", "expect", "expect-gpt", "not-expect", "parallelize", "simulate", "skipOnFailure" };
+        private static readonly string[] supportedFilterProperties = { "DisplayName", "FullyQualifiedName", "Category", "cli", "command", "script", "bash", "foreach", "arguments", "input", "expect", "expect-regex", "not-expect-regex", "parallelize", "simulate", "skipOnFailure" };
     }
 }

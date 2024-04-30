@@ -165,10 +165,10 @@ Parenthesis () can be used to group sub-expressions.
 | | | `script~recognize`
 | | | `script~weather`
 | | | `script~mp3`
-| expect | | `expect~RECOGNIZED:`
-| not-expect | | `not-expect~ERROR`
-| log-expect | | `log-expect~path:`
-| log-not-expect | | `log-not-expect~ERROR`
+| expect-regex | | `expect-regex~RECOGNIZED:`
+| not-expect-regex | | `not-expect-regex~ERROR`
+| log-expect-regex | | `log-expect-regex~path:`
+| log-not-expect-regex | | `log-not-expect-regex~ERROR`
 
 ---
 # BUILD

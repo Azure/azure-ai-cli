@@ -7,7 +7,7 @@ Example:
 ```yaml
 - name: Build search index
   command: ai search index update --files "data/*.md" --index-name myindex
-  expect: |
+  expect-regex: |
     Updating search index 'myindex' ...
     Updating search index 'myindex' ... Done!
 ```
@@ -18,9 +18,9 @@ The test case YAML file contains a list of test cases. Each test case is a dicti
 * `command`, `script`, `bash` (required): The command or script to run.
 - `env` (optional): A dictionary of environment variables to set before running the command or script.
 - `input` (optional): The input to pass to the command or script.
-- `expect` (optional): A list of regular expressions that must be matched in the stdout/stderr output.
-- `expect-gpt` (optional): A string that instructs the LLM (e.g. GPT-4) to decide pass/fail based on stdout/stderr.
-- `not-expect` (optional): A list of regular expressions that must not be matched in the stdout/stderr output.
+- `expect` (optional): A string that instructs the LLM (e.g. GPT-4) to decide pass/fail based on stdout/stderr.
+- `expect-regex` (optional): A list of regular expressions that must be matched in the stdout/stderr output.
+- `not-expect-regex` (optional): A list of regular expressions that must not be matched in the stdout/stderr output.
 - `parallelize` (optional): Whether the test case should run in parallel with other test cases.
 - `skipOnFailure` (optional): Whether the test case should be skipped when it fails.
 - `tag`/`tags` (optional): A list of tags to associate with the test case.
@@ -112,6 +112,18 @@ input: |
 
 Optional.
 
+Represents instructions given to LLM (e.g. GPT-4) along with stdout/stderr to decide whether the test passes or fails.
+
+Example: 
+
+```yaml
+expect: the output must have exactly two jokes
+```
+
+## `expect-regex`
+
+Optional.
+
 Each string (or line in multiline string) is a regular expression that must be matched in the stdout/stderr output.
 
 If any regular expression is not matched, the test will fail. If all expressions are matched, in order, the test will pass.
@@ -119,24 +131,12 @@ If any regular expression is not matched, the test will fail. If all expressions
 Example:
 
 ```yaml
-expect: |
+expect-regex: |
   Regex 1
   Regex 2
 ```
 
-## `expect-gpt`
-
-Optional.
-
-Represents instructions given to LLM (e.g. GPT-4) along with stdout/stderr to decide whether the test passes or fails.
-
-Example: 
-
-```yaml
-expect-gpt: the output must have exactly two jokes
-```
-
-## `not-expect`
+## `not-expect-regex`
 
 Optional.
 
@@ -147,7 +147,7 @@ If any regular expression is matched, the test fails. If none match, the test pa
 Example:
 
 ```yaml
-not-expect: |
+not-expect-regex: |
   ERROR
   curseword1
   curseword2

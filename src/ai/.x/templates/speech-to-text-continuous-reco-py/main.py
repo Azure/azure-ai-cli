@@ -1,15 +1,11 @@
-<#@ template hostspecific="true" #>
-<#@ output extension=".py" encoding="utf-8" #>
-<#@ parameter type="System.String" name="AZURE_AI_SPEECH_KEY" #>
-<#@ parameter type="System.String" name="AZURE_AI_SPEECH_REGION" #>
 from concurrent.futures import Future
 from azure.cognitiveservices.speech import SpeechConfig, SpeechRecognizer, AudioConfig, CancellationReason
 import threading
 import os
 
 # Connection and configuration details required
-speech_key = os.environ.get('AZURE_AI_SPEECH_KEY') or "<#= AZURE_AI_SPEECH_KEY #>"
-service_region = os.environ.get('AZURE_AI_SPEECH_REGION') or "<#= AZURE_AI_SPEECH_REGION #>"
+speech_key = os.environ.get('AZURE_AI_SPEECH_KEY') or "{AZURE_AI_SPEECH_KEY}"
+service_region = os.environ.get('AZURE_AI_SPEECH_REGION') or "{AZURE_AI_SPEECH_REGION}"
 speech_language = "en-US"
 
 # Create instances of a speech config and audio config

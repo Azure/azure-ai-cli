@@ -62,6 +62,7 @@ namespace Azure.AI.Details.Common.CLI
                 }
             }
 
+            if (start + i >= sb.Length) return cchPrefix; // no closing '}' ... that's ok, we'll just leave it as is
             if (sb[start + i] != '}') throw new InvalidOperationException($"Interpolate() '}}' not found; pos={start + i}");
             i += 1; // skipping '}'
 
@@ -114,7 +115,11 @@ namespace Azure.AI.Details.Common.CLI
           
             if (str == null && !expandAtFile)
             {
-                str = deleteUnresolved ? string.Empty : $"{{{name}}}";
+                str = deleteUnresolved
+                    ? string.Empty
+                    : cchPrefix == 1
+                        ? $"{{{name}}}"
+                        : $"${{{name}}}";
                 sb.Remove(start, name.Length + cchPrefix + 1);
                 sb.Insert(start, str);
                 return str.Length;

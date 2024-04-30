@@ -1,7 +1,3 @@
-<#@ template hostspecific="true" #>
-<#@ output extension=".cs" encoding="utf-8" #>
-<#@ parameter type="System.String" name="AZURE_AI_SPEECH_KEY" #>
-<#@ parameter type="System.String" name="AZURE_AI_SPEECH_REGION" #>
 using System;
 using Microsoft.CognitiveServices.Speech;
 using Microsoft.CognitiveServices.Speech.Audio;
@@ -11,8 +7,8 @@ public class Program
     public static async Task<int> Main(string[] args)
     {
         // Connection and configuration details required
-        var speechKey = Environment.GetEnvironmentVariable("AZURE_AI_SPEECH_KEY") ?? "<#= AZURE_AI_SPEECH_KEY #>";
-        var speechRegion = Environment.GetEnvironmentVariable("AZURE_AI_SPEECH_REGION") ?? "<#= AZURE_AI_SPEECH_REGION #>";
+        var speechKey = Environment.GetEnvironmentVariable("AZURE_AI_SPEECH_KEY") ?? "{AZURE_AI_SPEECH_KEY}";
+        var speechRegion = Environment.GetEnvironmentVariable("AZURE_AI_SPEECH_REGION") ?? "{AZURE_AI_SPEECH_REGION}";
         var speechLanguage = "en-US"; // BCP-47 language code
 
         // Create instances of a speech config, source language config, and audio config

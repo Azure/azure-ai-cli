@@ -13,7 +13,7 @@
 
 - name: test ai chat
   command: ai chat --question "Why is the sky blue, what's it called" --index-name @none
-  expect: Rayleigh
+  expect-regex: Rayleigh
 
 - name: test ai chat built in functions
   command: ai chat --interactive --built-in-functions
@@ -22,7 +22,7 @@
     What text files are in the current directory?
     Show me what's in the file "test.txt"
     exit
-  expect: |
+  expect-regex: |
     assistant-function: CreateFileAndSaveText
     assistant-function: FindAllFilesMatchingPattern
     test.txt
@@ -47,7 +47,7 @@
       How old is Jane?
       How old is Bob?
       exit
-    expect: |
+    expect-regex: |
       assistant-function: GetUsersName\({}\) =
       assistant-function: GetPersonsAge\({
       John
@@ -76,7 +76,7 @@
         Tell me a joke
         Tell me another joke
         exit
-      expect-gpt: |
+      expect: |
         The output should contain exactly two jokes.
 
   - class: dev new openai-chat (go)
@@ -454,6 +454,7 @@
     - name: pack template
       bash: |
         cd openai-chat-webpage-js
+        ai dev new .env
         npm run webpack
 
   - class: dev new openai-chat-webpage (typescript)
@@ -467,6 +468,7 @@
     - name: pack template
       bash: |
         cd openai-chat-webpage-ts
+        ai dev new .env
         npm run webpack
 
 - area: ai dev new openai-chat-webpage-with-functions
@@ -483,6 +485,7 @@
     - name: pack template 
       bash: |
         cd openai-chat-webpage-with-functions-js
+        ai dev new .env
         npm run webpack
 
   - class: dev new openai-chat-webpage-with-functions (typescript)
@@ -496,6 +499,7 @@
     - name: pack template
       bash: |
         cd openai-chat-webpage-with-functions-ts
+        ai dev new .env
         npm run webpack
 
 - area: ai dev new openai-asst
@@ -565,6 +569,7 @@
     - name: pack template
       bash: |
         cd openai-asst-webpage-js
+        ai dev new .env
         npm run webpack
 
   - class: dev new openai-asst-webpage (typescript)
@@ -593,4 +598,5 @@
     - name: pack template
       bash: |
         cd openai-asst-webpage-with-functions-js
+        ai dev new .env
         npm run webpack

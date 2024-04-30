@@ -1,9 +1,6 @@
-<#@ template hostspecific="true" #>
-<#@ output extension=".js" encoding="utf-8" #>
-<#@ parameter type="System.String" name="ClassName" #>
 const { OpenAIClient, AzureKeyCredential } = require("@azure/openai");
 
-class <#= ClassName #> {
+class {ClassName} {
   constructor(openAIEndpoint, openAIAPIKey, openAIChatDeploymentName, openAISystemPrompt, searchEndpoint, searchAPIKey, searchIndexName, openAIEmbeddingsEndpoint) {
     this.openAISystemPrompt = openAISystemPrompt;
     this.openAIChatDeploymentName = openAIChatDeploymentName;
@@ -63,4 +60,4 @@ class <#= ClassName #> {
   }
 }
 
-exports.<#= ClassName #> = <#= ClassName #>;
+exports.{ClassName} = {ClassName};

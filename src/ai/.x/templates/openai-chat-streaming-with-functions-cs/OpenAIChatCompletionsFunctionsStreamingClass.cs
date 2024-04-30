@@ -3,17 +3,14 @@
 // Licensed under the MIT license. See LICENSE.md file in the project root for full license information.
 //
 
-<#@ template hostspecific="true" #>
-<#@ output extension=".cs" encoding="utf-8" #>
-<#@ parameter type="System.String" name="ClassName" #>
 using Azure;
 using Azure.AI.OpenAI;
 using Azure.Identity;
 using System;
 
-public class <#= ClassName #>
+public class {ClassName}
 {
-    public <#= ClassName #>(string openAIEndpoint, string openAIAPIKey, string openAIChatDeploymentName, string openAISystemPrompt, FunctionFactory factory)
+    public {ClassName}(string openAIEndpoint, string openAIAPIKey, string openAIChatDeploymentName, string openAISystemPrompt, FunctionFactory factory)
     {
         _openAISystemPrompt = openAISystemPrompt;
         _functionFactory = factory;

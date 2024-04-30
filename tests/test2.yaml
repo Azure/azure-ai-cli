@@ -5,7 +5,7 @@
     ai dev new
     ai dev new --help
     
-  expect: |
+  expect-regex: |
     AI
     USAGE
     COMMANDS

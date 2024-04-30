@@ -1,13 +1,10 @@
-<#@ template hostspecific="true" #>
-<#@ output extension=".js" encoding="utf-8" #>
-<#@ parameter type="System.String" name="ClassName" #>
 const marked = require("marked");
 const hljs = require("highlight.js");
 
 const { factory } = require("./OpenAIAssistantsCustomFunctions");
 const { CreateOpenAI } = require("./CreateOpenAI");
 const { OpenAIEnvInfo } = require("./OpenAIEnvInfo");
-const { <#= ClassName #> } = require("./OpenAIAssistantsFunctionsStreamingClass");
+const { {ClassName} } = require("./OpenAIAssistantsFunctionsStreamingClass");
 
 let assistant;
 async function assistantInit(threadId = null) {
@@ -19,7 +16,7 @@ async function assistantInit(threadId = null) {
   });
 
   // Create the assistants streaming helper class instance
-  assistant = new <#= ClassName #>(OpenAIEnvInfo.ASSISTANT_ID, factory, openai);
+  assistant = new {ClassName}(OpenAIEnvInfo.ASSISTANT_ID, factory, openai);
 
   await assistantCreateOrRetrieveThread(threadId);
 }
