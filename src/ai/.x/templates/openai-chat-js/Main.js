@@ -1,5 +1,4 @@
-const { CreateOpenAI } = require("./CreateOpenAI");
-const { OpenAIEnvInfo } = require("./OpenAIEnvInfo");
+const { OpenAI } = require('openai');
 const { {ClassName} } = require("./OpenAIChatCompletionsClass");
 
 const readline = require('node:readline/promises');
@@ -10,17 +9,15 @@ const rl = readline.createInterface({
 
 async function main() {
 
-  // Create the OpenAI client
-  const openai = await CreateOpenAI.forChatCompletionsAPI({
-    errorCallback: text => process.stdout.write(text)
-  });
+  {{@include openai.chat.create.openai.node.js}}
 
   // Create the streaming chat completions helper
-  const useAzure = OpenAIEnvInfo.AZURE_OPENAI_ENDPOINT?.startsWith('https://');
-  const chat = useAzure
-    ? new {ClassName}(OpenAIEnvInfo.AZURE_OPENAI_CHAT_DEPLOYMENT, OpenAIEnvInfo.AZURE_OPENAI_SYSTEM_PROMPT, openai)
-    : new {ClassName}(OpenAIEnvInfo.OPENAI_MODEL_NAME, OpenAIEnvInfo.AZURE_OPENAI_SYSTEM_PROMPT, openai);
-
+  {{if {USE_AZURE_OPENAI}}}
+  const chat = new {ClassName}(AZURE_OPENAI_CHAT_DEPLOYMENT, AZURE_OPENAI_SYSTEM_PROMPT, openai);
+  {{else}}
+  const chat = new {ClassName}(OPENAI_MODEL_NAME, AZURE_OPENAI_SYSTEM_PROMPT, openai);
+  {{endif}}
+  
   // Loop until the user types 'exit'
   while (true) {
 
