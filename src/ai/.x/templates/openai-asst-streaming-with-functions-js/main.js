@@ -1,6 +1,5 @@
+const { OpenAI } = require('openai');
 const { factory } = require("./OpenAIAssistantsCustomFunctions");
-const { CreateOpenAI } = require("./CreateOpenAI");
-const { OpenAIEnvInfo } = require("./OpenAIEnvInfo");
 const { {ClassName} } = require("./OpenAIAssistantsFunctionsStreamingClass");
 
 const readline = require('node:readline/promises');
@@ -11,16 +10,14 @@ const rl = readline.createInterface({
 
 async function main() {
 
-  // Which thread
+  // Which assistant, which thread?
+  const ASSISTANT_ID = process.env.ASSISTANT_ID ?? "{ASSISTANT_ID}";
   const threadId = process.argv[2] || null;
 
-  // Create the OpenAI client
-  const openai = await CreateOpenAI.forAssistantsAPI({
-    errorCallback: text => process.stdout.write(text)
-  });
+  {{@include openai.asst.create.openai.node.js}}
   
   // Create the assistants streaming helper class instance
-  const assistant = new {ClassName}(OpenAIEnvInfo.ASSISTANT_ID, factory, openai);
+  const assistant = new {ClassName}(ASSISTANT_ID, factory, openai);
 
   // Get or create the thread, and display the messages if any
   if (threadId === null) {

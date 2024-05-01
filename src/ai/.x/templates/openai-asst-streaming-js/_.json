@@ -3,6 +3,8 @@
   "_ShortName": "openai-asst-streaming",
   "_Language": "JavaScript",
   "ClassName": "OpenAIAssistantsStreamingClass",
+  "USE_AZURE_OPENAI": "true",
+  "AZURE_OPENAI_AUTH_METHOD": "KEY",
   "ASSISTANT_ID": "<insert your OpenAI assistant ID here>",
   "AZURE_OPENAI_API_KEY": "<insert your Azure OpenAI API key here>",
   "AZURE_OPENAI_API_VERSION": "<insert your Azure OpenAI API version here>",
