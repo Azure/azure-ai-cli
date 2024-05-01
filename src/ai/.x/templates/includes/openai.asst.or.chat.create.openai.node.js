@@ -53,6 +53,7 @@
 {{else}}
   // Get the required environment variables, and form the base URL for OpenAI Platform API
   const OPENAI_API_KEY = process.env.OPENAI_API_KEY ?? "<insert your OpenAI API key here>";
+  const OPENAI_MODEL_NAME = process.env.OPENAI_MODEL_NAME ?? "<insert your OpenAI model name here>";
   const OPENAI_ORG_ID = process.env.OPENAI_ORG_ID ?? null;
 
   // NOTE: Never deploy your key in client-side environments like browsers or mobile apps

@@ -59,7 +59,7 @@
       53
       [Uu]nknown
 
-- area: ai dev new openai-chat
+- area: ai dev new openai-chat (key)
   tests:
 
   - class: dev new openai-chat (c#)
@@ -169,7 +169,45 @@
         Tell me another joke
         exit
 
-- area: ai dev new openai-chat-streaming
+- area: ai dev new openai-chat (aad)
+  tests:
+
+  - class: dev new openai-chat (javascript)
+    steps:
+    - name: generate template
+      command: ai dev new openai-chat --javascript --var AZURE_OPENAI_AUTH_METHOD=aad --output-path openai-chat-js-aad
+    - name: build template
+      bash: |
+        cd openai-chat-js-aad
+        npm install
+    - name: run template
+      command: ai dev shell --bash "cd openai-chat-js-aad;node Main.js"
+      input: |-
+        Tell me a joke
+        Tell me another joke
+        exit
+      tag: skip
+
+- area: ai dev new openai-chat (oai)
+  tests:
+
+  - class: dev new openai-chat (javascript)
+    steps:
+    - name: generate template
+      command: ai dev new openai-chat --javascript --var USE_AZURE_OPENAI=false --output-path openai-chat-js-oai
+    - name: build template
+      bash: |
+        cd openai-chat-js-oai
+        npm install
+    - name: run template
+      command: ai dev shell --bash "cd openai-chat-js-oai;node Main.js"
+      input: |-
+        Tell me a joke
+        Tell me another joke
+        exit
+      tag: skip
+
+- area: ai dev new openai-chat-streaming (key)
   tests:
 
   - class: dev new openai-chat-streaming (c#)
@@ -279,6 +317,44 @@
         Tell me another joke
         exit
 
+- area: ai dev new openai-chat-streaming (aad)
+  tests:
+
+  - class: dev new openai-chat-streaming (javascript)
+    steps:
+    - name: generate template
+      command: ai dev new openai-chat-streaming --javascript --var AZURE_OPENAI_AUTH_METHOD=aad --output-path openai-chat-streaming-js-aad
+    - name: build template
+      bash: |
+        cd openai-chat-streaming-js-aad
+        npm install
+    - name: run template
+      command: ai dev shell --bash "cd openai-chat-streaming-js-aad;node Main.js"
+      input: |-
+        Tell me a joke
+        Tell me another joke
+        exit
+      tag: skip
+
+- area: ai dev new openai-chat-streaming (oai)
+  tests:
+
+  - class: dev new openai-chat-streaming (javascript)
+    steps:
+    - name: generate template
+      command: ai dev new openai-chat-streaming --javascript --var USE_AZURE_OPENAI=false --output-path openai-chat-streaming-js-oai
+    - name: build template
+      bash: |
+        cd openai-chat-streaming-js-oai
+        npm install
+    - name: run template
+      command: ai dev shell --bash "cd openai-chat-streaming-js-oai;node Main.js"
+      input: |-
+        Tell me a joke
+        Tell me another joke
+        exit
+      tag: skip
+
 - area: ai dev new openai-chat-streaming-with-data
   tests:
 
@@ -359,7 +435,7 @@
         exit
       tag: skip
 
-- area: ai dev new openai-chat-streaming-with-functions
+- area: ai dev new openai-chat-streaming-with-functions (key)
   tests:
 
   - class: dev new openai-chat-streaming-with-functions (c#)
@@ -440,6 +516,44 @@
         What is the time?
         exit
 
+- area: ai dev new openai-chat-streaming-with-functions (aad)
+  tests:
+
+  - class: dev new openai-chat-streaming-with-functions (javascript)
+    steps:
+    - name: generate template
+      command: ai dev new openai-chat-streaming-with-functions --javascript --var AZURE_OPENAI_AUTH_METHOD=aad --output-path openai-chat-streaming-with-functions-js-aad
+    - name: build template
+      bash: |
+        cd openai-chat-streaming-with-functions-js-aad
+        npm install
+    - name: run template
+      command: ai dev shell --bash "cd openai-chat-streaming-with-functions-js-aad;node Main.js"
+      input: |-
+        What is the date?
+        What is the time?
+        exit
+      tag: skip
+
+- area: ai dev new openai-chat-streaming-with-functions (oai)
+  tests:
+
+  - class: dev new openai-chat-streaming-with-functions (javascript)
+    steps:
+    - name: generate template
+      command: ai dev new openai-chat-streaming-with-functions --javascript --var USE_AZURE_OPENAI=false --output-path openai-chat-streaming-with-functions-js-oai
+    - name: build template
+      bash: |
+        cd openai-chat-streaming-with-functions-js-oai
+        npm install
+    - name: run template
+      command: ai dev shell --bash "cd openai-chat-streaming-with-functions-js-oai;node Main.js"
+      input: |-
+        What is the date?
+        What is the time?
+        exit
+      tag: skip
+
 - area: ai dev new openai-chat-webpage
   tests:
 
@@ -502,7 +616,7 @@
         ai dev new .env
         npm run webpack
 
-- area: ai dev new openai-asst
+- area: ai dev new openai-asst (key)
   tests:
   - class: dev new openai-asst (javascript)
     steps:
@@ -520,7 +634,43 @@
         exit
       tag: skip
 
-- area: ai dev new openai-asst-streaming
+- area: ai dev new openai-asst (aad)
+  tests:
+  - class: dev new openai-asst (javascript)
+    steps:
+    - name: generate template
+      command: ai dev new openai-asst --javascript --var AZURE_OPENAI_AUTH_METHOD=aad --output-path openai-asst-js-aad
+    - name: build template
+      bash: |
+        cd openai-asst-js-aad
+        npm install
+    - name: run template
+      command: ai dev shell --bash "cd openai-asst-js-aad;node main.js"
+      input: |-
+        Tell me a joke
+        Tell me another joke
+        exit
+      tag: skip
+
+- area: ai dev new openai-asst (oai)
+  tests:
+  - class: dev new openai-asst (javascript)
+    steps:
+    - name: generate template
+      command: ai dev new openai-asst --javascript --var USE_AZURE_OPENAI=false --output-path openai-asst-js-oai
+    - name: build template
+      bash: |
+        cd openai-asst-js-oai
+        npm install
+    - name: run template
+      command: ai dev shell --bash "cd openai-asst-js-oai;node main.js"
+      input: |-
+        Tell me a joke
+        Tell me another joke
+        exit
+      tag: skip
+
+- area: ai dev new openai-asst-streaming (key)
   tests:
   - class: dev new openai-asst-streaming (javascript)
     steps:
@@ -538,7 +688,43 @@
         exit
       tag: skip
 
-- area: ai dev new openai-asst-streaming-with-functions
+- area: ai dev new openai-asst-streaming (aad)
+  tests:
+  - class: dev new openai-asst-streaming (javascript)
+    steps:
+    - name: generate template
+      command: ai dev new openai-asst-streaming --javascript --var AZURE_OPENAI_AUTH_METHOD=aad --output-path openai-asst-streaming-js-aad
+    - name: build template
+      bash: |
+        cd openai-asst-streaming-js-aad
+        npm install
+    - name: run template
+      command: ai dev shell --bash "cd openai-asst-streaming-js-aad;node main.js"
+      input: |-
+        Tell me a joke
+        Tell me another joke
+        exit
+      tag: skip
+
+- area: ai dev new openai-asst-streaming (oai)
+  tests:
+  - class: dev new openai-asst-streaming (javascript)
+    steps:
+    - name: generate template
+      command: ai dev new openai-asst-streaming --javascript --var USE_AZURE_OPENAI=false --output-path openai-asst-streaming-js-oai
+    - name: build template
+      bash: |
+        cd openai-asst-streaming-js-oai
+        npm install
+    - name: run template
+      command: ai dev shell --bash "cd openai-asst-streaming-js-oai;node main.js"
+      input: |-
+        Tell me a joke
+        Tell me another joke
+        exit
+      tag: skip
+
+- area: ai dev new openai-asst-streaming-with-functions (key)
   tests:
   - class: dev new openai-asst-streaming-with-functions (javascript)
     steps:
@@ -550,6 +736,42 @@
         npm install
     - name: run template
       command: ai dev shell --bash "cd openai-asst-streaming-with-functions-js;node main.js"
+      input: |-
+        What is the date?
+        What is the time?
+        exit
+      tag: skip
+
+- area: ai dev new openai-asst-streaming-with-functions (aad)
+  tests:
+  - class: dev new openai-asst-streaming-with-functions (javascript)
+    steps:
+    - name: generate template
+      command: ai dev new openai-asst-streaming-with-functions --javascript --var AZURE_OPENAI_AUTH_METHOD=aad --output-path openai-asst-streaming-with-functions-js-aad
+    - name: build template
+      bash: |
+        cd openai-asst-streaming-with-functions-js-aad
+        npm install
+    - name: run template
+      command: ai dev shell --bash "cd openai-asst-streaming-with-functions-js;node main.js"
+      input: |-
+        What is the date?
+        What is the time?
+        exit
+      tag: skip
+
+- area: ai dev new openai-asst-streaming-with-functions (oai)
+  tests:
+  - class: dev new openai-asst-streaming-with-functions (javascript)
+    steps:
+    - name: generate template
+      command: ai dev new openai-asst-streaming-with-functions --javascript --var USE_AZURE_OPENAI=false --output-path openai-asst-streaming-with-functions-js-oai
+    - name: build template
+      bash: |
+        cd openai-asst-streaming-with-functions-js-oai
+        npm install
+    - name: run template
+      command: ai dev shell --bash "cd openai-asst-streaming-with-functions-js-oai;node main.js"
       input: |-
         What is the date?
         What is the time?
