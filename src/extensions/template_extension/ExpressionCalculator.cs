@@ -134,12 +134,16 @@ namespace Azure.AI.Details.Common.CLI.Extensions.Templates
         {
             _expression = str;
             _position = _nextPosition = 0;
+
+            SkipWhiteSpace();
             NextToken();
+
             var value = Statement();
             if (_tokenType != TokenType.Eos)
             {
-                throw new CalcException("Unexpected character", _position);
+                throw UnexpectedCharacterCalcException(_position);
             }
+
             return value;
         }
 
@@ -180,6 +184,7 @@ namespace Azure.AI.Details.Common.CLI.Extensions.Templates
             if (!isAssignment)
             {
                 _position = _nextPosition = 0;
+                SkipWhiteSpace();
                 NextToken();
             }
 
@@ -655,17 +660,25 @@ namespace Azure.AI.Details.Common.CLI.Extensions.Templates
                             _tokenType = TokenType.BitwiseOr;
                             break;
                         default:
-                            Console.WriteLine($"Unexpected character: {_expression[_nextPosition]}");
-                            Console.WriteLine($"Expression: `{_expression}`");
-                            Console.WriteLine($"NextPosition: {_nextPosition}");
-                            Console.WriteLine($"... at: {_expression.Substring(_nextPosition)}");
-                            throw new CalcException("Unexpected character", _position);
+                            throw UnexpectedCharacterCalcException(_nextPosition);
                     }
                     _token = _expression.Substring(_position, _nextPosition - _position);
                     _nextPosition++;
                     SkipWhiteSpace();
                 }
             }
+        }
+
+        private CalcException UnexpectedCharacterCalcException(int pos)
+        {
+            var charAsInt = (int)_expression[pos];
+            var hexOfChar = (charAsInt).ToString("X");
+            var charAsString = _expression.Substring(pos, 1);
+            var ex = new CalcException(charAsInt < 127
+                ? $"Unexpected character at position {pos} ('{charAsString}', 0x{hexOfChar})."
+                : $"Unexpected character at position {pos} (0x{hexOfChar}).",
+                pos);
+            return ex;
         }
 
         private void SkipWhiteSpace()
