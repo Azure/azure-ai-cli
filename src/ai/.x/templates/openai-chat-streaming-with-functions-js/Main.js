@@ -10,7 +10,10 @@ const rl = readline.createInterface({
 
 async function main() {
 
-  {{@include openai.chat.create.openai.node.js}}
+  // What's the system prompt?
+  const AZURE_OPENAI_SYSTEM_PROMPT = process.env.AZURE_OPENAI_SYSTEM_PROMPT ?? "You are a helpful AI assistant.";
+
+  {{@include openai.asst.or.chat.create.openai.node.js}}
 
   // Create the streaming chat completions helper
   {{if {USE_AZURE_OPENAI}}}

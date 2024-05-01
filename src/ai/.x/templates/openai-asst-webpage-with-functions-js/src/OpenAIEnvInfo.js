@@ -3,7 +3,7 @@ class OpenAIEnvInfo {
   // NOTE: Never deploy your key in client-side environments like browsers or mobile apps
   //  SEE: https://help.openai.com/en/articles/5112595-best-practices-for-api-key-safety
 
-  static ASSISTANT_ID = process.env.ASSISTANT_ID ?? "{ASSISTANT_ID}";
+  static ASSISTANT_ID = process.env.ASSISTANT_ID ?? "<insert your OpenAI assistant ID here>";
 
   static AZURE_CLIENT_ID = process.env.AZURE_CLIENT_ID ?? null;
   static AZURE_TENANT_ID = process.env.AZURE_TENANT_ID ?? null;

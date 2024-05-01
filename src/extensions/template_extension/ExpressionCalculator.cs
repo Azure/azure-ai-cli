@@ -675,8 +675,8 @@ namespace Azure.AI.Details.Common.CLI.Extensions.Templates
             var hexOfChar = (charAsInt).ToString("X");
             var charAsString = _expression.Substring(pos, 1);
             var ex = new CalcException(charAsInt < 127
-                ? $"Unexpected character at position {pos} ('{charAsString}', 0x{hexOfChar})."
-                : $"Unexpected character at position {pos} (0x{hexOfChar}).",
+                ? $"Unexpected character at position {pos} ('{charAsString}', 0x{hexOfChar}); see: \n{_expression}."
+                : $"Unexpected character at position {pos} (0x{hexOfChar}); see:\n`{_expression}`",
                 pos);
             return ex;
         }

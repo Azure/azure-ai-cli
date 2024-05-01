@@ -11,10 +11,10 @@ const rl = readline.createInterface({
 async function main() {
 
   // Which assistant, which thread?
-  const ASSISTANT_ID = process.env.ASSISTANT_ID ?? "{ASSISTANT_ID}";
+  const ASSISTANT_ID = process.env.ASSISTANT_ID ?? "<insert your OpenAI assistant ID here>"
   const threadId = process.argv[2] || null;
 
-  {{@include openai.asst.create.openai.node.js}}
+  {{@include openai.asst.or.chat.create.openai.node.js}}
   
   // Create the assistants streaming helper class instance
   const assistant = new {ClassName}(ASSISTANT_ID, factory, openai);
