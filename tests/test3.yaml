@@ -554,7 +554,7 @@
         exit
       tag: skip
 
-- area: ai dev new openai-chat-webpage
+- area: ai dev new openai-chat-webpage (key)
   tests:
 
   - class: dev new openai-chat-webpage (javascript)
@@ -585,7 +585,41 @@
         ai dev new .env
         npm run webpack
 
-- area: ai dev new openai-chat-webpage-with-functions
+- area: ai dev new openai-chat-webpage (aad)
+  tests:
+
+  - class: dev new openai-chat-webpage (javascript)
+    steps:
+    - name: generate template
+      command: ai dev new openai-chat-webpage --javascript --var AZURE_OPENAI_AUTH_METHOD=aad --output-path openai-chat-webpage-js-aad
+    - name: build template
+      bash: |
+        cd openai-chat-webpage-js-aad
+        npm install
+    - name: pack template
+      bash: |
+        cd openai-chat-webpage-js-aad
+        ai dev new .env
+        npm run webpack
+
+- area: ai dev new openai-chat-webpage (oai)
+  tests:
+
+  - class: dev new openai-chat-webpage (javascript)
+    steps:
+    - name: generate template
+      command: ai dev new openai-chat-webpage --javascript --var USE_AZURE_OPENAI=false --output-path openai-chat-webpage-js-oai
+    - name: build template
+      bash: |
+        cd openai-chat-webpage-js-oai
+        npm install
+    - name: pack template
+      bash: |
+        cd openai-chat-webpage-js-oai
+        ai dev new .env
+        npm run webpack
+
+- area: ai dev new openai-chat-webpage-with-functions (key)
   tests:
 
   - class: dev new openai-chat-webpage-with-functions (javascript)
@@ -613,6 +647,40 @@
     - name: pack template
       bash: |
         cd openai-chat-webpage-with-functions-ts
+        ai dev new .env
+        npm run webpack
+
+- area: ai dev new openai-chat-webpage-with-functions (aad)
+  tests:
+
+  - class: dev new openai-chat-webpage-with-functions (javascript)
+    steps:
+    - name: generate template
+      command: ai dev new openai-chat-webpage-with-functions --javascript --var AZURE_OPENAI_AUTH_METHOD=aad --output-path openai-chat-webpage-with-functions-js-aad
+    - name: build template  
+      bash: |
+        cd openai-chat-webpage-with-functions-js-aad
+        npm install
+    - name: pack template 
+      bash: |
+        cd openai-chat-webpage-with-functions-js-aad
+        ai dev new .env
+        npm run webpack
+
+- area: ai dev new openai-chat-webpage-with-functions (oai)
+  tests:
+
+  - class: dev new openai-chat-webpage-with-functions (javascript)
+    steps:
+    - name: generate template
+      command: ai dev new openai-chat-webpage-with-functions --javascript --var USE_AZURE_OPENAI=false --output-path openai-chat-webpage-with-functions-js-oai
+    - name: build template  
+      bash: |
+        cd openai-chat-webpage-with-functions-js-oai
+        npm install
+    - name: pack template 
+      bash: |
+        cd openai-chat-webpage-with-functions-js-oai
         ai dev new .env
         npm run webpack
 
@@ -778,7 +846,7 @@
         exit
       tag: skip
 
-- area: ai dev new openai-asst-webpage
+- area: ai dev new openai-asst-webpage (key)
   tests:
   - class: dev new openai-asst-webpage (javascript)
     steps:
@@ -807,7 +875,39 @@
         cd openai-asst-webpage-ts
         npm run build
 
-- area: ai dev new openai-asst-webpage-with-functions
+- area: ai dev new openai-asst-webpage (aad)
+  tests:
+  - class: dev new openai-asst-webpage (javascript)
+    steps:
+    - name: generate template
+      command: ai dev new openai-asst-webpage --javascript --var AZURE_OPENAI_AUTH_METHOD=aad --output-path openai-asst-webpage-js-aad
+    - name: build template
+      bash: |
+        cd openai-asst-webpage-js-aad
+        npm install
+    - name: pack template
+      bash: |
+        cd openai-asst-webpage-js-aad
+        ai dev new .env
+        npm run webpack
+
+- area: ai dev new openai-asst-webpage (oai)
+  tests:
+  - class: dev new openai-asst-webpage (javascript)
+    steps:
+    - name: generate template
+      command: ai dev new openai-asst-webpage --javascript --var USE_AZURE_OPENAI=false --output-path openai-asst-webpage-js-oai
+    - name: build template
+      bash: |
+        cd openai-asst-webpage-js-oai
+        npm install
+    - name: pack template
+      bash: |
+        cd openai-asst-webpage-js-oai
+        ai dev new .env
+        npm run webpack
+
+- area: ai dev new openai-asst-webpage-with-functions (key)
   tests:
   - class: dev new openai-asst-webpage-with-functions (javascript)
     steps:
@@ -820,5 +920,37 @@
     - name: pack template
       bash: |
         cd openai-asst-webpage-with-functions-js
+        ai dev new .env
+        npm run webpack
+
+- area: ai dev new openai-asst-webpage-with-functions (aad)
+  tests:
+  - class: dev new openai-asst-webpage-with-functions (javascript)
+    steps:
+    - name: generate template
+      command: ai dev new openai-asst-webpage-with-functions --javascript --var AZURE_OPENAI_AUTH_METHOD=aad --output-path openai-asst-webpage-with-functions-js-aad
+    - name: build template
+      bash: |
+        cd openai-asst-webpage-with-functions-js-aad
+        npm install
+    - name: pack template
+      bash: |
+        cd openai-asst-webpage-with-functions-js-aad
+        ai dev new .env
+        npm run webpack
+
+- area: ai dev new openai-asst-webpage-with-functions (oai)
+  tests:
+  - class: dev new openai-asst-webpage-with-functions (javascript)
+    steps:
+    - name: generate template
+      command: ai dev new openai-asst-webpage-with-functions --javascript --var USE_AZURE_OPENAI=false --output-path openai-asst-webpage-with-functions-js-oai
+    - name: build template
+      bash: |
+        cd openai-asst-webpage-with-functions-js-oai
+        npm install
+    - name: pack template
+      bash: |
+        cd openai-asst-webpage-with-functions-js-oai
         ai dev new .env
         npm run webpack
