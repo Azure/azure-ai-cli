@@ -1,11 +1,27 @@
 const { OpenAI } = require('openai');
 const { {ClassName} } = require("./OpenAIAssistantsStreamingClass");
 
-const readline = require('node:readline/promises');
-const rl = readline.createInterface({
+const rl = require('readline').createInterface({
   input: process.stdin,
   output: process.stdout
 });
+
+async function* getLines() {
+  for await (const line of rl) {
+    yield line;
+  }
+}
+
+async function readLine(prompt) {
+  const lineGenerator = getLines();
+  process.stdout.write(prompt);
+  const result = await lineGenerator.next();
+  if(result.done) {
+    rl.close();
+    return '';
+  }
+  return result.value;
+}
 
 async function main() {
 
@@ -33,7 +49,7 @@ async function main() {
   while (true) {
 
     // Get user input
-    const input = await rl.question('User: ');
+    const input = await readLine('User: ');
     if (input === 'exit' || input === '') break;
 
     // Get the Assistant's response
@@ -49,11 +65,6 @@ async function main() {
   process.exit();
 }
 
-main().catch((err) => {
-  if (err.code !== 'ERR_USE_AFTER_CLOSE') { // filter out expected error (EOF on redirected input)
-    console.error("The sample encountered an error:", err);
-    process.exit(1);
-  }
-});
+main();
 
 module.exports = { main };
