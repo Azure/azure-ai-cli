@@ -7,5 +7,6 @@
   "AZURE_OPENAI_AUTH_METHOD": "KEY",
   "USE_AZURE_OPENAI": "true",
 
+  "_IS_BROWSER_TEMPLATE": "false",
   "_IS_OPENAI_ASST_TEMPLATE": "true"
 }

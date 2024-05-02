@@ -543,7 +543,7 @@ namespace Azure.AI.Details.Common.CLI.Extensions.Templates
             }
             else
             {
-                if (char.IsLetter(_expression[_nextPosition]))
+                if (char.IsLetter(_expression[_nextPosition]) || _expression[_nextPosition] == '_')
                 {
                     while (_nextPosition < _expression.Length &&
                            (char.IsLetter(_expression[_nextPosition]) ||
