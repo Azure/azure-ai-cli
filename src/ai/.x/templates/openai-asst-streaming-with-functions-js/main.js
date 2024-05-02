@@ -11,7 +11,7 @@ const rl = readline.createInterface({
 async function main() {
 
   // Which assistant, which thread?
-  const ASSISTANT_ID = process.env.ASSISTANT_ID ?? "<insert your OpenAI assistant ID here>"
+  const ASSISTANT_ID = process.env.ASSISTANT_ID ?? "<insert your OpenAI assistant ID here>";
   const threadId = process.argv[2] || null;
 
   {{@include openai.asst.or.chat.create.openai.node.js}}

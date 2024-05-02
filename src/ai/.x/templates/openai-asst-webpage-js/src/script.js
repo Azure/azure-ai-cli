@@ -317,15 +317,20 @@ async function threadItemsSetTitleIfUntitled(items, userInput, computerResponse)
 }
 
 async function threadItemsSetTitle(userInput, computerResponse, items, i) {
+
+  // What's the system prompt?
+  const AZURE_OPENAI_SYSTEM_PROMPT = process.env.AZURE_OPENAI_SYSTEM_PROMPT ?? "You are a helpful AI assistant.";
+
+  {{set _IS_OPENAI_ASST_TEMPLATE = false}}
+  {{@include openai.asst.or.chat.create.openai.node.js}}
+
+  // Prepare the messages for the OpenAI API
   let messages = [
-    { role: 'system', content: "You are a helpful assistant that answers questions, and on 2nd turn, will suggest a title for the interaction." },
+    { role: 'system', content: AZURE_OPENAI_SYSTEM_PROMPT },
     { role: 'user', content: userInput },
     { role: 'assistant', content: computerResponse },
     { role: 'system', content: "Please suggest a title for this interaction. Don't be cute or humorous in your answer. Answer only with a factual descriptive title. Do not use quotes. Do not prefix with 'Title:' or anything else. Just emit the title." }
   ];
-
-  {{set _IS_OPENAI_ASST_TEMPLATE = false}}
-  {{@include openai.asst.or.chat.create.openai.node.js}}
 
   // Call the OpenAI API to get a title for the conversation
   const completion = await openai.chat.completions.create({
