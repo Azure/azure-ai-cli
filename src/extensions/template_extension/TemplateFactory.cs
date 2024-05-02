@@ -29,7 +29,7 @@ namespace Azure.AI.Details.Common.CLI.Extensions.Templates
             if (InOutPipeServer.IsInOutPipeServer)
             {
                 string json = JsonSerializer.Serialize(new { list.Groups });
-                Console.WriteLine(json);
+                InOutPipeServer.OutputTemplateList(json);
                 return true;
             }
 
