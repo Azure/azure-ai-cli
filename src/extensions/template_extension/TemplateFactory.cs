@@ -28,7 +28,9 @@ namespace Azure.AI.Details.Common.CLI.Extensions.Templates
             }
             if (InOutPipeServer.IsInOutPipeServer)
             {
-                string json = JsonSerializer.Serialize(new { list.Groups });
+                var outServerTemplateObject = list.Groups.Select(x => 
+                    new { x.ShortName, x.LongName, Languages = x.Languages.Split(",") });
+                string json = JsonSerializer.Serialize(outServerTemplateObject);
                 InOutPipeServer.OutputTemplateList(json);
                 return true;
             }
