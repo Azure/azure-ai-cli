@@ -1,17 +1,18 @@
-const rl = require('readline').createInterface({
-  input: process.stdin,
-  output: process.stdout
-});
-
 class ReadLineWrapper {
 
   constructor() {
-    this.lineGenerator = this.getLines();
+    this.lineGenerator = this.readlines();
   }
 
-  async* getLines() {
-    for await (const line of rl) {
-      yield line;
+  async* readlines() {
+    let buffer = '';
+    for await (const chunk of process.stdin) {
+      buffer += chunk;
+      let i;
+      while ((i = buffer.indexOf('\n')) >= 0) {
+        yield buffer.substring(0, i);
+        buffer = buffer.substring(i + 1);
+      }
     }
   }
 
@@ -19,14 +20,9 @@ class ReadLineWrapper {
     process.stdout.write(prompt);
     const result = await this.lineGenerator.next();
     if(result.done) {
-      this.close();
       return '';
     }
     return result.value;
-  }
-
-  close() {
-    rl.close();
   }
 }
 
