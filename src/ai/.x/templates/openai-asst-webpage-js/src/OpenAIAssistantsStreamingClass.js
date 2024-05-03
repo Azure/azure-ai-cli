@@ -40,7 +40,7 @@ class {ClassName} {
   async getResponse(userInput, callback) {
 
     if (this.thread == null) {
-      await this.getOrCreateThread();
+      await this.createThread();
     }
 
     let runCompletedPromise = new Promise((resolve) => {
@@ -64,6 +64,10 @@ class {ClassName} {
     stream.on('event', async (event) => {
       if (event.event == 'thread.run.completed') {
         this.resolveRunCompletedPromise();
+      }
+      else if (event.event == 'thread.run.failed') {
+        console.log(JSON.stringify(event));
+        throw new Error('Run failed');
       }
     });
   }

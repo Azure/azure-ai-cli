@@ -175,13 +175,51 @@ namespace Azure.AI.Details.Common.CLI.Extensions.Templates
 
         private static void ProcessTemplate(string file, string outputFile, INamedValues values, out string generatedFileName, out string generatedContent)
         {
-            var text = FileHelpers.ReadAllText(file, new UTF8Encoding(false));
+            var text = ReadAllTextAndExpand(file);
             if (Program.Debug) Console.WriteLine($"```{file}\n{text}\n```");
 
             generatedFileName = outputFile;
             generatedContent = TemplateHelpers.ProcessTemplate(text, values);
 
             if (Program.Debug) Console.WriteLine($"```{generatedFileName}\n{generatedContent}\n```");
+        }
+
+        private static string ReadAllTextAndExpand(string file)
+        {
+            if (Program.Debug) Console.WriteLine($"Reading template file: '{file}'...");
+
+            var text = FileHelpers.ReadAllText(file, new UTF8Encoding(false));
+            var doExpand = text.Contains("{{@include ");
+            return doExpand
+                ? ExpandIncludes(text)
+                : text;
+        }
+
+        private static string ExpandIncludes(string text)
+        {
+            var sb = new StringBuilder();
+
+            var lines = text.Split('\n').ToList();
+            foreach (var line in lines)
+            {
+                var trimmed = line.Trim('\n', '\r', ' ', '\t');
+
+                var isInclude = trimmed.StartsWith("{{@include ");
+                if (!isInclude)
+                {
+                    sb.AppendLine(line.TrimEnd('\r'));
+                    continue;
+                }
+
+                var fileSpecified = trimmed.Substring("{{@include ".Length).TrimEnd('}');
+                var files = FileHelpers.FindFilesInTemplatePath($"includes/{fileSpecified}", null).ToList();
+                var file = files.FirstOrDefault();
+
+                text = ReadAllTextAndExpand(file).TrimEnd('\r', '\n');
+                sb.AppendLine(text);
+            }
+
+            return sb.ToString();
         }
     }
 }

@@ -1,24 +1,23 @@
 const marked = require("marked");
 const hljs = require("highlight.js");
+const { OpenAI } = require('openai');
 
-const { CreateOpenAI } = require("./CreateOpenAI");
-const { OpenAIEnvInfo } = require("./OpenAIEnvInfo");
 const { {ClassName} } = require("./OpenAIChatCompletionsStreamingClass");
 
 let streamingChatCompletions;
 async function streamingChatCompletionsInit() {
 
-  // Create the OpenAI client
-  const openai = await CreateOpenAI.forChatCompletionsAPI({
-    errorCallback: text => chatPanelAppendMessage('computer', markdownToHtml(text) || text),
-    dangerouslyAllowBrowser: true
-  });
-  
+  // What's the system prompt?
+  const AZURE_OPENAI_SYSTEM_PROMPT = process.env.AZURE_OPENAI_SYSTEM_PROMPT ?? "You are a helpful AI assistant.";
+
+  {{@include openai.asst.or.chat.create.openai.node.js}}
+
   // Create the streaming chat completions helper
-  const useAzure = OpenAIEnvInfo.AZURE_OPENAI_ENDPOINT?.startsWith('https://');
-  streamingChatCompletions = useAzure
-    ? new {ClassName}(OpenAIEnvInfo.AZURE_OPENAI_CHAT_DEPLOYMENT, OpenAIEnvInfo.AZURE_OPENAI_SYSTEM_PROMPT, openai, 20)
-    : new {ClassName}(OpenAIEnvInfo.OPENAI_MODEL_NAME, OpenAIEnvInfo.AZURE_OPENAI_SYSTEM_PROMPT, openai);
+  {{if {USE_AZURE_OPENAI}}}
+  streamingChatCompletions = new {ClassName}(AZURE_OPENAI_CHAT_DEPLOYMENT, AZURE_OPENAI_SYSTEM_PROMPT, openai, 20);
+  {{else}}
+  streamingChatCompletions = new {ClassName}(OPENAI_MODEL_NAME, AZURE_OPENAI_SYSTEM_PROMPT, openai);
+  {{endif}}
 }
 
 function streamingChatCompletionsClear() {
