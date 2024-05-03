@@ -10,7 +10,7 @@ class ReadLineWrapper {
       buffer += chunk;
       let i;
       while ((i = buffer.indexOf('\n')) >= 0) {
-        yield buffer.substring(0, i);
+        yield buffer.substring(0, i).trimEnd();
         buffer = buffer.substring(i + 1);
       }
     }
