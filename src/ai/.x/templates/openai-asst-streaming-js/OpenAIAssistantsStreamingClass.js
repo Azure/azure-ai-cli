@@ -62,7 +62,8 @@ class {ClassName} {
     stream.on('event', async (event) => {
       if (event.event == 'thread.run.completed') {
         this.resolveRunCompletedPromise();
-      } else if (event.event == 'thread.run.failed') {
+      }
+      else if (event.event == 'thread.run.failed') {
         console.log(JSON.stringify(event));
         throw new Error('Run failed');
       }

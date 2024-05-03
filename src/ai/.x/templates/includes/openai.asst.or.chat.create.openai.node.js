@@ -1,5 +1,5 @@
 {{if !{USE_AZURE_OPENAI} || contains(toupper("{AZURE_OPENAI_AUTH_METHOD}"), "KEY")}}
-  // NOTE: Never deploy your key in client-side environments like browsers or mobile apps
+  // NOTE: Never deploy your API Key in client-side environments like browsers or mobile apps
   // SEE: https://help.openai.com/en/articles/5112595-best-practices-for-api-key-safety
 
 {{endif}}

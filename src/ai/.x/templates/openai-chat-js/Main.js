@@ -1,11 +1,6 @@
 const { OpenAI } = require('openai');
 const { {ClassName} } = require("./OpenAIChatCompletionsClass");
-
-const readline = require('node:readline/promises');
-const rl = readline.createInterface({
-  input: process.stdin,
-  output: process.stdout
-});
+const { readline } = require("./ReadLineWrapper");
 
 async function main() {
 
@@ -25,7 +20,7 @@ async function main() {
   while (true) {
 
     // Get user input
-    const input = await rl.question('User: ');
+    const input = await readline.question('User: ');
     if (input === 'exit' || input === '') break;
 
     // Get the response
@@ -38,10 +33,8 @@ async function main() {
 }
 
 main().catch((err) => {
-  if (err.code !== 'ERR_USE_AFTER_CLOSE') { // filter out expected error (EOF on redirected input)
-    console.error("The sample encountered an error:", err);
-    process.exit(1);
-  }
+  console.error("The sample encountered an error:", err);
+  process.exit(1);
 });
 
 module.exports = { main };

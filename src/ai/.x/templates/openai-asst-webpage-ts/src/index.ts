@@ -11,7 +11,7 @@ import { OpenAIAssistantsStreamingClass } from "./OpenAIAssistantsStreamingClass
 let assistant: OpenAIAssistantsStreamingClass;
 let chatPanel: HTMLDivElement | null;
 
-// NOTE: Never deploy your key in client-side environments like browsers or mobile apps
+// NOTE: Never deploy your API Key in client-side environments like browsers or mobile apps
 // SEE: https://help.openai.com/en/articles/5112595-best-practices-for-api-key-safety
 
 // Which Assistant?

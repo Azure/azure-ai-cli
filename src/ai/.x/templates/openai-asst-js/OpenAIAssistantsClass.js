@@ -38,7 +38,7 @@ class {ClassName} {
   async getResponse(userInput) {
 
     if (this.thread == null) {
-      await this.getOrCreateThread();
+      await this.createThread();
     }
 
     await this.openai.beta.threads.messages.create(this.thread.id, { role: "user", content: userInput });
