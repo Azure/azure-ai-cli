@@ -42,7 +42,7 @@ namespace Azure.AI.Details.Common.CLI.Extensions.Templates
 
         public static string ProcessTemplate(string template, Func<string, bool> evaluateCondition, Func<string, string> interpolate, Action<string> setVariable)
         {
-            var lines = template.Split(new[] { Environment.NewLine }, StringSplitOptions.None);
+            var lines = template.Split('\n').ToList();
             var output = new StringBuilder();
 
             var inTrueBranchNow = new Stack<bool>();
@@ -53,7 +53,7 @@ namespace Azure.AI.Details.Common.CLI.Extensions.Templates
 
             foreach (var line in lines)
             {
-                var trimmedLine = line.Trim();
+                var trimmedLine = line.Trim('\n', '\r', ' ', '\t');
 
                 if (trimmedLine.StartsWith("{{if ") && trimmedLine.EndsWith("}}"))
                 {
