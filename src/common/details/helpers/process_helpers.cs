@@ -198,6 +198,40 @@ namespace Azure.AI.Details.Common.CLI
             return output;
         }
 
+        public static async Task<ParsedJsonProcessOutput<JsonElement>> ParseShellCommandJsonString(string command, string arguments, Dictionary<string, string>? addToEnvironment = null, Action<string>? stdOutHandler = null, Action<string>? stdErrHandler = null)
+        {
+            var processOutput = await ParseShellCommandJson(command, arguments, addToEnvironment, stdOutHandler, stdErrHandler);
+            if (processOutput.Payload.ValueKind != JsonValueKind.String)
+            {
+                processOutput.Payload = JsonDocument.Parse("\"\"").RootElement;
+            }
+
+            return processOutput;
+        }
+
+        public static async Task<ParsedJsonProcessOutput<JsonElement>> ParseShellCommandJsonArray(string command, string arguments, Dictionary<string, string>? addToEnvironment = null, Action<string>? stdOutHandler = null, Action<string>? stdErrHandler = null)
+        {
+            var processOutput = await ParseShellCommandJson(command, arguments, addToEnvironment, stdOutHandler, stdErrHandler);
+            if (processOutput.Payload.ValueKind != JsonValueKind.Array)
+            {
+                processOutput.Payload = JsonDocument.Parse("[]").RootElement;
+            }
+
+            return processOutput;
+        }
+
+        public static async Task<ParsedJsonProcessOutput<JsonElement>> ParseShellCommandJsonObject(string command, string arguments, Dictionary<string, string>? addToEnvironment = null, Action<string>? stdOutHandler = null, Action<string>? stdErrHandler = null)
+        {
+            var processOutput = await ParseShellCommandJson(command, arguments, addToEnvironment, stdOutHandler, stdErrHandler);
+            if (processOutput.Payload.ValueKind != JsonValueKind.Object)
+            {
+                processOutput.Payload = JsonDocument.Parse("{}").RootElement;
+            }
+
+            return processOutput;
+        }
+
+
         public static async Task<ParsedJsonProcessOutput<JsonElement>> ParseShellCommandJson(string command, string arguments, Dictionary<string, string>? addToEnvironment = null, Action<string>? stdOutHandler = null, Action<string>? stdErrHandler = null)
         {
             var processOutput = await RunShellCommandAsync(command, arguments, addToEnvironment, stdOutHandler, stdErrHandler);
