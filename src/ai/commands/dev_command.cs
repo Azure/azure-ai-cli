@@ -87,8 +87,9 @@ namespace Azure.AI.Details.Common.CLI
         private void DoNewTemplate(string templateName, string language)
         {
             var outputDirectory = templateName + ProgrammingLanguageToken.GetSuffix(language);
-            var instructions = InstructionsToken.Data().GetOrDefault(_values);
+            outputDirectory = _values.GetOrDefault("x.output.path", outputDirectory);
 
+            var instructions = InstructionsToken.Data().GetOrDefault(_values);
             var found = TemplateFactory.GenerateTemplateFiles(templateName, language, instructions, outputDirectory, _values);
             CheckGenerateTemplateFileWarnings(templateName, language, found);
         }

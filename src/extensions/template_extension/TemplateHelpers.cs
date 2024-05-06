@@ -31,13 +31,18 @@ namespace Azure.AI.Details.Common.CLI.Extensions.Templates
                     _ => calculator.Evaluate(condition)
                 };
             };
+            Action<string> setVariable = (s) => {
+                var result = calculator.Evaluate(s);
+                var name = s.Split('=')[0].Trim();
+                values.Reset(name, result.ToString());
+            };
 
-            return ProcessTemplate(template, evaluateCondition, interpolate);
+            return ProcessTemplate(template, evaluateCondition, interpolate, setVariable);
         }
 
-        public static string ProcessTemplate(string template, Func<string, bool> evaluateCondition, Func<string, string> interpolate)
+        public static string ProcessTemplate(string template, Func<string, bool> evaluateCondition, Func<string, string> interpolate, Action<string> setVariable)
         {
-            var lines = template.Split(new[] { Environment.NewLine }, StringSplitOptions.None);
+            var lines = template.Split('\n').ToList();
             var output = new StringBuilder();
 
             var inTrueBranchNow = new Stack<bool>();
@@ -48,7 +53,7 @@ namespace Azure.AI.Details.Common.CLI.Extensions.Templates
 
             foreach (var line in lines)
             {
-                var trimmedLine = line.Trim();
+                var trimmedLine = line.Trim('\n', '\r', ' ', '\t');
 
                 if (trimmedLine.StartsWith("{{if ") && trimmedLine.EndsWith("}}"))
                 {
@@ -104,6 +109,15 @@ namespace Azure.AI.Details.Common.CLI.Extensions.Templates
                 {
                     inTrueBranchNow.Pop();
                     skipElseBranches.Pop();
+                    continue;
+                }
+                else if (trimmedLine.StartsWith("{{set ") && trimmedLine.EndsWith("}}"))
+                {
+                    if (inTrueBranchNow.All(b => b))
+                    {
+                        var assignment = trimmedLine[6..^2].Trim();
+                        setVariable(assignment);
+                    }
                     continue;
                 }
 

@@ -1,21 +1,18 @@
 const marked = require("marked");
 const hljs = require("highlight.js");
-
-const { CreateOpenAI } = require("./CreateOpenAI");
-const { OpenAIEnvInfo } = require("./OpenAIEnvInfo");
+const { OpenAI } = require('openai');
 const { {ClassName} } = require("./OpenAIAssistantsStreamingClass");
 
 let assistant;
 async function assistantInit(threadId = null) {
-  
-  // Create the OpenAI client
-  const openai = await CreateOpenAI.forAssistantsAPI({
-    errorCallback: text => chatPanelAppendMessage('computer', markdownToHtml(text) || text),
-    dangerouslyAllowBrowser: true
-  });
+
+  // Which assistant, which thread?
+  const ASSISTANT_ID = process.env.ASSISTANT_ID ?? "<insert your OpenAI assistant ID here>";
+
+  {{@include openai.asst.or.chat.create.openai.node.js}}
 
   // Create the assistants streaming helper class instance
-  assistant = new {ClassName}(OpenAIEnvInfo.ASSISTANT_ID, openai);
+  assistant = new {ClassName}(ASSISTANT_ID, openai);
 
   await assistantCreateOrRetrieveThread(threadId);
 }
@@ -223,7 +220,7 @@ async function threadItemsCheckIfUpdatesNeeded(userInput, computerResponse) {
   let items = threadItemsGet();
   threadItemsCheckMoveOrAdd(items);
 
-  await threadItemsTitleIfUntitled(items, userInput, computerResponse);
+  await threadItemsSetTitleIfUntitled(items, userInput, computerResponse);
 }
 
 function threadItemsCheckMoveOrAdd(items) {
@@ -313,27 +310,43 @@ function threadItemsGroupByDate(threadItems) {
   return groupedItems;
 }
 
-async function threadItemsTitleIfUntitled(items, userInput, computerResponse) {
+async function threadItemsSetTitleIfUntitled(items, userInput, computerResponse) {
   if (threadItemIsUntitled(items[0])) {
-    let messages = [
-      { role: 'system', content: "You are a helpful assistant that answers questions, and on 2nd turn, will suggest a title for the interaction." },
-      { role: 'user', content: userInput },
-      { role: 'assistant', content: computerResponse },
-      { role: 'system', content: "Please suggest a title for this interaction. Don't be cute or humorous in your answer. Answer only with a factual descriptive title. Do not use quotes. Do not prefix with 'Title:' or anything else. Just emit the title." }
-    ];
-
-    const openai = await CreateOpenAI.forChatCompletionsAPI({ dangerouslyAllowBrowser: true });
-    const completion = await openai.chat.completions.create({
-      messages: messages,
-      model: "gpt-4-turbo-preview"
-    });
-
-    var newTitle = completion.choices[0].message.content;
-    items[0].metadata = newTitle;
-
-    localStorage.setItem('threadItems', JSON.stringify(items));
-    threadPanelPopulate(items);
+    await threadItemsSetTitle(userInput, computerResponse, items, 0);
   }
+}
+
+async function threadItemsSetTitle(userInput, computerResponse, items, i) {
+
+  // What's the system prompt?
+  const AZURE_OPENAI_SYSTEM_PROMPT = process.env.AZURE_OPENAI_SYSTEM_PROMPT ?? "You are a helpful AI assistant.";
+
+  {{set _IS_OPENAI_ASST_TEMPLATE = false}}
+  {{@include openai.asst.or.chat.create.openai.node.js}}
+
+  // Prepare the messages for the OpenAI API
+  let messages = [
+    { role: 'system', content: AZURE_OPENAI_SYSTEM_PROMPT },
+    { role: 'user', content: userInput },
+    { role: 'assistant', content: computerResponse },
+    { role: 'system', content: "Please suggest a title for this interaction. Don't be cute or humorous in your answer. Answer only with a factual descriptive title. Do not use quotes. Do not prefix with 'Title:' or anything else. Just emit the title." }
+  ];
+
+  // Call the OpenAI API to get a title for the conversation
+  const completion = await openai.chat.completions.create({
+    messages: messages,
+    {{if {USE_AZURE_OPENAI}}}
+    model: AZURE_OPENAI_CHAT_DEPLOYMENT
+    {{else}}
+    model: OPENAI_MODEL_NAME
+    {{endif}}
+  });
+
+var newTitle = completion.choices[i].message.content;
+  items[i].metadata = newTitle;
+
+  localStorage.setItem('threadItems', JSON.stringify(items));
+  threadPanelPopulate(items);
 }
 
 function threadPanelPopulate(items) {
