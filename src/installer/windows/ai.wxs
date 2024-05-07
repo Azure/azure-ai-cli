@@ -98,17 +98,17 @@
                 <File Name="Microsoft.CognitiveServices.Speech.extension.lu.dll"/>
             </Component>
 
-            <Component Directory="INSTALLDIR">
+            <Component Directory="INSTALLDIR" Win64="yes">
                 <File Name="NOTICE.txt"/>
             </Component>
             <!-- Persist the INSTALLDIR and restore it in subsequent installs -->
-            <Component Directory="INSTALLDIR">
+            <Component Directory="INSTALLDIR" Win64="yes">
                 <!-- Per-user registry key path to set per-user PATH environment variable. -->
                 <Condition>NOT ALLUSERS</Condition>
                 <RegistryValue Root="HKCU" Key="SOFTWARE\Microsoft\$(var.ProductFolder)" Name="InstallDir" Type="string" Value="[INSTALLDIR]"/>
                 <Environment Id="UserPath" Action="set" Name="PATH" Part="first" System="no" Value="[INSTALLDIR]"/>
             </Component>
-            <Component Directory="INSTALLDIR">
+            <Component Directory="INSTALLDIR" Win64="yes">
                 <!-- Per-machine registry key path to set per-machine PATH environment variable. -->
                 <Condition>ALLUSERS=1</Condition>
                 <RegistryValue Root="HKLM" Key="SOFTWARE\Microsoft\$(var.ProductFolder)" Name="InstallDir" Type="string" Value="[INSTALLDIR]"/>
