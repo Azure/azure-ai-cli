@@ -67,7 +67,7 @@
 
         <Feature Id="DefaultFeature" ConfigurableDirectory="INSTALLDIR">
             <!-- @Guid will be automatically and durably assigned based on key path -->
-            <Component Directory="INSTALLDIR">
+            <Component Directory="INSTALLDIR" Win64="yes">
                 <File Name="ai.exe"/>
 
                 <!--
@@ -79,22 +79,22 @@
                 <RemoveFolder Id="DownloadedFolder" Property="AiDataFolder" On="uninstall"/>
             </Component>
 
-            <Component Directory="INSTALLDIR">
+            <Component Directory="INSTALLDIR" Win64="yes">
                 <File Name="Microsoft.CognitiveServices.Speech.core.dll"/>
             </Component>
-            <Component Directory="INSTALLDIR">
+            <Component Directory="INSTALLDIR" Win64="yes">
                 <File Name="Microsoft.CognitiveServices.Speech.extension.audio.sys.dll"/>
             </Component>
-            <Component Directory="INSTALLDIR">
+            <Component Directory="INSTALLDIR" Win64="yes">
                 <File Name="Microsoft.CognitiveServices.Speech.extension.codec.dll"/>
             </Component>
-            <Component Directory="INSTALLDIR">
+            <Component Directory="INSTALLDIR" Win64="yes">
                 <File Name="Microsoft.CognitiveServices.Speech.extension.kws.dll"/>
             </Component>
-            <Component Directory="INSTALLDIR">
+            <Component Directory="INSTALLDIR" Win64="yes">
                 <File Name="Microsoft.CognitiveServices.Speech.extension.kws.ort.dll"/>
             </Component>
-            <Component Directory="INSTALLDIR">
+            <Component Directory="INSTALLDIR" Win64="yes">
                 <File Name="Microsoft.CognitiveServices.Speech.extension.lu.dll"/>
             </Component>
 
