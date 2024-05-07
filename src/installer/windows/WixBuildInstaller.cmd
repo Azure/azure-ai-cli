@@ -52,6 +52,13 @@ echo Publish Directory: %PUBLISH_DIR%
 set INSTALLER_FILE=Azure-AI-CLI-Setup-%TARGET_PLATFORM%-%PACKAGE_VERSION%.msi
 
 echo.
+echo Building/Publishing CLI for Windows %TARGET_PLATFORM%...
+dotnet publish ..\..\ai\ai-cli.csproj -r win-x64 -c Release -p:PublishProfile=scd -p:IncludeSymbols=false -p:CLIAssemblyVersion=%PRODUCT_VERSION% -p:CLIAssemblyInformationalVersion=%PACKAGE_VERSION% -p:PackageVersion=%PACKAGE_VERSION% -o %PUBLISH_DIR%
+if %ERRORLEVEL% neq 0 (
+  echo Error: dotnet publish failed 1>&2
+  exit /b 11
+)
+echo.
 echo Building %INSTALLER_FILE%...
 
 REM Check for WiX toolset
@@ -70,12 +77,13 @@ if %ERRORLEVEL% neq 0 (
   exit /b 41
 )
 
-light.exe ai.wixobj ui.wixobj -ext WixUIExtension -ext WixUtilExtension -o %INSTALLER_FILE% -b ..\..\..\ -b %PUBLISH_DIR%
+light.exe ai.wixobj ui.wixobj -ext WixUIExtension -ext WixUtilExtension -o %PUBLISH_DIR%\%INSTALLER_FILE% -b ..\..\..\ -b %PUBLISH_DIR%
 if %ERRORLEVEL% neq 0 (
   echo Error from light.exe 1>&2
   exit /b 42
 )
 
 :end
-echo Built %INSTALLER_FILE% successfully!
+echo Built %PUBLISH_DIR%\%INSTALLER_FILE% successfully!
+DIR %PUBLISH_DIR%\%INSTALLER_FILE%
 endlocal
