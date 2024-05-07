@@ -34,7 +34,7 @@
 
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
     <Product Id="*" Name="$(var.ProductName)" Version="$(var.ProductVersion)" Language="1033" Manufacturer="Microsoft Corporation" UpgradeCode="$(var.UpgradeCode)">
-        <Package Compressed="yes" InstallerVersion="500" InstallScope="perUser"/>
+        <Package Compressed="yes" InstallerVersion="500" InstallScope="perUser" Platform="x64"/>
         <MediaTemplate EmbedCab="yes"/>
 
         <!-- Use single package to installer per-user (default) or per-machine -->
