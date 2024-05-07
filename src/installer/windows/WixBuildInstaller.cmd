@@ -53,7 +53,7 @@ set INSTALLER_FILE=Azure-AI-CLI-Setup-%TARGET_PLATFORM%-%PACKAGE_VERSION%.msi
 
 echo.
 echo Building/Publishing CLI for Windows %TARGET_PLATFORM%...
-dotnet publish ..\..\ai\ai-cli.csproj -r win-x64 -c Release -p:PublishProfile=scd -p:IncludeSymbols=false -p:CLIAssemblyVersion=%PRODUCT_VERSION% -p:CLIAssemblyInformationalVersion=%PACKAGE_VERSION% -p:PackageVersion=%PACKAGE_VERSION% -o %PUBLISH_DIR%
+dotnet publish ..\..\ai\ai-cli.csproj -r win-x64 -c Release -p:CliPublishProfile=scd -p:IncludeSymbols=false -p:CLIAssemblyVersion=%PRODUCT_VERSION% -p:CLIAssemblyInformationalVersion=%PACKAGE_VERSION% -p:PackageVersion=%PACKAGE_VERSION% -o %PUBLISH_DIR%
 if %ERRORLEVEL% neq 0 (
   echo Error: dotnet publish failed 1>&2
   exit /b 11

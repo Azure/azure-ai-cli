@@ -27,12 +27,12 @@
     <DefineConstants Condition="'$(AI_CLI_ENABLE_TELEMETRY)' == '1'">$(DefineConstants);TELEMETRY_ENABLED</DefineConstants>
   </PropertyGroup>
 
-  <PropertyGroup Condition="'$(PublishProfile)' == '' or '$(PublishProfile)' == 'fdd'">
+  <PropertyGroup Condition="'$(CliPublishProfile)' == '' or '$(CliPublishProfile)' == 'fdd'">
     <SelfContained>false</SelfContained>
   </PropertyGroup>
 
   <!-- Self-contained deployment not yet finished/tested ... -->
-  <PropertyGroup Condition="'$(PublishProfile)' == 'scd'">
+  <PropertyGroup Condition="'$(CliPublishProfile)' == 'scd'">
     <SelfContained>true</SelfContained>
     <IsTrimmable>false</IsTrimmable>
     <PublishSingleFile>true</PublishSingleFile>
