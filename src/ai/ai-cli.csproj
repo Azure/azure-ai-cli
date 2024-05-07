@@ -34,10 +34,9 @@
   <!-- Self-contained deployment not yet finished/tested ... -->
   <PropertyGroup Condition="'$(PublishProfile)' == 'scd'">
     <SelfContained>true</SelfContained>
-    <IsTrimmable>true</IsTrimmable>
-    <PublishAot>true</PublishAot>
+    <IsTrimmable>false</IsTrimmable>
     <PublishSingleFile>true</PublishSingleFile>
-    <PublishTrimmed>true</PublishTrimmed>
+    <PublishTrimmed>false</PublishTrimmed>
     <LinkerDescriptor>linker.xml</LinkerDescriptor>
   </PropertyGroup>
 
