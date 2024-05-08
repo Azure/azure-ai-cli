@@ -125,7 +125,7 @@ namespace Azure.AI.Details.Common.CLI.Extensions.Templates
                 {
                     var firstLine = output.Length == 0;
                     if (!firstLine) output.AppendLine();
-                    output.Append(interpolate(line));
+                    output.Append(interpolate(line.TrimEnd('\n', '\r')));
                 }
             }
 
