@@ -498,7 +498,7 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
 
             var path1 = Environment.GetEnvironmentVariable("PATH");
             var path2 = Directory.GetCurrentDirectory();
-            var path3 = (new FileInfo(typeof(YamlTestCaseRunner).Assembly.Location)).DirectoryName;
+            var path3 = FileHelpers.GetAssemblyFileInfo(typeof(YamlTestCaseRunner)).DirectoryName;
             var path = $"{path3}{Path.PathSeparator}{path2}{Path.PathSeparator}{path1}";
 
             var paths = path.Split(Path.PathSeparator);

@@ -21,8 +21,7 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
             var startTime = testRun.StartTime;
             var endTime = testRun.EndTime;
 
-            var assembly = typeof(YamlTestFrameworkConsoleHost).Assembly;
-            var assemblyPath = assembly.Location;
+            var assemblyPath = FileHelpers.GetAssemblyFileInfo(typeof(YamlTestFrameworkConsoleHost)).DirectoryName;
 
             var testRunId = Guid.NewGuid().ToString();
             var testListId = "8c84fa94-04c1-424b-9868-57a2d4851a1d";
