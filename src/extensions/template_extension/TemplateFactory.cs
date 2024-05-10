@@ -90,7 +90,7 @@ namespace Azure.AI.Details.Common.CLI.Extensions.Templates
             if (files.Count() == 0) return null;
 
             var parameters = new Dictionary<string, string>(templateFound.Parameters);
-            parameters["AICLIExtensionReferencePath"] = Path.GetDirectoryName(typeof(TemplateFactory).Assembly.Location)!;
+            parameters["AICLIExtensionReferencePath"] = FileHelpers.GetAssemblyFileInfo(typeof(TemplateFactory)).DirectoryName!;
 
             outputDirectory = PathHelpers.NormalizePath(outputDirectory);
             var message = templateName != outputDirectory
