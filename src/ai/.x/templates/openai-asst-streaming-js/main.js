@@ -8,7 +8,7 @@ async function main() {
   const ASSISTANT_ID = process.env.ASSISTANT_ID ?? "<insert your OpenAI assistant ID here>";
   const threadId = process.argv[2] || null;
 
-  {{@include openai.asst.or.chat.create.openai.node.js}}
+  {{@include openai.asst.or.chat.create.openai.js}}
 
   // Create the assistants streaming helper class instance
   const assistant = new {ClassName}(ASSISTANT_ID, openai);

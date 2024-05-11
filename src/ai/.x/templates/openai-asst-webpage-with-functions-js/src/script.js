@@ -11,7 +11,7 @@ async function assistantInit(threadId = null) {
   // Which assistant, which thread?
   const ASSISTANT_ID = process.env.ASSISTANT_ID ?? "<insert your OpenAI assistant ID here>";
 
-  {{@include openai.asst.or.chat.create.openai.node.js}}
+  {{@include openai.asst.or.chat.create.openai.js}}
 
   // Create the assistants streaming helper class instance
   assistant = new {ClassName}(ASSISTANT_ID, factory, openai);
@@ -324,7 +324,7 @@ async function threadItemsSetTitle(userInput, computerResponse, items, i) {
   const AZURE_OPENAI_SYSTEM_PROMPT = process.env.AZURE_OPENAI_SYSTEM_PROMPT ?? "You are a helpful AI assistant.";
 
   {{set _IS_OPENAI_ASST_TEMPLATE = false}}
-  {{@include openai.asst.or.chat.create.openai.node.js}}
+  {{@include openai.asst.or.chat.create.openai.js}}
 
   // Prepare the messages for the OpenAI API
   let messages = [
