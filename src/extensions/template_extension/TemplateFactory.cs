@@ -26,6 +26,14 @@ namespace Azure.AI.Details.Common.CLI.Extensions.Templates
             {
                 ConsoleHelpers.WriteLineError($"No matching templates found\n");
             }
+            if (InOutPipeServer.IsInOutPipeServer)
+            {
+                var outServerTemplateObject = list.Groups.Select(x => 
+                    new { x.ShortName, x.LongName, Languages = x.Languages.Split(",") });
+                string json = JsonSerializer.Serialize(outServerTemplateObject);
+                InOutPipeServer.OutputTemplateList(json);
+                return true;
+            }
 
             var longNameLabel = "Name";
             var shortNameLabel = "Short Name";
