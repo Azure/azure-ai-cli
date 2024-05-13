@@ -18,6 +18,11 @@
     AZURE_OPENAI_CHAT_DEPLOYMENT = os.getenv('AZURE_OPENAI_CHAT_DEPLOYMENT', '<insert your Azure OpenAI chat deployment name here>')
     {{endif}}
     AZURE_OPENAI_ENDPOINT = os.getenv('AZURE_OPENAI_ENDPOINT', '<insert your Azure OpenAI endpoint here>')
+    {{if {_IS_OPENAI_ASST_TEMPLATE}}}
+    AZURE_OPENAI_BASE_URL = f'{AZURE_OPENAI_ENDPOINT.rstrip("/")}/openai'
+    {{else}}
+    AZURE_OPENAI_BASE_URL = f'{AZURE_OPENAI_ENDPOINT.rstrip("/")}/openai/deployments/{AZURE_OPENAI_CHAT_DEPLOYMENT}'
+    {{endif}}
 
     # Check if the required environment variables are set
     ok = \
@@ -66,10 +71,11 @@
     # Create the OpenAI client
     print('Using Azure OpenAI (w/ API Key)...')
     
-    openai = AzureOpenAI(
+    openai = OpenAI(
         api_key = AZURE_OPENAI_API_KEY,
-        api_version = AZURE_OPENAI_API_KEY,
-        azure_endpoint = AZURE_OPENAI_ENDPOINT
+        base_url = AZURE_OPENAI_BASE_URL,
+        default_query= { 'api-version': AZURE_OPENAI_API_VERSION },
+        default_headers = { 'api-key': AZURE_OPENAI_API_KEY }
     )
   
     {{else}}
@@ -82,13 +88,13 @@
     {{if !{_IS_OPENAI_ASST_TEMPLATE}}}
     OPENAI_MODEL_NAME = os.getenv('OPENAI_MODEL_NAME', '<insert your OpenAI model name here>')
     {{endif}}
-    OPENAI_ORG_ID = os.getenv('OPENAI_ORG_ID', '<insert your OpenAI organization ID here>')
+    OPENAI_ORG_ID = os.getenv('OPENAI_ORG_ID', None)
 
     # Check if the required environment variables are set
     ok = \
         OPENAI_API_KEY != None and not OPENAI_API_KEY.startswith('<insert') and \
         {{if {_IS_OPENAI_ASST_TEMPLATE}}}
-        ASSISTANT_ID != None and not ASSISTANT_ID.startswith('<insert') and \
+        ASSISTANT_ID != None and not ASSISTANT_ID.startswith('<insert')
         {{else}}
         OPENAI_MODEL_NAME != None and not OPENAI_MODEL_NAME.startswith('<insert') and \
         AZURE_OPENAI_SYSTEM_PROMPT != None and not AZURE_OPENAI_SYSTEM_PROMPT.startswith('<insert')
@@ -117,12 +123,11 @@
             '\n' +
             '\n  ai dev shell --run "python main.js"');
         os._exit(1)
-        {{endif}}
 
     # Create the OpenAI client
     print('Using OpenAI...');
     openai = OpenAI(
         api_key=OPENAI_API_KEY,
-        org=OPENAI_ORG_ID
-    })
+        organization=OPENAI_ORG_ID
+    )
 {{endif}}

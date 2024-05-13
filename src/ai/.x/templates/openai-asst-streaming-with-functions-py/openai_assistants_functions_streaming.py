@@ -6,9 +6,14 @@ from function_call_context import FunctionCallContext
 class EventHandler(AssistantEventHandler):
 
     def __init__(self, function_factory, openai, callback):
+        super().__init__()
         self.function_factory = function_factory
         self.openai = openai
         self.callback = callback
+
+    @override
+    def on_text_delta(self, delta, snapshot):
+        self.callback(delta.value)
 
     @override
     def on_event(self, event):
@@ -17,7 +22,8 @@ class EventHandler(AssistantEventHandler):
             self.handle_requires_action(event.data, run_id)
         elif event.event == 'thread.run.failed':
             print(event)
-            raise Exception('Run failed') 
+            raise Exception('Run failed')
+        super().on_event(event)
 
     def handle_requires_action(self, data, run_id):
         tool_outputs = []
@@ -43,10 +49,9 @@ class EventHandler(AssistantEventHandler):
             tool_outputs=tool_outputs,
             event_handler=EventHandler(self.function_factory, self.openai, self.callback),
         ) as stream:
-            for content in stream.text_deltas:
-                if content != None:
-                    self.callback(content)
- 
+            for text in stream.text_deltas:
+                pass
+
 class OpenAIAssistantsFunctionsStreamingClass:
 
     def __init__(self, assistant_id, function_factory, openai):
@@ -84,7 +89,7 @@ class OpenAIAssistantsFunctionsStreamingClass:
         with self.openai.beta.threads.runs.stream(
             thread_id=self.thread.id,
             assistant_id=self.assistant_id,
-            toosl=self.function_factory.get_tools(),
+            tools=self.function_factory.get_tools(),
             event_handler=EventHandler(self.function_factory, self.openai, callback)
         ) as stream:
             stream.until_done()

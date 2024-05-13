@@ -21,6 +21,6 @@ class FunctionFactory:
 
         result = function_info['function'](function_arguments)
         print(f"\rassistant-function: {function_name}({function_arguments}) => {result}")
-        print("\nAssistant: ")
+        print("\nAssistant: ", end='')
 
         return result
