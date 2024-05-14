@@ -70,14 +70,12 @@
     {{if contains(toupper("{AZURE_OPENAI_AUTH_METHOD}"), "KEY")}}
     # Create the OpenAI client
     print('Using Azure OpenAI (w/ API Key)...')
-    
     openai = OpenAI(
         api_key = AZURE_OPENAI_API_KEY,
         base_url = AZURE_OPENAI_BASE_URL,
         default_query= { 'api-version': AZURE_OPENAI_API_VERSION },
         default_headers = { 'api-key': AZURE_OPENAI_API_KEY }
     )
-  
     {{else}}
     # Get the access token using the DefaultAzureCredential
     # TBD: Add support for DefaultAzureCredential
