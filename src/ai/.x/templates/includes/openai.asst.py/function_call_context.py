@@ -1,5 +1,4 @@
 import json
-import logging
 
 class FunctionCallContext:
     def __init__(self, function_factory, messages):
