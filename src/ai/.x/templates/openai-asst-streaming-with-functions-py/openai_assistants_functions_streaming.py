@@ -49,8 +49,7 @@ class EventHandler(AssistantEventHandler):
             tool_outputs=tool_outputs,
             event_handler=EventHandler(self.function_factory, self.openai, self.callback),
         ) as stream:
-            for text in stream.text_deltas:
-                pass
+            stream.until_done()
 
 class OpenAIAssistantsFunctionsStreamingClass:
 
