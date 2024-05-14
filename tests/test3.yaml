@@ -701,6 +701,38 @@
         Tell me another joke
         exit
       tag: skip
+  - class: dev new openai-asst (python)
+    steps:
+    - name: generate template
+      command: ai dev new openai-asst --python
+    - name: install requirements
+      bash: |
+        cd openai-asst-py
+        if [ -f /etc/os-release ]; then
+          python3 -m venv env
+          source env/bin/activate
+        else
+          python -m venv env
+          source env/Scripts/activate
+        fi
+        pip install -r requirements.txt
+    - name: run template
+      command: ai dev shell
+      arguments:
+        bash: |
+          cd openai-asst-py
+          if [ -f /etc/os-release ]; then
+            source env/bin/activate
+            python main.py
+          else
+            source env/Scripts/activate
+            python main.py
+          fi
+      input: |-
+        Tell me a joke
+        Tell me another joke
+        exit
+      tag: skip
 
 - area: ai dev new openai-asst (aad)
   tests:
@@ -737,6 +769,38 @@
         Tell me another joke
         exit
       tag: skip
+  - class: dev new openai-asst (python)
+    steps:
+    - name: generate template
+      command: ai dev new openai-asst --python --var USE_AZURE_OPENAI=false --output-path openai-asst-py-oai
+    - name: install requirements
+      bash: |
+        cd openai-asst-py-oai
+        if [ -f /etc/os-release ]; then
+          python3 -m venv env
+          source env/bin/activate
+        else
+          python -m venv env
+          source env/Scripts/activate
+        fi
+        pip install -r requirements.txt
+    - name: run template
+      command: ai dev shell
+      arguments:
+        bash: |
+          cd openai-asst-py-oai
+          if [ -f /etc/os-release ]; then
+            source env/bin/activate
+            python main.py
+          else
+            source env/Scripts/activate
+            python main.py
+          fi
+      input: |-
+        Tell me a joke
+        Tell me another joke
+        exit
+      tag: skip
 
 - area: ai dev new openai-asst-streaming (key)
   tests:
@@ -750,6 +814,38 @@
         npm install
     - name: run template
       command: ai dev shell --bash "cd openai-asst-streaming-js;node main.js"
+      input: |-
+        Tell me a joke
+        Tell me another joke
+        exit
+      tag: skip
+  - class: dev new openai-asst-streaming (python)
+    steps:
+    - name: generate template
+      command: ai dev new openai-asst-streaming --python
+    - name: install requirements
+      bash: |
+        cd openai-asst-streaming-py
+        if [ -f /etc/os-release ]; then
+          python3 -m venv env
+          source env/bin/activate
+        else
+          python -m venv env
+          source env/Scripts/activate
+        fi
+        pip install -r requirements.txt
+    - name: run template
+      command: ai dev shell
+      arguments:
+        bash: |
+          cd openai-asst-streaming-py
+          if [ -f /etc/os-release ]; then
+            source env/bin/activate
+            python3 main.py
+          else
+            source env/Scripts/activate
+            python main.py
+          fi
       input: |-
         Tell me a joke
         Tell me another joke
@@ -786,6 +882,38 @@
         npm install
     - name: run template
       command: ai dev shell --bash "cd openai-asst-streaming-js-oai;node main.js"
+      input: |-
+        Tell me a joke
+        Tell me another joke
+        exit
+      tag: skip
+  - class: dev new openai-asst-streaming (python)
+    steps:
+    - name: generate template
+      command: ai dev new openai-asst-streaming --python --var USE_AZURE_OPENAI=false --output-path openai-asst-streaming-py-oai
+    - name: install requirements
+      bash: |
+        cd openai-asst-streaming-py-oai
+        if [ -f /etc/os-release ]; then
+          python3 -m venv env
+          source env/bin/activate
+        else
+          python -m venv env
+          source env/Scripts/activate
+        fi
+        pip install -r requirements.txt
+    - name: run template
+      command: ai dev shell
+      arguments:
+        bash: |
+          cd openai-asst-streaming-py-oai
+          if [ -f /etc/os-release ]; then
+            source env/bin/activate
+            python main.py
+          else
+            source env/Scripts/activate
+            python main.py
+          fi
       input: |-
         Tell me a joke
         Tell me another joke
@@ -872,6 +1000,38 @@
         npm install
     - name: run template
       command: ai dev shell --bash "cd openai-asst-streaming-with-functions-js-oai;node main.js"
+      input: |-
+        What is the date?
+        What is the time?
+        exit
+      tag: skip
+  - class: dev new openai-asst-streaming-with-functions (python)
+    steps:
+    - name: generate template
+      command: ai dev new openai-asst-streaming-with-functions --python --var USE_AZURE_OPENAI=false --output-path openai-asst-streaming-with-functions-py-oai
+    - name: install requirements
+      bash: |
+        cd openai-asst-streaming-with-functions-py-oai
+        if [ -f /etc/os-release ]; then
+          python3 -m venv env
+          source env/bin/activate
+        else
+          python -m venv env
+          source env/Scripts/activate
+        fi
+        pip install -r requirements.txt
+    - name: run template
+      command: ai dev shell
+      arguments:
+        bash: |
+          cd openai-asst-streaming-with-functions-py-oai
+          if [ -f /etc/os-release ]; then
+            source env/bin/activate
+            python main.py
+          else
+            source env/Scripts/activate
+            python main.py
+          fi
       input: |-
         What is the date?
         What is the time?

@@ -1,5 +1,5 @@
+{{if {_IS_OPENAI_ASST_STREAMING_TEMPLATE}}}
 from typing_extensions import override
-from openai import OpenAI
 from openai import AssistantEventHandler
 
 class EventHandler(AssistantEventHandler):
@@ -63,6 +63,7 @@ class EventHandler(AssistantEventHandler):
             stream.until_done()
     {{endif}}
 
+{{endif}}
 class {ClassName}:
 
     {{if {_IS_OPENAI_ASST_FUNCTIONS_TEMPLATE}}}
@@ -93,7 +94,11 @@ class {ClassName}:
             content = ''.join([item.text.value for item in message.content]) + '\n\n'
             callback(message.role, content)
 
-    def get_response(self, user_input, callback):
+    {{if {_IS_OPENAI_ASST_STREAMING_TEMPLATE}}}
+    def get_response(self, user_input, callback) -> None:
+    {{else}}
+    def get_response(self, user_input) -> str:
+    {{endif}}
         if self.thread == None:
             self.create_thread()
 
@@ -103,6 +108,7 @@ class {ClassName}:
             content=user_input,
         )
 
+        {{if {_IS_OPENAI_ASST_STREAMING_TEMPLATE}}}
         with self.openai.beta.threads.runs.stream(
             thread_id=self.thread.id,
             assistant_id=self.assistant_id,
@@ -114,3 +120,15 @@ class {ClassName}:
             {{endif}}
         ) as stream:
             stream.until_done()
+        {{else}}
+        run = self.openai.beta.threads.runs.create_and_poll(
+            thread_id=self.thread.id,
+            assistant_id=self.assistant_id
+        )
+
+        if run.status == 'completed': 
+            messages = self.openai.beta.threads.messages.list(thread_id=self.thread.id)
+            return ''.join([item.text.value for item in messages.data[0].content])
+
+        return str(run.status)
+        {{endif}}

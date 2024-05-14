@@ -1,0 +1,13 @@
+{
+  "_LongName": "OpenAI Assistants",
+  "_ShortName": "openai-asst",
+  "_Language": "Python",
+
+  "ClassName": "OpenAIAssistantsClass",
+  "AZURE_OPENAI_AUTH_METHOD": "KEY",
+  "USE_AZURE_OPENAI": "true",
+
+  "_IS_OPENAI_ASST_TEMPLATE": "true",
+  "_IS_OPENAI_ASST_STREAMING_TEMPLATE": "false",
+  "_IS_OPENAI_ASST_FUNCTIONS_TEMPLATE": "false"
+}

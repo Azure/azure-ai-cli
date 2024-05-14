@@ -10,7 +10,6 @@
     # Get the required environment variables, and form the base URL for Azure OpenAI Chat Completions API
     {{endif}}
     {{if contains(toupper("{AZURE_OPENAI_AUTH_METHOD}"), "KEY")}}
-    
     AZURE_OPENAI_API_KEY = os.getenv('AZURE_OPENAI_API_KEY', '<insert your Azure OpenAI API key here>')
     {{endif}}
     AZURE_OPENAI_API_VERSION = os.getenv('AZURE_OPENAI_API_VERSION', '<insert your Azure OpenAI API version here>')
@@ -59,12 +58,12 @@
         print('\nYou can easily do that using the Azure AI CLI by doing one of the following:\n' +
           '\n  ai init' +
           '\n  ai dev shell' +
-          '\n  python main.js' +
+          '\n  python main.py' +
           '\n' +
           '\n  or' +
           '\n' +
           '\n  ai init' +
-          '\n  ai dev shell --run "python main.js"')
+          '\n  ai dev shell --run "python main.py"')
         os._exit(1)
 
     {{if contains(toupper("{AZURE_OPENAI_AUTH_METHOD}"), "KEY")}}
@@ -115,11 +114,11 @@
             '\n' +
             '\n Then, do one of the following:\n' +
             '\n  ai dev shell' +
-            '\n  python main.js' +
+            '\n  python main.py' +
             '\n' +
             '\n  or' +
             '\n' +
-            '\n  ai dev shell --run "python main.js"');
+            '\n  ai dev shell --run "python main.py"');
         os._exit(1)
 
     # Create the OpenAI client

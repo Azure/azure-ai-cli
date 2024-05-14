@@ -4,8 +4,10 @@ from openai import OpenAI
 {{if {_IS_OPENAI_ASST_FUNCTIONS_TEMPLATE}}}
 from openai_assistants_custom_functions import factory
 from openai_assistants_functions_streaming import {ClassName}
-{{else}}
+{{else if {_IS_OPENAI_ASST_STREAMING_TEMPLATE}}}
 from openai_assistants_streaming import {ClassName}
+{{else}}
+from openai_assistants import {ClassName}
 {{endif}}
 
 def main():
@@ -38,12 +40,23 @@ def main():
             break
 
         # Get the Assistant's response
+        {{if {_IS_OPENAI_ASST_STREAMING_TEMPLATE}}}
         print('\nAssistant: ', end='')
         assistant.get_response(user_input, lambda content: print(content, end=''))
 
         print('\n')
+        {{else}}
+        response = assistant.get_response(user_input)
+        print(f'\nAssistant: {response}\n')
+        {{endif}}
 
     print(f"Bye! (threadId: {assistant.thread.id})")
 
-if __name__ == "__main__":
-    main()
+if __name__ == '__main__':
+    try:
+        main()
+    except EOFError:
+        pass
+    except Exception as e:
+        print(f"The sample encountered an error: {e}")
+        sys.exit(1)
