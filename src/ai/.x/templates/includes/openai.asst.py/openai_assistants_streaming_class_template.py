@@ -21,6 +21,22 @@ class EventHandler(AssistantEventHandler):
     def on_text_delta(self, delta, snapshot):
         self.callback(delta.value)
 
+    {{if {_IS_OPENAI_ASST_CODE_INTERPRETER_TEMPLATE}}}
+    def on_tool_call_created(self, tool_call):
+        if tool_call.type == 'code_interpreter':
+            print('\n\nassistant-code:\n', end='', flush=True) 
+    
+    def on_tool_call_delta(self, delta, snapshot):
+        if delta.type == 'code_interpreter':
+            if delta.code_interpreter.input:
+                print(delta.code_interpreter.input, end='', flush=True)
+            if delta.code_interpreter.outputs:
+                print(f'\n\nassistant-output:', end='', flush=True)
+                for output in delta.code_interpreter.outputs:
+                    if output.type == 'logs':
+                        print(f'\n{output.logs}', flush=True)
+
+    {{endif}}
     @override
     def on_event(self, event):
         {{if {_IS_OPENAI_ASST_FUNCTIONS_TEMPLATE}}}
@@ -61,8 +77,8 @@ class EventHandler(AssistantEventHandler):
             event_handler=EventHandler(self.function_factory, self.openai, self.callback),
         ) as stream:
             stream.until_done()
-    {{endif}}
 
+    {{endif}}
 {{endif}}
 class {ClassName}:
 

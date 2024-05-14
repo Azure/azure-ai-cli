@@ -929,6 +929,12 @@ namespace Azure.AI.Details.Common.CLI
                 fileIds.ForEach(id => createOptions.FileIds.Add(id));
             }
 
+            var codeInterpreter = CodeInterpreterToken.Data().GetOrDefault(_values, false);
+            if (codeInterpreter)
+            {
+                createOptions.Tools.Add(new CodeInterpreterToolDefinition());
+            }
+
             var response = await client.CreateAssistantAsync(createOptions);
             var assistant = response.Value;
 

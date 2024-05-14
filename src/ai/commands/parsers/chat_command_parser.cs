@@ -142,6 +142,7 @@ namespace Azure.AI.Details.Common.CLI
         };
 
         private static INamedValueTokenParser[] _chatAssistantCreateCommandParsers = {
+            CodeInterpreterToken.Parser(),
             FileIdOptionXToken.Parser(),
             FileIdsOptionXToken.Parser(),
 

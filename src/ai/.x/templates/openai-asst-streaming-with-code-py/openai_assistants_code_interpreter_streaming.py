@@ -1,0 +1,1 @@
+{{@include openai.asst.py/openai_assistants_streaming_class_template.py}}

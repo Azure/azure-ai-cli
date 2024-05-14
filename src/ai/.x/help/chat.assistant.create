@@ -13,6 +13,9 @@ USAGE: ai chat assistant create [...]
     --deployment DEPLOYMENT
     --instructions INSTRUCTIONS
 
+  TOOLS
+    --code-interpreter TRUE/FALSE
+
   RETRIEVAL
     --file-id ID
     --file-ids ID1 [...]
