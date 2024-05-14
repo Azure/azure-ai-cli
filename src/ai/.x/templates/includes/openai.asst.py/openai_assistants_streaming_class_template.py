@@ -1,15 +1,21 @@
 from typing_extensions import override
 from openai import OpenAI
 from openai import AssistantEventHandler
-from function_call_context import FunctionCallContext
 
 class EventHandler(AssistantEventHandler):
 
+    {{if {_IS_OPENAI_ASST_FUNCTIONS_TEMPLATE}}}
     def __init__(self, function_factory, openai, callback):
         super().__init__()
         self.function_factory = function_factory
         self.openai = openai
         self.callback = callback
+    {{else}}
+    def __init__(self, openai, callback):
+        super().__init__()
+        self.openai = openai
+        self.callback = callback
+    {{endif}}
 
     @override
     def on_text_delta(self, delta, snapshot):
@@ -17,14 +23,19 @@ class EventHandler(AssistantEventHandler):
 
     @override
     def on_event(self, event):
+        {{if {_IS_OPENAI_ASST_FUNCTIONS_TEMPLATE}}}
         if event.event == 'thread.run.requires_action':
             run_id = event.data.id
             self.handle_requires_action(event.data, run_id)
         elif event.event == 'thread.run.failed':
+        {{else}}
+        if event.event == 'thread.run.failed':
+        {{endif}}
             print(event)
             raise Exception('Run failed')
         super().on_event(event)
 
+    {{if {_IS_OPENAI_ASST_FUNCTIONS_TEMPLATE}}}
     def handle_requires_action(self, data, run_id):
         tool_outputs = []
 
@@ -50,12 +61,19 @@ class EventHandler(AssistantEventHandler):
             event_handler=EventHandler(self.function_factory, self.openai, self.callback),
         ) as stream:
             stream.until_done()
+    {{endif}}
 
-class OpenAIAssistantsFunctionsStreamingClass:
+class {ClassName}:
 
+    {{if {_IS_OPENAI_ASST_FUNCTIONS_TEMPLATE}}}
     def __init__(self, assistant_id, function_factory, openai):
+    {{else}}
+    def __init__(self, assistant_id, openai):
+    {{endif}}
         self.assistant_id = assistant_id
+        {{if {_IS_OPENAI_ASST_FUNCTIONS_TEMPLATE}}}
         self.function_factory = function_factory
+        {{endif}}
         self.thread = None
         self.openai = openai
 
@@ -88,7 +106,11 @@ class OpenAIAssistantsFunctionsStreamingClass:
         with self.openai.beta.threads.runs.stream(
             thread_id=self.thread.id,
             assistant_id=self.assistant_id,
+            {{if {_IS_OPENAI_ASST_FUNCTIONS_TEMPLATE}}}
             tools=self.function_factory.get_tools(),
             event_handler=EventHandler(self.function_factory, self.openai, callback)
+            {{else}}
+            event_handler=EventHandler(self.openai, callback)
+            {{endif}}
         ) as stream:
             stream.until_done()

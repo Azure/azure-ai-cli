@@ -1,8 +1,12 @@
 import os
 import sys
 from openai import OpenAI
+{{if {_IS_OPENAI_ASST_FUNCTIONS_TEMPLATE}}}
 from openai_assistants_custom_functions import factory
-from openai_assistants_functions_streaming import OpenAIAssistantsFunctionsStreamingClass
+from openai_assistants_functions_streaming import {ClassName}
+{{else}}
+from openai_assistants_streaming import {ClassName}
+{{endif}}
 
 def main():
 
@@ -13,7 +17,11 @@ def main():
     {{@include openai.asst.or.chat.create.openai.py}}
 
     # Create the assistants streaming helper class instance
-    assistant = OpenAIAssistantsFunctionsStreamingClass(ASSISTANT_ID, factory, openai)
+    {{if {_IS_OPENAI_ASST_FUNCTIONS_TEMPLATE}}}
+    assistant = {ClassName}(ASSISTANT_ID, factory, openai)
+    {{else}}
+    assistant = {ClassName}(ASSISTANT_ID, openai)
+    {{endif}}
 
     # Get or create the thread, and display the messages if any
     if threadId is None:
