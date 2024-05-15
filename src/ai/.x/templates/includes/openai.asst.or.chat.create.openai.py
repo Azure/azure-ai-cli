@@ -80,7 +80,7 @@
     # TBD: Add support for DefaultAzureCredential
     {{endif}}
 {{else}}
-  # Get the required environment variables, and form the base URL for OpenAI Platform API
+    # Get the required environment variables, and form the base URL for OpenAI Platform API
     OPENAI_API_KEY = os.getenv('OPENAI_API_KEY', '<insert your OpenAI API key here>')
     {{if !{_IS_OPENAI_ASST_TEMPLATE}}}
     OPENAI_MODEL_NAME = os.getenv('OPENAI_MODEL_NAME', '<insert your OpenAI model name here>')
