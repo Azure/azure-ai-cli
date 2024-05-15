@@ -19,7 +19,28 @@ class EventHandler(AssistantEventHandler):
 
     @override
     def on_text_delta(self, delta, snapshot):
+        {{if {_IS_OPENAI_ASST_FILE_SEARCH_TEMPLATE}}}
+        content = delta.value
+        if delta.annotations:
+            for annotation in delta.annotations:
+                content = content.replace(annotation.text, f"[{annotation.index}]")
+        self.callback(content)
+        {{else}}
         self.callback(delta.value)
+        {{endif}}
+
+    {{if {_IS_OPENAI_ASST_FILE_SEARCH_TEMPLATE}}}
+    @override
+    def on_message_done(self, message) -> None:
+        message_content = message.content[0].text
+        annotations = message_content.annotations
+        citations = []
+        for index, annotation in enumerate(annotations):
+            if file_citation := getattr(annotation, "file_citation", None):
+                cited_file = self.openai.files.retrieve(file_citation.file_id)
+                citations.append(f"[{index}] {cited_file.filename}")
+        print("\n\n" + "\n".join(citations))
+    {{endif}}
 
     {{if {_IS_OPENAI_ASST_CODE_INTERPRETER_TEMPLATE}}}
     def on_tool_call_created(self, tool_call):

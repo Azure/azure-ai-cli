@@ -1,15 +1,15 @@
 {
-  "_LongName": "OpenAI Assistants (Streaming)",
-  "_ShortName": "openai-asst-streaming",
+  "_LongName": "OpenAI Assistants (w/ File Search)",
+  "_ShortName": "openai-asst-streaming-with-file-search",
   "_Language": "Python",
 
-  "ClassName": "OpenAIAssistantsStreamingClass",
+  "ClassName": "OpenAIAssistantsFileSearchStreamingClass",
   "AZURE_OPENAI_AUTH_METHOD": "KEY",
   "USE_AZURE_OPENAI": "true",
 
   "_IS_OPENAI_ASST_TEMPLATE": "true",
   "_IS_OPENAI_ASST_STREAMING_TEMPLATE": "true",
   "_IS_OPENAI_ASST_CODE_INTERPRETER_TEMPLATE": "false",
-  "_IS_OPENAI_ASST_FILE_SEARCH_TEMPLATE": "false",
+  "_IS_OPENAI_ASST_FILE_SEARCH_TEMPLATE": "true",
   "_IS_OPENAI_ASST_FUNCTIONS_TEMPLATE": "false"
 }

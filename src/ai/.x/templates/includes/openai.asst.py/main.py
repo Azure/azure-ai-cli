@@ -6,6 +6,8 @@ from openai_assistants_custom_functions import factory
 from openai_assistants_functions_streaming import {ClassName}
 {{else if {_IS_OPENAI_ASST_CODE_INTERPRETER_TEMPLATE}}}
 from openai_assistants_code_interpreter_streaming import {ClassName}
+{{else if {_IS_OPENAI_ASST_FILE_SEARCH_TEMPLATE}}}
+from openai_assistants_file_search_streaming import {ClassName}
 {{else if {_IS_OPENAI_ASST_STREAMING_TEMPLATE}}}
 from openai_assistants_streaming import {ClassName}
 {{else}}
