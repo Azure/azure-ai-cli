@@ -1,17 +1,19 @@
 class FunctionFactory {
+  functions: { [name: string]: { schema: any; function: Function } };
+
   constructor() {
     this.functions = {};
   }
 
-  addFunction(schema, fun) {
+  addFunction(schema: any, fun: Function): void {
     this.functions[schema.name] = { schema: schema, function: fun };
   }
 
-  getFunctionSchemas() {
+  getFunctionSchemas(): any[] {
     return Object.values(this.functions).map(value => value.schema);
   }
 
-  getTools() {
+  getTools(): any[] {
     return Object.values(this.functions).map(value => {
       return {
         type: "function",
@@ -20,7 +22,7 @@ class FunctionFactory {
     });
   }
 
-  tryCallFunction(function_name, function_arguments) {
+  tryCallFunction(function_name: string, function_arguments: any): any {
     const function_info = this.functions[function_name];
     if (function_info === undefined) {
       return undefined;
@@ -33,4 +35,4 @@ class FunctionFactory {
   }
 }
 
-exports.FunctionFactory = FunctionFactory;
+export { FunctionFactory };

@@ -1,9 +1,9 @@
-const { OpenAI } = require('openai');
+import { OpenAI } from 'openai';
 
-class {ClassName} {
+class OpenAIAssistantsFunctionsStreamingClass {
 
   // Constructor
-  constructor(openAIAssistantId, functionFactory, openai, simulateTypingDelay = 0) {
+  constructor(private openAIAssistantId: string, private functionFactory: any, private openai: OpenAI, private simulateTypingDelay: number = 0) {
     this.simulateTypingDelay = simulateTypingDelay;
     this.openAIAssistantId = openAIAssistantId;
     this.functionFactory = functionFactory;
@@ -19,14 +19,14 @@ class {ClassName} {
   }
   
   // Retrieve an existing thread
-  async retrieveThread(threadId) {
+  async retrieveThread(threadId: string) {
     this.thread =await this.openai.beta.threads.retrieve(threadId);
     console.log(`Thread ID: ${this.thread.id}`);
     return this.thread;
   }
 
   // Get the messages in the thread
-  async getThreadMessages(callback) {
+  async getThreadMessages(callback: (role: string, content: string) => void) {
 
     const messages = await this.openai.beta.threads.messages.list(this.thread.id);
     messages.data.reverse();
@@ -38,7 +38,7 @@ class {ClassName} {
   }
 
   // Get the response from the Assistant
-  async getResponse(userInput, callback) {
+  async getResponse(userInput: string, callback: (content: string) => void) {
 
     if (this.thread == null) {
       await this.createThread();
@@ -61,9 +61,9 @@ class {ClassName} {
   }
 
   // Handle the stream events
-  async handleStreamEvents(stream, callback) {
-    stream.on('textDelta', async (textDelta, snapshot) => await this.onTextDelta(textDelta, callback));
-    stream.on('event', async (event) => {
+  async handleStreamEvents(stream: any, callback: (content: string) => void) {
+    stream.on('textDelta', async (textDelta: any, snapshot: any) => await this.onTextDelta(textDelta, callback));
+    stream.on('event', async (event: any) => {
       if (event.event == 'thread.run.completed') {
         this.resolveRunCompletedPromise();
       }
@@ -77,7 +77,7 @@ class {ClassName} {
     });
   }
 
-  async onTextDelta(textDelta, callback) {
+  async onTextDelta(textDelta: any, callback: (content: string) => void) {
     let content = textDelta.value;
     if (content != null) {
       if(callback != null) {
@@ -89,7 +89,7 @@ class {ClassName} {
     }
   }
 
-  async onThreadRunRequiresAction(event, callback) {
+  async onThreadRunRequiresAction(event: any, callback: (content: string) => void) {
     let toolCalls = event.data?.required_action?.submit_tool_outputs?.tool_calls;
     if (toolCalls != null) {
       let tool_outputs = this.getToolOutputs(toolCalls);
@@ -98,7 +98,7 @@ class {ClassName} {
     }
   }
 
-  getToolOutputs(toolCalls) {
+  getToolOutputs(toolCalls: any[]) {
     let tool_outputs = [];
     for (let toolCall of toolCalls) {
       if (toolCall.type == 'function') {
@@ -113,4 +113,4 @@ class {ClassName} {
   }
 }
 
-exports.{ClassName} = {ClassName};
+export { OpenAIAssistantsFunctionsStreamingClass };
