@@ -1,6 +1,6 @@
-# `ai` chat website
+# `ai` chat website (TypeScript Version)
 
-This is a simple website chat interface that uses OpenAI's API to generate text responses to user input.
+This is a simple website chat interface that uses OpenAI's API to generate text responses to user input, now fully converted to TypeScript.
 
 User input is typed into a text box and added to the conversation as a message inside a chat panel. The panel scrolls up and the computer responds with streaming text output into another message in the chat panel. There is a left nav that has a "new chat" button and has a spot for future expansion w/ a list of historical chats.
 
@@ -10,7 +10,7 @@ To build the website, run the following commands:
 
 ```bash
 npm install
-npm run webpack
+npm run vite
 ```
 
 To run the website, launch `index.html` in your browser.
@@ -21,12 +21,12 @@ These setup steps are also represented in tasks.json and launch.json, so that yo
 
 | Category | File | Description
 | --- | --- | ---
-| **SOURCE CODE** | ai.png | Logo/icon for the website.
+| **SOURCE CODE** | favicon.png | Logo/icon for the website.
 | | index.html | HTML file with controls and layout.
 | | style.css | CSS file with layout and styling.
-| | src/script.js | Main JS file with HTML to JS interactions.
-| | src/OpenAIAssistantsFunctionsStreamingClass.js | Main JS file with JS to OpenAI interactions.
+| | src/index.ts | Main TS file with HTML to TS interactions.
+| | src/OpenAIAssistantsFunctionsStreamingClass.ts | Main TS file with TS to OpenAI interactions.
 | | |
 | **BUILD + PACKAGING** | .env | Contains the API keys, endpoints, etc.
 | | package.json | Contains the dependencies.
-| | webpack.config.js | The webpack config file.
+| | vite.config.ts | The Vite config file.

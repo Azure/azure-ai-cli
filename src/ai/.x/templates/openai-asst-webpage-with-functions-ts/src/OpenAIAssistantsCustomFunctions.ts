@@ -1,7 +1,7 @@
-const { FunctionFactory } = require("./FunctionFactory");
+import { FunctionFactory } from "./FunctionFactory";
 let factory = new FunctionFactory();
 
-function getCurrentWeather(function_arguments) {
+function getCurrentWeather(function_arguments: string): string {
     const location = JSON.parse(function_arguments).location;
     return `The weather in ${location} is 72 degrees and sunny.`;
   };
@@ -27,7 +27,7 @@ const getCurrentWeatherSchema = {
 
 factory.addFunction(getCurrentWeatherSchema, getCurrentWeather);
 
-function getCurrentDate() {
+function getCurrentDate(): string {
   const date = new Date();
   return `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`;
 }
@@ -43,7 +43,7 @@ const getCurrentDateSchema = {
 
 factory.addFunction(getCurrentDateSchema, getCurrentDate);
 
-function getCurrentTime() {
+function getCurrentTime(): string {
   const date = new Date();
   return `${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}`;
 }
@@ -59,4 +59,4 @@ const getCurrentTimeSchema = {
 
 factory.addFunction(getCurrentTimeSchema, getCurrentTime);
 
-exports.factory = factory;
+export { factory };
