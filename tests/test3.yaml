@@ -990,6 +990,78 @@
         exit
       tag: skip
 
+- area: ai dev new openai-asst-streaming-with-file-search (key)
+  tests:
+
+  - class: dev new openai-asst-streaming-with-file-search (python)
+    steps:
+    - name: generate template
+      command: ai dev new openai-asst-streaming-with-file-search --python
+    - name: install requirements
+      bash: |
+        cd openai-asst-streaming-with-file-search-py
+        if [ -f /etc/os-release ]; then
+          python3 -m venv env
+          source env/bin/activate
+        else
+          python -m venv env
+          source env/Scripts/activate
+        fi
+        pip install -r requirements.txt
+    - name: run template
+      command: ai dev shell
+      arguments:
+        bash: |
+          cd openai-asst-streaming-with-file-search-py
+          if [ -f /etc/os-release ]; then
+            source env/bin/activate
+            python3 main.py
+          else
+            source env/Scripts/activate
+            python main.py
+          fi
+      input: |-
+        Tell me a joke
+        Tell me another joke
+        exit
+      tag: skip
+
+- area: ai dev new openai-asst-streaming-with-file-search (oai)
+  tests:
+
+  - class: dev new openai-asst-streaming-with-file-search (python)
+    steps:
+    - name: generate template
+      command: ai dev new openai-asst-streaming-with-file-search --python --var USE_AZURE_OPENAI=false --output-path openai-asst-streaming-with-file-search-py-oai
+    - name: install requirements
+      bash: |
+        cd openai-asst-streaming-with-file-search-py-oai
+        if [ -f /etc/os-release ]; then
+          python3 -m venv env
+          source env/bin/activate
+        else
+          python -m venv env
+          source env/Scripts/activate
+        fi
+        pip install -r requirements.txt
+    - name: run template
+      command: ai dev shell
+      arguments:
+        bash: |
+          cd openai-asst-streaming-with-file-search-py-oai
+          if [ -f /etc/os-release ]; then
+            source env/bin/activate
+            python3 main.py
+          else
+            source env/Scripts/activate
+            python main.py
+          fi
+      input: |-
+        Tell me a joke
+        Tell me another joke
+        exit
+      tag: skip
+
 - area: ai dev new openai-asst-streaming-with-functions (key)
   tests:
   - class: dev new openai-asst-streaming-with-functions (javascript)
