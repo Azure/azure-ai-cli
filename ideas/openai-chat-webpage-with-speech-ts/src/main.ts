@@ -1,5 +1,7 @@
 var echoOnly: boolean = false;
 var continuousReco: boolean = true;
+var useSSML: boolean = true;
+var streamSSML: boolean = true;
 
 import { OpenAI} from 'openai';
 import { OpenAIChatCompletionStreamingClass } from "./OpenAIChatCompletionStreamingClass";
@@ -19,15 +21,41 @@ const AZURE_OPENAI_CHAT_DEPLOYMENT = import.meta.env.AZURE_OPENAI_CHAT_DEPLOYMEN
 const AZURE_OPENAI_ENDPOINT = import.meta.env.AZURE_OPENAI_ENDPOINT ?? "<insert your Azure OpenAI endpoint here>";
 const AZURE_OPENAI_BASE_URL = `${AZURE_OPENAI_ENDPOINT.replace(/\/+$/, '')}/openai/deployments/${AZURE_OPENAI_CHAT_DEPLOYMENT}`;
 
+// Get the required environment variables for OpenAI
+const OPENAI_API_KEY = import.meta.env.OPENAI_API_KEY ?? "<insert your OpenAI API key here>";
+const OPENAI_MODEL_NAME = import.meta.env.OPENAI_MODEL_NAME ?? "<insert your OpenAI model name here>";
+
 // Check if the required environment variables are set
-const ok = 
-AZURE_OPENAI_SYSTEM_PROMPT != null && !AZURE_OPENAI_SYSTEM_PROMPT.startsWith('<insert') &&
-AZURE_OPENAI_API_KEY != null && !AZURE_OPENAI_API_KEY.startsWith('<insert') &&
-AZURE_OPENAI_API_VERSION != null && !AZURE_OPENAI_API_VERSION.startsWith('<insert') &&
-AZURE_OPENAI_CHAT_DEPLOYMENT != null && !AZURE_OPENAI_CHAT_DEPLOYMENT.startsWith('<insert') &&
-AZURE_OPENAI_ENDPOINT != null && !AZURE_OPENAI_ENDPOINT.startsWith('<insert');
+const azureOk = 
+    AZURE_OPENAI_SYSTEM_PROMPT != null && !AZURE_OPENAI_SYSTEM_PROMPT.startsWith('<insert') &&
+    AZURE_OPENAI_API_KEY != null && !AZURE_OPENAI_API_KEY.startsWith('<insert') &&
+    AZURE_OPENAI_API_VERSION != null && !AZURE_OPENAI_API_VERSION.startsWith('<insert') &&
+    AZURE_OPENAI_CHAT_DEPLOYMENT != null && !AZURE_OPENAI_CHAT_DEPLOYMENT.startsWith('<insert') &&
+    AZURE_OPENAI_ENDPOINT != null && !AZURE_OPENAI_ENDPOINT.startsWith('<insert');
+const oaiOk = 
+    OPENAI_API_KEY != null && !OPENAI_API_KEY.startsWith('<insert');
+    OPENAI_MODEL_NAME != null && !OPENAI_MODEL_NAME.startsWith('<insert') &&
+    AZURE_OPENAI_SYSTEM_PROMPT != null && !AZURE_OPENAI_SYSTEM_PROMPT.startsWith('<insert');
+const ok = azureOk || oaiOk;
 
 if (!ok) {
+    console.error('To use OpenAI, set the following environment variables:\n' +
+        '\n  OPENAI_API_KEY' +
+        '\n  OPENAI_ORG_ID (optional)' +
+        '\n  OPENAI_MODEL_NAME' +
+        '\n  AZURE_OPENAI_SYSTEM_PROMPT');
+    console.error('\nYou can easily obtain some of these values by visiting these links:\n' +
+        '\n  https://platform.openai.com/api-keys' +
+        '\n  https://platform.openai.com/settings/organization/general' +
+        '\n  https://platform.openai.com/playground/assistants' +
+        '\n' +
+        '\n Then, do one of the following:\n' +
+        '\n  ai dev new .env' +
+        '\n  npm run dev' +
+        '\n' +
+        '\n  or' +
+        '\n' +
+        '\n  ai dev shell --run "npm run dev"');
     console.error('To use Azure OpenAI, set the following environment variables:\n' +
         '\n  AZURE_OPENAI_SYSTEM_PROMPT' +
         '\n  AZURE_OPENAI_API_KEY' +
@@ -36,28 +64,52 @@ if (!ok) {
         '\n  AZURE_OPENAI_ENDPOINT');
     console.error('\nYou can easily do that using the Azure AI CLI by doing one of the following:\n' +
         '\n  ai init' +
-        '\n  ai dev shell' +
-        '\n  node main.js' +
+        '\n  ai dev new .env' +
+        '\n  npm run dev' +
         '\n' +
         '\n  or' +
         '\n' +
         '\n  ai init' +
-        '\n  ai dev shell --run "node main.js"');
+        '\n  ai dev shell --run "npm run dev"');
     throw new Error('Missing environment variables');
 }
 
 // Create the OpenAI client
-console.log('Using Azure OpenAI (w/ API Key)...');
-const openai = new OpenAI({
-    apiKey: AZURE_OPENAI_API_KEY,
-    baseURL: AZURE_OPENAI_BASE_URL,
-    defaultQuery: { 'api-version': AZURE_OPENAI_API_VERSION },
-    defaultHeaders: { 'api-key': AZURE_OPENAI_API_KEY },
-    dangerouslyAllowBrowser: true
-});
+console.log(azureOk
+    ? 'Using Azure OpenAI (w/ API Key)...'
+    : 'Using OpenAI...');
+const openai = !azureOk
+    ? new OpenAI({
+        apiKey: OPENAI_API_KEY,
+        dangerouslyAllowBrowser: true
+    })
+    : new OpenAI({
+        apiKey: AZURE_OPENAI_API_KEY,
+        baseURL: AZURE_OPENAI_BASE_URL,
+        defaultQuery: { 'api-version': AZURE_OPENAI_API_VERSION },
+        defaultHeaders: { 'api-key': AZURE_OPENAI_API_KEY },
+        dangerouslyAllowBrowser: true});
+
+const updatedPrompt = !useSSML
+    ? AZURE_OPENAI_SYSTEM_PROMPT
+    : AZURE_OPENAI_SYSTEM_PROMPT + 
+        '\n\nAI, please follow the given instructions for generating all responses:' +
+        '\n* You must only generate SSML fragments. No plain text responses are allowed.' +
+        '\n* The SSML fragments may only contain <emphasis>, <prosody>, and <p> tags.' +
+        '\n* The SSML fragments must not contain <speak> or <voice> tags.' +
+        '\n* The SSML fragments can only contain <break> tags between sentences, but only if necessary.' +
+        '\n* Ensure the narrative is positive, upbeat, and cheerful.' +
+        '\n* Speak at exactly "+35%" rate.' +
+        // '\n* To sound more human, introduce some disfluencies occassionaly (preferring uh to um, and always having a break when using them).' +
+        '\n* Use a friendly and engaging tone. Provide more emphasis than usual on important parts.' +
+        '\n* Break your response into separate SSML doucments at sentence boundaries.' +
+        '\n* If a sentence becomes too long, make the SSML document shorter by breaking at thoughtful thought boundaries.' +
+        '\n* Between SSML documents, use a sentinel of \"<ZZZ/>\"';
 
 // Create the streaming chat completions helper
-const chat = new OpenAIChatCompletionStreamingClass(AZURE_OPENAI_CHAT_DEPLOYMENT, AZURE_OPENAI_SYSTEM_PROMPT, openai);
+const chat = azureOk
+    ? new OpenAIChatCompletionStreamingClass(AZURE_OPENAI_CHAT_DEPLOYMENT, updatedPrompt, openai)
+    : new OpenAIChatCompletionStreamingClass(OPENAI_MODEL_NAME, updatedPrompt, openai);
 
 // Setup the speech parts
 import * as AzureSpeech from 'microsoft-cognitiveservices-speech-sdk';
@@ -94,11 +146,21 @@ function stopSpeaking(): void {
 }
 
 function speak(text: string): void {
+    if (text == null || text == '') return;
+
     if (synthesizer == null) {
         synthesizer = initSpeechSynthesizer();
     }
-    synthesizer.speakTextAsync(
-        text,
+
+    var ssml = '<speak version="1.0" xmlns="http://www.w3.org/2001/10/synthesis" xml:lang="en-US">' +
+        // '<voice name="en-US-AvaMultilingualNeural">' +
+        '<voice name="en-US-AndrewNeural">' +
+            text +
+        '</voice>' +
+    '</speak>';
+
+    console.log('ssml: ' + ssml);
+    synthesizer.speakSsmlAsync(ssml,
         result => {
             if (result.reason === AzureSpeech.ResultReason.SynthesizingAudioCompleted) {
                 console.log('Speech synthesis completed.');
@@ -150,10 +212,27 @@ async function processUserInput(text: string): Promise<void> {
         return;
     }
 
+    var accumulator: string = '';
     var response = await chat.getResponse(text, (response: string) => {
-        console.log('Chat response: ' + response);
+        if (streamSSML) {
+            accumulator += response;
+            // console.log('Accumulator: ' + accumulator);
+            if (accumulator.includes('<ZZZ/>')) {
+                const sentences = accumulator.split('<ZZZ/>');
+                for (const sentence of sentences) {
+                    speak(sentence);
+                }
+                accumulator = '';
+            }
+        }
     });
-    speak(response);
+
+    const sentences = streamSSML
+        ? accumulator.split('<ZZZ/>')
+        : response.split('<ZZZ/>');
+    for (const sentence of sentences) {
+        speak(sentence);
+    }
 }
 
 function handleRecognizing(e: any) {
