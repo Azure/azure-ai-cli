@@ -152,6 +152,7 @@ function speak(text: string): void {
         synthesizer = initSpeechSynthesizer();
     }
 
+    text = text.replace(/&/g, '&amp;');
     var ssml = '<speak version="1.0" xmlns="http://www.w3.org/2001/10/synthesis" xml:lang="en-US">' +
         // '<voice name="en-US-AvaMultilingualNeural">' +
         '<voice name="en-US-AndrewNeural">' +
@@ -252,11 +253,10 @@ async function handleRecognized(e: any) {
 
     if (e.result.reason === AzureSpeech.ResultReason.RecognizedSpeech) {
         console.log(`RECOGNIZED: Text=${e.result.text}`);
+        stopSpeaking();
     } else if (e.result.reason === AzureSpeech.ResultReason.NoMatch) {
         console.log("NOMATCH: Speech could not be recognized.");
     }
-
-    stopSpeaking();
 
     const textBox = document.getElementById('text-box') as HTMLInputElement;
     textBox.value = e.result.text;
