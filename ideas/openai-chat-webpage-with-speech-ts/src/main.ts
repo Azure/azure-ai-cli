@@ -1,7 +1,9 @@
 var echoOnly: boolean = false;
-var continuousReco: boolean = true;
+var continuousReco: boolean = false;
 var useSSML: boolean = true;
 var streamSSML: boolean = true;
+var sentinel: string = '\u001E';
+var streamCount: number = 0;
 
 import { OpenAI} from 'openai';
 import { OpenAIChatCompletionStreamingClass } from "./OpenAIChatCompletionStreamingClass";
@@ -95,16 +97,18 @@ const updatedPrompt = !useSSML
     : AZURE_OPENAI_SYSTEM_PROMPT + 
         '\n\nAI, please follow the given instructions for generating all responses:' +
         '\n* You must only generate SSML fragments. No plain text responses are allowed.' +
-        '\n* The SSML fragments may only contain <emphasis>, <prosody>, and <p> tags.' +
         '\n* The SSML fragments must not contain <speak> or <voice> tags.' +
-        '\n* The SSML fragments can only contain <break> tags between sentences, but only if necessary.' +
+        '\n* The SSML fragments may only contain <emphasis>, <prosody>, and <p> tags.' +
+        '\n* The SSML fragments must be balanced and well-formed, meaning that each opening tag must have a corresponding closing tag.' +
         '\n* Ensure the narrative is positive, upbeat, and cheerful.' +
         '\n* Speak at exactly "+35%" rate.' +
+        '\n* If you use "&" or "<" or ">", you must escape them as "&amp;", "&lt;", "&gt;" respectively.' +
         // '\n* To sound more human, introduce some disfluencies occassionaly (preferring uh to um, and always having a break when using them).' +
         '\n* Use a friendly and engaging tone. Provide more emphasis than usual on important parts.' +
-        '\n* Break your response into separate SSML doucments at sentence boundaries.' +
-        '\n* If a sentence becomes too long, make the SSML document shorter by breaking at thoughtful thought boundaries.' +
-        '\n* Between SSML documents, use a sentinel of \"<ZZZ/>\"';
+        '\n* Break your response into separate SSML fragments at sentence boundaries.' +
+        '\n* You **MUST NOT** put more than one sentence in a single SSML fragment.' +
+        '\n* If a sentence becomes too long, make the SSML fragment shorter by breaking at thoughtful thought boundaries.' +
+        '\n* Between SSML fragments, use a sentinel of \"' + sentinel + '\".';
 
 // Create the streaming chat completions helper
 const chat = azureOk
@@ -122,13 +126,16 @@ var speakers: AzureSpeech.AudioConfig | null = null;
 var synthesizer: AzureSpeech.SpeechSynthesizer | null = null;
 
 function initSpeechSynthesizer(): AzureSpeech.SpeechSynthesizer {
+    console.log('Initializing speech synthesis...');
     player = new AzureSpeech.SpeakerAudioDestination();
     speakers = AzureSpeech.AudioConfig.fromSpeakerOutput(player);
     synthesizer = new AzureSpeech.SpeechSynthesizer(speechConfig, speakers);
+    console.log('Initializing speech synthesis... Done!');
     return synthesizer;
 }
 
 function stopSpeaking(): void {
+    ++streamCount;
     if (player != null && synthesizer != null) {
         console.log('Stopping speech synthesis...');
         var p = player;
@@ -148,11 +155,14 @@ function stopSpeaking(): void {
 function speak(text: string): void {
     if (text == null || text == '') return;
 
+    text = text.trim();
+    if (text == '') return;
+
     if (synthesizer == null) {
         synthesizer = initSpeechSynthesizer();
     }
 
-    text = text.replace(/&/g, '&amp;');
+    console.log('Speaking: ' + text);
     var ssml = '<speak version="1.0" xmlns="http://www.w3.org/2001/10/synthesis" xml:lang="en-US">' +
         // '<voice name="en-US-AvaMultilingualNeural">' +
         '<voice name="en-US-AndrewNeural">' +
@@ -160,11 +170,10 @@ function speak(text: string): void {
         '</voice>' +
     '</speak>';
 
-    console.log('ssml: ' + ssml);
     synthesizer.speakSsmlAsync(ssml,
         result => {
             if (result.reason === AzureSpeech.ResultReason.SynthesizingAudioCompleted) {
-                console.log('Speech synthesis completed.');
+                // console.log('Speech synthesis completed.');
             } else {
                 console.error('Speech synthesis failed: ', result.errorDetails);
             }
@@ -203,23 +212,36 @@ function toggleSpeechRecognition(): void{
 recognizer.recognizing = (_, e) => handleRecognizing(e);
 recognizer.recognized = (_, e) => handleRecognized(e);
 
-async function processUserInput(text: string): Promise<void> {
+async function processUserInput(text: string, ensureUiUpdated: () => void): Promise<void> {
+
     var undefined: boolean = text == null || text == '' || text == "undefined";
     if (undefined) return;
 
     if (echoOnly) {
         console.log('User input: ' + text);
         speak(text);
+        ensureUiUpdated();
         return;
     }
 
+    var updatedUi: boolean = false;
+
+    console.log('Speaking: ... preparing to stream SSML ...');
+    var streamNumber: number = ++streamCount;
     var accumulator: string = '';
     var response = await chat.getResponse(text, (response: string) => {
+        if (streamNumber != streamCount) return;
+
+        if (!updatedUi) {
+            updatedUi = true;
+            ensureUiUpdated();
+        }
+
         if (streamSSML) {
             accumulator += response;
-            // console.log('Accumulator: ' + accumulator);
-            if (accumulator.includes('<ZZZ/>')) {
-                const sentences = accumulator.split('<ZZZ/>');
+            if (accumulator.includes(sentinel)) {
+                console.log('Accumulator: ' + accumulator);
+                const sentences = accumulator.split(sentinel);
                 for (const sentence of sentences) {
                     speak(sentence);
                 }
@@ -228,12 +250,20 @@ async function processUserInput(text: string): Promise<void> {
         }
     });
 
+    if (!updatedUi) {
+        updatedUi = true;
+        ensureUiUpdated();
+    }
+
+    console.log('Accumulator: ' + accumulator);
     const sentences = streamSSML
-        ? accumulator.split('<ZZZ/>')
-        : response.split('<ZZZ/>');
+        ? accumulator.split(sentinel)
+        : response.split(sentinel);
     for (const sentence of sentences) {
         speak(sentence);
     }
+
+    console.log('Speaking: ... FINISHED !!!');
 }
 
 function handleRecognizing(e: any) {
@@ -251,31 +281,36 @@ async function handleRecognized(e: any) {
         updateButtonIcon();
     }
 
+    const textBox = document.getElementById('text-box') as HTMLInputElement;
+
     if (e.result.reason === AzureSpeech.ResultReason.RecognizedSpeech) {
         console.log(`RECOGNIZED: Text=${e.result.text}`);
+        textBox.value = e.result.text;
         stopSpeaking();
+
+        await processUserInput(textBox.value, () => {
+            textBox.value = '';
+            updateButtonIcon();
+        });
     } else if (e.result.reason === AzureSpeech.ResultReason.NoMatch) {
         console.log("NOMATCH: Speech could not be recognized.");
+        textBox.value = '';
+        updateButtonIcon();
     }
-
-    const textBox = document.getElementById('text-box') as HTMLInputElement;
-    textBox.value = e.result.text;
-
-    await processUserInput(textBox.value);
-    textBox.value = '';
-
-    updateButtonIcon();
 }
 
 function handleButtonClick(): void {
+    stopSpeaking();
     const textBox = document.getElementById('text-box') as HTMLInputElement;
     if (textBox.value === '' || listening) {
         toggleSpeechRecognition();
         updateButtonIcon();
     } else {
-        processUserInput(textBox.value);
-        textBox.value = '';
-        updateButtonIcon();
+        stopSpeaking();
+        processUserInput(textBox.value, () => {
+            textBox.value = '';
+            updateButtonIcon();
+        });
     }
 }
 
