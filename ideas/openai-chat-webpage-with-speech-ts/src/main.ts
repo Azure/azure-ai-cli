@@ -1,9 +1,8 @@
-var echoOnly: boolean = false;
-var continuousReco: boolean = false;
-var useSSML: boolean = true;
-var streamSSML: boolean = true;
-var sentinel: string = '\u001E';
-var streamCount: number = 0;
+var use_continuous_speech_input: boolean = false;
+var update_prompt_to_generate_ssml: boolean = true;
+var speak_iteratively_while_streaming: boolean = true;
+var voice_name: string = 'en-US-AndrewNeural';
+var voice_rate: string = '+20%';
 
 import { OpenAI} from 'openai';
 import { OpenAIChatCompletionStreamingClass } from "./OpenAIChatCompletionStreamingClass";
@@ -76,6 +75,10 @@ if (!ok) {
     throw new Error('Missing environment variables');
 }
 
+// Set up the internal variables
+var sentinel: string = '\u001E';
+var streamCount: number = 0;
+
 // Create the OpenAI client
 console.log(azureOk
     ? 'Using Azure OpenAI (w/ API Key)...'
@@ -92,18 +95,17 @@ const openai = !azureOk
         defaultHeaders: { 'api-key': AZURE_OPENAI_API_KEY },
         dangerouslyAllowBrowser: true});
 
-const updatedPrompt = !useSSML
+const updatedPrompt = !update_prompt_to_generate_ssml
     ? AZURE_OPENAI_SYSTEM_PROMPT
     : AZURE_OPENAI_SYSTEM_PROMPT + 
         '\n\nAI, please follow the given instructions for generating all responses:' +
-        '\n* You must only generate SSML fragments. No plain text responses are allowed.' +
-        '\n* The SSML fragments must not contain <speak> or <voice> tags.' +
-        '\n* The SSML fragments may only contain <emphasis>, <prosody>, and <p> tags.' +
+        '\n* You must only generate SSML fragments.' +
         '\n* The SSML fragments must be balanced and well-formed, meaning that each opening tag must have a corresponding closing tag.' +
+        '\n* The SSML fragments must not contain <speak> or <voice> tags.' +
+        '\n* The SSML fragments may only contain <p>, <emphasis>, and <prosody> tags.' +
+        '\n* Never use the rate attribute in the <prosody> tag.' +
         '\n* Ensure the narrative is positive, upbeat, and cheerful.' +
-        '\n* Speak at exactly "+35%" rate.' +
         '\n* If you use "&" or "<" or ">", you must escape them as "&amp;", "&lt;", "&gt;" respectively.' +
-        // '\n* To sound more human, introduce some disfluencies occassionaly (preferring uh to um, and always having a break when using them).' +
         '\n* Use a friendly and engaging tone. Provide more emphasis than usual on important parts.' +
         '\n* Break your response into separate SSML fragments at sentence boundaries.' +
         '\n* You **MUST NOT** put more than one sentence in a single SSML fragment.' +
@@ -164,9 +166,10 @@ function speak(text: string): void {
 
     console.log('Speaking: ' + text);
     var ssml = '<speak version="1.0" xmlns="http://www.w3.org/2001/10/synthesis" xml:lang="en-US">' +
-        // '<voice name="en-US-AvaMultilingualNeural">' +
-        '<voice name="en-US-AndrewNeural">' +
-            text +
+        `<voice name="${voice_name}">` +
+            `<prosody rate="${voice_rate}">` +
+                text +
+            '</prosody>' +
         '</voice>' +
     '</speak>';
 
@@ -188,7 +191,7 @@ var listening: boolean = false;
 function toggleSpeechRecognition(): void{
     if (!listening) {
         console.log("Speech recognition started");
-        if (continuousReco) {
+        if (use_continuous_speech_input) {
             recognizer.startContinuousRecognitionAsync();
         }
         else {
@@ -217,13 +220,6 @@ async function processUserInput(text: string, ensureUiUpdated: () => void): Prom
     var undefined: boolean = text == null || text == '' || text == "undefined";
     if (undefined) return;
 
-    if (echoOnly) {
-        console.log('User input: ' + text);
-        speak(text);
-        ensureUiUpdated();
-        return;
-    }
-
     var updatedUi: boolean = false;
 
     console.log('Speaking: ... preparing to stream SSML ...');
@@ -237,7 +233,7 @@ async function processUserInput(text: string, ensureUiUpdated: () => void): Prom
             ensureUiUpdated();
         }
 
-        if (streamSSML) {
+        if (speak_iteratively_while_streaming) {
             accumulator += response;
             if (accumulator.includes(sentinel)) {
                 console.log('Accumulator: ' + accumulator);
@@ -256,7 +252,7 @@ async function processUserInput(text: string, ensureUiUpdated: () => void): Prom
     }
 
     console.log('Accumulator: ' + accumulator);
-    const sentences = streamSSML
+    const sentences = speak_iteratively_while_streaming
         ? accumulator.split(sentinel)
         : response.split(sentinel);
     for (const sentence of sentences) {
@@ -276,7 +272,7 @@ function handleRecognizing(e: any) {
 
 async function handleRecognized(e: any) {
 
-    if (!continuousReco) {
+    if (!use_continuous_speech_input) {
         listening = false;
         updateButtonIcon();
     }
