@@ -98,6 +98,28 @@ class {ClassName} {
       }
       {{endif}}
     });
+    {{if {_IS_OPENAI_ASST_CODE_INTERPRETER_TEMPLATE}}}
+    stream.on('toolCallCreated', (toolCall) => {
+      if (toolCall.type === 'code_interpreter') {
+        process.stdout.write('\n\nassistant-code:\n');
+      }
+    });
+    stream.on('toolCallDelta', (toolCallDelta, snapshot) => {
+      if (toolCallDelta.type === 'code_interpreter') {
+        if (toolCallDelta.code_interpreter.input) {
+          process.stdout.write(toolCallDelta.code_interpreter.input);
+        }
+        if (toolCallDelta.code_interpreter.outputs) {
+          process.stdout.write('\n\nassistant-output:');
+          toolCallDelta.code_interpreter.outputs.forEach(output => {
+            if (output.type === "logs") {
+              process.stdout.write(`\n${output.logs}\n`);
+            }
+          });
+        }
+      }
+    });
+    {{endif}}
   }
 
   async onTextDelta(textDelta, callback) {

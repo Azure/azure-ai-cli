@@ -923,6 +923,21 @@
 - area: ai dev new openai-asst-streaming-with-code (key)
   tests:
 
+  - class: dev new openai-asst-streaming-with-code (javascript)
+    steps:
+    - name: generate template
+      command: ai dev new openai-asst-streaming-with-code --javascript
+    - name: build template
+      bash: |
+        cd openai-asst-streaming-with-code-js
+        npm install
+    - name: run template
+      command: ai dev shell --bash "cd openai-asst-streaming-with-code-js;node main.js"
+      input: |-
+        How many letter 'e's are there in the pledge of allegiance? don't talk about it, just write the code, and then answer the question.
+        exit
+      tag: skip
+
   - class: dev new openai-asst-streaming-with-code (python)
     steps:
     - name: generate template
@@ -955,8 +970,41 @@
         exit
       tag: skip
 
+- area: ai dev new openai-asst-streaming-with-code (aad)
+  tests:
+
+  - class: dev new openai-asst-streaming-with-code (javascript)
+    steps:
+    - name: generate template
+      command: ai dev new openai-asst-streaming-with-code --javascript --var AZURE_OPENAI_AUTH_METHOD=aad --output-path openai-asst-streaming-with-code-js-aad
+    - name: build template
+      bash: |
+        cd openai-asst-streaming-with-code-js-aad
+        npm install
+    - name: run template
+      command: ai dev shell --bash "cd openai-asst-streaming-with-code-js-aad;node main.js"
+      input: |-
+        How many letter 'e's are there in the pledge of allegiance? don't talk about it, just write the code, and then answer the question.
+        exit
+      tag: skip
+
 - area: ai dev new openai-asst-streaming-with-code (oai)
   tests:
+
+  - class: dev new openai-asst-streaming-with-code (javascript)
+    steps:
+    - name: generate template
+      command: ai dev new openai-asst-streaming-with-code --javascript --var USE_AZURE_OPENAI=false --output-path openai-asst-streaming-with-code-js-oai
+    - name: build template
+      bash: |
+        cd openai-asst-streaming-with-code-js-oai
+        npm install
+    - name: run template
+      command: ai dev shell --bash "cd openai-asst-streaming-with-code-js-oai;node main.js"
+      input: |-
+        How many letter 'e's are there in the pledge of allegiance? don't talk about it, just write the code, and then answer the question.
+        exit
+      tag: skip
 
   - class: dev new openai-asst-streaming-with-code (python)
     steps:

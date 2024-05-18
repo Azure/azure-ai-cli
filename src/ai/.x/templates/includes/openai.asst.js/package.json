@@ -11,6 +11,6 @@
   "license": "MIT",
   "dependencies": {
     "@azure/identity": "4.1.0",
-    "openai": "^4.31.0"
+    "openai": "~4.46.0"
   }
 }

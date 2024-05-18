@@ -1,5 +1,7 @@
 const { OpenAI } = require('openai');
-{{if {_IS_OPENAI_ASST_FUNCTIONS_TEMPLATE}}}
+{{if {_IS_OPENAI_ASST_CODE_INTERPRETER_TEMPLATE}}}
+const { {ClassName} } = require("./OpenAIAssistantsCodeInterpreterStreamingClass");
+{{else if {_IS_OPENAI_ASST_FUNCTIONS_TEMPLATE}}}
 const { factory } = require("./OpenAIAssistantsCustomFunctions");
 const { {ClassName} } = require("./OpenAIAssistantsFunctionsStreamingClass");
 {{else if {_IS_OPENAI_ASST_STREAMING_TEMPLATE}}}
