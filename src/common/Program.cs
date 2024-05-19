@@ -15,6 +15,7 @@ namespace Azure.AI.Details.Common.CLI
     public class Program
     {
         public static bool Debug { get; internal set; }
+        public static bool InteractiveShellInProgress = false;
 
         private static int usingResource = 0;
         private static string updateMessage = "";
@@ -30,10 +31,14 @@ namespace Azure.AI.Details.Common.CLI
             Console.CancelKeyPress += (s, e) =>
             {
                 e.Cancel = true;
-                screen.SetCursorVisible(true);
-                screen.ResetColors();
-                Console.WriteLine("<ctrl-c> received... terminating ... ");
-                Environment.Exit(1);
+
+                if (!InteractiveShellInProgress)
+                {
+                    screen.SetCursorVisible(true);
+                    screen.ResetColors();
+                    Console.WriteLine("<ctrl-c> received... terminating ... ");
+                    Environment.Exit(1);
+                }
             };
 
             ICommandValues values = new CommandValues();

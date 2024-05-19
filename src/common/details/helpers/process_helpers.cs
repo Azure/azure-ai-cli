@@ -107,10 +107,19 @@ namespace Azure.AI.Details.Common.CLI
 
         public static async Task<ProcessOutput> RunShellInteractiveAsync(Dictionary<string, string>? addToEnvironment = null, Action<string>? stdOutHandler = null, Action<string>? stdErrHandler = null, Action<string>? mergedOutputHandler = null, bool captureOutput = true)
         {
-            var interactiveShellFileName = !OS.IsWindows() ? "bash" : "cmd.exe";
-            var interactiveShellArguments = !OS.IsWindows() ? "-li" : "/k PROMPT (ai dev shell) %PROMPT%& title (ai dev shell)";
+            Program.InteractiveShellInProgress = true;
 
-            return await RunShellCommandAsync(interactiveShellFileName, interactiveShellArguments, addToEnvironment, stdOutHandler, stdErrHandler, mergedOutputHandler, captureOutput);
+            try
+            {
+                var interactiveShellFileName = !OS.IsWindows() ? "bash" : "cmd.exe";
+                var interactiveShellArguments = !OS.IsWindows() ? "-li" : "/k PROMPT (ai dev shell) %PROMPT%& title (ai dev shell)";
+
+                return await RunShellCommandAsync(interactiveShellFileName, interactiveShellArguments, addToEnvironment, stdOutHandler, stdErrHandler, mergedOutputHandler, captureOutput);
+            }
+            finally
+            {
+                Program.InteractiveShellInProgress = false;
+            }
         }
 
         public static async Task<ProcessOutput> RunShellCommandAsync(string command, string arguments, Dictionary<string, string>? addToEnvironment = null, Action<string>? stdOutHandler = null, Action<string>? stdErrHandler = null, Action<string>? mergedOutputHandler = null, bool captureOutput = true)
