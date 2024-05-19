@@ -39,7 +39,8 @@ class EventHandler(AssistantEventHandler):
             if file_citation := getattr(annotation, "file_citation", None):
                 cited_file = self.openai.files.retrieve(file_citation.file_id)
                 citations.append(f"[{index}] {cited_file.filename}")
-        print("\n\n" + "\n".join(citations))
+        if citations:
+            print("\n\n" + "\n".join(citations), end="", flush=True)
     {{endif}}
 
     {{if {_IS_OPENAI_ASST_CODE_INTERPRETER_TEMPLATE}}}

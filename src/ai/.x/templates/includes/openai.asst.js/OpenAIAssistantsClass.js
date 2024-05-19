@@ -98,6 +98,29 @@ class {ClassName} {
       }
       {{endif}}
     });
+    {{if {_IS_OPENAI_ASST_FILE_SEARCH_TEMPLATE}}}
+    stream.on("messageDone", async (event) => {
+      if (event.content[0].type === "text") {
+        const { text } = event.content[0];
+        const { annotations } = text;
+        const citations = [];
+  
+        let index = 0;
+        for (let annotation of annotations) {
+          const { file_citation } = annotation;
+          if (file_citation) {
+            const citedFile = await this.openai.files.retrieve(file_citation.file_id);
+            citations.push("[" + index + "] " + citedFile.filename);
+          }
+          index++;
+        }
+
+        if (citations.length > 0) {
+          process.stdout.write(`\n\n${citations.join("\n")}\n`);
+        }
+      }
+    });
+    {{endif}}
     {{if {_IS_OPENAI_ASST_CODE_INTERPRETER_TEMPLATE}}}
     stream.on('toolCallCreated', (toolCall) => {
       if (toolCall.type === 'code_interpreter') {
@@ -126,6 +149,13 @@ class {ClassName} {
     let content = textDelta.value;
     if (content != null) {
       if(callback != null) {
+        {{if {_IS_OPENAI_ASST_FILE_SEARCH_TEMPLATE}}}
+        if (textDelta.annotations) {
+          for (let annotation of textDelta.annotations) {
+            content = content.replace(annotation.text, `[${annotation.index}]`);
+          }
+        }
+        {{endif}}
         callback(content);
         if (this.simulateTypingDelay > 0) {
           await new Promise(r => setTimeout(r, this.simulateTypingDelay));

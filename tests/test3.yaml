@@ -1041,6 +1041,22 @@
 - area: ai dev new openai-asst-streaming-with-file-search (key)
   tests:
 
+  - class: dev new openai-asst-streaming-with-file-search (javascript)
+    steps:
+    - name: generate template
+      command: ai dev new openai-asst-streaming-with-file-search --javascript
+    - name: build template
+      bash: |
+        cd openai-asst-streaming-with-file-search-js
+        npm install
+    - name: run template
+      command: ai dev shell --bash "cd openai-asst-streaming-with-file-search-js;node main.js"
+      input: |-
+        Tell me a joke
+        Tell me another joke
+        exit
+      tag: skip
+
   - class: dev new openai-asst-streaming-with-file-search (python)
     steps:
     - name: generate template
@@ -1074,8 +1090,44 @@
         exit
       tag: skip
 
+- area: ai dev new openai-asst-streaming-with-file-search (aad)
+
+  tests:
+
+  - class: dev new openai-asst-streaming-with-file-search (javascript)
+    steps:
+    - name: generate template
+      command: ai dev new openai-asst-streaming-with-file-search --javascript --var AZURE_OPENAI_AUTH_METHOD=aad --output-path openai-asst-streaming-with-file-search-js-aad
+    - name: build template
+      bash: |
+        cd openai-asst-streaming-with-file-search-js-aad
+        npm install
+    - name: run template
+      command: ai dev shell --bash "cd openai-asst-streaming-with-file-search-js-aad;node main.js"
+      input: |-
+        Tell me a joke
+        Tell me another joke
+        exit
+      tag: skip
+
 - area: ai dev new openai-asst-streaming-with-file-search (oai)
   tests:
+
+  - class: dev new openai-asst-streaming-with-file-search (javascript)
+    steps:
+    - name: generate template
+      command: ai dev new openai-asst-streaming-with-file-search --javascript --var USE_AZURE_OPENAI=false --output-path openai-asst-streaming-with-file-search-js-oai
+    - name: build template
+      bash: |
+        cd openai-asst-streaming-with-file-search-js-oai
+        npm install
+    - name: run template
+      command: ai dev shell --bash "cd openai-asst-streaming-with-file-search-js-oai;node main.js"
+      input: |-
+        Tell me a joke
+        Tell me another joke
+        exit
+      tag: skip
 
   - class: dev new openai-asst-streaming-with-file-search (python)
     steps:
