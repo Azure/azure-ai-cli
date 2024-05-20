@@ -92,7 +92,7 @@ class Program
         var files = FindFiles(args);
         if (files.Any())
         {
-            var uploadedFiles = UploadFiles(fileClient, files);
+            var uploadedFiles = await UploadFiles(fileClient, files);
             ProcessBatchFileJob(vectorStoreClient, vectorStore, uploadedFiles);
             PrintVectorStore(client, vectorStore, vectorStoreClient);
         }
@@ -218,12 +218,21 @@ class Program
         var fileClient = client.GetFileClient();
 
         Console.WriteLine("  Files:");
+
+        var count = 0;
         var associations = vectorStoreClient.GetFileAssociations(vectorStore);
         foreach (var association in associations)
         {
             var file = fileClient.GetFile(association.FileId);
             Console.WriteLine($"    {file.Value.Filename} ({file.Value.SizeInBytes} byte(s))");
+
+            if (++count >= 5)
+            {
+                Console.WriteLine($"    ({associations.Count() - count} more file(s) ... )");
+                break;
+            }
         }
+
         Console.WriteLine();
     }
 
@@ -272,30 +281,44 @@ class Program
         return found;
     }
 
-    private static IEnumerable<OpenAIFileInfo> UploadFiles(FileClient fileClient, IEnumerable<string> files)
+    private static async Task<IEnumerable<OpenAIFileInfo>> UploadFiles(FileClient fileClient, IEnumerable<string> files)
     {
         var list = files.ToList();
         Console.WriteLine($"Uploading files ... ({list.Count} file(s))");
 
-        var throttler = new SemaphoreSlim(5);
-        List<Task<ClientResult<OpenAIFileInfo>>> uploadTasks = [];
+        var throttler = new SemaphoreSlim(10);
+        var tasks = new List<Task>();
+
+        var uploadedFiles = new List<OpenAIFileInfo>();
         foreach (var file in list)
         {
-            throttler.Wait();
-            var stream = new FileStream(file, FileMode.Open);
-            var uploaded = fileClient.UploadFileAsync(stream, file, OpenAIFilePurpose.Assistants);
-            uploaded.ContinueWith(t => {
-                var file = t.Result.Value;
-                Console.WriteLine($"  {file.Filename} ({file.SizeInBytes} byte(s))");
-                throttler.Release();
-            });
-            uploadTasks.Add(uploaded);
+            tasks.Add(Task.Run(async () =>
+            {
+                var uploadedFile = await UploadFile(fileClient, throttler, file);
+                uploadedFiles.Add(uploadedFile);
+            }));
         }
 
-        Task.WaitAll(uploadTasks.ToArray());
+        await Task.WhenAll(tasks.ToArray());
         Console.WriteLine();
 
-        return uploadTasks.Select(x => x.Result.Value);
+        return uploadedFiles;
+    }
+
+    private static async Task<OpenAIFileInfo> UploadFile(FileClient fileClient, SemaphoreSlim throttler, string file)
+    {
+        await throttler.WaitAsync();
+        try
+        {
+            var stream = new FileStream(file, FileMode.Open);
+            var uploaded = await fileClient.UploadFileAsync(stream, file, OpenAIFilePurpose.Assistants);
+            Console.WriteLine($"  {uploaded.Value.Filename} ({uploaded.Value.SizeInBytes} byte(s))");
+            return uploaded.Value;
+        }
+        finally
+        {
+            throttler.Release();
+        }
     }
 
     private static VectorStoreBatchFileJob ProcessBatchFileJob(VectorStoreClient vectorStoreClient, VectorStore vectorStore, IEnumerable<OpenAIFileInfo> uploadedFiles)
