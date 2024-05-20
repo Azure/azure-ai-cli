@@ -227,56 +227,72 @@ class Program
         Console.WriteLine();
     }
 
-    private static List<string> FindFiles(string[] patterns)
+    private static List<string> FindFiles(IEnumerable<string> patterns)
     {
         Console.WriteLine("Files:");
-        var files = new List<string>();
-        for (int i = 0; i < patterns.Length; i++)
+
+        var found = new List<string>();
+        var currentDir = Directory.GetCurrentDirectory();
+        foreach (var item in patterns)
         {
-            var fi = new FileInfo(patterns[i]);
-            var path = Path.GetDirectoryName(fi.FullName) ?? ".";
-            var pattern = Path.GetFileName(fi.FullName);
-            var found = Directory.GetFiles(path, pattern);
-            if (found != null)
+            var i1 = item.LastIndexOf(Path.DirectorySeparatorChar);
+            var i2 = item.LastIndexOf(Path.AltDirectorySeparatorChar);
+            var hasPath = i1 >= 0 || i2 >= 0;
+
+            var pathLen = Math.Max(i1, i2);
+            var path = !hasPath ? currentDir : item.Substring(0, pathLen);
+            var pattern = !hasPath ? item : item.Substring(pathLen + 1);
+
+            EnumerationOptions? recursiveOptions = null;
+            if (path.EndsWith("**"))
             {
-                foreach (var file in found)
-                {
-                    files.Add(file);
-                    Console.WriteLine($"  {file}");
-                }
+                path = path.Substring(0, path.Length - 2).TrimEnd('/', '\\');
+                if (string.IsNullOrEmpty(path)) path = ".";
+                recursiveOptions = new EnumerationOptions() { RecurseSubdirectories = true };
+            }
+
+            if (!Directory.Exists(path)) continue;
+
+            var files = recursiveOptions != null 
+                ? Directory.EnumerateFiles(path, pattern, recursiveOptions)
+                : Directory.EnumerateFiles(path, pattern);
+            foreach (var file in files)
+            {
+                found.Add(file);
+                Console.WriteLine($"  {file}");
             }
         }
 
-        if (files.Count() == 0)
+        if (found.Count() == 0)
         {
             Console.WriteLine("No files found.");
         }
 
         Console.WriteLine();
-
-        return files;
+        return found;
     }
 
     private static IEnumerable<OpenAIFileInfo> UploadFiles(FileClient fileClient, IEnumerable<string> files)
     {
-        Console.Write("Uploading files ...");
+        var list = files.ToList();
+        Console.WriteLine($"Uploading files ... ({list.Count} file(s))");
 
+        var throttler = new SemaphoreSlim(5);
         List<Task<ClientResult<OpenAIFileInfo>>> uploadTasks = [];
-        foreach (var file in files)
+        foreach (var file in list)
         {
+            throttler.Wait();
             var stream = new FileStream(file, FileMode.Open);
             var uploaded = fileClient.UploadFileAsync(stream, file, OpenAIFilePurpose.Assistants);
+            uploaded.ContinueWith(t => {
+                var file = t.Result.Value;
+                Console.WriteLine($"  {file.Filename} ({file.SizeInBytes} byte(s))");
+                throttler.Release();
+            });
             uploadTasks.Add(uploaded);
         }
 
         Task.WaitAll(uploadTasks.ToArray());
-        Console.WriteLine(" Done!");
-
-        foreach (var task in uploadTasks)
-        {
-            var file = task.Result.Value;
-            Console.WriteLine($"  {file.Filename} ({file.SizeInBytes} byte(s))");
-        }
         Console.WriteLine();
 
         return uploadTasks.Select(x => x.Result.Value);
