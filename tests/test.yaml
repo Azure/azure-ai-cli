@@ -90,7 +90,7 @@
       ^OpenAI +Assistants +openai-asst +JavaScript, +Python *\r?$\n
       ^OpenAI +Assistants +\(Streaming\) +openai-asst-streaming +JavaScript, +Python *\r?$\n
       ^OpenAI +Assistants +\(w/ +Code Interpreter\) +openai-asst-streaming-with-code +JavaScript, +Python *\r?$\n
-      ^OpenAI +Assistants +\(w/ +File Search\) +openai-asst-streaming-with-file-search +Python *\r?$\n
+      ^OpenAI +Assistants +\(w/ +File Search\) +openai-asst-streaming-with-file-search +JavaScript, +Python *\r?$\n
       ^OpenAI +Assistants +\(w/ +Functions\) +openai-asst-streaming-with-functions +JavaScript, +Python *\r?$\n
       ^OpenAI +Assistants +Webpage +openai-asst-webpage +JavaScript, +TypeScript *\r?$\n
       ^OpenAI +Assistants +Webpage +\(w/ +Functions\) +openai-asst-webpage-with-functions +JavaScript *\r?$\n
