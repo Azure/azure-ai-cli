@@ -1,0 +1,15 @@
+{
+  "_LongName": "OpenAI Assistants (w/ Functions)",
+  "_ShortName": "openai-asst-streaming-with-functions",
+  "_Language": "Python",
+
+  "ClassName": "OpenAIAssistantsFunctionsStreamingClass",
+  "AZURE_OPENAI_AUTH_METHOD": "KEY",
+  "USE_AZURE_OPENAI": "true",
+
+  "_IS_OPENAI_ASST_TEMPLATE": "true",
+  "_IS_OPENAI_ASST_STREAMING_TEMPLATE": "true",
+  "_IS_OPENAI_ASST_CODE_INTERPRETER_TEMPLATE": "false",
+  "_IS_OPENAI_ASST_FILE_SEARCH_TEMPLATE": "false",
+  "_IS_OPENAI_ASST_FUNCTIONS_TEMPLATE": "true"
+}

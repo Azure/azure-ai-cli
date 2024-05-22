@@ -10,7 +10,7 @@ async function streamingChatCompletionsInit() {
   // What's the system prompt?
   const AZURE_OPENAI_SYSTEM_PROMPT = process.env.AZURE_OPENAI_SYSTEM_PROMPT ?? "You are a helpful AI assistant.";
 
-  {{@include openai.asst.or.chat.create.openai.node.js}}
+  {{@include openai.asst.or.chat.create.openai.js}}
 
   // Create the streaming chat completions helper
   {{if {USE_AZURE_OPENAI}}}

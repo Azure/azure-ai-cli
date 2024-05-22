@@ -6,13 +6,11 @@
 using Azure.AI.Details.Common.CLI.ConsoleGui;
 using Azure.AI.Details.Common.CLI.Extensions.HelperFunctions;
 using Azure.AI.OpenAI;
-using Azure.AI.OpenAI.Assistants;
 using Azure.Core.Diagnostics;
 using Microsoft.CognitiveServices.Speech;
 using System;
 using System.Text.Json;
 using System.Collections.Generic;
-using System.Diagnostics.Tracing;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -21,7 +19,6 @@ using System.Threading.Tasks;
 using YamlDotNet.Serialization;
 using YamlDotNet.Serialization.NamingConventions;
 using Scriban;
-using System.ClientModel.Primitives;
 
 namespace Azure.AI.Details.Common.CLI
 {
@@ -551,7 +548,7 @@ namespace Azure.AI.Details.Common.CLI
 
             if (!string.IsNullOrEmpty(endpoint))
             {
-                _azureEventSourceListener = new AzureEventSourceListener((e, message) => EventSourceAiLoggerLog(e, message), System.Diagnostics.Tracing.EventLevel.Verbose);
+                _azureEventSourceListener = new AzureEventSourceListener((e, message) => EventSourceHelpers.EventSourceAiLoggerLog(e, message), System.Diagnostics.Tracing.EventLevel.Verbose);
 
                 var options = new OpenAIClientOptions();
                 options.Diagnostics.IsLoggingContentEnabled = true;
@@ -871,30 +868,6 @@ namespace Azure.AI.Details.Common.CLI
             }
         }
 
-        private void EventSourceAiLoggerLog(EventWrittenEventArgs e, string message)
-        {
-            message = message.Replace("\r", "\\r").Replace("\n", "\\n");
-            switch (e.Level)
-            {
-                case EventLevel.Error:
-                    AI.DBG_TRACE_ERROR(message, 0, e.EventSource.Name, e.EventName);
-                    break;
-
-                case EventLevel.Warning:
-                    AI.DBG_TRACE_WARNING(message, 0, e.EventSource.Name, e.EventName);
-                    break;
-
-                case EventLevel.Informational:
-                    AI.DBG_TRACE_INFO(message, 0, e.EventSource.Name, e.EventName);
-                    break;
-
-                default:
-                case EventLevel.Verbose:
-                    AI.DBG_TRACE_VERBOSE(message, 0, e.EventSource.Name, e.EventName); break;
-            }
-        }
-
-
         private async Task<bool> DoChatAssistantCreate()
         {
             var name = _values["chat.assistant.create.name"];
@@ -917,25 +890,17 @@ namespace Azure.AI.Details.Common.CLI
             var message = $"Creating assistant ({name}) ...";
             if (!_quiet) Console.WriteLine(message);
 
-            var client = CreateOpenAIAssistantsClient();
-
+            var codeInterpreter = CodeInterpreterToken.Data().GetOrDefault(_values, false);
             var fileIds = FileIdOptionXToken.GetOptions(_values).ToList();
             fileIds.AddRange(FileIdsOptionXToken.GetOptions(_values));
 
-            var createOptions = new AssistantCreationOptions(deployment) { Name = name, Instructions = instructions };
-            if (fileIds.Count() > 0)
-            {
-                createOptions.Tools.Add(new RetrievalToolDefinition());
-                fileIds.ForEach(id => createOptions.FileIds.Add(id));
-            }
-
-            var response = await client.CreateAssistantAsync(createOptions);
-            var assistant = response.Value;
+            DemandKeyAndEndpoint(out var key, out var endpoint);
+            string assistantId = await OpenAIAssistantHelpers.CreateAssistant(key, endpoint, name, deployment, instructions, codeInterpreter, fileIds);
 
             if (!_quiet) Console.WriteLine($"{message} Done!\n");
 
-            var fi = new FileInfo(ConfigSetHelpers.ConfigSet("assistant.id", assistant.Id));
-            if (!_quiet) Console.WriteLine($"{fi.Name} (saved at {fi.DirectoryName})\n\n  {assistant.Id}");
+            var fi = new FileInfo(ConfigSetHelpers.ConfigSet("assistant.id", assistantId));
+            if (!_quiet) Console.WriteLine($"{fi.Name} (saved at {fi.DirectoryName})\n\n  {assistantId}");
 
             return true;
         }
@@ -951,8 +916,8 @@ namespace Azure.AI.Details.Common.CLI
             var message = $"Deleting assistant ({id}) ...";
             if (!_quiet) Console.WriteLine(message);
 
-            var client = CreateOpenAIAssistantsClient();
-            var response = await client.DeleteAssistantAsync(id);
+            DemandKeyAndEndpoint(out var key, out var endpoint);
+            await OpenAIAssistantHelpers.DeleteAssistant(key, endpoint, id);
 
             if (!_quiet) Console.WriteLine($"{message} Done!");
             return true;
@@ -969,20 +934,13 @@ namespace Azure.AI.Details.Common.CLI
             var message = $"Getting assistant ({id}) ...";
             if (!_quiet) Console.WriteLine(message);
 
-            var client = CreateOpenAIAssistantsClient();
-            var response = await client.GetAssistantAsync(id);
+            DemandKeyAndEndpoint(out var key, out var endpoint);
+            var json = await OpenAIAssistantHelpers.GetAssistantJson(key, endpoint, id);
 
-            var assistant = response.Value;
             if (!_quiet) Console.WriteLine($"{message} Done!\n");
 
-            var jsonModel = assistant as IJsonModel<Assistant>;
-            if (jsonModel != null)
-            {
-                var writer = new Utf8JsonWriter(Console.OpenStandardOutput());
-                jsonModel.Write(writer, ModelReaderWriterOptions.Json);
-                writer.Flush();
-                Console.WriteLine();
-            }
+            var ok = !string.IsNullOrEmpty(json);
+            if (ok) Console.WriteLine(json);
 
             return true;
         }
@@ -992,24 +950,12 @@ namespace Azure.AI.Details.Common.CLI
             var message = $"Listing assistants ...";
             if (!_quiet) Console.WriteLine(message);
 
-            var client = CreateOpenAIAssistantsClient();
-
-            var order = ListSortOrder.Ascending;
-            var response = await client.GetAssistantsAsync(order: order);
-
-            var pageable = response.Value;
-            var assistants = pageable.ToList();
-
-            while (pageable.HasMore)
-            {
-                response = await client.GetAssistantsAsync(after: pageable.LastId, order: order);
-                pageable = response.Value;
-                assistants.AddRange(pageable);
-            }
+            DemandKeyAndEndpoint(out var key, out var endpoint);
+            var assistants = await OpenAIAssistantHelpers.ListAssistants(key, endpoint);
 
             if (!_quiet) Console.WriteLine($"{message} Done!\n");
 
-            if (assistants.Count == 0)
+            if (assistants.Count() == 0)
             {
                 Console.WriteLine("No assistants found.");
             }
@@ -1018,9 +964,10 @@ namespace Azure.AI.Details.Common.CLI
                 Console.WriteLine("Assistants:\n");
                 foreach (var assistant in assistants)
                 {
-                    var assistantName = assistant.Name;
+                    var assistantId = assistant.Key;
+                    var assistantName = assistant.Value;
                     if (string.IsNullOrEmpty(assistantName)) assistantName = "(no name)";
-                    Console.WriteLine($"  {assistantName} ({assistant.Id})");
+                    Console.WriteLine($"  {assistantName} ({assistantId})");
                 }
             }
 
@@ -1040,11 +987,10 @@ namespace Azure.AI.Details.Common.CLI
             var message = $"Uploading assistant file ({file}) ...";
             if (!_quiet) Console.WriteLine(message);
 
-            var client = CreateOpenAIAssistantsClient();
-            var response = await client.UploadFileAsync(existing, OpenAIFilePurpose.Assistants);
+            DemandKeyAndEndpoint(out var key, out var endpoint);
+            var (uploadedId, uploadedName) = await OpenAIAssistantHelpers.UploadAssistantFile(key, endpoint, existing);
 
-            var uploaded = response.Value;
-            if (!_quiet) Console.WriteLine($"{message} Done!\n\n  {uploaded.Filename} ({uploaded.Id})\n");
+            if (!_quiet) Console.WriteLine($"{message} Done!\n\n  {uploadedName} ({uploadedId})\n");
 
             return true;
         }
@@ -1054,14 +1000,12 @@ namespace Azure.AI.Details.Common.CLI
             var message = $"Listing assistant files ...";
             if (!_quiet) Console.WriteLine(message);
 
-            var client = CreateOpenAIAssistantsClient();
-            var response = await client.GetFilesAsync(OpenAIFilePurpose.Assistants);
-            var list = response.Value;
+            DemandKeyAndEndpoint(out var key, out var endpoint);
+            var files = await OpenAIAssistantHelpers.ListAssistantFiles(key, endpoint);
 
             if (!_quiet) Console.WriteLine($"{message} Done!\n");
 
-            var files = list.ToList();
-            if (files.Count == 0)
+            if (files.Count() == 0)
             {
                 Console.WriteLine("No files found.");
             }
@@ -1070,9 +1014,10 @@ namespace Azure.AI.Details.Common.CLI
                 Console.WriteLine("Assistant files:\n");
                 foreach (var file in files)
                 {
-                    var fileName = file.Filename;
+                    var fileId = file.Key;
+                    var fileName = file.Value;
                     if (string.IsNullOrEmpty(fileName)) fileName = "(no name)";
-                    Console.WriteLine($"  {fileName} ({file.Id})");
+                    Console.WriteLine($"  {fileName} ({fileId})");
                 }
             }
 
@@ -1090,30 +1035,21 @@ namespace Azure.AI.Details.Common.CLI
             var message = $"Deleting assistant file ({id}) ...";
             if (!_quiet) Console.WriteLine(message);
 
-            var client = CreateOpenAIAssistantsClient();
-            var response = await client.DeleteFileAsync(id);
+            DemandKeyAndEndpoint(out var key, out var endpoint);
+            await OpenAIAssistantHelpers.DeleteAssistantFile(key, endpoint, id);
 
             if (!_quiet) Console.WriteLine($"{message} Done!");
             return true;
         }
 
-        private AssistantsClient CreateOpenAIAssistantsClient()
+        private void DemandKeyAndEndpoint(out string key, out string endpoint)
         {
-            var key = _values["service.config.key"];
-            var endpoint = ConfigEndpointUriToken.Data().GetOrDefault(_values);
-
+            key = _values["service.config.key"];
+            endpoint = ConfigEndpointUriToken.Data().GetOrDefault(_values);
             if (string.IsNullOrEmpty(endpoint))
             {
                 _values.AddThrowError("ERROR:", $"Creating AssistantsClient; requires endpoint.");
             }
-
-            _azureEventSourceListener = new AzureEventSourceListener((e, message) => EventSourceAiLoggerLog(e, message), System.Diagnostics.Tracing.EventLevel.Verbose);
-
-            var options = new AssistantsClientOptions();
-            options.Diagnostics.IsLoggingContentEnabled = true;
-            options.Diagnostics.IsLoggingEnabled = true;
-
-            return new AssistantsClient(new Uri(endpoint!), new AzureKeyCredential(key), options);
         }
 
         private void StartCommand()
@@ -1150,7 +1086,7 @@ namespace Azure.AI.Details.Common.CLI
         private readonly bool _quiet = false;
         private readonly bool _verbose = false;
 
-        private AzureEventSourceListener _azureEventSourceListener;
+        private static AzureEventSourceListener _azureEventSourceListener;
 
         // OutputHelper? _output = null;
         // DisplayHelper? _display = null;

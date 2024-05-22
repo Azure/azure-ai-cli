@@ -94,26 +94,22 @@
   <ItemGroup>
     <EmbeddedResource Include="$(IntermediateOutputPath)OriginalDotXfileNames.txt">
       <LogicalName>Azure.AI.Details.Common.CLI.resources..ai.internal.OriginalDotXfileNames.txt</LogicalName>
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </EmbeddedResource>
   </ItemGroup>
 
   <ItemGroup>
     <EmbeddedResource Include=".x\help\**">
       <Link>resources\.ai\help\%(RecursiveDir)%(Filename)%(Extension)</Link>
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include=".x\templates\**">
       <Link>resources\.ai\templates\%(RecursiveDir)%(Filename)%(Extension)</Link>
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include=".x\config\*">
       <Link>resources\.ai\config\%(Filename)%(Extension)</Link>
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </EmbeddedResource>
   </ItemGroup>
 
