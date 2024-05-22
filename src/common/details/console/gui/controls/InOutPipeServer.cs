@@ -33,7 +33,12 @@ namespace Azure.AI.Details.Common.CLI.ConsoleGui
             var responseOk = int.TryParse(response, out var index) && index >= 0 && index < items.Length;
             return responseOk ? index : -1;
         }
-        
+
+        public static void OutputTemplateList(string groupsJson)
+        {
+            Console.WriteLine($"\n{_inOutPipeServer} TemplateList {groupsJson}");
+        }
+
         private static string? _inOutPipeServer = Environment.GetEnvironmentVariable("AZURE_AI_CLI_IN_OUT_PIPE_SERVER");
     }
 }
