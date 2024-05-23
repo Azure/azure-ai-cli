@@ -684,6 +684,23 @@
         ai dev new .env
         npm run webpack
 
+- area: ai dev new openai-chat-webpage-with-speech (key)
+  tests:
+
+  - class: dev new openai-chat-webpage-with-speech (typescript)
+    steps:
+    - name: generate template
+      command: ai dev new openai-chat-webpage-with-speech --typescript
+    - name: build template
+      bash: |
+        cd openai-chat-webpage-with-speech-ts
+        npm install
+    - name: pack template
+      bash: |
+        cd openai-chat-webpage-with-speech-ts
+        ai dev new .env
+        npm run build
+
 - area: ai dev new openai-asst (key)
   tests:
   - class: dev new openai-asst (javascript)
