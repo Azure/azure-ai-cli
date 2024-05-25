@@ -194,7 +194,7 @@
   - class: dev new openai-chat (javascript)
     steps:
     - name: generate template
-      command: ai dev new openai-chat --javascript --var USE_AZURE_OPENAI=false --output-path openai-chat-js-oai
+      command: ai dev new openai-chat --javascript --var OPENAI_CLOUD=OpenAI --output-path openai-chat-js-oai
     - name: build template
       bash: |
         cd openai-chat-js-oai
@@ -342,7 +342,7 @@
   - class: dev new openai-chat-streaming (javascript)
     steps:
     - name: generate template
-      command: ai dev new openai-chat-streaming --javascript --var USE_AZURE_OPENAI=false --output-path openai-chat-streaming-js-oai
+      command: ai dev new openai-chat-streaming --javascript --var OPENAI_CLOUD=OpenAI --output-path openai-chat-streaming-js-oai
     - name: build template
       bash: |
         cd openai-chat-streaming-js-oai
@@ -541,7 +541,7 @@
   - class: dev new openai-chat-streaming-with-functions (javascript)
     steps:
     - name: generate template
-      command: ai dev new openai-chat-streaming-with-functions --javascript --var USE_AZURE_OPENAI=false --output-path openai-chat-streaming-with-functions-js-oai
+      command: ai dev new openai-chat-streaming-with-functions --javascript --var OPENAI_CLOUD=OpenAI --output-path openai-chat-streaming-with-functions-js-oai
     - name: build template
       bash: |
         cd openai-chat-streaming-with-functions-js-oai
@@ -608,7 +608,7 @@
   - class: dev new openai-chat-webpage (javascript)
     steps:
     - name: generate template
-      command: ai dev new openai-chat-webpage --javascript --var USE_AZURE_OPENAI=false --output-path openai-chat-webpage-js-oai
+      command: ai dev new openai-chat-webpage --javascript --var OPENAI_CLOUD=OpenAI --output-path openai-chat-webpage-js-oai
     - name: build template
       bash: |
         cd openai-chat-webpage-js-oai
@@ -673,7 +673,7 @@
   - class: dev new openai-chat-webpage-with-functions (javascript)
     steps:
     - name: generate template
-      command: ai dev new openai-chat-webpage-with-functions --javascript --var USE_AZURE_OPENAI=false --output-path openai-chat-webpage-with-functions-js-oai
+      command: ai dev new openai-chat-webpage-with-functions --javascript --var OPENAI_CLOUD=OpenAI --output-path openai-chat-webpage-with-functions-js-oai
     - name: build template  
       bash: |
         cd openai-chat-webpage-with-functions-js-oai
@@ -774,7 +774,7 @@
   - class: dev new openai-asst (javascript)
     steps:
     - name: generate template
-      command: ai dev new openai-asst --javascript --var USE_AZURE_OPENAI=false --output-path openai-asst-js-oai
+      command: ai dev new openai-asst --javascript --var OPENAI_CLOUD=OpenAI --output-path openai-asst-js-oai
     - name: build template
       bash: |
         cd openai-asst-js-oai
@@ -892,7 +892,7 @@
   - class: dev new openai-asst-streaming (javascript)
     steps:
     - name: generate template
-      command: ai dev new openai-asst-streaming --javascript --var USE_AZURE_OPENAI=false --output-path openai-asst-streaming-js-oai
+      command: ai dev new openai-asst-streaming --javascript --var OPENAI_CLOUD=OpenAI --output-path openai-asst-streaming-js-oai
     - name: build template
       bash: |
         cd openai-asst-streaming-js-oai
@@ -1011,7 +1011,7 @@
   - class: dev new openai-asst-streaming-with-code (javascript)
     steps:
     - name: generate template
-      command: ai dev new openai-asst-streaming-with-code --javascript --var USE_AZURE_OPENAI=false --output-path openai-asst-streaming-with-code-js-oai
+      command: ai dev new openai-asst-streaming-with-code --javascript --var OPENAI_CLOUD=OpenAI --output-path openai-asst-streaming-with-code-js-oai
     - name: build template
       bash: |
         cd openai-asst-streaming-with-code-js-oai
@@ -1133,7 +1133,7 @@
   - class: dev new openai-asst-streaming-with-file-search (javascript)
     steps:
     - name: generate template
-      command: ai dev new openai-asst-streaming-with-file-search --javascript --var USE_AZURE_OPENAI=false --output-path openai-asst-streaming-with-file-search-js-oai
+      command: ai dev new openai-asst-streaming-with-file-search --javascript --var OPENAI_CLOUD=OpenAI --output-path openai-asst-streaming-with-file-search-js-oai
     - name: build template
       bash: |
         cd openai-asst-streaming-with-file-search-js-oai
@@ -1252,7 +1252,7 @@
   - class: dev new openai-asst-streaming-with-functions (javascript)
     steps:
     - name: generate template
-      command: ai dev new openai-asst-streaming-with-functions --javascript --var USE_AZURE_OPENAI=false --output-path openai-asst-streaming-with-functions-js-oai
+      command: ai dev new openai-asst-streaming-with-functions --javascript --var OPENAI_CLOUD=OpenAI --output-path openai-asst-streaming-with-functions-js-oai
     - name: build template
       bash: |
         cd openai-asst-streaming-with-functions-js-oai
@@ -1347,7 +1347,7 @@
   - class: dev new openai-asst-webpage (javascript)
     steps:
     - name: generate template
-      command: ai dev new openai-asst-webpage --javascript --var USE_AZURE_OPENAI=false --output-path openai-asst-webpage-js-oai
+      command: ai dev new openai-asst-webpage --javascript --var OPENAI_CLOUD=OpenAI --output-path openai-asst-webpage-js-oai
     - name: build template
       bash: |
         cd openai-asst-webpage-js-oai
@@ -1395,7 +1395,7 @@
   - class: dev new openai-asst-webpage-with-functions (javascript)
     steps:
     - name: generate template
-      command: ai dev new openai-asst-webpage-with-functions --javascript --var USE_AZURE_OPENAI=false --output-path openai-asst-webpage-with-functions-js-oai
+      command: ai dev new openai-asst-webpage-with-functions --javascript --var OPENAI_CLOUD=OpenAI --output-path openai-asst-webpage-with-functions-js-oai
     - name: build template
       bash: |
         cd openai-asst-webpage-with-functions-js-oai

@@ -1,9 +1,9 @@
-{{if !{USE_AZURE_OPENAI} || contains(toupper("{AZURE_OPENAI_AUTH_METHOD}"), "KEY")}}
+{{if contains(toupper("{OPENAI_CLOUD}"), "OPENAI") || contains(toupper("{AZURE_OPENAI_AUTH_METHOD}"), "KEY")}}
     # NOTE: Never deploy your API Key in client-side environments like browsers or mobile apps
     # SEE: https://help.openai.com/en/articles/5112595-best-practices-for-api-key-safety
 
 {{endif}}
-{{if {USE_AZURE_OPENAI}}}
+{{if contains(toupper("{OPENAI_CLOUD}"), "AZURE")}}
     {{if {_IS_OPENAI_ASST_TEMPLATE}}}
     # Get the required environment variables, and form the base URL for Azure OpenAI Assistants API
     {{else}}
