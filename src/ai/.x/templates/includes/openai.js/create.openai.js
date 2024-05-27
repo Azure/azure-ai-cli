@@ -22,16 +22,16 @@
   // Get the required environment variables
 {{if {_USE_OPENAI_CLOUD_AZURE}}}
   {{if {_USE_AZURE_OPENAI_WITH_KEY}}}
-  const AZURE_OPENAI_API_KEY = process.env.AZURE_OPENAI_API_KEY ?? "<insert your Azure OpenAI API key here>";
+  const AZURE_OPENAI_API_KEY = {__process_env_or_import_meta_env}.AZURE_OPENAI_API_KEY ?? "<insert your Azure OpenAI API key here>";
   {{else if {_IS_BROWSER_TEMPLATE}}}
-  const AZURE_CLIENT_ID = process.env.AZURE_CLIENT_ID ?? null;
-  const AZURE_TENANT_ID = process.env.AZURE_TENANT_ID ?? null;
+  const AZURE_CLIENT_ID = {__process_env_or_import_meta_env}.AZURE_CLIENT_ID ?? null;
+  const AZURE_TENANT_ID = {__process_env_or_import_meta_env}.AZURE_TENANT_ID ?? null;
   {{endif}}
-  const AZURE_OPENAI_API_VERSION = process.env.AZURE_OPENAI_API_VERSION ?? "<insert your Azure OpenAI API version here>";
+  const AZURE_OPENAI_API_VERSION = {__process_env_or_import_meta_env}.AZURE_OPENAI_API_VERSION ?? "<insert your Azure OpenAI API version here>";
   {{if !{_IS_OPENAI_ASST_TEMPLATE}}}
-  const AZURE_OPENAI_CHAT_DEPLOYMENT = process.env.AZURE_OPENAI_CHAT_DEPLOYMENT ?? "<insert your Azure OpenAI chat deployment name here>";
+  const AZURE_OPENAI_CHAT_DEPLOYMENT = {__process_env_or_import_meta_env}.AZURE_OPENAI_CHAT_DEPLOYMENT ?? "<insert your Azure OpenAI chat deployment name here>";
   {{endif}}
-  const AZURE_OPENAI_ENDPOINT = process.env.AZURE_OPENAI_ENDPOINT ?? "<insert your Azure OpenAI endpoint here>";
+  const AZURE_OPENAI_ENDPOINT = {__process_env_or_import_meta_env}.AZURE_OPENAI_ENDPOINT ?? "<insert your Azure OpenAI endpoint here>";
   {{if {_IS_OPENAI_ASST_TEMPLATE}}}
   const AZURE_OPENAI_BASE_URL = `${AZURE_OPENAI_ENDPOINT.replace(/\/+$/, '')}/openai`;
   {{else}}
@@ -42,11 +42,11 @@
   {{endif}}
 {{endif}}
 {{if {_USE_OPENAI_CLOUD_OPENAI}}}
-  const OPENAI_API_KEY = process.env.OPENAI_API_KEY ?? "<insert your OpenAI API key here>";
+  const OPENAI_API_KEY = {__process_env_or_import_meta_env}.OPENAI_API_KEY ?? "<insert your OpenAI API key here>";
   {{if !{_IS_OPENAI_ASST_TEMPLATE}}}
-  const OPENAI_MODEL_NAME = process.env.OPENAI_MODEL_NAME ?? "<insert your OpenAI model name here>";
+  const OPENAI_MODEL_NAME = {__process_env_or_import_meta_env}.OPENAI_MODEL_NAME ?? "<insert your OpenAI model name here>";
   {{endif}}
-  const OPENAI_ORG_ID = process.env.OPENAI_ORG_ID ?? null;
+  const OPENAI_ORG_ID = {__process_env_or_import_meta_env}.OPENAI_ORG_ID ?? null;
 {{endif}}
 
   // Check if the required environment variables are set
@@ -90,7 +90,12 @@
 
   if (!ok) {
 {{if {_USE_OPENAI_CLOUD_AZURE}}}
-    console.error('To use Azure OpenAI, set the following environment variables:\n' +
+    {{if {_IS_BROWSER_TEMPLATE}}}
+    chatPanelAppendMessage('computer', markdownToHtml(
+    {{else}}
+    console.error(
+    {{endif}}
+      'To use Azure OpenAI, set the following environment variables:\n' +
     {{if {_IS_OPENAI_ASST_TEMPLATE}}}
       '\n  ASSISTANT_ID' +
     {{else}}
@@ -108,9 +113,15 @@
     {{if !{_IS_OPENAI_ASST_TEMPLATE}}}
       '\n  AZURE_OPENAI_CHAT_DEPLOYMENT' +
     {{endif}}
-      '\n  AZURE_OPENAI_ENDPOINT');
+      '\n  AZURE_OPENAI_ENDPOINT'
     {{if {_IS_BROWSER_TEMPLATE}}}
-    console.error('\nYou can easily do that using the Azure AI CLI by doing one of the following:\n' +
+    ));
+    {{else}}
+    );
+    {{endif}}
+    {{if {_IS_BROWSER_TEMPLATE}}}
+    chatPanelAppendMessage('computer', markdownToHtml(
+      '\nYou can easily do that using the Azure AI CLI by doing one of the following:\n' +
       '\n  ai init' +
       '\n  ai dev new .env' +
       '\n  npm run webpack' +
@@ -124,9 +135,11 @@
       '\n  or' +
       '\n' +
       '\n  ai init' +
-      '\n  ai dev shell --run "npm run webpack"');
+      '\n  ai dev shell --run "npm run webpack"'
+    ));
     {{else}}
-    console.error('\nYou can easily do that using the Azure AI CLI by doing one of the following:\n' +
+    console.error(
+      '\nYou can easily do that using the Azure AI CLI by doing one of the following:\n' +
       '\n  ai init' +
       '\n  ai dev shell' +
       '\n  node main.js' +
@@ -134,28 +147,44 @@
       '\n  or' +
       '\n' +
       '\n  ai init' +
-      '\n  ai dev shell --run "node main.js"');
+      '\n  ai dev shell --run "node main.js"'
+    );
     {{endif}}
     {{if {_USE_OPENAI_CLOUD_OPENAI}}}
 
     {{endif}}
 {{endif}}
 {{if {_USE_OPENAI_CLOUD_OPENAI}}}
-    console.error('To use OpenAI, set the following environment variables:\n' +
+    {{if {_IS_BROWSER_TEMPLATE}}}
+    chatPanelAppendMessage('computer', markdownToHtml(
+    {{else}}
+    console.error(
+    {{endif}}
+      'To use OpenAI, set the following environment variables:\n' +
       '\n  OPENAI_API_KEY' +
       '\n  OPENAI_ORG_ID (optional)' +
       {{if {_IS_OPENAI_ASST_TEMPLATE}}}
-      '\n  ASSISTANT_ID');
+      '\n  ASSISTANT_ID'
       {{else}}
       '\n  OPENAI_MODEL_NAME' +
-      '\n  AZURE_OPENAI_SYSTEM_PROMPT');
+      '\n  AZURE_OPENAI_SYSTEM_PROMPT'
       {{endif}}
-    console.error('\nYou can easily obtain some of these values by visiting these links:\n' +
+    {{if {_IS_BROWSER_TEMPLATE}}}
+    ));
+    {{else}}
+    );
+    {{endif}}
+    {{if {_IS_BROWSER_TEMPLATE}}}
+    chatPanelAppendMessage('computer', markdownToHtml(
+    {{else}}
+    console.error(
+    {{endif}}
+      '\nYou can easily obtain some of these values by visiting these links:\n' +
       '\n  https://platform.openai.com/api-keys' +
       '\n  https://platform.openai.com/settings/organization/general' +
       '\n  https://platform.openai.com/playground/assistants' +
       '\n' +
-      {{if {_IS_BROWSER_TEMPLATE}}}
+    {{if {_IS_BROWSER_TEMPLATE}}}
       '\n Then, do one of the following:\n' +
       '\n  ai dev new .env' +
       '\n  npm run webpack' +
@@ -167,7 +196,8 @@
       '\n' +
       '\n  or' +
       '\n' +
-      '\n  ai dev shell --run "npm run webpack"');
+      '\n  ai dev shell --run "npm run webpack"'
+    ));
     {{else}}
       '\n Then, do one of the following:\n' +
       '\n  ai dev shell' +
@@ -175,13 +205,14 @@
       '\n' +
       '\n  or' +
       '\n' +
-      '\n  ai dev shell --run "node main.js"');
+      '\n  ai dev shell --run "node main.js"'
+    );
     {{endif}}
 {{endif}}
 {{if {_IS_BROWSER_TEMPLATE}}}
-      throw new Error('Missing required environment variables');
+    throw new Error('Missing required environment variables');
 {{else}}
-      process.exit(1);
+    process.exit(1);
 {{endif}}
   }
 

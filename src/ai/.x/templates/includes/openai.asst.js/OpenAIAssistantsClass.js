@@ -1,6 +1,12 @@
+{{if {_IMPORT_EXPORT_USING_ES6}}}
+import { OpenAI } from "openai";
+
+export class {ClassName} {
+{{else}}
 const { OpenAI } = require('openai');
 
 class {ClassName} {
+{{endif}}
 
   // Constructor
   {{if {_IS_OPENAI_ASST_FUNCTIONS_TEMPLATE}}}
@@ -20,12 +26,18 @@ class {ClassName} {
   // Create a new the thread
   async createThread() {
     this.thread = await this.openai.beta.threads.create();
+    {{if {_IS_BROWSER_TEMPLATE}}}
+    console.log(`Thread ID: ${this.thread.id}`);
+    {{endif}}
     return this.thread;
   }
   
   // Retrieve an existing thread
   async retrieveThread(threadId) {
     this.thread = await this.openai.beta.threads.retrieve(threadId);
+    {{if {_IS_BROWSER_TEMPLATE}}}
+    console.log(`Thread ID: ${this.thread.id}`);
+    {{endif}}
     return this.thread;
   }
 
@@ -190,5 +202,7 @@ class {ClassName} {
   {{endif}}
   {{endif}}
 }
+{{if !{_IMPORT_EXPORT_USING_ES6}}}
 
 exports.{ClassName} = {ClassName};
+{{endif}}

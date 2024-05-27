@@ -1,0 +1,1 @@
+{{@include openai.asst.web/vite.config.js}}
