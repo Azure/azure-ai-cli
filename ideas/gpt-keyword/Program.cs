@@ -172,16 +172,24 @@ public class Program
     {
         var config = SpeechConfig.FromSubscription(speechKey, speechRegion);
         config.SpeechSynthesisVoiceName = speechOutputVoiceName;
-        return new SpeechSynthesizer(config);
+
+        var synthesizer = new SpeechSynthesizer(config);
+
+        var generation = GetSynthesizerGeneration();
+        synthesizer.SynthesisStarted += (s, e) => HandleSynthesisStarted(e, generation);
+        synthesizer.SynthesisCompleted += (s, e) => HandleSynthesisCompleted(e, generation);
+
+        return synthesizer;
     }
 
     private static async Task EnsureStopSynthesizer()
     {
-        if (synthesizer != null)
+        if (synthesizer != null && IsSpeaking())
         {
             var task = synthesizer.StopSpeakingAsync();
             synthesizer = null;
             synthesizerGeneration++;
+            synthesizerSpeakingCount = 0;
             await task;
         }
     }
@@ -189,6 +197,27 @@ public class Program
     private static int GetSynthesizerGeneration()
     {
         return synthesizerGeneration;
+    }
+
+    private static bool IsSpeaking()
+    {
+        return synthesizerSpeakingCount > 0;
+    }
+
+    private static void HandleSynthesisStarted(SpeechSynthesisEventArgs e, int generation)
+    {
+        if (generation == GetSynthesizerGeneration())
+        {
+            synthesizerSpeakingCount++;
+        }
+    }
+
+    private static void HandleSynthesisCompleted(SpeechSynthesisEventArgs e, int generation)
+    {
+        if (generation == GetSynthesizerGeneration())
+        {
+            synthesizerSpeakingCount--;
+        }
     }
 
     private static string ConvertToSsml(string text, string name, string rate)
@@ -295,4 +324,5 @@ public class Program
 
     private static SpeechSynthesizer? synthesizer = null;
     private static int synthesizerGeneration = 0;
+    private static int synthesizerSpeakingCount = 0;
 }
