@@ -11,3 +11,5 @@ testresults/**
 **/launchSettings.json
 **/package-lock.json
 *.user
+ideas/openai-chat-webpage-with-speech-ts/.env
+ideas/openai-chat-webpage-with-speech-and-functions-ts/.env
