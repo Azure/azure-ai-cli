@@ -20,7 +20,7 @@ def main():
     ASSISTANT_ID = os.getenv('ASSISTANT_ID') or "<insert your OpenAI assistant ID here>"
     threadId = sys.argv[1] if len(sys.argv) > 1 else None
 
-    {{@include openai.asst.or.chat.create.openai.py}}
+    {{@include openai.py/create.openai.py}}
 
     # Create the assistants streaming helper class instance
     {{if {_IS_OPENAI_ASST_FUNCTIONS_TEMPLATE}}}

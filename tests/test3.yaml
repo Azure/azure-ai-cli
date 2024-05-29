@@ -126,7 +126,7 @@
     steps:
     - name: generate template
       command: ai dev new openai-chat --javascript
-    - name: build template
+    - name: install dependencies
       bash: |
         cd openai-chat-js
         npm install
@@ -176,7 +176,7 @@
     steps:
     - name: generate template
       command: ai dev new openai-chat --javascript --var AZURE_OPENAI_AUTH_METHOD=aad --output-path openai-chat-js-aad
-    - name: build template
+    - name: install dependencies
       bash: |
         cd openai-chat-js-aad
         npm install
@@ -194,8 +194,8 @@
   - class: dev new openai-chat (javascript)
     steps:
     - name: generate template
-      command: ai dev new openai-chat --javascript --var USE_AZURE_OPENAI=false --output-path openai-chat-js-oai
-    - name: build template
+      command: ai dev new openai-chat --javascript --var OPENAI_CLOUD=OpenAI --output-path openai-chat-js-oai
+    - name: install dependencies
       bash: |
         cd openai-chat-js-oai
         npm install
@@ -274,7 +274,7 @@
     steps:
     - name: generate template
       command: ai dev new openai-chat-streaming --javascript
-    - name: build template
+    - name: install dependencies
       bash: |
         cd openai-chat-streaming-js
         npm install
@@ -324,7 +324,7 @@
     steps:
     - name: generate template
       command: ai dev new openai-chat-streaming --javascript --var AZURE_OPENAI_AUTH_METHOD=aad --output-path openai-chat-streaming-js-aad
-    - name: build template
+    - name: install dependencies
       bash: |
         cd openai-chat-streaming-js-aad
         npm install
@@ -342,8 +342,8 @@
   - class: dev new openai-chat-streaming (javascript)
     steps:
     - name: generate template
-      command: ai dev new openai-chat-streaming --javascript --var USE_AZURE_OPENAI=false --output-path openai-chat-streaming-js-oai
-    - name: build template
+      command: ai dev new openai-chat-streaming --javascript --var OPENAI_CLOUD=OpenAI --output-path openai-chat-streaming-js-oai
+    - name: install dependencies
       bash: |
         cd openai-chat-streaming-js-oai
         npm install
@@ -377,7 +377,7 @@
     steps:
     - name: generate template
       command: ai dev new openai-chat-streaming-with-data --javascript
-    - name: build template
+    - name: install dependencies
       bash: |
         cd openai-chat-streaming-with-data-js
         npm install
@@ -473,7 +473,7 @@
     steps:
     - name: generate template
       command: ai dev new openai-chat-streaming-with-functions --javascript
-    - name: build template
+    - name: install dependencies
       bash: |
         cd openai-chat-streaming-with-functions-js
         npm install
@@ -523,7 +523,7 @@
     steps:
     - name: generate template
       command: ai dev new openai-chat-streaming-with-functions --javascript --var AZURE_OPENAI_AUTH_METHOD=aad --output-path openai-chat-streaming-with-functions-js-aad
-    - name: build template
+    - name: install dependencies
       bash: |
         cd openai-chat-streaming-with-functions-js-aad
         npm install
@@ -541,8 +541,8 @@
   - class: dev new openai-chat-streaming-with-functions (javascript)
     steps:
     - name: generate template
-      command: ai dev new openai-chat-streaming-with-functions --javascript --var USE_AZURE_OPENAI=false --output-path openai-chat-streaming-with-functions-js-oai
-    - name: build template
+      command: ai dev new openai-chat-streaming-with-functions --javascript --var OPENAI_CLOUD=OpenAI --output-path openai-chat-streaming-with-functions-js-oai
+    - name: install dependencies
       bash: |
         cd openai-chat-streaming-with-functions-js-oai
         npm install
@@ -561,7 +561,7 @@
     steps:
     - name: generate template
       command: ai dev new openai-chat-webpage --javascript
-    - name: build template
+    - name: install dependencies
       bash: |
         cd openai-chat-webpage-js
         npm install
@@ -575,7 +575,7 @@
     steps:
     - name: generate template
       command: ai dev new openai-chat-webpage --typescript
-    - name: build template
+    - name: install dependencies
       bash: |
         cd openai-chat-webpage-ts
         npm install
@@ -592,7 +592,7 @@
     steps:
     - name: generate template
       command: ai dev new openai-chat-webpage --javascript --var AZURE_OPENAI_AUTH_METHOD=aad --output-path openai-chat-webpage-js-aad
-    - name: build template
+    - name: install dependencies
       bash: |
         cd openai-chat-webpage-js-aad
         npm install
@@ -608,8 +608,8 @@
   - class: dev new openai-chat-webpage (javascript)
     steps:
     - name: generate template
-      command: ai dev new openai-chat-webpage --javascript --var USE_AZURE_OPENAI=false --output-path openai-chat-webpage-js-oai
-    - name: build template
+      command: ai dev new openai-chat-webpage --javascript --var OPENAI_CLOUD=OpenAI --output-path openai-chat-webpage-js-oai
+    - name: install dependencies
       bash: |
         cd openai-chat-webpage-js-oai
         npm install
@@ -626,7 +626,7 @@
     steps:
     - name: generate template
       command: ai dev new openai-chat-webpage-with-functions --javascript  
-    - name: build template  
+    - name: install dependencies  
       bash: |
         cd openai-chat-webpage-with-functions-js
         npm install
@@ -640,7 +640,7 @@
     steps:
     - name: generate template
       command: ai dev new openai-chat-webpage-with-functions --typescript
-    - name: build template
+    - name: install dependencies
       bash: |
         cd openai-chat-webpage-with-functions-ts
         npm install
@@ -657,7 +657,7 @@
     steps:
     - name: generate template
       command: ai dev new openai-chat-webpage-with-functions --javascript --var AZURE_OPENAI_AUTH_METHOD=aad --output-path openai-chat-webpage-with-functions-js-aad
-    - name: build template  
+    - name: install dependencies  
       bash: |
         cd openai-chat-webpage-with-functions-js-aad
         npm install
@@ -673,8 +673,8 @@
   - class: dev new openai-chat-webpage-with-functions (javascript)
     steps:
     - name: generate template
-      command: ai dev new openai-chat-webpage-with-functions --javascript --var USE_AZURE_OPENAI=false --output-path openai-chat-webpage-with-functions-js-oai
-    - name: build template  
+      command: ai dev new openai-chat-webpage-with-functions --javascript --var OPENAI_CLOUD=OpenAI --output-path openai-chat-webpage-with-functions-js-oai
+    - name: install dependencies  
       bash: |
         cd openai-chat-webpage-with-functions-js-oai
         npm install
@@ -684,13 +684,30 @@
         ai dev new .env
         npm run webpack
 
+- area: ai dev new openai-chat-webpage-with-speech (key)
+  tests:
+
+  - class: dev new openai-chat-webpage-with-speech (typescript)
+    steps:
+    - name: generate template
+      command: ai dev new openai-chat-webpage-with-speech --typescript
+    - name: install dependencies
+      bash: |
+        cd openai-chat-webpage-with-speech-ts
+        npm install
+    - name: pack template
+      bash: |
+        cd openai-chat-webpage-with-speech-ts
+        ai dev new .env
+        npm run build
+
 - area: ai dev new openai-asst (key)
   tests:
   - class: dev new openai-asst (javascript)
     steps:
     - name: generate template
       command: ai dev new openai-asst --javascript
-    - name: build template
+    - name: install dependencies
       bash: |
         cd openai-asst-js
         npm install
@@ -740,7 +757,7 @@
     steps:
     - name: generate template
       command: ai dev new openai-asst --javascript --var AZURE_OPENAI_AUTH_METHOD=aad --output-path openai-asst-js-aad
-    - name: build template
+    - name: install dependencies
       bash: |
         cd openai-asst-js-aad
         npm install
@@ -757,8 +774,8 @@
   - class: dev new openai-asst (javascript)
     steps:
     - name: generate template
-      command: ai dev new openai-asst --javascript --var USE_AZURE_OPENAI=false --output-path openai-asst-js-oai
-    - name: build template
+      command: ai dev new openai-asst --javascript --var OPENAI_CLOUD=OpenAI --output-path openai-asst-js-oai
+    - name: install dependencies
       bash: |
         cd openai-asst-js-oai
         npm install
@@ -808,7 +825,7 @@
     steps:
     - name: generate template
       command: ai dev new openai-asst-streaming --javascript
-    - name: build template
+    - name: install dependencies
       bash: |
         cd openai-asst-streaming-js
         npm install
@@ -858,7 +875,7 @@
     steps:
     - name: generate template
       command: ai dev new openai-asst-streaming --javascript --var AZURE_OPENAI_AUTH_METHOD=aad --output-path openai-asst-streaming-js-aad
-    - name: build template
+    - name: install dependencies
       bash: |
         cd openai-asst-streaming-js-aad
         npm install
@@ -875,8 +892,8 @@
   - class: dev new openai-asst-streaming (javascript)
     steps:
     - name: generate template
-      command: ai dev new openai-asst-streaming --javascript --var USE_AZURE_OPENAI=false --output-path openai-asst-streaming-js-oai
-    - name: build template
+      command: ai dev new openai-asst-streaming --javascript --var OPENAI_CLOUD=OpenAI --output-path openai-asst-streaming-js-oai
+    - name: install dependencies
       bash: |
         cd openai-asst-streaming-js-oai
         npm install
@@ -927,7 +944,7 @@
     steps:
     - name: generate template
       command: ai dev new openai-asst-streaming-with-code --javascript
-    - name: build template
+    - name: install dependencies
       bash: |
         cd openai-asst-streaming-with-code-js
         npm install
@@ -977,7 +994,7 @@
     steps:
     - name: generate template
       command: ai dev new openai-asst-streaming-with-code --javascript --var AZURE_OPENAI_AUTH_METHOD=aad --output-path openai-asst-streaming-with-code-js-aad
-    - name: build template
+    - name: install dependencies
       bash: |
         cd openai-asst-streaming-with-code-js-aad
         npm install
@@ -994,8 +1011,8 @@
   - class: dev new openai-asst-streaming-with-code (javascript)
     steps:
     - name: generate template
-      command: ai dev new openai-asst-streaming-with-code --javascript --var USE_AZURE_OPENAI=false --output-path openai-asst-streaming-with-code-js-oai
-    - name: build template
+      command: ai dev new openai-asst-streaming-with-code --javascript --var OPENAI_CLOUD=OpenAI --output-path openai-asst-streaming-with-code-js-oai
+    - name: install dependencies
       bash: |
         cd openai-asst-streaming-with-code-js-oai
         npm install
@@ -1045,7 +1062,7 @@
     steps:
     - name: generate template
       command: ai dev new openai-asst-streaming-with-file-search --javascript
-    - name: build template
+    - name: install dependencies
       bash: |
         cd openai-asst-streaming-with-file-search-js
         npm install
@@ -1098,7 +1115,7 @@
     steps:
     - name: generate template
       command: ai dev new openai-asst-streaming-with-file-search --javascript --var AZURE_OPENAI_AUTH_METHOD=aad --output-path openai-asst-streaming-with-file-search-js-aad
-    - name: build template
+    - name: install dependencies
       bash: |
         cd openai-asst-streaming-with-file-search-js-aad
         npm install
@@ -1116,8 +1133,8 @@
   - class: dev new openai-asst-streaming-with-file-search (javascript)
     steps:
     - name: generate template
-      command: ai dev new openai-asst-streaming-with-file-search --javascript --var USE_AZURE_OPENAI=false --output-path openai-asst-streaming-with-file-search-js-oai
-    - name: build template
+      command: ai dev new openai-asst-streaming-with-file-search --javascript --var OPENAI_CLOUD=OpenAI --output-path openai-asst-streaming-with-file-search-js-oai
+    - name: install dependencies
       bash: |
         cd openai-asst-streaming-with-file-search-js-oai
         npm install
@@ -1168,7 +1185,7 @@
     steps:
     - name: generate template
       command: ai dev new openai-asst-streaming-with-functions --javascript
-    - name: build template
+    - name: install dependencies
       bash: |
         cd openai-asst-streaming-with-functions-js
         npm install
@@ -1218,7 +1235,7 @@
     steps:
     - name: generate template
       command: ai dev new openai-asst-streaming-with-functions --javascript --var AZURE_OPENAI_AUTH_METHOD=aad --output-path openai-asst-streaming-with-functions-js-aad
-    - name: build template
+    - name: install dependencies
       bash: |
         cd openai-asst-streaming-with-functions-js-aad
         npm install
@@ -1235,8 +1252,8 @@
   - class: dev new openai-asst-streaming-with-functions (javascript)
     steps:
     - name: generate template
-      command: ai dev new openai-asst-streaming-with-functions --javascript --var USE_AZURE_OPENAI=false --output-path openai-asst-streaming-with-functions-js-oai
-    - name: build template
+      command: ai dev new openai-asst-streaming-with-functions --javascript --var OPENAI_CLOUD=OpenAI --output-path openai-asst-streaming-with-functions-js-oai
+    - name: install dependencies
       bash: |
         cd openai-asst-streaming-with-functions-js-oai
         npm install
@@ -1286,21 +1303,21 @@
     steps:
     - name: generate template
       command: ai dev new openai-asst-webpage --javascript
-    - name: build template
+    - name: install dependencies
       bash: |
         cd openai-asst-webpage-js
         npm install
-    - name: pack template
+    - name: build template
       bash: |
         cd openai-asst-webpage-js
         ai dev new .env
-        npm run webpack
+        npm run build
 
   - class: dev new openai-asst-webpage (typescript)
     steps:
     - name: generate template
       command: ai dev new openai-asst-webpage --typescript
-    - name: build template
+    - name: install dependencies
       bash: |
         cd openai-asst-webpage-ts
         npm install
@@ -1315,31 +1332,31 @@
     steps:
     - name: generate template
       command: ai dev new openai-asst-webpage --javascript --var AZURE_OPENAI_AUTH_METHOD=aad --output-path openai-asst-webpage-js-aad
-    - name: build template
+    - name: install dependencies
       bash: |
         cd openai-asst-webpage-js-aad
         npm install
-    - name: pack template
+    - name: build template
       bash: |
         cd openai-asst-webpage-js-aad
         ai dev new .env
-        npm run webpack
+        npm run build
 
 - area: ai dev new openai-asst-webpage (oai)
   tests:
   - class: dev new openai-asst-webpage (javascript)
     steps:
     - name: generate template
-      command: ai dev new openai-asst-webpage --javascript --var USE_AZURE_OPENAI=false --output-path openai-asst-webpage-js-oai
-    - name: build template
+      command: ai dev new openai-asst-webpage --javascript --var OPENAI_CLOUD=OpenAI --output-path openai-asst-webpage-js-oai
+    - name: install dependencies
       bash: |
         cd openai-asst-webpage-js-oai
         npm install
-    - name: pack template
+    - name: build template
       bash: |
         cd openai-asst-webpage-js-oai
         ai dev new .env
-        npm run webpack
+        npm run build
 
 - area: ai dev new openai-asst-webpage-with-functions (key)
   tests:
@@ -1347,15 +1364,15 @@
     steps:
     - name: generate template
       command: ai dev new openai-asst-webpage-with-functions --javascript
-    - name: build template
+    - name: install dependencies
       bash: |
         cd openai-asst-webpage-with-functions-js
         npm install
-    - name: pack template
+    - name: build template
       bash: |
         cd openai-asst-webpage-with-functions-js
         ai dev new .env
-        npm run webpack
+        npm run build
 
 - area: ai dev new openai-asst-webpage-with-functions (aad)
   tests:
@@ -1363,28 +1380,28 @@
     steps:
     - name: generate template
       command: ai dev new openai-asst-webpage-with-functions --javascript --var AZURE_OPENAI_AUTH_METHOD=aad --output-path openai-asst-webpage-with-functions-js-aad
-    - name: build template
+    - name: install dependencies
       bash: |
         cd openai-asst-webpage-with-functions-js-aad
         npm install
-    - name: pack template
+    - name: build template
       bash: |
         cd openai-asst-webpage-with-functions-js-aad
         ai dev new .env
-        npm run webpack
+        npm run build
 
 - area: ai dev new openai-asst-webpage-with-functions (oai)
   tests:
   - class: dev new openai-asst-webpage-with-functions (javascript)
     steps:
     - name: generate template
-      command: ai dev new openai-asst-webpage-with-functions --javascript --var USE_AZURE_OPENAI=false --output-path openai-asst-webpage-with-functions-js-oai
-    - name: build template
+      command: ai dev new openai-asst-webpage-with-functions --javascript --var OPENAI_CLOUD=OpenAI --output-path openai-asst-webpage-with-functions-js-oai
+    - name: install dependencies
       bash: |
         cd openai-asst-webpage-with-functions-js-oai
         npm install
-    - name: pack template
+    - name: build template
       bash: |
         cd openai-asst-webpage-with-functions-js-oai
         ai dev new .env
-        npm run webpack
+        npm run build

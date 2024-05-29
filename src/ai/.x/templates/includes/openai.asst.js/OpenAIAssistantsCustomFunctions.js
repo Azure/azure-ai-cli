@@ -1,4 +1,8 @@
+{{if {_IMPORT_EXPORT_USING_ES6}}}
+import { FunctionFactory } from "./FunctionFactory";
+{{else}}
 const { FunctionFactory } = require("./FunctionFactory");
+{{endif}}
 let factory = new FunctionFactory();
 
 function getCurrentWeather(function_arguments) {
@@ -59,4 +63,8 @@ const getCurrentTimeSchema = {
 
 factory.addFunction(getCurrentTimeSchema, getCurrentTime);
 
+{{if {_IMPORT_EXPORT_USING_ES6}}}
+export { factory };
+{{else}}
 exports.factory = factory;
+{{endif}}
