@@ -16,6 +16,7 @@ public class {ClassName}
     {
         _systemPrompt = systemPrompt;
         _kernel = kernel;
+
         _history = new ChatHistory(_systemPrompt);
         _chatCompletionService = _kernel.GetRequiredService<IChatCompletionService>();
     }

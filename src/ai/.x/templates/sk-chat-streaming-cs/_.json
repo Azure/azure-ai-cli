@@ -4,5 +4,6 @@
   "_Language": "C#",
   "ClassName": "SemanticKernelChatCompletionsStreamingClass",
 
-  "_IS_WITH_FUNCTIONS_TEMPLATE": "false"
+  "_IS_WITH_FUNCTIONS_TEMPLATE": "false",
+  "_IS_WITH_DATA_TEMPLATE": "false"
 }
