@@ -1,0 +1,6 @@
+{
+  "_LongName": "Semantic Kernel Chat Completions (w/ Functions)",
+  "_ShortName": "sk-chat-streaming-with-functions",
+  "_Language": "C#",
+  "ClassName": "SemanticKernelChatCompletionsFunctionsStreamingClass"
+}
