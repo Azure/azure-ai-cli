@@ -1,0 +1,9 @@
+{
+  "_LongName": "Semantic Kernel Chat Completions (w/ Data + AI Search)",
+  "_ShortName": "sk-chat-streaming-with-data",
+  "_Language": "C#",
+  "ClassName": "SemanticKernelChatCompletionsWithDataStreamingClass",
+
+  "_IS_WITH_FUNCTIONS_TEMPLATE": "false",
+  "_IS_WITH_DATA_TEMPLATE": "true"
+}
