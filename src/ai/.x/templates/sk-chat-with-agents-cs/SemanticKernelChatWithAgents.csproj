@@ -1,0 +1,24 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <EnableDefaultCompileItems>true</EnableDefaultCompileItems>
+    <OutputType>Exe</OutputType>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.SemanticKernel" Version="1.13.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\semantic-kernel\dotnet\src\Agents\Abstractions\Agents.Abstractions.csproj" />
+    <ProjectReference Include="..\..\semantic-kernel\dotnet\src\Agents\Core\Agents.Core.csproj" />
+    <ProjectReference Include="..\..\semantic-kernel\dotnet\src\Agents\OpenAI\Agents.OpenAI.csproj" />
+    <ProjectReference Include="..\..\semantic-kernel\dotnet\src\Connectors\Connectors.OpenAI\Connectors.OpenAI.csproj" />
+    <ProjectReference Include="..\..\semantic-kernel\dotnet\src\SemanticKernel.Abstractions\SemanticKernel.Abstractions.csproj" />
+    <ProjectReference Include="..\..\semantic-kernel\dotnet\src\SemanticKernel.Core\SemanticKernel.Core.csproj" />
+  </ItemGroup>
+
+</Project>

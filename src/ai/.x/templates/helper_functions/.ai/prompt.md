@@ -1,7 +1,7 @@
 I will now tell you about a scenario I want to make a helper function for:
 
 ---
-{scenario}
+{instructions}
 ---
 
 Task you must perform:
