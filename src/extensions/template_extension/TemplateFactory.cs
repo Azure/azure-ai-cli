@@ -128,7 +128,7 @@ namespace Azure.AI.Details.Common.CLI.Extensions.Templates
                     "--index", "@none",
                     "--system", "@system.md",
                     "--user", "@prompt.md",
-                    "--var", "scenario", instructions
+                    "--var", "instructions", instructions
                 );
                 Directory.SetCurrentDirectory(saved);
 

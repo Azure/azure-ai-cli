@@ -15,9 +15,6 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.SemanticKernel;
-using Microsoft.SemanticKernel.Memory;
-using Microsoft.SemanticKernel.Connectors.Memory.AzureCognitiveSearch;
 
 using Azure.Search.Documents;
 using Azure.Search.Documents.Indexes;

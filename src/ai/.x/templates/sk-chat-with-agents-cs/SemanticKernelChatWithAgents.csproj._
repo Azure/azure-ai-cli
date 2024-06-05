@@ -10,6 +10,7 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.SemanticKernel" Version="1.14.1" />
+    <PackageReference Include="Microsoft.SemanticKernel.Agents.Core" Version="1.14.1-alpha" />
   </ItemGroup>
 
 </Project>
