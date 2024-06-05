@@ -8,22 +8,9 @@
     <OutputType>Exe</OutputType>
   </PropertyGroup>
 
-  <!-- output an error if SemanticKernelBaseDir is not set -->
-  <Target Name="CheckSemanticKernelBaseDir" BeforeTargets="PrepareForBuild">
-    <Error Condition="'$(SemanticKernelBaseDir)' == ''" Text="SemanticKernelBaseDir is not set. Please set it to the path of the Semantic Kernel repository.&#xD;For example: dotnet build -p:SemanticKernelBaseDir=../../semantic-kernel." />
-  </Target>
-
-  <ItemGroup Condition="'$(SemanticKernelBaseDir)' == ''">
-    <PackageReference Include="Microsoft.SemanticKernel" Version="1.14.0" />
-  </ItemGroup>
-
-  <ItemGroup Condition="'$(SemanticKernelBaseDir)' != ''">
-    <ProjectReference Include="$(SemanticKernelBaseDir)\dotnet\src\Agents\Abstractions\Agents.Abstractions.csproj" />
-    <ProjectReference Include="$(SemanticKernelBaseDir)\dotnet\src\Agents\Core\Agents.Core.csproj" />
-    <ProjectReference Include="$(SemanticKernelBaseDir)\dotnet\src\Agents\OpenAI\Agents.OpenAI.csproj" />
-    <ProjectReference Include="$(SemanticKernelBaseDir)\dotnet\src\Connectors\Connectors.OpenAI\Connectors.OpenAI.csproj" />
-    <ProjectReference Include="$(SemanticKernelBaseDir)\dotnet\src\SemanticKernel.Abstractions\SemanticKernel.Abstractions.csproj" />
-    <ProjectReference Include="$(SemanticKernelBaseDir)\dotnet\src\SemanticKernel.Core\SemanticKernel.Core.csproj" />
+  <ItemGroup>
+    <PackageReference Include="Microsoft.SemanticKernel" Version="1.14.1" />
+    <PackageReference Include="Microsoft.SemanticKernel.Agents.Core" Version="1.14.1-alpha" />
   </ItemGroup>
 
 </Project>

@@ -13,9 +13,6 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.SemanticKernel;
-using Microsoft.SemanticKernel.Memory;
-using Microsoft.SemanticKernel.Connectors.Memory.AzureCognitiveSearch;
 using Azure.AI.Details.Common.CLI.ConsoleGui;
 
 namespace Azure.AI.Details.Common.CLI
