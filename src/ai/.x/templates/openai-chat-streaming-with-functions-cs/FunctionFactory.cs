@@ -8,6 +8,11 @@ using Azure.AI.OpenAI;
 using System.Collections;
 using System.Text;
 using System.Text.Json;
+using OpenAI.Assistants;
+using System.Collections.Generic;
+using OpenAI.Chat;
+
+#pragma warning disable CS0618 // Type or member is obsolete
 
 public class FunctionFactory
 {
@@ -72,15 +77,11 @@ public class FunctionFactory
             var funcDescription = funcDescriptionAttrib!.Description;
 
             string json = GetMethodParametersJsonSchema(method);
-            _functions.TryAdd(method, new FunctionDefinition(method.Name)
-            {
-                Description = funcDescription,
-                Parameters = new BinaryData(json)
-            });
+            _functions.TryAdd(method, ChatTool.CreateFunctionTool(method.Name, funcDescription, new BinaryData(json)));
         }
     }
 
-    public IEnumerable<FunctionDefinition> GetFunctionDefinitions()
+    public IEnumerable<ChatTool> GetChatTools()
     {
         return _functions.Values;
     }
@@ -90,7 +91,7 @@ public class FunctionFactory
         result = null;
         if (!string.IsNullOrEmpty(functionName) && !string.IsNullOrEmpty(functionArguments))
         {
-            var function = _functions.FirstOrDefault(x => x.Value.Name == functionName);
+            var function = _functions.FirstOrDefault(x => x.Value.FunctionName == functionName);
             if (function.Key != null)
             {
                 result = CallFunction(function.Key, function.Value, functionArguments);
@@ -109,7 +110,7 @@ public class FunctionFactory
         return newFactory;
     }
 
-    private static string? CallFunction(MethodInfo methodInfo, FunctionDefinition functionDefinition, string argumentsAsJson)
+    private static string? CallFunction(MethodInfo methodInfo, ChatTool chatTool, string argumentsAsJson)
     {
         var parsed = JsonDocument.Parse(argumentsAsJson).RootElement;
         var arguments = new List<object>();
@@ -427,5 +428,5 @@ public class FunctionFactory
             t.GetGenericTypeDefinition() == typeof(IReadOnlyList<>));
     }
 
-    private Dictionary<MethodInfo, FunctionDefinition> _functions = new();
+    private Dictionary<MethodInfo, ChatTool> _functions = new();
 }

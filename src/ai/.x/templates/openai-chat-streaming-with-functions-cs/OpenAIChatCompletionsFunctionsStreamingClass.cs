@@ -6,6 +6,8 @@
 using Azure;
 using Azure.AI.OpenAI;
 using Azure.Identity;
+using OpenAI;
+using OpenAI.Chat;
 using System;
 
 public class {ClassName}
@@ -16,48 +18,47 @@ public class {ClassName}
         _functionFactory = factory;
 
         _client = string.IsNullOrEmpty(openAIAPIKey)
-            ? new OpenAIClient(new Uri(openAIEndpoint), new DefaultAzureCredential())
-            : new OpenAIClient(new Uri(openAIEndpoint), new AzureKeyCredential(openAIAPIKey));
+            ? new AzureOpenAIClient(new Uri(openAIEndpoint), new DefaultAzureCredential())
+            : new AzureOpenAIClient(new Uri(openAIEndpoint), new AzureKeyCredential(openAIAPIKey));
 
-        _options = new ChatCompletionsOptions();
-        _options.DeploymentName = openAIChatDeploymentName;
+        _chatClient = _client.GetChatClient(openAIChatDeploymentName);
+        _messages = new List<ChatMessage>();
 
-        foreach (var function in _functionFactory.GetFunctionDefinitions())
+        _options = new ChatCompletionOptions();
+        foreach (var tool in _functionFactory.GetChatTools())
         {
-            _options.Functions.Add(function);
-            // _options.Tools.Add(new ChatCompletionsFunctionToolDefinition(function));
+            _options.Tools.Add(tool);
         }
 
-        _functionCallContext = new FunctionCallContext(_functionFactory, _options.Messages);
+        _functionCallContext = new FunctionCallContext(_functionFactory, _messages);
         ClearConversation();
     }
 
     public void ClearConversation()
     {
-        _options.Messages.Clear();
-        _options.Messages.Add(new ChatRequestSystemMessage(_openAISystemPrompt));
+        _messages.Clear();
+        _messages.Add(ChatMessage.CreateSystemMessage(_openAISystemPrompt));
     }
 
-    public async Task<string> GetChatCompletionsStreamingAsync(string userPrompt, Action<StreamingChatCompletionsUpdate>? callback = null)
+    public async Task<string> GetChatCompletionsStreamingAsync(string userPrompt, Action<StreamingChatCompletionUpdate>? callback = null)
     {
-        _options.Messages.Add(new ChatRequestUserMessage(userPrompt));
+        _messages.Add(ChatMessage.CreateUserMessage(userPrompt));
 
         var responseContent = string.Empty;
         while (true)
         {
-            var response = await _client.GetChatCompletionsStreamingAsync(_options);
-            await foreach (var update in response.EnumerateValues())
+            var response = _chatClient.CompleteChatStreamingAsync(_messages, _options);
+            await foreach (var update in response)
             {
                 _functionCallContext.CheckForUpdate(update);
 
-                var content = update.ContentUpdate;
-                if (update.FinishReason == CompletionsFinishReason.ContentFiltered)
+                var content = string.Join("", update.ContentUpdate
+                    .Where(x => x.Kind == ChatMessageContentPartKind.Text)
+                    .Select(x => x.Text)
+                    .ToList());
+                if (update.FinishReason == ChatFinishReason.ContentFilter)
                 {
                     content = $"{content}\nWARNING: Content filtered!";
-                }
-                else if (update.FinishReason == CompletionsFinishReason.TokenLimitReached)
-                {
-                    content = $"{content}\nERROR: Exceeded token limit!";
                 }
 
                 if (string.IsNullOrEmpty(content)) continue;
@@ -66,13 +67,13 @@ public class {ClassName}
                 if (callback != null) callback(update);
             }
 
-            if (_functionCallContext.TryCallFunction() != null)
+            if (_functionCallContext.TryCallFunctions(responseContent))
             {
                 _functionCallContext.Clear();
                 continue;
             }
 
-            _options.Messages.Add(new ChatRequestAssistantMessage(responseContent));
+            _messages.Add(ChatMessage.CreateAssistantMessage(responseContent));
             return responseContent;
         }
     }
@@ -80,6 +81,8 @@ public class {ClassName}
     private string _openAISystemPrompt;
     private FunctionFactory _functionFactory;
     private FunctionCallContext _functionCallContext;
-    private ChatCompletionsOptions _options;
+    private ChatCompletionOptions _options;
     private OpenAIClient _client;
+    private ChatClient _chatClient;
+    private List<ChatMessage> _messages;
 }
