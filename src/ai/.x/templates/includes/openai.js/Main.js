@@ -42,6 +42,7 @@ async function main() {
   console.log('Bye!');
   process.exit();
 }
+{{endif}}
 
 main().catch((err) => {
   console.error("The sample encountered an error:", err);
@@ -49,4 +50,3 @@ main().catch((err) => {
 });
 
 module.exports = { main };
-{{endif}}
