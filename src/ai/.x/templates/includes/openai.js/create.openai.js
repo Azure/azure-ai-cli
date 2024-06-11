@@ -26,6 +26,11 @@
 {{@include openai.js/environment.vars.js}}
 {{if {_USE_OPENAI_CLOUD_AZURE}}}
   {{if {_IS_LEARN_DOC_TEMPLATE}}}
+  {{if {_IS_AUTHOR_COMMENT} }}
+  // There's likely opportunity to further reduce here and force more overlap across
+  // all of our samples. For the time being, keeping this unique/separate for the initial
+  // pitch to showcase the integration with Learn docs.
+  {{endif}}
   const client = new AzureOpenAI({ endpoint, apiKey, apiVersion, deployment });
   const result = await client.chat.completions.create({
     messages: [
