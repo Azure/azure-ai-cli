@@ -1,21 +1,21 @@
-const { OpenAI } = require('openai');
-const { {ClassName} } = require("./OpenAIChatCompletionsClass");
-const { readline } = require("./ReadLineWrapper");
+{{if {_IS_LEARN_DOC_TEMPLATE}}}
+  const { AzureOpenAI } = require("openai");
+{{else}}
+  const { OpenAI } = require("openai");
+  const { {ClassName} } = require("./OpenAIChatCompletionsClass");
+  const { readline } = require("./ReadLineWrapper");
+{{endif}}
 
 async function main() {
 
-  // What's the system prompt?
-  const AZURE_OPENAI_SYSTEM_PROMPT = process.env.AZURE_OPENAI_SYSTEM_PROMPT ?? "You are a helpful AI assistant.";
-
   {{@include openai.js/create.openai.js}}
 
-  // Create the streaming chat completions helper
-  {{if contains(toupper("{OPENAI_CLOUD}"), "AZURE")}}
-  const chat = new {ClassName}(AZURE_OPENAI_CHAT_DEPLOYMENT, AZURE_OPENAI_SYSTEM_PROMPT, openai);
-  {{else}}
-  const chat = new {ClassName}(OPENAI_MODEL_NAME, AZURE_OPENAI_SYSTEM_PROMPT, openai);
-  {{endif}}
-
+if{{ {_IS_LEARN_DOC_TEMPLATE} || {_IS_STUDIO_VIEW_CODE_TEMPLATE}}}
+  for (const choice of result.choices) {
+    console.log(choice.message);
+  }
+}
+{{else}}
   // Loop until the user types 'exit'
   while (true) {
 
@@ -38,3 +38,4 @@ main().catch((err) => {
 });
 
 module.exports = { main };
+{{endif}}

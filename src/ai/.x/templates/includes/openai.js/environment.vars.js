@@ -2,31 +2,31 @@
 {{if {_USE_OPENAI_CLOUD_AZURE}}}
   {{if {_USE_AZURE_OPENAI_WITH_KEY}}}
     {{if {_IS_LEARN_DOC_TEMPLATE}}}
-      // Load the .env file if it exists
-      const dotenv = require("dotenv");
-      dotenv.config();
+    // Load the .env file if it exists
+    const dotenv = require("dotenv");
+    dotenv.config();
 
-      // You will need to set these environment variables or edit the following values
-      const endpoint = process.env["AZURE_OPENAI_ENDPOINT"] || "<endpoint>";
-      const apiKey = process.env["AZURE_OPENAI_API_KEY"] || "<api key>";
-      const apiVersion = "2024-05-01-preview";
-      const deployment = "gpt-4o"; //This must match your deployment name.
-      require("dotenv/config");
+    // You will need to set these environment variables or edit the following values
+    const endpoint = process.env["AZURE_OPENAI_ENDPOINT"] || "<endpoint>";
+    const apiKey = process.env["AZURE_OPENAI_API_KEY"] || "<api key>";
+    const apiVersion = "2024-05-01-preview";
+    const deployment = "gpt-4o"; //This must match your deployment name.
+    require("dotenv/config");
     {{else}}
-      const AZURE_OPENAI_API_KEY = {__process_env_or_import_meta_env}.AZURE_OPENAI_API_KEY ?? "<insert your Azure OpenAI API key here>";
-      {{else if {_IS_BROWSER_TEMPLATE}}}
-      const AZURE_CLIENT_ID = {__process_env_or_import_meta_env}.AZURE_CLIENT_ID ?? null;
-      const AZURE_TENANT_ID = {__process_env_or_import_meta_env}.AZURE_TENANT_ID ?? null;
-      {{endif}}
-      const AZURE_OPENAI_API_VERSION = {__process_env_or_import_meta_env}.AZURE_OPENAI_API_VERSION ?? "<insert your Azure OpenAI API version here>";
-      {{if !{_IS_OPENAI_ASST_TEMPLATE}}}
-      const AZURE_OPENAI_CHAT_DEPLOYMENT = {__process_env_or_import_meta_env}.AZURE_OPENAI_CHAT_DEPLOYMENT ?? "<insert your Azure OpenAI chat deployment name here>";
-      {{endif}}
-      const AZURE_OPENAI_ENDPOINT = {__process_env_or_import_meta_env}.AZURE_OPENAI_ENDPOINT ?? "<insert your Azure OpenAI endpoint here>";
-      {{if {_IS_OPENAI_ASST_TEMPLATE}}}
-      const AZURE_OPENAI_BASE_URL = `${AZURE_OPENAI_ENDPOINT.replace(/\/+$/, '')}/openai`;
-      {{else}}
-      const AZURE_OPENAI_BASE_URL = `${AZURE_OPENAI_ENDPOINT.replace(/\/+$/, '')}/openai/deployments/${AZURE_OPENAI_CHAT_DEPLOYMENT}`;
+    const AZURE_OPENAI_API_KEY = {__process_env_or_import_meta_env}.AZURE_OPENAI_API_KEY ?? "<insert your Azure OpenAI API key here>";
+    {{else if {_IS_BROWSER_TEMPLATE}}}
+    const AZURE_CLIENT_ID = {__process_env_or_import_meta_env}.AZURE_CLIENT_ID ?? null;
+    const AZURE_TENANT_ID = {__process_env_or_import_meta_env}.AZURE_TENANT_ID ?? null;
+    {{endif}}
+    const AZURE_OPENAI_API_VERSION = {__process_env_or_import_meta_env}.AZURE_OPENAI_API_VERSION ?? "<insert your Azure OpenAI API version here>";
+    {{if !{_IS_OPENAI_ASST_TEMPLATE}}}
+    const AZURE_OPENAI_CHAT_DEPLOYMENT = {__process_env_or_import_meta_env}.AZURE_OPENAI_CHAT_DEPLOYMENT ?? "<insert your Azure OpenAI chat deployment name here>";
+    {{endif}}
+    const AZURE_OPENAI_ENDPOINT = {__process_env_or_import_meta_env}.AZURE_OPENAI_ENDPOINT ?? "<insert your Azure OpenAI endpoint here>";
+    {{if {_IS_OPENAI_ASST_TEMPLATE}}}
+    const AZURE_OPENAI_BASE_URL = `${AZURE_OPENAI_ENDPOINT.replace(/\/+$/, '')}/openai`;
+    {{else}}
+    const AZURE_OPENAI_BASE_URL = `${AZURE_OPENAI_ENDPOINT.replace(/\/+$/, '')}/openai/deployments/${AZURE_OPENAI_CHAT_DEPLOYMENT}`;
     {{endif}}
   {{endif}}
 {{endif}}
@@ -38,6 +38,11 @@
   const OPENAI_ORG_ID = {__process_env_or_import_meta_env}.OPENAI_ORG_ID ?? null;
 {{endif}}
 
+{{if {_IS_AUTHOR_COMMENT} }}
+// For some Learn docs and snippets, error handling or additional checks are excluded to keep
+// the code scoped and focused on the main concept being showcased.
+{{endif}}
+{{if !{_IS_LEARN_DOC_TEMPLATE}}}
 // Check if the required environment variables are set
 {{if {_USE_OPENAI_CLOUD_AZURE}}}
   const azureOk = 
@@ -204,3 +209,4 @@
     process.exit(1);
 {{endif}}
   }
+{{endif}}

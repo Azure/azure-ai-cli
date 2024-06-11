@@ -14,28 +14,50 @@
 {{if {_USE_OPENAI_CLOUD_AZURE} && {_USE_OPENAI_CLOUD_OPENAI}}}
   {{set _USE_OPENAI_CLOUD_EITHER=true}}
 {{endif}}
-{{if {_USE_OPENAI_CLOUD_OPENAI} || {_USE_AZURE_OPENAI_WITH_KEY}}}
+{{if !{_IS_LEARN_DOC_TEMPLATE}}}
+  // What's the system prompt?
+  const AZURE_OPENAI_SYSTEM_PROMPT = process.env.AZURE_OPENAI_SYSTEM_PROMPT ?? "You are a helpful AI assistant.";
+
+  {{if {_USE_OPENAI_CLOUD_OPENAI} || {_USE_AZURE_OPENAI_WITH_KEY}}}
   // NOTE: Never deploy your API Key in client-side environments like browsers or mobile apps
   // SEE: https://help.openai.com/en/articles/5112595-best-practices-for-api-key-safety
-
+  {{endif}}
 {{endif}}
 
 {{@include openai.js/environment.vars.js}}
 
+{{if {_IS_AUTHOR_COMMENT} }}
+// For some Learn docs and snippets, error handling or additional helpers are excluded to keep
+// the code scoped and focused on the main concept being showcased.
+{{endif}}
+{{if !{_IS_LEARN_DOC_TEMPLATE}}}
+
 {{if {_USE_OPENAI_CLOUD_AZURE}}}
   {{if {_USE_OPENAI_CLOUD_OPENAI}}}
-  // Create the OpenAI client
+    {{if {_IS_LEARN_DOC_TEMPLATE}}}
+  const client = new AzureOpenAI({ endpoint, apiKey, apiVersion, deployment });
+  const result = await client.chat.completions.create({
+    messages: [
+    { role: "system", content: "You are a helpful assistant." },
+    { role: "user", content: "Does Azure OpenAI support customer managed keys?" },
+    { role: "assistant", content: "Yes, customer managed keys are supported by Azure OpenAI?" },
+    { role: "user", content: "Do other Azure AI services support this too?" },
+    ],
+    model: "",
+  });
+    {{else}}
+  // Create the AzureOpenAI client
   console.log(azureOk
     ? 'Using Azure OpenAI (w/ API Key)...'
     : 'Using OpenAI...');
-  const openai = !azureOk
-    ? new OpenAI({
+  const client = !azureOk
+    ? new AzureOpenAI({
         apiKey: OPENAI_API_KEY,
         {{if {_IS_BROWSER_TEMPLATE}}}
         dangerouslyAllowBrowser: true
         {{endif}}
       })
-    : new OpenAI({
+    : new AzureOpenAI({
         apiKey: AZURE_OPENAI_API_KEY,
         baseURL: AZURE_OPENAI_BASE_URL,
         defaultQuery: { 'api-version': AZURE_OPENAI_API_VERSION },
@@ -44,10 +66,11 @@
         dangerouslyAllowBrowser: true
         {{endif}}
       });
+    {{endif}}
   {{else if {_USE_AZURE_OPENAI_WITH_KEY}}}
-  // Create the OpenAI client
+  // Create the AzureOpenAI client
   console.log('Using Azure OpenAI (w/ API Key)...');
-  const openai = new OpenAI({
+  const client = new AzureOpenAI({
     apiKey: AZURE_OPENAI_API_KEY,
     baseURL: AZURE_OPENAI_BASE_URL,
     defaultQuery: { 'api-version': AZURE_OPENAI_API_VERSION },
@@ -77,9 +100,9 @@
     throw error;  
   }
 
-  // Create the OpenAI client
+  // Create the AzureOpenAI client
   console.log('Using Azure OpenAI (w/ AAD)...');
-  const openai = new OpenAI({
+  const client = new AzureOpenAI({
     apiKey: '',
     baseURL: AZURE_OPENAI_BASE_URL,
     defaultQuery: { 'api-version': AZURE_OPENAI_API_VERSION },
@@ -99,4 +122,17 @@
     dangerouslyAllowBrowser: true
     {{endif}}
   });
+{{endif}}
+
+{{if {_IS_AUTHOR_COMMENT} }}
+// For some Learn docs and snippets, error handling or additional helpers are excluded to keep
+// the code scoped and focused on the main concept being showcased.
+{{endif}}
+{{if !{_IS_LEARN_DOC_TEMPLATE}}}
+  // Create the streaming chat completions helper
+  {{if contains(toupper("{OPENAI_CLOUD}"), "AZURE")}}
+  const chat = new {ClassName}(AZURE_OPENAI_CHAT_DEPLOYMENT, AZURE_OPENAI_SYSTEM_PROMPT, client);
+  {{else}}
+  const chat = new {ClassName}(OPENAI_MODEL_NAME, AZURE_OPENAI_SYSTEM_PROMPT, openai);
+  {{endif}}
 {{endif}}
