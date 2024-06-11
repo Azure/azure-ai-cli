@@ -26,7 +26,7 @@
 {{@include openai.js/environment.vars.js}}
 {{if {_USE_OPENAI_CLOUD_AZURE}}}
   {{if {_IS_LEARN_DOC_TEMPLATE}}}
-  {{if {_IS_AUTHOR_COMMENT} }}
+  {{if {_TEMPLATE_AUTHOR_COMMENT} }}
   // There's likely opportunity to further reduce here and force more overlap across
   // all of our samples. For the time being, keeping this unique/separate for the initial
   // pitch to showcase the integration with Learn docs.
@@ -121,7 +121,7 @@
   });
 {{endif}}
 
-{{if {_IS_AUTHOR_COMMENT} }}
+{{if {_TEMPLATE_AUTHOR_COMMENT} }}
 // For some Learn docs and snippets, error handling or additional helpers are excluded to keep
 // the code scoped and focused on the main concept being showcased.
 {{endif}}

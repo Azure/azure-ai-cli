@@ -27,7 +27,7 @@
   const OPENAI_ORG_ID = {__process_env_or_import_meta_env}.OPENAI_ORG_ID ?? null;
 {{endif}}
 
-{{if {_IS_AUTHOR_COMMENT} }}
+{{if {_TEMPLATE_AUTHOR_COMMENT} }}
 // For some Learn docs and snippets, error handling or additional checks are excluded to keep
 // the code scoped and focused on the main concept being showcased.
 {{endif}}

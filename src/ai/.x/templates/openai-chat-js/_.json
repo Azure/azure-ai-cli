@@ -12,6 +12,6 @@
   "__process_env_or_import_meta_env": "process.env",
   "_IS_OPENAI_ASST_TEMPLATE": "false",
   "_IS_LEARN_DOC_TEMPLATE": "false",
-  "_IS_AUTHOR_COMMENT": "false",
+  "_TEMPLATE_AUTHOR_COMMENT": "false",
   "_IS_STUDIO_VIEW_CODE_TEMPLATE": "false"
 }
