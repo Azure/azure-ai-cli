@@ -23,18 +23,9 @@
   // SEE: https://help.openai.com/en/articles/5112595-best-practices-for-api-key-safety
   {{endif}}
 {{endif}}
-
 {{@include openai.js/environment.vars.js}}
-
-{{if {_IS_AUTHOR_COMMENT} }}
-// For some Learn docs and snippets, error handling or additional helpers are excluded to keep
-// the code scoped and focused on the main concept being showcased.
-{{endif}}
-{{if !{_IS_LEARN_DOC_TEMPLATE}}}
-
 {{if {_USE_OPENAI_CLOUD_AZURE}}}
-  {{if {_USE_OPENAI_CLOUD_OPENAI}}}
-    {{if {_IS_LEARN_DOC_TEMPLATE}}}
+  {{if {_IS_LEARN_DOC_TEMPLATE}}}
   const client = new AzureOpenAI({ endpoint, apiKey, apiVersion, deployment });
   const result = await client.chat.completions.create({
     messages: [
@@ -45,7 +36,8 @@
     ],
     model: "",
   });
-    {{else}}
+  {{else}}
+  {{if {_USE_OPENAI_CLOUD_OPENAI}}}
   // Create the AzureOpenAI client
   console.log(azureOk
     ? 'Using Azure OpenAI (w/ API Key)...'
@@ -66,7 +58,6 @@
         dangerouslyAllowBrowser: true
         {{endif}}
       });
-    {{endif}}
   {{else if {_USE_AZURE_OPENAI_WITH_KEY}}}
   // Create the AzureOpenAI client
   console.log('Using Azure OpenAI (w/ API Key)...');
@@ -111,6 +102,7 @@
     dangerouslyAllowBrowser: true
     {{endif}}
   });
+  {{endif}}
   {{endif}}
 {{else}}
   // Create the OpenAI client
