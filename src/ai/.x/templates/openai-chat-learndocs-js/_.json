@@ -1,6 +1,6 @@
 {
-  "_LongName": "OpenAI Chat Completions",
-  "_ShortName": "openai-chat",
+  "_LongName": "OpenAI Chat Completions quickstart docs",
+  "_ShortName": "openai-chat-learndocs",
   "_Language": "JavaScript",
 
   "ClassName": "OpenAIChatCompletionsClass",
@@ -12,7 +12,5 @@
   "__process_env_or_import_meta_env": "process.env",
   "_IS_OPENAI_ASST_TEMPLATE": "false",
   "_IS_STUDIO_VIEW_CODE_TEMPLATE": "false",
-  "_IS_LEARN_DOC_TEMPLATE": "true",
-  "_IS_AUTHOR_COMMENT": "false",
-  "_IS_ENTRA_ID": "false"
+  "_IS_LEARN_DOC_TEMPLATE": "true"
 }
