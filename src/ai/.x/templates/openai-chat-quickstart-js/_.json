@@ -9,5 +9,4 @@
 
   "_IS_BROWSER_TEMPLATE": "false",
   "_IMPORT_EXPORT_USING_ES6": "false",
-  "__process_env_or_import_meta_env": "process.env",
-}
+  "__process_env_or_import_meta_env": "process.env"
