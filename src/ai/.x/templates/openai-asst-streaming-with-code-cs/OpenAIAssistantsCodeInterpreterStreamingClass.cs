@@ -8,11 +8,11 @@ using OpenAI.Chat;
 
 #pragma warning disable OPENAI001 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
 
-public class OpenAIAssistantsStreamingClass
+public class OpenAIAssistantsCodeInterpreterStreamingClass
 {
     public AssistantThread? Thread;
 
-    public OpenAIAssistantsStreamingClass(OpenAIClient client, string assistantId)
+    public OpenAIAssistantsCodeInterpreterStreamingClass(OpenAIClient client, string assistantId)
     {
         _client = client.GetAssistantClient();
         _assistantId = assistantId;
@@ -51,6 +51,14 @@ public class OpenAIAssistantsStreamingClass
             if (update is MessageContentUpdate contentUpdate)
             {
                 callback(contentUpdate.Text);
+            }
+            else if (update is RunStepDetailsUpdate runStepDetailsUpdate)
+            {
+                var input = runStepDetailsUpdate.CodeInterpreterInput;
+                if (input != null)
+                {
+                    callback(input);
+                }
             }
 
             if (update.UpdateKind == StreamingUpdateReason.RunStepCompleted)

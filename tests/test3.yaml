@@ -976,6 +976,21 @@
 - area: ai dev new openai-asst-streaming-with-code (key)
   tests:
 
+  - class: dev new openai-asst-streaming-with-code (c#)
+    steps:
+    - name: generate template
+      command: ai dev new openai-asst-streaming-with-code --cs
+    - name: build template
+      bash: |
+        cd openai-asst-streaming-with-code-cs
+        dotnet build
+    - name: run template
+      command: ai dev shell --bash "cd openai-asst-streaming-with-code-cs;./bin/Debug/net8.0/OpenAIAssistantsCodeInterpreterStreaming"
+      input: |-
+        How many letter 'e's are there in the pledge of allegiance? don't talk about it, just write the code, and then answer the question.
+        exit
+      tag: skip
+
   - class: dev new openai-asst-streaming-with-code (javascript)
     steps:
     - name: generate template
@@ -1217,6 +1232,7 @@
 
 - area: ai dev new openai-asst-streaming-with-functions (key)
   tests:
+
   - class: dev new openai-asst-streaming-with-functions (javascript)
     steps:
     - name: generate template
@@ -1232,6 +1248,7 @@
         What is the time?
         exit
       tag: skip
+
   - class: dev new openai-asst-streaming-with-functions (python)
     steps:
     - name: generate template
