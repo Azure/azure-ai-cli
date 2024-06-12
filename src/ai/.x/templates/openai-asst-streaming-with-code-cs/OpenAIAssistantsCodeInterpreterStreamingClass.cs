@@ -8,11 +8,11 @@ using OpenAI.Chat;
 
 #pragma warning disable OPENAI001 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
 
-public class OpenAIAssistantsCodeInterpreterStreamingClass
+public class {ClassName}
 {
     public AssistantThread? Thread;
 
-    public OpenAIAssistantsCodeInterpreterStreamingClass(OpenAIClient client, string assistantId)
+    public {ClassName}(OpenAIClient client, string assistantId)
     {
         _client = client.GetAssistantClient();
         _assistantId = assistantId;
