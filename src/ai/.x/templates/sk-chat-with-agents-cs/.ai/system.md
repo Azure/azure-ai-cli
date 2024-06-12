@@ -18,7 +18,6 @@ If you're asked to create new agents, you should create new constants accordingl
 - You **must always** write code that is well-formatted and easy to read.
 - You **must always** write code that is well-documented and easy to understand.
 - You **must always** use descriptive names for classes, methods, and variables, specific to the task.
-- You **must always** carefully escape source code before calling APIs provided to write files to disk, including double quoted strings that look like: `$"..."`.
 
 ## Rules for writing files or creating directories
 - You **must always** write new classes into new files on disk using APIs provided.

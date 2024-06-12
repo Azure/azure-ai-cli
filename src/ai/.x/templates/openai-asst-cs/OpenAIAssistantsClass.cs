@@ -1,5 +1,5 @@
 using System;
-using System.Threading.Tasks;
+using System.Threading;
 using Azure.AI.OpenAI;
 using Azure.AI.OpenAI.Chat;
 using OpenAI;
@@ -8,11 +8,11 @@ using OpenAI.Chat;
 
 #pragma warning disable OPENAI001 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
 
-public class OpenAIAssistantsStreamingClass
+public class OpenAIAssistantsClass
 {
     public AssistantThread? Thread;
 
-    public OpenAIAssistantsStreamingClass(OpenAIClient client, string assistantId)
+    public OpenAIAssistantsClass(OpenAIClient client, string assistantId)
     {
         _client = client.GetAssistantClient();
         _assistantId = assistantId;
@@ -40,19 +40,31 @@ public class OpenAIAssistantsStreamingClass
         }
     }
 
-    public async Task GetResponseAsync(string userInput, Action<string> callback)
+    public async Task<string> GetResponseAsync(string userInput)
     {
         await _client.CreateMessageAsync(Thread, [ userInput ]);
         var assistant = await _client.GetAssistantAsync(_assistantId);
-        var stream = _client.CreateRunStreamingAsync(Thread, assistant.Value);
 
-        await foreach (var update in stream) 
+        var result = await _client.CreateRunAsync(Thread, assistant);
+        var run = result.Value;
+
+        while (!run.Status.IsTerminal)
         {
-            if (update is MessageContentUpdate contentUpdate)
+            System.Threading.Thread.Sleep(TimeSpan.FromMilliseconds(100));
+            result = _client.GetRun(run.ThreadId, run.Id);
+            run = result.Value;
+        }
+
+        await foreach (var message in _client.GetMessagesAsync(run.ThreadId, ListOrder.NewestFirst))
+        {
+            if (message.Role == MessageRole.Assistant)
             {
-                callback(contentUpdate.Text);
+                var content = string.Join("", message.Content.Select(c => c.Text));
+                return content;
             }
         }
+
+        return string.Empty;
     }
 
     private readonly string _assistantId;
