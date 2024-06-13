@@ -74,7 +74,10 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
 
             var @foreach = YamlTestProperties.Get(test, "foreach");
             var arguments = YamlTestProperties.Get(test, "arguments");
+
             var input = YamlTestProperties.Get(test, "input");
+            if (input != null && input.StartsWith('"') && input.EndsWith('"')) input = input[1..^1];
+
             var expectGpt = YamlTestProperties.Get(test, "expect");
             var expectRegex = YamlTestProperties.Get(test, "expect-regex");
             var notExpectRegex = YamlTestProperties.Get(test, "not-expect-regex");

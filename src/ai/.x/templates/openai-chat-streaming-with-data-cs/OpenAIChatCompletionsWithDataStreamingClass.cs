@@ -5,11 +5,16 @@
 
 using Azure;
 using Azure.AI.OpenAI;
+using Azure.AI.OpenAI.Chat;
 using Azure.Identity;
+using OpenAI;
+using OpenAI.Chat;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
+
+#pragma warning disable AOAI001 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
 
 public class {ClassName}
 {
@@ -18,51 +23,47 @@ public class {ClassName}
         _openAISystemPrompt = openAISystemPrompt;
 
         _client = string.IsNullOrEmpty(openAIAPIKey)
-            ? new OpenAIClient(new Uri(openAIEndpoint), new DefaultAzureCredential())
-            : new OpenAIClient(new Uri(openAIEndpoint), new AzureKeyCredential(openAIAPIKey));
+            ? new AzureOpenAIClient(new Uri(openAIEndpoint), new DefaultAzureCredential())
+            : new AzureOpenAIClient(new Uri(openAIEndpoint), new AzureKeyCredential(openAIAPIKey));
 
-        var extensionConfig = new AzureSearchChatExtensionConfiguration()
+        _chatClient = _client.GetChatClient(openAIChatDeploymentName);
+        _messages = new List<ChatMessage>();
+
+        _options = new();
+        _options.AddDataSource(new AzureSearchChatDataSource()
         {
-            Authentication = new OnYourDataApiKeyAuthenticationOptions(searchApiKey),
-            SearchEndpoint = new Uri(searchEndpoint),
+            Authentication = DataSourceAuthentication.FromApiKey(searchApiKey),
+            Endpoint = new Uri(searchEndpoint),
             IndexName = searchIndexName,
-            QueryType = AzureSearchQueryType.VectorSimpleHybrid, // Use VectorSimpleHybrid to get the best vector and keyword search query types.
-            VectorizationSource = new OnYourDataEndpointVectorizationSource(new Uri(embeddingsEndpoint), new OnYourDataApiKeyAuthenticationOptions(openAIAPIKey))
-        };
-        _options = new ChatCompletionsOptions()
-        {
-            DeploymentName = openAIChatDeploymentName,
-            AzureExtensionsOptions = new()
-            {
-                Extensions = { extensionConfig }
-            }
-        };
+            QueryType = DataSourceQueryType.VectorSimpleHybrid, // Use VectorSimpleHybrid to get the best vector and keyword search query types.
+            VectorizationSource = DataSourceVectorizer.FromEndpoint(new Uri(embeddingsEndpoint), DataSourceAuthentication.FromApiKey(openAIAPIKey))
+        });
 
         ClearConversation();
     }
 
     public void ClearConversation()
     {
-        _options.Messages.Clear();
-        _options.Messages.Add(new ChatRequestSystemMessage(_openAISystemPrompt));
+        _messages.Clear();
+        _messages.Add(ChatMessage.CreateSystemMessage(_openAISystemPrompt));
     }
 
-    public async Task<string> GetChatCompletionsStreamingAsync(string userPrompt, Action<StreamingChatCompletionsUpdate>? callback = null)
+    public async Task<string> GetChatCompletionsStreamingAsync(string userPrompt, Action<StreamingChatCompletionUpdate>? callback = null)
     {
-        _options.Messages.Add(new ChatRequestUserMessage(userPrompt));
+        _messages.Add(ChatMessage.CreateUserMessage(userPrompt));
 
         var responseContent = string.Empty;
-        var response = await _client.GetChatCompletionsStreamingAsync(_options);
-        await foreach (var update in response.EnumerateValues())
+        var response = _chatClient.CompleteChatStreamingAsync(_messages, _options);
+        await foreach (var update in response)
         {
-            var content = update.ContentUpdate;
-            if (update.FinishReason == CompletionsFinishReason.ContentFiltered)
+            var content = string.Join("", update.ContentUpdate
+                .Where(x => x.Kind == ChatMessageContentPartKind.Text)
+                .Select(x => x.Text)
+                .ToList());
+
+            if (update.FinishReason == ChatFinishReason.ContentFilter)
             {
                 content = $"{content}\nWARNING: Content filtered!";
-            }
-            else if (update.FinishReason == CompletionsFinishReason.TokenLimitReached)
-            {
-                content = $"{content}\nERROR: Exceeded token limit!";
             }
 
             if (string.IsNullOrEmpty(content)) continue;
@@ -71,11 +72,13 @@ public class {ClassName}
             if (callback != null) callback(update);
         }
 
-        _options.Messages.Add(new ChatRequestAssistantMessage(responseContent));
+        _messages.Add(ChatMessage.CreateAssistantMessage(responseContent));
         return responseContent;
     }
 
     private string _openAISystemPrompt;
-    private ChatCompletionsOptions _options;
+    private ChatCompletionOptions _options;
     private OpenAIClient _client;
+    private ChatClient _chatClient;
+    private List<ChatMessage> _messages;
 }

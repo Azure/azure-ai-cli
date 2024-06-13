@@ -703,6 +703,23 @@
 
 - area: ai dev new openai-asst (key)
   tests:
+
+  - class: dev new openai-asst (c#)
+    steps:
+    - name: generate template
+      command: ai dev new openai-asst --cs
+    - name: build template
+      bash: |
+        cd openai-asst-cs
+        dotnet build
+    - name: run template
+      command: ai dev shell --bash "cd openai-asst-cs;./bin/Debug/net8.0/OpenAIAssistants"
+      input: |-
+        Tell me a joke
+        Tell me another joke
+        exit
+      tag: skip
+        
   - class: dev new openai-asst (javascript)
     steps:
     - name: generate template
@@ -718,6 +735,7 @@
         Tell me another joke
         exit
       tag: skip
+
   - class: dev new openai-asst (python)
     steps:
     - name: generate template
@@ -821,6 +839,23 @@
 
 - area: ai dev new openai-asst-streaming (key)
   tests:
+
+  - class: dev new openai-asst-streaming (c#)
+    steps:
+    - name: generate template
+      command: ai dev new openai-asst-streaming --cs
+    - name: build template
+      bash: |
+        cd openai-asst-streaming-cs
+        dotnet build
+    - name: run template
+      command: ai dev shell --bash "cd openai-asst-streaming-cs;./bin/Debug/net8.0/OpenAIAssistantsStreaming"
+      input: |-
+        Tell me a joke
+        Tell me another joke
+        exit
+      tag: skip
+      
   - class: dev new openai-asst-streaming (javascript)
     steps:
     - name: generate template
@@ -836,6 +871,7 @@
         Tell me another joke
         exit
       tag: skip
+
   - class: dev new openai-asst-streaming (python)
     steps:
     - name: generate template
@@ -939,6 +975,21 @@
 
 - area: ai dev new openai-asst-streaming-with-code (key)
   tests:
+
+  - class: dev new openai-asst-streaming-with-code (c#)
+    steps:
+    - name: generate template
+      command: ai dev new openai-asst-streaming-with-code --cs
+    - name: build template
+      bash: |
+        cd openai-asst-streaming-with-code-cs
+        dotnet build
+    - name: run template
+      command: ai dev shell --bash "cd openai-asst-streaming-with-code-cs;./bin/Debug/net8.0/OpenAIAssistantsCodeInterpreterStreaming"
+      input: |-
+        How many letter 'e's are there in the pledge of allegiance? don't talk about it, just write the code, and then answer the question.
+        exit
+      tag: skip
 
   - class: dev new openai-asst-streaming-with-code (javascript)
     steps:
@@ -1057,6 +1108,22 @@
 
 - area: ai dev new openai-asst-streaming-with-file-search (key)
   tests:
+
+  - class: dev new openai-asst-streaming-with-file-search (c#)
+    steps:
+    - name: generate template
+      command: ai dev new openai-asst-streaming-with-file-search --cs
+    - name: build template
+      bash: |
+        cd openai-asst-streaming-with-file-search-cs
+        dotnet build
+    - name: run template
+      command: ai dev shell --bash "cd openai-asst-streaming-with-file-search-cs;./bin/Debug/net8.0/OpenAIAssistantsFileSearchStreaming"
+      input: |-
+        Tell me a joke
+        Tell me another joke
+        exit
+      tag: skip
 
   - class: dev new openai-asst-streaming-with-file-search (javascript)
     steps:
@@ -1181,6 +1248,23 @@
 
 - area: ai dev new openai-asst-streaming-with-functions (key)
   tests:
+
+  - class: dev new openai-asst-streaming-with-functions (c#)
+    steps:
+    - name: generate template
+      command: ai dev new openai-asst-streaming-with-functions --cs
+    - name: build template
+      bash: |
+        cd openai-asst-streaming-with-functions-cs
+        dotnet build
+    - name: run template
+      command: ai dev shell --bash "cd openai-asst-streaming-with-functions-cs;./bin/Debug/net8.0/OpenAIAssistantsFunctionsStreaming"
+      input: |-
+        What is the date?
+        What is the time?
+        exit
+      tag: skip
+
   - class: dev new openai-asst-streaming-with-functions (javascript)
     steps:
     - name: generate template
@@ -1196,6 +1280,7 @@
         What is the time?
         exit
       tag: skip
+
   - class: dev new openai-asst-streaming-with-functions (python)
     steps:
     - name: generate template
@@ -1392,6 +1477,7 @@
 
 - area: ai dev new openai-asst-webpage-with-functions (oai)
   tests:
+
   - class: dev new openai-asst-webpage-with-functions (javascript)
     steps:
     - name: generate template
@@ -1405,3 +1491,77 @@
         cd openai-asst-webpage-with-functions-js-oai
         ai dev new .env
         npm run build
+
+- area: ai dev new sk-chat-streaming (key)
+  tests:
+
+  - class: dev new sk-chat-streaming (c#)
+    steps:
+    - name: generate template
+      command: ai dev new sk-chat-streaming --cs
+    - name: build template
+      bash: |
+        cd sk-chat-streaming-cs
+        dotnet build
+    - name: run template
+      command: ai dev shell --bash "cd sk-chat-streaming-cs;./bin/Debug/net8.0/SemanticKernelChatCompletionsStreaming"
+      input: |-
+        Tell me a joke
+        Tell me another joke
+        exit
+      tag: skip
+
+- area: ai dev new sk-chat-streaming-with-data (key)
+  tests:
+
+  - class: dev new sk-chat-streaming-with-data (c#)
+    steps:
+    - name: generate template
+      command: ai dev new sk-chat-streaming-with-data --cs
+    - name: build template
+      bash: |
+        cd sk-chat-streaming-with-data-cs
+        dotnet build
+    - name: run template
+      command: ai dev shell --bash "cd sk-chat-streaming-with-data-cs;./bin/Debug/net8.0/SemanticKernelChatCompletionsDataStreaming"
+      input: |-
+        What parameter should i use to select my resources?
+        exit
+      tag: skip
+
+- area: ai dev new sk-chat-streaming-with-functions (key)
+  tests:
+  
+  - class: dev new sk-chat-streaming-with-functions (c#)
+    steps:
+    - name: generate template
+      command: ai dev new sk-chat-streaming-with-functions --cs
+    - name: build template
+      bash: |
+        cd sk-chat-streaming-with-functions-cs
+        dotnet build
+    - name: run template
+      command: ai dev shell --bash "cd sk-chat-streaming-with-functions-cs;./bin/Debug/net8.0/SemanticKernelChatCompletionsFunctionsStreaming"
+      input: |-
+        What is the date?
+        What is the time?
+        exit
+      tag: skip
+
+- area: ai dev new sk-chat-with-agents (key)
+  tests:
+
+  - class: dev new sk-chat-with-agents (c#)
+    steps:
+    - name: generate template
+      command: ai dev new sk-chat-with-agents --cs
+    - name: build template
+      bash: |
+        cd sk-chat-with-agents-cs
+        dotnet build
+    - name: run template
+      command: ai dev shell --bash "cd sk-chat-with-agents-cs;./bin/Debug/net8.0/SemanticKernelChatWithAgents"
+      input: |-
+        Eggs that are blue
+        exit
+      tag: skip

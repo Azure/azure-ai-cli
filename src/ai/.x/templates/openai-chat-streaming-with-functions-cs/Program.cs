@@ -3,6 +3,7 @@
 // Licensed under the MIT license. See LICENSE.md file in the project root for full license information.
 //
 
+using OpenAI.Chat;
 using System;
 
 public class Program
@@ -26,9 +27,13 @@ public class Program
             if (string.IsNullOrEmpty(userPrompt) || userPrompt == "exit") break;
 
             Console.Write("\nAssistant: ");
-            var response = await chat.GetChatCompletionsStreamingAsync(userPrompt, update =>
-                Console.Write(update.ContentUpdate)
-            );
+            var response = await chat.GetChatCompletionsStreamingAsync(userPrompt, update => {
+                var text = string.Join("", update.ContentUpdate
+                    .Where(x => x.Kind == ChatMessageContentPartKind.Text)
+                    .Select(x => x.Text)
+                    .ToList());
+                Console.Write(text);
+            });
             Console.WriteLine("\n");
         }
     }

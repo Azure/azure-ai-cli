@@ -4,6 +4,8 @@
 //
 
 using Azure;
+using OpenAI;
+using OpenAI.Chat;
 using Azure.AI.OpenAI;
 using Azure.Identity;
 using System;
@@ -15,33 +17,36 @@ public class {ClassName}
         _openAISystemPrompt = openAISystemPrompt;
 
         _client = string.IsNullOrEmpty(openAIAPIKey)
-            ? new OpenAIClient(new Uri(openAIEndpoint), new DefaultAzureCredential())
-            : new OpenAIClient(new Uri(openAIEndpoint), new AzureKeyCredential(openAIAPIKey));
-
-        _options = new ChatCompletionsOptions();
-        _options.DeploymentName = openAIChatDeploymentName;
+            ? new AzureOpenAIClient(new Uri(openAIEndpoint), new DefaultAzureCredential())
+            : new AzureOpenAIClient(new Uri(openAIEndpoint), new AzureKeyCredential(openAIAPIKey));
+        _chatClient = _client.GetChatClient(openAIChatDeploymentName);
+        _messages = new List<ChatMessage>();
 
         ClearConversation();
     }
 
     public void ClearConversation()
     {
-        _options.Messages.Clear();
-        _options.Messages.Add(new ChatRequestSystemMessage(_openAISystemPrompt));
+        _messages.Clear();
+        _messages.Add(ChatMessage.CreateSystemMessage(_openAISystemPrompt));
     }
 
     public string GetChatCompletion(string userPrompt)
     {
-        _options.Messages.Add(new ChatRequestUserMessage(userPrompt));
+        _messages.Add(ChatMessage.CreateUserMessage(userPrompt));
 
-        var response = _client.GetChatCompletions(_options);
-        var responseContent = response.Value.Choices[0].Message.Content;
+        var response = _chatClient.CompleteChat(_messages);
+        var responseText = string.Join("", response.Value.Content
+            .Where(x => x.Kind == ChatMessageContentPartKind.Text)
+            .Select(x => x.Text)
+            .ToList());
 
-        _options.Messages.Add(new ChatRequestAssistantMessage(responseContent));
-        return responseContent;
+        _messages.Add(ChatMessage.CreateAssistantMessage(responseText));
+        return responseText;
     }
 
     private string _openAISystemPrompt;
-    private ChatCompletionsOptions _options;
     private OpenAIClient _client;
+    private ChatClient _chatClient;
+    private List<ChatMessage> _messages;
 }

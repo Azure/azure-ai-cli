@@ -86,6 +86,11 @@ public class FunctionFactory
         return _functions.Values;
     }
 
+    public IEnumerable<ToolDefinition> GetToolDefinitions()
+    {
+        return GetChatTools().Select(x => ToolDefinition.CreateFunction(x.FunctionName, x.FunctionDescription, x.FunctionParameters));
+    }
+
     public bool TryCallFunction(string functionName, string functionArguments, out string? result)
     {
         result = null;

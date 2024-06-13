@@ -3,62 +3,93 @@
 // Licensed under the MIT license. See LICENSE.md file in the project root for full license information.
 //
 
-using Azure.AI.OpenAI;
+using OpenAI.Chat;
 using System;
 using System.Collections.Generic;
+using System.Text;
 
 public class FunctionCallContext
 {
-    private FunctionFactory _functionFactory;
-    private IList<ChatRequestMessage> _messages;
-    private string _functionName = "";
-    private string _functionArguments = "";
-
-    public FunctionCallContext(FunctionFactory functionFactory, IList<ChatRequestMessage> messages)
+    public FunctionCallContext(FunctionFactory functionFactory, IList<ChatMessage> messages)
     {
         _functionFactory = functionFactory;
         _messages = messages;
     }
 
     
-    public bool CheckForUpdate(StreamingChatCompletionsUpdate update)
+    public bool CheckForUpdate(StreamingChatCompletionUpdate streamingUpdate)
     {
         var updated = false;
 
-        var name = update?.FunctionName;
-        if (name != null)
+        foreach (var update in streamingUpdate.ToolCallUpdates)
         {
-            _functionName = name;
-            updated = true;
-        }
+            if (!string.IsNullOrEmpty(update.Id))
+            {
+                updated = true;
+                _indexToToolCallId[update.Index] = update.Id;
+            }
+            if (!string.IsNullOrEmpty(update.FunctionName))
+            {
+                updated = true;
+                _indexToFunctionName[update.Index] = update.FunctionName;
+            }
+            if (!string.IsNullOrEmpty(update.FunctionArgumentsUpdate))
+            {
+                updated = true;
 
-        var args = update?.FunctionArgumentsUpdate;
-        if (args != null)
-        {
-            _functionArguments += args;
-            updated = true;
+                var needToAdd = !_indexToArguments.ContainsKey(update.Index);
+                if (needToAdd) _indexToArguments[update.Index] = new StringBuilder();
+
+                _indexToArguments[update.Index].Append(update.FunctionArgumentsUpdate);
+            }
         }
 
         return updated;
     }
 
-    public string? TryCallFunction()
+    public bool TryCallFunctions(string content)
     {
-        var ok = _functionFactory.TryCallFunction(_functionName, _functionArguments, out var result);
-        if (!ok) return null;
+        if (_indexToArguments.Count == 0) return false;
 
-        Console.WriteLine($"\rassistant-function: {_functionName}({_functionArguments}) => {result}");
-        Console.Write("\nAssistant: ");
+        List<ChatToolCall> toolCalls = [];
+        foreach (var item in _indexToToolCallId)
+        {
+            toolCalls.Add(ChatToolCall.CreateFunctionToolCall(
+                item.Value,
+                _indexToFunctionName[item.Key],
+                _indexToArguments[item.Key].ToString()));
+        }
 
-        _messages.Add(new ChatRequestAssistantMessage("") { FunctionCall = new FunctionCall(_functionName, _functionArguments) });
-        _messages.Add(new ChatRequestFunctionMessage(_functionName, result));
+        _messages.Add(new AssistantChatMessage(toolCalls, content));
 
-        return result;
+        foreach (var toolCall in toolCalls)
+        {
+            var functionName = toolCall.FunctionName;
+            var functionArguments = toolCall.FunctionArguments;
+
+            var ok = _functionFactory.TryCallFunction(functionName, functionArguments, out var result);
+            if (!ok) return false;
+
+            Console.WriteLine($"\rassistant-function: {functionName}({functionArguments}) => {result}");
+            Console.Write("\nAssistant: ");
+
+            _messages.Add(ChatMessage.CreateToolChatMessage(toolCall.Id, result));
+        }
+
+        return true;
     }
 
     public void Clear()
     {
-        _functionName = "";
-        _functionArguments = "";
+        _indexToToolCallId.Clear();
+        _indexToFunctionName.Clear();
+        _indexToArguments.Clear();
     }
+
+    private FunctionFactory _functionFactory;
+    private IList<ChatMessage> _messages;
+
+    private Dictionary<int, string> _indexToToolCallId = [];
+    private Dictionary<int, string> _indexToFunctionName = [];
+    private Dictionary<int, StringBuilder> _indexToArguments = [];
 }
