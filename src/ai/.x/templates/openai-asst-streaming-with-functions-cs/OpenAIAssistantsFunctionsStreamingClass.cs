@@ -12,10 +12,17 @@ public class {ClassName}
 {
     public AssistantThread? Thread;
 
-    public {ClassName}(OpenAIClient client, string assistantId)
+    public {ClassName}(OpenAIClient client, string assistantId, FunctionFactory factory)
     {
         _assistantClient = client.GetAssistantClient();
         _assistantId = assistantId;
+        _functionFactory = factory;
+
+        _runOptions=  new RunCreationOptions();
+        foreach (var tool in _functionFactory.GetToolDefinitions())
+        {
+            _runOptions.ToolsOverride.Add(tool);
+        }
     }
 
     public async Task CreateThreadAsync()
@@ -44,22 +51,50 @@ public class {ClassName}
     {
         await _assistantClient.CreateMessageAsync(Thread, [ userInput ]);
         var assistant = await _assistantClient.GetAssistantAsync(_assistantId);
-        var stream = _assistantClient.CreateRunStreamingAsync(Thread, assistant.Value);
+        var stream = _assistantClient.CreateRunStreamingAsync(Thread, assistant.Value, _runOptions);
 
-        await foreach (var update in stream) 
+        ThreadRun? run = null;
+        List<ToolOutput> toolOutputs = [];
+        do
         {
-            if (update is MessageContentUpdate contentUpdate)
+            await foreach (var update in stream)
             {
-                callback(contentUpdate.Text);
+                // Console.Write($"{update.UpdateKind}\n\n");
+                if (update is MessageContentUpdate contentUpdate)
+                {
+                    callback(contentUpdate.Text);
+                }
+                else if (update is RunUpdate runUpdate)
+                {
+                    run = runUpdate;
+                }
+                else if (update is RequiredActionUpdate requiredActionUpdate)
+                {
+                    if (_functionFactory.TryCallFunction(requiredActionUpdate.FunctionName, requiredActionUpdate.FunctionArguments, out var result))
+                    {
+                        callback($"\rassistant-function: {requiredActionUpdate.FunctionName}({requiredActionUpdate.FunctionArguments}) => {result}\n");
+                        callback("\nAssistant: ");
+                        toolOutputs.Add(new ToolOutput(requiredActionUpdate.ToolCallId, result));
+                    }
+                }
+
+                if (run?.Status.IsTerminal == true)
+                {
+                    callback("\n\n");
+                }
             }
 
-            if (update.UpdateKind == StreamingUpdateReason.RunStepCompleted)
+            if (toolOutputs.Count > 0 && run != null)
             {
-                callback("\n\n");
+                stream = _assistantClient.SubmitToolOutputsToRunStreamingAsync(run, toolOutputs);
+                toolOutputs.Clear();
             }
         }
+        while (run?.Status.IsTerminal == false);
     }
 
     private readonly string _assistantId;
+    private FunctionFactory _functionFactory;
+    private RunCreationOptions _runOptions;
     private readonly AssistantClient _assistantClient;
 }

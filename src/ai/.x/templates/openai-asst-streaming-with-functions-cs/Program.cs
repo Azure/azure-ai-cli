@@ -36,7 +36,12 @@ class Program
             ? new AzureOpenAIClient(new Uri(openAIEndpoint), new DefaultAzureCredential())
             : new AzureOpenAIClient(new Uri(openAIEndpoint), new AzureKeyCredential(openAIAPIKey));
 
-        var assistant = new {ClassName}(client, assistantId);
+        // Register custom functions
+        var factory = new FunctionFactory();
+        factory.AddFunctions(typeof(OpenAIChatCompletionsCustomFunctions));
+
+        // Create the helper class
+        var assistant = new {ClassName}(client, assistantId, factory);
 
         // Create or retrieve thread
         if (string.IsNullOrEmpty(threadId))
