@@ -50,7 +50,19 @@ public class {ClassName}
         {
             if (update is MessageContentUpdate contentUpdate)
             {
-                callback(contentUpdate.Text);
+                var content = contentUpdate.Text;
+
+                var replace = contentUpdate.TextAnnotation?.TextToReplace;
+                var hasAnnotation = !string.IsNullOrEmpty(replace);
+                if (hasAnnotation)
+                {
+                    var fileId = contentUpdate.TextAnnotation!.InputFileId;
+                    content = !string.IsNullOrEmpty(content)
+                        ? content.Replace(replace!, $"({fileId}")
+                        : $"[{fileId}]\n";
+                }
+
+               callback(content);
             }
 
             if (update.UpdateKind == StreamingUpdateReason.RunStepCompleted)
