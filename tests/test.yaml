@@ -89,9 +89,9 @@
       ^Helper +Function +Class +Library +helper-functions +C# *\r?$\n
       ^OpenAI +Assistants +openai-asst +C#, +JavaScript, +Python *\r?$\n
       ^OpenAI +Assistants +\(Streaming\) +openai-asst-streaming +C#, +JavaScript, +Python *\r?$\n
-      ^OpenAI +Assistants +\(w/ +Code Interpreter\) +openai-asst-streaming-with-code +JavaScript, +Python *\r?$\n
-      ^OpenAI +Assistants +\(w/ +File Search\) +openai-asst-streaming-with-file-search +JavaScript, +Python *\r?$\n
-      ^OpenAI +Assistants +\(w/ +Functions\) +openai-asst-streaming-with-functions +JavaScript, +Python *\r?$\n
+      ^OpenAI +Assistants +\(w/ +Code Interpreter\) +openai-asst-streaming-with-code +C#, +JavaScript, +Python *\r?$\n
+      ^OpenAI +Assistants +\(w/ +File Search\) +openai-asst-streaming-with-file-search +C#, +JavaScript, +Python *\r?$\n
+      ^OpenAI +Assistants +\(w/ +Functions\) +openai-asst-streaming-with-functions +C#, +JavaScript, +Python *\r?$\n
       ^OpenAI +Assistants +Webpage +openai-asst-webpage +JavaScript, +TypeScript *\r?$\n
       ^OpenAI +Assistants +Webpage +\(w/ +Functions\) +openai-asst-webpage-with-functions +JavaScript *\r?$\n
       ^OpenAI +Chat +Completions +openai-chat +C#, +Go, +Java, +JavaScript, +Python *\r?$\n
