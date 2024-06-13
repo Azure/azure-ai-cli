@@ -14,25 +14,25 @@ public class {ClassName}
 
     public {ClassName}(OpenAIClient client, string assistantId)
     {
-        _client = client.GetAssistantClient();
+        _assistantClient = client.GetAssistantClient();
         _assistantId = assistantId;
     }
 
     public async Task CreateThreadAsync()
     {
-        var result = await _client.CreateThreadAsync();
+        var result = await _assistantClient.CreateThreadAsync();
         Thread = result.Value;
     }
 
     public async Task RetrieveThreadAsync(string threadId)
     {
-        var result = await _client.GetThreadAsync(threadId);
+        var result = await _assistantClient.GetThreadAsync(threadId);
         Thread = result.Value;
     }
 
     public async Task GetThreadMessagesAsync(Action<string, string> callback)
     {
-        await foreach (var message in _client.GetMessagesAsync(Thread, ListOrder.OldestFirst))
+        await foreach (var message in _assistantClient.GetMessagesAsync(Thread, ListOrder.OldestFirst))
         {
             var content = string.Join("", message.Content.Select(c => c.Text));
             var role = message.Role == MessageRole.User ? "user" : "assistant";
@@ -42,9 +42,9 @@ public class {ClassName}
 
     public async Task GetResponseAsync(string userInput, Action<string> callback)
     {
-        await _client.CreateMessageAsync(Thread, [ userInput ]);
-        var assistant = await _client.GetAssistantAsync(_assistantId);
-        var stream = _client.CreateRunStreamingAsync(Thread, assistant.Value);
+        await _assistantClient.CreateMessageAsync(Thread, [ userInput ]);
+        var assistant = await _assistantClient.GetAssistantAsync(_assistantId);
+        var stream = _assistantClient.CreateRunStreamingAsync(Thread, assistant.Value);
 
         await foreach (var update in stream) 
         {
@@ -61,5 +61,5 @@ public class {ClassName}
     }
 
     private readonly string _assistantId;
-    private readonly AssistantClient _client;
+    private readonly AssistantClient _assistantClient;
 }

@@ -14,25 +14,25 @@ public class OpenAIAssistantsClass
 
     public OpenAIAssistantsClass(OpenAIClient client, string assistantId)
     {
-        _client = client.GetAssistantClient();
+        _assistantClient = client.GetAssistantClient();
         _assistantId = assistantId;
     }
 
     public async Task CreateThreadAsync()
     {
-        var result = await _client.CreateThreadAsync();
+        var result = await _assistantClient.CreateThreadAsync();
         Thread = result.Value;
     }
 
     public async Task RetrieveThreadAsync(string threadId)
     {
-        var result = await _client.GetThreadAsync(threadId);
+        var result = await _assistantClient.GetThreadAsync(threadId);
         Thread = result.Value;
     }
 
     public async Task GetThreadMessagesAsync(Action<string, string> callback)
     {
-        await foreach (var message in _client.GetMessagesAsync(Thread, ListOrder.OldestFirst))
+        await foreach (var message in _assistantClient.GetMessagesAsync(Thread, ListOrder.OldestFirst))
         {
             var content = string.Join("", message.Content.Select(c => c.Text));
             var role = message.Role == MessageRole.User ? "user" : "assistant";
@@ -42,20 +42,20 @@ public class OpenAIAssistantsClass
 
     public async Task<string> GetResponseAsync(string userInput)
     {
-        await _client.CreateMessageAsync(Thread, [ userInput ]);
-        var assistant = await _client.GetAssistantAsync(_assistantId);
+        await _assistantClient.CreateMessageAsync(Thread, [ userInput ]);
+        var assistant = await _assistantClient.GetAssistantAsync(_assistantId);
 
-        var result = await _client.CreateRunAsync(Thread, assistant);
+        var result = await _assistantClient.CreateRunAsync(Thread, assistant);
         var run = result.Value;
 
         while (!run.Status.IsTerminal)
         {
             System.Threading.Thread.Sleep(TimeSpan.FromMilliseconds(100));
-            result = _client.GetRun(run.ThreadId, run.Id);
+            result = _assistantClient.GetRun(run.ThreadId, run.Id);
             run = result.Value;
         }
 
-        await foreach (var message in _client.GetMessagesAsync(run.ThreadId, ListOrder.NewestFirst))
+        await foreach (var message in _assistantClient.GetMessagesAsync(run.ThreadId, ListOrder.NewestFirst))
         {
             if (message.Role == MessageRole.Assistant)
             {
@@ -68,5 +68,5 @@ public class OpenAIAssistantsClass
     }
 
     private readonly string _assistantId;
-    private readonly AssistantClient _client;
+    private readonly AssistantClient _assistantClient;
 }
