@@ -61,6 +61,9 @@ namespace Azure.AI.Details.Common.CLI
             env.Add("OPENAI_MODEL_NAME", null);
             env.Add("OPENAI_ORG_ID", null);
 
+            env.Add("AZURE_AI_INFERENCE_CHAT_API_KEY", null);
+            env.Add("AZURE_AI_INFERENCE_CHAT_ENDPOINT", null);
+
             // For each key, if it's already in the environment, use that value instead
             foreach (var key in env.Keys.ToList())
             {
