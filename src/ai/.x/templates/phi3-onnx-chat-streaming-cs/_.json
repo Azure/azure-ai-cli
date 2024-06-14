@@ -1,0 +1,5 @@
+{
+  "_LongName": "Phi-3 Chat Completions (w/ ONNX)",
+  "_ShortName": "phi3-onnx-chat-streaming",
+  "_Language": "C#"
+}
