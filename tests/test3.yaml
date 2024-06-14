@@ -1565,3 +1565,39 @@
         Eggs that are blue
         exit
       tag: skip
+
+- area: ai dev new aml-chat-streaming (key)
+  tests:
+
+  - class: dev new aml-chat-streaming (python)
+    steps:
+    - name: generate template
+      command: ai dev new aml-chat-streaming --python
+    - name: install requirements
+      bash: |
+        cd aml-chat-streaming-py
+        if [ -f /etc/os-release ]; then
+          python3 -m venv env
+          source env/bin/activate
+        else
+          python -m venv env
+          source env/Scripts/activate
+        fi
+        pip install -r requirements.txt
+    - name: run template
+      command: ai dev shell
+      arguments:
+        bash: |
+          cd aml-chat-streaming-py
+          if [ -f /etc/os-release ]; then
+            source env/bin/activate
+            python main.py
+          else
+            source env/Scripts/activate
+            python main.py
+          fi
+      input: |-
+        Tell me a joke
+        Tell me another joke
+        exit
+      tag: skip
