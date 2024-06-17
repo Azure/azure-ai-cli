@@ -98,12 +98,12 @@ namespace Azure.AI.Details.Common.CLI
                 _values.AddThrowError("WARNING:", $"Requires blob container.");
             }
 
-            var aiServicesApiKey = AiServicesApiKeyToken.Data().Demand(_values, action, command, checkConfig: "services.key");
             var searchEndpoint = DemandSearchEndpointUri(action, command);
             var searchApiKey = DemandSearchApiKey(action, command);
             var embeddingsEndpoint = DemandEmbeddingsEndpointUri(action, command);
             var embeddingsApiKey = DemandEmbeddingsApiKey(action, command);
             var embeddingModelDeployment = SearchEmbeddingModelDeploymentNameToken.Data().Demand(_values, action, command, checkConfig: "embedding.model.deployment.name");
+            var embeddingModelName = SearchEmbeddingModelNameToken.Data().Demand(_values, action, command, checkConfig: "search.embedding.model.name");
             var dataSourceConnectionName = SearchIndexerDataSourceConnectionNameToken.Data().GetOrDefault(_values, $"{searchIndexName}-datasource");
             var skillsetName = SearchIndexerSkillsetNameToken.Data().GetOrDefault(_values, $"{searchIndexName}-skillset");
             var indexerName = SearchIndexerNameToken.Data().GetOrDefault(_values, $"{searchIndexName}-indexer");
@@ -112,7 +112,16 @@ namespace Azure.AI.Details.Common.CLI
             var contentFieldName = IndexContentFieldNameToken.Data().GetOrDefault(_values, "content");
             var vectorFieldName = IndexVectorFieldNameToken.Data().GetOrDefault(_values, "contentVector");
 
-            output = DoIndexUpdateWithAISearch(aiServicesApiKey, searchEndpoint, searchApiKey, embeddingsEndpoint, embeddingModelDeployment, embeddingsApiKey, searchIndexName, dataSourceConnectionName, blobContainer, pattern, skillsetName, indexerName, idFieldName, contentFieldName, vectorFieldName).Result;
+            var aiServicesApiKey = AiServicesApiKeyToken.Data().GetOrDefault(_values, FileHelpers.FileExistsInConfigPath("services.v1.key", _values)
+                ? File.ReadAllText(FileHelpers.FindFileInConfigPath("services.v1.key", _values))
+                : string.Empty);
+
+            if (embeddingsEndpoint.Contains("cognitiveservices.azure.com")) // AI Search checks for .openai.azure.com, so we need to replace cognitiveservices with openai
+            {
+                embeddingsEndpoint = embeddingsEndpoint.Replace(".cognitiveservices.azure.com/", ".openai.azure.com/");
+            }
+
+            output = DoIndexUpdateWithAISearch(aiServicesApiKey, searchEndpoint, searchApiKey, embeddingsEndpoint, embeddingModelDeployment, embeddingModelName, embeddingsApiKey, searchIndexName, dataSourceConnectionName, blobContainer, pattern, skillsetName, indexerName, idFieldName, contentFieldName, vectorFieldName).Result;
             if (!_quiet) Console.WriteLine($"{message} Done!\n");
 
             var fi = new FileInfo(ConfigSetHelpers.ConfigSet("search.index.name", searchIndexName));
@@ -121,14 +130,14 @@ namespace Azure.AI.Details.Common.CLI
             if (!string.IsNullOrEmpty(output)) Console.WriteLine(output);
         }
 
-        private async Task<string> DoIndexUpdateWithAISearch(string aiServicesApiKey, string searchEndpoint, string searchApiKey, string embeddingsEndpoint, string embeddingsDeployment, string embeddingsApiKey, string searchIndexName, string dataSourceConnectionName, string blobContainer, string pattern, string skillsetName, string indexerName, string idFieldName, string contentFieldName, string vectorFieldName)
+        private async Task<string> DoIndexUpdateWithAISearch(string aiServicesApiKey, string searchEndpoint, string searchApiKey, string embeddingsEndpoint, string embeddingsDeployment, string embeddingModelName, string embeddingsApiKey, string searchIndexName, string dataSourceConnectionName, string blobContainer, string pattern, string skillsetName, string indexerName, string idFieldName, string contentFieldName, string vectorFieldName)
         {
             var (connectionString, containerName) = await UploadFilesToBlobContainer(blobContainer, pattern);
 
             Console.WriteLine("Connecting to Search ...");
-            var datasourceIndex = PrepGetSearchIndex(embeddingsEndpoint, embeddingsDeployment, embeddingsApiKey, searchIndexName, idFieldName, contentFieldName, vectorFieldName);
+            var datasourceIndex = PrepGetSearchIndex(embeddingsEndpoint, embeddingsDeployment, embeddingModelName, embeddingsApiKey, searchIndexName, idFieldName, contentFieldName, vectorFieldName);
             var dataSource = PrepGetDataSourceConnection(dataSourceConnectionName, connectionString, containerName);
-            var skillset = PrepGetSkillset(skillsetName, aiServicesApiKey, embeddingsEndpoint, embeddingsDeployment, embeddingsApiKey, idFieldName, contentFieldName, vectorFieldName, datasourceIndex);
+            var skillset = PrepGetSkillset(skillsetName, aiServicesApiKey, embeddingsEndpoint, embeddingsDeployment, embeddingModelName, embeddingsApiKey, idFieldName, contentFieldName, vectorFieldName, datasourceIndex);
             var indexer = PrepGetIndexer(indexerName, datasourceIndex, dataSource, skillset);
 
             Uri endpoint = new Uri(searchEndpoint);
@@ -268,45 +277,50 @@ namespace Azure.AI.Details.Common.CLI
             return $"BlobEndpoint={endpoint};SharedAccessSignature={sasToken}";
         }
 
-        private static SearchIndex PrepGetSearchIndex(string embeddingsEndpoint, string embeddingsDeployment, string embeddingsApiKey, string searchIndexName, string idFieldName, string contentFieldName, string vectorFieldName)
+        private static SearchIndex PrepGetSearchIndex(string embeddingsEndpoint, string embeddingsDeployment, string embeddingModelName, string embeddingsApiKey, string searchIndexName, string idFieldName, string contentFieldName, string vectorFieldName)
         {
+            const string vectorSearchHnswProfile = "myVectorSearchProfile";
+            const string vectorSearchHnswConfig = "myHnsw";
+            const string vectorSearchVectorizer = "myOpenAIVectorizer";
+            const int modelDimensions = 1536;
+
             SearchIndex datasourceIndex = new(searchIndexName)
             {
                 Fields =
+                {
+                    new SearchableField("ChunkKey") { IsKey = true, AnalyzerName = LexicalAnalyzerName.Keyword },
+                    new SearchableField(idFieldName) { IsFilterable = true},
+                    new SearchableField(contentFieldName),
+                    new SearchField(vectorFieldName, SearchFieldDataType.Collection(SearchFieldDataType.Single))
                     {
-                        new SearchableField("ChunkKey") { IsKey = true, AnalyzerName = LexicalAnalyzerName.Keyword },
-                        new SearchableField(idFieldName) { IsFilterable = true},
-                        new SearchableField(contentFieldName),
-                        new SearchField(vectorFieldName, SearchFieldDataType.Collection(SearchFieldDataType.Single))
-                        {
-                            IsSearchable = true,
-                            VectorSearchDimensions = 1536,
-                            VectorSearchProfile = "vectorsearchprofile"
-                        }
-                    },
+                        IsSearchable = true,
+                        VectorSearchDimensions = modelDimensions,
+                        VectorSearchProfileName = vectorSearchHnswProfile
+                    }
+                },
                 VectorSearch = new()
                 {
                     Profiles =
                     {
-                        new VectorSearchProfile("vectorsearchprofile", "algoconfig")
+                        new VectorSearchProfile(vectorSearchHnswProfile, vectorSearchHnswConfig)
                         {
-                            Vectorizer = "myvectorizer"
+                            Vectorizer = vectorSearchVectorizer
                         }
                     },
                     Algorithms =
                     {
-                        new HnswVectorSearchAlgorithmConfiguration("algoconfig")
+                        new HnswAlgorithmConfiguration(vectorSearchHnswConfig)
                     },
                     Vectorizers =
                     {
-                        new AzureOpenAIVectorizer("myvectorizer")
+                        new AzureOpenAIVectorizer(vectorSearchVectorizer)
                         {
                             AzureOpenAIParameters = new AzureOpenAIParameters()
                             {
+                                ApiKey = embeddingsApiKey,
                                 DeploymentId = embeddingsDeployment,
+                                ModelName = embeddingModelName,
                                 ResourceUri = new Uri(embeddingsEndpoint),
-                                ApiKey = embeddingsApiKey
-                                //AuthIdentity = new SearchIndexerDataUserAssignedIdentity("randomuser"),
                             }
                         }
                     }
@@ -324,9 +338,12 @@ namespace Azure.AI.Details.Common.CLI
                     new SearchIndexerDataContainer(dataSourceContainerName));
         }
 
-        private static SearchIndexerSkillset PrepGetSkillset(string skillsetName, string aiServicesApiKey, string embeddingsEndpoint, string embeddingsDeployment, string embeddingsApiKey, string idFieldName, string contentFieldName, string vectorFieldName, SearchIndex datasourceIndex)
+        private static SearchIndexerSkillset PrepGetSkillset(string skillsetName, string aiServicesApiKey, string embeddingsEndpoint, string embeddingsDeployment, string embeddingsModelName, string embeddingsApiKey, string idFieldName, string contentFieldName, string vectorFieldName, SearchIndex datasourceIndex)
         {
-            var useOcr = true;
+            const int maximumPageLength = 2000;
+            const int pageOverlapLength = 500;
+
+            var useOcr = !string.IsNullOrEmpty(aiServicesApiKey);
 
             var ocrSkill = new OcrSkill(
                 new List<InputFieldMappingEntry> {
@@ -354,31 +371,36 @@ namespace Azure.AI.Details.Common.CLI
                 };
 
             var splitSkill = new SplitSkill(
-                new List<InputFieldMappingEntry> {
+                new List<InputFieldMappingEntry>
+                {
                     new InputFieldMappingEntry("text") { Source = useOcr ? "/document/mergedText" : "/document/content" }
                 },
                 new List<OutputFieldMappingEntry> {
                     new OutputFieldMappingEntry("textItems") { TargetName = "pages"}
-                }) {
+                })
+                {
                     DefaultLanguageCode = SplitSkillLanguage.En,
                     TextSplitMode = TextSplitMode.Pages,
-                    MaximumPageLength = 1000,
-                    PageOverlapLength = 100,
-                    Context = "/document"
+                    MaximumPageLength = maximumPageLength,
+                    PageOverlapLength = pageOverlapLength,
+                    Context = "/document",
                 };
 
             var azureOpenAIEmbeddingSkill = new AzureOpenAIEmbeddingSkill(
-                new List<InputFieldMappingEntry> {
+                new List<InputFieldMappingEntry>
+                {
                     new InputFieldMappingEntry("text") { Source = "/document/pages/*" }
                 },
-                new List<OutputFieldMappingEntry> {
+                new List<OutputFieldMappingEntry>
+                {
                     new OutputFieldMappingEntry("embedding") { TargetName = "vector" }
-                }) {
+                })
+                {
                     Context = "/document/pages/*",
                     ResourceUri = new Uri(embeddingsEndpoint),
                     ApiKey = embeddingsApiKey,
                     DeploymentId = embeddingsDeployment,
-                    //AuthIdentity = new SearchIndexerDataUserAssignedIdentity("randomuser")
+                    ModelName = embeddingsModelName,
                 };
 
             var skills = useOcr
@@ -386,26 +408,38 @@ namespace Azure.AI.Details.Common.CLI
                 : new List<SearchIndexerSkill> { splitSkill, azureOpenAIEmbeddingSkill };
 
             var indexProjections = new SearchIndexerIndexProjections(
-                new List<SearchIndexerIndexProjectionSelector> {
+                new List<SearchIndexerIndexProjectionSelector>
+                {
                     new SearchIndexerIndexProjectionSelector(
                         datasourceIndex.Name,
-                        idFieldName,
-                        "/document/pages/*",
-                        new List<InputFieldMappingEntry> {
-                            new InputFieldMappingEntry(contentFieldName) { Source = "/document/pages/*" },
-                            new InputFieldMappingEntry(vectorFieldName) { Source = "/document/pages/*/vector" }
-                })}) {
-                    Parameters = new SearchIndexerIndexProjectionsParameters() { ProjectionMode = IndexProjectionMode.SkipIndexingParentDocuments }
+                        parentKeyFieldName: idFieldName,
+                        sourceContext: "/document/pages/*",
+                        mappings: new List<InputFieldMappingEntry>
+                        {
+                            new InputFieldMappingEntry(contentFieldName)
+                            {
+                                Source = "/document/pages/*"
+                            },
+                            new InputFieldMappingEntry(vectorFieldName)
+                            {
+                                Source = "/document/pages/*/vector"
+                            }
+                        })
+                })
+                {
+                    Parameters = new SearchIndexerIndexProjectionsParameters()
+                    {
+                        ProjectionMode = IndexProjectionMode.SkipIndexingParentDocuments
+                    }
                 };
 
-            var skillset = !string.IsNullOrEmpty(aiServicesApiKey)
-                ? new SearchIndexerSkillset(skillsetName, skills) {
-                    CognitiveServicesAccount = new CognitiveServicesAccountKey(aiServicesApiKey),
-                    IndexProjections = indexProjections
-                }
-                : new SearchIndexerSkillset(skillsetName, skills) {
-                    IndexProjections = indexProjections
-                };
+            var skillset = new SearchIndexerSkillset(skillsetName, skills)
+            {
+                IndexProjections = indexProjections,
+                CognitiveServicesAccount = useOcr
+                    ? new CognitiveServicesAccountKey(aiServicesApiKey)
+                    : new DefaultCognitiveServicesAccount()
+            };
 
             return skillset;
         }

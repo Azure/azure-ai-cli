@@ -75,7 +75,7 @@ namespace Azure.AI.Details.Common.CLI
                 case "init.cognitiveservices": await DoInitRootCognitiveServicesCognitiveServicesKind(interactive); break;
 
                 case "init":
-                case "init.openai":
+                case "init.openai": await DoInitRootOpenAi(interactive, false, false, false, true, true, true); break;
                 case "init.openai.chat": await DoInitRootOpenAi(interactive, false, false, true, true, true, true); break;
                 case "init.openai.embeddings": await DoInitRootOpenAi(interactive, true, true, false, false, true, true); break;
                 case "init.openai.evaluations": await DoInitRootOpenAi(interactive, true, true, true, true, false, false); break;
@@ -620,6 +620,9 @@ namespace Azure.AI.Details.Common.CLI
             _values.Reset("services.region", resource.RegionLocation);
             _values.Reset("services.endpoint", resource.Endpoint);
             _values.Reset("services.key", resource.Key);
+            _values.Reset("services.v1.region", resource.RegionLocation);
+            _values.Reset("services.v1.endpoint", resource.Endpoint);
+            _values.Reset("services.v1.key", resource.Key);
             ResourceNameToken.Data().Set(_values, resource.Name);
             ResourceGroupNameToken.Data().Set(_values, resource.Group);
         }

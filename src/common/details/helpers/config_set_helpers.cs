@@ -80,6 +80,10 @@ namespace Azure.AI.Details.Common.CLI
                 ConfigSetLambda("@services.key", key, "Key (AIServices)", key.Substring(0, 4) + "****************************", ref maxLabelWidth),
                 ConfigSetLambda("@services.region", region, "Region (AIServices)", region, ref maxLabelWidth),
 
+                ConfigSetLambda("@services.v1.endpoint", endpoint, "Endpoint (AIServices v1)", endpoint, ref maxLabelWidth),
+                ConfigSetLambda("@services.v1.key", key, "Key (AIServices v1)", key.Substring(0, 4) + "****************************", ref maxLabelWidth),
+                ConfigSetLambda("@services.v1.region", region, "Region (AIServices v1)", region, ref maxLabelWidth),
+
                 ConfigSetLambda("@speech.endpoint", endpoint, "Endpoint (speech)", endpoint, ref maxLabelWidth),
                 ConfigSetLambda("@speech.key", key, "Key (speech)", key.Substring(0, 4) + "****************************", ref maxLabelWidth),
                 ConfigSetLambda("@speech.region", region, "Region (speech)", region, ref maxLabelWidth),
