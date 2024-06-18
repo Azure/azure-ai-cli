@@ -606,7 +606,7 @@ namespace Azure.AI.Details.Common.CLI
                     ? CreateFunctionFactoryForCustomFunctions(customFunctions)
                     : useBuiltInFunctions
                         ? CreateFunctionFactoryWithBuiltinFunctions()
-            : CreateFunctionFactoryWithNoFunctions();
+                        : CreateFunctionFactoryWithNoFunctions();
 
             foreach (var tool in factory.GetChatTools())
             {
