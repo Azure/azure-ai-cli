@@ -1,0 +1,15 @@
+- area: ai dev new openai-chat-quickstart-js (key)
+  tests:
+
+  - class: dev new openai-chat-quickstart (javascript)
+    steps:
+    - name: generate template
+      command: ai dev new openai-chat-quickstart --javascript
+    - name: install dependencies
+      bash: |
+        cd openai-chat-quickstart-js
+        npm install
+    - name: run template
+      command: ai dev shell --bash "cd openai-chat-quickstart-js;node Main.js"
+      expect: |
+        The output should have positive confirmation that other Azure AI services support managed keys.
