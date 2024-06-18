@@ -92,7 +92,7 @@ namespace Azure.AI.Details.Common.CLI
                     SearchEmbeddingModelDeploymentNameToken.Parser(),
                     SearchEmbeddingModelNameToken.Parser(),
 
-                    new NamedValueTokenParser(null, "chat.assistant.id", "111", "1"),
+                    new NamedValueTokenParser(null, "chat.assistant.id", "011", "1"),
                     new NamedValueTokenParser(null, "chat.assistant.file.id", "0011", "1"),
 
                     new NamedValueTokenParser(null,             "service.config.search.api.key", "00101", "1"),
