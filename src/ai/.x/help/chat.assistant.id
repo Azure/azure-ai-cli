@@ -1,0 +1,15 @@
+CHAT ASSISTANT ID
+
+  The `--assistant-id` option allows you to specify an assistant ID
+  acquired via `ai chat assistant create` or `ai chat assistant list`.
+
+USAGE: ai chat --assistant-id ASSISTANT_ID
+   OR: ai chat --assistant-id @FILE
+
+WHERE: ASSISTANT_ID is the ID of the assistant you wish to use.
+   OR: @FILE is a file containing the assistant ID.
+
+SEE ALSO
+
+  ai help chat assistant create
+  ai help chat assistant list

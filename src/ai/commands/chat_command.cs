@@ -23,8 +23,10 @@ using OpenAI;
 using OpenAI.Chat;
 using System.ClientModel;
 using Azure.AI.OpenAI.Chat;
+using OpenAI.Assistants;
 
 #pragma warning disable AOAI001 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
+#pragma warning disable OPENAI001 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
 
 namespace Azure.AI.Details.Common.CLI
 {
@@ -93,13 +95,13 @@ namespace Azure.AI.Details.Common.CLI
             }
             else
             {
-                ChatNonInteractively();
+                ChatNonInteractively().Wait();
             }
         }
 
         private async Task ChatInteractively()
         {
-            var chatTextHandler = GetChatTextHandler(interactive: true);
+            var chatTextHandler = await GetChatTextHandlerAsync(interactive: true);
 
             var speechInput = _values.GetOrDefault("chat.speech.input", false);
             var userPrompt = _values["chat.message.user.prompt"];
@@ -139,9 +141,9 @@ namespace Azure.AI.Details.Common.CLI
             Console.ResetColor();
         }
 
-        private void ChatNonInteractively()
+        private async Task ChatNonInteractively()
         {
-            var chatTextHandler = GetChatTextHandler(interactive: false);
+            var chatTextHandler = await GetChatTextHandlerAsync(interactive: false);
 
             var userPrompt = _values["chat.message.user.prompt"];
             if (string.IsNullOrEmpty(userPrompt))
@@ -164,16 +166,48 @@ namespace Azure.AI.Details.Common.CLI
             Console.ResetColor();
         }
 
-        private Func<string, Task> GetChatTextHandler(bool interactive)
+        private async Task<Func<string, Task>> GetChatTextHandlerAsync(bool interactive)
         {
             var parameterFile = InputChatParameterFileToken.Data().GetOrDefault(_values);
             if (!string.IsNullOrEmpty(parameterFile)) SetValuesFromParameterFile(parameterFile);
 
+            var assistantId = _values["chat.assistant.id"];
+            var assistantIdOk = !string.IsNullOrEmpty(assistantId);
+
+            return assistantIdOk
+                ? await GetAssistantsAPITextHandlerAsync(interactive, assistantId)
+                : GetChatCompletionsTextHandler(interactive);
+        }
+
+        private async Task<Func<string, Task>> GetAssistantsAPITextHandlerAsync(bool interactive, string assistantId)
+        {
+            var threadId = _values.GetOrDefault("chat.thread.id", null);
+
+            var client = CreateAssistantClient();
+            var thread = await CreateOrGetAssistantThread(client, threadId);
+
+            var options = new RunCreationOptions();
+            var factory = CreateFunctionFactoryWithRunOptions(options);
+
+            return async (string text) =>
+            {
+                if (interactive && text.ToLower() == "reset")
+                {
+                    // ClearMessageHistory(messages);
+                    return;
+                }
+
+                await GetAssistantsAPIResponseAsync(client, assistantId, thread, options, factory, text);
+            };
+        }
+
+        private Func<string, Task> GetChatCompletionsTextHandler(bool interactive)
+        {
             var client = CreateOpenAIClient(out var deployment);
             var chatClient = client.GetChatClient(deployment);
 
             var options = CreateChatCompletionOptions(out var messages);
-            var funcContext = CreateFunctionFactoryAndCallContext(messages, options);
+            var funcContext = CreateChatCompletionsFunctionFactoryAndCallContext(messages, options);
 
             return async (string text) =>
             {
@@ -311,6 +345,8 @@ namespace Azure.AI.Details.Common.CLI
 
         private void DisplayAssistantPromptTextStreaming(string text)
         {
+            if (string.IsNullOrEmpty(text)) return;
+
             // do "tab" indentation when not quiet
             Console.Write(!_quiet
                 ? text.Replace("\n", "\n           ")
@@ -337,6 +373,54 @@ namespace Azure.AI.Details.Common.CLI
             }
         }
 
+        public async Task GetAssistantsAPIResponseAsync(AssistantClient assistantClient, string assistantId, AssistantThread thread, RunCreationOptions options, HelperFunctionFactory factory, string userInput)
+        {
+            await assistantClient.CreateMessageAsync(thread, [ userInput ]);
+
+            DisplayAssistantPromptLabel();
+
+            var assistant = await assistantClient.GetAssistantAsync(assistantId);
+            var stream = assistantClient.CreateRunStreamingAsync(thread, assistant.Value, options);
+
+            ThreadRun? run = null;
+            List<ToolOutput> toolOutputs = [];
+            do
+            {
+                await foreach (var update in stream)
+                {
+                    if (update is MessageContentUpdate contentUpdate)
+                    {
+                        DisplayAssistantPromptTextStreaming(contentUpdate.Text);
+                    }
+                    else if (update is RunUpdate runUpdate)
+                    {
+                        run = runUpdate;
+                    }
+                    else if (update is RequiredActionUpdate requiredActionUpdate)
+                    {
+                        if (factory.TryCallFunction(requiredActionUpdate.FunctionName, requiredActionUpdate.FunctionArguments, out var result))
+                        {
+                            DisplayAssistantFunctionCall(requiredActionUpdate.FunctionName, requiredActionUpdate.FunctionArguments, result);
+                            DisplayAssistantPromptLabel();
+                            toolOutputs.Add(new ToolOutput(requiredActionUpdate.ToolCallId, result));
+                        }
+                    }
+
+                    if (run?.Status.IsTerminal == true)
+                    {
+                        DisplayAssistantPromptTextStreamingDone();
+                    }
+                }
+
+                if (toolOutputs.Count > 0 && run != null)
+                {
+                    stream = assistantClient.SubmitToolOutputsToRunStreamingAsync(run, toolOutputs);
+                    toolOutputs.Clear();
+                }
+            }
+            while (run?.Status.IsTerminal == false);
+        }
+
         private async Task<string> GetChatCompletionsAsync(ChatClient client, List<ChatMessage> messages, ChatCompletionOptions options, HelperFunctionCallContext functionCallContext, string text)
         {
             var requestMessage = new UserChatMessage(text);
@@ -346,7 +430,6 @@ namespace Azure.AI.Details.Common.CLI
             DisplayAssistantPromptLabel();
 
             string contentComplete = string.Empty;
-
             while (true)
             {
                 var response = client.CompleteChatStreamingAsync(messages, options);
@@ -594,26 +677,88 @@ namespace Azure.AI.Details.Common.CLI
             }
         }
 
-        private HelperFunctionCallContext CreateFunctionFactoryAndCallContext(IList<ChatMessage> messages, ChatCompletionOptions options)
+        private AssistantClient CreateAssistantClient()
         {
-            var customFunctions = _values.GetOrDefault("chat.custom.helper.functions", null);
-            var useCustomFunctions = !string.IsNullOrEmpty(customFunctions);
-            var useBuiltInFunctions = _values.GetOrDefault("chat.built.in.helper.functions", false);
+            var client = CreateOpenAIClient(out var deployment);
+            return client.GetAssistantClient();
+        }
 
-            var factory = useCustomFunctions && useBuiltInFunctions
-                ? CreateFunctionFactoryForCustomFunctions(customFunctions) + CreateFunctionFactoryWithBuiltinFunctions()
-                : useCustomFunctions
-                    ? CreateFunctionFactoryForCustomFunctions(customFunctions)
-                    : useBuiltInFunctions
-                        ? CreateFunctionFactoryWithBuiltinFunctions()
-                        : CreateFunctionFactoryWithNoFunctions();
+        private async Task<AssistantThread> CreateOrGetAssistantThread(AssistantClient client, string threadId)
+        {
+            return string.IsNullOrEmpty(threadId)
+                ? await CreateAssistantThread(client)
+                : await GetAssistantThread(client, threadId);
+        }
 
+        private static async Task<AssistantThread> CreateAssistantThread(AssistantClient client)
+        {
+            var result = await client.CreateThreadAsync();
+            return result.Value;
+        }
+
+        private async Task<AssistantThread> GetAssistantThread(AssistantClient client, string threadId)
+        {
+            var result = await client.GetThreadAsync(threadId);
+            var thread = result.Value;
+
+            await foreach (var message in client.GetMessagesAsync(thread, ListOrder.OldestFirst))
+            {
+                var content = string.Join("", message.Content.Select(c => c.Text));
+                var isUser = message.Role == MessageRole.User;
+                var isAssistant = message.Role == MessageRole.Assistant;
+
+                if (isUser)
+                {
+                    DisplayUserChatPromptLabel();
+                    DisplayUserChatPromptText(content);
+                }
+
+                if (isAssistant)
+                {
+                    DisplayAssistantPromptLabel();
+                    DisplayAssistantPromptTextStreaming(content);
+                    DisplayAssistantPromptTextStreamingDone();
+                }
+            }
+
+            return thread;
+        }
+
+        private HelperFunctionFactory CreateFunctionFactoryWithRunOptions(RunCreationOptions options)
+        {
+            var factory = CreateFunctionFactory();
+            foreach (var tool in factory.GetToolDefinitions())
+            {
+                options.ToolsOverride.Add(tool);
+            }
+
+            return factory;
+        }
+
+        private HelperFunctionCallContext CreateChatCompletionsFunctionFactoryAndCallContext(IList<ChatMessage> messages, ChatCompletionOptions options)
+        {
+            var factory = CreateFunctionFactory();
             foreach (var tool in factory.GetChatTools())
             {
                 options.Tools.Add(tool);
             }
 
             return new HelperFunctionCallContext(factory, messages);
+        }
+
+        private HelperFunctionFactory CreateFunctionFactory()
+        {
+            var customFunctions = _values.GetOrDefault("chat.custom.helper.functions", null);
+            var useCustomFunctions = !string.IsNullOrEmpty(customFunctions);
+            var useBuiltInFunctions = _values.GetOrDefault("chat.built.in.helper.functions", false);
+
+            return useCustomFunctions && useBuiltInFunctions
+                ? CreateFunctionFactoryForCustomFunctions(customFunctions) + CreateFunctionFactoryWithBuiltinFunctions()
+                : useCustomFunctions
+                    ? CreateFunctionFactoryForCustomFunctions(customFunctions)
+                    : useBuiltInFunctions
+                        ? CreateFunctionFactoryWithBuiltinFunctions()
+                        : CreateFunctionFactoryWithNoFunctions();
         }
 
         private HelperFunctionFactory CreateFunctionFactoryForCustomFunctions(string customFunctions)

@@ -16,6 +16,9 @@ USAGE: ai chat [...]
     --user MESSAGE                      (see: ai help chat user message)
     --chat-history FILE                 (see: ai help chat history)
 
+  CHAT WITH ASSISTANT
+    --assistant-id ID                   (see: ai help chat assistant id)
+
   CHAT WITH DATA                        (see: ai help chat with data)
     --index-name INDEX                  (see: ai help index name)
     --search-endpoint ENDPOINT          (see: ai help search endpoint)
