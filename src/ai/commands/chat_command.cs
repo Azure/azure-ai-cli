@@ -99,7 +99,7 @@ namespace Azure.AI.Details.Common.CLI
 
         private async Task ChatInteractively()
         {
-            var chatTextHandler = GetChatTextHandler();
+            var chatTextHandler = GetChatTextHandler(interactive: true);
 
             var speechInput = _values.GetOrDefault("chat.speech.input", false);
             var userPrompt = _values["chat.message.user.prompt"];
@@ -141,7 +141,7 @@ namespace Azure.AI.Details.Common.CLI
 
         private void ChatNonInteractively()
         {
-            var chatTextHandler = GetChatTextHandler();
+            var chatTextHandler = GetChatTextHandler(interactive: false);
 
             var userPrompt = _values["chat.message.user.prompt"];
             if (string.IsNullOrEmpty(userPrompt))
@@ -164,7 +164,7 @@ namespace Azure.AI.Details.Common.CLI
             Console.ResetColor();
         }
 
-        private Func<string, Task> GetChatTextHandler()
+        private Func<string, Task> GetChatTextHandler(bool interactive)
         {
             var parameterFile = InputChatParameterFileToken.Data().GetOrDefault(_values);
             if (!string.IsNullOrEmpty(parameterFile)) SetValuesFromParameterFile(parameterFile);
@@ -177,6 +177,12 @@ namespace Azure.AI.Details.Common.CLI
 
             return async (string text) =>
             {
+                if (interactive && text.ToLower() == "reset")
+                {
+                    ClearMessageHistory(messages);
+                    return;
+                }
+
                 await GetChatCompletionsAsync(chatClient, messages, options, funcContext, text);
             };
         }
@@ -250,7 +256,14 @@ namespace Azure.AI.Details.Common.CLI
                 ? new string[] { "speech", "---", "reset conversation", "exit" }
                 : new string[] { "reset conversation", "exit" };
             var select = allowSpeechInput ? 0 : choices.Length - 1;
-            return ListBoxPicker.PickString(choices, 20, choices.Length + 2, new Colors(ConsoleColor.White, ConsoleColor.Blue), new Colors(ConsoleColor.White, ConsoleColor.Red), select);
+
+            var choice = ListBoxPicker.PickString(choices, 20, choices.Length + 2, new Colors(ConsoleColor.White, ConsoleColor.Blue), new Colors(ConsoleColor.White, ConsoleColor.Red), select);
+            return choice switch
+            {
+                "speech" => "speech",
+                "exit" => "exit",
+                _ => "reset"
+            };
         }
 
         private void DisplayUserChatPromptLabel()
@@ -288,6 +301,7 @@ namespace Azure.AI.Details.Common.CLI
                 Console.Write("assistant");
                 Console.ForegroundColor = ConsoleColor.White;
                 Console.Write(": ");
+                Console.ForegroundColor = ColorHelpers.MapColor(ConsoleColor.Gray);
             }
             else
             {
@@ -320,19 +334,16 @@ namespace Azure.AI.Details.Common.CLI
                Console.WriteLine($"{functionName}({functionArguments}) = {result}");
 
                DisplayAssistantPromptLabel();
-               Console.ForegroundColor = ColorHelpers.MapColor(ConsoleColor.Gray);
             }
         }
 
-        private async Task<AsyncResultCollection<StreamingChatCompletionUpdate>> GetChatCompletionsAsync(ChatClient client, List<ChatMessage> messages, ChatCompletionOptions options, HelperFunctionCallContext functionCallContext, string text)
+        private async Task<string> GetChatCompletionsAsync(ChatClient client, List<ChatMessage> messages, ChatCompletionOptions options, HelperFunctionCallContext functionCallContext, string text)
         {
             var requestMessage = new UserChatMessage(text);
             messages.Add(requestMessage);
-            
             CheckWriteChatHistoryOutputFile(messages);
 
             DisplayAssistantPromptLabel();
-            Console.ForegroundColor = ConsoleColor.Gray;
 
             string contentComplete = string.Empty;
 
@@ -367,12 +378,12 @@ namespace Azure.AI.Details.Common.CLI
                 DisplayAssistantPromptTextStreamingDone();
                 CheckWriteChatAnswerOutputFile(contentComplete);
 
-                var currentContent = new UserChatMessage(contentComplete);
+                var currentContent = new AssistantChatMessage(contentComplete);
                 messages.Add(currentContent);
                 
                 CheckWriteChatHistoryOutputFile(messages);
 
-                return response;
+                return contentComplete;
             }
         }
 
@@ -386,14 +397,14 @@ namespace Azure.AI.Details.Common.CLI
             }
         }
 
-        private void ClearMessageHistory()
+        private void ClearMessageHistory(List<ChatMessage> messages)
         {
-            var outputHistoryFile = OutputChatHistoryFileToken.Data().GetOrDefault(_values);
-            if (!string.IsNullOrEmpty(outputHistoryFile))
-            {
-                var fileName = FileHelpers.GetOutputDataFileName(outputHistoryFile, _values);
-                FileHelpers.WriteAllText(fileName, "", Encoding.UTF8);
-            }
+            messages.RemoveRange(1, messages.Count - 1);
+            CheckWriteChatHistoryOutputFile(messages);
+
+            DisplayAssistantPromptLabel();
+            DisplayAssistantPromptTextStreaming("I've reset the conversation. How can I help you today?");
+            DisplayAssistantPromptTextStreamingDone();
         }
 
         private void CheckWriteChatHistoryOutputFile(IList<ChatMessage> messages)
