@@ -19,6 +19,12 @@ using System.Threading.Tasks;
 using YamlDotNet.Serialization;
 using YamlDotNet.Serialization.NamingConventions;
 using Scriban;
+using OpenAI;
+using OpenAI.Chat;
+using System.ClientModel;
+using Azure.AI.OpenAI.Chat;
+
+#pragma warning disable AOAI001 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
 
 namespace Azure.AI.Details.Common.CLI
 {
@@ -93,7 +99,7 @@ namespace Azure.AI.Details.Common.CLI
 
         private async Task ChatInteractively()
         {
-            var chatTextHandler = GetChatTextHandler();
+            var chatTextHandler = GetChatTextHandler(interactive: true);
 
             var speechInput = _values.GetOrDefault("chat.speech.input", false);
             var userPrompt = _values["chat.message.user.prompt"];
@@ -135,7 +141,7 @@ namespace Azure.AI.Details.Common.CLI
 
         private void ChatNonInteractively()
         {
-            var chatTextHandler = GetChatTextHandler();
+            var chatTextHandler = GetChatTextHandler(interactive: false);
 
             var userPrompt = _values["chat.message.user.prompt"];
             if (string.IsNullOrEmpty(userPrompt))
@@ -158,18 +164,26 @@ namespace Azure.AI.Details.Common.CLI
             Console.ResetColor();
         }
 
-        private Func<string, Task> GetChatTextHandler()
+        private Func<string, Task> GetChatTextHandler(bool interactive)
         {
             var parameterFile = InputChatParameterFileToken.Data().GetOrDefault(_values);
             if (!string.IsNullOrEmpty(parameterFile)) SetValuesFromParameterFile(parameterFile);
 
             var client = CreateOpenAIClient(out var deployment);
-            var options = CreateChatCompletionOptions(deployment);
-            var funcContext = CreateFunctionFactoryAndCallContext(options);
+            var chatClient = client.GetChatClient(deployment);
+
+            var options = CreateChatCompletionOptions(out var messages);
+            var funcContext = CreateFunctionFactoryAndCallContext(messages, options);
 
             return async (string text) =>
             {
-                await GetChatCompletionsAsync(client, options, funcContext, text);
+                if (interactive && text.ToLower() == "reset")
+                {
+                    ClearMessageHistory(messages);
+                    return;
+                }
+
+                await GetChatCompletionsAsync(chatClient, messages, options, funcContext, text);
             };
         }
 
@@ -242,7 +256,14 @@ namespace Azure.AI.Details.Common.CLI
                 ? new string[] { "speech", "---", "reset conversation", "exit" }
                 : new string[] { "reset conversation", "exit" };
             var select = allowSpeechInput ? 0 : choices.Length - 1;
-            return ListBoxPicker.PickString(choices, 20, choices.Length + 2, new Colors(ConsoleColor.White, ConsoleColor.Blue), new Colors(ConsoleColor.White, ConsoleColor.Red), select);
+
+            var choice = ListBoxPicker.PickString(choices, 20, choices.Length + 2, new Colors(ConsoleColor.White, ConsoleColor.Blue), new Colors(ConsoleColor.White, ConsoleColor.Red), select);
+            return choice switch
+            {
+                "speech" => "speech",
+                "exit" => "exit",
+                _ => "reset"
+            };
         }
 
         private void DisplayUserChatPromptLabel()
@@ -280,6 +301,7 @@ namespace Azure.AI.Details.Common.CLI
                 Console.Write("assistant");
                 Console.ForegroundColor = ConsoleColor.White;
                 Console.Write(": ");
+                Console.ForegroundColor = ColorHelpers.MapColor(ConsoleColor.Gray);
             }
             else
             {
@@ -300,67 +322,68 @@ namespace Azure.AI.Details.Common.CLI
             Console.WriteLine("\n");
         }
 
-        private void DisplayAssistantFunctionCall(HelperFunctionCallContext context, string result)
+        private void DisplayAssistantFunctionCall(string functionName, string functionArguments, string result)
         {
             if (!_quiet && _verbose)
             {
-                Console.ForegroundColor = ConsoleColor.Green;
-                Console.Write("\rassistant-function");
-                Console.ForegroundColor = ConsoleColor.White;
-                Console.Write(": ");
-                Console.ForegroundColor = ColorHelpers.MapColor(ConsoleColor.DarkGray);
-                Console.WriteLine($"{context.FunctionName}({context.Arguments}) = {result}");
+               Console.ForegroundColor = ConsoleColor.Green;
+               Console.Write("\rassistant-function");
+               Console.ForegroundColor = ConsoleColor.White;
+               Console.Write(": ");
+               Console.ForegroundColor = ColorHelpers.MapColor(ConsoleColor.DarkGray);
+               Console.WriteLine($"{functionName}({functionArguments}) = {result}");
 
-                DisplayAssistantPromptLabel();
-                Console.ForegroundColor = ColorHelpers.MapColor(ConsoleColor.DarkGray);
+               DisplayAssistantPromptLabel();
             }
         }
 
-        private async Task<StreamingResponse<StreamingChatCompletionsUpdate>> GetChatCompletionsAsync(OpenAIClient client, ChatCompletionsOptions options, HelperFunctionCallContext funcContext, string text)
+        private async Task<string> GetChatCompletionsAsync(ChatClient client, List<ChatMessage> messages, ChatCompletionOptions options, HelperFunctionCallContext functionCallContext, string text)
         {
-            var requestMessage = new ChatRequestUserMessage(text);
-            options.Messages.Add(requestMessage);
-            
-            CheckWriteChatHistoryOutputFile(options);
-            DisplayAssistantPromptLabel();
+            var requestMessage = new UserChatMessage(text);
+            messages.Add(requestMessage);
+            CheckWriteChatHistoryOutputFile(messages);
 
-            Console.ForegroundColor = ConsoleColor.Gray;
+            DisplayAssistantPromptLabel();
 
             string contentComplete = string.Empty;
 
             while (true)
             {
-                var response = await client.GetChatCompletionsStreamingAsync(options);
-                await foreach (var update in response.EnumerateValues())
+                var response = client.CompleteChatStreamingAsync(messages, options);
+                await foreach (var update in response)
                 {
-                    funcContext.CheckForUpdate(update);
+                    functionCallContext.CheckForUpdate(update);
 
                     CheckChoiceFinishReason(update.FinishReason);
 
-                    var content = update.ContentUpdate;
+                    var content = update.ContentUpdate.ToText();
+                    if (update.FinishReason == ChatFinishReason.ContentFilter)
+                    {
+                        content = $"{content}\nWARNING: Content filtered!";
+                    }
+
                     if (content == null) continue;
 
                     contentComplete += content;
                     DisplayAssistantPromptTextStreaming(content);
                 }
 
-                if (options.TryCallFunction(funcContext, out var result))
+                if (functionCallContext.TryCallFunctions(contentComplete, (name, args, result) => DisplayAssistantFunctionCall(name, args, result)))
                 {
-                    DisplayAssistantFunctionCall(funcContext, result);
-                    funcContext.Reset();
-                    CheckWriteChatHistoryOutputFile(options);
+                    functionCallContext.Clear();
+                    CheckWriteChatHistoryOutputFile(messages);
                     continue;
                 }
 
                 DisplayAssistantPromptTextStreamingDone();
                 CheckWriteChatAnswerOutputFile(contentComplete);
 
-                var currentContent = new ChatRequestAssistantMessage(contentComplete);
-                options.Messages.Add(currentContent);
+                var currentContent = new AssistantChatMessage(contentComplete);
+                messages.Add(currentContent);
                 
-                CheckWriteChatHistoryOutputFile(options);
+                CheckWriteChatHistoryOutputFile(messages);
 
-                return response;
+                return contentComplete;
             }
         }
 
@@ -374,33 +397,32 @@ namespace Azure.AI.Details.Common.CLI
             }
         }
 
-        private void ClearMessageHistory()
+        private void ClearMessageHistory(List<ChatMessage> messages)
+        {
+            messages.RemoveRange(1, messages.Count - 1);
+            CheckWriteChatHistoryOutputFile(messages);
+
+            DisplayAssistantPromptLabel();
+            DisplayAssistantPromptTextStreaming("I've reset the conversation. How can I help you today?");
+            DisplayAssistantPromptTextStreamingDone();
+        }
+
+        private void CheckWriteChatHistoryOutputFile(IList<ChatMessage> messages)
         {
             var outputHistoryFile = OutputChatHistoryFileToken.Data().GetOrDefault(_values);
             if (!string.IsNullOrEmpty(outputHistoryFile))
             {
                 var fileName = FileHelpers.GetOutputDataFileName(outputHistoryFile, _values);
-                FileHelpers.WriteAllText(fileName, "", Encoding.UTF8);
+                messages.SaveChatHistoryToFile(fileName);
             }
         }
 
-        private void CheckWriteChatHistoryOutputFile(ChatCompletionsOptions options)
+        private ChatCompletionOptions CreateChatCompletionOptions(out List<ChatMessage> messages)
         {
-            var outputHistoryFile = OutputChatHistoryFileToken.Data().GetOrDefault(_values);
-            if (!string.IsNullOrEmpty(outputHistoryFile))
-            {
-                var fileName = FileHelpers.GetOutputDataFileName(outputHistoryFile, _values);
-                options.SaveChatHistoryToFile(fileName);
-            }
-        }
-
-        private ChatCompletionsOptions CreateChatCompletionOptions(string deployment)
-        {
-            var options = new ChatCompletionsOptions();
-            options.DeploymentName = deployment;
-
             var systemPrompt = _values.GetOrDefault("chat.message.system.prompt", DefaultSystemPrompt);
-            options.Messages.Add(new ChatRequestSystemMessage(systemPrompt));
+
+            messages = new List<ChatMessage>();
+            messages.Add(ChatMessage.CreateSystemMessage(systemPrompt));
 
             var textFile = _values["chat.message.history.text.file"];
             var jsonFile = InputChatHistoryJsonFileToken.Data().GetOrDefault(_values);
@@ -410,18 +432,21 @@ namespace Azure.AI.Details.Common.CLI
                 _values.AddThrowError("chat.message.history.text.file", "chat.message.history.json.file", "Only one of these options can be specified");
             }
 
-            if (!string.IsNullOrEmpty(jsonFile)) options.ReadChatHistoryFromFile(jsonFile);
-            if (!string.IsNullOrEmpty(textFile)) AddChatMessagesFromTextFile(options.Messages, textFile);
+            if (!string.IsNullOrEmpty(jsonFile)) messages.ReadChatHistoryFromFile(jsonFile);
+            if (!string.IsNullOrEmpty(textFile)) AddChatMessagesFromTextFile(messages, textFile);
 
             var maxTokens = _values["chat.options.max.tokens"];
             var temperature = _values["chat.options.temperature"];
             var frequencyPenalty = _values["chat.options.frequency.penalty"];
             var presencePenalty = _values["chat.options.presence.penalty"];
 
-            options.MaxTokens = TryParse(maxTokens, null);
-            options.Temperature = TryParse(temperature, _defaultTemperature);
-            options.FrequencyPenalty = TryParse(frequencyPenalty, _defaultFrequencyPenalty);
-            options.PresencePenalty = TryParse(presencePenalty, _defaultPresencePenalty);
+            var options = new ChatCompletionOptions()
+            {
+                MaxTokens = TryParse(maxTokens, null),
+                Temperature = TryParse(temperature, _defaultTemperature),
+                FrequencyPenalty = TryParse(frequencyPenalty, _defaultFrequencyPenalty),
+                PresencePenalty = TryParse(presencePenalty, _defaultPresencePenalty),
+            };
 
             var stop = _values["chat.options.stop.sequence"];
             if (!string.IsNullOrEmpty(stop))
@@ -435,7 +460,7 @@ namespace Azure.AI.Details.Common.CLI
             return options;
         }
 
-        private void AddAzureExtensionOptions(ChatCompletionsOptions options)
+        private void AddAzureExtensionOptions(ChatCompletionOptions options)
         {
             var indexName = SearchIndexNameToken.Data().GetOrDefault(_values);
             var indexOk = !string.IsNullOrEmpty(indexName);
@@ -458,41 +483,38 @@ namespace Azure.AI.Details.Common.CLI
                 _values.AddThrowError("ERROR:", $"Creating Azure AI Search extension; requires embedding key, endpoint, and deployment.");
             }
 
-            var queryType = QueryTypeFrom(_values["service.config.search.query.type"]) ?? AzureSearchQueryType.VectorSimpleHybrid;
+            var queryType = QueryTypeFrom(_values["service.config.search.query.type"]) ?? DataSourceQueryType.VectorSimpleHybrid;
 
-            var search = new AzureSearchChatExtensionConfiguration()
+            options.AddDataSource(new AzureSearchChatDataSource()
             {
-                Authentication = new OnYourDataApiKeyAuthenticationOptions(searchKey),
-                SearchEndpoint = new Uri(searchEndpoint),
+                Authentication = DataSourceAuthentication.FromApiKey(searchKey),
+                Endpoint = new Uri(searchEndpoint),
                 IndexName = indexName,
                 QueryType = queryType,
-                DocumentCount = 16,
-                VectorizationSource = new OnYourDataEndpointVectorizationSource(embeddingEndpoint, new OnYourDataApiKeyAuthenticationOptions(embeddingsKey))
-            };
-
-            options.AzureExtensionsOptions = new() { Extensions = { search } };
+                VectorizationSource = DataSourceVectorizer.FromEndpoint(embeddingEndpoint, DataSourceAuthentication.FromApiKey(embeddingsKey))
+            });
         }
 
-        private static AzureSearchQueryType? QueryTypeFrom(string queryType)
+        private static DataSourceQueryType? QueryTypeFrom(string queryType)
         {
             if (string.IsNullOrEmpty(queryType)) return null;
 
             return queryType.ToLower() switch
             {
-                "semantic" => AzureSearchQueryType.Semantic,
-                "simple" => AzureSearchQueryType.Simple,
-                "vector" => AzureSearchQueryType.Vector,
+                "semantic" => DataSourceQueryType.Semantic,
+                "simple" => DataSourceQueryType.Simple,
+                "vector" => DataSourceQueryType.Vector,
 
                 "hybrid"
                 or "simplehybrid"
                 or "simple-hybrid"
                 or "vectorsimplehybrid"
-                or "vector-simple-hybrid" => AzureSearchQueryType.VectorSimpleHybrid,
+                or "vector-simple-hybrid" => DataSourceQueryType.VectorSimpleHybrid,
 
                 "semantichybrid"
                 or "semantic-hybrid"
                 or "vectorsemantichybrid"
-                or "vector-semantic-hybrid" => AzureSearchQueryType.VectorSemanticHybrid,
+                or "vector-semantic-hybrid" => DataSourceQueryType.VectorSemanticHybrid,
 
                 _ => throw new ArgumentException($"Invalid query type: {queryType}")
             };
@@ -518,7 +540,7 @@ namespace Azure.AI.Details.Common.CLI
 
         public static string GetOpenAIClientVersionNumber()
         {
-            var latest = ((OpenAIClientOptions.ServiceVersion[])Enum.GetValues(typeof(OpenAIClientOptions.ServiceVersion))).MaxBy(i => (int)i);
+            var latest = ((AzureOpenAIClientOptions.ServiceVersion[])Enum.GetValues(typeof(AzureOpenAIClientOptions.ServiceVersion))).MaxBy(i => (int)i);
             var latestVersion = latest.ToString().ToLower().Replace("_", "-").Substring(1);
             return latestVersion;
         }
@@ -548,13 +570,13 @@ namespace Azure.AI.Details.Common.CLI
 
             if (!string.IsNullOrEmpty(endpoint))
             {
-                _azureEventSourceListener = new AzureEventSourceListener((e, message) => EventSourceHelpers.EventSourceAiLoggerLog(e, message), System.Diagnostics.Tracing.EventLevel.Verbose);
+                // _azureEventSourceListener = new AzureEventSourceListener((e, message) => EventSourceHelpers.EventSourceAiLoggerLog(e, message), System.Diagnostics.Tracing.EventLevel.Verbose);
 
-                var options = new OpenAIClientOptions();
-                options.Diagnostics.IsLoggingContentEnabled = true;
-                options.Diagnostics.IsLoggingEnabled = true;
+                var options = new AzureOpenAIClientOptions();
+                //options.Diagnostics.IsLoggingContentEnabled = true;
+                //options.Diagnostics.IsLoggingEnabled = true;
 
-                return new OpenAIClient(
+                return new AzureOpenAIClient(
                     new Uri(endpoint!),
                     new AzureKeyCredential(key!),
                     options
@@ -572,7 +594,7 @@ namespace Azure.AI.Details.Common.CLI
             }
         }
 
-        private HelperFunctionCallContext CreateFunctionFactoryAndCallContext(ChatCompletionsOptions options)
+        private HelperFunctionCallContext CreateFunctionFactoryAndCallContext(IList<ChatMessage> messages, ChatCompletionOptions options)
         {
             var customFunctions = _values.GetOrDefault("chat.custom.helper.functions", null);
             var useCustomFunctions = !string.IsNullOrEmpty(customFunctions);
@@ -586,7 +608,12 @@ namespace Azure.AI.Details.Common.CLI
                         ? CreateFunctionFactoryWithBuiltinFunctions()
                         : CreateFunctionFactoryWithNoFunctions();
 
-            return options.AddFunctions(factory);
+            foreach (var tool in factory.GetChatTools())
+            {
+                options.Tools.Add(tool);
+            }
+
+            return new HelperFunctionCallContext(factory, messages);
         }
 
         private HelperFunctionFactory CreateFunctionFactoryForCustomFunctions(string customFunctions)
@@ -623,52 +650,40 @@ namespace Azure.AI.Details.Common.CLI
             return new HelperFunctionFactory();
         }
 
-        private ChatChoice CheckChoiceFinishReason(ChatChoice choice)
+        private void CheckChoiceFinishReason(ChatFinishReason? reason)
         {
-            if (choice.FinishReason == CompletionsFinishReason.ContentFiltered)
+            if (reason == null) return;
+
+            if (reason == ChatFinishReason.ContentFilter)
             {
                 if (!_quiet) ConsoleHelpers.WriteLineWithHighlight("#e_;WARNING: Content filtered!");
             }
-            if (choice.FinishReason == CompletionsFinishReason.TokenLimitReached)
+            if (reason == ChatFinishReason.Length)
             {
                 _values.AddThrowError("ERROR:", $"exceeded token limit!",
-                                         "TRY:", $"{Program.Name} chat --max-tokens TOKENS");
-            }
-            return choice;
-        }
-
-        private void CheckChoiceFinishReason(CompletionsFinishReason? finishReason)
-        {
-            if (finishReason == CompletionsFinishReason.ContentFiltered)
-            {
-                if (!_quiet) ConsoleHelpers.WriteLineWithHighlight("#e_;WARNING: Content filtered!");
-            }
-            if (finishReason == CompletionsFinishReason.TokenLimitReached)
-            {
-                _values.AddThrowError("ERROR:", $"exceeded token limit!",
-                                         "TRY:", $"{Program.Name} chat --max-tokens TOKENS");
+                                        "TRY:", $"{Program.Name} chat --max-tokens TOKENS");
             }
         }
 
-        private ChatRole UpdateRole(ref string line, ChatRole? currentRole = null)
+        private ChatMessageRole UpdateRole(ref string line, ChatMessageRole? currentRole = null)
         {
             var lower = line.ToLower();
             if (lower.StartsWith("system:"))
             {
                 line = line.Substring(7).Trim();
-                return ChatRole.System;
+                return ChatMessageRole.System;
             }
             else if (lower.StartsWith("user:"))
             {
                 line = line.Substring(5).Trim();
-                return ChatRole.User;
+                return ChatMessageRole.User;
             }
             else if (lower.StartsWith("assistant:"))
             {
                 line = line.Substring(10).Trim();
-                return ChatRole.Assistant;
+                return ChatMessageRole.Assistant;
             }
-            return currentRole ?? ChatRole.System;
+            return currentRole ?? ChatMessageRole.System;
         }
 
         private void SetValuesFromParameterFile(string parameterFile)
@@ -788,7 +803,7 @@ namespace Azure.AI.Details.Common.CLI
             return dictionary;
         }
 
-        private void AddChatMessagesFromTextFile(IList<ChatRequestMessage> messages, string textFile)
+        private void AddChatMessagesFromTextFile(IList<ChatMessage> messages, string textFile)
         {
             var existing = FileHelpers.DemandFindFileInDataPath(textFile, _values, "chat history");
             var text = FileHelpers.ReadAllText(existing, Encoding.Default);
@@ -806,49 +821,54 @@ namespace Azure.AI.Details.Common.CLI
                 var line = lines[i];
                 role = UpdateRole(ref line, role);
 
-                if (role == ChatRole.System || role == ChatRole.User)
+                if (role == ChatMessageRole.System || role == ChatMessageRole.User)
                 {
                     line = line.ReplaceValues(_values);
                 }
 
-                if (i == 0 && role == ChatRole.System && FirstMessageIsDefaultSystemPrompt(messages, role))
+                if (i == 0 && role == ChatMessageRole.System && FirstMessageIsDefaultSystemPrompt(messages, role))
                 {
-                    messages[0] = new ChatRequestSystemMessage(line);
+                    messages[0] = new SystemChatMessage(line);
                     continue;
                 }
 
-                messages.Add(role == ChatRole.System
-                    ? new ChatRequestSystemMessage(line)
-                    : role == ChatRole.User
-                        ? new ChatRequestUserMessage(line)
-                        : new ChatRequestAssistantMessage(line));
+                messages.Add(role == ChatMessageRole.System
+                    ? new SystemChatMessage(line)
+                    : role == ChatMessageRole.User
+                        ? new UserChatMessage(line)
+                        : new AssistantChatMessage(line));
             }
         }
 
-        private static bool FirstMessageIsDefaultSystemPrompt(IList<ChatRequestMessage> messages, ChatRole role)
+        private static bool FirstMessageIsDefaultSystemPrompt(IList<ChatMessage> messages, ChatMessageRole role)
         {
-            var message = messages.FirstOrDefault() as ChatRequestSystemMessage;
-            return message != null && message.Content == DefaultSystemPrompt;
+            var message = messages.FirstOrDefault() as SystemChatMessage;
+            return message != null && message.Content.FirstOrDefault()?.Text == DefaultSystemPrompt;
         }
 
-        private static string ConvertMessagesToJson(IList<ChatRequestMessage> messages)
+        private static string ConvertMessagesToJson(IList<ChatMessage> messages)
         {
             var sb = new StringBuilder();
             sb.Append("[");
             foreach (var message in messages)
             {
-                var user = message as ChatRequestUserMessage;
-                var system = message as ChatRequestSystemMessage;
-                var assistant = message as ChatRequestAssistantMessage;
-                var content = system?.Content ?? user?.Content ?? assistant?.Content;
-                content = content.Replace("\\", "\u005C").Replace("\"", "");
+                var user = message as UserChatMessage;
+                var system = message as SystemChatMessage;
+                var assistant = message as AssistantChatMessage;
+                var role = system != null ? "system"
+                    : assistant != null ? "assistant"
+                    : user != null ? "user"
+                    : null;
+
+                var contentParts = system?.Content ?? user?.Content ?? assistant?.Content;
+                var content = contentParts.ToText().Replace("\\", "\u005C").Replace("\"", "");
 
                 var ok = !string.IsNullOrEmpty(content);
                 if (!ok) continue;
 
                 if (sb.Length > 1) sb.Append(",");
 
-                sb.Append($"{{\"role\": \"{message.Role}\", \"content\": \"{content}\"}}");
+                sb.Append($"{{\"role\": \"{role}\", \"content\": \"{content}\"}}");
             }
             sb.Append("]");
             var theDict = $"{{ \"messages\": {sb.ToString()} }}";

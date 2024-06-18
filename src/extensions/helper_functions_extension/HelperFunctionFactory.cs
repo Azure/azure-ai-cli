@@ -6,8 +6,13 @@
 using System.Reflection;
 using Azure.AI.OpenAI;
 using System.Collections;
-using System.Text.Json;
 using System.Text;
+using System.Text.Json;
+using OpenAI.Assistants;
+using System.Collections.Generic;
+using OpenAI.Chat;
+
+#pragma warning disable CS0618 // Type or member is obsolete
 
 namespace Azure.AI.Details.Common.CLI.Extensions.HelperFunctions
 {
@@ -74,36 +79,24 @@ namespace Azure.AI.Details.Common.CLI.Extensions.HelperFunctions
                 var funcDescription = funcDescriptionAttrib!.Description;
 
                 string json = GetMethodParametersJsonSchema(method);
-                if (Program.Debug)
-                {
-                    System.Console.WriteLine($"\nFunction: {method.Name}");
-                    System.Console.WriteLine($"Description: {funcDescription}");
-                    System.Console.WriteLine($"Parameters: {json}");
-                }
-                _functions.TryAdd(method, new FunctionDefinition(method.Name)
-                {
-                    Description = funcDescription,
-                    Parameters = new BinaryData(json)
-                });
+                _functions.TryAdd(method, ChatTool.CreateFunctionTool(method.Name, funcDescription, new BinaryData(json)));
             }
         }
 
-        public IEnumerable<FunctionDefinition> GetFunctionDefinitions()
+        public IEnumerable<ChatTool> GetChatTools()
         {
             return _functions.Values;
         }
 
-        public bool TryCallFunction(ChatCompletionsOptions options, HelperFunctionCallContext context, out string? result)
+        public bool TryCallFunction(string functionName, string functionArguments, out string? result)
         {
             result = null;
-            if (!string.IsNullOrEmpty(context.FunctionName) && !string.IsNullOrEmpty(context.Arguments))
+            if (!string.IsNullOrEmpty(functionName) && !string.IsNullOrEmpty(functionArguments))
             {
-                var function = _functions.FirstOrDefault(x => x.Value.Name == context.FunctionName);
+                var function = _functions.FirstOrDefault(x => x.Value.FunctionName == functionName);
                 if (function.Key != null)
                 {
-                    result = CallFunction(function.Key, function.Value, context.Arguments);
-                    options.Messages.Add(new ChatRequestAssistantMessage("") { FunctionCall = new FunctionCall(context.FunctionName, context.Arguments) });
-                    options.Messages.Add(new ChatRequestFunctionMessage(context.FunctionName, result));
+                    result = CallFunction(function.Key, function.Value, functionArguments);
                     return true;
                 }
             }
@@ -119,13 +112,9 @@ namespace Azure.AI.Details.Common.CLI.Extensions.HelperFunctions
             return newFactory;
         }
 
-        private static string? CallFunction(MethodInfo methodInfo, FunctionDefinition functionDefinition, string argumentsAsJson)
+        private static string? CallFunction(MethodInfo methodInfo, ChatTool chatTool, string argumentsAsJson)
         {
-            var dbg = $"Calling function {methodInfo.Name} with arguments {argumentsAsJson}";
-            if (Program.Debug) Console.WriteLine(dbg);
-            AI.DBG_TRACE_VERBOSE(dbg);
-
-            var parsed = JsonDocument.Parse(argumentsAsJson);
+            var parsed = JsonDocument.Parse(argumentsAsJson).RootElement;
             var arguments = new List<object>();
 
             var parameters = methodInfo.GetParameters();
@@ -134,11 +123,14 @@ namespace Azure.AI.Details.Common.CLI.Extensions.HelperFunctions
                 var parameterName = parameter.Name;
                 if (parameterName == null) continue;
 
-                var parameterValue = parsed?.GetPropertyStringOrNull(parameterName);
-                if (parameterValue == null) continue;
+                if (parsed.ValueKind == JsonValueKind.Object && parsed.TryGetProperty(parameterName, out var value))
+                {
+                    var parameterValue = value.ValueKind == JsonValueKind.String ? value.GetString() : value.GetRawText();
+                    if (parameterValue == null) continue;
 
-                var argument = ParseParameterValue(parameterValue, parameter.ParameterType);
-                arguments.Add(argument);
+                    var argument = ParseParameterValue(parameterValue, parameter.ParameterType);
+                    arguments.Add(argument);
+                }
             }
 
             var args = arguments.ToArray();
@@ -351,7 +343,7 @@ namespace Azure.AI.Details.Common.CLI.Extensions.HelperFunctions
         {
             var attributes = parameter.GetCustomAttributes(typeof(HelperFunctionParameterDescriptionAttribute), false);
             var paramDescriptionAttrib = attributes.Length > 0 ? (attributes[0] as HelperFunctionParameterDescriptionAttribute) : null;
-            return  paramDescriptionAttrib?.Description ?? $"The {parameter.Name} parameter";
+            return paramDescriptionAttrib?.Description ?? $"The {parameter.Name} parameter";
         }
 
         private static void WriteJsonSchemaType(Utf8JsonWriter writer, Type t, string? parameterDescription = null)
@@ -393,12 +385,12 @@ namespace Azure.AI.Details.Common.CLI.Extensions.HelperFunctions
         {
             writer.WriteStartObject();
             writer.WriteString("type", GetJsonTypeFromPrimitiveType(primativeType));
-            
+
             if (!string.IsNullOrEmpty(parameterDescription))
             {
                 writer.WriteString("description", parameterDescription);
             }
-            
+
             writer.WriteEndObject();
         }
 
@@ -441,6 +433,6 @@ namespace Azure.AI.Details.Common.CLI.Extensions.HelperFunctions
                 t.GetGenericTypeDefinition() == typeof(IReadOnlyList<>));
         }
 
-        private Dictionary<MethodInfo, FunctionDefinition> _functions = new();
+        private Dictionary<MethodInfo, ChatTool> _functions = new();
     }
 }

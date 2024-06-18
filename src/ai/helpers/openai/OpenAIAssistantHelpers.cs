@@ -3,8 +3,6 @@
 // Licensed under the MIT license. See LICENSE.md file in the project root for full license information.
 //
 
-using Azure.AI.OpenAI.Assistants;
-using Azure.Core.Diagnostics;
 using System;
 using System.Text.Json;
 using System.Collections.Generic;
@@ -13,6 +11,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.ClientModel.Primitives;
+using OpenAI.Assistants;
+using OpenAI;
+using Azure.AI.OpenAI;
+using OpenAI.Files;
+
+#pragma warning disable OPENAI001 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
 
 namespace Azure.AI.Details.Common.CLI
 {
@@ -20,34 +24,48 @@ namespace Azure.AI.Details.Common.CLI
     {
         public static async Task<string> CreateAssistant(string key, string endpoint, string name, string deployment, string instructions, bool codeInterpreter, List<string> fileIds)
         {
-            var createOptions = new AssistantCreationOptions(deployment) { Name = name, Instructions = instructions };
+            var hasFiles = fileIds.Count() > 0;
+            var createOptions = new AssistantCreationOptions()
+            {
+                Name = name,
+                Instructions = instructions,
+                ToolResources = !hasFiles ? new() : new()
+                {
+                    FileSearch = new()
+                    {
+                        NewVectorStores =
+                        {
+                            new(fileIds)
+                        }
+                    }
+                }
+            };
 
             if (codeInterpreter)
             {
                 createOptions.Tools.Add(new CodeInterpreterToolDefinition());
             }
 
-            if (fileIds.Count() > 0)
+            if (hasFiles)
             {
-                createOptions.Tools.Add(new RetrievalToolDefinition());
-                fileIds.ForEach(id => createOptions.FileIds.Add(id));
+                createOptions.Tools.Add(new FileSearchToolDefinition());
             }
 
-            var client = CreateOpenAIAssistantsClient(key, endpoint);
-            var response = await client.CreateAssistantAsync(createOptions);
+            var client = CreateOpenAIAssistantClient(key, endpoint);
+            var response = await client.CreateAssistantAsync(deployment, createOptions);
 
             return response.Value.Id;
         }
 
         public static async Task DeleteAssistant(string key, string endpoint, string id)
         {
-            var client = CreateOpenAIAssistantsClient(key, endpoint);
+            var client = CreateOpenAIAssistantClient(key, endpoint);
             var response = await client.DeleteAssistantAsync(id);
         }
 
         public static async Task<string?> GetAssistantJson(string key, string endpoint, string id)
         {
-            var client = CreateOpenAIAssistantsClient(key, endpoint);
+            var client = CreateOpenAIAssistantClient(key, endpoint);
             var response = await client.GetAssistantAsync(id);
             var assistant = response.Value;
 
@@ -67,18 +85,14 @@ namespace Azure.AI.Details.Common.CLI
 
         public static async Task<Dictionary<string, string>> ListAssistants(string key, string endpoint)
         {
-            var order = ListSortOrder.Ascending;
-            var client = CreateOpenAIAssistantsClient(key, endpoint);
-            var response = await client.GetAssistantsAsync(order: order);
+            var order = ListOrder.OldestFirst;
+            var client = CreateOpenAIAssistantClient(key, endpoint);
+            var assistants = client.GetAssistantsAsync(order);
 
-            var pageable = response.Value;
-            var list = pageable.ToList();
-
-            while (pageable.HasMore)
+            var list = new List<Assistant>();
+            await foreach (Assistant assistant in assistants)
             {
-                response = await client.GetAssistantsAsync(after: pageable.LastId, order: order);
-                pageable = response.Value;
-                list.AddRange(pageable);
+                list.Add(assistant);
             }
 
             return list.ToDictionary(a => a.Id, a => a.Name);
@@ -86,14 +100,14 @@ namespace Azure.AI.Details.Common.CLI
 
         public static async Task<(string, string)> UploadAssistantFile(string key, string endpoint, string fileName)
         {
-            var client = CreateOpenAIAssistantsClient(key, endpoint);
-            var response = await client.UploadFileAsync(fileName, OpenAIFilePurpose.Assistants);
+            var client = CreateOpenAIFileClient(key, endpoint);
+            var response = await client.UploadFileAsync(fileName, FileUploadPurpose.Assistants);
             return (response.Value.Id, response.Value.Filename);
         }
 
         public static async Task<Dictionary<string, string>> ListAssistantFiles(string key, string endpoint)
         {
-            var client = CreateOpenAIAssistantsClient(key, endpoint);
+            var client = CreateOpenAIFileClient(key, endpoint);
             var response = await client.GetFilesAsync(OpenAIFilePurpose.Assistants);
             var files = response.Value.ToList();
             return files.ToDictionary(f => f.Id, f => f.Filename);
@@ -101,21 +115,33 @@ namespace Azure.AI.Details.Common.CLI
 
         public static async Task DeleteAssistantFile(string key, string endpoint, string id)
         {
-            var client = CreateOpenAIAssistantsClient(key, endpoint);
+            var client = CreateOpenAIFileClient(key, endpoint);
             var response = await client.DeleteFileAsync(id);
         }
 
-        private static AssistantsClient CreateOpenAIAssistantsClient(string key, string endpoint)
+        private static OpenAIClient CreateOpenAIClient(string key, string endpoint)
         {
-            _azureEventSourceListener = new AzureEventSourceListener((e, message) => EventSourceHelpers.EventSourceAiLoggerLog(e, message), System.Diagnostics.Tracing.EventLevel.Verbose);
+            //_azureEventSourceListener = new AzureEventSourceListener((e, message) => EventSourceHelpers.EventSourceAiLoggerLog(e, message), System.Diagnostics.Tracing.EventLevel.Verbose);
 
-            var options = new AssistantsClientOptions();
-            options.Diagnostics.IsLoggingContentEnabled = true;
-            options.Diagnostics.IsLoggingEnabled = true;
-
-            return new AssistantsClient(new Uri(endpoint!), new AzureKeyCredential(key), options);
+            var options = new AzureOpenAIClientOptions();
+            return new AzureOpenAIClient(
+                new Uri(endpoint!),
+                new AzureKeyCredential(key!),
+                options);
         }
 
-        private static AzureEventSourceListener _azureEventSourceListener;
+        private static AssistantClient CreateOpenAIAssistantClient(string key, string endpoint)
+        {
+            var client = CreateOpenAIClient(key, endpoint);
+            return client.GetAssistantClient();
+        }
+
+        private static FileClient CreateOpenAIFileClient(string key, string endpoint)
+        {
+            var client = CreateOpenAIClient(key, endpoint);
+            return client.GetFileClient();
+        }
+
+        //private static AzureEventSourceListener _azureEventSourceListener;
     }
 }

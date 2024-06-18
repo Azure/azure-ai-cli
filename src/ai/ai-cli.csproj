@@ -114,7 +114,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Azure.AI.OpenAI.Assistants" Version="1.0.0-beta.3" />
     <PackageReference Include="Azure.AI.Vision.ImageAnalysis" Version="1.0.0-beta.2" />
     <PackageReference Include="Azure.Identity" Version="1.11.0" />
     <PackageReference Include="Azure.Search.Documents" Version="11.6.0-beta.4" />
@@ -124,7 +123,7 @@
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
     <PackageReference Include="Scriban" Version="5.9.1" />
     <PackageReference Include="System.Interactive.Async" Version="6.0.1" />
-    <PackageReference Include="Azure.AI.OpenAI" Version="1.0.0-beta.16" />
+    <PackageReference Include="Azure.AI.OpenAI" Version="2.0.0-beta.2" />
   </ItemGroup>
 
   <ItemGroup>
