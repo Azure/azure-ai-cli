@@ -3,73 +3,92 @@
 // Licensed under the MIT license. See LICENSE.md file in the project root for full license information.
 //
 
-using Azure.AI.OpenAI;
+using OpenAI.Chat;
+using System.Text;
 
 namespace Azure.AI.Details.Common.CLI.Extensions.HelperFunctions
 {
     public class HelperFunctionCallContext
     {
-        public HelperFunctionCallContext(HelperFunctionFactory factory)
+        public HelperFunctionCallContext(HelperFunctionFactory functionFactory, IList<ChatMessage> messages)
         {
-            _factory = factory;
+            _functionFactory = functionFactory;
+            _messages = messages;
         }
 
-        public bool CheckForFunction(ChatResponseMessage message)
+
+        public bool CheckForUpdate(StreamingChatCompletionUpdate streamingUpdate)
         {
             var updated = false;
 
-            if (!string.IsNullOrEmpty(message.FunctionCall?.Name))
+            foreach (var update in streamingUpdate.ToolCallUpdates)
             {
-                _functionName = message.FunctionCall.Name;
-                updated = true;
-            }
+                if (!string.IsNullOrEmpty(update.Id))
+                {
+                    updated = true;
+                    _indexToToolCallId[update.Index] = update.Id;
+                }
+                if (!string.IsNullOrEmpty(update.FunctionName))
+                {
+                    updated = true;
+                    _indexToFunctionName[update.Index] = update.FunctionName;
+                }
+                if (!string.IsNullOrEmpty(update.FunctionArgumentsUpdate))
+                {
+                    updated = true;
 
-            if (!string.IsNullOrEmpty(message.FunctionCall?.Arguments))
-            {
-                _arguments = message.FunctionCall.Arguments;
-                updated = true;
+                    var needToAdd = !_indexToArguments.ContainsKey(update.Index);
+                    if (needToAdd) _indexToArguments[update.Index] = new StringBuilder();
+
+                    _indexToArguments[update.Index].Append(update.FunctionArgumentsUpdate);
+                }
             }
 
             return updated;
         }
 
-        public bool CheckForUpdate(StreamingChatCompletionsUpdate update)
+        public bool TryCallFunctions(string content, Action<string, string, string> callback)
         {
-            var updated = false;
+            if (_indexToArguments.Count == 0) return false;
 
-            if (!string.IsNullOrEmpty(update.FunctionName))
+            List<ChatToolCall> toolCalls = [];
+            foreach (var item in _indexToToolCallId)
             {
-                _functionName = update.FunctionName;
-                updated = true;
-            }
-            
-            var arguments = update.FunctionArgumentsUpdate;
-            if (arguments != null)
-            {
-                _arguments += arguments;
-                updated = true;
+                toolCalls.Add(ChatToolCall.CreateFunctionToolCall(
+                    item.Value,
+                    _indexToFunctionName[item.Key],
+                    _indexToArguments[item.Key].ToString()));
             }
 
-            return updated;
+            _messages.Add(new AssistantChatMessage(toolCalls, content));
+
+            foreach (var toolCall in toolCalls)
+            {
+                var functionName = toolCall.FunctionName;
+                var functionArguments = toolCall.FunctionArguments;
+
+                var ok = _functionFactory.TryCallFunction(functionName, functionArguments, out var result);
+                if (!ok) return false;
+
+                callback(functionName, functionArguments, result);
+                _messages.Add(ChatMessage.CreateToolChatMessage(toolCall.Id, result));
+            }
+
+            return true;
         }
 
-        public bool TryCallFunction(ChatCompletionsOptions options, out string? result)
+        public void Clear()
         {
-            return _factory.TryCallFunction(options, this, out result);
+            _indexToToolCallId.Clear();
+            _indexToFunctionName.Clear();
+            _indexToArguments.Clear();
         }
 
-        public void Reset()
-        {
-            _functionName = string.Empty;
-            _arguments = string.Empty;
-        }
+        private HelperFunctionFactory _functionFactory;
+        private IList<ChatMessage> _messages;
 
-        public string FunctionName => _functionName;
-
-        public string Arguments => _arguments;
-
-        private string _functionName = string.Empty;
-        private string _arguments = string.Empty;
-        private readonly HelperFunctionFactory _factory;
+        private Dictionary<int, string> _indexToToolCallId = [];
+        private Dictionary<int, string> _indexToFunctionName = [];
+        private Dictionary<int, StringBuilder> _indexToArguments = [];
     }
 }
