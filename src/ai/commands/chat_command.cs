@@ -71,6 +71,12 @@ namespace Azure.AI.Details.Common.CLI
                 case "chat.assistant.get": DoChatAssistantGet().Wait(); break;
                 case "chat.assistant.list": DoChatAssistantList().Wait(); break;
 
+                case "chat.assistant.vector-store": HelpCommandParser.DisplayHelp(_values); break;
+                case "chat.assistant.vector-store.create": HelpCommandParser.DisplayHelp(_values); break;
+                case "chat.assistant.vector-store.delete": HelpCommandParser.DisplayHelp(_values); break;
+                case "chat.assistant.vector-store.get": HelpCommandParser.DisplayHelp(_values); break;
+                case "chat.assistant.vector-store.list": HelpCommandParser.DisplayHelp(_values); break;
+
                 case "chat.assistant.file": HelpCommandParser.DisplayHelp(_values); break;
                 case "chat.assistant.file.upload": DoChatAssistantFileUpload().Wait(); break;
                 case "chat.assistant.file.list": DoChatAssistantFileList().Wait(); break;

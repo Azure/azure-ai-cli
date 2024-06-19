@@ -26,11 +26,18 @@ namespace Azure.AI.Details.Common.CLI
             ("chat.assistant.delete", false),
             ("chat.assistant.get", true ),
             ("chat.assistant.list", false),
+
+            ("chat.assistant.vector-store.create", true),
+            ("chat.assistant.vector-store.delete", true),
+            ("chat.assistant.vector-store.get", true),
+            ("chat.assistant.vector-store.list", false),
+            ("chat.assistant.vector-store", true),
+
             ("chat.assistant.file.upload", true),
             ("chat.assistant.file.delete", true),
             ("chat.assistant.file.list", false),
-            // ("chat.assistant.file.get", true),
             ("chat.assistant.file", true),
+
             ("chat.assistant", true),
             ("chat", true),
         };
@@ -51,6 +58,11 @@ namespace Azure.AI.Details.Common.CLI
                 case "chat.assistant.get": return _chatAssistantGetCommandParsers;
                 case "chat.assistant.list": return _chatPlaceHolderParsers;
                 case "chat.assistant.delete": return _chatAssistantDeleteCommandParsers;
+
+                case "chat.assistant.vector-store.create": return _chatPlaceHolderParsers;
+                case "chat.assistant.vector-store.get": return _chatPlaceHolderParsers;
+                case "chat.assistant.vector-store.list": return _chatPlaceHolderParsers;
+                case "chat.assistant.vector-store.delete": return _chatPlaceHolderParsers;
 
                 case "chat.assistant.file.upload": return _chatAssistantFileUploadCommandParsers;
                 case "chat.assistant.file.list": return _chatPlaceHolderParsers;

@@ -5,18 +5,19 @@ CHAT ASSISTANT
 
 COMMANDS
 
-  ai chat assistant create [...]      (see: ai help chat assistant create)
-  ai chat assistant delete [...]      (see: ai help chat assistant delete)
+  ai chat assistant create [...]          (see: ai help chat assistant create)
+  ai chat assistant delete [...]          (see: ai help chat assistant delete)
 
-  ai chat assistant list [...]        (see: ai help chat assistant list)
-  ai chat assistant get [...]         (see: ai help chat assistant get)
+  ai chat assistant list [...]            (see: ai help chat assistant list)
+  ai chat assistant get [...]             (see: ai help chat assistant get)
 
 SUB-COMMANDS
 
-  ai chat assistant file [...]        (see: ai help chat assistant file)
+  ai chat assistant file [...]            (see: ai help chat assistant file)
+  ai chat assistant vector-store [...]    (see: ai help chat assistant vector-store)
 
 ADDITIONAL TOPICS
 
+  ai help chat examples
   ai help chat assistant examples
-  ai help documentation
-  
+  ai help find topics chat assistant

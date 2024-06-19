@@ -1,0 +1,19 @@
+CHAT ASSISTANT VECTOR-STORE LIST
+
+  The `ai chat assistant vector-store list` command lists OpenAI Assistants Vector Store.
+
+USAGE: ai chat assistant vector-store list [...]
+
+  CONNECTION
+    --endpoint ENDPOINT                 (see: ai help chat endpoint)
+    --key KEY                           (see: ai help chat key)
+
+EXAMPLE
+
+  ai chat assistant vector-store list
+
+SEE ALSO
+
+  ai help chat assistant examples
+  ai help chat assistant vector-store examples
+  ai help find topics chat assistant vector-store

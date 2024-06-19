@@ -1,0 +1,24 @@
+CHAT ASSISTANT VECTOR-STORE CREATE
+
+  The `ai chat assistant vector-store create` command creates a new OpenAI Assistant Vector Store.
+
+USAGE: ai chat assistant vector-store create [...]
+
+  CONNECTION
+    --endpoint ENDPOINT                 (see: ai help chat endpoint)
+    --key KEY                           (see: ai help chat key)
+
+  VECTOR-STORE
+    --name NAME
+    --file-id ID
+    --file-ids ID1 [...]
+
+EXAMPLE
+
+  ai chat assistant vector-store create --name "My Vector Store" --file-id ID1
+
+SEE ALSO
+
+  ai help chat assistant examples
+  ai help chat assistant vector-store examples
+  ai help find topics chat assistant vector-store
