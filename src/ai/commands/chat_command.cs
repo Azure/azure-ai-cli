@@ -376,12 +376,14 @@ namespace Azure.AI.Details.Common.CLI
         public async Task GetAssistantsAPIResponseAsync(AssistantClient assistantClient, string assistantId, AssistantThread thread, RunCreationOptions options, HelperFunctionFactory factory, string userInput)
         {
             await assistantClient.CreateMessageAsync(thread, [ userInput ]);
+            _ = CheckWriteChatHistoryOutputFileAsync(assistantClient, thread);
 
             DisplayAssistantPromptLabel();
 
             var assistant = await assistantClient.GetAssistantAsync(assistantId);
             var stream = assistantClient.CreateRunStreamingAsync(thread, assistant.Value, options);
 
+            string contentComplete = string.Empty;
             ThreadRun? run = null;
             List<ToolOutput> toolOutputs = [];
             do
@@ -390,6 +392,7 @@ namespace Azure.AI.Details.Common.CLI
                 {
                     if (update is MessageContentUpdate contentUpdate)
                     {
+                        contentComplete += contentUpdate.Text;
                         DisplayAssistantPromptTextStreaming(contentUpdate.Text);
                     }
                     else if (update is RunUpdate runUpdate)
@@ -409,6 +412,7 @@ namespace Azure.AI.Details.Common.CLI
                     if (run?.Status.IsTerminal == true)
                     {
                         DisplayAssistantPromptTextStreamingDone();
+                        CheckWriteChatAnswerOutputFile(contentComplete);
                     }
                 }
 
@@ -419,6 +423,8 @@ namespace Azure.AI.Details.Common.CLI
                 }
             }
             while (run?.Status.IsTerminal == false);
+
+            await CheckWriteChatHistoryOutputFileAsync(assistantClient, thread);
         }
 
         private async Task<string> GetChatCompletionsAsync(ChatClient client, List<ChatMessage> messages, ChatCompletionOptions options, HelperFunctionCallContext functionCallContext, string text)
@@ -480,14 +486,14 @@ namespace Azure.AI.Details.Common.CLI
             }
         }
 
-        private void ClearMessageHistory(List<ChatMessage> messages)
+        private async Task CheckWriteChatHistoryOutputFileAsync(AssistantClient client, AssistantThread thread)
         {
-            messages.RemoveRange(1, messages.Count - 1);
-            CheckWriteChatHistoryOutputFile(messages);
-
-            DisplayAssistantPromptLabel();
-            DisplayAssistantPromptTextStreaming("I've reset the conversation. How can I help you today?");
-            DisplayAssistantPromptTextStreamingDone();
+            var outputHistoryFile = OutputChatHistoryFileToken.Data().GetOrDefault(_values);
+            if (!string.IsNullOrEmpty(outputHistoryFile))
+            {
+                var fileName = FileHelpers.GetOutputDataFileName(outputHistoryFile, _values);
+                await thread.SaveChatHistoryToFileAsync(client, fileName);
+            }
         }
 
         private void CheckWriteChatHistoryOutputFile(IList<ChatMessage> messages)
@@ -498,6 +504,16 @@ namespace Azure.AI.Details.Common.CLI
                 var fileName = FileHelpers.GetOutputDataFileName(outputHistoryFile, _values);
                 messages.SaveChatHistoryToFile(fileName);
             }
+        }
+
+        private void ClearMessageHistory(List<ChatMessage> messages)
+        {
+            messages.RemoveRange(1, messages.Count - 1);
+            CheckWriteChatHistoryOutputFile(messages);
+
+            DisplayAssistantPromptLabel();
+            DisplayAssistantPromptTextStreaming("I've reset the conversation. How can I help you today?");
+            DisplayAssistantPromptTextStreamingDone();
         }
 
         private ChatCompletionOptions CreateChatCompletionOptions(out List<ChatMessage> messages)
