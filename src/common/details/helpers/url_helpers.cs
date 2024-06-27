@@ -93,6 +93,35 @@ namespace Azure.AI.Details.Common.CLI
             }
         }
 
+        public static void CheckWriteOutputNamesOrIds<T>(IEnumerable<T> items, ICommandValues values, string domain, IdKind kind, Func<T, string> func)
+        {
+            var outKey = kind == IdKind.Name
+                ? $"{domain}.output.names"
+                : $"{domain}.output.ids";
+            var outVal = values.GetOrEmpty(outKey);
+            var outOk = !string.IsNullOrEmpty(outVal);
+            if (outOk)
+            {
+                var atFile = FileHelpers.GetOutputDataFileName(outVal, values)!;
+                var namesOrIds = string.Join('\n', items.Select(func));
+                FileHelpers.WriteAllText(atFile, namesOrIds, Encoding.UTF8);
+                values.Reset(outKey); // once we wrote it, don't try to again
+            }
+
+            var addKey = kind == IdKind.Name
+                ? $"{domain}.output.add.names"
+                : $"{domain}.output.add.ids";
+            var addVal = values.GetOrEmpty(addKey);
+            var addOk = !string.IsNullOrEmpty(addVal);
+            if (addOk)
+            {
+                var addFile = FileHelpers.GetOutputDataFileName(addVal, values)!;
+                var namesOrIds = string.Join('\n', items.Select(func));
+                FileHelpers.AppendAllText(addFile, "\n" + namesOrIds, Encoding.UTF8);
+                values.Reset(addKey); // once we wrote it, don't try to again
+            }
+        }
+
         #region private data
         private static readonly string guidPatternEnd = "([0-9A-Fa-f]{8}[-][0-9A-Fa-f]{4}[-][0-9A-Fa-f]{4}[-][0-9A-Fa-f]{4}[-][0-9A-Fa-f]{12})$";
         private static readonly string flatDateTimePatternEnd = "((?#year)20[0-9][0-9])((?#month)(0[1-9])|(1[0-2]))((?#day)(0[1-9])|([12][0-9])|(3[0-1]))((?#time)[0-9]{10})$";

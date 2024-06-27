@@ -10,7 +10,13 @@ USAGE: ai chat assistant file upload [...]
 
   UPLOAD
     --file FILE
-    --file FILEs
+    --files FILE1 [...]
+
+  OUTPUT
+    --output-id @@FILE
+    --output-name @@FILE
+    --output-add-id @@FILE
+    --output-add-name @@FILE
 
 EXAMPLE
 

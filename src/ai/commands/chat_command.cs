@@ -1087,6 +1087,8 @@ namespace Azure.AI.Details.Common.CLI
 
             var codeInterpreter = CodeInterpreterToken.Data().GetOrDefault(_values, false);
             var assistant = await OpenAIAssistantHelpers.CreateAssistantAsync(key, endpoint, name, deployment, instructions, codeInterpreter);
+            IdHelpers.CheckWriteOutputNameOrId(assistant.Id, _values, "chat", IdKind.Id);
+            IdHelpers.CheckWriteOutputNameOrId(assistant.Name, _values, "chat", IdKind.Name);
 
             var fileIds = FileIdOptionXToken.GetOptions(_values).ToList();
             fileIds.AddRange(FileIdsOptionXToken.GetOptions(_values));
@@ -1183,6 +1185,8 @@ namespace Azure.AI.Details.Common.CLI
 
             DemandKeyAndEndpoint(out var key, out var endpoint);
             var assistants = await OpenAIAssistantHelpers.ListAssistantsAsync(key, endpoint);
+            IdHelpers.CheckWriteOutputNamesOrIds(assistants, _values, "chat", IdKind.Id, (a) => a.Key);
+            IdHelpers.CheckWriteOutputNamesOrIds(assistants, _values, "chat", IdKind.Name, (a) => a.Value);
 
             if (!_quiet) Console.WriteLine($"{message} Done!\n");
 
@@ -1240,6 +1244,9 @@ namespace Azure.AI.Details.Common.CLI
             }
 
             var store = await CreateAssistantVectorStoreAsync(key, endpoint, name, fileIds, files);
+            IdHelpers.CheckWriteOutputNameOrId(store.Id, _values, "chat", IdKind.Id);
+            IdHelpers.CheckWriteOutputNameOrId(store.Name, _values, "chat", IdKind.Name);
+
             PrintVectorStore(key, endpoint, store);
 
             if (!_quiet) Console.WriteLine($"{message} Done!\n");
@@ -1325,6 +1332,8 @@ namespace Azure.AI.Details.Common.CLI
 
             DemandKeyAndEndpoint(out var key, out var endpoint);
             var stores = await OpenAIAssistantHelpers.ListAssistantVectorStoresAsync(key, endpoint);
+            IdHelpers.CheckWriteOutputNamesOrIds(stores, _values, "chat", IdKind.Id, (a) => a.Key);
+            IdHelpers.CheckWriteOutputNamesOrIds(stores, _values, "chat", IdKind.Name, (a) => a.Value);
 
             if (!_quiet) Console.WriteLine($"{message} Done!\n");
 
@@ -1369,6 +1378,8 @@ namespace Azure.AI.Details.Common.CLI
 
             DemandKeyAndEndpoint(out var key, out var endpoint);
             var (uploadedId, uploadedName) = await OpenAIAssistantHelpers.UploadAssistantFile(key, endpoint, existing);
+            IdHelpers.CheckWriteOutputNameOrId(uploadedId, _values, "chat", IdKind.Id);
+            IdHelpers.CheckWriteOutputNameOrId(uploadedName, _values, "chat", IdKind.Name);
 
             if (!_quiet) Console.WriteLine($"{message} Done!\n\n  {uploadedName} ({uploadedId})\n");
 
@@ -1382,6 +1393,8 @@ namespace Azure.AI.Details.Common.CLI
 
             DemandKeyAndEndpoint(out var key, out var endpoint);
             var files = await OpenAIAssistantHelpers.ListAssistantFiles(key, endpoint);
+            IdHelpers.CheckWriteOutputNamesOrIds(files, _values, "chat", IdKind.Id, (a) => a.Key);
+            IdHelpers.CheckWriteOutputNamesOrIds(files, _values, "chat", IdKind.Name, (a) => a.Value);
 
             if (!_quiet) Console.WriteLine($"{message} Done!\n");
 

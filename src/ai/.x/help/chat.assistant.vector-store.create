@@ -8,14 +8,24 @@ USAGE: ai chat assistant vector-store create [...]
     --endpoint ENDPOINT                 (see: ai help chat endpoint)
     --key KEY                           (see: ai help chat key)
 
-  VECTOR-STORE
-    --name NAME
+  FILES
+    --file FILE
+    --files FILE1 [...]
     --file-id ID
     --file-ids ID1 [...]
 
+  VECTOR-STORE
+    --name NAME
+
+  OUTPUT
+    --output-id @@FILE
+    --output-name @@FILE
+    --output-add-id @@FILE
+    --output-add-name @@FILE
+
 EXAMPLE
 
-  ai chat assistant vector-store create --name "My Vector Store" --file-id ID1
+  ai chat assistant vector-store create --name "My Vector Store" --files "**/*.md"
 
 SEE ALSO
 

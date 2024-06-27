@@ -6,7 +6,7 @@ CHAT ASSISTANT VECTOR-STORE EXAMPLES
 
   `EXAMPLE 2`: Create an OpenAI Assistant Vector Store
 
-    ai chat assistant vector-store create --name "My Vector Store" --file-id ID1
+    ai chat assistant vector-store create --name "My Vector Store" --files "**/*.md"
 
 SEE ALSO
 

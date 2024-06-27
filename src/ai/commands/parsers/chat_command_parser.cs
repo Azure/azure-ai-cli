@@ -56,16 +56,16 @@ namespace Azure.AI.Details.Common.CLI
 
                 case "chat.assistant.create": return _chatAssistantCreateCommandParsers;
                 case "chat.assistant.get": return _chatAssistantGetCommandParsers;
-                case "chat.assistant.list": return _chatPlaceHolderParsers;
+                case "chat.assistant.list": return _chatAssistantListCommandParsers;
                 case "chat.assistant.delete": return _chatAssistantDeleteCommandParsers;
 
                 case "chat.assistant.vector-store.create": return _chatAssistantVectorStoreCreateCommandParsers;
                 case "chat.assistant.vector-store.get": return _chatAssistantVectorStoreGetCommandParsers;
-                case "chat.assistant.vector-store.list": return _chatPlaceHolderParsers;
+                case "chat.assistant.vector-store.list": return _chatAssistantVectorStoreListCommandParsers;
                 case "chat.assistant.vector-store.delete": return _chatAssistantVectorStoreDeleteCommandParsers;
 
                 case "chat.assistant.file.upload": return _chatAssistantFileUploadCommandParsers;
-                case "chat.assistant.file.list": return _chatPlaceHolderParsers;
+                case "chat.assistant.file.list": return _chatAssistantFileListCommandParsers;
                 case "chat.assistant.file.delete": return _chatAssistantFileDeleteCommandParsers;
             }
 
@@ -164,6 +164,11 @@ namespace Azure.AI.Details.Common.CLI
 
             new Any1ValueNamedValueTokenParser(null, "chat.assistant.create.name", "0001"),
             InstructionsToken.Parser(),
+
+            new OutputFileNameNamedValueTokenParser(null, "chat.output.assistant.id", "0101", "chat.output.id"),
+            new OutputFileNameNamedValueTokenParser(null, "chat.output.assistant.name", "0101", "chat.output.name"),
+            new OutputFileNameNamedValueTokenParser(null, "chat.output.add.assistant.id", "01101", "chat.output.add.id"),
+            new OutputFileNameNamedValueTokenParser(null, "chat.output.add.assistant.name", "01101", "chat.output.add.name")
         };
 
         private static INamedValueTokenParser[] _chatAssistantGetCommandParsers = {
@@ -174,6 +179,14 @@ namespace Azure.AI.Details.Common.CLI
         private static INamedValueTokenParser[] _chatAssistantDeleteCommandParsers = {
             new CommonChatNamedValueTokenParsers(),
             new Any1ValueNamedValueTokenParser(null, "chat.assistant.id", "001"),
+        };
+
+        private static INamedValueTokenParser[] _chatAssistantListCommandParsers = {
+            new CommonChatNamedValueTokenParsers(),
+            new OutputFileNameNamedValueTokenParser(null, "chat.output.assistant.ids", "0101", "chat.output.ids"),
+            new OutputFileNameNamedValueTokenParser(null, "chat.output.assistant.names", "0101", "chat.output.names"),
+            new OutputFileNameNamedValueTokenParser(null, "chat.output.add.assistant.ids", "01101", "chat.output.add.ids"),
+            new OutputFileNameNamedValueTokenParser(null, "chat.output.add.assistant.names", "01101", "chat.output.add.names"),
         };
 
         private static INamedValueTokenParser[] _chatAssistantVectorStoreDeleteCommandParsers = {
@@ -190,17 +203,43 @@ namespace Azure.AI.Details.Common.CLI
 
             new CommonChatNamedValueTokenParsers(),
             new Any1ValueNamedValueTokenParser(null, "chat.assistant.vector.store.name", "00001"),
+
+            new OutputFileNameNamedValueTokenParser(null, "chat.output.assistant.vector.store.id", "010001", "chat.output.id"),
+            new OutputFileNameNamedValueTokenParser(null, "chat.output.assistant.vector.store.name", "010001", "chat.output.name"),
+            new OutputFileNameNamedValueTokenParser(null, "chat.output.add.assistant.vector.store.id", "0110001", "chat.output.add.id"),
+            new OutputFileNameNamedValueTokenParser(null, "chat.output.add.assistant.vector.store.name", "0110001", "chat.output.add.name")
         };
 
         private static INamedValueTokenParser[] _chatAssistantVectorStoreGetCommandParsers = {
             new CommonChatNamedValueTokenParsers(),
             new Any1ValueNamedValueTokenParser(null, "chat.assistant.vector.store.id", "00001"),
         };
+
+        private static INamedValueTokenParser[] _chatAssistantVectorStoreListCommandParsers = {
+            new CommonChatNamedValueTokenParsers(),
+            new OutputFileNameNamedValueTokenParser(null, "chat.output.assistant.vector.store.ids", "010001", "chat.output.ids"),
+            new OutputFileNameNamedValueTokenParser(null, "chat.output.assistant.vector.store.names", "010001", "chat.output.names"),
+            new OutputFileNameNamedValueTokenParser(null, "chat.output.add.assistant.vector.store.ids", "0110001", "chat.output.add.ids"),
+            new OutputFileNameNamedValueTokenParser(null, "chat.output.add.assistant.vector.store.names", "0110001", "chat.output.add.names")
+        };
         
         private static INamedValueTokenParser[] _chatAssistantFileUploadCommandParsers = {
             new CommonChatNamedValueTokenParsers(),
             new Any1ValueNamedValueTokenParser("--file", "assistant.upload.file", "001"),
             new ExpandFileNameNamedValueTokenParser("--files", "assistant.upload.files", "001", "assistant.upload.file"),
+
+            new OutputFileNameNamedValueTokenParser(null, "chat.output.assistant.file.id", "01001", "chat.output.id"),
+            new OutputFileNameNamedValueTokenParser(null, "chat.output.assistant.file.name", "01001", "chat.output.name"),
+            new OutputFileNameNamedValueTokenParser(null, "chat.output.add.assistant.file.id", "011001", "chat.output.add.id"),
+            new OutputFileNameNamedValueTokenParser(null, "chat.output.add.assistant.file.name", "011001", "chat.output.add.name"),
+        };
+
+        private static INamedValueTokenParser[] _chatAssistantFileListCommandParsers = {
+            new CommonChatNamedValueTokenParsers(),
+            new OutputFileNameNamedValueTokenParser(null, "chat.output.assistant.file.ids", "01001", "chat.output.ids"),
+            new OutputFileNameNamedValueTokenParser(null, "chat.output.assistant.file.names", "01001", "chat.output.names"),
+            new OutputFileNameNamedValueTokenParser(null, "chat.output.add.assistant.file.ids", "011001", "chat.output.add.ids"),
+            new OutputFileNameNamedValueTokenParser(null, "chat.output.add.assistant.file.names", "011001", "chat.output.add.names"),
         };
 
         private static INamedValueTokenParser[] _chatAssistantFileDeleteCommandParsers = {
