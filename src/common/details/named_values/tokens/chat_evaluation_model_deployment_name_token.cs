@@ -8,7 +8,7 @@ namespace Azure.AI.Details.Common.CLI
     public class ChatEvaluationModelDeploymentNameToken
     {
         public static NamedValueTokenData Data() => new NamedValueTokenData(_optionName, _fullName, _optionExample, _requiredDisplayName);
-        public static INamedValueTokenParser Parser(bool requireSearchPart = false) => new NamedValueTokenParser(_optionName, _fullName, requireSearchPart ? "11010" : "01010", "1");
+        public static INamedValueTokenParser Parser(bool requireSearchPart = false) => new Any1ValueNamedValueTokenParser(_optionName, _fullName, requireSearchPart ? "11010" : "01010");
 
         private const string _requiredDisplayName = "evaluation deployment name";
         private const string _optionName = "--evaluation-deployment";

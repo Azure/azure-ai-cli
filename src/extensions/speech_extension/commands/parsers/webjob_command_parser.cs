@@ -82,76 +82,76 @@ namespace Azure.AI.Details.Common.CLI
         {
             public CommonWebjobNamedValueTokenParsers(Allow allow) : base(
 
-                new NamedValueTokenParser(null, "x.command", "11", "1"),
+                new Any1ValueNamedValueTokenParser(null, "x.command", "11"),
 
                 new CommonNamedValueTokenParsers(),
                 new ExpectConsoleOutputTokenParser(),
                 new ParallelCommandsTokenParser(),
 
-                new NamedValueTokenParser("--ini", "ini.file", "10", "1", "@"),
+                new IniFileNamedValueTokenParser(),
 
-                new NamedValueTokenParser("--user", "webjob.config.username", "001", "1"),
-                new NamedValueTokenParser("--pass", "webjob.config.password", "001", "1"),
-                new NamedValueTokenParser(null, "webjob.config.endpoint", "001", "1"),
-                new NamedValueTokenParser(null, "webjob.timeout", "01", "1"),
+                new Any1ValueNamedValueTokenParser("--user", "webjob.config.username", "001"),
+                new Any1ValueNamedValueTokenParser("--pass", "webjob.config.password", "001"),
+                new Any1ValueNamedValueTokenParser(null, "webjob.config.endpoint", "001"),
+                new Any1ValueNamedValueTokenParser(null, "webjob.timeout", "01"),
 
-                new NamedValueTokenParser(null, "webjob.output.request.file", "0110", "1", "@@"),
-                new NamedValueTokenParser(null, "webjob.output.json.file", "0110", "1", "@@")
+                new OutputFileNameNamedValueTokenParser(null, "webjob.output.request.file", "0110"),
+                new OutputFileNameNamedValueTokenParser(null, "webjob.output.json.file", "0110")
             )
             {
                 if ((allow & Allow.InputJobName) != 0 && (allow & Allow.InputJobRunId) != 0)
                 {
-                    Add(new NamedValueTokenParser(null, "webjob.job.name", "001", "1"));
-                    Add(new NamedValueTokenParser("--job", "webjob.job.id", "001", "2;1"));
+                    Add(new Any1ValueNamedValueTokenParser(null, "webjob.job.name", "001"));
+                    Add(new Any1or2ValueNamedValueTokenParser("--job", "webjob.job.id", "001"));
                 }
                 else if ((allow & Allow.InputJobName) != 0)
                 {
-                    Add(new NamedValueTokenParser(null, "webjob.job.name", "001;010", "1"));
+                    Add(new Any1ValueNamedValueTokenParser(null, "webjob.job.name", "001;010"));
                 }
                 else if ((allow & Allow.InputJobRunId) != 0)
                 {
-                    Add(new NamedValueTokenParser(null, "webjob.job.id", "001", "1"));
+                    Add(new Any1ValueNamedValueTokenParser(null, "webjob.job.id", "001"));
                 }
 
                 if ((allow & Allow.OutputJobName) != 0)
                 {
-                    Add(new NamedValueTokenParser(null, "webjob.output.name", "011", "1", "@@"));
-                    Add(new NamedValueTokenParser(null, "webjob.output.add.name", "0111", "1", "@@"));
+                    Add(new OutputFileNameNamedValueTokenParser(null, "webjob.output.name", "011"));
+                    Add(new OutputFileNameNamedValueTokenParser(null, "webjob.output.add.name", "0111"));
                 }
 
                 if ((allow & Allow.OutputJobRunId) != 0)
                 {
-                    Add(new NamedValueTokenParser(null, "webjob.output.id", "011", "1", "@@"));
-                    Add(new NamedValueTokenParser(null, "webjob.output.add.id", "0111", "1", "@@"));
+                    Add(new OutputFileNameNamedValueTokenParser(null, "webjob.output.id", "011"));
+                    Add(new OutputFileNameNamedValueTokenParser(null, "webjob.output.add.id", "0111"));
                 }
 
                 if ((allow & Allow.OutputUrl) != 0)
                 {
-                    Add(new NamedValueTokenParser(null, "webjob.output.url", "011", "1", "@@"));
-                    Add(new NamedValueTokenParser(null, "webjob.output.add.url", "0111", "1", "@@"));
+                    Add(new OutputFileNameNamedValueTokenParser(null, "webjob.output.url", "011"));
+                    Add(new OutputFileNameNamedValueTokenParser(null, "webjob.output.add.url", "0111"));
                 }
 
                 if ((allow & Allow.OutputJobNames) != 0)
                 {
-                    Add(new NamedValueTokenParser(null, "webjob.output.last.name", "0111;0101", "1", "@@", "webjob.output.name", "true", "webjob.output.list.last"));
-                    Add(new NamedValueTokenParser(null, "webjob.output.job.names", "0101", "1", "@@", "webjob.output.names"));
+                    Add(new OutputFileNameNamedValueTokenParser(null, "webjob.output.last.name", "0111;0101", "webjob.output.name", "true", "webjob.output.list.last"));
+                    Add(new OutputFileNameNamedValueTokenParser(null, "webjob.output.job.names", "0101", "webjob.output.names"));
                 }
 
                 if ((allow & Allow.OutputJobRunIds) != 0)
                 {
-                    Add(new NamedValueTokenParser(null, "webjob.output.last.id", "0111", "1", "@@", "webjob.output.id", "true", "webjob.output.list.last"));
-                    Add(new NamedValueTokenParser(null, "webjob.output.ids", "011", "1", "@@", "webjob.output.ids"));
+                    Add(new OutputFileNameNamedValueTokenParser(null, "webjob.output.last.id", "0111", "webjob.output.id", "true", "webjob.output.list.last"));
+                    Add(new OutputFileNameNamedValueTokenParser(null, "webjob.output.ids", "011", "webjob.output.ids"));
                 }
 
                 if ((allow & Allow.OutputUrls) != 0)
                 {
-                    Add(new NamedValueTokenParser(null, "webjob.output.last.url", "0110;0101", "1", "@@", "webjob.output.url", "true", "webjob.output.list.last"));
-                    Add(new NamedValueTokenParser(null, "webjob.output.job.urls", "0101", "1", "@@", "webjob.output.urls"));
+                    Add(new OutputFileNameNamedValueTokenParser(null, "webjob.output.last.url", "0110;0101", "webjob.output.url", "true", "webjob.output.list.last"));
+                    Add(new OutputFileNameNamedValueTokenParser(null, "webjob.output.job.urls", "0101", "webjob.output.urls"));
                 }
 
                 if ((allow & Allow.Wait) != 0)
                 {
-                    Add(new NamedValueTokenParser(null, "webjob.wait.timeout", "010", "1;0", null, null, "864000000"));
+                    Add(new OptionalWithDefaultNamedValueTokenParser(null, "webjob.wait.timeout", "010", "864000000"));
                 }
             }
         }
@@ -165,9 +165,9 @@ namespace Azure.AI.Details.Common.CLI
                 Allow.OutputJobRunId | Allow.OutputJobRunIds |
                 Allow.OutputUrl | Allow.OutputUrls),
 
-            new NamedValueTokenParser("--jobs", "webjob.list.jobs", "001", "0", null, null, "jobs", "webjob.list.kind"),
-            new NamedValueTokenParser("--runs", "webjob.list.runs", "001", "0", null, null, "runs", "webjob.list.kind"),
-            new NamedValueTokenParser(null, "webjob.list.kind", "001", "1", "jobs;runs"),
+            new PinnedNamedValueTokenParser("--jobs", "webjob.list.jobs", "001", "jobs", "webjob.list.kind"),
+            new PinnedNamedValueTokenParser("--runs", "webjob.list.runs", "001", "runs", "webjob.list.kind"),
+            new RequiredValidValueNamedValueTokenParser(null, "webjob.list.kind", "001", "jobs;runs"),
         };
 
         private static readonly INamedValueTokenParser[] uploadCommandParsers = {
@@ -176,7 +176,7 @@ namespace Azure.AI.Details.Common.CLI
                 Allow.OutputJobRunId |
                 Allow.OutputUrl |
                 Allow.Wait),
-            new NamedValueTokenParser(null, "webjob.upload.job.file", "0001", "1"),
+            new Any1ValueNamedValueTokenParser(null, "webjob.upload.job.file", "0001"),
             new TrueFalseNamedValueTokenParser("webjob.run.job", "010"),
         };
 
@@ -206,9 +206,9 @@ namespace Azure.AI.Details.Common.CLI
                 Allow.InputJobName |
                 Allow.InputJobRunId),
 
-            new NamedValueTokenParser("--href", "webjob.download.url", "001", "1"),
-            new NamedValueTokenParser(null, "webjob.download.file", "001", "1"),
-            new NamedValueTokenParser(null, "webjob.output.file", "011", "1", "@@"),
+            new Any1ValueNamedValueTokenParser("--href", "webjob.download.url", "001"),
+            new Any1ValueNamedValueTokenParser(null, "webjob.download.file", "001"),
+            new OutputFileNameNamedValueTokenParser(null, "webjob.output.file", "011"),
         };
 
         #endregion

@@ -8,7 +8,7 @@ namespace Azure.AI.Details.Common.CLI
     public class EnvironmentVariablesToken
     {
         public static NamedValueTokenData Data() => new NamedValueTokenData(_optionName, _fullName, _optionExample, _requiredDisplayName);
-        public static INamedValueTokenParser Parser() => new NamedValueTokenParser(_optionName, _fullName, "11;10", "1", "@;");
+        public static INamedValueTokenParser Parser() => new AtFileOrListNamedValueTokenParser(_optionName, _fullName, "11;10");
 
         private const string _requiredDisplayName = "environment variables";
         private const string _optionName = "--environment-variables";

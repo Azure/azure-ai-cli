@@ -25,15 +25,14 @@ namespace Azure.AI.Details.Common.CLI
 
         private static INamedValueTokenParser[] evalCommandParsers = {
 
-            new NamedValueTokenParser(null, "x.command", "11", "1", "eval"),
+            new RequiredValidValueNamedValueTokenParser(null, "x.command", "11", "eval"),
 
             new ExpectOutputTokenParser(),
             new DiagnosticLogTokenParser(),
             new CommonNamedValueTokenParsers(),
 
-            new NamedValueTokenParser("--ini", "ini.file", "10", "1", "@"),
-
-            new NamedValueTokenParser(null, "x.command.expand.file.name", "11111", "1"),
+            new IniFileNamedValueTokenParser(),
+            new ExpandFileNameNamedValueTokenParser(),
 
             ConfigEndpointUriToken.Parser(),
             ConfigDeploymentToken.Parser(),

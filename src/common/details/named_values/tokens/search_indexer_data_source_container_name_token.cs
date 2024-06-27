@@ -8,7 +8,7 @@ namespace Azure.AI.Details.Common.CLI
     public class SearchIndexerDataSourceContainerNameToken
     {
         public static NamedValueTokenData Data() => new NamedValueTokenData(_optionName, _fullName, _optionExample, _requiredDisplayName);
-        public static INamedValueTokenParser Parser() => new NamedValueTokenParser(_optionName, _fullName, "001110;000011", "1");
+        public static INamedValueTokenParser Parser() => new Any1ValueNamedValueTokenParser(_optionName, _fullName, "001110;000011");
 
         private const string _requiredDisplayName = "data source container name";
         private const string _optionName = "--data-source-container";

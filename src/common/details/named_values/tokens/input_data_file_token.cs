@@ -9,8 +9,8 @@ namespace Azure.AI.Details.Common.CLI
     {
         public static NamedValueTokenData Data() => new NamedValueTokenData(_optionName, _fullName, _optionExample, _requiredDisplayName);
         public static INamedValueTokenParser Parser() => new NamedValueTokenParserList(
-            new NamedValueTokenParser(_optionName, _fullName, "110;001", "1"),
-            new NamedValueTokenParser("--files", $"{_fullName}s", "110;001", "1", null, null, _fullName, "x.command.expand.file.name")
+            new Any1ValueNamedValueTokenParser(_optionName, _fullName, "110;001"),
+            new ExpandFileNameNamedValueTokenParser("--files", $"{_fullName}s", "110;001", _fullName)
         );
 
         private const string _requiredDisplayName = "input data file";

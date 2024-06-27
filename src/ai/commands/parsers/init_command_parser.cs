@@ -81,36 +81,36 @@ namespace Azure.AI.Details.Common.CLI
         {
             public CommonInitNamedValueTokenParsers() : base(
 
-                new NamedValueTokenParser(null, "x.command", "11", "1"),
+                new Any1ValueNamedValueTokenParser(null, "x.command", "11"),
 
                 new ExpectOutputTokenParser(),
                 new DiagnosticLogTokenParser(),
                 new CommonNamedValueTokenParsers(false),
 
-                new NamedValueTokenParser("--ini", "ini.file", "10", "1", "@"),
+                new IniFileNamedValueTokenParser(),
 
                 SubscriptionToken.Parser(),
-                new NamedValueTokenParser("--region", "init.service.resource.region.name", "00010", "1"),
-                new NamedValueTokenParser("--group", "init.service.resource.group.name", "00010", "1"),
-                new NamedValueTokenParser("--name", "init.service.cognitiveservices.resource.name", "00001", "1"),
-                new NamedValueTokenParser("--kind", "init.service.cognitiveservices.resource.kind", "00001", "1"),
-                new NamedValueTokenParser("--sku", "init.service.cognitiveservices.resource.sku", "00001", "1"),
-                new NamedValueTokenParser("--yes", "init.service.cognitiveservices.terms.agree", "00001", "1;0", "true;false", null, "true"),
+                new Any1ValueNamedValueTokenParser("--region", "init.service.resource.region.name", "00010"),
+                new Any1ValueNamedValueTokenParser("--group", "init.service.resource.group.name", "00010"),
+                new Any1ValueNamedValueTokenParser("--name", "init.service.cognitiveservices.resource.name", "00001"),
+                new Any1ValueNamedValueTokenParser("--kind", "init.service.cognitiveservices.resource.kind", "00001"),
+                new Any1ValueNamedValueTokenParser("--sku", "init.service.cognitiveservices.resource.sku", "00001"),
+                new TrueFalseNamedValueTokenParser("--yes", "init.service.cognitiveservices.terms.agree", "00001"),
 
-                new NamedValueTokenParser(null, "init.chat.model.deployment.name", "01010;00010", "1"),
-                new NamedValueTokenParser(null, "init.embeddings.model.deployment.name", "01010", "1"),
-                new NamedValueTokenParser(null, "init.evaluation.model.deployment.name", "01010", "1"),
+                new Any1ValueNamedValueTokenParser(null, "init.chat.model.deployment.name", "01010;00010"),
+                new Any1ValueNamedValueTokenParser(null, "init.embeddings.model.deployment.name", "01010"),
+                new Any1ValueNamedValueTokenParser(null, "init.evaluation.model.deployment.name", "01010"),
 
-                new NamedValueTokenParser(null, "init.chat.model.name", "0110;0010", "1"),
-                new NamedValueTokenParser(null, "init.embeddings.model.name", "0110", "1"),
-                new NamedValueTokenParser(null, "init.evaluation.model.name", "0110", "1"),
+                new Any1ValueNamedValueTokenParser(null, "init.chat.model.name", "0110;0010"),
+                new Any1ValueNamedValueTokenParser(null, "init.embeddings.model.name", "0110"),
+                new Any1ValueNamedValueTokenParser(null, "init.evaluation.model.name", "0110"),
 
-                new NamedValueTokenParser(null, "init.output.env.file", "0110", "1;0", "true;false", null, "true"),
+                new TrueFalseNamedValueTokenParser(null, "init.output.env.file", "0110"),
 
-                new NamedValueTokenParser("--interactive", "init.service.interactive", "001", "1;0", "true;false", null, "true")
+                new TrueFalseNamedValueTokenParser("--interactive", "init.service.interactive", "001")
 
-            // new NamedValueTokenParser(null, "init.output.azcli.command.file", "01100", "1", "@@"),
-            // new NamedValueTokenParser(null, "init.output.azcli.json.file", "01110", "1", "@@")
+            // new OutputFileNameNamedValueTokenParser(null, "init.output.azcli.command.file", "01100"),
+            // new OutputFileNameNamedValueTokenParser(null, "init.output.azcli.json.file", "01110")
             )
             {
             }

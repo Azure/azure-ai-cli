@@ -111,15 +111,14 @@ namespace Azure.AI.Details.Common.CLI
         {
             public CommonServiceNamedValueTokenParsers() : base(
 
-                    new NamedValueTokenParser(null, "x.command", "11", "1"),
+                    new Any1ValueNamedValueTokenParser(null, "x.command", "11"),
 
                     new ExpectOutputTokenParser(),
                     new DiagnosticLogTokenParser(),
                     new CommonNamedValueTokenParsers(),
 
-                    new NamedValueTokenParser("--ini", "ini.file", "10", "1", "@"),
-
-                    new NamedValueTokenParser(null, "x.command.expand.file.name", "11111", "1"),
+                    new IniFileNamedValueTokenParser(),
+                    new ExpandFileNameNamedValueTokenParser(),
 
                     ConfigEndpointUriToken.Parser(),
                     ConfigDeploymentToken.Parser(),
@@ -145,15 +144,15 @@ namespace Azure.AI.Details.Common.CLI
             ResourceDisplayNameToken.Parser(),
             ResourceDescriptionToken.Parser(),
 
-            new NamedValueTokenParser("--output-resource-id", "service.output.resource.id", "0110;0101", "1"),
-            new NamedValueTokenParser(null, "service.output.json", "011", "1")
+            new Any1ValueNamedValueTokenParser("--output-resource-id", "service.output.resource.id", "0110;0101"),
+            new Any1ValueNamedValueTokenParser(null, "service.output.json", "011")
         };
 
         private static INamedValueTokenParser[] _resourceListParsers = {
             
             new CommonServiceNamedValueTokenParsers(),
 
-            new NamedValueTokenParser(null, "service.output.json", "011", "1")
+            new Any1ValueNamedValueTokenParser(null, "service.output.json", "011")
         };
 
         private static INamedValueTokenParser[] _resourceDeleteParsers = {
@@ -164,7 +163,7 @@ namespace Azure.AI.Details.Common.CLI
             ResourceNameToken.Parser(),
             DeleteDependentResourcesToken.Parser(),
 
-            new NamedValueTokenParser(null, "service.output.json", "011", "1")
+            new Any1ValueNamedValueTokenParser(null, "service.output.json", "011")
         };
 
         private static INamedValueTokenParser[] _projectCreateParsers = {
@@ -178,15 +177,15 @@ namespace Azure.AI.Details.Common.CLI
             ProjectDisplayNameToken.Parser(),
             ProjectDescriptionToken.Parser(),
 
-            new NamedValueTokenParser("--output-project-id", "service.output.project.id", "0110;0101", "1"),
-            new NamedValueTokenParser(null, "service.output.json", "011", "1")
+            new Any1ValueNamedValueTokenParser("--output-project-id", "service.output.project.id", "0110;0101"),
+            new Any1ValueNamedValueTokenParser(null, "service.output.json", "011")
         };
 
         private static INamedValueTokenParser[] _projectListParsers = {
             
             new CommonServiceNamedValueTokenParsers(),
 
-            new NamedValueTokenParser(null, "service.output.json", "011", "1")
+            new Any1ValueNamedValueTokenParser(null, "service.output.json", "011")
         };
 
         private static INamedValueTokenParser[] _projectDeleteParsers = {
@@ -197,7 +196,7 @@ namespace Azure.AI.Details.Common.CLI
             ProjectNameToken.Parser(requireProjectPart: false),
             DeleteDependentResourcesToken.Parser(),
 
-            new NamedValueTokenParser(null, "service.output.json", "011", "1")
+            new Any1ValueNamedValueTokenParser(null, "service.output.json", "011")
         };
 
         private static INamedValueTokenParser[] _connectionCreateParsers = {
@@ -212,7 +211,7 @@ namespace Azure.AI.Details.Common.CLI
             ProjectConnectionKeyToken.Parser(),
             CognitiveServicesResourceKindToken.Parser(),
 
-            new NamedValueTokenParser(null, "service.output.json", "011", "1")
+            new Any1ValueNamedValueTokenParser(null, "service.output.json", "011")
         };
 
         private static INamedValueTokenParser[] _connectionListParsers = {
@@ -222,7 +221,7 @@ namespace Azure.AI.Details.Common.CLI
             ResourceGroupNameToken.Parser(),
             ProjectNameToken.Parser(),
 
-            new NamedValueTokenParser(null, "service.output.json", "011", "1")
+            new Any1ValueNamedValueTokenParser(null, "service.output.json", "011")
         };
 
         private static INamedValueTokenParser[] _connectionDeleteParsers = {
@@ -233,7 +232,7 @@ namespace Azure.AI.Details.Common.CLI
             ProjectNameToken.Parser(),
             ProjectConnectionNameToken.Parser(),
 
-            new NamedValueTokenParser(null, "service.output.json", "011", "1")
+            new Any1ValueNamedValueTokenParser(null, "service.output.json", "011")
         };
 
         private static INamedValueTokenParser[] _searchCreateParsers = {
@@ -247,8 +246,8 @@ namespace Azure.AI.Details.Common.CLI
             // ProjectDisplayNameToken.Parser(),
             // ProjectDescriptionToken.Parser(),
 
-            // new NamedValueTokenParser("--output-project-id", "service.output.project.id", "0110;0101", "1"),
-            // new NamedValueTokenParser(null, "service.output.json", "011", "1")
+            // new Any1ValueNamedValueTokenParser("--output-project-id", "service.output.project.id", "0110;0101"),
+            // new Any1ValueNamedValueTokenParser(null, "service.output.json", "011")
         };
 
         #endregion

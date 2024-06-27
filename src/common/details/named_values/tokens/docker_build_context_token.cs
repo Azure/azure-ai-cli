@@ -8,7 +8,7 @@ namespace Azure.AI.Details.Common.CLI
     public class DockerBuildContextToken
     {
         public static NamedValueTokenData Data() => new NamedValueTokenData(_optionName, _fullName, _optionExample, _requiredDisplayName);
-        public static INamedValueTokenParser Parser() => new NamedValueTokenParser(_optionName, _fullName, "111;100", "1");
+        public static INamedValueTokenParser Parser() => new Any1ValueNamedValueTokenParser(_optionName, _fullName, "111;100");
 
         private const string _requiredDisplayName = "docker build context";
         private const string _optionName = "--docker-build-context";

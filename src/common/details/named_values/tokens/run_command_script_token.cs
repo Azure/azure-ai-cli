@@ -8,7 +8,7 @@ namespace Azure.AI.Details.Common.CLI
     public class RunCommandScriptToken
     {
         public static NamedValueTokenData Data() => new NamedValueTokenData(_optionName, _fullName, _optionExample, _requiredDisplayName);
-        public static INamedValueTokenParser Parser() => new NamedValueTokenParser(_optionName, _fullName, "100;010;010", "1");
+        public static INamedValueTokenParser Parser() => new Any1ValueNamedValueTokenParser(_optionName, _fullName, "100;010;010");
 
         private const string _requiredDisplayName = "run shell command/script";
         private const string _optionName = "--script";

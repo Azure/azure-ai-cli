@@ -8,7 +8,7 @@ namespace Azure.AI.Details.Common.CLI
     public class SearchEmbeddingModelNameToken
     {
         public static NamedValueTokenData Data() => new NamedValueTokenData(_optionName, _fullName, _optionExample, _requiredDisplayName);
-        public static INamedValueTokenParser Parser(bool requireSearchPart = false) => new NamedValueTokenParser(_optionName, _fullName, requireSearchPart ? "1110" : "0110", "1");
+        public static INamedValueTokenParser Parser(bool requireSearchPart = false) => new Any1ValueNamedValueTokenParser(_optionName, _fullName, requireSearchPart ? "1110" : "0110");
 
         private const string _requiredDisplayName = "embedding model name";
         private const string _optionName = "--embedding-model";

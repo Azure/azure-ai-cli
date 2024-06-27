@@ -46,20 +46,19 @@ namespace Azure.AI.Details.Common.CLI
         {
             public CommonScenarioNamedValueTokenParsers() : base(
 
-                new NamedValueTokenParser(null, "x.command", "11", "1", "wizard"),
+                new RequiredValidValueNamedValueTokenParser(null, "x.command", "11", "wizard"),
 
                 new ExpectOutputTokenParser(),
                 new DiagnosticLogTokenParser(),
                 new CommonNamedValueTokenParsers(),
 
-                new NamedValueTokenParser("--ini", "ini.file", "10", "1", "@"),
-
-                new NamedValueTokenParser(null, "x.command.expand.file.name", "11111", "1"),
+                new IniFileNamedValueTokenParser(),
+                new ExpandFileNameNamedValueTokenParser(),
 
                 ConfigEndpointUriToken.Parser(),
                 ConfigDeploymentToken.Parser(),
 
-                new NamedValueTokenParser("--interactive", "scenario.wizard.interactive", "001", "1;0", "true;false", null, "true")
+                new TrueFalseNamedValueTokenParser("--interactive", "scenario.wizard.interactive", "001")
 
             )
             {

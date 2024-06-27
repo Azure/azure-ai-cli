@@ -88,14 +88,14 @@ namespace Azure.AI.Details.Common.CLI
         {
             public CommonChatNamedValueTokenParsers() : base(
 
-                    new NamedValueTokenParser(null, "x.command", "11", "1"),
+                    new Any1ValueNamedValueTokenParser(null, "x.command", "11"),
 
                     new ExpectOutputTokenParser(),
                     new DiagnosticLogTokenParser(),
                     new CommonNamedValueTokenParsers(),
 
-                    new NamedValueTokenParser("--ini", "ini.file", "10", "1", "@"),
-                    new NamedValueTokenParser(null, "x.command.expand.file.name", "11111", "1"),
+                    new IniFileNamedValueTokenParser(),
+                    new ExpandFileNameNamedValueTokenParser(),
 
                     ConfigEndpointUriToken.Parser(),
                     ConfigDeploymentToken.Parser(),
@@ -104,22 +104,22 @@ namespace Azure.AI.Details.Common.CLI
                     SearchEmbeddingModelDeploymentNameToken.Parser(),
                     SearchEmbeddingModelNameToken.Parser(),
 
-                    new NamedValueTokenParser(null, "chat.assistant.id", "011", "1"),
-                    new NamedValueTokenParser(null, "chat.assistant.file.id", "0011", "1"),
+                    new Any1ValueNamedValueTokenParser(null, "chat.assistant.id", "011"),
+                    new Any1ValueNamedValueTokenParser(null, "chat.assistant.file.id", "0011"),
 
-                    new NamedValueTokenParser(null,             "service.config.search.api.key", "00101", "1"),
-                    new NamedValueTokenParser(null,             "service.config.search.endpoint.uri", "00110;00101", "1"),
-                    new NamedValueTokenParser(null,             "service.config.search.query.type", "00011", "1"),
+                    new Any1ValueNamedValueTokenParser(null, "service.config.search.api.key", "00101"),
+                    new Any1ValueNamedValueTokenParser(null, "service.config.search.endpoint.uri", "00110;00101"),
+                    new Any1ValueNamedValueTokenParser(null, "service.config.search.query.type", "00011"),
 
-                    new NamedValueTokenParser(null,             "chat.options.max.tokens", "0011", "1"),
-                    new NamedValueTokenParser(null,             "chat.options.temperature", "001", "1"),
-                    new NamedValueTokenParser(null,             "chat.options.top.p", "0001", "1"),
-                    new NamedValueTokenParser(null,             "chat.options.frequency.penalty", "0011", "1"),
-                    new NamedValueTokenParser(null,             "chat.options.presence.penalty", "0011", "1"),
-                    new NamedValueTokenParser(null,             "chat.options.stop.sequence", "0010", "1"),
+                    new Any1ValueNamedValueTokenParser(null, "chat.options.max.tokens", "0011"),
+                    new Any1ValueNamedValueTokenParser(null, "chat.options.temperature", "001"),
+                    new Any1ValueNamedValueTokenParser(null, "chat.options.top.p", "0001"),
+                    new Any1ValueNamedValueTokenParser(null, "chat.options.frequency.penalty", "0011"),
+                    new Any1ValueNamedValueTokenParser(null, "chat.options.presence.penalty", "0011"),
+                    new Any1ValueNamedValueTokenParser(null, "chat.options.stop.sequence", "0010"),
 
                     new TrueFalseNamedValueTokenParser("chat.built.in.helper.functions", "01101"),
-                    new NamedValueTokenParser(null, "chat.custom.helper.functions", "0101;0011", "1")
+                    new Any1ValueNamedValueTokenParser(null, "chat.custom.helper.functions", "0101;0011")
                 )
             {
             }
@@ -133,13 +133,13 @@ namespace Azure.AI.Details.Common.CLI
 
             new CommonChatNamedValueTokenParsers(),
 
-            new NamedValueTokenParser(null, "chat.message.history.json.file", "10110", "1", null, null, "json.file", "chat.history.type"),
-            new NamedValueTokenParser(null, "chat.message.history.jsonl.file", "10110", "1", null, null, "jsonl.file", "chat.history.type"),
-            new NamedValueTokenParser(null, "chat.message.history.text.file", "10110", "1", null, null, "text.file", "chat.history.type"),
-            new NamedValueTokenParser(null, "chat.message.history.type", "1111", "1", "interactive;interactive+;json;jsonl;text;json.file;jsonl.file;text.file"),
+            new Any1PinnedNamedValueTokenParser(null, "chat.message.history.json.file", "10110", "json.file", "chat.history.type"),
+            new Any1PinnedNamedValueTokenParser(null, "chat.message.history.jsonl.file", "10110", "jsonl.file", "chat.history.type"),
+            new Any1PinnedNamedValueTokenParser(null, "chat.message.history.text.file", "10110", "text.file", "chat.history.type"),
+            new RequiredValidValueNamedValueTokenParser(null, "chat.message.history.type", "1111", "interactive;interactive+;json;jsonl;text;json.file;jsonl.file;text.file"),
 
-            new NamedValueTokenParser(null, "chat.message.system.prompt", "0010;0001", "1"),
-            new NamedValueTokenParser(null, "chat.message.user.prompt", "0010", "1"),
+            new Any1ValueNamedValueTokenParser(null, "chat.message.system.prompt", "0010;0001"),
+            new Any1ValueNamedValueTokenParser(null, "chat.message.user.prompt", "0010"),
             new NamedValueTokenParser(null, "chat.message.user.question", "0001", "1", null, "chat.message.user.prompt"),
 
             new TrueFalseNamedValueTokenParser("chat.input.interactive", "001"),
@@ -149,8 +149,6 @@ namespace Azure.AI.Details.Common.CLI
             OutputChatHistoryFileToken.Parser(),
             InputChatHistoryJsonFileToken.Parser(),
             InputChatParameterFileToken.Parser(),
-            // new TrueFalseRequiredPrefixNamedValueTokenParser("output", "all.answer", "01"),
-            // new TrueFalseRequiredPrefixNamedValueTokenParser("output", "each.answer", "11")
         };
 
         private static INamedValueTokenParser[] _chatAssistantCreateCommandParsers = {
@@ -164,23 +162,23 @@ namespace Azure.AI.Details.Common.CLI
 
             new CommonChatNamedValueTokenParsers(),
 
-            new NamedValueTokenParser(null, "chat.assistant.create.name", "0001", "1"),
+            new Any1ValueNamedValueTokenParser(null, "chat.assistant.create.name", "0001"),
             InstructionsToken.Parser(),
         };
 
         private static INamedValueTokenParser[] _chatAssistantGetCommandParsers = {
             new CommonChatNamedValueTokenParsers(),
-            new NamedValueTokenParser(null, "chat.assistant.id", "001", "1"),
+            new Any1ValueNamedValueTokenParser(null, "chat.assistant.id", "001"),
         };
 
         private static INamedValueTokenParser[] _chatAssistantDeleteCommandParsers = {
             new CommonChatNamedValueTokenParsers(),
-            new NamedValueTokenParser(null, "chat.assistant.id", "001", "1"),
+            new Any1ValueNamedValueTokenParser(null, "chat.assistant.id", "001"),
         };
 
         private static INamedValueTokenParser[] _chatAssistantVectorStoreDeleteCommandParsers = {
             new CommonChatNamedValueTokenParsers(),
-            new NamedValueTokenParser(null, "chat.assistant.vector.store.id", "00001", "1"),
+            new Any1ValueNamedValueTokenParser(null, "chat.assistant.vector.store.id", "00001"),
         };
 
         private static INamedValueTokenParser[] _chatAssistantVectorStoreCreateCommandParsers = {
@@ -191,23 +189,23 @@ namespace Azure.AI.Details.Common.CLI
             FilesOptionXToken.Parser(),
 
             new CommonChatNamedValueTokenParsers(),
-            new NamedValueTokenParser(null, "chat.assistant.vector.store.name", "00001", "1"),
+            new Any1ValueNamedValueTokenParser(null, "chat.assistant.vector.store.name", "00001"),
         };
 
         private static INamedValueTokenParser[] _chatAssistantVectorStoreGetCommandParsers = {
             new CommonChatNamedValueTokenParsers(),
-            new NamedValueTokenParser(null, "chat.assistant.vector.store.id", "00001", "1"),
+            new Any1ValueNamedValueTokenParser(null, "chat.assistant.vector.store.id", "00001"),
         };
         
         private static INamedValueTokenParser[] _chatAssistantFileUploadCommandParsers = {
             new CommonChatNamedValueTokenParsers(),
-            new NamedValueTokenParser("--file",        "assistant.upload.file", "001", "1"),
-            new NamedValueTokenParser("--files",       "assistant.upload.files", "001", "1", null, null, "assistant.upload.file", "x.command.expand.file.name"),
+            new Any1ValueNamedValueTokenParser("--file", "assistant.upload.file", "001"),
+            new ExpandFileNameNamedValueTokenParser("--files", "assistant.upload.files", "001", "assistant.upload.file"),
         };
 
         private static INamedValueTokenParser[] _chatAssistantFileDeleteCommandParsers = {
             new CommonChatNamedValueTokenParsers(),
-            new NamedValueTokenParser(null, "chat.assistant.file.id", "0001", "1"),
+            new Any1ValueNamedValueTokenParser(null, "chat.assistant.file.id", "0001"),
         };
 
         #endregion

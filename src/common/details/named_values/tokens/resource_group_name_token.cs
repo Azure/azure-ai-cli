@@ -8,7 +8,7 @@ namespace Azure.AI.Details.Common.CLI
     public class ResourceGroupNameToken
     {
         public static NamedValueTokenData Data() => new NamedValueTokenData(_optionName, _fullName, _optionExample, _requiredDisplayName);
-        public static INamedValueTokenParser Parser() => new NamedValueTokenParser(_optionName, _fullName, "0010", "1");
+        public static INamedValueTokenParser Parser() => new Any1ValueNamedValueTokenParser(_optionName, _fullName, "0010");
 
         private const string _requiredDisplayName = "group";
         private const string _optionName = "--group";
