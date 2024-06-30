@@ -6,6 +6,7 @@ CHAT ASSISTANT
 COMMANDS
 
   ai chat assistant vector-store create [...]      (see: ai help chat assistant vector-store create)
+  ai chat assistant vector-store update [...]      (see: ai help chat assistant vector-store update)
   ai chat assistant vector-store delete [...]      (see: ai help chat assistant vector-store delete)
 
   ai chat assistant vector-store list [...]        (see: ai help chat assistant vector-store list)

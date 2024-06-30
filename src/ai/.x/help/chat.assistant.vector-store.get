@@ -8,7 +8,7 @@ USAGE: ai chat assistant vector-store get [...]
     --endpoint ENDPOINT                 (see: ai help chat endpoint)
     --key KEY                           (see: ai help chat key)
 
-  GET
+  VECTOR-STORE
     --id ID
 
 EXAMPLE

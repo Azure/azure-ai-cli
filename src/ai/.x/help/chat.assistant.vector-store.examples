@@ -8,6 +8,10 @@ CHAT ASSISTANT VECTOR-STORE EXAMPLES
 
     ai chat assistant vector-store create --name "My Vector Store" --files "**/*.md"
 
+  `EXAMPLE 3`: Update an OpenAI Assistant Vector Store
+   
+    ai chat assistant vector-store update --files "../more/**/*.md"
+
 SEE ALSO
 
   ai help chat assistant vector-store

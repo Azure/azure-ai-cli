@@ -23,13 +23,14 @@ namespace Azure.AI.Details.Common.CLI
 
         private static readonly (string name, bool valuesRequired)[] _commands =  {
             ("chat.assistant.create", true),
-            ("chat.assistant.delete", false),
-            ("chat.assistant.get", true ),
+            ("chat.assistant.delete", true),
+            ("chat.assistant.get", false ),
             ("chat.assistant.list", false),
 
             ("chat.assistant.vector-store.create", true),
+            ("chat.assistant.vector-store.update", true),
             ("chat.assistant.vector-store.delete", true),
-            ("chat.assistant.vector-store.get", true),
+            ("chat.assistant.vector-store.get", false),
             ("chat.assistant.vector-store.list", false),
             ("chat.assistant.vector-store", true),
 
@@ -60,6 +61,7 @@ namespace Azure.AI.Details.Common.CLI
                 case "chat.assistant.delete": return _chatAssistantDeleteCommandParsers;
 
                 case "chat.assistant.vector-store.create": return _chatAssistantVectorStoreCreateCommandParsers;
+                case "chat.assistant.vector-store.update": return _chatAssistantVectorStoreUpdateCommandParsers;
                 case "chat.assistant.vector-store.get": return _chatAssistantVectorStoreGetCommandParsers;
                 case "chat.assistant.vector-store.list": return _chatAssistantVectorStoreListCommandParsers;
                 case "chat.assistant.vector-store.delete": return _chatAssistantVectorStoreDeleteCommandParsers;
@@ -105,7 +107,9 @@ namespace Azure.AI.Details.Common.CLI
                     SearchEmbeddingModelNameToken.Parser(),
 
                     new Any1ValueNamedValueTokenParser(null, "chat.assistant.id", "011"),
+                    new Any1ValueNamedValueTokenParser(null, "chat.assistant.vector.store.id", "00111"),
                     new Any1ValueNamedValueTokenParser(null, "chat.assistant.file.id", "0011"),
+                    new Any1ValueNamedValueTokenParser(null, "chat.thread.id", "011"),
 
                     new Any1ValueNamedValueTokenParser(null, "service.config.search.api.key", "00101"),
                     new Any1ValueNamedValueTokenParser(null, "service.config.search.endpoint.uri", "00110;00101"),
@@ -149,6 +153,9 @@ namespace Azure.AI.Details.Common.CLI
             OutputChatHistoryFileToken.Parser(),
             InputChatHistoryJsonFileToken.Parser(),
             InputChatParameterFileToken.Parser(),
+
+            new OutputFileNameNamedValueTokenParser(null, "chat.output.thread.id", "0111", "chat.assistant.thread.output.id"),
+            new OutputFileNameNamedValueTokenParser(null, "chat.output.add.thread.id", "01111", "chat.assistant.thread.output.add.id"),
         };
 
         private static INamedValueTokenParser[] _chatAssistantCreateCommandParsers = {
@@ -208,6 +215,19 @@ namespace Azure.AI.Details.Common.CLI
             new OutputFileNameNamedValueTokenParser(null, "chat.output.assistant.vector.store.name", "010001", "chat.output.name"),
             new OutputFileNameNamedValueTokenParser(null, "chat.output.add.assistant.vector.store.id", "0110001", "chat.output.add.id"),
             new OutputFileNameNamedValueTokenParser(null, "chat.output.add.assistant.vector.store.name", "0110001", "chat.output.add.name")
+        };
+
+        private static INamedValueTokenParser[] _chatAssistantVectorStoreUpdateCommandParsers = {
+            // FileIdOptionXToken.Parser(),
+            // FileIdsOptionXToken.Parser(),
+
+            FileOptionXToken.Parser(),
+            FilesOptionXToken.Parser(),
+
+            new Any1ValueNamedValueTokenParser(null, "chat.assistant.vector.store.id", "00001"),
+            new Any1ValueNamedValueTokenParser(null, "chat.assistant.vector.store.name", "00001"),
+
+            new CommonChatNamedValueTokenParsers(),
         };
 
         private static INamedValueTokenParser[] _chatAssistantVectorStoreGetCommandParsers = {

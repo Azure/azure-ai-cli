@@ -119,6 +119,22 @@ namespace Azure.AI.Details.Common.CLI
             return result.Value;
         }
 
+        public static async Task<VectorStore> UpdateAssistantVectorStoreAsync(string key, string endpoint, string id, string name)
+        {
+            var client = CreateOpenAIVectorStoreClient(key, endpoint);
+            return await UpdateAssistantVectorStoreAsync(client, id, name);
+        }
+
+        private static async Task<VectorStore> UpdateAssistantVectorStoreAsync(VectorStoreClient client, string id, string name)
+        {
+            var store = await client.GetVectorStoreAsync(id);
+            var result = await client.ModifyVectorStoreAsync(store, new VectorStoreModificationOptions()
+            {
+                Name = name
+            });
+            return result.Value;
+        }
+
         public static async Task DeleteAssistantVectorStoreAsync(string key, string endpoint, string id)
         {
             var client = CreateOpenAIVectorStoreClient(key, endpoint);

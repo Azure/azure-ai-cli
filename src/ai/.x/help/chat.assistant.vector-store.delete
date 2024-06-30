@@ -8,7 +8,7 @@ USAGE: ai chat assistant vector-store delete [...]
     --endpoint ENDPOINT                 (see: ai help chat endpoint)
     --key KEY                           (see: ai help chat key)
 
-  DELETE VECTOR-STORE
+  VECTOR-STORE
     --id ID
 
 EXAMPLE

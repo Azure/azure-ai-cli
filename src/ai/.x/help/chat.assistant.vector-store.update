@@ -1,0 +1,27 @@
+CHAT ASSISTANT VECTOR-STORE UPDATE
+
+  The `ai chat assistant vector-store update` command updates an OpenAI Assistant Vector Store.
+
+USAGE: ai chat assistant vector-store udpate [...]
+
+  CONNECTION
+    --endpoint ENDPOINT                 (see: ai help chat endpoint)
+    --key KEY                           (see: ai help chat key)
+
+  FILES
+    --file FILE
+    --files FILE1 [...]
+
+  VECTOR-STORE
+    --id ID
+    --name NAME
+
+EXAMPLE
+
+  ai chat assistant vector-store update --name "My Vector Store" --files "**/*.md"
+
+SEE ALSO
+
+  ai help chat assistant examples
+  ai help chat assistant vector-store examples
+  ai help find topics chat assistant vector-store
