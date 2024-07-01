@@ -103,6 +103,20 @@ namespace Azure.AI.Details.Common.CLI
 
     public static class StringExtensions
     {
+        public static void ExtendSplitItems(this List<string> ids, char c)
+        {
+            var containsSemicolon = ids.FirstOrDefault(x => x.Contains(c));
+            while (containsSemicolon != null)
+            {
+                ids.Remove(containsSemicolon);
+
+                var items = containsSemicolon.Split(c, StringSplitOptions.RemoveEmptyEntries);
+                ids.AddRange(items);
+
+                containsSemicolon = ids.FirstOrDefault(x => x.Contains(c));
+            }
+        }
+
         public static string IfTrimStartsWith(this string s, string value, Action<string> action)
         {
             if (s.StartsWith(value))

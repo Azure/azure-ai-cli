@@ -1,0 +1,22 @@
+CHAT ASSISTANT VECTOR-STORE DELETE
+
+  The `ai chat assistant vector-store delete` command deletes an existing OpenAI Assistant Vector Store.
+
+USAGE: ai chat assistant vector-store delete [...]
+
+  CONNECTION
+    --endpoint ENDPOINT                 (see: ai help chat endpoint)
+    --key KEY                           (see: ai help chat key)
+
+  VECTOR-STORE
+    --id ID
+
+EXAMPLE
+
+  ai chat assistant vector-store delete --id vs_xdAyb8HQsXRKnqCFPCTvwCYa
+
+SEE ALSO
+
+  ai help chat assistant examples
+  ai help chat assistant vector-store examples
+  ai help find topics chat assistant vector-store

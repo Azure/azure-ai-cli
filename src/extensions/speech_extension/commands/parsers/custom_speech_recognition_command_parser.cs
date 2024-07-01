@@ -129,13 +129,13 @@ namespace Azure.AI.Details.Common.CLI
         private class CommonCustomSpeechValueTokenParsers : NamedValueTokenParserList
         {
             public CommonCustomSpeechValueTokenParsers() : base(
-                new NamedValueTokenParser(null,           "x.command", "11", "1"),
+                new Any1ValueNamedValueTokenParser(null, "x.command", "11"),
 
                 new CommonNamedValueTokenParsers(),
                 new ExpectConsoleOutputTokenParser(),
 
-                new NamedValueTokenParser(null,                 "csr.api.version", "011", "1"),
-                new NamedValueTokenParser(null,                 "csr.api.endpoint", "011", "1")
+                new Any1ValueNamedValueTokenParser(null, "csr.api.version", "011"),
+                new Any1ValueNamedValueTokenParser(null, "csr.api.endpoint", "011")
             ) {}
         }
 
@@ -160,67 +160,67 @@ namespace Azure.AI.Details.Common.CLI
             {
                 if ((allow & AllowList.Projects) != 0)
                 {
-                    Add(new NamedValueTokenParser("--projects",  "csr.list.projects", "001", "0", null, null, "projects", "csr.list.kind"));
-                    Add(new NamedValueTokenParser(null,          "csr.list.project.languages", "0011", "0", null, null, "project", "csr.list.languages.kind"));
+                    Add(new PinnedNamedValueTokenParser("--projects", "csr.list.projects", "001", "projects", "csr.list.kind"));
+                    Add(new PinnedNamedValueTokenParser(null, "csr.list.project.languages", "0011", "project", "csr.list.languages.kind"));
                 }
                 if ((allow & AllowList.Datasets) != 0)
                 {
                     var notOnlyDatasets = allow != AllowList.Datasets;
-                    Add(new NamedValueTokenParser("--datasets", "csr.list.datasets", "001", "0", null, null, "datasets", "csr.list.kind"));
-                    Add(new NamedValueTokenParser(null,         "csr.list.dataset.languages", notOnlyDatasets ? "0011" : "0001", "0", null, null, "dataset", "csr.list.languages.kind"));
-                    Add(new NamedValueTokenParser(null,         "csr.list.dataset.files", notOnlyDatasets ? "0011" : "0001", "1;0", "true;false", null, "true"));
-                    Add(new NamedValueTokenParser(null,         "csr.dataset.id", notOnlyDatasets ? "010" : "001;010", "1"));
+                    Add(new PinnedNamedValueTokenParser("--datasets", "csr.list.datasets", "001", "datasets", "csr.list.kind"));
+                    Add(new PinnedNamedValueTokenParser(null, "csr.list.dataset.languages", notOnlyDatasets ? "0011" : "0001", "dataset", "csr.list.languages.kind"));
+                    Add(new TrueFalseNamedValueTokenParser(null, "csr.list.dataset.files", notOnlyDatasets ? "0011" : "0001"));
+                    Add(new Any1ValueNamedValueTokenParser(null, "csr.dataset.id", notOnlyDatasets ? "010" : "001;010"));
                 }
                 if ((allow & AllowList.Models) != 0)
                 {
                     var notOnlyModels = allow != AllowList.Models;
-                    Add(new NamedValueTokenParser("--models", "csr.list.models", "001", "0", null, null, "models", "csr.list.kind"));
-                    Add(new NamedValueTokenParser(null,       "csr.list.base.models", "0010", "0", null, null, "models/base", "csr.list.kind"));
-                    Add(new NamedValueTokenParser(null,       "csr.list.model.languages", notOnlyModels ? "0011" : "0001", "0", null, null, "model", "csr.list.languages.kind"));
+                    Add(new PinnedNamedValueTokenParser("--models", "csr.list.models", "001", "models", "csr.list.kind"));
+                    Add(new PinnedNamedValueTokenParser(null, "csr.list.base.models", "0010", "models/base", "csr.list.kind"));
+                    Add(new PinnedNamedValueTokenParser(null, "csr.list.model.languages", notOnlyModels ? "0011" : "0001", "model", "csr.list.languages.kind"));
                 }
                 if ((allow & AllowList.Endpoints) != 0)
                 {
                     var notOnlyEndpoints = allow != AllowList.Endpoints;
-                    Add(new NamedValueTokenParser("--endpoints", "csr.list.endpoints", "001", "0", null, null, "endpoints", "csr.list.kind"));
-                    Add(new NamedValueTokenParser(null,          "csr.list.endpoint.languages", notOnlyEndpoints ? "0011" : "0001", "0", null, null, "endpoint", "csr.list.languages.kind"));
+                    Add(new PinnedNamedValueTokenParser("--endpoints", "csr.list.endpoints", "001", "endpoints", "csr.list.kind"));
+                    Add(new PinnedNamedValueTokenParser(null, "csr.list.endpoint.languages", notOnlyEndpoints ? "0011" : "0001", "endpoint", "csr.list.languages.kind"));
                     Add(new TrueFalseNamedValueTokenParser("csr.list.endpoint.logs", "0001"));
-                    Add(new NamedValueTokenParser(null,          "csr.endpoint.id", notOnlyEndpoints ? "010" : "001;010", "1"));
+                    Add(new Any1ValueNamedValueTokenParser(null, "csr.endpoint.id", notOnlyEndpoints ? "010" : "001;010"));
                 }
                 if ((allow & AllowList.Evaluations) != 0)
                 {
                     var notOnlyEvaluations = allow != AllowList.Evaluations;
-                    Add(new NamedValueTokenParser("--evaluations", "csr.list.evaluations", "001", "0", null, null, "evaluations", "csr.list.kind"));
-                    Add(new NamedValueTokenParser(null,            "csr.list.evaluation.languages", notOnlyEvaluations ? "0011" : "0001", "0", null, null, "evaluation", "csr.list.languages.kind"));
-                    Add(new NamedValueTokenParser(null,            "csr.list.evaluation.files", notOnlyEvaluations ? "0011" : "0001", "1;0", "true;false", null, "true"));
-                    Add(new NamedValueTokenParser(null,            "csr.evaluation.id", notOnlyEvaluations ? "010" : "001;010", "1"));
+                    Add(new PinnedNamedValueTokenParser("--evaluations", "csr.list.evaluations", "001", "evaluations", "csr.list.kind"));
+                    Add(new PinnedNamedValueTokenParser(null, "csr.list.evaluation.languages", notOnlyEvaluations ? "0011" : "0001", "evaluation", "csr.list.languages.kind"));
+                    Add(new TrueFalseNamedValueTokenParser(null, "csr.list.evaluation.files", notOnlyEvaluations ? "0011" : "0001"));
+                    Add(new Any1ValueNamedValueTokenParser(null, "csr.evaluation.id", notOnlyEvaluations ? "010" : "001;010"));
                 }
 
-                Add(new NamedValueTokenParser(null, "csr.list.kind", "001", "1", "endpoints;projects;datasets;models;models/base;evaluations"));
+                Add(new RequiredValidValueNamedValueTokenParser(null, "csr.list.kind", "001", "endpoints;projects;datasets;models;models/base;evaluations"));
 
-                Add(new NamedValueTokenParser(null, "csr.list.languages.kind", "0011", "1;0", "endpoint;project;dataset;model"));
+                Add(new OptionalValidValueNamedValueTokenParser(null, "csr.list.languages.kind", "0011", "endpoint;project;dataset;model"));
                 Add(new TrueFalseNamedValueTokenParser("csr.list.languages", "001"));
 
-                Add(new NamedValueTokenParser(null, "csr.list.id", "001", "1"));
-                Add(new NamedValueTokenParser(null, "csr.project.id", "010", "1"));
+                Add(new Any1ValueNamedValueTokenParser(null, "csr.list.id", "001"));
+                Add(new Any1ValueNamedValueTokenParser(null, "csr.project.id", "010"));
 
-                Add(new NamedValueTokenParser(null, "csr.top", "01", "1"));
-                Add(new NamedValueTokenParser(null, "csr.skip", "01", "1"));
+                Add(new Any1ValueNamedValueTokenParser(null, "csr.top", "01"));
+                Add(new Any1ValueNamedValueTokenParser(null, "csr.skip", "01"));
 
-                Add(new NamedValueTokenParser(null, "csr.output.json.file", "0110", "1", "@@"));
-                Add(new NamedValueTokenParser(null, "csr.output.request.file", "0110", "1", "@@"));
+                Add(new OutputFileNameNamedValueTokenParser(null, "csr.output.json.file", "0110"));
+                Add(new OutputFileNameNamedValueTokenParser(null, "csr.output.request.file", "0110"));
 
-                Add(new NamedValueTokenParser(null, "csr.output.last.id", "0111;0101", "1", "@@", "csr.output.id", "true", "csr.output.list.last"));
-                Add(new NamedValueTokenParser(null, "csr.output.last.url", "0110;0101", "1", "@@", "csr.output.url", "true", "csr.output.list.last"));
-                Add(new NamedValueTokenParser(null, "csr.output.list.last", "1111", "1"));
+                Add(new OutputFileNameNamedValueTokenParser(null, "csr.output.last.id", "0111;0101", "csr.output.id", "true", "csr.output.list.last"));
+                Add(new OutputFileNameNamedValueTokenParser(null, "csr.output.last.url", "0110;0101", "csr.output.url", "true", "csr.output.list.last"));
+                Add(new Any1ValueNamedValueTokenParser(null, "csr.output.list.last", "1111"));
 
-                Add(new NamedValueTokenParser(null, "csr.output.project.ids", "0101", "1", "@@", "csr.output.ids"));
-                Add(new NamedValueTokenParser(null, "csr.output.project.urls", "0101", "1", "@@", "csr.output.urls"));
-                Add(new NamedValueTokenParser(null, "csr.output.dataset.ids", "0101", "1", "@@", "csr.output.ids"));
-                Add(new NamedValueTokenParser(null, "csr.output.dataset.urls", "0101", "1", "@@", "csr.output.urls"));
-                Add(new NamedValueTokenParser(null, "csr.output.model.ids", "0101", "1", "@@", "csr.output.ids"));
-                Add(new NamedValueTokenParser(null, "csr.output.model.urls", "0101", "1", "@@", "csr.output.urls"));
-                Add(new NamedValueTokenParser(null, "csr.output.endpoint.ids", "0101", "1", "@@", "csr.output.ids"));
-                Add(new NamedValueTokenParser(null, "csr.output.endpoint.urls", "0101", "1", "@@", "csr.output.urls"));
+                Add(new OutputFileNameNamedValueTokenParser(null, "csr.output.project.ids", "0101", "csr.output.ids"));
+                Add(new OutputFileNameNamedValueTokenParser(null, "csr.output.project.urls", "0101", "csr.output.urls"));
+                Add(new OutputFileNameNamedValueTokenParser(null, "csr.output.dataset.ids", "0101", "csr.output.ids"));
+                Add(new OutputFileNameNamedValueTokenParser(null, "csr.output.dataset.urls", "0101", "csr.output.urls"));
+                Add(new OutputFileNameNamedValueTokenParser(null, "csr.output.model.ids", "0101", "csr.output.ids"));
+                Add(new OutputFileNameNamedValueTokenParser(null, "csr.output.model.urls", "0101", "csr.output.urls"));
+                Add(new OutputFileNameNamedValueTokenParser(null, "csr.output.endpoint.ids", "0101", "csr.output.ids"));
+                Add(new OutputFileNameNamedValueTokenParser(null, "csr.output.endpoint.urls", "0101", "csr.output.urls"));
 
             }
         }
@@ -258,169 +258,169 @@ namespace Azure.AI.Details.Common.CLI
 
             new CommonCustomSpeechValueTokenParsers(),
 
-            new NamedValueTokenParser(null,                 "csr.dataset.file.id", "0110", "1"),
-            new NamedValueTokenParser(null,                 "csr.endpoint.log.id", "0010;0011", "1"),
-            new NamedValueTokenParser(null,                 "csr.evaluation.file.id", "0110", "1"),
+            new Any1ValueNamedValueTokenParser(null, "csr.dataset.file.id", "0110"),
+            new Any1ValueNamedValueTokenParser(null, "csr.endpoint.log.id", "0010;0011"),
+            new Any1ValueNamedValueTokenParser(null, "csr.evaluation.file.id", "0110"),
 
-            new NamedValueTokenParser(null,                 "csr.list.id", "001", "1"),
-            new NamedValueTokenParser(null,                 "csr.dataset.id", "010", "1"),
-            new NamedValueTokenParser(null,                 "csr.endpoint.id", "010", "1"),
-            new NamedValueTokenParser(null,                 "csr.evaluation.id", "010", "1"),
-            new NamedValueTokenParser(null,                 "csr.model.id", "010", "1"),
+            new Any1ValueNamedValueTokenParser(null, "csr.list.id", "001"),
+            new Any1ValueNamedValueTokenParser(null, "csr.dataset.id", "010"),
+            new Any1ValueNamedValueTokenParser(null, "csr.endpoint.id", "010"),
+            new Any1ValueNamedValueTokenParser(null, "csr.evaluation.id", "010"),
+            new Any1ValueNamedValueTokenParser(null, "csr.model.id", "010"),
 
-            new NamedValueTokenParser(null,                 "csr.download.url", "001", "1"),
-            new NamedValueTokenParser(null,                 "csr.download.file", "001", "1"),
+            new Any1ValueNamedValueTokenParser(null, "csr.download.url", "001"),
+            new Any1ValueNamedValueTokenParser(null, "csr.download.file", "001"),
 
-            new NamedValueTokenParser(null,                 "csr.output.file", "011", "1", "@@"),
-            new NamedValueTokenParser(null,                 "csr.output.json.file", "0110", "1", "@@"),
-            new NamedValueTokenParser(null,                 "csr.output.request.file", "0110", "1", "@@"),
-            new NamedValueTokenParser(null,                 "csr.output.url", "011", "1", "@@"),
+            new OutputFileNameNamedValueTokenParser(null, "csr.output.file", "011"),
+            new OutputFileNameNamedValueTokenParser(null, "csr.output.json.file", "0110"),
+            new OutputFileNameNamedValueTokenParser(null, "csr.output.request.file", "0110"),
+            new OutputFileNameNamedValueTokenParser(null, "csr.output.url", "011"),
         };
 
         private static INamedValueTokenParser[] projectCommandParsers = {
 
             new CommonCustomSpeechValueTokenParsers(),
 
-            new NamedValueTokenParser("--name",             "csr.project.name", "001", "1"),
-            new NamedValueTokenParser("--description",      "csr.project.description", "001", "1"),
-            new NamedValueTokenParser("--language",         "csr.project.language", "001", "1"),
+            new Any1ValueNamedValueTokenParser("--name", "csr.project.name", "001"),
+            new Any1ValueNamedValueTokenParser("--description", "csr.project.description", "001"),
+            new Any1ValueNamedValueTokenParser("--language", "csr.project.language", "001"),
 
-            new NamedValueTokenParser("--property",         "csr.project.create.property", "0001", "2;1"),
-            new NamedValueTokenParser("--properties",       "csr.project.create.properties", "0001", "1", "@;"),
+            new Any1or2ValueNamedValueTokenParser("--property", "csr.project.create.property", "0001"),
+            new AtFileOrListNamedValueTokenParser("--properties", "csr.project.create.properties", "0001"),
 
-            new NamedValueTokenParser("--id",               "csr.project.id", "001;010", "1"),
+            new Any1ValueNamedValueTokenParser("--id", "csr.project.id", "001;010"),
 
-            new NamedValueTokenParser(null,                 "csr.output.file", "011", "1", "@@"),
-            new NamedValueTokenParser(null,                 "csr.output.json.file", "0110", "1", "@@"),
-            new NamedValueTokenParser(null,                 "csr.output.request.file", "0110", "1", "@@"),
-            new NamedValueTokenParser(null,                 "csr.output.project.id", "0111;0101", "1", "@@", "csr.output.id"),
-            new NamedValueTokenParser(null,                 "csr.output.project.url", "0110;0101", "1", "@@", "csr.output.url"),
-            new NamedValueTokenParser(null,                 "csr.output.add.project.id", "01111;01101", "1", "@@", "csr.output.add.id"),
-            new NamedValueTokenParser(null,                 "csr.output.add.project.url", "01110;01101", "1", "@@", "csr.output.add.url"),
+            new OutputFileNameNamedValueTokenParser(null, "csr.output.file", "011"),
+            new OutputFileNameNamedValueTokenParser(null, "csr.output.json.file", "0110"),
+            new OutputFileNameNamedValueTokenParser(null, "csr.output.request.file", "0110"),
+            new OutputFileNameNamedValueTokenParser(null, "csr.output.project.id", "0111;0101", "csr.output.id"),
+            new OutputFileNameNamedValueTokenParser(null, "csr.output.project.url", "0110;0101", "csr.output.url"),
+            new OutputFileNameNamedValueTokenParser(null, "csr.output.add.project.id", "01111;01101", "csr.output.add.id"),
+            new OutputFileNameNamedValueTokenParser(null, "csr.output.add.project.url", "01110;01101", "csr.output.add.url"),
         };
 
         private static INamedValueTokenParser[] datasetCommandParsers = {
 
             new CommonCustomSpeechValueTokenParsers(),
 
-            new NamedValueTokenParser(null,                 "csr.project.id", "010", "1"),
+            new Any1ValueNamedValueTokenParser(null, "csr.project.id", "010"),
             
-            new NamedValueTokenParser(null,                 "csr.dataset.kind", "001", "1"),
-            new NamedValueTokenParser("--name",             "csr.dataset.name", "001", "1"),
-            new NamedValueTokenParser("--description",      "csr.dataset.description", "001", "1"),
-            new NamedValueTokenParser("--language",         "csr.dataset.language", "001", "1"),
+            new Any1ValueNamedValueTokenParser(null, "csr.dataset.kind", "001"),
+            new Any1ValueNamedValueTokenParser("--name", "csr.dataset.name", "001"),
+            new Any1ValueNamedValueTokenParser("--description", "csr.dataset.description", "001"),
+            new Any1ValueNamedValueTokenParser("--language", "csr.dataset.language", "001"),
 
-            new NamedValueTokenParser(null,                 "csr.dataset.create.content.url", "00010", "1"),
-            new NamedValueTokenParser("--property",         "csr.dataset.create.property", "0001", "2;1"),
-            new NamedValueTokenParser("--properties",       "csr.dataset.create.properties", "0001", "1", "@;"),
+            new Any1ValueNamedValueTokenParser(null, "csr.dataset.create.content.url", "00010"),
+            new Any1or2ValueNamedValueTokenParser("--property", "csr.dataset.create.property", "0001"),
+            new AtFileOrListNamedValueTokenParser("--properties", "csr.dataset.create.properties", "0001"),
 
-            new NamedValueTokenParser("--data",             "csr.dataset.upload.data.file", "00010", "1"),
+            new Any1ValueNamedValueTokenParser("--data", "csr.dataset.upload.data.file", "00010"),
 
-            new NamedValueTokenParser("--id",               "csr.dataset.id", "001;010", "1"),
-            new NamedValueTokenParser(null,                 "csr.dataset.file.id", "0010", "1"),
+            new Any1ValueNamedValueTokenParser("--id", "csr.dataset.id", "001;010"),
+            new Any1ValueNamedValueTokenParser(null, "csr.dataset.file.id", "0010"),
 
-            new NamedValueTokenParser(null,                 "csr.output.file", "011", "1", "@@"),
-            new NamedValueTokenParser(null,                 "csr.output.json.file", "0110", "1", "@@"),
-            new NamedValueTokenParser(null,                 "csr.output.request.file", "0110", "1", "@@"),
-            new NamedValueTokenParser(null,                 "csr.output.dataset.id", "0111;0101", "1", "@@", "csr.output.id"),
-            new NamedValueTokenParser(null,                 "csr.output.dataset.url", "0110;0101", "1", "@@", "csr.output.url"),
-            new NamedValueTokenParser(null,                 "csr.output.add.dataset.id", "01111;01101", "1", "@@", "csr.output.add.id"),
-            new NamedValueTokenParser(null,                 "csr.output.add.dataset.url", "01110;01101", "1", "@@", "csr.output.add.url"),
+            new OutputFileNameNamedValueTokenParser(null, "csr.output.file", "011"),
+            new OutputFileNameNamedValueTokenParser(null, "csr.output.json.file", "0110"),
+            new OutputFileNameNamedValueTokenParser(null, "csr.output.request.file", "0110"),
+            new OutputFileNameNamedValueTokenParser(null, "csr.output.dataset.id", "0111;0101", "csr.output.id"),
+            new OutputFileNameNamedValueTokenParser(null, "csr.output.dataset.url", "0110;0101", "csr.output.url"),
+            new OutputFileNameNamedValueTokenParser(null, "csr.output.add.dataset.id", "01111;01101", "csr.output.add.id"),
+            new OutputFileNameNamedValueTokenParser(null, "csr.output.add.dataset.url", "01110;01101", "csr.output.add.url"),
 
-            new NamedValueTokenParser(null,                 "csr.wait.timeout", "010", "1;0", null, null, "864000000"),
+            new OptionalWithDefaultNamedValueTokenParser(null, "csr.wait.timeout", "010", "864000000"),
         };
 
         private static INamedValueTokenParser[] modelCommandParsers = {
 
             new CommonCustomSpeechValueTokenParsers(),
 
-            new NamedValueTokenParser(null,                 "csr.project.id", "010", "1"),
+            new Any1ValueNamedValueTokenParser(null, "csr.project.id", "010"),
 
-            new NamedValueTokenParser("--name",             "csr.model.name", "001", "1"),
-            new NamedValueTokenParser("--description",      "csr.model.description", "001", "1"),
-            new NamedValueTokenParser("--language",         "csr.model.language", "001", "1"),
+            new Any1ValueNamedValueTokenParser("--name", "csr.model.name", "001"),
+            new Any1ValueNamedValueTokenParser("--description", "csr.model.description", "001"),
+            new Any1ValueNamedValueTokenParser("--language", "csr.model.language", "001"),
 
-            new NamedValueTokenParser(null,                 "csr.model.create.base.model.id", "000100", "1"),
-            new NamedValueTokenParser("--datasets",         "csr.model.create.dataset.ids", "00011", "1", "@;"),
-            new NamedValueTokenParser(null,                 "csr.model.create.dataset.id", "00010", "1"),
-            new NamedValueTokenParser("--text",             "csr.model.create.text", "0001", "1"),
-            new NamedValueTokenParser("--property",         "csr.model.create.property", "0001", "2;1"),
-            new NamedValueTokenParser("--properties",       "csr.model.create.properties", "0001", "1", "@;"),
+            new Any1ValueNamedValueTokenParser(null, "csr.model.create.base.model.id", "000100"),
+            new AtFileOrListNamedValueTokenParser("--datasets", "csr.model.create.dataset.ids", "00011"),
+            new Any1ValueNamedValueTokenParser(null, "csr.model.create.dataset.id", "00010"),
+            new Any1ValueNamedValueTokenParser("--text", "csr.model.create.text", "0001"),
+            new Any1or2ValueNamedValueTokenParser("--property", "csr.model.create.property", "0001"),
+            new AtFileOrListNamedValueTokenParser("--properties", "csr.model.create.properties", "0001"),
 
-            new NamedValueTokenParser(null,                 "csr.model.copy.target.key", "00011", "1"),
+            new Any1ValueNamedValueTokenParser(null, "csr.model.copy.target.key", "00011"),
 
-            new NamedValueTokenParser("--id",               "csr.model.id", "001;010", "1"),
+            new Any1ValueNamedValueTokenParser("--id", "csr.model.id", "001;010"),
 
-            new NamedValueTokenParser(null,                 "csr.output.file", "011", "1", "@@"),
-            new NamedValueTokenParser(null,                 "csr.output.json.file", "0110", "1", "@@"),
-            new NamedValueTokenParser(null,                 "csr.output.request.file", "0110", "1", "@@"),
-            new NamedValueTokenParser(null,                 "csr.output.model.id", "0111;0101", "1", "@@", "csr.output.id"),
-            new NamedValueTokenParser(null,                 "csr.output.model.url", "0110;0101", "1", "@@", "csr.output.url"),
-            new NamedValueTokenParser(null,                 "csr.output.add.model.id", "01111;01101", "1", "@@", "csr.output.add.id"),
-            new NamedValueTokenParser(null,                 "csr.output.add.model.url", "01110;01101", "1", "@@", "csr.output.add.url"),
+            new OutputFileNameNamedValueTokenParser(null, "csr.output.file", "011"),
+            new OutputFileNameNamedValueTokenParser(null, "csr.output.json.file", "0110"),
+            new OutputFileNameNamedValueTokenParser(null, "csr.output.request.file", "0110"),
+            new OutputFileNameNamedValueTokenParser(null, "csr.output.model.id", "0111;0101", "csr.output.id"),
+            new OutputFileNameNamedValueTokenParser(null, "csr.output.model.url", "0110;0101", "csr.output.url"),
+            new OutputFileNameNamedValueTokenParser(null, "csr.output.add.model.id", "01111;01101", "csr.output.add.id"),
+            new OutputFileNameNamedValueTokenParser(null, "csr.output.add.model.url", "01110;01101", "csr.output.add.url"),
 
-            new NamedValueTokenParser(null,                 "csr.wait.timeout", "010", "1;0", null, null, "864000000"),
+            new OptionalWithDefaultNamedValueTokenParser(null, "csr.wait.timeout", "010", "864000000"),
         };
 
         private static INamedValueTokenParser[] evaluationCommandParsers = {
 
             new CommonCustomSpeechValueTokenParsers(),
 
-            new NamedValueTokenParser(null,                 "csr.project.id", "010", "1"),
+            new Any1ValueNamedValueTokenParser(null, "csr.project.id", "010"),
 
-            new NamedValueTokenParser("--name",             "csr.evaluation.name", "001", "1"),
-            new NamedValueTokenParser("--description",      "csr.evaluation.description", "001", "1"),
-            new NamedValueTokenParser("--language",         "csr.evaluation.language", "001", "1"),
+            new Any1ValueNamedValueTokenParser("--name", "csr.evaluation.name", "001"),
+            new Any1ValueNamedValueTokenParser("--description", "csr.evaluation.description", "001"),
+            new Any1ValueNamedValueTokenParser("--language", "csr.evaluation.language", "001"),
 
-            new NamedValueTokenParser("--model1",           "csr.evaluation.create.model1.id", "00010", "1"),
-            new NamedValueTokenParser("--model2",           "csr.evaluation.create.model2.id", "00010", "1"),
+            new Any1ValueNamedValueTokenParser("--model1", "csr.evaluation.create.model1.id", "00010"),
+            new Any1ValueNamedValueTokenParser("--model2", "csr.evaluation.create.model2.id", "00010"),
 
-            new NamedValueTokenParser("--dataset",          "csr.evaluation.create.dataset.id", "00010", "1"),
-            new NamedValueTokenParser("--property",         "csr.evaluation.create.property", "0001", "2;1"),
-            new NamedValueTokenParser("--properties",       "csr.evaluation.create.properties", "0001", "1", "@;"),
+            new Any1ValueNamedValueTokenParser("--dataset", "csr.evaluation.create.dataset.id", "00010"),
+            new Any1or2ValueNamedValueTokenParser("--property", "csr.evaluation.create.property", "0001"),
+            new AtFileOrListNamedValueTokenParser("--properties", "csr.evaluation.create.properties", "0001"),
 
-            new NamedValueTokenParser("--id",               "csr.evaluation.id", "001;010", "1"),
+            new Any1ValueNamedValueTokenParser("--id", "csr.evaluation.id", "001;010"),
 
-            new NamedValueTokenParser(null,                 "csr.output.file", "011", "1", "@@"),
-            new NamedValueTokenParser(null,                 "csr.output.json.file", "0110", "1", "@@"),
-            new NamedValueTokenParser(null,                 "csr.output.request.file", "0110", "1", "@@"),
-            new NamedValueTokenParser(null,                 "csr.output.evaluation.id", "0111;0101", "1", "@@", "csr.output.id"),
-            new NamedValueTokenParser(null,                 "csr.output.evaluation.url", "0110;0101", "1", "@@", "csr.output.url"),
-            new NamedValueTokenParser(null,                 "csr.output.add.evaluation.id", "01111;01101", "1", "@@", "csr.output.add.id"),
-            new NamedValueTokenParser(null,                 "csr.output.add.evaluation.url", "01110;01101", "1", "@@", "csr.output.add.url"),
+            new OutputFileNameNamedValueTokenParser(null, "csr.output.file", "011"),
+            new OutputFileNameNamedValueTokenParser(null, "csr.output.json.file", "0110"),
+            new OutputFileNameNamedValueTokenParser(null, "csr.output.request.file", "0110"),
+            new OutputFileNameNamedValueTokenParser(null, "csr.output.evaluation.id", "0111;0101", "csr.output.id"),
+            new OutputFileNameNamedValueTokenParser(null, "csr.output.evaluation.url", "0110;0101", "csr.output.url"),
+            new OutputFileNameNamedValueTokenParser(null, "csr.output.add.evaluation.id", "01111;01101", "csr.output.add.id"),
+            new OutputFileNameNamedValueTokenParser(null, "csr.output.add.evaluation.url", "01110;01101", "csr.output.add.url"),
 
-            new NamedValueTokenParser(null,                 "csr.wait.timeout", "010", "1;0", null, null, "864000000"),
+            new OptionalWithDefaultNamedValueTokenParser(null, "csr.wait.timeout", "010", "864000000"),
         };
 
         private static INamedValueTokenParser[] endpointCommandParsers = {
 
             new CommonCustomSpeechValueTokenParsers(),
 
-            new NamedValueTokenParser(null,                 "csr.project.id", "010", "1"),
+            new Any1ValueNamedValueTokenParser(null, "csr.project.id", "010"),
 
-            new NamedValueTokenParser("--name",             "csr.endpoint.name", "001", "1"),
-            new NamedValueTokenParser("--description",      "csr.endpoint.description", "001", "1"),
-            new NamedValueTokenParser("--language",         "csr.endpoint.language", "001", "1"),
+            new Any1ValueNamedValueTokenParser("--name", "csr.endpoint.name", "001"),
+            new Any1ValueNamedValueTokenParser("--description", "csr.endpoint.description", "001"),
+            new Any1ValueNamedValueTokenParser("--language", "csr.endpoint.language", "001"),
             new TrueFalseNamedValueTokenParser("service.config.content.logging.enabled", "00011;00110"),
 
-            new NamedValueTokenParser("--text",             "csr.endpoint.create.text", "0011", "1"),
-            new NamedValueTokenParser(null,                 "csr.endpoint.create.model.id", "00010", "1"),
+            new Any1ValueNamedValueTokenParser("--text", "csr.endpoint.create.text", "0011"),
+            new Any1ValueNamedValueTokenParser(null, "csr.endpoint.create.model.id", "00010"),
 
-            new NamedValueTokenParser("--property",         "csr.endpoint.create.property", "0001", "2;1"),
-            new NamedValueTokenParser("--properties",       "csr.endpoint.create.properties", "0001", "1", "@;"),
+            new Any1or2ValueNamedValueTokenParser("--property", "csr.endpoint.create.property", "0001"),
+            new AtFileOrListNamedValueTokenParser("--properties", "csr.endpoint.create.properties", "0001"),
 
-            new NamedValueTokenParser(null,                 "csr.endpoint.log.id", "0010", "1"),
-            new NamedValueTokenParser("--id",               "csr.endpoint.id", "001;010", "1"),
+            new Any1ValueNamedValueTokenParser(null, "csr.endpoint.log.id", "0010"),
+            new Any1ValueNamedValueTokenParser("--id", "csr.endpoint.id", "001;010"),
 
-            new NamedValueTokenParser(null,                 "csr.output.file", "011", "1", "@@"),
-            new NamedValueTokenParser(null,                 "csr.output.json.file", "0110", "1", "@@"),
-            new NamedValueTokenParser(null,                 "csr.output.request.file", "0110", "1", "@@"),
-            new NamedValueTokenParser(null,                 "csr.output.endpoint.id", "0111;0101", "1", "@@", "csr.output.id"),
-            new NamedValueTokenParser(null,                 "csr.output.endpoint.url", "0110;0101", "1", "@@", "csr.output.url"),
-            new NamedValueTokenParser(null,                 "csr.output.add.endpoint.id", "01111;01101", "1", "@@", "csr.output.add.id"),
-            new NamedValueTokenParser(null,                 "csr.output.add.endpoint.url", "01110;01101", "1", "@@", "csr.outputadd..url"),
+            new OutputFileNameNamedValueTokenParser(null, "csr.output.file", "011"),
+            new OutputFileNameNamedValueTokenParser(null, "csr.output.json.file", "0110"),
+            new OutputFileNameNamedValueTokenParser(null, "csr.output.request.file", "0110"),
+            new OutputFileNameNamedValueTokenParser(null, "csr.output.endpoint.id", "0111;0101", "csr.output.id"),
+            new OutputFileNameNamedValueTokenParser(null, "csr.output.endpoint.url", "0110;0101", "csr.output.url"),
+            new OutputFileNameNamedValueTokenParser(null, "csr.output.add.endpoint.id", "01111;01101", "csr.output.add.id"),
+            new OutputFileNameNamedValueTokenParser(null, "csr.output.add.endpoint.url", "01110;01101", "csr.outputadd..url"),
 
-            new NamedValueTokenParser(null,                 "csr.wait.timeout", "010", "1;0", null, null, "864000000"),
+            new OptionalWithDefaultNamedValueTokenParser(null, "csr.wait.timeout", "010", "864000000"),
         };
 
         #endregion

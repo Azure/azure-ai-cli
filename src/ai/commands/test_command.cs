@@ -166,13 +166,11 @@ namespace Azure.AI.Details.Common.CLI
 
             var options = FileOptionXToken.GetOptions(_values).ToList();
             options.AddRange(FilesOptionXToken.GetOptions(_values).ToList());
-            foreach (var item in options)
+            options.ExtendSplitItems(';');
+            
+            foreach (var pattern in options)
             {
-                var patterns = item.Split(';', StringSplitOptions.RemoveEmptyEntries);
-                foreach (var pattern in patterns)
-                {
-                    AddFindFiles(files, pattern);
-                }
+                AddFindFiles(files, pattern);
             }
 
             return files;

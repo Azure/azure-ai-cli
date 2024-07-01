@@ -1,1 +1,2 @@
 chat.assistant.id=@assistant.id
+chat.assistant.vector.store.id=@vector.store.id

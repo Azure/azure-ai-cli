@@ -70,7 +70,7 @@ namespace Azure.AI.Details.Common.CLI
             yield return tokens.PeekNextToken(v)!;
         }
 
-        private NamedValueTokenParser _parser1 = new NamedValueTokenParser(null, "replace.var.*", "011;101", "1;0", null, null, "=");
+        private OptionalWithDefaultNamedValueTokenParser _parser1 = new OptionalWithDefaultNamedValueTokenParser(null, "replace.var.*", "011;101", "=");
         private ForEachTokenParser _forEachTokenParser = new();
     }
 }

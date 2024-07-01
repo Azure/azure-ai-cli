@@ -48,6 +48,7 @@ namespace Azure.AI.Details.Common.CLI
 
             // Assistants API
             env.Add("ASSISTANT_ID", ReadConfig(values, "assistant.id"));
+            env.Add("VECTOR_STORE_ID", ReadConfig(values, "vector.store.id"));
 
             // Cognitive Search SDK (non-standard, will be removed at some point)
             env.Add("AZURE_COGNITIVE_SEARCH_TARGET", env["AZURE_AI_SEARCH_ENDPOINT"]);

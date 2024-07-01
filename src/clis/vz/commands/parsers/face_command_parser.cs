@@ -51,20 +51,20 @@ namespace Azure.AI.Details.Common.CLI
         {
             public CommonFaceNamedValueTokenParsers() : base(
 
-                    new NamedValueTokenParser(null, "x.command", "11", "1"),
+                    new Any1ValueNamedValueTokenParser(null, "x.command", "11"),
 
                     new CommonNamedValueTokenParsers(),
-                    new NamedValueTokenParser(null, "x.command.expand.file.name", "11111", "1"),
+                    new ExpandFileNameNamedValueTokenParser(),
 
                     new ExpectConsoleOutputTokenParser(),
                     new DiagnosticLogTokenParser(),
 
                     new VisionServiceOptionsTokenParser(),
 
-                    new NamedValueTokenParser("--url",        "vision.input.file", "001", "1", null, null, "file", "vision.input.type"),
-                    new NamedValueTokenParser("--urls",       "vision.input.files", "001", "1", null, null, "vision.input.file", "x.command.expand.file.name"),
-                    new NamedValueTokenParser(null,           "vision.input.camera.device", "0010", "1;0", null, null, "camera", "vision.input.type"),
-                    new NamedValueTokenParser(null,           "vision.input.type", "011", "1", "file;files;camera")
+                    new Any1PinnedNamedValueTokenParser("--url", "vision.input.file", "001", "file", "vision.input.type"),
+                    new ExpandFileNameNamedValueTokenParser("--urls", "vision.input.files", "001", "vision.input.file"),
+                    new OptionalWithDefaultNamedValueTokenParser(null, "vision.input.camera.device", "0010", "camera", "vision.input.type"),
+                    new RequiredValidValueNamedValueTokenParser(null, "vision.input.type", "011", "file;files;camera")
 
                 )
             {

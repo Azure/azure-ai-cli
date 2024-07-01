@@ -23,8 +23,12 @@ using OpenAI;
 using OpenAI.Chat;
 using System.ClientModel;
 using Azure.AI.OpenAI.Chat;
+using OpenAI.Assistants;
+using OpenAI.Files;
+using OpenAI.VectorStores;
 
 #pragma warning disable AOAI001 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
+#pragma warning disable OPENAI001 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
 
 namespace Azure.AI.Details.Common.CLI
 {
@@ -46,8 +50,13 @@ namespace Azure.AI.Details.Common.CLI
             {
                 ex.Handle(x => {
                     var msg = x.Message.Split(new char[] { '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries).FirstOrDefault();
-                    ConsoleHelpers.WriteLineError($"\n  ERROR: {msg}");
-                    return true;
+                    if (!msg.StartsWith("ERROR: "))
+                    {
+                        ConsoleHelpers.WriteLineError($"\n  ERROR: {msg}");
+                        return true;
+                    }
+
+                    throw ex;
                 });
                 _values.Reset("passed", "false");
             }
@@ -65,9 +74,17 @@ namespace Azure.AI.Details.Common.CLI
 
                 case "chat.assistant": HelpCommandParser.DisplayHelp(_values); break;
                 case "chat.assistant.create": DoChatAssistantCreate().Wait(); break;
+                case "chat.assistant.update": DoChatAssistantUpdate().Wait(); break;
                 case "chat.assistant.delete": DoChatAssistantDelete().Wait(); break;
                 case "chat.assistant.get": DoChatAssistantGet().Wait(); break;
                 case "chat.assistant.list": DoChatAssistantList().Wait(); break;
+
+                case "chat.assistant.vector-store": HelpCommandParser.DisplayHelp(_values); break;
+                case "chat.assistant.vector-store.create": DoChatAssistantVectorStoreCreate().Wait(); break;
+                case "chat.assistant.vector-store.update": DoChatAssistantVectorStoreUpdate().Wait(); break;
+                case "chat.assistant.vector-store.delete": DoChatAssistantVectorStoreDelete().Wait(); break;
+                case "chat.assistant.vector-store.get": DoChatAssistantVectorStoreGet().Wait(); break;
+                case "chat.assistant.vector-store.list": DoChatAssistantVectorStoreList().Wait(); break;
 
                 case "chat.assistant.file": HelpCommandParser.DisplayHelp(_values); break;
                 case "chat.assistant.file.upload": DoChatAssistantFileUpload().Wait(); break;
@@ -93,18 +110,20 @@ namespace Azure.AI.Details.Common.CLI
             }
             else
             {
-                ChatNonInteractively();
+                ChatNonInteractively().Wait();
             }
+
+            CheckOutputThreadId();
         }
 
         private async Task ChatInteractively()
         {
-            var chatTextHandler = GetChatTextHandler(interactive: true);
+            if (!_quiet) Console.WriteLine("Press ENTER for more options.\n");
+
+            var chatTextHandler = await GetChatTextHandlerAsync(interactive: true);
 
             var speechInput = _values.GetOrDefault("chat.speech.input", false);
             var userPrompt = _values["chat.message.user.prompt"];
-
-            if (!_quiet) Console.WriteLine("Press ENTER for more options.\n");
 
             while (true)
             {
@@ -139,9 +158,9 @@ namespace Azure.AI.Details.Common.CLI
             Console.ResetColor();
         }
 
-        private void ChatNonInteractively()
+        private async Task ChatNonInteractively()
         {
-            var chatTextHandler = GetChatTextHandler(interactive: false);
+            var chatTextHandler = await GetChatTextHandlerAsync(interactive: false);
 
             var userPrompt = _values["chat.message.user.prompt"];
             if (string.IsNullOrEmpty(userPrompt))
@@ -164,16 +183,65 @@ namespace Azure.AI.Details.Common.CLI
             Console.ResetColor();
         }
 
-        private Func<string, Task> GetChatTextHandler(bool interactive)
+        private void CheckOutputThreadId()
+        {
+            var threadId = _values.GetOrDefault("chat.thread.id", null);
+            if (!string.IsNullOrEmpty(threadId))
+            {
+                IdHelpers.CheckWriteOutputNameOrId(threadId, _values, "chat.assistant.thread", IdKind.Id);
+                if (!_quiet)
+                {
+                    DisplayAssistantPromptLabel();
+                    Console.WriteLine($"Bye!\n\n(ThreadId: {threadId})");
+                }
+            }
+        }
+
+        private async Task<Func<string, Task>> GetChatTextHandlerAsync(bool interactive)
         {
             var parameterFile = InputChatParameterFileToken.Data().GetOrDefault(_values);
             if (!string.IsNullOrEmpty(parameterFile)) SetValuesFromParameterFile(parameterFile);
 
+            var assistantId = _values["chat.assistant.id"];
+            var assistantIdOk = !string.IsNullOrEmpty(assistantId);
+
+            return assistantIdOk
+                ? await GetAssistantsAPITextHandlerAsync(interactive, assistantId)
+                : GetChatCompletionsTextHandler(interactive);
+        }
+
+        private async Task<Func<string, Task>> GetAssistantsAPITextHandlerAsync(bool interactive, string assistantId)
+        {
+            var threadId = _values.GetOrDefault("chat.thread.id", null);
+
+            var client = CreateAssistantClient();
+            var thread = await CreateOrGetAssistantThread(client, threadId);
+
+            threadId = thread.Id;
+            _values.Reset("chat.thread.id", threadId);
+
+            var options = new RunCreationOptions();
+            var factory = CreateFunctionFactoryWithRunOptions(options);
+
+            return async (string text) =>
+            {
+                if (interactive && text.ToLower() == "reset")
+                {
+                    // ClearMessageHistory(messages);
+                    return;
+                }
+
+                await GetAssistantsAPIResponseAsync(client, assistantId, thread, options, factory, text);
+            };
+        }
+
+        private Func<string, Task> GetChatCompletionsTextHandler(bool interactive)
+        {
             var client = CreateOpenAIClient(out var deployment);
             var chatClient = client.GetChatClient(deployment);
 
             var options = CreateChatCompletionOptions(out var messages);
-            var funcContext = CreateFunctionFactoryAndCallContext(messages, options);
+            var funcContext = CreateChatCompletionsFunctionFactoryAndCallContext(messages, options);
 
             return async (string text) =>
             {
@@ -311,10 +379,9 @@ namespace Azure.AI.Details.Common.CLI
 
         private void DisplayAssistantPromptTextStreaming(string text)
         {
-            // do "tab" indentation when not quiet
-            Console.Write(!_quiet
-                ? text.Replace("\n", "\n           ")
-                : text);
+            if (string.IsNullOrEmpty(text)) return;
+
+            Console.Write(text);
         }
 
         private void DisplayAssistantPromptTextStreamingDone()
@@ -337,6 +404,60 @@ namespace Azure.AI.Details.Common.CLI
             }
         }
 
+        public async Task GetAssistantsAPIResponseAsync(AssistantClient assistantClient, string assistantId, AssistantThread thread, RunCreationOptions options, HelperFunctionFactory factory, string userInput)
+        {
+            await assistantClient.CreateMessageAsync(thread, [ userInput ]);
+            _ = CheckWriteChatHistoryOutputFileAsync(assistantClient, thread);
+
+            DisplayAssistantPromptLabel();
+
+            var assistant = await assistantClient.GetAssistantAsync(assistantId);
+            var stream = assistantClient.CreateRunStreamingAsync(thread, assistant.Value, options);
+
+            string contentComplete = string.Empty;
+            ThreadRun? run = null;
+            List<ToolOutput> toolOutputs = [];
+            do
+            {
+                await foreach (var update in stream)
+                {
+                    if (update is MessageContentUpdate contentUpdate)
+                    {
+                        contentComplete += contentUpdate.Text;
+                        DisplayAssistantPromptTextStreaming(contentUpdate.Text);
+                    }
+                    else if (update is RunUpdate runUpdate)
+                    {
+                        run = runUpdate;
+                    }
+                    else if (update is RequiredActionUpdate requiredActionUpdate)
+                    {
+                        if (factory.TryCallFunction(requiredActionUpdate.FunctionName, requiredActionUpdate.FunctionArguments, out var result))
+                        {
+                            DisplayAssistantFunctionCall(requiredActionUpdate.FunctionName, requiredActionUpdate.FunctionArguments, result);
+                            DisplayAssistantPromptLabel();
+                            toolOutputs.Add(new ToolOutput(requiredActionUpdate.ToolCallId, result));
+                        }
+                    }
+
+                    if (run?.Status.IsTerminal == true)
+                    {
+                        DisplayAssistantPromptTextStreamingDone();
+                        CheckWriteChatAnswerOutputFile(contentComplete);
+                    }
+                }
+
+                if (toolOutputs.Count > 0 && run != null)
+                {
+                    stream = assistantClient.SubmitToolOutputsToRunStreamingAsync(run, toolOutputs);
+                    toolOutputs.Clear();
+                }
+            }
+            while (run?.Status.IsTerminal == false);
+
+            await CheckWriteChatHistoryOutputFileAsync(assistantClient, thread);
+        }
+
         private async Task<string> GetChatCompletionsAsync(ChatClient client, List<ChatMessage> messages, ChatCompletionOptions options, HelperFunctionCallContext functionCallContext, string text)
         {
             var requestMessage = new UserChatMessage(text);
@@ -346,7 +467,6 @@ namespace Azure.AI.Details.Common.CLI
             DisplayAssistantPromptLabel();
 
             string contentComplete = string.Empty;
-
             while (true)
             {
                 var response = client.CompleteChatStreamingAsync(messages, options);
@@ -397,14 +517,14 @@ namespace Azure.AI.Details.Common.CLI
             }
         }
 
-        private void ClearMessageHistory(List<ChatMessage> messages)
+        private async Task CheckWriteChatHistoryOutputFileAsync(AssistantClient client, AssistantThread thread)
         {
-            messages.RemoveRange(1, messages.Count - 1);
-            CheckWriteChatHistoryOutputFile(messages);
-
-            DisplayAssistantPromptLabel();
-            DisplayAssistantPromptTextStreaming("I've reset the conversation. How can I help you today?");
-            DisplayAssistantPromptTextStreamingDone();
+            var outputHistoryFile = OutputChatHistoryFileToken.Data().GetOrDefault(_values);
+            if (!string.IsNullOrEmpty(outputHistoryFile))
+            {
+                var fileName = FileHelpers.GetOutputDataFileName(outputHistoryFile, _values);
+                await thread.SaveChatHistoryToFileAsync(client, fileName);
+            }
         }
 
         private void CheckWriteChatHistoryOutputFile(IList<ChatMessage> messages)
@@ -415,6 +535,16 @@ namespace Azure.AI.Details.Common.CLI
                 var fileName = FileHelpers.GetOutputDataFileName(outputHistoryFile, _values);
                 messages.SaveChatHistoryToFile(fileName);
             }
+        }
+
+        private void ClearMessageHistory(List<ChatMessage> messages)
+        {
+            messages.RemoveRange(1, messages.Count - 1);
+            CheckWriteChatHistoryOutputFile(messages);
+
+            DisplayAssistantPromptLabel();
+            DisplayAssistantPromptTextStreaming("I've reset the conversation. How can I help you today?");
+            DisplayAssistantPromptTextStreamingDone();
         }
 
         private ChatCompletionOptions CreateChatCompletionOptions(out List<ChatMessage> messages)
@@ -594,26 +724,88 @@ namespace Azure.AI.Details.Common.CLI
             }
         }
 
-        private HelperFunctionCallContext CreateFunctionFactoryAndCallContext(IList<ChatMessage> messages, ChatCompletionOptions options)
+        private AssistantClient CreateAssistantClient()
         {
-            var customFunctions = _values.GetOrDefault("chat.custom.helper.functions", null);
-            var useCustomFunctions = !string.IsNullOrEmpty(customFunctions);
-            var useBuiltInFunctions = _values.GetOrDefault("chat.built.in.helper.functions", false);
+            var client = CreateOpenAIClient(out var deployment);
+            return client.GetAssistantClient();
+        }
 
-            var factory = useCustomFunctions && useBuiltInFunctions
-                ? CreateFunctionFactoryForCustomFunctions(customFunctions) + CreateFunctionFactoryWithBuiltinFunctions()
-                : useCustomFunctions
-                    ? CreateFunctionFactoryForCustomFunctions(customFunctions)
-                    : useBuiltInFunctions
-                        ? CreateFunctionFactoryWithBuiltinFunctions()
-                        : CreateFunctionFactoryWithNoFunctions();
+        private async Task<AssistantThread> CreateOrGetAssistantThread(AssistantClient client, string threadId)
+        {
+            return string.IsNullOrEmpty(threadId)
+                ? await CreateAssistantThread(client)
+                : await GetAssistantThread(client, threadId);
+        }
 
+        private static async Task<AssistantThread> CreateAssistantThread(AssistantClient client)
+        {
+            var result = await client.CreateThreadAsync();
+            return result.Value;
+        }
+
+        private async Task<AssistantThread> GetAssistantThread(AssistantClient client, string threadId)
+        {
+            var result = await client.GetThreadAsync(threadId);
+            var thread = result.Value;
+
+            await foreach (var message in client.GetMessagesAsync(thread, ListOrder.OldestFirst))
+            {
+                var content = string.Join("", message.Content.Select(c => c.Text));
+                var isUser = message.Role == MessageRole.User;
+                var isAssistant = message.Role == MessageRole.Assistant;
+
+                if (isUser)
+                {
+                    DisplayUserChatPromptLabel();
+                    DisplayUserChatPromptText(content);
+                }
+
+                if (isAssistant)
+                {
+                    DisplayAssistantPromptLabel();
+                    DisplayAssistantPromptTextStreaming(content);
+                    DisplayAssistantPromptTextStreamingDone();
+                }
+            }
+
+            return thread;
+        }
+
+        private HelperFunctionFactory CreateFunctionFactoryWithRunOptions(RunCreationOptions options)
+        {
+            var factory = CreateFunctionFactory();
+            foreach (var tool in factory.GetToolDefinitions())
+            {
+                options.ToolsOverride.Add(tool);
+            }
+
+            return factory;
+        }
+
+        private HelperFunctionCallContext CreateChatCompletionsFunctionFactoryAndCallContext(IList<ChatMessage> messages, ChatCompletionOptions options)
+        {
+            var factory = CreateFunctionFactory();
             foreach (var tool in factory.GetChatTools())
             {
                 options.Tools.Add(tool);
             }
 
             return new HelperFunctionCallContext(factory, messages);
+        }
+
+        private HelperFunctionFactory CreateFunctionFactory()
+        {
+            var customFunctions = _values.GetOrDefault("chat.custom.helper.functions", null);
+            var useCustomFunctions = !string.IsNullOrEmpty(customFunctions);
+            var useBuiltInFunctions = _values.GetOrDefault("chat.built.in.helper.functions", false);
+
+            return useCustomFunctions && useBuiltInFunctions
+                ? CreateFunctionFactoryForCustomFunctions(customFunctions) + CreateFunctionFactoryWithBuiltinFunctions()
+                : useCustomFunctions
+                    ? CreateFunctionFactoryForCustomFunctions(customFunctions)
+                    : useBuiltInFunctions
+                        ? CreateFunctionFactoryWithBuiltinFunctions()
+                        : CreateFunctionFactoryWithNoFunctions();
         }
 
         private HelperFunctionFactory CreateFunctionFactoryForCustomFunctions(string customFunctions)
@@ -890,9 +1082,9 @@ namespace Azure.AI.Details.Common.CLI
 
         private async Task<bool> DoChatAssistantCreate()
         {
-            var name = _values["chat.assistant.create.name"];
+            var name = _values["chat.assistant.name"];
             var deployment = ConfigDeploymentToken.Data().GetOrDefault(_values);
-            var instructions = InstructionsToken.Data().GetOrDefault(_values);
+            var instructions = InstructionsToken.Data().GetOrDefault(_values, "You are a helpful assistant.");
 
             if (string.IsNullOrEmpty(name))
             {
@@ -902,26 +1094,134 @@ namespace Azure.AI.Details.Common.CLI
             {
                 _values.AddThrowError("ERROR:", $"Creating assistant; requires deployment.");
             }
-            else if (string.IsNullOrEmpty(instructions))
-            {
-                _values.AddThrowError("ERROR:", $"Creating assistant; requires instructions.");
-            }
 
             var message = $"Creating assistant ({name}) ...";
             if (!_quiet) Console.WriteLine(message);
 
+            DemandKeyAndEndpoint(out var key, out var endpoint);
+
             var codeInterpreter = CodeInterpreterToken.Data().GetOrDefault(_values, false);
+            var assistant = await OpenAIAssistantHelpers.CreateAssistantAsync(key, endpoint, name, deployment, instructions, codeInterpreter);
+            IdHelpers.CheckWriteOutputNameOrId(assistant.Id, _values, "chat", IdKind.Id);
+            IdHelpers.CheckWriteOutputNameOrId(assistant.Name, _values, "chat", IdKind.Name);
+
             var fileIds = FileIdOptionXToken.GetOptions(_values).ToList();
             fileIds.AddRange(FileIdsOptionXToken.GetOptions(_values));
+            fileIds.ExtendSplitItems(';');
 
-            DemandKeyAndEndpoint(out var key, out var endpoint);
-            string assistantId = await OpenAIAssistantHelpers.CreateAssistant(key, endpoint, name, deployment, instructions, codeInterpreter, fileIds);
+            var files = FileOptionXToken.GetOptions(_values).ToList();
+            files.AddRange(FilesOptionXToken.GetOptions(_values));
+            files.ExtendSplitItems(';');
+
+            files = ExpandFindFiles(files);
+
+            if (fileIds.Count() > 0 || files.Count() > 0)
+            {
+                if (!_quiet) Console.WriteLine("\n  Creating vector store ...");
+
+                var store = await CreateAssistantVectorStoreAsync(key, endpoint, name, fileIds, files);
+                var modifyOptions = new AssistantModificationOptions()
+                {
+                    ToolResources = ToolResourcesFromVectorStoreId(store.Id)
+                };
+                modifyOptions.DefaultTools.Add(new FileSearchToolDefinition());
+
+                var assistantClient = OpenAIAssistantHelpers.CreateOpenAIAssistantClient(key, endpoint);
+                var modified = await assistantClient.ModifyAssistantAsync(assistant, modifyOptions);
+                assistant = modified.Value;
+
+                Console.WriteLine();
+            }
 
             if (!_quiet) Console.WriteLine($"{message} Done!\n");
 
-            var fi = new FileInfo(ConfigSetHelpers.ConfigSet("assistant.id", assistantId));
-            if (!_quiet) Console.WriteLine($"{fi.Name} (saved at {fi.DirectoryName})\n\n  {assistantId}");
+            SetAssistantIdConfig(assistant);
+            return true;
+        }
 
+        private async Task<bool> DoChatAssistantUpdate()
+        {
+            var id = _values["chat.assistant.id"];
+            if (string.IsNullOrEmpty(id))
+            {
+                _values.AddThrowError(
+                      "ERROR:", $"Updating assistant; requires id.",
+                                "",
+                        "TRY:", $"{Program.Name} chat assistant update --id ID",
+                                "",
+                        "SEE:", $"{Program.Name} help chat assistant update");
+            }
+
+            var name = _values["chat.assistant.name"];
+            var nameToDisplay = string.IsNullOrEmpty(name) ? id : name;
+
+            var message = $"Updating assistant ({nameToDisplay}) ...";
+            if (!_quiet) Console.WriteLine(message);
+
+            DemandKeyAndEndpoint(out var key, out var endpoint);
+            var assistantClient = OpenAIAssistantHelpers.CreateOpenAIAssistantClient(key, endpoint);
+            var response = await assistantClient.GetAssistantAsync(id);
+            var assistant = response.Value;
+
+            var deployment = ConfigDeploymentToken.Data().GetOrDefault(_values, assistant.Model);
+            var instructions = InstructionsToken.Data().GetOrDefault(_values, assistant.Instructions);
+            var codeInterpreter = CodeInterpreterToken.Data().GetOrDefault(_values, assistant.Tools.FirstOrDefault(t => t is CodeInterpreterToolDefinition) != null);
+            var vectorStoreId = assistant.ToolResources.FileSearch?.VectorStoreIds?.FirstOrDefault();
+
+            var fileIds = FileIdOptionXToken.GetOptions(_values).ToList();
+            fileIds.AddRange(FileIdsOptionXToken.GetOptions(_values));
+            fileIds.ExtendSplitItems(';');
+
+            var files = FileOptionXToken.GetOptions(_values).ToList();
+            files.AddRange(FilesOptionXToken.GetOptions(_values));
+            files.ExtendSplitItems(';');
+            files = ExpandFindFiles(files);
+
+            var existingVectorStore = !string.IsNullOrEmpty(vectorStoreId);
+            var newFilesForVectorStore = fileIds.Count() > 0 || files.Count() > 0;
+            if (newFilesForVectorStore)
+            {
+                if (!existingVectorStore)
+                {
+                    if (!_quiet) Console.WriteLine("\n  Creating vector store ...");
+
+                    var store = await CreateAssistantVectorStoreAsync(key, endpoint, name, fileIds, files);
+                    vectorStoreId = store.Id;
+                }
+                else
+                {
+                    if (!_quiet) Console.WriteLine("\n  Updating vector store ...");
+
+                    var store = await OpenAIAssistantHelpers.GetVectorStoreAsync(key, endpoint, vectorStoreId);
+                    store = await UploadFilesToAssistantVectorStore(key, endpoint, fileIds, files, store);
+                    vectorStoreId = store.Id;
+                }
+            }
+
+            var modifyOptions = new AssistantModificationOptions()
+            {
+                Name = name ?? assistant.Name,
+                Model = deployment ?? assistant.Model,
+                Instructions = instructions ?? assistant.Instructions,
+                ToolResources = ToolResourcesFromVectorStoreId(vectorStoreId),
+            };
+
+            if (codeInterpreter)
+            {
+                modifyOptions.DefaultTools.Add(new CodeInterpreterToolDefinition());
+            }
+
+            if (existingVectorStore || newFilesForVectorStore)
+            {
+                modifyOptions.DefaultTools.Add(new FileSearchToolDefinition());
+            }
+
+            var modified = await assistantClient.ModifyAssistantAsync(assistant, modifyOptions);
+            assistant = modified.Value;
+
+            if (!_quiet) Console.WriteLine($"{message} Done!\n");
+
+            SetAssistantIdConfig(assistant);
             return true;
         }
 
@@ -930,7 +1230,12 @@ namespace Azure.AI.Details.Common.CLI
             var id = _values["chat.assistant.id"];
             if (string.IsNullOrEmpty(id))
             {
-                _values.AddThrowError("ERROR:", $"Deleting assistant; requires id.");
+                _values.AddThrowError(
+                      "ERROR:", $"Deleting assistant; requires id.",
+                                "",
+                        "TRY:", $"{Program.Name} chat assistant delete --id ID",
+                                "",
+                        "SEE:", $"{Program.Name} help chat assistant delete");
             }
 
             var message = $"Deleting assistant ({id}) ...";
@@ -948,14 +1253,19 @@ namespace Azure.AI.Details.Common.CLI
             var id = _values["chat.assistant.id"];
             if (string.IsNullOrEmpty(id))
             {
-                _values.AddThrowError("ERROR:", $"Deleting assistant; requires id.");
+                _values.AddThrowError(
+                      "ERROR:", $"Getting assistant; requires id.",
+                                "",
+                        "TRY:", $"{Program.Name} chat assistant get --id ID",
+                                "",
+                        "SEE:", $"{Program.Name} help chat assistant get");
             }
 
             var message = $"Getting assistant ({id}) ...";
             if (!_quiet) Console.WriteLine(message);
 
             DemandKeyAndEndpoint(out var key, out var endpoint);
-            var json = await OpenAIAssistantHelpers.GetAssistantJson(key, endpoint, id);
+            var json = await OpenAIAssistantHelpers.GetAssistantJsonAsync(key, endpoint, id);
 
             if (!_quiet) Console.WriteLine($"{message} Done!\n");
 
@@ -971,23 +1281,193 @@ namespace Azure.AI.Details.Common.CLI
             if (!_quiet) Console.WriteLine(message);
 
             DemandKeyAndEndpoint(out var key, out var endpoint);
-            var assistants = await OpenAIAssistantHelpers.ListAssistants(key, endpoint);
+            var assistants = await OpenAIAssistantHelpers.ListAssistantsAsync(key, endpoint);
+            IdHelpers.CheckWriteOutputNamesOrIds(assistants, _values, "chat", IdKind.Id, (a) => a.Key);
+            IdHelpers.CheckWriteOutputNamesOrIds(assistants, _values, "chat", IdKind.Name, (a) => a.Value);
 
             if (!_quiet) Console.WriteLine($"{message} Done!\n");
 
             if (assistants.Count() == 0)
             {
-                Console.WriteLine("No assistants found.");
+                if (!_quiet) Console.WriteLine("No assistants found.");
             }
             else
             {
-                Console.WriteLine("Assistants:\n");
+                if (!_quiet) Console.WriteLine("Assistants:\n");
                 foreach (var assistant in assistants)
                 {
                     var assistantId = assistant.Key;
                     var assistantName = assistant.Value;
                     if (string.IsNullOrEmpty(assistantName)) assistantName = "(no name)";
-                    Console.WriteLine($"  {assistantName} ({assistantId})");
+                    if (!_quiet)
+                    {
+                        Console.WriteLine($"  {assistantName} ({assistantId})");
+                    }
+                    else
+                    {
+                        Console.WriteLine(assistantId);
+                    }
+                }
+            }
+
+            return true;
+        }
+
+        private async Task<bool> DoChatAssistantVectorStoreCreate()
+        {
+            DemandKeyAndEndpoint(out var key, out var endpoint);
+
+            var name = _values["chat.assistant.vector.store.name"];
+            var nameToDisplay = string.IsNullOrEmpty(name) ? "no name" : name;
+
+            var message = $"Creating assistant vector store ({nameToDisplay}) ...";
+            if (!_quiet) Console.WriteLine(message);
+
+            var fileIds = FileIdOptionXToken.GetOptions(_values).ToList();
+            fileIds.AddRange(FileIdsOptionXToken.GetOptions(_values));
+            fileIds.ExtendSplitItems(';');
+
+            var files = FileOptionXToken.GetOptions(_values).ToList();
+            files.AddRange(FilesOptionXToken.GetOptions(_values));
+            files.ExtendSplitItems(';');
+
+            files = ExpandFindFiles(files);
+
+            var store = await CreateAssistantVectorStoreAsync(key, endpoint, name, fileIds, files);
+            IdHelpers.CheckWriteOutputNameOrId(store.Id, _values, "chat", IdKind.Id);
+            IdHelpers.CheckWriteOutputNameOrId(store.Name, _values, "chat", IdKind.Name);
+
+            PrintVectorStore(key, endpoint, store);
+
+            if (!_quiet) Console.WriteLine($"{message} Done!\n");
+
+            ConfigSetHelpers.ConfigSet("vector.store.id", store.Id, print: !_quiet);
+            return true;
+        }
+
+        private async Task<bool> DoChatAssistantVectorStoreUpdate()
+        {
+            DemandKeyAndEndpoint(out var key, out var endpoint);
+
+            var id = _values["chat.assistant.vector.store.id"];
+            if (string.IsNullOrEmpty(id))
+            {
+                _values.AddThrowError(
+                      "ERROR:", $"Updating assistant vector store; requires id.",
+                                "",
+                        "TRY:", $"{Program.Name} chat assistant vector-store update --id ID",
+                                "",
+                        "SEE:", $"{Program.Name} help chat assistant vector-store update");
+            }
+
+            var name = _values["chat.assistant.vector.store.name"];
+            var nameToDisplay = string.IsNullOrEmpty(name) ? id : name;
+
+            var message = $"Updating assistant vector store ({nameToDisplay}) ...";
+            if (!_quiet) Console.WriteLine(message);
+
+            var fileIds = FileIdOptionXToken.GetOptions(_values).ToList();
+            fileIds.AddRange(FileIdsOptionXToken.GetOptions(_values));
+            fileIds.ExtendSplitItems(';');
+
+            var files = FileOptionXToken.GetOptions(_values).ToList();
+            files.AddRange(FilesOptionXToken.GetOptions(_values));
+            files.ExtendSplitItems(';');
+
+            files = ExpandFindFiles(files);
+
+            var store = await UpdateAssistantVectorStoreAsync(key, endpoint, id, name, fileIds, files);
+            PrintVectorStore(key, endpoint, store);
+
+            if (!_quiet) Console.WriteLine($"{message} Done!\n");
+            return true;
+        }
+
+        private async Task<bool> DoChatAssistantVectorStoreDelete()
+        {
+            var id = _values["chat.assistant.vector.store.id"];
+            if (string.IsNullOrEmpty(id))
+            {
+                _values.AddThrowError(
+                      "ERROR:", $"Deleting assistant vector store; requires id.",
+                                "",
+                        "TRY:", $"{Program.Name} chat assistant vector-store delete --id ID",
+                                "",
+                        "SEE:", $"{Program.Name} help chat assistant vector-store delete");
+            }
+
+            var message = $"Deleting assistant vector store ...";
+            if (!_quiet) Console.WriteLine(message);
+
+            DemandKeyAndEndpoint(out var key, out var endpoint);
+            await OpenAIAssistantHelpers.DeleteAssistantVectorStoreAsync(key, endpoint, id);
+
+            if (!_quiet) Console.WriteLine($"{message} Done!");
+            return true;
+        }
+
+        private async Task<bool> DoChatAssistantVectorStoreGet()
+        {
+            var id = _values["chat.assistant.vector.store.id"];
+            if (string.IsNullOrEmpty(id))
+            {
+                _values.AddThrowError(
+                      "ERROR:", $"Getting assistant vector store; requires id.",
+                                "",
+                        "TRY:", $"{Program.Name} chat assistant vector-store get --id ID",
+                                "",
+                        "SEE:", $"{Program.Name} help chat assistant vector-store get");
+            }
+
+            var message = $"Getting assistant vector store ...";
+            if (!_quiet) Console.WriteLine(message);
+
+            DemandKeyAndEndpoint(out var key, out var endpoint);
+            var store = await OpenAIAssistantHelpers.GetAssistantVectorStoreAsync(key, endpoint, id);
+            var json = OpenAIAssistantHelpers.GetAssistantVectorStoreJson(store);
+
+            PrintVectorStore(key, endpoint, store);
+
+            if (!_quiet) Console.WriteLine($"{message} Done!\n");
+
+            // var ok = !string.IsNullOrEmpty(json);
+            // if (ok) Console.WriteLine(json);
+
+            return true;
+        }
+
+        private async Task<bool> DoChatAssistantVectorStoreList()
+        {
+            var message = $"Listing assistant vector stores ...";
+            if (!_quiet) Console.WriteLine(message);
+
+            DemandKeyAndEndpoint(out var key, out var endpoint);
+            var stores = await OpenAIAssistantHelpers.ListAssistantVectorStoresAsync(key, endpoint);
+            IdHelpers.CheckWriteOutputNamesOrIds(stores, _values, "chat", IdKind.Id, (a) => a.Key);
+            IdHelpers.CheckWriteOutputNamesOrIds(stores, _values, "chat", IdKind.Name, (a) => a.Value);
+
+            if (!_quiet) Console.WriteLine($"{message} Done!\n");
+
+            if (stores.Count() == 0)
+            {
+                if (!_quiet) Console.WriteLine("No vector stores found.");
+            }
+            else
+            {
+                if (!_quiet) Console.WriteLine("Vector stores:\n");
+                foreach (var store in stores)
+                {
+                    var storeId = store.Key;
+                    var storeName = store.Value;
+                    if (string.IsNullOrEmpty(storeName)) storeName = "(no name)";
+                    if (!_quiet) 
+                    {
+                        Console.WriteLine($"  {storeName} ({storeId})");
+                    }
+                    else
+                    {
+                        Console.WriteLine(storeId);
+                    }
                 }
             }
 
@@ -1009,6 +1489,8 @@ namespace Azure.AI.Details.Common.CLI
 
             DemandKeyAndEndpoint(out var key, out var endpoint);
             var (uploadedId, uploadedName) = await OpenAIAssistantHelpers.UploadAssistantFile(key, endpoint, existing);
+            IdHelpers.CheckWriteOutputNameOrId(uploadedId, _values, "chat", IdKind.Id);
+            IdHelpers.CheckWriteOutputNameOrId(uploadedName, _values, "chat", IdKind.Name);
 
             if (!_quiet) Console.WriteLine($"{message} Done!\n\n  {uploadedName} ({uploadedId})\n");
 
@@ -1022,22 +1504,31 @@ namespace Azure.AI.Details.Common.CLI
 
             DemandKeyAndEndpoint(out var key, out var endpoint);
             var files = await OpenAIAssistantHelpers.ListAssistantFiles(key, endpoint);
+            IdHelpers.CheckWriteOutputNamesOrIds(files, _values, "chat", IdKind.Id, (a) => a.Key);
+            IdHelpers.CheckWriteOutputNamesOrIds(files, _values, "chat", IdKind.Name, (a) => a.Value);
 
             if (!_quiet) Console.WriteLine($"{message} Done!\n");
 
             if (files.Count() == 0)
             {
-                Console.WriteLine("No files found.");
+                if (!_quiet) Console.WriteLine("No files found.");
             }
             else
             {
-                Console.WriteLine("Assistant files:\n");
+                if (!_quiet) Console.WriteLine("Assistant files:\n");
                 foreach (var file in files)
                 {
                     var fileId = file.Key;
                     var fileName = file.Value;
                     if (string.IsNullOrEmpty(fileName)) fileName = "(no name)";
-                    Console.WriteLine($"  {fileName} ({fileId})");
+                    if (!_quiet)
+                    {
+                        Console.WriteLine($"  {fileName} ({fileId})");
+                    }
+                    else
+                    {
+                        Console.WriteLine($"{fileId}");
+                    }
                 }
             }
 
@@ -1062,6 +1553,140 @@ namespace Azure.AI.Details.Common.CLI
             return true;
         }
 
+        private List<string> ExpandFindFiles(List<string> files)
+        {
+            if (files.Count() > 0)
+            {
+                if (!_quiet) Console.Write("\n  Finding files ...");
+
+                files = files.SelectMany(f => FileHelpers.FindFiles(f, _values)).ToList();
+
+                if (!_quiet) Console.WriteLine($"\r  Found {files.Count()} file(s) ...   ");
+            }
+
+            return files;
+        }
+
+        private static ToolResources ToolResourcesFromVectorStoreId(string vectorStoreId)
+        {
+            return string.IsNullOrEmpty(vectorStoreId) ? new() : new()
+            {
+                FileSearch = new()
+                {
+                    VectorStoreIds = { vectorStoreId }
+                },
+            };
+        }
+
+        private async Task<VectorStore> CreateAssistantVectorStoreAsync(string key, string endpoint, string name, List<string> fileIds, List<string> files)
+        {
+            var store = await OpenAIAssistantHelpers.CreateAssistantVectorStoreAsync(key, endpoint, name, fileIds);
+            return await UploadFilesToAssistantVectorStore(key, endpoint, new(), files, store);
+        }
+
+        private async Task<VectorStore> UpdateAssistantVectorStoreAsync(string key, string endpoint, string id, string name, List<string> fileIds, List<string> files)
+        {
+            var store = await OpenAIAssistantHelpers.UpdateAssistantVectorStoreAsync(key, endpoint, id, name);
+            return await UploadFilesToAssistantVectorStore(key, endpoint, fileIds, files, store);
+        }
+
+        private async Task<VectorStore> UploadFilesToAssistantVectorStore(string key, string endpoint, List<string> fileIds, List<string> files, VectorStore store)
+        {
+            var batchFiles = new List<OpenAIFileInfo>();
+
+            if (fileIds.Count() > 0)
+            {
+                if (!_quiet) Console.WriteLine("\n  Getting files ...\n");
+
+                var fileClient = OpenAIAssistantHelpers.CreateOpenAIFileClient(key, endpoint);
+                var foundFiles = await OpenAIAssistantHelpers.GetFilesAsync(fileClient, fileIds,
+                    parallelism: 10,
+                    callback: (x) =>
+                    {
+                        Console.WriteLine($"    {x.Filename} ({x.SizeInBytes} byte(s))");
+                    });
+
+                batchFiles.AddRange(foundFiles);
+            }
+
+            if (files.Count() > 0)
+            {
+                if (!_quiet) Console.WriteLine("\n  Uploading files ...\n");
+
+                var fileClient = OpenAIAssistantHelpers.CreateOpenAIFileClient(key, endpoint);
+                var uploaded = await OpenAIAssistantHelpers.UploadFilesAsync(fileClient, files,
+                    parallelism: 10,
+                    callback: (x) =>
+                    {
+                        Console.WriteLine($"    {x.Filename} ({x.SizeInBytes} byte(s))");
+                    });
+
+                batchFiles.AddRange(uploaded);
+            }
+
+            if (batchFiles.Count() > 0)
+            {
+                Console.Write("\n  Processing vector store files ...");
+                var batchJob = await OpenAIAssistantHelpers.ProcessBatchFileJob(key, endpoint, store, batchFiles);
+
+                Console.WriteLine("\n");
+                Console.WriteLine($"    Batch job: {batchJob.BatchId}");
+                Console.WriteLine($"    File Completed/Total: {batchJob.FileCounts.Completed} out of {batchJob.FileCounts.Total}");
+
+                store = await OpenAIAssistantHelpers.GetAssistantVectorStoreAsync(key, endpoint, store.Id);
+            }
+
+            return store;
+        }
+
+        private void PrintVectorStore(string key, string endpoint, VectorStore store)
+        {
+            var id = store.Id;
+            var name = store.Name ?? "(no name)";
+
+            Console.WriteLine();
+            Console.WriteLine($"  ID: {id}");
+            Console.WriteLine($"  Name: {name}");
+
+            var storeClient = OpenAIAssistantHelpers.CreateOpenAIVectorStoreClient(key, endpoint);
+            var fileClient = OpenAIAssistantHelpers.CreateOpenAIFileClient(key, endpoint);
+
+            if (store.FileCounts.Total == 0)
+            {
+                Console.WriteLine("\n  Files: (no files)");
+                Console.WriteLine();
+            }
+            else if (store.FileCounts.Total == 1)
+            {
+                var association = storeClient.GetFileAssociations(store).First();
+                var file = fileClient.GetFile(association.FileId);
+
+                Console.Write("\n  File:");
+                Console.WriteLine($" {file.Value.Filename} ({file.Value.SizeInBytes} byte(s))");
+                Console.WriteLine();
+            }
+            else // if (store.FileCounts.Total > 1)
+            {
+                Console.WriteLine("\n  Files:\n");
+
+                var count = 0;
+                var associations = storeClient.GetFileAssociations(store);
+                foreach (var association in associations)
+                {
+                    var file = fileClient.GetFile(association.FileId);
+                    Console.WriteLine($"    {file.Value.Filename} ({file.Value.SizeInBytes} byte(s))");
+
+                    if (++count >= 5 && !_verbose)
+                    {
+                        Console.WriteLine($"    ({associations.Count() - count} more file(s) ... )");
+                        break;
+                    }
+                }
+
+                Console.WriteLine();
+            }
+        }
+
         private void DemandKeyAndEndpoint(out string key, out string endpoint)
         {
             key = _values["service.config.key"];
@@ -1069,6 +1694,18 @@ namespace Azure.AI.Details.Common.CLI
             if (string.IsNullOrEmpty(endpoint))
             {
                 _values.AddThrowError("ERROR:", $"Creating AssistantsClient; requires endpoint.");
+            }
+        }
+
+        private void SetAssistantIdConfig(Assistant assistant)
+        {
+            ConfigSetHelpers.ConfigSet("assistant.id", assistant.Id, print: !_quiet);
+
+            var vectorStoreId = assistant.ToolResources.FileSearch?.VectorStoreIds?.FirstOrDefault();
+            if (!string.IsNullOrEmpty(vectorStoreId))
+            {
+                Console.WriteLine();
+                ConfigSetHelpers.ConfigSet("vector.store.id", vectorStoreId, print: !_quiet);
             }
         }
 

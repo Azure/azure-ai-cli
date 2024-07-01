@@ -8,13 +8,14 @@ CHAT ASSISTANT EXAMPLES
 
     ai chat assistant create --name "My Assistant" --instructions "You are a helpful Assistant."
 
-  `EXAMPLE 3`: Upload files for use with RETRIEVAL
+  `EXAMPLE 3`: Create an OpenAI assistant w/ File Search
 
-    ai chat assistant file upload --files **\*.md
+    ai chat assistant create --name "My Assistant" --instructions "You are a helpful Assistant." --files "**/*.md"
 
-  `EXAMPLE 4`: Create an OpenAI assistant w/ RETRIEVAL for specific files
+  `EXAMPLE 4`: Chat with a previously created assistant
 
-    ai chat assistant create --name "My Assistant 2" --instructions "You are a helpful Assistant." --file-ids id1 id2 ...
+    ai chat assistant list
+    ai chat --assistant-id ID --interactive
 
   `EXAMPLE 5`: Create sample Node.js source code
 
@@ -26,5 +27,6 @@ CHAT ASSISTANT EXAMPLES
 
 SEE ALSO
 
+  ai help chat
   ai help chat assistant
   ai help find topics chat assistant

@@ -8,11 +8,18 @@ USAGE: ai chat assistant list [...]
     --endpoint ENDPOINT                 (see: ai help chat endpoint)
     --key KEY                           (see: ai help chat key)
 
+  OUTPUT
+    --output-ids @@FILE
+    --output-names @@FILE
+    --output-add-id @@FILE
+    --output-add-name @@FILE
+
 EXAMPLE
 
   ai chat assistant list
 
 SEE ALSO
 
+  ai help chat examples
   ai help chat assistant examples
   ai help find topics chat assistant

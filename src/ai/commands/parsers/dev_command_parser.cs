@@ -56,15 +56,14 @@ namespace Azure.AI.Details.Common.CLI
         {
             public CommonDevNamedValueTokenParsers() : base(
 
-                    new NamedValueTokenParser(null, "x.command", "11", "1"),
+                    new Any1ValueNamedValueTokenParser(null, "x.command", "11"),
 
                     new ExpectOutputTokenParser(),
                     new DiagnosticLogTokenParser(),
                     new CommonNamedValueTokenParsers(),
 
-                    new NamedValueTokenParser("--ini", "ini.file", "10", "1", "@"),
-
-                    new NamedValueTokenParser(null, "x.command.expand.file.name", "11111", "1")
+                    new IniFileNamedValueTokenParser(),
+                    new ExpandFileNameNamedValueTokenParser()
 
                 )
             {

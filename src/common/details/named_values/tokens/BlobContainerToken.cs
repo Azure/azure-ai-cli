@@ -8,7 +8,7 @@ namespace Azure.AI.Details.Common.CLI
     public class BlobContainerToken
     {
         public static NamedValueTokenData Data() => new NamedValueTokenData(_optionName, _fullName, _optionExample, _requiredDisplayName);
-        public static INamedValueTokenParser Parser(bool blobPartRequired = true) => new NamedValueTokenParser(_optionName, _fullName, blobPartRequired ? "11" : "01", "1");
+        public static INamedValueTokenParser Parser(bool blobPartRequired = true) => new Any1ValueNamedValueTokenParser(_optionName, _fullName, blobPartRequired ? "11" : "01");
 
         private const string _requiredDisplayName = "blob container";
         private const string _optionName = "--blob-container";

@@ -10,8 +10,12 @@ using OpenAI.Chat;
 using System.Collections.Generic;
 using System.Linq;
 using System;
+using System.Threading.Tasks;
+using OpenAI.Assistants;
+using OpenAI;
 
 #pragma warning disable CS0618 // Type or member is obsolete
+#pragma warning disable OPENAI001 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
 
 namespace Azure.AI.Details.Common.CLI
 {
@@ -25,9 +29,31 @@ namespace Azure.AI.Details.Common.CLI
                 .ToList());
         }
 
+        public static async Task SaveChatHistoryToFileAsync(this AssistantThread thread, AssistantClient client, string fileName)
+        {
+            var chatMessages = new List<ChatMessage>();
+            await foreach (var message in client.GetMessagesAsync(thread, ListOrder.OldestFirst))
+            {
+                var content = string.Join("", message.Content.Select(c => c.Text));
+                var isUser = message.Role == MessageRole.User;
+                var isAssistant = message.Role == MessageRole.Assistant;
+
+                if (isUser)
+                {
+                    chatMessages.Add(new UserChatMessage(content));
+                }
+                else if (isAssistant)
+                {
+                    chatMessages.Add(new AssistantChatMessage(content));
+                }
+            }
+
+            chatMessages.SaveChatHistoryToFile(fileName);
+        }
+
         public static void SaveChatHistoryToFile(this IList<ChatMessage> messages, string fileName)
         {
-            var historyFile = new StringBuilder();
+            var history = new StringBuilder();
 
             foreach (var message in messages)
             {
@@ -43,11 +69,11 @@ namespace Azure.AI.Details.Common.CLI
 
                 if (!string.IsNullOrEmpty(messageText))
                 {
-                    historyFile.AppendLine(messageText);
+                    history.AppendLine(messageText);
                 }
             }
 
-            FileHelpers.WriteAllText(fileName, historyFile.ToString(), Encoding.UTF8);
+            FileHelpers.WriteAllText(fileName, history.ToString(), Encoding.UTF8);
         }
 
         public static void ReadChatHistoryFromFile(this List<ChatMessage> messages, string fileName)

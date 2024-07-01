@@ -124,8 +124,7 @@ namespace Azure.AI.Details.Common.CLI
             output = DoIndexUpdateWithAISearch(aiServicesApiKey, searchEndpoint, searchApiKey, embeddingsEndpoint, embeddingModelDeployment, embeddingModelName, embeddingsApiKey, searchIndexName, dataSourceConnectionName, blobContainer, pattern, skillsetName, indexerName, idFieldName, contentFieldName, vectorFieldName).Result;
             if (!_quiet) Console.WriteLine($"{message} Done!\n");
 
-            var fi = new FileInfo(ConfigSetHelpers.ConfigSet("search.index.name", searchIndexName));
-            if (!_quiet) Console.WriteLine($"{fi.Name} (saved at {fi.DirectoryName})\n\n  {searchIndexName}\n");
+            ConfigSetHelpers.ConfigSet("search.index.name", searchIndexName, print: !_quiet);
 
             if (!string.IsNullOrEmpty(output)) Console.WriteLine(output);
         }

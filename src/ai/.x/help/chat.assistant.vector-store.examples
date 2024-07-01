@@ -1,0 +1,18 @@
+CHAT ASSISTANT VECTOR-STORE EXAMPLES
+
+  `EXAMPLE 1`: Create or select OpenAI resource and model deployments
+
+    ai init
+
+  `EXAMPLE 2`: Create an OpenAI Assistant Vector Store
+
+    ai chat assistant vector-store create --name "My Vector Store" --files "**/*.md"
+
+  `EXAMPLE 3`: Update an OpenAI Assistant Vector Store
+   
+    ai chat assistant vector-store update --files "../more/**/*.md"
+
+SEE ALSO
+
+  ai help chat assistant vector-store
+  ai help find topics chat assistant vector-store

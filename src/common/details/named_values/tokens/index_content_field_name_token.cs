@@ -8,7 +8,7 @@ namespace Azure.AI.Details.Common.CLI
     public class IndexContentFieldNameToken
     {
         public static NamedValueTokenData Data() => new NamedValueTokenData(_optionName, _fullName, _optionExample, _requiredDisplayName);
-        public static INamedValueTokenParser Parser() => new NamedValueTokenParser(_optionName, _fullName, "110", "1");
+        public static INamedValueTokenParser Parser() => new Any1ValueNamedValueTokenParser(_optionName, _fullName, "110");
 
         private const string _requiredDisplayName = "content field name";
         private const string _optionName = "--content-field";

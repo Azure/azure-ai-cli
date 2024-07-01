@@ -77,24 +77,24 @@ namespace Azure.AI.Details.Common.CLI
 
         private static INamedValueTokenParser[] configCommandParsers = {
 
-            new NamedValueTokenParser("--help",       "--?", "1", "0", null, null, "true", "display.help"),
-            // new NamedValueTokenParser("--cls",        "x.cls", "01", "1;0", "true;false", null, "true"),
-            new NamedValueTokenParser("--pause",      "x.pause", "01", "1;0", "true;false", null, "true"),
-            new NamedValueTokenParser("--quiet",      "x.quiet", "01", "1;0", "true;false", null, "true"),
-            new NamedValueTokenParser("--verbose",    "x.verbose", "01", "1;0", "true;false", null, "true"),
+            new PinnedNamedValueTokenParser("--help", "--?", "1", "true", "display.help"),
+            // new TrueFalseNamedValueTokenParser("--cls", "x.cls", "01"),
+            new TrueFalseNamedValueTokenParser("--pause", "x.pause", "01"),
+            new TrueFalseNamedValueTokenParser("--quiet", "x.quiet", "01"),
+            new TrueFalseNamedValueTokenParser("--verbose", "x.verbose", "01"),
 
-            new NamedValueTokenParser(null,           "x.input.path", "001", "1"),
-            new NamedValueTokenParser(null,           "x.output.path", "011", "1"),
-            new NamedValueTokenParser(null,           "x.run.time", "111", "1"),
+            new Any1ValueNamedValueTokenParser(null, "x.input.path", "001"),
+            new Any1ValueNamedValueTokenParser(null, "x.output.path", "011"),
+            new Any1ValueNamedValueTokenParser(null, "x.run.time", "111"),
 
-            new NamedValueTokenParser("--hive",       "x.config.scope.hive", "0001", "1"),
-            new NamedValueTokenParser("--region",     "x.config.scope.region", "0001", "1"),
-            new NamedValueTokenParser("--scope",      "x.config.scope.command", "0001", "1", Program.ConfigScopeTokens),
-
-            new NamedValueTokenParser("-s",           "x.config.command.set", "0001", "2;1"),
-            new NamedValueTokenParser("-a",           "x.config.command.add", "0001", "2;1"),
-            new NamedValueTokenParser("-f",           "x.config.command.find", "0001", "1;0", null, null, "*"),
-            new NamedValueTokenParser("-c",           "x.config.command.clear", "0001", "1;0", null, null, "*"),
+            new Any1ValueNamedValueTokenParser("--hive", "x.config.scope.hive", "0001"),
+            new Any1ValueNamedValueTokenParser("--region", "x.config.scope.region", "0001"),
+            new RequiredValidValueNamedValueTokenParser("--scope", "x.config.scope.command", "0001", Program.ConfigScopeTokens),
+            
+            new Any1or2ValueNamedValueTokenParser("-s", "x.config.command.set", "0001"),
+            new Any1or2ValueNamedValueTokenParser("-a", "x.config.command.add", "0001"),
+            new OptionalWithDefaultNamedValueTokenParser("-f", "x.config.command.find", "0001", "*"),
+            new OptionalWithDefaultNamedValueTokenParser("-c", "x.config.command.clear", "0001", "*"),
 
         };
 

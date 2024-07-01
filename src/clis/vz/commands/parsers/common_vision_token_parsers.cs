@@ -13,17 +13,17 @@ namespace Azure.AI.Details.Common.CLI
     {
         public VisionServiceOptionsTokenParser() : base(
 
-            new NamedValueTokenParser("--host",       "service.config.host", "001", "1"),
-            new NamedValueTokenParser("--endpointid", "service.config.endpoint.id", "0011", "1"),
-            new NamedValueTokenParser(null,           "service.config.endpoint.query.string", "00011", "1"),
-            new NamedValueTokenParser(null,           "service.config.endpoint.http.header", "00011", "1"),
-            new NamedValueTokenParser(null,           "service.config.endpoint.traffic.type", "00011", "1"),
-            new NamedValueTokenParser("--uri",        "service.config.endpoint.uri", "0010;0001", "1"),
+            new Any1ValueNamedValueTokenParser("--host", "service.config.host", "001"),
+            new Any1ValueNamedValueTokenParser("--endpointid", "service.config.endpoint.id", "0011"),
+            new Any1ValueNamedValueTokenParser(null, "service.config.endpoint.query.string", "00011"),
+            new Any1ValueNamedValueTokenParser(null, "service.config.endpoint.http.header", "00011"),
+            new Any1ValueNamedValueTokenParser(null, "service.config.endpoint.traffic.type", "00011"),
+            new Any1ValueNamedValueTokenParser("--uri", "service.config.endpoint.uri", "0010;0001"),
 
-            new NamedValueTokenParser("--token.value","service.config.token.value", "0010", "1"),
+            new Any1ValueNamedValueTokenParser("--token.value", "service.config.token.value", "0010"),
 
-            new NamedValueTokenParser(null,           "service.config.proxy.port", "0011", "1"),
-            new NamedValueTokenParser(null,           "service.config.proxy.host", "0010", "1")
+            new Any1ValueNamedValueTokenParser(null, "service.config.proxy.port", "0011"),
+            new Any1ValueNamedValueTokenParser(null, "service.config.proxy.host", "0010")
 
         ) {}
     }

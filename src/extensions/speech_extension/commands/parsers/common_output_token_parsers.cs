@@ -13,16 +13,16 @@ namespace Azure.AI.Details.Common.CLI
     {
         public OutputBatchRecognizerTokenParser() : base(
             new TrueFalseNamedValueTokenParser("output.batch.json", "111"),
-            new NamedValueTokenParser(null, "output.batch.file.name", "1110", "1", "@@", null, "true", "output.batch.json")
+            new OutputFileNameNamedValueTokenParser(null, "output.batch.file.name", "1110", null, "true", "output.batch.json")
         ) {}
     }
 
     public class OutputSrtVttRecognizerTokenParser : NamedValueTokenParserList
     {
         public OutputSrtVttRecognizerTokenParser() : base(
-            new NamedValueTokenParser(null, "output.srt.file.name", "1110", "1", "@@", null, "true", "output.type.srt"),
+            new OutputFileNameNamedValueTokenParser(null, "output.srt.file.name", "1110", null, "true", "output.type.srt"),
             new TrueFalseNamedValueTokenParser("output.type.srt", "101"),
-            new NamedValueTokenParser(null, "output.vtt.file.name", "1110", "1", "@@", null, "true", "output.type.vtt"),
+            new OutputFileNameNamedValueTokenParser(null, "output.vtt.file.name", "1110", null, "true", "output.type.vtt"),
             new TrueFalseNamedValueTokenParser("output.type.vtt", "101")
         ) {}
     }
@@ -39,7 +39,7 @@ namespace Azure.AI.Details.Common.CLI
             new TrueFalseNamedValueTokenParser("output.all.connection.message.received.text.message", "1001010"),
             new TrueFalseNamedValueTokenParser("output.all.connection.message.received.request.id", "1001011"),
             new TrueFalseNamedValueTokenParser("output.all.connection.message.received.content.type", "1001011"),
-            new NamedValueTokenParser(null, "output.all.connection.message.received.*.property", "1001011", "1;0", "true;false", null, "true"),
+            new TrueFalseNamedValueTokenParser(null, "output.all.connection.message.received.*.property", "1001011"),
 
             new TrueFalseNamedValueTokenParser("output.all.connection.connected.sessionid", "10011"),
             new TrueFalseNamedValueTokenParser("output.all.connection.disconnected.sessionid", "10011"),
@@ -72,8 +72,8 @@ namespace Azure.AI.Details.Common.CLI
             new TrueFalseNamedValueTokenParser("output.all.recognizer.recognizing.result.duration", "100101"),
             new TrueFalseNamedValueTokenParser("output.all.recognizer.recognizing.result.latency", "100101"),
             new TrueFalseNamedValueTokenParser("output.all.recognizer.recognizing.result.json", "100101"),
-            new NamedValueTokenParser(null, "output.all.recognizer.recognizing.result.*.property", "1001011", "1;0", "true;false", null, "true"),
-            new NamedValueTokenParser(null, "output.all.recognizer.recognizing.recognizer.*.property", "1001111", "1;0", "true;false", null, "true"),
+            new TrueFalseNamedValueTokenParser(null, "output.all.recognizer.recognizing.result.*.property", "1001011"),
+            new TrueFalseNamedValueTokenParser(null, "output.all.recognizer.recognizing.recognizer.*.property", "1001111"),
 
             new TrueFalseNamedValueTokenParser("output.all.recognizer.recognized.sessionid", "10011"),
             new TrueFalseNamedValueTokenParser("output.all.recognizer.recognized.timestamp", "10011"),
@@ -86,19 +86,19 @@ namespace Azure.AI.Details.Common.CLI
             new TrueFalseNamedValueTokenParser("output.all.recognizer.recognized.result.duration", "100001"),
             new TrueFalseNamedValueTokenParser("output.all.recognizer.recognized.result.latency", "100001"),
             new TrueFalseNamedValueTokenParser("output.all.recognizer.recognized.result.json", "110001;100101;100011"),
-            new NamedValueTokenParser(null, "output.all.recognizer.recognized.result.*.property", "1001011", "1;0", "true;false", null, "true"),
-            new NamedValueTokenParser(null, "output.all.recognizer.recognized.recognizer.*.property", "1001111", "1;0", "true;false", null, "true"),
+            new TrueFalseNamedValueTokenParser(null, "output.all.recognizer.recognized.result.*.property", "1001011"),
+            new TrueFalseNamedValueTokenParser(null, "output.all.recognizer.recognized.recognizer.*.property", "1001111"),
 
             new TrueFalseNamedValueTokenParser("output.all.recognizer.canceled.error.code", "100101;100011"),
             new TrueFalseNamedValueTokenParser("output.all.recognizer.canceled.error.details", "100101;100011"),
             new TrueFalseNamedValueTokenParser("output.all.recognizer.canceled.error", "10011"),
             new TrueFalseNamedValueTokenParser("output.all.recognizer.canceled.reason", "10011"),
-            new NamedValueTokenParser(null, "output.all.recognizer.canceled.recognizer.*.property", "1001111", "1;0", "true;false", null, "true"),
+            new TrueFalseNamedValueTokenParser(null, "output.all.recognizer.canceled.recognizer.*.property", "1001111"),
 
-            new NamedValueTokenParser(null, "output.all.recognizer.session.started.recognizer.*.property", "10011011", "1;0", "true;false", null, "true"),
-            new NamedValueTokenParser(null, "output.all.recognizer.session.stopped.recognizer.*.property", "10011011", "1;0", "true;false", null, "true"),
-            new NamedValueTokenParser(null, "output.all.recognizer.session.event.recognizer.*.property", "10011011", "1;0", "true;false", null, "true"),
-            new NamedValueTokenParser(null, "output.all.recognizer.event.recognizer.*.property", "1000111", "1;0", "true;false", null, "true"),
+            new TrueFalseNamedValueTokenParser(null, "output.all.recognizer.session.started.recognizer.*.property", "10011011"),
+            new TrueFalseNamedValueTokenParser(null, "output.all.recognizer.session.stopped.recognizer.*.property", "10011011"),
+            new TrueFalseNamedValueTokenParser(null, "output.all.recognizer.session.event.recognizer.*.property", "10011011"),
+            new TrueFalseNamedValueTokenParser(null, "output.all.recognizer.event.recognizer.*.property", "1000111"),
 
             new TrueFalseNamedValueTokenParser("output.all.recognizer.session.started.sessionid", "101011;100111;100001"),
             new TrueFalseNamedValueTokenParser("output.all.recognizer.session.stopped.sessionid", "101011;100111"),
@@ -123,8 +123,8 @@ namespace Azure.AI.Details.Common.CLI
             new TrueFalseNamedValueTokenParser("output.all.result.duration", "1101"),
             new TrueFalseNamedValueTokenParser("output.all.result.latency", "1101"),
             new TrueFalseNamedValueTokenParser("output.all.result.json", "1101"),
-            new NamedValueTokenParser(null, "output.all.result.*.property", "10011", "1;0", "true;false", null, "true"),
-            new NamedValueTokenParser(null, "output.all.recognizer.*.property", "10111", "1;0", "true;false", null, "true"),
+            new TrueFalseNamedValueTokenParser(null, "output.all.result.*.property", "10011"),
+            new TrueFalseNamedValueTokenParser(null, "output.all.recognizer.*.property", "10111"),
 
             new TrueFalseNamedValueTokenParser("output.all.recognizer.recognizing.events", "10010"),
             new TrueFalseNamedValueTokenParser("output.all.recognizer.recognized.events", "10010"),
@@ -135,11 +135,11 @@ namespace Azure.AI.Details.Common.CLI
             new TrueFalseNamedValueTokenParser("output.all.event.timestamp", "1101"),
             new TrueFalseNamedValueTokenParser("output.all.events", "111"),
 
-            new NamedValueTokenParser(null, "output.all.tsv.file.columns", "10001", "1", "@;\t"),
+            new RequiredValidValueNamedValueTokenParser(null, "output.all.tsv.file.columns", "10001", "@;\t"),
             new TrueFalseNamedValueTokenParser("output.all.tsv.file.has.header", "100111;101011"),
 
-            new NamedValueTokenParser(null, "output.all.file.type", "1011", "1", "tsv;json"),
-            new NamedValueTokenParser(null, "output.all.file.name", "1010", "1", "@@")
+            new RequiredValidValueNamedValueTokenParser(null, "output.all.file.type", "1011", "tsv;json"),
+            new OutputFileNameNamedValueTokenParser(null, "output.all.file.name", "1010")
 
         ) {}
     }
@@ -156,7 +156,7 @@ namespace Azure.AI.Details.Common.CLI
             new TrueFalseNamedValueTokenParser("output.each.connection.message.received.text.message", "1101010"),
             new TrueFalseNamedValueTokenParser("output.each.connection.message.received.request.id", "1101011"),
             new TrueFalseNamedValueTokenParser("output.each.connection.message.received.content.type", "1101011"),
-            new NamedValueTokenParser(null, "output.each.connection.message.received.*.property", "1101011", "1;0", "true;false", null, "true"),
+            new TrueFalseNamedValueTokenParser(null, "output.each.connection.message.received.*.property", "1101011"),
 
             new TrueFalseNamedValueTokenParser("output.each.connection.connected.sessionid", "11011"),
             new TrueFalseNamedValueTokenParser("output.each.connection.disconnected.sessionid", "11011"),
@@ -189,8 +189,8 @@ namespace Azure.AI.Details.Common.CLI
             new TrueFalseNamedValueTokenParser("output.each.recognizer.recognizing.result.duration", "100101"),
             new TrueFalseNamedValueTokenParser("output.each.recognizer.recognizing.result.latency", "100101"),
             new TrueFalseNamedValueTokenParser("output.each.recognizer.recognizing.result.json", "100101"),
-            new NamedValueTokenParser(null, "output.each.recognizer.recognizing.result.*.property", "1001011", "1;0", "true;false", null, "true"),
-            new NamedValueTokenParser(null, "output.each.recognizer.recognizing.recognizer.*.property", "1001111", "1;0", "true;false", null, "true"),
+            new TrueFalseNamedValueTokenParser(null, "output.each.recognizer.recognizing.result.*.property", "1001011"),
+            new TrueFalseNamedValueTokenParser(null, "output.each.recognizer.recognizing.recognizer.*.property", "1001111"),
 
             new TrueFalseNamedValueTokenParser("output.each.recognizer.recognized.sessionid", "10011"),
             new TrueFalseNamedValueTokenParser("output.each.recognizer.recognized.timestamp", "10011"),
@@ -203,19 +203,19 @@ namespace Azure.AI.Details.Common.CLI
             new TrueFalseNamedValueTokenParser("output.each.recognizer.recognized.result.duration", "100101"),
             new TrueFalseNamedValueTokenParser("output.each.recognizer.recognized.result.latency", "100101"),
             new TrueFalseNamedValueTokenParser("output.each.recognizer.recognized.result.json", "100101"),
-            new NamedValueTokenParser(null, "output.each.recognizer.recognized.result.*.property", "1001011", "1;0", "true;false", null, "true"),
-            new NamedValueTokenParser(null, "output.each.recognizer.recognized.recognizer.*.property", "1001111", "1;0", "true;false", null, "true"),
+            new TrueFalseNamedValueTokenParser(null, "output.each.recognizer.recognized.result.*.property", "1001011"),
+            new TrueFalseNamedValueTokenParser(null, "output.each.recognizer.recognized.recognizer.*.property", "1001111"),
 
             new TrueFalseNamedValueTokenParser("output.each.recognizer.canceled.error.code", "100101;100011"),
             new TrueFalseNamedValueTokenParser("output.each.recognizer.canceled.error.details", "100101;100011"),
             new TrueFalseNamedValueTokenParser("output.each.recognizer.canceled.error", "10011"),
             new TrueFalseNamedValueTokenParser("output.each.recognizer.canceled.reason", "10011"),
-            new NamedValueTokenParser(null, "output.each.recognizer.canceled.recognizer.*.property", "1001111", "1;0", "true;false", null, "true"),
+            new TrueFalseNamedValueTokenParser(null, "output.each.recognizer.canceled.recognizer.*.property", "1001111"),
 
-            new NamedValueTokenParser(null, "output.each.recognizer.session.started.recognizer.*.property", "11011011", "1;0", "true;false", null, "true"),
-            new NamedValueTokenParser(null, "output.each.recognizer.session.stopped.recognizer.*.property", "11011011", "1;0", "true;false", null, "true"),
-            new NamedValueTokenParser(null, "output.each.recognizer.session.event.recognizer.*.property", "11010011", "1;0", "true;false", null, "true"),
-            new NamedValueTokenParser(null, "output.each.recognizer.event.recognizer.*.property", "1100111", "1;0", "true;false", null, "true"),
+            new TrueFalseNamedValueTokenParser(null, "output.each.recognizer.session.started.recognizer.*.property", "11011011"),
+            new TrueFalseNamedValueTokenParser(null, "output.each.recognizer.session.stopped.recognizer.*.property", "11011011"),
+            new TrueFalseNamedValueTokenParser(null, "output.each.recognizer.session.event.recognizer.*.property", "11010011"),
+            new TrueFalseNamedValueTokenParser(null, "output.each.recognizer.event.recognizer.*.property", "1100111"),
 
             new TrueFalseNamedValueTokenParser("output.each.recognizer.session.started.sessionid", "111011;110111"),
             new TrueFalseNamedValueTokenParser("output.each.recognizer.session.stopped.sessionid", "111011;110111"),
@@ -240,8 +240,8 @@ namespace Azure.AI.Details.Common.CLI
             new TrueFalseNamedValueTokenParser("output.each.result.duration", "1101"),
             new TrueFalseNamedValueTokenParser("output.each.result.latency", "1101"),
             new TrueFalseNamedValueTokenParser("output.each.result.json", "1101"),
-            new NamedValueTokenParser(null, "output.each.result.*.property", "11011", "1;0", "true;false", null, "true"),
-            new NamedValueTokenParser(null, "output.each.recognizer.*.property", "11111", "1;0", "true;false", null, "true"),
+            new TrueFalseNamedValueTokenParser(null, "output.each.result.*.property", "11011"),
+            new TrueFalseNamedValueTokenParser(null, "output.each.recognizer.*.property", "11111"),
 
             new TrueFalseNamedValueTokenParser("output.each.recognizer.recognizing.event", "11010"),
             new TrueFalseNamedValueTokenParser("output.each.recognizer.recognized.event", "11010"),
@@ -252,11 +252,11 @@ namespace Azure.AI.Details.Common.CLI
             new TrueFalseNamedValueTokenParser("output.each.event.timestamp", "1101"),
             new TrueFalseNamedValueTokenParser("output.each.event", "111"),
 
-            new NamedValueTokenParser(null, "output.each.tsv.file.columns", "11001", "1", "@;\t"),
+            new RequiredValidValueNamedValueTokenParser(null, "output.each.tsv.file.columns", "11001", "@;\t"),
             new TrueFalseNamedValueTokenParser("output.each.tsv.file.has.header", "110111;111011"),
 
-            new NamedValueTokenParser(null, "output.each.file.type", "1111", "1", "tsv;json"),
-            new NamedValueTokenParser(null, "output.each.file.name", "1110", "1", "@@")
+            new RequiredValidValueNamedValueTokenParser(null, "output.each.file.type", "1111", "tsv;json"),
+            new OutputFileNameNamedValueTokenParser(null, "output.each.file.name", "1110")
 
         ) {}
     }

@@ -13,22 +13,28 @@ USAGE: ai chat assistant create [...]
     --deployment DEPLOYMENT
     --instructions INSTRUCTIONS
 
-  TOOLS
-    --code-interpreter TRUE/FALSE
-
-  RETRIEVAL
+  FILE SEARCH
+    --file FILE
+    --files FILE1 [...]
     --file-id ID
     --file-ids ID1 [...]
 
+  TOOLS
+    --code-interpreter TRUE/FALSE
+
+  OUTPUT
+    --output-id @@FILE
+    --output-name @@FILE
+    --output-add-id @@FILE
+    --output-add-name @@FILE
+
 EXAMPLEs
 
-  ai init openai
   ai chat assistant create --name "My Assistant" --instructions "You are a helpful Assistant."
-
-  ai chat assistant file upload --files **\*.md
-  ai chat assistant create --name "My Assistant 2" --instructions "You are a helpful Assistant." --file-ids id1 id2 ...
+  ai chat assistant create --name "My Assistant 2" --instructions "You are a helpful Assistant." --files "**/*.md"
 
 SEE ALSO
 
+  ai help chat examples
   ai help chat assistant examples
   ai help find topics chat assistant

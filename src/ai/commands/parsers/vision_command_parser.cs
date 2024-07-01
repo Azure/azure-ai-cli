@@ -78,15 +78,15 @@ namespace Azure.AI.Details.Common.CLI
         {
             public CommonVisionNamedValueTokenParsers() : base(
 
-                    new NamedValueTokenParser(null, "x.command", "11", "1"),
+                    new Any1ValueNamedValueTokenParser(null, "x.command", "11"),
 
                     new CommonNamedValueTokenParsers(),
-                    new NamedValueTokenParser("--ini", "ini.file", "10", "1", "@"),
-                    new NamedValueTokenParser(null, "x.command.expand.file.name", "11111", "1"),
-                    new NamedValueTokenParser(null, "service.config.endpoint.uri", "0011", "1"),
-                    new NamedValueTokenParser("--url", "vision.input.url", "001", "1", null, null, "url", "vision.input.type"),
-                    new NamedValueTokenParser("--file", "vision.input.file", "001", "1", null, null, "file", "vision.input.type"),
-                    new NamedValueTokenParser("--outputtype", "vision.output.type", "011", "1"),
+                    new IniFileNamedValueTokenParser(),
+                    new ExpandFileNameNamedValueTokenParser(),
+                    new Any1ValueNamedValueTokenParser(null, "service.config.endpoint.uri", "0011"),
+                    new Any1PinnedNamedValueTokenParser("--url", "vision.input.url", "001", "url", "vision.input.type"),
+                    new Any1PinnedNamedValueTokenParser("--file", "vision.input.file", "001", "file", "vision.input.type"),
+                    new Any1ValueNamedValueTokenParser("--outputtype", "vision.output.type", "011"),
                     new ExpectConsoleOutputTokenParser(),
                     new DiagnosticLogTokenParser()
 
@@ -103,11 +103,11 @@ namespace Azure.AI.Details.Common.CLI
 
         private static INamedValueTokenParser[] imageAnalyzeParsers = [
             new CommonVisionNamedValueTokenParsers(),
-            new NamedValueTokenParser("--language",  "vision.image.language", "001", "1"),
-            new NamedValueTokenParser("--gender-neutral-captions",  "vision.image.gender.neutral.captions", "00111", "1"),
-            new NamedValueTokenParser("--smart-crop-aspect-ratios",  "vision.image.smart.crop.aspect.ratios", "001111", "1"),
-            new NamedValueTokenParser("--model-version",  "vision.image.model.version", "0011", "1"),
-            new NamedValueTokenParser("--visual-features", "vision.image.visual.features", "0011", "1")
+            new Any1ValueNamedValueTokenParser("--language", "vision.image.language", "001"),
+            new Any1ValueNamedValueTokenParser("--gender-neutral-captions", "vision.image.gender.neutral.captions", "00111"),
+            new Any1ValueNamedValueTokenParser("--smart-crop-aspect-ratios", "vision.image.smart.crop.aspect.ratios", "001111"),
+            new Any1ValueNamedValueTokenParser("--model-version", "vision.image.model.version", "0011"),
+            new Any1ValueNamedValueTokenParser("--visual-features", "vision.image.visual.features", "0011")
         ];
 
         #endregion
