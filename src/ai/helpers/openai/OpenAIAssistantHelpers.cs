@@ -103,6 +103,12 @@ namespace Azure.AI.Details.Common.CLI
             return list.ToDictionary(a => a.Id, a => a.Name);
         }
 
+        public static async Task<VectorStore> GetVectorStoreAsync(string key, string endpoint, string id)
+        {
+            var client = CreateOpenAIVectorStoreClient(key, endpoint);
+            return await client.GetVectorStoreAsync(id);
+        }
+
         public static async Task<VectorStore> CreateAssistantVectorStoreAsync(string key, string endpoint, string name, List<string> fileIds)
         {
             var client = CreateOpenAIVectorStoreClient(key, endpoint);
@@ -213,6 +219,33 @@ namespace Azure.AI.Details.Common.CLI
         {
             var client = CreateOpenAIFileClient(key, endpoint);
             var response = await client.DeleteFileAsync(id);
+        }
+
+        public static async Task<IEnumerable<OpenAIFileInfo>> GetFilesAsync(FileClient fileClient, IEnumerable<string> fileIds, int parallelism = 10, Action<OpenAIFileInfo> callback = null)
+        {
+            var list = fileIds.ToList();
+
+            var throttler = new SemaphoreSlim(parallelism);
+            var tasks = new List<Task>();
+
+            var foundFiles = new List<OpenAIFileInfo>();
+            foreach (var file in list)
+            {
+                tasks.Add(Task.Run(async () =>
+                {
+                    var foundFile = await fileClient.GetFileAsync(file);
+                    foundFiles.Add(foundFile);
+
+                    if (callback != null)
+                    {
+                        callback(foundFile);
+                    }
+                }));
+            }
+
+            await Task.WhenAll(tasks.ToArray());
+
+            return foundFiles;
         }
 
         public static async Task<IEnumerable<OpenAIFileInfo>> UploadFilesAsync(FileClient fileClient, IEnumerable<string> files, int parallelism = 10, Action<OpenAIFileInfo> callback = null)

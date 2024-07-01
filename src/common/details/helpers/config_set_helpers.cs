@@ -190,15 +190,20 @@ namespace Azure.AI.Details.Common.CLI
             Console.WriteLine($"\r  *** SET ***   {displayLabel}: {displayValue}");
         }
 
-        public static string ConfigSet(string atFile, string setValue)
+        public static string ConfigSet(string atFile, string setValue, bool print = false)
         {
             var setCommandValues = new CommandValues();
             setCommandValues.Add("x.command", "config");
             setCommandValues.Add("x.config.scope.hive", "local");
             setCommandValues.Add("x.config.command.at.file", atFile);
             setCommandValues.Add("x.config.command.set", setValue);
+
             var fileName = FileHelpers.GetOutputConfigFileName(atFile, setCommandValues);
             FileHelpers.WriteAllText(fileName, setValue, Encoding.UTF8);
+
+            var fi = new FileInfo(fileName);
+            if (print) Console.WriteLine($"{fi.Name} (saved at {fi.DirectoryName})\n\n  {setValue}");
+
             return fileName;
         }
     }

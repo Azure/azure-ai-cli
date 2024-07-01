@@ -18,6 +18,7 @@ USAGE: ai chat [...]
 
   CHAT WITH ASSISTANT
     --assistant-id ID                   (see: ai help chat assistant id)
+    --thread-id ID                      (see: ai help chat thread id)
 
   CHAT WITH DATA                        (see: ai help chat with data)
     --index-name INDEX                  (see: ai help index name)

@@ -24,6 +24,7 @@ using OpenAI.Chat;
 using System.ClientModel;
 using Azure.AI.OpenAI.Chat;
 using OpenAI.Assistants;
+using OpenAI.Files;
 using OpenAI.VectorStores;
 
 #pragma warning disable AOAI001 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
@@ -73,6 +74,7 @@ namespace Azure.AI.Details.Common.CLI
 
                 case "chat.assistant": HelpCommandParser.DisplayHelp(_values); break;
                 case "chat.assistant.create": DoChatAssistantCreate().Wait(); break;
+                case "chat.assistant.update": DoChatAssistantUpdate().Wait(); break;
                 case "chat.assistant.delete": DoChatAssistantDelete().Wait(); break;
                 case "chat.assistant.get": DoChatAssistantGet().Wait(); break;
                 case "chat.assistant.list": DoChatAssistantList().Wait(); break;
@@ -1080,7 +1082,7 @@ namespace Azure.AI.Details.Common.CLI
 
         private async Task<bool> DoChatAssistantCreate()
         {
-            var name = _values["chat.assistant.create.name"];
+            var name = _values["chat.assistant.name"];
             var deployment = ConfigDeploymentToken.Data().GetOrDefault(_values);
             var instructions = InstructionsToken.Data().GetOrDefault(_values, "You are a helpful assistant.");
 
@@ -1118,36 +1120,108 @@ namespace Azure.AI.Details.Common.CLI
                 if (!_quiet) Console.WriteLine("\n  Creating vector store ...");
 
                 var store = await CreateAssistantVectorStoreAsync(key, endpoint, name, fileIds, files);
-                var updateOptions = new AssistantModificationOptions()
+                var modifyOptions = new AssistantModificationOptions()
                 {
-                    ToolResources = new()
-                    {
-                        FileSearch = new()
-                        {
-                            VectorStoreIds = { store.Id }
-                        },
-                    }
+                    ToolResources = ToolResourcesFromVectorStoreId(store.Id)
                 };
-                updateOptions.DefaultTools.Add(new FileSearchToolDefinition());
+                modifyOptions.DefaultTools.Add(new FileSearchToolDefinition());
 
                 var assistantClient = OpenAIAssistantHelpers.CreateOpenAIAssistantClient(key, endpoint);
-                assistant = assistantClient.ModifyAssistant(assistant, updateOptions).Value;
+                var modified = await assistantClient.ModifyAssistantAsync(assistant, modifyOptions);
+                assistant = modified.Value;
 
                 Console.WriteLine();
             }
 
             if (!_quiet) Console.WriteLine($"{message} Done!\n");
 
-            var fi = new FileInfo(ConfigSetHelpers.ConfigSet("assistant.id", assistant.Id));
-            if (!_quiet) Console.WriteLine($"{fi.Name} (saved at {fi.DirectoryName})\n\n  {assistant.Id}");
+            SetAssistantIdConfig(assistant);
+            return true;
+        }
 
-            var vectorStoreId = assistant.ToolResources.FileSearch?.VectorStoreIds?.FirstOrDefault();
-            if (!string.IsNullOrEmpty(vectorStoreId))
+        private async Task<bool> DoChatAssistantUpdate()
+        {
+            var id = _values["chat.assistant.id"];
+            if (string.IsNullOrEmpty(id))
             {
-                fi = new FileInfo(ConfigSetHelpers.ConfigSet("vector.store.id", vectorStoreId));
-                if (!_quiet) Console.WriteLine($"{fi.Name} (saved at {fi.DirectoryName})\n\n  {vectorStoreId}");
+                _values.AddThrowError(
+                      "ERROR:", $"Updating assistant; requires id.",
+                                "",
+                        "TRY:", $"{Program.Name} chat assistant update --id ID",
+                                "",
+                        "SEE:", $"{Program.Name} help chat assistant update");
             }
 
+            var name = _values["chat.assistant.name"];
+            var nameToDisplay = string.IsNullOrEmpty(name) ? id : name;
+
+            var message = $"Updating assistant ({nameToDisplay}) ...";
+            if (!_quiet) Console.WriteLine(message);
+
+            DemandKeyAndEndpoint(out var key, out var endpoint);
+            var assistantClient = OpenAIAssistantHelpers.CreateOpenAIAssistantClient(key, endpoint);
+            var response = await assistantClient.GetAssistantAsync(id);
+            var assistant = response.Value;
+
+            var deployment = ConfigDeploymentToken.Data().GetOrDefault(_values, assistant.Model);
+            var instructions = InstructionsToken.Data().GetOrDefault(_values, assistant.Instructions);
+            var codeInterpreter = CodeInterpreterToken.Data().GetOrDefault(_values, assistant.Tools.FirstOrDefault(t => t is CodeInterpreterToolDefinition) != null);
+            var vectorStoreId = assistant.ToolResources.FileSearch?.VectorStoreIds?.FirstOrDefault();
+
+            var fileIds = FileIdOptionXToken.GetOptions(_values).ToList();
+            fileIds.AddRange(FileIdsOptionXToken.GetOptions(_values));
+            fileIds.ExtendSplitItems(';');
+
+            var files = FileOptionXToken.GetOptions(_values).ToList();
+            files.AddRange(FilesOptionXToken.GetOptions(_values));
+            files.ExtendSplitItems(';');
+            files = ExpandFindFiles(files);
+
+            var existingVectorStore = !string.IsNullOrEmpty(vectorStoreId);
+            var newFilesForVectorStore = fileIds.Count() > 0 || files.Count() > 0;
+            if (newFilesForVectorStore)
+            {
+                if (!existingVectorStore)
+                {
+                    if (!_quiet) Console.WriteLine("\n  Creating vector store ...");
+
+                    var store = await CreateAssistantVectorStoreAsync(key, endpoint, name, fileIds, files);
+                    vectorStoreId = store.Id;
+                }
+                else
+                {
+                    if (!_quiet) Console.WriteLine("\n  Updating vector store ...");
+
+                    var store = await OpenAIAssistantHelpers.GetVectorStoreAsync(key, endpoint, vectorStoreId);
+                    store = await UploadFilesToAssistantVectorStore(key, endpoint, fileIds, files, store);
+                    vectorStoreId = store.Id;
+                }
+            }
+
+            var modifyOptions = new AssistantModificationOptions()
+            {
+                Name = name ?? assistant.Name,
+                Model = deployment ?? assistant.Model,
+                Instructions = instructions ?? assistant.Instructions,
+                ToolResources = ToolResourcesFromVectorStoreId(vectorStoreId),
+            };
+
+            if (codeInterpreter)
+            {
+                modifyOptions.DefaultTools.Add(new CodeInterpreterToolDefinition());
+            }
+
+            if (existingVectorStore || newFilesForVectorStore)
+            {
+                modifyOptions.DefaultTools.Add(new FileSearchToolDefinition());
+            }
+
+            var modified = await assistantClient.ModifyAssistantAsync(assistant, modifyOptions);
+            assistant = modified.Value;
+
+            if (!_quiet) Console.WriteLine($"{message} Done!\n");
+
+            SetAssistantIdConfig(assistant);
             return true;
         }
 
@@ -1267,9 +1341,7 @@ namespace Azure.AI.Details.Common.CLI
 
             if (!_quiet) Console.WriteLine($"{message} Done!\n");
 
-            var fi = new FileInfo(ConfigSetHelpers.ConfigSet("vector.store.id", store.Id));
-            if (!_quiet) Console.WriteLine($"{fi.Name} (saved at {fi.DirectoryName})\n\n  {store.Id}");
-
+            ConfigSetHelpers.ConfigSet("vector.store.id", store.Id, print: !_quiet);
             return true;
         }
 
@@ -1294,13 +1366,17 @@ namespace Azure.AI.Details.Common.CLI
             var message = $"Updating assistant vector store ({nameToDisplay}) ...";
             if (!_quiet) Console.WriteLine(message);
 
+            var fileIds = FileIdOptionXToken.GetOptions(_values).ToList();
+            fileIds.AddRange(FileIdsOptionXToken.GetOptions(_values));
+            fileIds.ExtendSplitItems(';');
+
             var files = FileOptionXToken.GetOptions(_values).ToList();
             files.AddRange(FilesOptionXToken.GetOptions(_values));
             files.ExtendSplitItems(';');
 
             files = ExpandFindFiles(files);
 
-            var store = await UpdateAssistantVectorStoreAsync(key, endpoint, id, name, files);
+            var store = await UpdateAssistantVectorStoreAsync(key, endpoint, id, name, fileIds, files);
             PrintVectorStore(key, endpoint, store);
 
             if (!_quiet) Console.WriteLine($"{message} Done!\n");
@@ -1491,20 +1567,48 @@ namespace Azure.AI.Details.Common.CLI
             return files;
         }
 
+        private static ToolResources ToolResourcesFromVectorStoreId(string vectorStoreId)
+        {
+            return string.IsNullOrEmpty(vectorStoreId) ? new() : new()
+            {
+                FileSearch = new()
+                {
+                    VectorStoreIds = { vectorStoreId }
+                },
+            };
+        }
+
         private async Task<VectorStore> CreateAssistantVectorStoreAsync(string key, string endpoint, string name, List<string> fileIds, List<string> files)
         {
             var store = await OpenAIAssistantHelpers.CreateAssistantVectorStoreAsync(key, endpoint, name, fileIds);
-            return await UploadFilesToAssistantVectorStore(key, endpoint, files, store);
+            return await UploadFilesToAssistantVectorStore(key, endpoint, new(), files, store);
         }
 
-        private async Task<VectorStore> UpdateAssistantVectorStoreAsync(string key, string endpoint, string id, string name, List<string> files)
+        private async Task<VectorStore> UpdateAssistantVectorStoreAsync(string key, string endpoint, string id, string name, List<string> fileIds, List<string> files)
         {
             var store = await OpenAIAssistantHelpers.UpdateAssistantVectorStoreAsync(key, endpoint, id, name);
-            return await UploadFilesToAssistantVectorStore(key, endpoint, files, store);
+            return await UploadFilesToAssistantVectorStore(key, endpoint, fileIds, files, store);
         }
 
-        private async Task<VectorStore> UploadFilesToAssistantVectorStore(string key, string endpoint, List<string> files, VectorStore store)
+        private async Task<VectorStore> UploadFilesToAssistantVectorStore(string key, string endpoint, List<string> fileIds, List<string> files, VectorStore store)
         {
+            var batchFiles = new List<OpenAIFileInfo>();
+
+            if (fileIds.Count() > 0)
+            {
+                if (!_quiet) Console.WriteLine("\n  Getting files ...\n");
+
+                var fileClient = OpenAIAssistantHelpers.CreateOpenAIFileClient(key, endpoint);
+                var foundFiles = await OpenAIAssistantHelpers.GetFilesAsync(fileClient, fileIds,
+                    parallelism: 10,
+                    callback: (x) =>
+                    {
+                        Console.WriteLine($"    {x.Filename} ({x.SizeInBytes} byte(s))");
+                    });
+
+                batchFiles.AddRange(foundFiles);
+            }
+
             if (files.Count() > 0)
             {
                 if (!_quiet) Console.WriteLine("\n  Uploading files ...\n");
@@ -1517,8 +1621,13 @@ namespace Azure.AI.Details.Common.CLI
                         Console.WriteLine($"    {x.Filename} ({x.SizeInBytes} byte(s))");
                     });
 
+                batchFiles.AddRange(uploaded);
+            }
+
+            if (batchFiles.Count() > 0)
+            {
                 Console.Write("\n  Processing vector store files ...");
-                var batchJob = await OpenAIAssistantHelpers.ProcessBatchFileJob(key, endpoint, store, uploaded);
+                var batchJob = await OpenAIAssistantHelpers.ProcessBatchFileJob(key, endpoint, store, batchFiles);
 
                 Console.WriteLine("\n");
                 Console.WriteLine($"    Batch job: {batchJob.BatchId}");
@@ -1530,7 +1639,7 @@ namespace Azure.AI.Details.Common.CLI
             return store;
         }
 
-        private static void PrintVectorStore(string key, string endpoint, VectorStore store)
+        private void PrintVectorStore(string key, string endpoint, VectorStore store)
         {
             var id = store.Id;
             var name = store.Name ?? "(no name)";
@@ -1567,7 +1676,7 @@ namespace Azure.AI.Details.Common.CLI
                     var file = fileClient.GetFile(association.FileId);
                     Console.WriteLine($"    {file.Value.Filename} ({file.Value.SizeInBytes} byte(s))");
 
-                    if (++count >= 5)
+                    if (++count >= 5 && !_verbose)
                     {
                         Console.WriteLine($"    ({associations.Count() - count} more file(s) ... )");
                         break;
@@ -1585,6 +1694,18 @@ namespace Azure.AI.Details.Common.CLI
             if (string.IsNullOrEmpty(endpoint))
             {
                 _values.AddThrowError("ERROR:", $"Creating AssistantsClient; requires endpoint.");
+            }
+        }
+
+        private void SetAssistantIdConfig(Assistant assistant)
+        {
+            ConfigSetHelpers.ConfigSet("assistant.id", assistant.Id, print: !_quiet);
+
+            var vectorStoreId = assistant.ToolResources.FileSearch?.VectorStoreIds?.FirstOrDefault();
+            if (!string.IsNullOrEmpty(vectorStoreId))
+            {
+                Console.WriteLine();
+                ConfigSetHelpers.ConfigSet("vector.store.id", vectorStoreId, print: !_quiet);
             }
         }
 
