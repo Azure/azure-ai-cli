@@ -217,6 +217,8 @@ namespace Azure.AI.Details.Common.CLI
             var client = CreateAssistantClient();
             var thread = await CreateOrGetAssistantThread(client, threadId);
 
+            _ = CheckWriteChatHistoryOutputFileAsync(client, thread);
+
             threadId = thread.Id;
             _values.Reset("chat.thread.id", threadId);
 
@@ -241,6 +243,8 @@ namespace Azure.AI.Details.Common.CLI
             var chatClient = client.GetChatClient(deployment);
 
             var options = CreateChatCompletionOptions(out var messages);
+            CheckWriteChatHistoryOutputFile(messages);
+
             var funcContext = CreateChatCompletionsFunctionFactoryAndCallContext(messages, options);
 
             return async (string text) =>
