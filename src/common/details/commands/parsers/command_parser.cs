@@ -334,7 +334,7 @@ namespace Azure.AI.Details.Common.CLI
         {
             if (!values.Contains("error"))
             {
-                var restOfTokens = tokens.PeekAllTokens();
+                var restOfTokens = tokens.PeekAllTokens().Replace('.', '-');
                 var command = values.GetCommandForDisplay();
                 values.AddError(
                     "ERROR:", $"Invalid {kind} at \"{restOfTokens}\".", "",

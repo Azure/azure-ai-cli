@@ -161,13 +161,14 @@ namespace Azure.AI.Details.Common.CLI
         };
 
         private static INamedValueTokenParser[] _chatAssistantCreateCommandParsers = {
-            CodeInterpreterToken.Parser(),
+            CodeInterpreterTrueFalseToken.Parser(),
 
+            FileSearchTrueFalseToken.Parser(),
             FileIdOptionXToken.Parser(),
             FileIdsOptionXToken.Parser(),
             FileOptionXToken.Parser(),
             FilesOptionXToken.Parser(),
-
+            
             new CommonChatNamedValueTokenParsers(),
 
             new Any1ValueNamedValueTokenParser(null, "chat.assistant.id", "001"),
@@ -181,8 +182,9 @@ namespace Azure.AI.Details.Common.CLI
         };
 
         private static INamedValueTokenParser[] _chatAssistantUpdateCommandParsers = {
-            CodeInterpreterToken.Parser(),
+            CodeInterpreterTrueFalseToken.Parser(),
 
+            FileSearchTrueFalseToken.Parser(),
             FileIdOptionXToken.Parser(),
             FileIdsOptionXToken.Parser(),
             FileOptionXToken.Parser(),
