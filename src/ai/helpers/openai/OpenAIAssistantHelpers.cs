@@ -58,6 +58,18 @@ namespace Azure.AI.Details.Common.CLI
             var response = await client.DeleteAssistantAsync(id);
         }
 
+        public static async Task<Assistant> GetAssistantAsync(string key, string endpoint, string id)
+        {
+            var client = CreateOpenAIAssistantClient(key, endpoint);
+            return await GetAssistantAsync(client, id);
+        }
+
+        public static async Task<Assistant> GetAssistantAsync(AssistantClient client, string id)
+        {
+            var response = await client.GetAssistantAsync(id);
+            return response.Value;
+        }
+
         public static async Task<string?> GetAssistantJsonAsync(string key, string endpoint, string id)
         {
             var client = CreateOpenAIAssistantClient(key, endpoint);
