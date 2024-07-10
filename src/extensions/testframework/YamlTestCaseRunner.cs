@@ -72,17 +72,17 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
             var isWindows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
             if (!isWindows) scriptIsBash = true;
 
-            var @foreach = YamlTestProperties.Get(test, "foreach");
             var arguments = YamlTestProperties.Get(test, "arguments");
-
             var input = YamlTestProperties.Get(test, "input");
             if (input != null && input.StartsWith('"') && input.EndsWith('"')) input = input[1..^1];
 
             var expectGpt = YamlTestProperties.Get(test, "expect");
             var expectRegex = YamlTestProperties.Get(test, "expect-regex");
             var notExpectRegex = YamlTestProperties.Get(test, "not-expect-regex");
+
             var env = YamlTestProperties.Get(test, "env");
             var workingDirectory = YamlTestProperties.Get(test, "working-directory");
+
             var timeout = int.Parse(YamlTestProperties.Get(test, "timeout", YamlTestFramework.DefaultTimeout)!);
             var simulate = YamlTestProperties.Get(test, "simulate");
             var skipOnFailure = YamlTestProperties.Get(test, "skipOnFailure") switch { "true" => true, _ => false };
@@ -90,44 +90,115 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
             var basePath = new FileInfo(test.CodeFilePath).DirectoryName!;
             workingDirectory = Path.Combine(basePath, workingDirectory ?? "");
             var tryCreateWorkingDirectory = !string.IsNullOrEmpty(workingDirectory) && !Directory.Exists(workingDirectory);
-            if (tryCreateWorkingDirectory) Directory.CreateDirectory(workingDirectory);
+            if (tryCreateWorkingDirectory) Directory.CreateDirectory(workingDirectory!);
 
-            var expanded = ExpandForEachGroups(@foreach);
-            Logger.Log($"YamlTestCaseRunner.TestCaseGetResults: expanded count = {expanded.Count()}");
-
-            foreach (var foreachItem in expanded)
+            var @foreach = YamlTestProperties.Get(test, "foreach");
+            if (!string.IsNullOrEmpty(@foreach))
             {
-                var start = DateTime.Now;
-
-                var outcome = string.IsNullOrEmpty(simulate)
-                    ? RunTestCase(test, skipOnFailure, cli, command, script, scriptIsBash, foreachItem, arguments, input, expectGpt, expectRegex, notExpectRegex, env, workingDirectory, timeout, out string stdOut, out string stdErr, out string errorMessage, out string stackTrace, out string additional, out string debugTrace)
-                    : SimulateTestCase(test, simulate, cli, command, script, scriptIsBash, foreachItem, arguments, input, expectGpt, expectRegex, notExpectRegex, env, workingDirectory, out stdOut, out stdErr, out errorMessage, out stackTrace, out additional, out debugTrace);
-
-                // #if DEBUG
-                // additional += outcome == TestOutcome.Failed ? $"\nEXTRA: {ExtraDebugInfo()}" : "";
-                // #endif
-
-                var stop = DateTime.Now;
-                var result = CreateTestResult(test, start, stop, stdOut, stdErr, errorMessage, stackTrace, additional, debugTrace, outcome);
-                if (!string.IsNullOrEmpty(foreachItem) && foreachItem != "{}")
+                foreach (var foreachItem in ExpandForEachGroups(@foreach))
                 {
-                    result.DisplayName = GetTestResultDisplayName(test.DisplayName, foreachItem);
+                    var result = TestCaseGetResult(test, cli, command, script, scriptIsBash, foreachItem, arguments, input, expectGpt, expectRegex, notExpectRegex, env, workingDirectory!, timeout, simulate, skipOnFailure);
+                    if (!string.IsNullOrEmpty(foreachItem) && foreachItem != "{}")
+                    {
+                        result.DisplayName = GetTestResultDisplayName(test.DisplayName, foreachItem);
+                    }
+                    yield return result;
                 }
-                yield return result;
+            }
+
+            var matrix = YamlTestProperties.Get(test, "matrix");
+            if (!string.IsNullOrEmpty(matrix))
+            {
+                var matrixItems = JsonHelpers.FromJsonArrayText(matrix);
+                foreach (var matrixItem in matrixItems)
+                {
+                    var result = TestCaseGetResultForMatrixItem(test, matrixItem, cli, command, script, scriptIsBash, arguments, input, expectGpt, expectRegex, notExpectRegex, env, workingDirectory!, timeout, simulate, skipOnFailure);
+                    result.DisplayName = GetTestResultDisplayName(test.DisplayName, JsonHelpers.GetJsonObjectText(matrixItem));
+                    yield return result;
+                }
             }
 
             Logger.Log($"YamlTestCaseRunner.TestCaseGetResults: EXIT");
         }
 
-        private static string GetTestResultDisplayName(string testDisplayName, string foreachItem)
+        private static TestResult TestCaseGetResult(TestCase test, string cli, string? command, string? script, bool scriptIsBash, string? foreachItem, string? arguments, string? input, string? expectGpt, string? expectRegex, string? notExpectRegex, string? env, string workingDirectory, int timeout, string? simulate, bool skipOnFailure)
+        {
+            var start = DateTime.Now;
+
+            var outcome = string.IsNullOrEmpty(simulate)
+                ? RunTestCase(test, skipOnFailure, cli, command, script, scriptIsBash, foreachItem, arguments, input, expectGpt, expectRegex, notExpectRegex, env, workingDirectory, timeout, out string stdOut, out string stdErr, out string errorMessage, out string stackTrace, out string additional, out string debugTrace)
+                : SimulateTestCase(test, simulate, cli, command, script, scriptIsBash, foreachItem, arguments, input, expectGpt, expectRegex, notExpectRegex, env, workingDirectory, out stdOut, out stdErr, out errorMessage, out stackTrace, out additional, out debugTrace);
+
+            // #if DEBUG
+            // additional += outcome == TestOutcome.Failed ? $"\nEXTRA: {ExtraDebugInfo()}" : "";
+            // #endif
+
+            var stop = DateTime.Now;
+            return CreateTestResult(test, start, stop, stdOut, stdErr, errorMessage, stackTrace, additional, debugTrace, outcome);
+        }
+
+        private static TestResult TestCaseGetResultForMatrixItem(TestCase test, Dictionary<string, string> matrixItem, string cli, string? command, string? script, bool scriptIsBash, string? arguments, string? input, string? expectGpt, string? expectRegex, string? notExpectRegex, string? env, string workingDirectory, int timeout, string? simulate, bool skipOnFailure)
+        {
+            cli = UpdateMatrixTemplateItems(cli, matrixItem)!;
+            command = UpdateMatrixTemplateItems(command, matrixItem);
+            script = UpdateMatrixTemplateItems(script, matrixItem);
+            arguments = UpdateMatrixTemplateItems(arguments, matrixItem, true);
+            input = UpdateMatrixTemplateItems(input, matrixItem);
+            expectGpt = UpdateMatrixTemplateItems(expectGpt, matrixItem);
+            expectRegex = UpdateMatrixTemplateItems(expectRegex, matrixItem);
+            notExpectRegex = UpdateMatrixTemplateItems(notExpectRegex, matrixItem);
+            env = UpdateMatrixTemplateItems(env, matrixItem);
+            workingDirectory = UpdateMatrixTemplateItems(workingDirectory, matrixItem)!;
+            
+            return TestCaseGetResult(test, cli, command, script, scriptIsBash, null, arguments, input, expectGpt, expectRegex, notExpectRegex, env, workingDirectory, timeout, simulate, skipOnFailure);
+        }
+
+        private static string? UpdateMatrixTemplateItems(string? text, Dictionary<string, string> matrixItem, bool replaceQuotes = false)
+        {
+            if (string.IsNullOrEmpty(text)) return text;
+            if (!text.Contains("${{") || !text.Contains("}}")) return text;
+
+            var index = 0;
+            var start = text.IndexOf("${{", index);
+            while (start >= 0)
+            {
+                var end = text.IndexOf("}}", start);
+                if (end < 0) break;
+
+                var key = text.Substring(start + 3, end - start - 3).Trim();
+                if (matrixItem.ContainsKey(key))
+                {
+                    var value = matrixItem[key];
+                    if (replaceQuotes) value = value.Replace("\"", "\\\"");
+                    text = text.Substring(0, start) + value + text.Substring(end + 2);
+                }
+                else if (key.StartsWith("matrix."))
+                {
+                    key = key.Substring(7);
+                    if (matrixItem.ContainsKey(key))
+                    {
+                        var value = matrixItem[key];
+                        if (replaceQuotes) value = value.Replace("\"", "\\\"");
+                        text = text.Substring(0, start) + value + text.Substring(end + 2);
+                    }
+                }
+
+                index = start + 1;
+                start = text.IndexOf("${{", index);
+            }
+
+            return text;
+        }
+
+        private static string GetTestResultDisplayName(string testDisplayName, string json)
         {
             var testResultDisplayName = testDisplayName;
 
-            var document = JsonDocument.Parse(foreachItem);
+            var document = JsonDocument.Parse(json);
             if(document.RootElement.ValueKind == JsonValueKind.Object)
             {
-                var foreachItemObject = document.RootElement;
-                foreach(var property in foreachItemObject.EnumerateObject())
+                var root = document.RootElement;
+                foreach(var property in root.EnumerateObject())
                 {
                     var keys = property.Name.Split(new char[] { '\t' });
                     var values = property.Value.GetString()!.Split(new char[] { '\t' });
@@ -145,13 +216,12 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
             // if the testDisplayName was not templatized, ie, it had no {}
             if (testResultDisplayName == testDisplayName)
             {
-                return $"{testDisplayName}: {RedactSensitiveDataFromForeachItem(foreachItem)}";
+                return $"{testDisplayName}: {RedactSensitiveDataFromForeachItem(json)}";
             }
 
             return testResultDisplayName;
         }
 
-        // Finds "token" in foreach key and redacts its value
         private static string RedactSensitiveDataFromForeachItem(string foreachItem)
         {
             using var stream = new MemoryStream();
@@ -206,6 +276,8 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
                     .ToList();
             }
 
+            Logger.Log($"YamlTestCaseRunner.TestCaseGetResults: expanded count = {dicts.Count()}");
+
             return dicts.Select(d =>
             {
                 var options = new JsonSerializerOptions
@@ -223,7 +295,7 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
             return dup;
         }
 
-        private static TestOutcome RunTestCase(TestCase test, bool skipOnFailure, string cli, string? command, string? script, bool scriptIsBash, string @foreach, string? arguments, string? input, string? expectGpt, string? expectRegex, string? notExpectRegex, string? env, string workingDirectory, int timeout, out string stdOut, out string stdErr, out string errorMessage, out string stackTrace, out string additional, out string debugTrace)
+        private static TestOutcome RunTestCase(TestCase test, bool skipOnFailure, string cli, string? command, string? script, bool scriptIsBash, string? @foreach, string? arguments, string? input, string? expectGpt, string? expectRegex, string? notExpectRegex, string? env, string workingDirectory, int timeout, out string stdOut, out string stdErr, out string errorMessage, out string stackTrace, out string additional, out string debugTrace)
         {
             var outcome = TestOutcome.None;
 
@@ -812,7 +884,7 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
             return args.ToString().TrimEnd();
         }
 
-        private static TestOutcome SimulateTestCase(TestCase test, string simulate, string cli, string? command, string? script, bool scriptIsBash, string @foreach, string? arguments, string? input, string? expectGpt, string? expectRegex, string? notExpectRegex, string? env, string workingDirectory, out string stdOut, out string stdErr, out string errorMessage, out string stackTrace, out string additional, out string debugTrace)
+        private static TestOutcome SimulateTestCase(TestCase test, string simulate, string cli, string? command, string? script, bool scriptIsBash, string? @foreach, string? arguments, string? input, string? expectGpt, string? expectRegex, string? notExpectRegex, string? env, string workingDirectory, out string stdOut, out string stdErr, out string errorMessage, out string stackTrace, out string additional, out string debugTrace)
         {
             var sb = new StringBuilder();
             sb.AppendLine($"cli='{cli?.Replace("\n", "\\n")}'");

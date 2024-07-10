@@ -120,6 +120,7 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
                 case "script": return YamlTestProperties.Get(test, "script");
                 case "bash": return YamlTestProperties.Get(test, "bash");
 
+                case "matrix": return YamlTestProperties.Get(test, "matrix");
                 case "foreach": return YamlTestProperties.Get(test, "foreach");
                 case "arguments": return YamlTestProperties.Get(test, "arguments");
                 case "input": return YamlTestProperties.Get(test, "input");

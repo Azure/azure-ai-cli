@@ -46,6 +46,7 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
             { "bash", RegisterTestCaseProperty("Bash") },
             { "parallelize", RegisterTestCaseProperty("Parallelize") },
             { "nextStepId", RegisterTestCaseProperty("nextStepId") },
+            { "matrix", RegisterTestCaseProperty("Matrix") },
             { "foreach", RegisterTestCaseProperty("ForEach") },
             { "arguments", RegisterTestCaseProperty("Arguments") },
             { "input", RegisterTestCaseProperty("Input")},

@@ -30,7 +30,8 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
                 Class = GetScalarString(null, defaultTags, "class", defaultClassName)!,
                 Tags = defaultTags,
                 Environment = YamlEnvHelpers.GetDefaultEnvironment(true, workingDirectory),
-                WorkingDirectory = workingDirectory
+                WorkingDirectory = workingDirectory,
+                Matrix = new List<Dictionary<string, string>>()
             };
 
             var parsed = YamlHelpers.ParseYamlStream(file.FullName);
@@ -66,6 +67,8 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
 
         private static IEnumerable<TestCase>? TestCasesFromYamlMapping(YamlTestCaseParseContext context, YamlMappingNode mapping)
         {
+            context.Matrix = CheckUpdateExpandMatrix(context, mapping);
+
             var children = CheckForChildren(context, mapping);
             if (children != null)
             {
@@ -79,6 +82,134 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
             }
 
             return null;
+        }
+
+        private static List<Dictionary<string, string>> CheckUpdateExpandMatrix(YamlTestCaseParseContext context, YamlMappingNode mapping)
+        {
+            if (mapping.Children.ContainsKey("matrix") == false) return context.Matrix;
+            var matrixNode = mapping.Children["matrix"];
+
+            var asMapping = matrixNode as YamlMappingNode;
+            var asSequence = asMapping != null && asMapping.Children.ContainsKey("foreach")
+                ? asMapping.Children["foreach"] as YamlSequenceNode
+                : matrixNode as YamlSequenceNode;
+            
+            if (asMapping != null)
+            {
+                context.Matrix = UpdateExpandMatrixWithMapping(context, asMapping);
+            }
+
+            if (asSequence != null)
+            {
+                context.Matrix = UpdateExpandMatrixWithSequence(context, asSequence);
+            }
+
+            return context.Matrix;
+        }
+
+        private static List<Dictionary<string, string>> UpdateExpandMatrixWithMapping(YamlTestCaseParseContext context, YamlMappingNode mapping)
+        {
+            if (context.Matrix.Count == 0)
+            {
+                context.Matrix.Add(new Dictionary<string, string>());
+            }
+
+            foreach (var kvp in mapping.Children)
+            {
+                var key = (kvp.Key as YamlScalarNode)?.Value;
+                if (key == null)
+                {
+                    Logger.LogError($"Error parsing YAML: expected scalar key at at {context.File.FullName}({kvp.Key.Start.Line})");
+                    continue;
+                }
+
+                if (key == "foreach") continue;
+
+                var value = (kvp.Value as YamlScalarNode)?.Value;
+                if (value != null)
+                {
+                    foreach (var existingMatrixItem in context.Matrix)
+                    {
+                        existingMatrixItem[key] = value;
+                    }
+                    continue;
+                }
+
+                var asSequence = kvp.Value as YamlSequenceNode;
+                if (asSequence == null)
+                {
+                    Logger.LogError($"Error parsing YAML: expected string or sequence at at {context.File.FullName}({kvp.Value.Start.Line})");
+                    continue;
+                }
+
+                var newMatrix = new List<Dictionary<string, string>>();
+                foreach (var item in asSequence.Children)
+                {
+                    value = (item as YamlScalarNode)?.Value;
+                    if (value == null)
+                    {
+                        Logger.LogError($"Error parsing YAML: expected scalar value at at {context.File.FullName}({item.Start.Line})");
+                        continue;
+                    }
+
+                    foreach (var existingMatrixItem in context.Matrix)
+                    {
+                        var newMatrixItem = new Dictionary<string, string>(existingMatrixItem);
+                        newMatrixItem[key] = value;
+                        newMatrix.Add(newMatrixItem);
+                    }
+                }
+
+                context.Matrix = newMatrix;
+            }
+
+            return context.Matrix;
+        }
+
+        private static List<Dictionary<string, string>> UpdateExpandMatrixWithSequence(YamlTestCaseParseContext context, YamlSequenceNode sequenceOfMaps)
+        {
+            if (context.Matrix.Count == 0)
+            {
+                context.Matrix.Add(new Dictionary<string, string>());
+            }
+
+            var newMatrix = new List<Dictionary<string, string>>();
+            foreach (var item in sequenceOfMaps.Children)
+            {
+                var asMapping = item as YamlMappingNode;
+                if (asMapping == null)
+                {
+                    Logger.LogError($"Error parsing YAML: expected mapping at at {context.File.FullName}({item.Start.Line})");
+                    continue;
+                }
+
+                foreach (var existingMatrixItem in context.Matrix)
+                {
+                    var newMatrixItem = new Dictionary<string, string>(existingMatrixItem);
+                    foreach (var kvp in asMapping.Children)
+                    {
+                        var key = (kvp.Key as YamlScalarNode)?.Value;
+                        if (key == null)
+                        {
+                            Logger.LogError($"Error parsing YAML: expected scalar key at at {context.File.FullName}({kvp.Key.Start.Line})");
+                            continue;
+                        }
+
+                        var value = (kvp.Value as YamlScalarNode)?.Value;
+                        if (value == null)
+                        {
+                            Logger.LogError($"Error parsing YAML: expected scalar value at at {context.File.FullName}({kvp.Value.Start.Line})");
+                            continue;
+                        }
+
+                        newMatrixItem[key] = value;
+                    }
+
+                    newMatrix.Add(newMatrixItem);
+                }
+            }
+
+            return newMatrix;
         }
 
         private static IEnumerable<TestCase>? TestCasesFromYamlSequence(YamlTestCaseParseContext context, YamlSequenceNode? sequence)
@@ -158,6 +289,9 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
             var testEnv = YamlEnvHelpers.UpdateCopyEnvironment(context.Environment, mapping);
             testEnv = YamlEnvHelpers.GetNewAndUpdatedEnvironmentVariables(processEnv, testEnv);
             SetTestCasePropertyMap(test, "env", testEnv);
+
+            var matrix = JsonHelpers.GetJsonArrayText(context.Matrix);
+            SetTestCaseProperty(test, "matrix", matrix);
 
             SetTestCasePropertyMap(test, "foreach", mapping, "foreach", workingDirectory);
             SetTestCasePropertyMap(test, "arguments", mapping, "arguments", workingDirectory);

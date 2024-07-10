@@ -389,6 +389,17 @@ namespace Azure.AI.Details.Common.CLI
             return Encoding.UTF8.GetString(stream.ToArray());
         }
 
+        public static string GetJsonObjectText(Dictionary<string, string> properties)
+        {
+            using var stream = new MemoryStream();
+            using var writer = new Utf8JsonWriter(stream, new JsonWriterOptions{ Indented = false });
+
+            WriteJsonObject(writer, properties);
+
+            writer.Flush();
+            return Encoding.UTF8.GetString(stream.ToArray());
+        }
+
         public static string GetJsonObjectText(Dictionary<string, List<string>> properties)
         {
             using var stream = new MemoryStream();
@@ -409,6 +420,22 @@ namespace Azure.AI.Details.Common.CLI
 
             writer.Flush();
             return Encoding.UTF8.GetString(stream.ToArray());
+        }
+
+        public static List<Dictionary<string, string>> FromJsonArrayText(string json)
+        {
+            var list = new List<Dictionary<string, string>>();
+            using var doc = JsonDocument.Parse(json);
+            foreach (var item in doc.RootElement.EnumerateArray())
+            {
+                var properties = new Dictionary<string, string>();
+                foreach (var property in item.EnumerateObject())
+                {
+                    properties.Add(property.Name, property.Value.GetString() ?? property.Value.GetRawText());
+                }
+                list.Add(properties);
+            }
+            return list;
         }
 
         private static void WriteJsonArray(Utf8JsonWriter writer, List<Dictionary<string, string>> items)
