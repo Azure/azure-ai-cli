@@ -224,7 +224,7 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
                 var itemCompletion = itemCompletionFromItemIdMap.ContainsKey(nextItemId) ? itemCompletionFromItemIdMap[nextItemId] : null;
                 if (itemCompletion == null)
                 {
-                    Logger.LogWarning($"YamlTestFramework.RunAndRecordRunnableTestCaseItemsStepByStep() ==> nextItemId '{nextItemId}' completion not found for test '{checkItem.RunnableTest.Test.DisplayName}'");
+                    Logger.Log($"YamlTestFramework.RunAndRecordRunnableTestCaseItemsStepByStep() ==> nextItemId '{nextItemId}' completion not found for test '{checkItem.RunnableTest.Test.DisplayName}'");
                     break;
                 }
 
@@ -254,14 +254,14 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
             var matrixId = current.MatrixId;
             if (string.IsNullOrEmpty(matrixId))
             {
-                Logger.LogError($"YamlTestFramework.GetNextRunnableTestCaseItem() ==> matrixId not found for {test.Id}");
+                Logger.Log($"YamlTestFramework.GetNextRunnableTestCaseItem() ==> matrixId not found for {test.Id}");
                 return null;
             }
 
             var nextItemId = RunnableTestCaseItem.ItemIdFromIds(nextTestCaseId, matrixId);
             if (!itemFromItemIdMap.ContainsKey(nextItemId))
             {
-                Logger.LogError($"YamlTestFramework.GetNextRunnableTestCaseItem() ==> nextItemId '{nextItemId}' not found for {test.Id}");
+                Logger.Log($"YamlTestFramework.GetNextRunnableTestCaseItem() ==> nextItemId '{nextItemId}' not found for {test.Id}");
                 return null;
             }
 
