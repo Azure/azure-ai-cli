@@ -31,7 +31,7 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
                 Tags = defaultTags,
                 Environment = YamlEnvHelpers.GetDefaultEnvironment(true, workingDirectory),
                 WorkingDirectory = workingDirectory,
-                Matrix = new List<Dictionary<string, string>>()
+                Matrix = YamlTestCaseMatrixHelpers.GetNewMatrix()
             };
 
             var parsed = YamlHelpers.ParseYamlStream(file.FullName);
@@ -84,6 +84,7 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
             return null;
         }
 
+
         private static List<Dictionary<string, string>> CheckUpdateExpandMatrix(YamlTestCaseParseContext context, YamlMappingNode mapping)
         {
             if (mapping.Children.ContainsKey("matrix") == false) return context.Matrix;
@@ -109,11 +110,6 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
 
         private static List<Dictionary<string, string>> UpdateExpandMatrixWithMapping(YamlTestCaseParseContext context, YamlMappingNode mapping)
         {
-            if (context.Matrix.Count == 0)
-            {
-                context.Matrix.Add(new Dictionary<string, string>());
-            }
-
             foreach (var kvp in mapping.Children)
             {
                 var key = (kvp.Key as YamlScalarNode)?.Value;
@@ -126,12 +122,18 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
                 if (key == "foreach") continue;
 
                 var value = (kvp.Value as YamlScalarNode)?.Value;
+                var newMatrix = new List<Dictionary<string, string>>();
+
                 if (value != null)
                 {
                     foreach (var existingMatrixItem in context.Matrix)
                     {
-                        existingMatrixItem[key] = value;
+                        var newMatrixItem = YamlTestCaseMatrixHelpers.GetNewMatrixItemDictionary(existingMatrixItem);
+                        newMatrixItem[key] = value;
+                        newMatrix.Add(newMatrixItem);
                     }
+
+                    context.Matrix = newMatrix;
                     continue;
                 }
 
@@ -142,7 +144,6 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
                     continue;
                 }
 
-                var newMatrix = new List<Dictionary<string, string>>();
                 foreach (var item in asSequence.Children)
                 {
                     value = (item as YamlScalarNode)?.Value;
@@ -154,7 +155,7 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
 
                     foreach (var existingMatrixItem in context.Matrix)
                     {
-                        var newMatrixItem = new Dictionary<string, string>(existingMatrixItem);
+                        var newMatrixItem = YamlTestCaseMatrixHelpers.GetNewMatrixItemDictionary(existingMatrixItem);
                         newMatrixItem[key] = value;
                         newMatrix.Add(newMatrixItem);
                     }
@@ -168,11 +169,6 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
 
         private static List<Dictionary<string, string>> UpdateExpandMatrixWithSequence(YamlTestCaseParseContext context, YamlSequenceNode sequenceOfMaps)
         {
-            if (context.Matrix.Count == 0)
-            {
-                context.Matrix.Add(new Dictionary<string, string>());
-            }
-
             var newMatrix = new List<Dictionary<string, string>>();
             foreach (var item in sequenceOfMaps.Children)
             {
@@ -185,7 +181,7 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
 
                 foreach (var existingMatrixItem in context.Matrix)
                 {
-                    var newMatrixItem = new Dictionary<string, string>(existingMatrixItem);
+                    var newMatrixItem = YamlTestCaseMatrixHelpers.GetNewMatrixItemDictionary(existingMatrixItem);
                     foreach (var kvp in asMapping.Children)
                     {
                         var key = (kvp.Key as YamlScalarNode)?.Value;
@@ -246,7 +242,6 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
             var skipOnFailure = GetScalarString(mapping, context.Tags, "skipOnFailure");
             string workingDirectory = UpdateWorkingDirectory(mapping!, context.WorkingDirectory);
 
-            var simulate = GetScalarString(mapping, "simulate");
             var command = GetScalarString(mapping, "command");
             var script = GetScalarString(mapping, "script");
             var bash = GetScalarString(mapping, "bash");
@@ -256,9 +251,8 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
                 : GetFullyQualifiedName(mapping, context.Area, context.Class, stepNumber);
             fullyQualifiedName ??= GetFullyQualifiedName(context.Area, context.Class, $"Expected YAML node ('name') at {context.File.FullName}({mapping.Start.Line})", 0);
 
-            var simulating = !string.IsNullOrEmpty(simulate);
             var neitherOrBoth = (command == null) == (script == null && bash == null);
-            if (neitherOrBoth && !simulating)
+            if (neitherOrBoth)
             {
                 var message = $"Error parsing YAML: expected/unexpected key ('name', 'command', 'script', 'bash', 'arguments') at {context.File.FullName}({mapping.Start.Line})";
                 Logger.LogError(message);
@@ -276,7 +270,6 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
             SetTestCaseProperty(test, "command", command);
             SetTestCaseProperty(test, "script", script);
             SetTestCaseProperty(test, "bash", bash);
-            SetTestCaseProperty(test, "simulate", simulate);
             SetTestCaseProperty(test, "parallelize", parallelize);
             SetTestCaseProperty(test, "skipOnFailure", skipOnFailure);
 
@@ -347,15 +340,15 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
                 }
             }
 
-            if (tests.Count > 0)
+            for (int i = 0; i < tests.Count; i++)
             {
-                SetTestCaseProperty(tests[0], "parallelize", "true");
-            }
+                if (i > 0)
+                {
+                    SetTestCaseProperty(tests[i - 1], "nextTestCaseId", tests[i].Id.ToString());
+                    SetTestCaseProperty(tests[i], "afterTestCaseId", tests[i - 1].Id.ToString());
+                }
 
-            for (int i = 1; i < tests.Count; i++)
-            {
-                SetTestCaseProperty(tests[i - 1], "nextStepId", tests[i].Id.ToString());
-                SetTestCaseProperty(tests[i], "parallelize", "false");
+                SetTestCaseProperty(tests[i], "parallelize", "true");
             }
 
             return tests;
@@ -377,7 +370,7 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
 
         private static bool IsValidTestCaseNode(string? value)
         {
-            return !string.IsNullOrEmpty(value) && ";area;class;name;cli;command;script;bash;timeout;foreach;arguments;input;expect;expect-regex;not-expect-regex;parallelize;simulate;skipOnFailure;tag;tags;workingDirectory;env;sanitize;".IndexOf($";{value};") >= 0;
+            return !string.IsNullOrEmpty(value) && ";area;class;name;cli;command;script;bash;timeout;foreach;arguments;input;expect;expect-regex;not-expect-regex;parallelize;skipOnFailure;tag;tags;workingDirectory;env;sanitize;".IndexOf($";{value};") >= 0;
         }
 
         private static void SetTestCaseProperty(TestCase test, string propertyName, YamlMappingNode mapping, string mappingName)
