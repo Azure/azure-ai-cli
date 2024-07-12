@@ -831,7 +831,8 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
             question.AppendLine($"Here's the expectation:\n\n{expectGpt}\n");
             question.AppendLine("You **must always** answer \"PASS\" if the expectation is met.");
             question.AppendLine("You **must always** answer \"FAIL\" if the expectation is not met.");
-            question.AppendLine("You **must only** answer \"PASS\" or \"FAIL\".");
+            question.AppendLine("You **must only** answer \"PASS\" with no additional text if the expectation is met.");
+            question.AppendLine("If you answer \"FAIL\", you **must** provide additional text to explain why the expectation was not met (without using the word \"PASS\" as we will interpret that as a \"PASS\").");
             var questionTempFile = WriteTextToTempFile(question.ToString())!;
 
             try
