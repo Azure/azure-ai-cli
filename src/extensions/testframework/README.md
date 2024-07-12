@@ -14,8 +14,9 @@ Example:
 
 The test case YAML file contains a list of test cases. Each test case is a dictionary with the following keys:
 
-* `name` (required): The name of the test case.
+- `tests`, `steps` (required): A list of test cases to run.
 * `command`, `script`, `bash` (required): The command or script to run.
+* `name` (required): The name of the test case.
 - `env` (optional): A dictionary of environment variables to set before running the command or script.
 - `input` (optional): The input to pass to the command or script.
 - `expect` (optional): A string that instructs the LLM (e.g. GPT-4) to decide pass/fail based on stdout/stderr.
@@ -26,6 +27,7 @@ The test case YAML file contains a list of test cases. Each test case is a dicti
 - `tag`/`tags` (optional): A list of tags to associate with the test case.
 - `timeout` (optional): The maximum time allowed to execute the test case, in milliseconds.
 - `workingDirectory` (optional): The working directory where the test will be run.
+- `matrix` (optional): A matrix used to parameterize and/or create multiple variations of a test case.
 
 Test cases can be organized into areas, sub-areas, and so on.
 
@@ -55,6 +57,32 @@ Test cases can also be grouped into classes.
 
 If no class is specified, the default class is "TestCases".
 
+## `tests`, `steps`
+
+Required.
+
+When present, specifies a list of test cases to run.
+
+By default, for `steps`, all tests will be run sequentially. The full set of tests will be run in parallel with other `steps` for other test areas, unless `parallelize: false` is set.
+
+Examples:
+
+```yaml
+tests:
+- name: Test 1
+  command: echo "Hello, world!"
+- name: Test 2
+  command: echo "Goodbye, world!"
+```
+
+```yaml
+steps:
+- name: Step 1
+  bash: echo "Hello, world!"
+- name: Step 2
+  bash: echo "Goodbye, world!"
+```
+
 ## `command`, `script`, `bash`
 
 Required.
@@ -79,6 +107,7 @@ bash: |
     py script.py
   fi
 ```
+
 
 ## `env`
 
@@ -228,7 +257,6 @@ Example:
 timeout: 3000  # 3 seconds
 ```
 
-
 ## `workingDirectory`
 
 Optional. Inherits from parent.
@@ -237,3 +265,47 @@ When present, specifies an absolute path or relative path where the test will be
 
 When specified as a relative path, it will be relative to the working directory of the parent, or if no parent exists, where the test case file is located.
 
+## `matrix`
+
+Optional. Inerits from parent.
+
+When present, specifies a matrix (set of values) used to parameterize and/or create multiple variations of a test case with different parameter values. This is achieved using the `matrix` key and `${{ matrix.VALUE }}` syntax within the test cases.
+
+Examples:
+
+```yaml
+- name: Example Matrix Test
+  matrix:
+    VALUE: [1, 2, 3]
+  bash: echo "Value is ${{ matrix.VALUE }}"
+```
+
+In this example, the test case will run three times with `VALUE` set to 1, 2, and 3 respectively.
+
+```yaml
+matrix:
+  animals: [ cats, bears, goats ]
+  temperature: [ 0.8, 1.0 ]
+command: 'ai chat --question "Tell me a joke about ${{ matrix.animals }}"'
+expect: 'The joke should be about ${{ matrix.animals }}'
+```
+
+In this example the test case will run six times (2x3) with `temperature` set to 0.8 and 1.0, and `animals` set to cats, bears, and goats.
+
+```yaml
+matrix:
+  assistant-id: asst_TqfFCksyWK83VKe76kiBYWGt
+  foreach:
+  - question: How do you create an MP3 file with speech synthesis from the text "Hello, World!"?
+  - question: How do you recognize speech from an MP3 file?
+  - question: How do you recognize speech from a microphone?
+steps:
+- name: Inference call to `ai chat`
+  command: ai chat
+  arguments:
+    question: ${{ matrix.question }}
+    assistant-id: ${{ matrix.assistant-id }}
+    output-chat-history: chat-history-${{ matrix.__matrix_id__ }}.jsonl
+```
+
+In this example the test case will run three times with `assistant-id` set to `asst_TqfFCksyWK83VKe76kiBYWGt`, and `question` set to the three questions specified in the `foreach` list, and the `output-chat-history` specifies where to save the chat history, using a filename that is unique to the "matrix" combination.
