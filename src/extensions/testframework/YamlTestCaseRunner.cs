@@ -23,92 +23,13 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
 
     public class YamlTestCaseRunner
     {
-        public static IList<TestResult> RunAndRecordTestCase(TestCase test, IYamlTestFrameworkHost host)
-        {
-            TestCaseStart(test, host);
-            var results = TestCaseRun(test, host);
-
-            var outcome = TestResultHelpers.TestOutcomeFromResults(results);
-            TestCaseStop(test, host, outcome);
-
-            return results;
-        }
-
-        #region private methods
-
-        private static void TestCaseStart(TestCase test, IYamlTestFrameworkHost host)
-        {
-            Logger.Log($"YamlTestCaseRunner.TestCaseStart({test.DisplayName})");
-            host.RecordStart(test);
-        }
-
-        private static IList<TestResult> TestCaseRun(TestCase test, IYamlTestFrameworkHost host)
-        {
-            Logger.Log($"YamlTestCaseRunner.TestCaseRun({test.DisplayName})");
-
-            // run the test case, getting all the results, prior to recording any of those results
-            // (not doing this in this order seems to, for some reason, cause "foreach" test cases to run 5 times!?)
-            var results = TestCaseGetResults(test).ToList();
-            foreach (var result in results)
-            {
-                host.RecordResult(result);
-            }
-
-            return results;
-        }
-
-        private static IEnumerable<TestResult> TestCaseGetResults(TestCase test)
+        public static IEnumerable<TestResult> TestCaseGetResults(TestCase test, string cli, string? command, string? script, bool scriptIsBash, string? arguments, string? input, string? expectGpt, string? expectRegex, string? notExpectRegex, string? env, string? workingDirectory, int timeout, bool skipOnFailure, string? @foreach)
         {
             Logger.Log($"YamlTestCaseRunner.TestCaseGetResults: ENTER");
 
-            var cli = YamlTestProperties.Get(test, "cli") ?? "";
-            var command = YamlTestProperties.Get(test, "command");
-            var script = YamlTestProperties.Get(test, "script");
-            var bash = YamlTestProperties.Get(test, "bash");
-
-            var scriptIsBash = !string.IsNullOrEmpty(bash);
-            if (scriptIsBash) script = bash;
-
-            var isWindows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
-            if (!isWindows) scriptIsBash = true;
-
-            var @foreach = YamlTestProperties.Get(test, "foreach");
-            var arguments = YamlTestProperties.Get(test, "arguments");
-
-            var input = YamlTestProperties.Get(test, "input");
-            if (input != null && input.StartsWith('"') && input.EndsWith('"')) input = input[1..^1];
-
-            var expectGpt = YamlTestProperties.Get(test, "expect");
-            var expectRegex = YamlTestProperties.Get(test, "expect-regex");
-            var notExpectRegex = YamlTestProperties.Get(test, "not-expect-regex");
-            var env = YamlTestProperties.Get(test, "env");
-            var workingDirectory = YamlTestProperties.Get(test, "working-directory");
-            var timeout = int.Parse(YamlTestProperties.Get(test, "timeout", YamlTestFramework.DefaultTimeout)!);
-            var simulate = YamlTestProperties.Get(test, "simulate");
-            var skipOnFailure = YamlTestProperties.Get(test, "skipOnFailure") switch { "true" => true, _ => false };
-
-            var basePath = new FileInfo(test.CodeFilePath).DirectoryName!;
-            workingDirectory = Path.Combine(basePath, workingDirectory ?? "");
-            var tryCreateWorkingDirectory = !string.IsNullOrEmpty(workingDirectory) && !Directory.Exists(workingDirectory);
-            if (tryCreateWorkingDirectory) Directory.CreateDirectory(workingDirectory);
-
-            var expanded = ExpandForEachGroups(@foreach);
-            Logger.Log($"YamlTestCaseRunner.TestCaseGetResults: expanded count = {expanded.Count()}");
-
-            foreach (var foreachItem in expanded)
+            foreach (var foreachItem in ExpandForEachGroups(@foreach))
             {
-                var start = DateTime.Now;
-
-                var outcome = string.IsNullOrEmpty(simulate)
-                    ? RunTestCase(test, skipOnFailure, cli, command, script, scriptIsBash, foreachItem, arguments, input, expectGpt, expectRegex, notExpectRegex, env, workingDirectory, timeout, out string stdOut, out string stdErr, out string errorMessage, out string stackTrace, out string additional, out string debugTrace)
-                    : SimulateTestCase(test, simulate, cli, command, script, scriptIsBash, foreachItem, arguments, input, expectGpt, expectRegex, notExpectRegex, env, workingDirectory, out stdOut, out stdErr, out errorMessage, out stackTrace, out additional, out debugTrace);
-
-                // #if DEBUG
-                // additional += outcome == TestOutcome.Failed ? $"\nEXTRA: {ExtraDebugInfo()}" : "";
-                // #endif
-
-                var stop = DateTime.Now;
-                var result = CreateTestResult(test, start, stop, stdOut, stdErr, errorMessage, stackTrace, additional, debugTrace, outcome);
+                var result = TestCaseGetResult(test, cli, command, script, scriptIsBash, foreachItem, arguments, input, expectGpt, expectRegex, notExpectRegex, env, workingDirectory!, timeout, skipOnFailure);
                 if (!string.IsNullOrEmpty(foreachItem) && foreachItem != "{}")
                 {
                     result.DisplayName = GetTestResultDisplayName(test.DisplayName, foreachItem);
@@ -119,15 +40,31 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
             Logger.Log($"YamlTestCaseRunner.TestCaseGetResults: EXIT");
         }
 
-        private static string GetTestResultDisplayName(string testDisplayName, string foreachItem)
+        #region private methods
+
+        private static TestResult TestCaseGetResult(TestCase test, string cli, string? command, string? script, bool scriptIsBash, string? foreachItem, string? arguments, string? input, string? expectGpt, string? expectRegex, string? notExpectRegex, string? env, string workingDirectory, int timeout, bool skipOnFailure)
+        {
+            var start = DateTime.Now;
+
+            var outcome = RunTestCase(skipOnFailure, cli, command, script, scriptIsBash, foreachItem, arguments, input, expectGpt, expectRegex, notExpectRegex, env, workingDirectory, timeout, out string stdOut, out string stdErr, out string errorMessage, out string stackTrace, out string additional, out string debugTrace);
+
+            // #if DEBUG
+            // additional += outcome == TestOutcome.Failed ? $"\nEXTRA: {ExtraDebugInfo()}" : "";
+            // #endif
+
+            var stop = DateTime.Now;
+            return CreateTestResult(test, start, stop, stdOut, stdErr, errorMessage, stackTrace, additional, debugTrace, outcome);
+        }
+
+        private static string GetTestResultDisplayName(string testDisplayName, string json)
         {
             var testResultDisplayName = testDisplayName;
 
-            var document = JsonDocument.Parse(foreachItem);
+            var document = JsonDocument.Parse(json);
             if(document.RootElement.ValueKind == JsonValueKind.Object)
             {
-                var foreachItemObject = document.RootElement;
-                foreach(var property in foreachItemObject.EnumerateObject())
+                var root = document.RootElement;
+                foreach(var property in root.EnumerateObject())
                 {
                     var keys = property.Name.Split(new char[] { '\t' });
                     var values = property.Value.GetString()!.Split(new char[] { '\t' });
@@ -145,13 +82,12 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
             // if the testDisplayName was not templatized, ie, it had no {}
             if (testResultDisplayName == testDisplayName)
             {
-                return $"{testDisplayName}: {RedactSensitiveDataFromForeachItem(foreachItem)}";
+                return $"{testDisplayName}: {RedactSensitiveDataFromForeachItem(json)}";
             }
 
             return testResultDisplayName;
         }
 
-        // Finds "token" in foreach key and redacts its value
         private static string RedactSensitiveDataFromForeachItem(string foreachItem)
         {
             using var stream = new MemoryStream();
@@ -206,6 +142,8 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
                     .ToList();
             }
 
+            Logger.Log($"YamlTestCaseRunner.ExpandForEachGroups: expanded count = {dicts.Count()}");
+
             return dicts.Select(d =>
             {
                 var options = new JsonSerializerOptions
@@ -223,7 +161,7 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
             return dup;
         }
 
-        private static TestOutcome RunTestCase(TestCase test, bool skipOnFailure, string cli, string? command, string? script, bool scriptIsBash, string @foreach, string? arguments, string? input, string? expectGpt, string? expectRegex, string? notExpectRegex, string? env, string workingDirectory, int timeout, out string stdOut, out string stdErr, out string errorMessage, out string stackTrace, out string additional, out string debugTrace)
+        private static TestOutcome RunTestCase(bool skipOnFailure, string cli, string? command, string? script, bool scriptIsBash, string? @foreach, string? arguments, string? input, string? expectGpt, string? expectRegex, string? notExpectRegex, string? env, string workingDirectory, int timeout, out string stdOut, out string stdErr, out string errorMessage, out string stackTrace, out string additional, out string debugTrace)
         {
             var outcome = TestOutcome.None;
 
@@ -812,69 +750,9 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
             return args.ToString().TrimEnd();
         }
 
-        private static TestOutcome SimulateTestCase(TestCase test, string simulate, string cli, string? command, string? script, bool scriptIsBash, string @foreach, string? arguments, string? input, string? expectGpt, string? expectRegex, string? notExpectRegex, string? env, string workingDirectory, out string stdOut, out string stdErr, out string errorMessage, out string stackTrace, out string additional, out string debugTrace)
-        {
-            var sb = new StringBuilder();
-            sb.AppendLine($"cli='{cli?.Replace("\n", "\\n")}'");
-            sb.AppendLine($"command='{command?.Replace("\n", "\\n")}'");
-            sb.AppendLine($"script='{script?.Replace("\n", "\\n")}'");
-            sb.AppendLine($"scriptIsBash='{scriptIsBash}'");
-            sb.AppendLine($"foreach='{@foreach?.Replace("\n", "\\n")}'");
-            sb.AppendLine($"arguments='{arguments?.Replace("\n", "\\n")}'");
-            sb.AppendLine($"input='{input?.Replace("\n", "\\n")}'");
-            sb.AppendLine($"expect-gpt='{expectGpt?.Replace("\n", "\\n")}'");
-            sb.AppendLine($"expect-regex='{expectRegex?.Replace("\n", "\\n")}'");
-            sb.AppendLine($"not-expect-regex='{notExpectRegex?.Replace("\n", "\\n")}'");
-            sb.AppendLine($"working-directory='{workingDirectory}'");
-
-            stdOut = sb.ToString();
-            stdErr = "STDERR";
-            additional = "ADDITIONAL-INFO";
-            debugTrace = "DEBUG-TRACE";
-            errorMessage = "ERRORMESSAGE";
-            stackTrace = "STACKTRACE";
-
-            var outcome = OutcomeFromString(simulate);
-            if (outcome == TestOutcome.Passed)
-            {
-                stdErr = string.Empty;
-                debugTrace = string.Empty;
-                errorMessage = string.Empty;
-            }
-
-            return outcome;
-        }
-
-        private static TestOutcome OutcomeFromString(string simulate)
-        {
-            TestOutcome outcome = TestOutcome.None;
-            switch (simulate?.ToLower())
-            {
-                case "failed":
-                    outcome = TestOutcome.Failed;
-                    break;
-
-                case "skipped":
-                    outcome = TestOutcome.Skipped;
-                    break;
-
-                case "passed":
-                    outcome = TestOutcome.Passed;
-                    break;
-            }
-
-            return outcome;
-        }
-
-        private static void TestCaseStop(TestCase test, IYamlTestFrameworkHost host, TestOutcome outcome)
-        {
-            Logger.Log($"YamlTestCaseRunner.TestCaseStop({test.DisplayName})");
-            host.RecordEnd(test, outcome);
-        }
-
         private static TestResult CreateTestResult(TestCase test, DateTime start, DateTime stop, string stdOut, string stdErr, string errorMessage, string stackTrace, string additional, string debugTrace, TestOutcome outcome)
         {
-            Logger.Log($"YamlTestCaseRunner.TestRecordResult({test.DisplayName})");
+            Logger.Log($"YamlTestCaseRunner.CreateTestResult({test.DisplayName})");
 
             var result = new TestResult(test) { Outcome = outcome };
             result.Messages.Add(new TestResultMessage(TestResultMessage.StandardOutCategory, stdOut));
@@ -953,7 +831,8 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
             question.AppendLine($"Here's the expectation:\n\n{expectGpt}\n");
             question.AppendLine("You **must always** answer \"PASS\" if the expectation is met.");
             question.AppendLine("You **must always** answer \"FAIL\" if the expectation is not met.");
-            question.AppendLine("You **must only** answer \"PASS\" or \"FAIL\".");
+            question.AppendLine("You **must only** answer \"PASS\" with no additional text if the expectation is met.");
+            question.AppendLine("If you answer \"FAIL\", you **must** provide additional text to explain why the expectation was not met (without using the word \"PASS\" as we will interpret that as a \"PASS\").");
             var questionTempFile = WriteTextToTempFile(question.ToString())!;
 
             try

@@ -30,7 +30,8 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
                 Class = GetScalarString(null, defaultTags, "class", defaultClassName)!,
                 Tags = defaultTags,
                 Environment = YamlEnvHelpers.GetDefaultEnvironment(true, workingDirectory),
-                WorkingDirectory = workingDirectory
+                WorkingDirectory = workingDirectory,
+                Matrix = YamlTestCaseMatrixHelpers.GetNewMatrix()
             };
 
             var parsed = YamlHelpers.ParseYamlStream(file.FullName);
@@ -66,6 +67,8 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
 
         private static IEnumerable<TestCase>? TestCasesFromYamlMapping(YamlTestCaseParseContext context, YamlMappingNode mapping)
         {
+            context.Matrix = CheckUpdateExpandMatrix(context, mapping);
+
             var children = CheckForChildren(context, mapping);
             if (children != null)
             {
@@ -79,6 +82,130 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
             }
 
             return null;
+        }
+
+
+        private static List<Dictionary<string, string>> CheckUpdateExpandMatrix(YamlTestCaseParseContext context, YamlMappingNode mapping)
+        {
+            if (mapping.Children.ContainsKey("matrix") == false) return context.Matrix;
+            var matrixNode = mapping.Children["matrix"];
+
+            var asMapping = matrixNode as YamlMappingNode;
+            var asSequence = asMapping != null && asMapping.Children.ContainsKey("foreach")
+                ? asMapping.Children["foreach"] as YamlSequenceNode
+                : matrixNode as YamlSequenceNode;
+            
+            if (asMapping != null)
+            {
+                context.Matrix = UpdateExpandMatrixWithMapping(context, asMapping);
+            }
+
+            if (asSequence != null)
+            {
+                context.Matrix = UpdateExpandMatrixWithSequence(context, asSequence);
+            }
+
+            return context.Matrix;
+        }
+
+        private static List<Dictionary<string, string>> UpdateExpandMatrixWithMapping(YamlTestCaseParseContext context, YamlMappingNode mapping)
+        {
+            foreach (var kvp in mapping.Children)
+            {
+                var key = (kvp.Key as YamlScalarNode)?.Value;
+                if (key == null)
+                {
+                    Logger.LogError($"Error parsing YAML: expected scalar key at at {context.File.FullName}({kvp.Key.Start.Line})");
+                    continue;
+                }
+
+                if (key == "foreach") continue;
+
+                var value = (kvp.Value as YamlScalarNode)?.Value;
+                var newMatrix = new List<Dictionary<string, string>>();
+
+                if (value != null)
+                {
+                    foreach (var existingMatrixItem in context.Matrix)
+                    {
+                        var newMatrixItem = YamlTestCaseMatrixHelpers.GetNewMatrixItemDictionary(existingMatrixItem);
+                        newMatrixItem[key] = value;
+                        newMatrix.Add(newMatrixItem);
+                    }
+
+                    context.Matrix = newMatrix;
+                    continue;
+                }
+
+                var asSequence = kvp.Value as YamlSequenceNode;
+                if (asSequence == null)
+                {
+                    Logger.LogError($"Error parsing YAML: expected string or sequence at at {context.File.FullName}({kvp.Value.Start.Line})");
+                    continue;
+                }
+
+                foreach (var item in asSequence.Children)
+                {
+                    value = (item as YamlScalarNode)?.Value;
+                    if (value == null)
+                    {
+                        Logger.LogError($"Error parsing YAML: expected scalar value at at {context.File.FullName}({item.Start.Line})");
+                        continue;
+                    }
+
+                    foreach (var existingMatrixItem in context.Matrix)
+                    {
+                        var newMatrixItem = YamlTestCaseMatrixHelpers.GetNewMatrixItemDictionary(existingMatrixItem);
+                        newMatrixItem[key] = value;
+                        newMatrix.Add(newMatrixItem);
+                    }
+                }
+
+                context.Matrix = newMatrix;
+            }
+
+            return context.Matrix;
+        }
+
+        private static List<Dictionary<string, string>> UpdateExpandMatrixWithSequence(YamlTestCaseParseContext context, YamlSequenceNode sequenceOfMaps)
+        {
+            var newMatrix = new List<Dictionary<string, string>>();
+            foreach (var item in sequenceOfMaps.Children)
+            {
+                var asMapping = item as YamlMappingNode;
+                if (asMapping == null)
+                {
+                    Logger.LogError($"Error parsing YAML: expected mapping at at {context.File.FullName}({item.Start.Line})");
+                    continue;
+                }
+
+                foreach (var existingMatrixItem in context.Matrix)
+                {
+                    var newMatrixItem = YamlTestCaseMatrixHelpers.GetNewMatrixItemDictionary(existingMatrixItem);
+                    foreach (var kvp in asMapping.Children)
+                    {
+                        var key = (kvp.Key as YamlScalarNode)?.Value;
+                        if (key == null)
+                        {
+                            Logger.LogError($"Error parsing YAML: expected scalar key at at {context.File.FullName}({kvp.Key.Start.Line})");
+                            continue;
+                        }
+
+                        var value = (kvp.Value as YamlScalarNode)?.Value;
+                        if (value == null)
+                        {
+                            Logger.LogError($"Error parsing YAML: expected scalar value at at {context.File.FullName}({kvp.Value.Start.Line})");
+                            continue;
+                        }
+
+                        newMatrixItem[key] = value;
+                    }
+
+                    newMatrix.Add(newMatrixItem);
+                }
+            }
+
+            return newMatrix;
         }
 
         private static IEnumerable<TestCase>? TestCasesFromYamlSequence(YamlTestCaseParseContext context, YamlSequenceNode? sequence)
@@ -115,7 +242,6 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
             var skipOnFailure = GetScalarString(mapping, context.Tags, "skipOnFailure");
             string workingDirectory = UpdateWorkingDirectory(mapping!, context.WorkingDirectory);
 
-            var simulate = GetScalarString(mapping, "simulate");
             var command = GetScalarString(mapping, "command");
             var script = GetScalarString(mapping, "script");
             var bash = GetScalarString(mapping, "bash");
@@ -125,9 +251,8 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
                 : GetFullyQualifiedName(mapping, context.Area, context.Class, stepNumber);
             fullyQualifiedName ??= GetFullyQualifiedName(context.Area, context.Class, $"Expected YAML node ('name') at {context.File.FullName}({mapping.Start.Line})", 0);
 
-            var simulating = !string.IsNullOrEmpty(simulate);
             var neitherOrBoth = (command == null) == (script == null && bash == null);
-            if (neitherOrBoth && !simulating)
+            if (neitherOrBoth)
             {
                 var message = $"Error parsing YAML: expected/unexpected key ('name', 'command', 'script', 'bash', 'arguments') at {context.File.FullName}({mapping.Start.Line})";
                 Logger.LogError(message);
@@ -145,7 +270,6 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
             SetTestCaseProperty(test, "command", command);
             SetTestCaseProperty(test, "script", script);
             SetTestCaseProperty(test, "bash", bash);
-            SetTestCaseProperty(test, "simulate", simulate);
             SetTestCaseProperty(test, "parallelize", parallelize);
             SetTestCaseProperty(test, "skipOnFailure", skipOnFailure);
 
@@ -158,6 +282,9 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
             var testEnv = YamlEnvHelpers.UpdateCopyEnvironment(context.Environment, mapping);
             testEnv = YamlEnvHelpers.GetNewAndUpdatedEnvironmentVariables(processEnv, testEnv);
             SetTestCasePropertyMap(test, "env", testEnv);
+
+            var matrix = JsonHelpers.GetJsonArrayText(context.Matrix);
+            SetTestCaseProperty(test, "matrix", matrix);
 
             SetTestCasePropertyMap(test, "foreach", mapping, "foreach", workingDirectory);
             SetTestCasePropertyMap(test, "arguments", mapping, "arguments", workingDirectory);
@@ -213,15 +340,15 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
                 }
             }
 
-            if (tests.Count > 0)
+            for (int i = 0; i < tests.Count; i++)
             {
-                SetTestCaseProperty(tests[0], "parallelize", "true");
-            }
+                if (i > 0)
+                {
+                    SetTestCaseProperty(tests[i - 1], "nextTestCaseId", tests[i].Id.ToString());
+                    SetTestCaseProperty(tests[i], "afterTestCaseId", tests[i - 1].Id.ToString());
+                }
 
-            for (int i = 1; i < tests.Count; i++)
-            {
-                SetTestCaseProperty(tests[i - 1], "nextStepId", tests[i].Id.ToString());
-                SetTestCaseProperty(tests[i], "parallelize", "false");
+                SetTestCaseProperty(tests[i], "parallelize", "true");
             }
 
             return tests;
@@ -243,7 +370,7 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
 
         private static bool IsValidTestCaseNode(string? value)
         {
-            return !string.IsNullOrEmpty(value) && ";area;class;name;cli;command;script;bash;timeout;foreach;arguments;input;expect;expect-regex;not-expect-regex;parallelize;simulate;skipOnFailure;tag;tags;workingDirectory;env;sanitize;".IndexOf($";{value};") >= 0;
+            return !string.IsNullOrEmpty(value) && ";area;class;name;cli;command;script;bash;timeout;foreach;arguments;input;expect;expect-regex;not-expect-regex;parallelize;skipOnFailure;tag;tags;workingDirectory;env;sanitize;".IndexOf($";{value};") >= 0;
         }
 
         private static void SetTestCaseProperty(TestCase test, string propertyName, YamlMappingNode mapping, string mappingName)
