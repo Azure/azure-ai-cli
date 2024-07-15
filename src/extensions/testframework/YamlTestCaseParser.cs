@@ -84,12 +84,44 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
             return null;
         }
 
-
         private static List<Dictionary<string, string>> CheckUpdateExpandMatrix(YamlTestCaseParseContext context, YamlMappingNode mapping)
         {
-            if (mapping.Children.ContainsKey("matrix") == false) return context.Matrix;
-            var matrixNode = mapping.Children["matrix"];
+            var fileName = GetScalarString(mapping, "matrix-file");
+            var fileNameOk = !string.IsNullOrEmpty(fileName);
+            if (fileNameOk)
+            {
+                context.Matrix = UpdateExpandMatrixFromFile(context, fileName!);
+            }
 
+            var matrixNodeOk = mapping.Children.ContainsKey("matrix");
+            if (matrixNodeOk)
+            {
+                var matrixNode = mapping.Children["matrix"];
+                context.Matrix = UpdateExpandMatrixFromNode(context, matrixNode);
+            }
+
+            return context.Matrix;
+        }
+
+        private static List<Dictionary<string, string>> UpdateExpandMatrixFromFile(YamlTestCaseParseContext context, string fileName)
+        {
+            fileName = PathHelpers.Combine(context.File.Directory!.FullName, fileName)!;
+            
+            var fi = new FileInfo(fileName);
+            if (fi.Exists)
+            {
+                var parsed = YamlHelpers.ParseYamlStream(fileName);
+                var matrixNode = parsed.Documents[0].RootNode;
+
+                context.File = fi;
+                return UpdateExpandMatrixFromNode(context, matrixNode);
+            }
+
+            return context.Matrix;
+        }
+
+        private static List<Dictionary<string, string>> UpdateExpandMatrixFromNode(YamlTestCaseParseContext context, YamlNode matrixNode)
+        {
             var asMapping = matrixNode as YamlMappingNode;
             var asSequence = asMapping != null && asMapping.Children.ContainsKey("foreach")
                 ? asMapping.Children["foreach"] as YamlSequenceNode
@@ -370,7 +402,7 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
 
         private static bool IsValidTestCaseNode(string? value)
         {
-            return !string.IsNullOrEmpty(value) && ";area;class;name;cli;command;script;bash;timeout;foreach;arguments;input;expect;expect-regex;not-expect-regex;parallelize;skipOnFailure;tag;tags;workingDirectory;env;sanitize;".IndexOf($";{value};") >= 0;
+            return !string.IsNullOrEmpty(value) && ";area;class;name;cli;command;script;bash;timeout;foreach;arguments;input;expect;expect-regex;not-expect-regex;parallelize;skipOnFailure;tag;tags;matrix;matrix-file;workingDirectory;env;sanitize;".IndexOf($";{value};") >= 0;
         }
 
         private static void SetTestCaseProperty(TestCase test, string propertyName, YamlMappingNode mapping, string mappingName)

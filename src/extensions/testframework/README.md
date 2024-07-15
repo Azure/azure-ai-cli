@@ -27,7 +27,7 @@ The test case YAML file contains a list of test cases. Each test case is a dicti
 - `tag`/`tags` (optional): A list of tags to associate with the test case.
 - `timeout` (optional): The maximum time allowed to execute the test case, in milliseconds.
 - `workingDirectory` (optional): The working directory where the test will be run.
-- `matrix` (optional): A matrix used to parameterize and/or create multiple variations of a test case.
+- `matrix`, `matrix-file` (optional): A matrix used to parameterize and/or create multiple variations of a test case.
 
 Test cases can be organized into areas, sub-areas, and so on.
 
@@ -265,7 +265,7 @@ When present, specifies an absolute path or relative path where the test will be
 
 When specified as a relative path, it will be relative to the working directory of the parent, or if no parent exists, where the test case file is located.
 
-## `matrix`
+## `matrix`, `matrix-file`
 
 Optional. Inerits from parent.
 
@@ -309,3 +309,19 @@ steps:
 ```
 
 In this example the test case will run three times with `assistant-id` set to `asst_TqfFCksyWK83VKe76kiBYWGt`, and `question` set to the three questions specified in the `foreach` list, and the `output-chat-history` specifies where to save the chat history, using a filename that is unique to the "matrix" combination.
+
+```yaml
+matrix-file: questions.yaml
+```
+
+`questions.yaml`:
+```yaml
+foreach:
+- question: How do you create an MP3 file with speech synthesis from the text "Hello, World!"?
+- question: How do you recognize speech from an MP3 file?
+- question: How do you recognize speech from a microphone?
+```
+
+In this example, the matrix is loaded from a file.
+
+
