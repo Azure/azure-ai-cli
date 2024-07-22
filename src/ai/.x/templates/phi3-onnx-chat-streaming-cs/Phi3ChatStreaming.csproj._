@@ -6,6 +6,6 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="Microsoft.ML.OnnxRuntimeGenAI" Version="0.3.0-rc2" />
+    <PackageReference Include="Microsoft.ML.OnnxRuntimeGenAI" Version="0.3.0" />
   </ItemGroup>
 </Project>
