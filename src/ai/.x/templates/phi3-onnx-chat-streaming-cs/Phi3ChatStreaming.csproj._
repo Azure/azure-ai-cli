@@ -6,6 +6,12 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
   <ItemGroup>
+    {{if contains(toupper("{ONNX_GENAI_MODEL_PLATFORM}"), "DIRECTML")}}
+    <PackageReference Include="Microsoft.ML.OnnxRuntimeGenAI.DirectML" Version="0.3.0" />
+    {{else if contains(toupper("{ONNX_GENAI_MODEL_PLATFORM}"), "CUDA")}}
+    <PackageReference Include="Microsoft.ML.OnnxRuntimeGenAI.Cuda" Version="0.3.0" />
+    {{else}}
     <PackageReference Include="Microsoft.ML.OnnxRuntimeGenAI" Version="0.3.0" />
+    {{endif}}
   </ItemGroup>
 </Project>
