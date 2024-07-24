@@ -1,25 +1,19 @@
-using System.Text;
-using Microsoft.ML.OnnxRuntimeGenAI;
-
-public class ContentMessage
-{
-    public string Role { get; set; }
-    public string Content { get; set; }
-}
-
 public class Program
 {
     public static void Main(string[] args)
     {
-        var modelDirectory = args.Length < 2
-            ? @"Phi-3-mini-4k-instruct-onnx\cpu_and_mobile\cpu-int4-rtn-block-32"
-            : args[1];
+        var modelDirectory = Environment.GetEnvironmentVariable("ONNX_GENAI_MODEL_PATH") ?? "<insert your ONNX GenAI model path here>";
+        var systemPrompt = Environment.GetEnvironmentVariable("ONNX_GENAI_SYSTEM_PROMPT") ?? "You are a helpful assistant.";
 
-        using var model = new Model(modelDirectory);
-        using var tokenizer = new Tokenizer(model);
+        if (string.IsNullOrEmpty(modelDirectory) || modelDirectory.StartsWith("<insert") ||
+            string.IsNullOrEmpty(systemPrompt) || systemPrompt.StartsWith("<insert"))
+        {
+            Console.WriteLine("To use this ONNX GenAI sample, set the following environment variables:");
+            Console.WriteLine("  ONNX_GENAI_MODEL_PATH\n  ONNX_GENAI_SYSTEM_PROMPT");
+            Environment.Exit(1);
+        }
 
-        var messages = new List<ContentMessage>();
-        messages.Append(new ContentMessage { Role = "system", Content = "You are a helpful assistant." });
+        var chat = new OnnxGenAIChatStreamingClass(modelDirectory, systemPrompt);
 
         while (true)
         {
@@ -28,38 +22,10 @@ public class Program
             if (string.IsNullOrEmpty(input) || input == "exit") break;
 
             Console.Write("\nAssistant: ");
-
-            messages.Add(new ContentMessage { Role = "user", Content = input });
-            var asStr = string.Join("\n", messages
-                .Select(m => $"<|{m.Role}|>{m.Content}<|end|>"))
-                + "<|assistant|>";
-
-            using var tokens = tokenizer.Encode(asStr);
-
-            using var generatorParams = new GeneratorParams(model);
-            generatorParams.SetSearchOption("max_length", 2048);
-            generatorParams.SetInputSequences(tokens);
-
-            using var generator = new Generator(model, generatorParams);
-
-            var sb = new StringBuilder();
-            while (!generator.IsDone())
-            {
-                generator.ComputeLogits();
-                generator.GenerateNextToken();
-
-                var outputTokens = generator.GetSequence(0);
-                var newToken = outputTokens.Slice(outputTokens.Length - 1, 1);
-
-                var output = tokenizer.Decode(newToken);
-                sb.Append(output);
-
-                Console.Write(output);
-            }
-
+            chat.GetChatCompletionStreaming(input, update => {
+                Console.Write(update);
+            });
             Console.WriteLine("\n");
-            
-            messages.Add(new ContentMessage { Role = "assistant", Content = sb.ToString() });
         }
     }
 }
