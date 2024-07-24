@@ -1,5 +1,7 @@
 {
   "_LongName": "Phi-3 Chat Completions (w/ ONNX)",
   "_ShortName": "phi3-onnx-chat-streaming",
-  "_Language": "C#"
+  "_Language": "C#",
+
+  "ONNX_GENAI_MODEL_PLATFORM": "CPU"
 }
