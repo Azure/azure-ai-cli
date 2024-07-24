@@ -152,6 +152,7 @@ namespace Azure.AI.Details.Common.CLI
             new TrueFalseNamedValueTokenParser("chat.speech.input", "010"),
 
             OutputChatAnswerFileToken.Parser(),
+            OutputAddChatAnswerFileToken.Parser(),
             OutputChatHistoryFileToken.Parser(),
             InputChatHistoryJsonFileToken.Parser(),
             InputChatParameterFileToken.Parser(),
