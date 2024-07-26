@@ -40,6 +40,8 @@ namespace Azure.AI.Details.Common.CLI
             ("chat.assistant.file.list", false),
             ("chat.assistant.file", true),
 
+            ("chat.assistant.trace.get", true),
+
             ("chat.assistant", true),
             ("chat", true),
         };
@@ -71,6 +73,7 @@ namespace Azure.AI.Details.Common.CLI
                 case "chat.assistant.file.upload": return _chatAssistantFileUploadCommandParsers;
                 case "chat.assistant.file.delete": return _chatAssistantFileDeleteCommandParsers;
                 case "chat.assistant.file.list": return _chatAssistantFileListCommandParsers;
+                case "chat.assistant.trace.get": return _chatAssistantTraceGetCommandParsers;
             }
 
             foreach (var command in _commands)
@@ -152,7 +155,6 @@ namespace Azure.AI.Details.Common.CLI
             new TrueFalseNamedValueTokenParser("chat.speech.input", "010"),
 
             OutputChatAnswerFileToken.Parser(),
-            OutputAddChatAnswerFileToken.Parser(),
             OutputChatHistoryFileToken.Parser(),
             InputChatHistoryJsonFileToken.Parser(),
             InputChatParameterFileToken.Parser(),
@@ -283,6 +285,12 @@ namespace Azure.AI.Details.Common.CLI
         private static INamedValueTokenParser[] _chatAssistantFileDeleteCommandParsers = {
             new CommonChatNamedValueTokenParsers(),
             new Any1ValueNamedValueTokenParser(null, "chat.assistant.file.id", "0001"),
+        };
+        private static INamedValueTokenParser[] _chatAssistantTraceGetCommandParsers = {
+            new CommonChatNamedValueTokenParsers(),
+            new Any1ValueNamedValueTokenParser(null, "chat.trace.request.id", "0011;0101"),
+            new Any1ValueNamedValueTokenParser(null, "chat.trace.output.file", "0001"),
+            new TrueFalseNamedValueTokenParser("chat.trace.dashboard", "001"),
         };
 
         #endregion

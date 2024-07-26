@@ -26,6 +26,7 @@ using Azure.AI.OpenAI.Chat;
 using OpenAI.Assistants;
 using OpenAI.Files;
 using OpenAI.VectorStores;
+using Azure.AI.Details.Common.CLI.Extensions.Otel;
 
 #pragma warning disable AOAI001 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
 #pragma warning disable OPENAI001 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
@@ -90,6 +91,8 @@ namespace Azure.AI.Details.Common.CLI
                 case "chat.assistant.file.upload": DoChatAssistantFileUpload().Wait(); break;
                 case "chat.assistant.file.list": DoChatAssistantFileList().Wait(); break;
                 case "chat.assistant.file.delete": DoChatAssistantFileDelete().Wait(); break;
+
+                case "chat.assistant.trace.get": DoChatAssistantTraceGet().Wait(); break;
 
                 default:
                     _values.AddThrowError("WARNING:", $"'{command.Replace('.', ' ')}' NOT YET IMPLEMENTED!!");
@@ -518,13 +521,6 @@ namespace Azure.AI.Details.Common.CLI
             {
                 var fileName = FileHelpers.GetOutputDataFileName(outputAnswerFile, _values);
                 FileHelpers.WriteAllText(fileName, completeResponse, Encoding.UTF8);
-            }
-
-            var outputAddAnswerFile = OutputAddChatAnswerFileToken.Data().GetOrDefault(_values);
-            if (!string.IsNullOrEmpty(outputAddAnswerFile))
-            {
-                var fileName = FileHelpers.GetOutputDataFileName(outputAddAnswerFile, _values);
-                FileHelpers.AppendAllText(fileName, "\n" + completeResponse, Encoding.UTF8);
             }
         }
 
@@ -1579,6 +1575,26 @@ namespace Azure.AI.Details.Common.CLI
             await OpenAIAssistantHelpers.DeleteAssistantFile(key, endpoint, id);
 
             if (!_quiet) Console.WriteLine($"{message} Done!");
+            return true;
+        }
+        private async Task<bool> DoChatAssistantTraceGet() {
+            var requestId = _values["chat.trace.request.id"];
+            var dashboard = _values.GetOrDefault("chat.trace.dashboard", false);
+            var filePath = _values.GetOrDefault("chat.trace.output.file", "");
+            
+            if (string.IsNullOrEmpty(requestId))
+            {
+                _values.AddThrowError("ERROR:", $"Retrieving trace; requires request id.");
+            }
+            Console.WriteLine("Attempting to fetch trace data...");
+            var data = await OtelData.GetTrace(requestId);
+            Console.WriteLine(data);
+            if (!string.IsNullOrEmpty(filePath)) {
+                await OtelData.WriteDataToFile(data, filePath);
+            }
+            if (dashboard) {
+                await OtelData.ExportToDashboard(data);
+            }
             return true;
         }
 

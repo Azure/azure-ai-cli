@@ -20,11 +20,14 @@ namespace Azure.AI.Details.Common.CLI
         {
             return ParseCommandValues("tool", GetCommandParsers(values), tokens, values);
         }
-
+        
         private static readonly (string name, bool valuesRequired)[] _commands =  {
-            ("tool", true)
+            ("tool.dashboard.start", false),
+            ("tool.dashboard.stop", false),
+            ("tool", true),
+            
         };
-
+        
         private static readonly string[] _partialCommands = {
             "tool"
         };
