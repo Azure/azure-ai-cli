@@ -3,6 +3,12 @@ using Microsoft.ML.OnnxRuntimeGenAI;
 
 public class ContentMessage
 {
+    public ContentMessage()
+    {
+        Role = string.Empty;
+        Content = string.Empty;
+    }
+
     public string Role { get; set; }
     public string Content { get; set; }
 }
