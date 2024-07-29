@@ -522,6 +522,13 @@ namespace Azure.AI.Details.Common.CLI
                 var fileName = FileHelpers.GetOutputDataFileName(outputAnswerFile, _values);
                 FileHelpers.WriteAllText(fileName, completeResponse, Encoding.UTF8);
             }
+
+            var outputAddAnswerFile = OutputAddChatAnswerFileToken.Data().GetOrDefault(_values);
+            if (!string.IsNullOrEmpty(outputAddAnswerFile))
+            {
+                var fileName = FileHelpers.GetOutputDataFileName(outputAddAnswerFile, _values);
+                FileHelpers.AppendAllText(fileName, "\n" + completeResponse, Encoding.UTF8);
+            }
         }
 
         private async Task CheckWriteChatHistoryOutputFileAsync(AssistantClient client, AssistantThread thread)
