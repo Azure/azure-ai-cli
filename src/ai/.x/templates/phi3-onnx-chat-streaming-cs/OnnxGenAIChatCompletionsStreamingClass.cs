@@ -3,6 +3,12 @@ using Microsoft.ML.OnnxRuntimeGenAI;
 
 public class ContentMessage
 {
+    public ContentMessage()
+    {
+        Role = string.Empty;
+        Content = string.Empty;
+    }
+
     public string Role { get; set; }
     public string Content { get; set; }
 }
@@ -33,8 +39,8 @@ public class OnnxGenAIChatStreamingClass
 
         var responseContent = string.Empty;
         using var tokens = _tokenizer.Encode(string.Join("\n", _messages
-            .Select(m => $"<|{m.Role}|>{m.Content}<|end|>"))
-            + "<|assistant|>");
+            .Select(m => $"<|{m.Role}|>\n{m.Content}\n<|end|>"))
+            + "<|assistant|>\n");
 
         using var generatorParams = new GeneratorParams(_model);
         generatorParams.SetSearchOption("max_length", 2048);
