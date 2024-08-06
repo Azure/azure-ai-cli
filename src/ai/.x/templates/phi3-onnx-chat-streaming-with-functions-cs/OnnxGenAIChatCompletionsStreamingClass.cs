@@ -37,8 +37,8 @@ public class OnnxGenAIChatStreamingClass
         while (true)
         {
             var history = string.Join("\n", _messages
-                .Select(m => $"<|{m.Role}|>{m.Content}<|end|>"))
-                + "<|assistant|>";
+                .Select(m => $"<|{m.Role}|>\n{m.Content}\n<|end|>"))
+                + "<|assistant|>\n";
 
             // Console.WriteLine("\n**************** History ****************");
             // Console.WriteLine(history);

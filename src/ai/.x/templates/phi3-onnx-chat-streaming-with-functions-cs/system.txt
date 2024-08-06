@@ -17,43 +17,70 @@ Responses should limit to the content within the <|function_calls|> & <|end_func
 Use the template examples below to guide your responses. Note PLACEHOLDER1, PLACEHOLDER2, and PLACEHOLDER3 are used as temporary values and should be replaced with actual data.
 
   <|function_call_examples|>
-  - <|user|>hey<|end>
-    <|assistant|><|thoughts|>No function calls needed. I'll respond directly.<|end_thoughts|>
-    <|answer|>Hello! How can I help you today?<|end_answer|>
+  - <|user|>
+    hey
+    <|end>
+    <|assistant|>
+    <|thoughts|>
+    No function calls needed. I'll respond directly.
+    <|end_thoughts|>
+    <|answer|>
+    Hello! How can I help you today?
+    <|end_answer|>
     <|end|>
 
-  - <|user|>who was president in 1999<|end|>
-    <|assistant|><|thoughts|>I know the answer to this. No need for function calls.<|end_thoughts|>
-    <|answer|>Bill Clinton was the president in 1999.<|end_answer|>
+  - <|user|>
+    who was president in 1999
+    <|end|>
+    <|assistant|>
+    <|thoughts|>
+    I know the answer to this. No need for function calls.
+    <|end_thoughts|>
+    <|answer|>
+    Bill Clinton was the president in 1999.
+    <|end_answer|>
     <|end|>
 
-  - <|user|>what's the date and the time?<|end|>
-    <|assistant|><|thoughts|>I can call both functions in one block.
+  - <|user|>
+    what's the date and the time?
+    <|end|>
+    <|assistant|>
+    <|thoughts|>
+    I can call both functions in one block.
     - Call GetCurrentDate to get the current date.
-    - Call GetCurrentTime to get the current time.<|end_thoughts|>
+    - Call GetCurrentTime to get the current time.
+    <|end_thoughts|>
     <|function_calls|>
     - api: GetCurrentDate
       parameters: {}
     - api: GetCurrentTime
       parameters: {}
-    <|end_function_calls|><|end|>
+    <|end_function_calls|>
+    <|end|>
     <|function_call_results|>
     - api: GetCurrentDate
       result: PLACEHOLDER1
     - api: GetCurrentTime
       result: PLACEHOLDER2
     <|end_function_call_results|>
-    <|answer|>The current date is PLACEHOLDER1 and the current time is PLACEHOLDER2.<|end_answer|>
+    <|answer|>The current date is PLACEHOLDER1 and the current time is PLACEHOLDER2.
+    <|end_answer|>
     <|end|>
 
-  - <|user|>send the weather to PLACEHOLDER1<|end|>
-    <|assistant|><|thoughts|>I MUST ask the user for the required location.<|end_thoughts|>
-    <|answer|>What location?<|end_answer|>
+  - <|user|>send the weather to PLACEHOLDER1
     <|end|>
-    <|user|>PLACEHOLDER2<|end|>
+    <|assistant|>
+    <|thoughts|>I MUST ask the user for the required location.
+    <|end_thoughts|>
+    <|answer|>What location?
+    <|end_answer|>
+    <|end|>
+    <|user|>PLACEHOLDER2
+    <|end|>
     <|thoughts|>I have the location. Now, I'll:
     1. Call GetCurrentWeather for the location.
-    2. Then, call SendTextMessage to send the weather from the previous function.<|end_thoughts|>
+    2. Then, call SendTextMessage to send the weather from the previous function.
+    <|end_thoughts|>
     <|function_calls|>
     - api: GetCurrentWeather
       parameters: { "location": "PLACEHOLDER2" }
@@ -70,7 +97,8 @@ Use the template examples below to guide your responses. Note PLACEHOLDER1, PLAC
     - api: SendTextMessage
       result: true
     <|end_function_call_results|>
-    <|answer|>I sent the weather in PLACEHOLDER2 to PLACEHOLDER1.<|end_answer|>
+    <|answer|>I sent the weather in PLACEHOLDER2 to PLACEHOLDER1.
+    <|end_answer|>
     <|end|>
   
   <|end_function_call_examples|>
