@@ -53,6 +53,7 @@ namespace Azure.AI.Details.Common.CLI
                     var msg = x.Message.Split(new char[] { '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries).FirstOrDefault();
                     if (!msg.StartsWith("ERROR: "))
                     {
+                        FileHelpers.LogException(_values, ex);
                         ConsoleHelpers.WriteLineError($"\n  ERROR: {msg}");
                         return true;
                     }
@@ -1379,7 +1380,7 @@ namespace Azure.AI.Details.Common.CLI
             if (string.IsNullOrEmpty(id))
             {
                 _values.AddThrowError(
-                      "ERROR:", $"Updating assistant vector store; requires id.",
+                    "ERROR:", $"Updating assistant vector store; requires id.",
                                 "",
                         "TRY:", $"{Program.Name} chat assistant vector-store update --id ID",
                                 "",

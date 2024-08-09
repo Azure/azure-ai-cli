@@ -358,7 +358,6 @@ namespace Azure.AI.Details.Common.CLI
                         message += Encoding.UTF8.GetString(stream.ToArray());
                     }
 
-                    ConsoleHelpers.WriteLineError(message);
                     throw new Exception(message);
                 }
 
