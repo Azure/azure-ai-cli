@@ -304,9 +304,9 @@ namespace Azure.AI.Details.Common.CLI
 
         public static OpenAIClient CreateOpenAIClient(string key, string endpoint)
         {
-            //_azureEventSourceListener = new AzureEventSourceListener((e, message) => EventSourceHelpers.EventSourceAiLoggerLog(e, message), System.Diagnostics.Tracing.EventLevel.Verbose);
+            AzureOpenAIClientOptions options = new();
+            options.AddPolicy(new LogTrafficEventPolicy(), PipelinePosition.PerCall);
 
-            var options = new AzureOpenAIClientOptions();
             return new AzureOpenAIClient(
                 new Uri(endpoint!),
                 new AzureKeyCredential(key!),
@@ -343,6 +343,25 @@ namespace Azure.AI.Details.Common.CLI
                 Thread.Sleep(250);
 
                 batchJob = await client.GetBatchFileJobAsync(batchJob);
+                var error = batchJob.Value.Status == VectorStoreBatchFileJobStatus.Failed;
+                if (error)
+                {
+                    var message = $"Batch job failed: {batchJob.Value.Status}";
+                    var jsonModel = batchJob.Value as IJsonModel<Assistant>;
+                    if (jsonModel != null)
+                    {
+                        using var stream = new MemoryStream();
+                        var writer = new Utf8JsonWriter(stream);
+                        jsonModel.Write(writer, ModelReaderWriterOptions.Json);
+                        writer.Flush();
+
+                        message += Encoding.UTF8.GetString(stream.ToArray());
+                    }
+
+                    ConsoleHelpers.WriteLineError(message);
+                    throw new Exception(message);
+                }
+
                 completed = batchJob.Value.Status == VectorStoreBatchFileJobStatus.Completed;
             }
 
