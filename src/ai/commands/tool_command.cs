@@ -40,10 +40,13 @@ namespace Azure.AI.Details.Common.CLI
 
             return _values.GetOrDefault("passed", true);
         }
-        private void StartDashboard() {
+        private void StartDashboard() 
+        {
             Dashboard.StartDashboard();
         }
-        private void StopDashboard() {
+
+        private void StopDashboard() 
+        {
             Dashboard.StopDashboard();
         }
 

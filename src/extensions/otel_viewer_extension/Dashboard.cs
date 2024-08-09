@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
+using System.Runtime.InteropServices;
 using Azure.AI.Details.Common.CLI;
 
 namespace Azure.AI.Details.Common.CLI.Extensions.Otel
@@ -9,26 +10,35 @@ namespace Azure.AI.Details.Common.CLI.Extensions.Otel
         // Execute a command in the command prompt and return the output
         private static string ExecuteCommand(string command)
         {
-            ProcessStartInfo processStartInfo = new ProcessStartInfo
+            ProcessStartInfo processStartInfo = new ProcessStartInfo();
+
+            var isWindows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
+            if (isWindows)
             {
-                FileName = "cmd.exe",
-                Arguments = $"/c {command}",
-                RedirectStandardOutput = true,
-                UseShellExecute = false,
-                CreateNoWindow = true,
-            };
+                processStartInfo.FileName = "cmd.exe";
+                processStartInfo.Arguments = $"/c {command}";
+            }
+            else 
+            {
+                processStartInfo.FileName = "/bin/bash";
+                processStartInfo.Arguments = $"-c \"{command}\"";
+            }
+           
+            processStartInfo.RedirectStandardOutput = true;
+            processStartInfo.RedirectStandardError = true;
+            processStartInfo.UseShellExecute = false;
+            processStartInfo.CreateNoWindow = true;
 
             using (Process process = new Process())
             {
                 process.StartInfo = processStartInfo;
                 process.Start();
-                process.WaitForExit();  
-                return process.StandardOutput.ReadToEnd();  
+                process.WaitForExit();
+                return process.StandardOutput.ReadToEnd();
             }
         }
         public static void StartDashboard()
         {
-            
             // Commands for the terminal
             string dockerStartCommand = "docker run --rm -it -p 18888:18888 -p 4317:18889 -d --name aspire-dashboard mcr.microsoft.com/dotnet/aspire-dashboard:8.0.0";
             string dockerLogsCommand = "docker logs aspire-dashboard";
@@ -39,8 +49,8 @@ namespace Azure.AI.Details.Common.CLI.Extensions.Otel
                 string startResult = ExecuteCommand(dockerStartCommand);
                 Console.WriteLine(startResult);
 
-                // Optionally wait a bit before fetching logs if needed
-                System.Threading.Thread.Sleep(3000); 
+                // Wait before fetching logs if needed
+                System.Threading.Thread.Sleep(3000);
 
                 // Get logs from the Docker container
                 string logsResult = ExecuteCommand(dockerLogsCommand);

@@ -39,11 +39,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Telemetry", "Telemetry", "{
 		src\telemetry\NuGet.config = src\telemetry\NuGet.config
 	EndProjectSection
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{13B3E651-BF79-4138-A73D-FD41F773E0F4}"
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "extensions", "extensions", "{A5154519-2271-45E8-8761-816440870E40}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "otel_viewer_extension", "src\extensions\otel_viewer_extension\otel_viewer_extension.csproj", "{B153ED12-2028-49A9-AD7F-9D67DA0ECA32}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "otel_viewer_extension", "src\extensions\otel_viewer_extension\otel_viewer_extension.csproj", "{B153ED12-2028-49A9-AD7F-9D67DA0ECA32}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -213,8 +209,6 @@ Global
 		{9499C018-FA08-4133-93B3-FC0F3863A6CC} = {C8AFF891-D6AA-4B8F-BC21-10404DF4B355}
 		{CED7C805-0435-4BF7-A42F-9F3BBF14A18F} = {644B75F1-C768-4DB3-BAF2-C69A1F36DD28}
 		{306A3CD6-91C2-450B-9995-79701CE63FE2} = {975EBC5A-506D-49B5-AA7F-70D3119F009D}
-		{A5154519-2271-45E8-8761-816440870E40} = {13B3E651-BF79-4138-A73D-FD41F773E0F4}
-		{B153ED12-2028-49A9-AD7F-9D67DA0ECA32} = {A5154519-2271-45E8-8761-816440870E40}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {002655B1-E1E1-4F2A-8D53-C9CD55136AE2}

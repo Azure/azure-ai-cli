@@ -45,7 +45,6 @@ namespace Azure.AI.Details.Common.CLI.Extensions.Otel
         {
             try
             {
-                //var data = await GetTrace(requestId);
                 using (StreamWriter writer = new StreamWriter(filePath))
                 {
                     await writer.WriteAsync(data);

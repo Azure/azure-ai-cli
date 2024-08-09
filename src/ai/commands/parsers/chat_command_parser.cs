@@ -40,6 +40,7 @@ namespace Azure.AI.Details.Common.CLI
             ("chat.assistant.file.list", false),
             ("chat.assistant.file", true),
 
+            ("chat.assistant.trace", true),
             ("chat.assistant.trace.get", true),
 
             ("chat.assistant", true),

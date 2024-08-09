@@ -35,7 +35,7 @@ namespace Azure.AI.Details.Common.CLI
 
             var parsed = Program.DispatchParseCommand(tokens, values);
             if (parsed || values.DisplayHelpRequested()) return parsed;
-            var test = command.Split('.')[0];
+            
             switch (command.Split('.')[0])
             {
                 case "-?":
@@ -83,9 +83,6 @@ namespace Azure.AI.Details.Common.CLI
 
         protected static bool ParseCommands(IEnumerable<(string commandName, bool valuesRequired)> commands, IEnumerable<string> partials, INamedValueTokens tokens, ICommandValues values, Func<ICommandValues, IEnumerable<INamedValueTokenParser>> parsers)
         {
-            var one = ParseCommandName(commands, partials, tokens, values);
-            var two = ParseCommandDefaults(values.GetCommand()!, parsers(values), tokens, values);
-            var three = ParseAllCommandValues(parsers(values), tokens, values);
             return ParseCommandName(commands, partials, tokens, values) &&
                    ParseCommandDefaults(values.GetCommand()!, parsers(values), tokens, values) &&
                    ParseAllCommandValues(parsers(values), tokens, values);

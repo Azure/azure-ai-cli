@@ -1584,7 +1584,9 @@ namespace Azure.AI.Details.Common.CLI
             if (!_quiet) Console.WriteLine($"{message} Done!");
             return true;
         }
-        private async Task<bool> DoChatAssistantTraceGet() {
+        
+        private async Task<bool> DoChatAssistantTraceGet() 
+        {
             var requestId = _values["chat.trace.request.id"];
             var dashboard = _values.GetOrDefault("chat.trace.dashboard", false);
             var filePath = _values.GetOrDefault("chat.trace.output.file", "");
