@@ -1,6 +1,6 @@
 {
   "_LongName": "Azure AI Inference Chat Completions (Streaming)",
   "_ShortName": "az-inference-chat-streaming",
-  "_Language": "Python",
+  "_Language": "C#",
   "ClassName": "AzureAIInferenceChatCompletionsStreaming"
 }
