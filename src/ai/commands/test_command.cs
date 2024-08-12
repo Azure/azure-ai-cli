@@ -31,6 +31,7 @@ namespace Azure.AI.Details.Common.CLI
             }
             catch (WebException ex)
             {
+                FileHelpers.LogException(_values, ex);
                 ConsoleHelpers.WriteLineError($"\n  ERROR: {ex.Message}");
                 JsonHelpers.PrintJson(HttpHelpers.ReadWriteJson(ex.Response, _values, "test"));
             }

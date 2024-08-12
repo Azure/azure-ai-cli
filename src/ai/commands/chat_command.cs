@@ -26,6 +26,7 @@ using Azure.AI.OpenAI.Chat;
 using OpenAI.Assistants;
 using OpenAI.Files;
 using OpenAI.VectorStores;
+using System.ClientModel.Primitives;
 
 #pragma warning disable AOAI001 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
 #pragma warning disable OPENAI001 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
@@ -52,6 +53,7 @@ namespace Azure.AI.Details.Common.CLI
                     var msg = x.Message.Split(new char[] { '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries).FirstOrDefault();
                     if (!msg.StartsWith("ERROR: "))
                     {
+                        FileHelpers.LogException(_values, ex);
                         ConsoleHelpers.WriteLineError($"\n  ERROR: {msg}");
                         return true;
                     }
@@ -711,17 +713,13 @@ namespace Azure.AI.Details.Common.CLI
 
             if (!string.IsNullOrEmpty(endpoint))
             {
-                // _azureEventSourceListener = new AzureEventSourceListener((e, message) => EventSourceHelpers.EventSourceAiLoggerLog(e, message), System.Diagnostics.Tracing.EventLevel.Verbose);
-
-                var options = new AzureOpenAIClientOptions();
-                //options.Diagnostics.IsLoggingContentEnabled = true;
-                //options.Diagnostics.IsLoggingEnabled = true;
+                AzureOpenAIClientOptions options = new();
+                options.AddPolicy(new LogTrafficEventPolicy(), PipelinePosition.PerCall);
 
                 return new AzureOpenAIClient(
                     new Uri(endpoint!),
                     new AzureKeyCredential(key!),
-                    options
-                    );
+                    options);
             }
             else if (!string.IsNullOrEmpty(host))
             {
@@ -1382,7 +1380,7 @@ namespace Azure.AI.Details.Common.CLI
             if (string.IsNullOrEmpty(id))
             {
                 _values.AddThrowError(
-                      "ERROR:", $"Updating assistant vector store; requires id.",
+                    "ERROR:", $"Updating assistant vector store; requires id.",
                                 "",
                         "TRY:", $"{Program.Name} chat assistant vector-store update --id ID",
                                 "",
