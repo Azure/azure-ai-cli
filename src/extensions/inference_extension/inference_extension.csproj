@@ -1,0 +1,23 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <AssemblyName>Azure.AI.CLI.Extensions.Inference</AssemblyName>
+    <TargetFramework>net8.0</TargetFramework>
+    <RootNamespace>Azure.AI.Details.Common.CLI.Extensions.Inference</RootNamespace>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <SuppressTfmSupportBuildWarnings>true</SuppressTfmSupportBuildWarnings>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\common\common.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Azure.Identity" Version="1.12.0" />
+    <PackageReference Include="Azure.AI.Inference" Version="1.0.0-beta.1" />
+  </ItemGroup>
+
+  <Import Project="BuildCommon.targets" />
+
+</Project>

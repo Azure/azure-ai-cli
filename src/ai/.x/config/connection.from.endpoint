@@ -1,3 +1,4 @@
 service.config.region=@region
 service.config.endpoint.uri=@endpoint
+service.config.endpoint.type=@endpoint.type
 service.config.key=@key

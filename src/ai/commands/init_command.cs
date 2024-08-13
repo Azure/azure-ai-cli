@@ -74,6 +74,8 @@ namespace Azure.AI.Details.Common.CLI
                 case "init.aiservices": await DoInitRootCognitiveServicesAIServicesKind(interactive); break;
                 case "init.cognitiveservices": await DoInitRootCognitiveServicesCognitiveServicesKind(interactive); break;
 
+                case "init.inference": await DoInitRootAzureAiInference(interactive); break;
+
                 case "init":
                 case "init.openai": await DoInitRootOpenAi(interactive, false, false, false, true, true, true); break;
                 case "init.openai.chat": await DoInitRootOpenAi(interactive, false, false, true, true, true, true); break;
@@ -594,6 +596,29 @@ namespace Azure.AI.Details.Common.CLI
             _values.Reset("service.openai.resource.kind", resource.Kind);
             ResourceNameToken.Data().Set(_values, resource.Name);
             ResourceGroupNameToken.Data().Set(_values, resource.Group);
+        }
+
+        private async Task DoInitRootAzureAiInference(bool interactive)
+        {
+            if (!interactive) ThrowInteractiveNotSupportedApplicationException(); // POST-IGNITE: TODO: Add back non-interactive mode support
+
+            await DoInitSubscriptionId(interactive);
+            await DoInitAzureAiInference(interactive);
+        }
+
+        private async Task DoInitAzureAiInference(bool interactive)
+        {
+            ConsoleHelpers.WriteLineWithHighlight($"\n`AZURE AI INFERENCE`");
+
+            Console.Write("Endpoint: ");
+            var endpoint = Console.ReadLine();
+
+            Console.Write("Key: ");
+            var key = Console.ReadLine();
+
+            ConfigSetHelpers.ConfigAzureAiInference(endpoint, key);
+
+            await Task.CompletedTask;
         }
 
         private async Task DoInitRootCognitiveServicesCognitiveServicesKind(bool interactive)

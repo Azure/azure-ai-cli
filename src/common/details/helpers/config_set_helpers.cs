@@ -40,6 +40,8 @@ namespace Azure.AI.Details.Common.CLI
             actions.Add(ConfigSetLambda("@chat.key", key, "Key (chat)", key.Substring(0, 4) + "****************************", ref maxLabelWidth));
             actions.Add(ConfigSetLambda("@chat.region", region, "Region (chat)", region, ref maxLabelWidth));
             actions.Add(ConfigSetLambda("@chat.endpoint", endpoint, "Endpoint (chat)", endpoint, ref maxLabelWidth));
+            ConfigSet("@chat.endpoint.type", "ais");
+
             if (chatDeployment != null)
             {
                 actions.Add(ConfigSetLambda("@chat.deployment", chatDeployment.Value.Name, "Deployment (chat)", chatDeployment.Value.Name, ref maxLabelWidth));
@@ -101,6 +103,7 @@ namespace Azure.AI.Details.Common.CLI
 
             actions.Add(ConfigSetLambda("@chat.key", key, "Key (chat)", key.Substring(0, 4) + "****************************", ref maxLabelWidth));
             actions.Add(ConfigSetLambda("@chat.endpoint", endpoint, "Endpoint (chat)", endpoint, ref maxLabelWidth));
+            ConfigSet("@chat.endpoint.type", "aoai");
             if (chatDeployment != null)
             {
                 actions.Add(ConfigSetLambda("@chat.deployment", chatDeployment.Value.Name, "Deployment (chat)", chatDeployment.Value.Name, ref maxLabelWidth));
@@ -205,6 +208,20 @@ namespace Azure.AI.Details.Common.CLI
             if (print) Console.WriteLine($"{fi.Name} (saved at {fi.DirectoryName})\n\n  {setValue}");
 
             return fileName;
+        }
+
+        public static void ConfigAzureAiInference(string endpoint, string key)
+        {
+            ConsoleHelpers.WriteLineWithHighlight($"\n`CONFIG AZURE AI INFERENCE`");
+            Console.WriteLine();
+
+            int maxLabelWidth = 0;
+            var actions = new List<Action<int>>(new Action<int>[] {
+                ConfigSetLambda("@chat.endpoint", endpoint, "Endpoint", endpoint, ref maxLabelWidth),
+                ConfigSetLambda("@chat.key", key, "Key", key.Substring(0, 4) + "****************************", ref maxLabelWidth),
+            });
+            ConfigSet("@chat.endpoint.type", "inference");
+            actions.ForEach(x => x?.Invoke(maxLabelWidth));
         }
     }
 }

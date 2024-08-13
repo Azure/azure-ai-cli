@@ -83,6 +83,7 @@ namespace Azure.AI.Details.Common.CLI
                     new CommonNamedValueTokenParsers(),
                     new IniFileNamedValueTokenParser(),
                     new ExpandFileNameNamedValueTokenParser(),
+                    new Any1ValueNamedValueTokenParser(null, "service.config.endpoint.type", "0011"),
                     new Any1ValueNamedValueTokenParser(null, "service.config.endpoint.uri", "0011"),
                     new Any1PinnedNamedValueTokenParser("--url", "vision.input.url", "001", "url", "vision.input.type"),
                     new Any1PinnedNamedValueTokenParser("--file", "vision.input.file", "001", "file", "vision.input.type"),
