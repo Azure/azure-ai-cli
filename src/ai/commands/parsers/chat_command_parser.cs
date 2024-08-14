@@ -101,6 +101,7 @@ namespace Azure.AI.Details.Common.CLI
                     new IniFileNamedValueTokenParser(),
                     new ExpandFileNameNamedValueTokenParser(),
 
+                    ConfigEndpointTypeToken.Parser(),
                     ConfigEndpointUriToken.Parser(),
                     ConfigDeploymentToken.Parser(),
 
@@ -159,6 +160,8 @@ namespace Azure.AI.Details.Common.CLI
 
             new OutputFileNameNamedValueTokenParser(null, "chat.output.thread.id", "0111", "chat.assistant.thread.output.id"),
             new OutputFileNameNamedValueTokenParser(null, "chat.output.add.thread.id", "01111", "chat.assistant.thread.output.add.id"),
+
+            ChatModelNameToken.Parser(),
         };
 
         private static INamedValueTokenParser[] _chatAssistantCreateCommandParsers = {

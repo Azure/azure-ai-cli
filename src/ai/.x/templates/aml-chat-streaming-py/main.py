@@ -3,21 +3,23 @@ import os
 import sys
 
 def main():
-    chat_api_key = os.getenv("AZURE_AI_INFERENCE_CHAT_API_KEY", '<insert your Azure AI Inference API key here>')
-    chat_endpoint = os.getenv("AZURE_AI_INFERENCE_CHAT_ENDPOINT", '<insert your Azure AI Inference endpoint here>')
-    chat_system_prompt = os.getenv('AZURE_AI_INFERENCE_CHAT_SYSTEM_PROMPT', 'You are a helpful AI assistant.')
+    chat_api_key = os.getenv("AZURE_AI_CHAT_API_KEY", '<insert your Azure AI Inference API key here>')
+    chat_endpoint = os.getenv("AZURE_AI_CHAT_ENDPOINT", '<insert your Azure AI Inference endpoint here>')
+    chat_model = os.getenv('AZURE_AI_CHAT_MODEL', '')
+    chat_system_prompt = os.getenv('SYSTEM_PROMPT', 'You are a helpful AI assistant.')
 
     ok = all([chat_api_key, chat_endpoint, chat_system_prompt]) and \
          all([not s.startswith('<insert') for s in [chat_api_key, chat_endpoint, chat_system_prompt]])
     if not ok:
         print(
             'To use Azure AI Chat Streaming, set the following environment variables:' +
-            '\n- AZURE_AI_INFERENCE_CHAT_API_KEY' +
-            '\n- AZURE_AI_INFERENCE_CHAT_ENDPOINT' +
-            '\n- AZURE_AI_INFERENCE_CHAT_SYSTEM_PROMPT (optional)')
+            '\n- AZURE_AI_CHAT_API_KEY' +
+            '\n- AZURE_AI_CHAT_ENDPOINT' +
+            '\n- AZURE_AI_CHAT_MODEL (optional)' +
+            '\n- SYSTEM_PROMPT (optional)')
         sys.exit(1)
 
-    chat = {ClassName}(chat_endpoint, chat_api_key, chat_system_prompt)
+    chat = {ClassName}(chat_endpoint, chat_api_key, chat_model, chat_system_prompt)
 
     while True:
         user_input = input('User: ')

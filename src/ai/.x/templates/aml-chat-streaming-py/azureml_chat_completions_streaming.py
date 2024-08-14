@@ -3,8 +3,9 @@ from azure.ai.inference.models import SystemMessage, UserMessage, AssistantMessa
 from azure.core.credentials import AzureKeyCredential
 
 class {ClassName}:
-    def __init__(self, chat_endpoint, chat_api_key, chat_system_prompt):
+    def __init__(self, chat_endpoint, chat_api_key, chat_model, chat_system_prompt):
         self.chat_system_prompt = chat_system_prompt
+        self.chat_model = chat_model
         self.client = ChatCompletionsClient(endpoint=chat_endpoint, credential=AzureKeyCredential(chat_api_key))
         self.clear_conversation()
 
@@ -19,10 +20,14 @@ class {ClassName}:
         complete_content = ''
         response = self.client.complete(
             messages=self.messages,
+            model=self.chat_model,
             stream=True,
         )
 
         for update in response:
+
+            if update.choices is None or len(update.choices) == 0: 
+                continue
 
             content = update.choices[0].delta.content or ""
             if content is None: continue

@@ -74,6 +74,9 @@ namespace Azure.AI.Details.Common.CLI
                 case "init.aiservices": await DoInitRootCognitiveServicesAIServicesKind(interactive); break;
                 case "init.cognitiveservices": await DoInitRootCognitiveServicesCognitiveServicesKind(interactive); break;
 
+                case "init.inference": await DoInitRootAzureAiInference(interactive); break;
+                case "init.github": await DoInitRootGitHub(interactive); break;
+
                 case "init":
                 case "init.openai": await DoInitRootOpenAi(interactive, false, false, false, true, true, true); break;
                 case "init.openai.chat": await DoInitRootOpenAi(interactive, false, false, true, true, true, true); break;
@@ -594,6 +597,80 @@ namespace Azure.AI.Details.Common.CLI
             _values.Reset("service.openai.resource.kind", resource.Kind);
             ResourceNameToken.Data().Set(_values, resource.Name);
             ResourceGroupNameToken.Data().Set(_values, resource.Group);
+        }
+
+        private async Task DoInitRootGitHub(bool interactive)
+        {
+            ConsoleHelpers.WriteLineWithHighlight($"`GITHUB MODELS`");
+
+            Console.WriteLine("You can use GitHub Models to find and experiment with AI models for free.");
+            Console.WriteLine("Once you are ready to bring your application to production, you can switch");
+            Console.WriteLine("to a token from a paid Azure account.\n");
+            Console.WriteLine("Create a token: https://github.com/settings/tokens");
+            Console.WriteLine("Review models:  https://github.com/marketplace/models/");
+
+            ConsoleHelpers.WriteLineWithHighlight($"\n`GITHUB CONFIGURATION`");
+            Console.Write("Token: ");
+            var color = Console.ForegroundColor;
+            Console.ForegroundColor = Console.BackgroundColor;
+            var token = Console.ReadLine();
+            Console.ForegroundColor = color;
+
+            if (string.IsNullOrEmpty(token))
+            {
+                throw new ApplicationException($"CANCELED: No token provided");
+            }
+            else if (token.Length < 4)
+            {
+                throw new ApplicationException($"CANCELED: Token is too short");
+            }
+
+            Console.Write("Model: ");
+            var model = Console.ReadLine();
+            if (string.IsNullOrEmpty(model))
+            {
+                throw new ApplicationException($"CANCELED: No model provided");
+            }
+
+            var endpoint = "https://models.inference.ai.azure.com";
+            ConfigSetHelpers.ConfigGitHub(endpoint, model, token);
+
+            await Task.CompletedTask;
+        }
+
+        private async Task DoInitRootAzureAiInference(bool interactive)
+        {
+            await DoInitAzureAiInference(interactive);
+        }
+
+        private async Task DoInitAzureAiInference(bool interactive)
+        {
+            ConsoleHelpers.WriteLineWithHighlight($"`AZURE AI INFERENCE`");
+
+            Console.Write("Endpoint: ");
+            var endpoint = Console.ReadLine();
+            if (string.IsNullOrEmpty(endpoint))
+            {
+                throw new ApplicationException($"CANCELED: No endpoint provided");
+            }
+
+            Console.Write("Key: ");
+            var color = Console.ForegroundColor;
+            Console.ForegroundColor = Console.BackgroundColor;
+            var key = Console.ReadLine();
+            Console.ForegroundColor = color;
+            if (string.IsNullOrEmpty(key))
+            {
+                throw new ApplicationException($"CANCELED: No key provided");
+            }
+            else if (key.Length < 4)
+            {
+                throw new ApplicationException($"CANCELED: Key is too short");
+            }
+
+            ConfigSetHelpers.ConfigAzureAiInference(endpoint, key);
+
+            await Task.CompletedTask;
         }
 
         private async Task DoInitRootCognitiveServicesCognitiveServicesKind(bool interactive)

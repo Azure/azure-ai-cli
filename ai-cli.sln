@@ -39,6 +39,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Telemetry", "Telemetry", "{
 		src\telemetry\NuGet.config = src\telemetry\NuGet.config
 	EndProjectSection
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "inference_extension", "src\extensions\inference_extension\inference_extension.csproj", "{7BF26AB6-8931-46CB-A330-D83DF55AB4E8}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -181,6 +183,18 @@ Global
 		{306A3CD6-91C2-450B-9995-79701CE63FE2}.Release|x64.Build.0 = Release|Any CPU
 		{306A3CD6-91C2-450B-9995-79701CE63FE2}.Release|x86.ActiveCfg = Release|Any CPU
 		{306A3CD6-91C2-450B-9995-79701CE63FE2}.Release|x86.Build.0 = Release|Any CPU
+		{7BF26AB6-8931-46CB-A330-D83DF55AB4E8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7BF26AB6-8931-46CB-A330-D83DF55AB4E8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7BF26AB6-8931-46CB-A330-D83DF55AB4E8}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{7BF26AB6-8931-46CB-A330-D83DF55AB4E8}.Debug|x64.Build.0 = Debug|Any CPU
+		{7BF26AB6-8931-46CB-A330-D83DF55AB4E8}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{7BF26AB6-8931-46CB-A330-D83DF55AB4E8}.Debug|x86.Build.0 = Debug|Any CPU
+		{7BF26AB6-8931-46CB-A330-D83DF55AB4E8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7BF26AB6-8931-46CB-A330-D83DF55AB4E8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7BF26AB6-8931-46CB-A330-D83DF55AB4E8}.Release|x64.ActiveCfg = Release|Any CPU
+		{7BF26AB6-8931-46CB-A330-D83DF55AB4E8}.Release|x64.Build.0 = Release|Any CPU
+		{7BF26AB6-8931-46CB-A330-D83DF55AB4E8}.Release|x86.ActiveCfg = Release|Any CPU
+		{7BF26AB6-8931-46CB-A330-D83DF55AB4E8}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -195,6 +209,7 @@ Global
 		{9499C018-FA08-4133-93B3-FC0F3863A6CC} = {C8AFF891-D6AA-4B8F-BC21-10404DF4B355}
 		{CED7C805-0435-4BF7-A42F-9F3BBF14A18F} = {644B75F1-C768-4DB3-BAF2-C69A1F36DD28}
 		{306A3CD6-91C2-450B-9995-79701CE63FE2} = {975EBC5A-506D-49B5-AA7F-70D3119F009D}
+		{7BF26AB6-8931-46CB-A330-D83DF55AB4E8} = {644B75F1-C768-4DB3-BAF2-C69A1F36DD28}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {002655B1-E1E1-4F2A-8D53-C9CD55136AE2}

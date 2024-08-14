@@ -86,7 +86,7 @@
       ^Name +Short +Name +Language +\r?$\n
       ^-+ +-+ +-+\r?$\n
       ^Environment +Variables +\.env *\r?$\n
-      ^AzureML Chat Completions \(Streaming\) +aml-chat-streaming +Python *\r?$\n
+      ^Azure AI Inference Chat Completions \(Streaming\) +az-inference-chat-streaming +C#, +Python *\r?$\n
       ^Helper +Function +Class +Library +helper-functions +C# *\r?$\n
       ^OpenAI +Assistants +openai-asst +C#, +JavaScript, +Python *\r?$\n
       ^OpenAI +Assistants +\(Streaming\) +openai-asst-streaming +C#, +JavaScript, +Python *\r?$\n
