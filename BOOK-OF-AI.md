@@ -192,13 +192,50 @@ Let's do a quick tour of the various AI capabilities available in Azure via the 
 
 🔗 [OpenAI Assistants Basics](#chapter-7-openai-assistants-basics)  
 
-...
+⏹️ Create a simple assistant  
+⏹️ `ai chat assistant create --name MyAssistant`  
+⏹️ `ai config @assistant.id`
+
+⏹️ Threads ...  
+⏹️ `ai chat --interactive`  
+⏹️ `ai chat --interactive --thread-id ID` (from previous chat)  
+
+⏹️ `ai chat --question "..." --output-thread-id myNewThread.txt`  
+⏹️ `ai chat --question "..." --thread-id @myNewThread.txt`  
+⏹️ `ai chat --interactive --thread-id @myNewThread.txt --output-chat-history history.jsonl`  
+
+⏹️ Delete the assistant  
+⏹️ `ai chat assistant delete`  
+⏹️ `ai config --clear assistant.id`  
+
+⏹️ Generate code for using assistants  
+⏹️ `ai dev new list asst`  
+⏹️ `ai dev new openai-asst-streaming --csharp` or `--python` or `--javascript` ...  
+
+⏹️ Go over what was generated in the console app  
+⏹️ ... similar to console apps generated in earlier chapters
+⏹️ ... see how the LLM sends back citations to the helper class  
+⏹️ ... see how the helper class processes the citations  
+
+⏹️ Install the dependencies  
+⏹️ `dotnet restore` or `pip install -r requirements.txt` or `npm install` ...  
+
+⏹️ Run the console app  
+⏹️ `ai dev shell`  
+⏹️ `dotnet run` or `python main.py` or `node main.js` ...
+
 
 ## CHAPTER 8: OpenAI Assistants w/ Code Interpreter
 
 🔗 [OpenAI Assistants w/ Code Interpreter](#chapter-8-openai-assistants-w-code-interpreter)  
 
-...
+⏹️ Create or update an assistant with a code interpreter  
+⏹️ `ai chat assistant create --name MyCodeAssistant --code-interpreter`  
+⏹️ `ai chat assistant update --code-interpreter`  
+
+⏹️ Use the code interpreter in the assistant  
+⏹️ `ai chat --interactive --question "how many e's are there in the pledge of allegiance?"`  
+⏹️ ... `how'd you do that?`  
 
 ## CHAPTER 9: OpenAI Assistants w/ Function Calling
 
