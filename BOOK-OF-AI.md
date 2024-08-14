@@ -213,7 +213,7 @@ Let's do a quick tour of the various AI capabilities available in Azure via the 
 ⏹️ `ai dev new openai-asst-streaming --csharp` or `--python` or `--javascript` ...  
 
 ⏹️ Go over what was generated in the console app  
-⏹️ ... similar to console apps generated in earlier chapters
+⏹️ ... similar to console apps generated in earlier chapters  
 ⏹️ ... see how the LLM sends back citations to the helper class  
 ⏹️ ... see how the helper class processes the citations  
 
@@ -236,6 +236,20 @@ Let's do a quick tour of the various AI capabilities available in Azure via the 
 ⏹️ Use the code interpreter in the assistant  
 ⏹️ `ai chat --interactive --question "how many e's are there in the pledge of allegiance?"`  
 ⏹️ ... `how'd you do that?`  
+
+⏹️ Generate code for using code interpreters  
+⏹️ `ai dev new openai-asst-streaming-with-code --csharp` or `--python` or `--javascript` ...  
+
+⏹️ Go over what was generated in the console app  
+⏹️ ... similar to previous chapters' console app  
+⏹️ ... see how the LLM sends back code snippets to the helper class
+
+⏹️ Install the dependencies  
+⏹️ `dotnet restore` or `pip install -r requirements.txt` or `npm install` ...  
+
+⏹️ Run the console app  
+⏹️ `ai dev shell`  
+⏹️ `dotnet run` or `python main.py` or `node main.js` ...
 
 ## CHAPTER 9: OpenAI Assistants w/ Function Calling
 
