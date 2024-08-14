@@ -10,9 +10,10 @@ using System;
 
 public class {ClassName}
 {
-    public {ClassName}(string aiChatEndpoint, string aiChatAPIKey, string systemPrompt)
+    public {ClassName}(string aiChatEndpoint, string aiChatAPIKey, string? aiChatModel, string systemPrompt)
     {
         _systemPrompt = systemPrompt;
+        _aiChatModel = aiChatModel;
 
         _client = string.IsNullOrEmpty(aiChatAPIKey)
             ? new ChatCompletionsClient(new Uri(aiChatEndpoint), new DefaultAzureCredential())
@@ -32,6 +33,10 @@ public class {ClassName}
     {
         _messages.Add(new ChatRequestUserMessage(userPrompt));
         var options = new ChatCompletionsOptions(_messages);
+        if (!string.IsNullOrEmpty(_aiChatModel))
+        {
+            options.Model = _aiChatModel;
+        }
 
         var responseContent = string.Empty;
         var response = await _client.CompleteStreamingAsync(options);
@@ -55,6 +60,7 @@ public class {ClassName}
     }
 
     private string _systemPrompt;
+    private string? _aiChatModel;
     private ChatCompletionsClient _client;
     private List<ChatRequestMessage> _messages;
 }

@@ -250,7 +250,8 @@ namespace Azure.AI.Details.Common.CLI
 
             var systemPrompt = _values.GetOrDefault("chat.message.system.prompt", DefaultSystemPrompt);
             var chatHistoryJsonFile = InputChatHistoryJsonFileToken.Data().GetOrDefault(_values);
-            var chat = new AzureAIInferenceChatCompletionsStreaming(aiChatEndpoint, aiChatAPIKey, systemPrompt, chatHistoryJsonFile);
+            var aiChatModel = ChatModelNameToken.Data().GetOrDefault(_values);
+            var chat = new AzureAIInferenceChatCompletionsStreaming(aiChatEndpoint, aiChatAPIKey, aiChatModel, systemPrompt, chatHistoryJsonFile);
 
             return async (string text) =>
             {

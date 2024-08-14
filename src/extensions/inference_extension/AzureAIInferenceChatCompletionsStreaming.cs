@@ -11,9 +11,10 @@ namespace Azure.AI.Details.Common.CLI.Extensions.Inference;
 
 public class AzureAIInferenceChatCompletionsStreaming
 {
-    public AzureAIInferenceChatCompletionsStreaming(string aiChatEndpoint, string aiChatAPIKey, string systemPrompt, string? chatHistoryJsonFile = null)
+    public AzureAIInferenceChatCompletionsStreaming(string aiChatEndpoint, string aiChatAPIKey, string? aiChatModel, string systemPrompt, string? chatHistoryJsonFile = null)
     {
         _systemPrompt = systemPrompt;
+        _aiChatModel = aiChatModel;
 
         _client = string.IsNullOrEmpty(aiChatAPIKey)
             ? new ChatCompletionsClient(new Uri(aiChatEndpoint), new DefaultAzureCredential())
@@ -42,6 +43,10 @@ public class AzureAIInferenceChatCompletionsStreaming
     {
         _messages.Add(new ChatRequestUserMessage(userPrompt));
         var options = new ChatCompletionsOptions(_messages);
+        if (!string.IsNullOrEmpty(_aiChatModel))
+        {
+            options.Model = _aiChatModel;
+        }
 
         var responseContent = string.Empty;
         var response = await _client.CompleteStreamingAsync(options);
@@ -65,6 +70,7 @@ public class AzureAIInferenceChatCompletionsStreaming
     }
 
     private string _systemPrompt;
+    private string? _aiChatModel;
     private ChatCompletionsClient _client;
     private List<ChatRequestMessage> _messages;
 }

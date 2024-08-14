@@ -223,5 +223,19 @@ namespace Azure.AI.Details.Common.CLI
             ConfigSet("@chat.endpoint.type", "inference");
             actions.ForEach(x => x?.Invoke(maxLabelWidth));
         }
+
+        public static void ConfigGitHub(string endpoint, string model, string token)
+        {
+            ConsoleHelpers.WriteLineWithHighlight($"\n`CONFIG AZURE AI INFERENCE/GITHUB MODELS`");
+            Console.WriteLine();
+
+            int maxLabelWidth = 0;
+            var actions = new List<Action<int>>(new Action<int>[] {
+                ConfigSetLambda("@chat.endpoint", endpoint, "Endpoint", endpoint, ref maxLabelWidth),
+                ConfigSetLambda("@chat.key", token, "Token", token.Substring(0, 4) + "****************************", ref maxLabelWidth),
+                ConfigSetLambda("@chat.model", model, "Model", model, ref maxLabelWidth),
+            });
+            actions.ForEach(x => x?.Invoke(maxLabelWidth));
+        }
     }
 }

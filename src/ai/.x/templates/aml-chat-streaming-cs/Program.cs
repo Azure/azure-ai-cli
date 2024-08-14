@@ -11,6 +11,7 @@ public class Program
     {
         var aiChatAPIKey = Environment.GetEnvironmentVariable("AZURE_AI_CHAT_API_KEY") ?? "<insert your OpenAI API key here>";
         var aiChatEndpoint = Environment.GetEnvironmentVariable("AZURE_AI_CHAT_ENDPOINT") ?? "<insert your OpenAI endpoint here>";
+        var aiChatModel = Environment.GetEnvironmentVariable("AZURE_AI_CHAT_MODEL"); // null is fine
         var systemPrompt = Environment.GetEnvironmentVariable("SYSTEM_PROMPT") ?? "You are a helpful AI assistant.";
 
         if (string.IsNullOrEmpty(aiChatAPIKey) || aiChatAPIKey.StartsWith("<insert") ||
@@ -18,11 +19,11 @@ public class Program
             string.IsNullOrEmpty(systemPrompt) || systemPrompt.StartsWith("<insert"))
         {
             Console.WriteLine("To use Azure AI Inference, set the following environment variables:");
-            Console.WriteLine("  AZURE_AI_CHAT_API_KEY\n  AZURE_AI_CHAT_ENDPOINT\n  SYSTEM_PROMPT (optional)");
+            Console.WriteLine("- AZURE_AI_CHAT_API_KEY\n- AZURE_AI_CHAT_ENDPOINT\n- AZURE_AI_CHAT_MODEL (optional)\n- SYSTEM_PROMPT (optional)");
             Environment.Exit(1);
         }
 
-		var chat = new {ClassName}(aiChatEndpoint, aiChatAPIKey, systemPrompt);
+		var chat = new {ClassName}(aiChatEndpoint, aiChatAPIKey, aiChatModel, systemPrompt);
 
         while (true)
         {

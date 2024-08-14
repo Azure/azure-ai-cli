@@ -32,6 +32,7 @@ namespace Azure.AI.Details.Common.CLI
             {
                 env.Add("AZURE_AI_CHAT_API_KEY", ReadConfig(values, "chat.key"));
                 env.Add("AZURE_AI_CHAT_ENDPOINT", ReadConfig(values, "chat.endpoint"));
+                env.Add("AZURE_AI_CHAT_MODEL", ReadConfig(values, "chat.model"));
             }
             else
             {
