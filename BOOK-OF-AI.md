@@ -321,6 +321,15 @@ Let's do a quick tour of the various AI capabilities available in Azure via the 
 ◦ `ai chat assistant create --name MyFileAssistant --files "**/*.md"`  
 ◦ `ai chat assistant update --files "**/*.txt"` or `--files "**/*.cs"` or `--files "**/*.ts"` ...  
 
+◦ See that it created a vector store for the files  
+◦ `ai chat assistant vector-store`  
+◦ `ai chat assistant vector-store list`  
+◦ `ai chat assistant vector-store get`  
+
+◦ You can update the vector directly as well  
+◦ `ai chat assistant vector-store update --file README.md`  
+
+
 ◦ Use the assistant with file search  
 ◦ `ai chat --user "..."`  
 ◦ `ai chat --user "..." --interactive`  
@@ -344,6 +353,10 @@ Let's do a quick tour of the various AI capabilities available in Azure via the 
 ◦ Delete the assistant  
 ◦ `ai chat assistant delete`  
 ◦ `ai config --clear assistant.id`  
+
+◦ Delete the vector store  
+◦ `ai chat assistant vector-store delete`  
+◦ `ai config --clear vector.store.id`  
 
 ## CHAPTER 11: Setup w/ GitHub Model Marketplace
 
