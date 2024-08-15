@@ -29,7 +29,7 @@ Let's do a quick tour of the various AI capabilities available in Azure via the 
 [CHAPTER 16: AI Studio Chat Completions w/ Function Calling](#chapter-16-ai-studio-chat-completions-w-function-calling)🚧  
 
 **LOCAL INFERENCING W/ ONNX AND PHI-3**  
-[CHAPTER 17: PHI-3 Models](#chapter-17-phi-3-models)  
+[CHAPTER 17: Setup w/ ONNX and PHI-3 Models](#chapter-17-setup-w-onnx-and-phi-3-models)  
 [CHAPTER 18: ONNX Chat Completions](#chapter-18-onnx-chat-completions)  
 [CHAPTER 19: ONNX Chat Completions w/ Function Calling](#chapter-19-onnx-chat-completions-w-function-calling)  
 
@@ -458,11 +458,19 @@ Let's do a quick tour of the various AI capabilities available in Azure via the 
 
 ... 🚧 UNDER CONSTRUCTION ...  
 
-## CHAPTER 17: PHI-3 Models
+## CHAPTER 17: Setup w/ ONNX and PHI-3 Models
 
-➡️ [PHI-3 Models](#chapter-17-phi-3-models)  
+➡️ [PHI-3 Models](#chapter-17-setup-w-onnx-and-phi-3-models)  
 
-...
+◦ https://huggingface.co/microsoft/Phi-3-mini-4k-instruct-onnx  
+
+◦ Setup locally:  
+◦ `git lfs install`  
+◦ `git clone https://huggingface.co/microsoft/Phi-3-mini-4k-instruct-onnx`  
+◦ `git lfs checkout`  
+
+◦ OR: Use the VS Code AI Toolkit to download the model  
+◦ https://learn.microsoft.com/windows/ai/toolkit/  
 
 ## CHAPTER 18: ONNX Chat Completions
 
