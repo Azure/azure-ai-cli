@@ -462,6 +462,8 @@ Let's do a quick tour of the various AI capabilities available in Azure via the 
 
 ➡️ [PHI-3 Models](#chapter-17-setup-w-onnx-and-phi-3-models)  
 
+🚧 COMING SOON 🚧 ◦ `ai init phi-3` or `ai init onnx`  
+
 ◦ https://huggingface.co/microsoft/Phi-3-mini-4k-instruct-onnx  
 
 ◦ Setup locally:  
@@ -472,17 +474,78 @@ Let's do a quick tour of the various AI capabilities available in Azure via the 
 ◦ OR: Use the VS Code AI Toolkit to download the model  
 ◦ https://learn.microsoft.com/windows/ai/toolkit/  
 
+◦ Setup the model path in the config so we can use it later  
+◦ `ai config --set mp Phi-3-mini-4k-instruct-onnx\directml\directml-int4-awq-block-128`  
+
 ## CHAPTER 18: ONNX Chat Completions
 
 ➡️ [ONNX Chat Completions](#chapter-18-onnx-chat-completions)
 
-...
+🛑 Setup w/ ONNX and PHI-3 Models in [chapter 17](#chapter-17-setup-w-onnx-and-phi-3-models)  
+
+◦ Use the model in chat completions  
+◦ `ai chat --model-path @mp --user "What is the capital of France?"`  
+◦ `ai chat --model-path @mp --interactive`  
+◦ `ai chat --model-path @mp --interactive --system @prompt.txt`  
+◦ `ai chat --model-path @mp --interactive --system @prompt.txt --user "Tell me a joke"`  
+◦ `ai chat --model-path @mp --interactive --output-answer answer.txt`  
+◦ `ai chat --model-path @mp --interactive --output-chat-history history.jsonl`  
+◦ `ai chat --model-path @mp --interactive --input-chat-history history.jsonl`  
+
+◦ Generate code for chat completions with ONNX models  
+◦ `ai dev new list onnx`  
+◦ `ai dev new phi3-onnx-chat-streaming --csharp`  
+🚧 COMING SOON 🚧 `--python` or `--javascript` ...  
+
+◦ Go over what was generated in the console app  
+◦ ... similar to console apps generated in earlier chapters  
+◦ ... getting connection info/secrets from environment variables  
+◦ ... using a helper class to encapsulate the ONNX API calls  
+◦ ... getting input from the user  
+◦ ... sending the input to the helper class  
+◦ ... getting the response from the helper class  
+◦ ... deeper dive into the helper class  
+
+◦ Install the dependencies  
+◦ `dotnet restore`  
+
+◦ Run the console app  
+◦ `ai dev shell`  
+◦ `dotnet run`  
 
 ## CHAPTER 19: ONNX Chat Completions w/ Function Calling
 
 ➡️ [ONNX Chat Completions w/ Function Calling](#chapter-19-onnx-chat-completions-w-function-calling)  
 
-...
+🛑 Setup w/ ONNX and PHI-3 Models in [chapter 17](#chapter-17-setup-w-onnx-and-phi-3-models)  
+
+🚧 COMING SOON 🚧 ◦ Extending the Phi-3's world knowledge with functions  
+🚧 COMING SOON 🚧 ◦ `ai chat --model-path @mp --user "What time is it?"` => doesn't know the time  
+🚧 COMING SOON 🚧 ◦ `ai chat --model-path @mp --user "What time is it?" --built-in-functions` => works!  
+🚧 COMING SOON 🚧 ◦ `ai chat --model-path @mp --user "What is in the README.md file?" --built-in-functions`  
+
+🚧 COMING SOON 🚧 ◦ Allowing the LLM to interact with your code  
+🚧 COMING SOON 🚧 ◦ `ai chat --model-path @mp --user "Save the pledge of allegiance to 'pledge.txt'"` => doesn't work  
+🚧 COMING SOON 🚧 ◦ `ai chat --model-path @mp --user "Save the pledge of allegiance to 'pledge.txt'" --built-in-functions` => works!  
+
+◦ Generating code for function calling  
+◦ `ai dev new list function`  
+◦ `ai dev new phi3-onnx-chat-streaming-with-functions --csharp`  
+🚧 COMING SOON 🚧 `--python` or `--javascript` ...  
+
+◦ Go over what was generated in the console app  
+◦ ... builds on previous chapter's console app  
+◦ ... see how functions are defined, given to "function factory"  
+◦ ... in helper class, see how functions are given to the LLM  
+◦ ... see how the LLM streams back the function call requests  
+◦ ... see how the helper class processes the function call responses  
+
+◦ Install the dependencies  
+◦ `dotnet restore`  
+
+◦ Run the console app  
+◦ `ai dev shell`  
+◦ `dotnet run`  
 
 ## CHAPTER 20: Speech Synthesis
 

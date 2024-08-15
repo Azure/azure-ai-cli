@@ -6,6 +6,7 @@
 using Azure.AI.Details.Common.CLI.ConsoleGui;
 using Azure.AI.Details.Common.CLI.Extensions.HelperFunctions;
 using Azure.AI.Details.Common.CLI.Extensions.Inference;
+using Azure.AI.Details.Common.CLI.Extensions.ONNX;
 using Azure.AI.OpenAI;
 using Azure.Core.Diagnostics;
 using Microsoft.CognitiveServices.Speech;
@@ -209,6 +210,10 @@ namespace Azure.AI.Details.Common.CLI
             var inferenceEndpointOk = endpointType == "inference";
             if (inferenceEndpointOk) return GetInferenceChatTextHandler(interactive);
 
+            var modelPath = ChatModelPathToken.Data().GetOrDefault(_values);
+            var modelPathOk = !string.IsNullOrEmpty(modelPath);
+            if (modelPathOk) return GetONNXGenAIChatCompletionsTextHandler(interactive, modelPath);
+
             var assistantId = _values["chat.assistant.id"];
             var assistantIdOk = !string.IsNullOrEmpty(assistantId);
             if (assistantIdOk) return await GetAssistantsAPITextHandlerAsync(interactive, assistantId);
@@ -262,6 +267,24 @@ namespace Azure.AI.Details.Common.CLI
                 }
 
                 await GetInferenceChatTextHandlerAsync(chat, text);
+            };
+        }
+
+        private Func<string, Task> GetONNXGenAIChatCompletionsTextHandler(bool interactive, string modelPath)
+        {
+            var systemPrompt = _values.GetOrDefault("chat.message.system.prompt", DefaultSystemPrompt);
+            var chatHistoryJsonFile = InputChatHistoryJsonFileToken.Data().GetOrDefault(_values);
+            var chat = new OnnxGenAIChatCompletionsStreamingClass(modelPath, systemPrompt, chatHistoryJsonFile);
+
+            return async (string text) =>
+            {
+                if (interactive && text.ToLower() == "reset")
+                {
+                    chat.ClearConversation();
+                    return;
+                }
+
+                await GetONNXGenAIChatTextHandlerAsync(chat, text);
             };
         }
 
@@ -504,6 +527,23 @@ namespace Azure.AI.Details.Common.CLI
             DisplayAssistantPromptTextStreamingDone();
             CheckWriteChatAnswerOutputFile(response);
             CheckWriteChatHistoryOutputFile(fileName => chat.Messages.SaveChatHistoryToFile(fileName));
+        }
+
+        private Task GetONNXGenAIChatTextHandlerAsync(OnnxGenAIChatCompletionsStreamingClass chat, string text)
+        {
+            CheckWriteChatHistoryOutputFile(fileName => chat.Messages.SaveChatHistoryToFile(fileName));
+            DisplayAssistantPromptLabel();
+
+            var response = chat.GetChatCompletionStreaming(text, update =>
+            {
+                DisplayAssistantPromptTextStreaming(update);
+            });
+
+            DisplayAssistantPromptTextStreamingDone();
+            CheckWriteChatAnswerOutputFile(response);
+            CheckWriteChatHistoryOutputFile(fileName => chat.Messages.SaveChatHistoryToFile(fileName));
+
+            return Task.CompletedTask;
         }
 
         private async Task<string> GetChatCompletionsAsync(ChatClient client, List<ChatMessage> messages, ChatCompletionOptions options, HelperFunctionCallContext functionCallContext, string text)

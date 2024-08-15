@@ -128,6 +128,7 @@ namespace Azure.AI.Details.Common.CLI
                     new TrueFalseNamedValueTokenParser("chat.built.in.helper.functions", "01101"),
                     new Any1ValueNamedValueTokenParser(null, "chat.custom.helper.functions", "0101;0011"),
 
+                    ChatModelPathToken.Parser(),
                     ChatModelNameToken.Parser()
                 )
             {
