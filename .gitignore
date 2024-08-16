@@ -1,4 +1,4 @@
-**/.ai/data/*
+**/.ai*/data/*
 **/.pyenv/**
 **/.vs/**
 **/.vscode/**
@@ -7,7 +7,8 @@
 **/bin/*/net8.0/*
 **/obj/*
 **/node_modules/**
-testresults/**
 **/launchSettings.json
 **/package-lock.json
 *.user
+openai-cli-asst/**
+testresults/**
