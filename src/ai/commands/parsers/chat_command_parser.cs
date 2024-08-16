@@ -105,6 +105,7 @@ namespace Azure.AI.Details.Common.CLI
                     new IniFileNamedValueTokenParser(),
                     new ExpandFileNameNamedValueTokenParser(),
 
+                    ConfigEndpointTypeToken.Parser(),
                     ConfigEndpointUriToken.Parser(),
                     ConfigDeploymentToken.Parser(),
 
@@ -129,7 +130,9 @@ namespace Azure.AI.Details.Common.CLI
                     new Any1ValueNamedValueTokenParser(null, "chat.options.stop.sequence", "0010"),
 
                     new TrueFalseNamedValueTokenParser("chat.built.in.helper.functions", "01101"),
-                    new Any1ValueNamedValueTokenParser(null, "chat.custom.helper.functions", "0101;0011")
+                    new Any1ValueNamedValueTokenParser(null, "chat.custom.helper.functions", "0101;0011"),
+
+                    ChatModelNameToken.Parser()
                 )
             {
             }
@@ -163,6 +166,9 @@ namespace Azure.AI.Details.Common.CLI
 
             new OutputFileNameNamedValueTokenParser(null, "chat.output.thread.id", "0111", "chat.assistant.thread.output.id"),
             new OutputFileNameNamedValueTokenParser(null, "chat.output.add.thread.id", "01111", "chat.assistant.thread.output.add.id"),
+
+            new OutputFileNameNamedValueTokenParser(null, "chat.output.request.id", "0111"),
+            new OutputFileNameNamedValueTokenParser(null, "chat.output.add.request.id", "01111"),
         };
 
         private static INamedValueTokenParser[] _chatAssistantCreateCommandParsers = {

@@ -25,18 +25,30 @@ namespace Azure.AI.Details.Common.CLI
             env.Add("AZURE_AI_RESOURCE_NAME", ReadConfig(values, "resource"));
 #endif
 
-            env.Add("AZURE_OPENAI_KEY", ReadConfig(values, "chat.key"));
-            env.Add("AZURE_OPENAI_API_KEY", ReadConfig(values, "chat.key"));
-            env.Add("AZURE_OPENAI_API_VERSION", ChatCommand.GetOpenAIClientVersionNumber());
-            env.Add("AZURE_OPENAI_ENDPOINT", ReadConfig(values, "chat.endpoint"));
+            var endpointType = ReadConfig(values, "chat.endpoint.type");
+            var endpointTypeIsInference = endpointType == "inference";
 
-            env.Add("AZURE_OPENAI_CHAT_DEPLOYMENT", ReadConfig(values, "chat.deployment"));
-            env.Add("AZURE_OPENAI_EVALUATION_DEPLOYMENT", ReadConfig(values, "chat.evaluation.model.deployment.name") ?? ReadConfig(values, "chat.deployment"));
-            env.Add("AZURE_OPENAI_EMBEDDING_DEPLOYMENT", ReadConfig(values, "search.embedding.model.deployment.name"));
+            if (endpointTypeIsInference)
+            {
+                env.Add("AZURE_AI_CHAT_API_KEY", ReadConfig(values, "chat.key"));
+                env.Add("AZURE_AI_CHAT_ENDPOINT", ReadConfig(values, "chat.endpoint"));
+                env.Add("AZURE_AI_CHAT_MODEL", ReadConfig(values, "chat.model"));
+            }
+            else
+            {
+                env.Add("AZURE_OPENAI_KEY", ReadConfig(values, "chat.key"));
+                env.Add("AZURE_OPENAI_API_KEY", ReadConfig(values, "chat.key"));
+                env.Add("AZURE_OPENAI_API_VERSION", ChatCommand.GetOpenAIClientVersionNumber());
+                env.Add("AZURE_OPENAI_ENDPOINT", ReadConfig(values, "chat.endpoint"));
 
-            env.Add("AZURE_OPENAI_CHAT_MODEL", ReadConfig(values, "chat.model"));
-            env.Add("AZURE_OPENAI_EVALUATION_MODEL", ReadConfig(values, "chat.evaluation.model.name") ?? ReadConfig(values, "chat.model"));
-            env.Add("AZURE_OPENAI_EMBEDDING_MODEL", ReadConfig(values, "search.embedding.model.name"));
+                env.Add("AZURE_OPENAI_CHAT_DEPLOYMENT", ReadConfig(values, "chat.deployment"));
+                env.Add("AZURE_OPENAI_EVALUATION_DEPLOYMENT", ReadConfig(values, "chat.evaluation.model.deployment.name") ?? ReadConfig(values, "chat.deployment"));
+                env.Add("AZURE_OPENAI_EMBEDDING_DEPLOYMENT", ReadConfig(values, "search.embedding.model.deployment.name"));
+
+                env.Add("AZURE_OPENAI_CHAT_MODEL", ReadConfig(values, "chat.model"));
+                env.Add("AZURE_OPENAI_EVALUATION_MODEL", ReadConfig(values, "chat.evaluation.model.name") ?? ReadConfig(values, "chat.model"));
+                env.Add("AZURE_OPENAI_EMBEDDING_MODEL", ReadConfig(values, "search.embedding.model.name"));
+            }
 
             env.Add("AZURE_AI_SEARCH_ENDPOINT", ReadConfig(values, "search.endpoint"));
             env.Add("AZURE_AI_SEARCH_INDEX_NAME", ReadConfig(values, "search.index.name"));

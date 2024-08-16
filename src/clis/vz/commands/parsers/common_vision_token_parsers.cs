@@ -18,6 +18,7 @@ namespace Azure.AI.Details.Common.CLI
             new Any1ValueNamedValueTokenParser(null, "service.config.endpoint.query.string", "00011"),
             new Any1ValueNamedValueTokenParser(null, "service.config.endpoint.http.header", "00011"),
             new Any1ValueNamedValueTokenParser(null, "service.config.endpoint.traffic.type", "00011"),
+            new Any1ValueNamedValueTokenParser(null, "service.config.endpoint.type", "0011"),
             new Any1ValueNamedValueTokenParser("--uri", "service.config.endpoint.uri", "0010;0001"),
 
             new Any1ValueNamedValueTokenParser("--token.value", "service.config.token.value", "0010"),

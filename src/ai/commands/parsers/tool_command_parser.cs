@@ -63,6 +63,7 @@ namespace Azure.AI.Details.Common.CLI
 
                 new ExpandFileNameNamedValueTokenParser(),
 
+                ConfigEndpointTypeToken.Parser(),
                 ConfigEndpointUriToken.Parser(),
                 ConfigDeploymentToken.Parser()
 

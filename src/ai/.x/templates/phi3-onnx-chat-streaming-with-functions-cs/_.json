@@ -1,0 +1,7 @@
+{
+  "_LongName": "Phi-3 Chat Completions (w/ ONNX + Functions)",
+  "_ShortName": "phi3-onnx-chat-streaming-with-functions",
+  "_Language": "C#",
+
+  "ONNX_GENAI_MODEL_PLATFORM": "DIRECTML"
+}

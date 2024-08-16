@@ -1,6 +1,6 @@
 {
-  "_LongName": "AzureML Chat Completions (Streaming)",
-  "_ShortName": "aml-chat-streaming",
+  "_LongName": "Azure AI Inference Chat Completions (Streaming)",
+  "_ShortName": "az-inference-chat-streaming",
   "_Language": "Python",
-  "ClassName": "AzureMLChatCompletionsStreaming"
+  "ClassName": "AzureAIInferenceChatCompletionsStreaming"
 }

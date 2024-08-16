@@ -23,6 +23,8 @@ namespace Azure.AI.Details.Common.CLI
         private static readonly (string name, bool valuesRequired)[] _commands =  {
             ("init.aiservices", false),
             ("init.cognitiveservices", false),
+            ("init.inference", false),
+            ("init.github", false),
             ("init.openai.chat", false),
             ("init.openai.embeddings", false),
             ("init.openai.evaluations", false),
@@ -52,6 +54,8 @@ namespace Azure.AI.Details.Common.CLI
             {
                 case "init.aiservices":
                 case "init.cognitiveservices":
+                case "init.inference":
+                case "init.github":
                 case "init.openai":
                 case "init.openai.chat":
                 case "init.openai.embeddings":

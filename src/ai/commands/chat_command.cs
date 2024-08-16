@@ -5,6 +5,7 @@
 
 using Azure.AI.Details.Common.CLI.ConsoleGui;
 using Azure.AI.Details.Common.CLI.Extensions.HelperFunctions;
+using Azure.AI.Details.Common.CLI.Extensions.Inference;
 using Azure.AI.OpenAI;
 using Azure.Core.Diagnostics;
 using Microsoft.CognitiveServices.Speech;
@@ -27,6 +28,7 @@ using OpenAI.Assistants;
 using OpenAI.Files;
 using OpenAI.VectorStores;
 using Azure.AI.Details.Common.CLI.Extensions.Otel;
+using System.ClientModel.Primitives;
 
 #pragma warning disable AOAI001 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
 #pragma warning disable OPENAI001 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
@@ -53,6 +55,7 @@ namespace Azure.AI.Details.Common.CLI
                     var msg = x.Message.Split(new char[] { '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries).FirstOrDefault();
                     if (!msg.StartsWith("ERROR: "))
                     {
+                        FileHelpers.LogException(_values, ex);
                         ConsoleHelpers.WriteLineError($"\n  ERROR: {msg}");
                         return true;
                     }
@@ -205,12 +208,15 @@ namespace Azure.AI.Details.Common.CLI
             var parameterFile = InputChatParameterFileToken.Data().GetOrDefault(_values);
             if (!string.IsNullOrEmpty(parameterFile)) SetValuesFromParameterFile(parameterFile);
 
+            var endpointType = ConfigEndpointTypeToken.Data().GetOrDefault(_values);
+            var inferenceEndpointOk = endpointType == "inference";
+            if (inferenceEndpointOk) return GetInferenceChatTextHandler(interactive);
+
             var assistantId = _values["chat.assistant.id"];
             var assistantIdOk = !string.IsNullOrEmpty(assistantId);
+            if (assistantIdOk) return await GetAssistantsAPITextHandlerAsync(interactive, assistantId);
 
-            return assistantIdOk
-                ? await GetAssistantsAPITextHandlerAsync(interactive, assistantId)
-                : GetChatCompletionsTextHandler(interactive);
+            return GetChatCompletionsTextHandler(interactive);
         }
 
         private async Task<Func<string, Task>> GetAssistantsAPITextHandlerAsync(bool interactive, string assistantId)
@@ -220,7 +226,7 @@ namespace Azure.AI.Details.Common.CLI
             var client = CreateAssistantClient();
             var thread = await CreateOrGetAssistantThread(client, threadId);
 
-            _ = CheckWriteChatHistoryOutputFileAsync(client, thread);
+            _ = CheckWriteChatHistoryOutputFileAsync(fileName => thread.SaveChatHistoryToFileAsync(client, fileName));
 
             threadId = thread.Id;
             _values.Reset("chat.thread.id", threadId);
@@ -240,13 +246,35 @@ namespace Azure.AI.Details.Common.CLI
             };
         }
 
+        private Func<string, Task> GetInferenceChatTextHandler(bool interactive)
+        {
+            var aiChatEndpoint = _values["service.config.endpoint.uri"];
+            var aiChatAPIKey = _values["service.config.key"];
+
+            var systemPrompt = _values.GetOrDefault("chat.message.system.prompt", DefaultSystemPrompt);
+            var chatHistoryJsonFile = InputChatHistoryJsonFileToken.Data().GetOrDefault(_values);
+            var aiChatModel = ChatModelNameToken.Data().GetOrDefault(_values);
+            var chat = new AzureAIInferenceChatCompletionsStreaming(aiChatEndpoint, aiChatAPIKey, aiChatModel, systemPrompt, chatHistoryJsonFile);
+
+            return async (string text) =>
+            {
+                if (interactive && text.ToLower() == "reset")
+                {
+                    chat.ClearConversation();
+                    return;
+                }
+
+                await GetInferenceChatTextHandlerAsync(chat, text);
+            };
+        }
+
         private Func<string, Task> GetChatCompletionsTextHandler(bool interactive)
         {
             var client = CreateOpenAIClient(out var deployment);
             var chatClient = client.GetChatClient(deployment);
 
             var options = CreateChatCompletionOptions(out var messages);
-            CheckWriteChatHistoryOutputFile(messages);
+            CheckWriteChatHistoryOutputFile(fileName => messages.SaveChatHistoryToFile(fileName));
 
             var funcContext = CreateChatCompletionsFunctionFactoryAndCallContext(messages, options);
 
@@ -414,7 +442,7 @@ namespace Azure.AI.Details.Common.CLI
         public async Task GetAssistantsAPIResponseAsync(AssistantClient assistantClient, string assistantId, AssistantThread thread, RunCreationOptions options, HelperFunctionFactory factory, string userInput)
         {
             await assistantClient.CreateMessageAsync(thread, [ userInput ]);
-            _ = CheckWriteChatHistoryOutputFileAsync(assistantClient, thread);
+            _ = CheckWriteChatHistoryOutputFileAsync(fileName => thread.SaveChatHistoryToFileAsync(assistantClient, fileName));
 
             DisplayAssistantPromptLabel();
 
@@ -462,14 +490,30 @@ namespace Azure.AI.Details.Common.CLI
             }
             while (run?.Status.IsTerminal == false);
 
-            await CheckWriteChatHistoryOutputFileAsync(assistantClient, thread);
+            await CheckWriteChatHistoryOutputFileAsync(fileName => thread.SaveChatHistoryToFileAsync(assistantClient, fileName));
+        }
+
+        private async Task GetInferenceChatTextHandlerAsync(AzureAIInferenceChatCompletionsStreaming chat, string text)
+        {
+            CheckWriteChatHistoryOutputFile(fileName => chat.Messages.SaveChatHistoryToFile(fileName));
+            DisplayAssistantPromptLabel();
+
+            var response = await chat.GetChatCompletionsStreamingAsync(text, update =>
+            {
+                var content = update.ContentUpdate;
+                DisplayAssistantPromptTextStreaming(content);
+            });
+
+            DisplayAssistantPromptTextStreamingDone();
+            CheckWriteChatAnswerOutputFile(response);
+            CheckWriteChatHistoryOutputFile(fileName => chat.Messages.SaveChatHistoryToFile(fileName));
         }
 
         private async Task<string> GetChatCompletionsAsync(ChatClient client, List<ChatMessage> messages, ChatCompletionOptions options, HelperFunctionCallContext functionCallContext, string text)
         {
             var requestMessage = new UserChatMessage(text);
             messages.Add(requestMessage);
-            CheckWriteChatHistoryOutputFile(messages);
+            CheckWriteChatHistoryOutputFile(fileName => messages.SaveChatHistoryToFile(fileName));
 
             DisplayAssistantPromptLabel();
 
@@ -498,7 +542,7 @@ namespace Azure.AI.Details.Common.CLI
                 if (functionCallContext.TryCallFunctions(contentComplete, (name, args, result) => DisplayAssistantFunctionCall(name, args, result)))
                 {
                     functionCallContext.Clear();
-                    CheckWriteChatHistoryOutputFile(messages);
+                    CheckWriteChatHistoryOutputFile(fileName => messages.SaveChatHistoryToFile(fileName));
                     continue;
                 }
 
@@ -508,7 +552,7 @@ namespace Azure.AI.Details.Common.CLI
                 var currentContent = new AssistantChatMessage(contentComplete);
                 messages.Add(currentContent);
                 
-                CheckWriteChatHistoryOutputFile(messages);
+                CheckWriteChatHistoryOutputFile(fileName => messages.SaveChatHistoryToFile(fileName));
 
                 return contentComplete;
             }
@@ -531,30 +575,30 @@ namespace Azure.AI.Details.Common.CLI
             }
         }
 
-        private async Task CheckWriteChatHistoryOutputFileAsync(AssistantClient client, AssistantThread thread)
+        private async Task CheckWriteChatHistoryOutputFileAsync(Func<string, Task> saveChatHistoryToFile)
         {
             var outputHistoryFile = OutputChatHistoryFileToken.Data().GetOrDefault(_values);
             if (!string.IsNullOrEmpty(outputHistoryFile))
             {
                 var fileName = FileHelpers.GetOutputDataFileName(outputHistoryFile, _values);
-                await thread.SaveChatHistoryToFileAsync(client, fileName);
+                await saveChatHistoryToFile(fileName);
             }
         }
 
-        private void CheckWriteChatHistoryOutputFile(IList<ChatMessage> messages)
+        private void CheckWriteChatHistoryOutputFile(Action<string> saveChatHistoryToFile)
         {
             var outputHistoryFile = OutputChatHistoryFileToken.Data().GetOrDefault(_values);
             if (!string.IsNullOrEmpty(outputHistoryFile))
             {
                 var fileName = FileHelpers.GetOutputDataFileName(outputHistoryFile, _values);
-                messages.SaveChatHistoryToFile(fileName);
+                saveChatHistoryToFile(fileName);
             }
         }
 
         private void ClearMessageHistory(List<ChatMessage> messages)
         {
             messages.RemoveRange(1, messages.Count - 1);
-            CheckWriteChatHistoryOutputFile(messages);
+            CheckWriteChatHistoryOutputFile(fileName => messages.SaveChatHistoryToFile(fileName));
 
             DisplayAssistantPromptLabel();
             DisplayAssistantPromptTextStreaming("I've reset the conversation. How can I help you today?");
@@ -696,6 +740,20 @@ namespace Azure.AI.Details.Common.CLI
             var region = _values["service.config.region"];
             var endpoint = ConfigEndpointUriToken.Data().GetOrDefault(_values);
             var tokenValue = _values["service.config.token.value"];
+           
+            var filepathOutput = _values.GetOrDefault("chat.output.request.id", "");
+            var filepathAdd = _values.GetOrDefault("chat.output.add.request.id", "");
+            bool outputId = !string.IsNullOrEmpty(filepathOutput);
+            bool addId = !string.IsNullOrEmpty(filepathAdd);
+            var filepath = "";
+            if (outputId)
+            {
+                filepath = filepathOutput;
+            }
+            else if (addId)
+            {
+                filepath = filepathAdd;
+            }
 
             deployment = ConfigDeploymentToken.Data().GetOrDefault(_values);
 
@@ -714,17 +772,18 @@ namespace Azure.AI.Details.Common.CLI
 
             if (!string.IsNullOrEmpty(endpoint))
             {
-                // _azureEventSourceListener = new AzureEventSourceListener((e, message) => EventSourceHelpers.EventSourceAiLoggerLog(e, message), System.Diagnostics.Tracing.EventLevel.Verbose);
-
-                var options = new AzureOpenAIClientOptions();
-                //options.Diagnostics.IsLoggingContentEnabled = true;
-                //options.Diagnostics.IsLoggingEnabled = true;
+                AzureOpenAIClientOptions options = new();
+                options.AddPolicy(new LogTrafficEventPolicy(), PipelinePosition.PerCall);
+                
+                if (outputId || addId)
+                {
+                    options.AddPolicy(new GetRequestIdLogTrafficEventPolicy(filepath, outputId, addId), PipelinePosition.PerCall);
+                }
 
                 return new AzureOpenAIClient(
                     new Uri(endpoint!),
                     new AzureKeyCredential(key!),
-                    options
-                    );
+                    options);
             }
             else if (!string.IsNullOrEmpty(host))
             {
@@ -1385,7 +1444,7 @@ namespace Azure.AI.Details.Common.CLI
             if (string.IsNullOrEmpty(id))
             {
                 _values.AddThrowError(
-                      "ERROR:", $"Updating assistant vector store; requires id.",
+                    "ERROR:", $"Updating assistant vector store; requires id.",
                                 "",
                         "TRY:", $"{Program.Name} chat assistant vector-store update --id ID",
                                 "",

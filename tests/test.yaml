@@ -86,7 +86,7 @@
       ^Name +Short +Name +Language +\r?$\n
       ^-+ +-+ +-+\r?$\n
       ^Environment +Variables +\.env *\r?$\n
-      ^AzureML Chat Completions \(Streaming\) +aml-chat-streaming +Python *\r?$\n
+      ^Azure AI Inference Chat Completions \(Streaming\) +az-inference-chat-streaming +C#, +Python *\r?$\n
       ^Helper +Function +Class +Library +helper-functions +C# *\r?$\n
       ^OpenAI +Assistants +openai-asst +C#, +JavaScript, +Python *\r?$\n
       ^OpenAI +Assistants +\(Streaming\) +openai-asst-streaming +C#, +JavaScript, +Python *\r?$\n
@@ -104,6 +104,7 @@
       ^OpenAI +Chat +Webpage +\(w/ +Speech +input/output\) +openai-chat-webpage-with-speech +TypeScript *\r?$\n
       ^OpenAI +Chat +Webpage +\(w/ +Functions +\+ +Speech\) +openai-chat-webpage-with-speech-and-functions +TypeScript *\r?$\n
       ^Phi-3 Chat Completions \(w/ ONNX\) +phi3-onnx-chat-streaming +C# +\r?$\n
+      ^Phi-3 Chat Completions \(w/ ONNX \+ Functions\) +phi3-onnx-chat-streaming-with-functions +C# +\r?$\n
       ^Semantic +Kernel +Chat +Completions +\(Streaming\) +sk-chat-streaming +C# *\r?$\n
       ^Semantic +Kernel +Chat +Completions +\(w/ +Data +\+ +AI +Search\) +sk-chat-streaming-with-data +C# *\r?$\n
       ^Semantic +Kernel +Chat +Completions +\(w/ +Functions\) +sk-chat-streaming-with-functions +C# *\r?$\n

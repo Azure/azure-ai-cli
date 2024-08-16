@@ -36,7 +36,7 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
             var isWindows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
             if (!isWindows) _scriptIsBash = true;
 
-            _arguments = GetInterpolatedProperty("arguments", replaceQuotes: true);
+            _arguments = GetInterpolatedProperty("arguments", escapeJson: true);
             _input = GetInterpolatedProperty("input");
             if (_input != null && _input.StartsWith('"') && _input.EndsWith('"')) _input = _input[1..^1];
 
@@ -55,7 +55,7 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
             var tryCreateWorkingDirectory = !string.IsNullOrEmpty(_workingDirectory) && !Directory.Exists(_workingDirectory);
             if (tryCreateWorkingDirectory) Directory.CreateDirectory(_workingDirectory!);
 
-            _foreach = GetInterpolatedProperty("foreach", replaceQuotes: true);
+            _foreach = GetInterpolatedProperty("foreach", escapeJson: true);
         }
 
         public string Id { get { return _id; } }
@@ -83,13 +83,13 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
             return _results;
         }
 
-        private string? GetInterpolatedProperty(string key, string? defaultValue = null, bool replaceQuotes = false)
+        private string? GetInterpolatedProperty(string key, string? defaultValue = null, bool escapeJson = false)
         {
             var value = YamlTestProperties.Get(_runnableTest.Test, key, defaultValue);
-            return Interpolate(value, replaceQuotes);
+            return Interpolate(value, escapeJson);
         }
 
-        private string? Interpolate(string? text, bool replaceQuotes = false)
+        private string? Interpolate(string? text, bool escapeJson = false)
         {
             if (_properties == null) return text;
             if (string.IsNullOrEmpty(text)) return text;
@@ -106,7 +106,7 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
                 if (_properties.ContainsKey(key))
                 {
                     var value = _properties[key];
-                    if (replaceQuotes) value = value.Replace("\"", "\\\"");
+                    if (escapeJson) value = EscapeJson(value);
                     text = text.Substring(0, start) + value + text.Substring(end + 2);
                 }
                 else if (key.StartsWith("matrix."))
@@ -115,7 +115,7 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
                     if (_properties.ContainsKey(key))
                     {
                         var value = _properties[key];
-                        if (replaceQuotes) value = value.Replace("\"", "\\\"");
+                        if (escapeJson) value = EscapeJson(value);
                         text = text.Substring(0, start) + value + text.Substring(end + 2);
                     }
                 }
@@ -125,6 +125,12 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
             }
 
             return text;
+        }
+
+        private string EscapeJson(string text)
+        {
+            var asJsonString = System.Text.Json.JsonSerializer.Serialize(text);
+            return asJsonString[1..^1];
         }
 
         private string _id;
