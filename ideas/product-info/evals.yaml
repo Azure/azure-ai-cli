@@ -1,46 +1,75 @@
 matrix:
-  assistant-id: asst_i27tBJfHmVb9sveuN9Lw9kR1
-  output-average-eval-score-file: average-eval-score.json
 
-  output-question-answer-file: output-${{ matrix.__matrix_id__ }}-answer.json
-  output-question-answer-eval-file: output-${{ matrix.__matrix_id__ }}-eval-score.json
-  output-question-answer-eval-file-pattern: output-*-eval-score.json
+  # Assistant ID to use for question-answer prediction.
+  QUESTION_ANSWER_ASSISTANT_ID: asst_i27tBJfHmVb9sveuN9Lw9kR1
 
-  output-chat-history-question-answer-file: output-question-answer-chat-history-${{ matrix.__matrix_id__ }}.jsonl
-  output-chat-history-question-answer-eval-file: output-question-answer-eval-score-chat-history-${{ matrix.__matrix_id__ }}.jsonl
+  # Input file containing the questions to predict and then evaluate.
+  QUESTIONS_INPUT_FILE: eval-questions.yaml
+
+  # Output files for the question-answer prediction.
+  QUESTION_ANSWER_FILE: output-answer-${{ matrix.__matrix_id__ }}.json
+  QUESTION_ANSWER_CHAT_HISTORY_FILE: output-question-answer-chat-history-${{ matrix.__matrix_id__ }}.jsonl
+
+  # Output files for the question-answer evaluation.
+  EVAL_SCORE_FILE: output-eval-score${{ matrix.__matrix_id__ }}.json
+  EVAL_SCORE_CHAT_HISTORY_FILE: output-question-answer-eval-score-chat-history-${{ matrix.__matrix_id__ }}.jsonl
+  
+  # Average evaluation scores output file and minimum scoring requirements.
+  EVAL_ALL_SCORES_FILE: output-eval-all-scores.jsonl
+  EVAL_AVG_SCORES_FILE: output-eval-avg-score.json
+  EVAL_AVG_MIN_SCORE: 7.5
+  EVAL_AVG_MIN_SCORE_PROMPT: |
+    The average evaluation score must be greater than or equal to ${{ matrix.EVAL_AVG_MIN_SCORE }}.
 
 tests:
-- area: matrix eval questions
-  matrix-file: eval-questions.yaml
+
+# pre-setup (clears the assistant ID, vector store ID, search index name, and output files)
+- area: pre-setup
+  tags: [before]
+  steps:
+  - name: start-clean
+    bash: |
+      ai config --clear assistant.id
+      ai config --clear vector.store.id
+      ai config --clear search.index.name
+      rm ${{ matrix.EVAL_ALL_SCORES_FILE }}
+      exit 0
+
+# question-answer prediction and evaluation (repeated for each "row" in the matrix)
+- area: question-matrix-processing
+  matrix-file: ${{ matrix.QUESTIONS_INPUT_FILE }}
 
   steps:
-  - name: Predict the answer w/ `ai chat`
+  - name: question-answer-prediction
     command: ai chat
     arguments:
-      assistant-id: ${{ matrix.assistant-id }}
+      assistant-id: ${{ matrix.QUESTION_ANSWER_ASSISTANT_ID }}
       question: ${{ matrix.question }}
-      output-answer: ${{ matrix.output-question-answer-file }}
-      output-chat-history: ${{ matrix.output-chat-history-question-answer-file }}
+      output-answer: ${{ matrix.QUESTION_ANSWER_FILE }}
+      output-chat-history: ${{ matrix.QUESTION_ANSWER_CHAT_HISTORY_FILE }}
 
-  - name: Check the answer against the truth
+  - name: question-answer-evaluation
     command: ai chat
     arguments:
-      assistant-id: '@none'
-      system-prompt: You are a helpful assistant.
-      question: '@eval-answer-prompt.md'
-      var-question: ${{ matrix.question }}
-      var-truth: ${{ matrix.truth }}
-      var-answer: '{@${{ matrix.output-question-answer-file }}}'
-      output-answer: ${{ matrix.output-question-answer-eval-file }}
-      output-chat-history: ${{ matrix.output-chat-history-question-answer-eval-file }}
+      system-prompt: '@eval-answer-system-prompt.md'
+      user-prompt: '@eval-answer-user-prompt.md'
+      var-q: ${{ matrix.question }}   # The question to evaluate; shows up in the user prompt as {q}
+      var-truth: ${{ matrix.truth }}  # The correct answer to the question; shows up in the system prompt as {truth}
+      var-ai: '{@${{ matrix.QUESTION_ANSWER_FILE }}}' # {@file} reads the file content as a variable
+      output-answer: ${{ matrix.EVAL_SCORE_FILE }}
+      output-add-answer: ${{ matrix.EVAL_ALL_SCORES_FILE }} # Append the evaluation score to the file.
+      output-chat-history: ${{ matrix.EVAL_SCORE_CHAT_HISTORY_FILE }}
 
-- area: post-evals
+# average evaluation score calculation and expectation validation
+- area: post-setup
+  tags: [after]
   steps:
-  - name: Post-evaluation
-    command: ai chat --built-in-functions
+  - name: eval-average-calculation
+    command: ai chat
     arguments:
-      assistant-id: '@none'
-      system-prompt: You are a helpful assistant.
-      question: '{@eval-average-prompt.md}'
-      var-pattern: ${{ matrix.output-question-answer-eval-file-pattern }}
-      output-answer: ${{ matrix.output-average-eval-score-file }}
+      built-in-functions: true # Use built-in functions to calculate the average.
+      system-prompt: "You are a helpful assistant can average numbers between 1 and 10."
+      user-prompt: 'Calculate the average of the following numbers: {numbers}'
+      var-numbers: '{@${{ matrix.EVAL_ALL_SCORES_FILE }}}' # {@file} reads the file contents.
+      output-answer: ${{ matrix.EVAL_AVG_SCORES_FILE }}
+    expect: ${{ matrix.EVAL_AVG_MIN_SCORE_PROMPT }}
