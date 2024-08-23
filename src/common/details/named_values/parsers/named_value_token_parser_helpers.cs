@@ -76,7 +76,7 @@ namespace Azure.AI.Details.Common.CLI
                 }
             }
 
-            if (fullNamePartsOk)
+            if (fullNamePartsOk && iPeekToken > 0)
             {
                 nameTokenCount = iPeekToken;
                 return true;

@@ -89,48 +89,11 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
             return Interpolate(value, escapeJson);
         }
 
-        private string? Interpolate(string? text, bool escapeJson = false)
+        public string? Interpolate(string? text, bool escapeJson = false)
         {
-            if (_properties == null) return text;
-            if (string.IsNullOrEmpty(text)) return text;
-            if (!text.Contains("${{") || !text.Contains("}}")) return text;
-
-            var index = 0;
-            var start = text.IndexOf("${{", index);
-            while (start >= 0)
-            {
-                var end = text.IndexOf("}}", start);
-                if (end < 0) break;
-
-                var key = text.Substring(start + 3, end - start - 3).Trim();
-                if (_properties.ContainsKey(key))
-                {
-                    var value = _properties[key];
-                    if (escapeJson) value = EscapeJson(value);
-                    text = text.Substring(0, start) + value + text.Substring(end + 2);
-                }
-                else if (key.StartsWith("matrix."))
-                {
-                    key = key.Substring(7);
-                    if (_properties.ContainsKey(key))
-                    {
-                        var value = _properties[key];
-                        if (escapeJson) value = EscapeJson(value);
-                        text = text.Substring(0, start) + value + text.Substring(end + 2);
-                    }
-                }
-
-                index = start + 1;
-                start = text.IndexOf("${{", index);
-            }
-
-            return text;
-        }
-
-        private string EscapeJson(string text)
-        {
-            var asJsonString = System.Text.Json.JsonSerializer.Serialize(text);
-            return asJsonString[1..^1];
+            return _properties != null
+                ? PropertyInterpolationHelpers.Interpolate(text!, _properties, escapeJson)
+                : text;
         }
 
         private string _id;

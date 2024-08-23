@@ -116,6 +116,20 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
                 context.File = fi;
                 return UpdateExpandMatrixFromNode(context, matrixNode);
             }
+            else
+            {
+                Logger.LogInfo($"YamlTestCaseParser.UpdateExpandMatrixFromFile: File not found '{fileName}'");
+                var check = PropertyInterpolationHelpers.Interpolate(fileName, context.Matrix.Last());
+                if (File.Exists(check))
+                {
+                    Logger.LogInfo($"YamlTestCaseParser.UpdateExpandMatrixFromFile: File found '{check}'");
+                    return UpdateExpandMatrixFromFile(context, check);
+                }
+                else
+                {
+                    Logger.LogError($"YamlTestCaseParser.UpdateExpandMatrixFromFile: File not found '{check}'");
+                }
+            }
 
             return context.Matrix;
         }
