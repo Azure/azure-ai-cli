@@ -235,6 +235,7 @@ namespace Azure.AI.Details.Common.CLI
                 ConfigSetLambda("@chat.key", token, "Token", token.Substring(0, 4) + "****************************", ref maxLabelWidth),
                 ConfigSetLambda("@chat.model", model, "Model", model, ref maxLabelWidth),
             });
+            ConfigSet("@chat.endpoint.type", "inference");
             actions.ForEach(x => x?.Invoke(maxLabelWidth));
         }
     }
