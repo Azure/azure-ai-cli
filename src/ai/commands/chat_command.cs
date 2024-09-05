@@ -422,7 +422,7 @@ namespace Azure.AI.Details.Common.CLI
             if (!_quiet)
             {
                 Console.ForegroundColor = ConsoleColor.Green;
-                Console.Write("assistant");
+                Console.Write("\rassistant");
                 Console.ForegroundColor = ConsoleColor.White;
                 Console.Write(": ");
                 Console.ForegroundColor = ColorHelpers.MapColor(ConsoleColor.Gray);
@@ -482,10 +482,6 @@ namespace Azure.AI.Details.Common.CLI
                         contentComplete += contentUpdate.Text;
                         DisplayAssistantPromptTextStreaming(contentUpdate.Text);
                     }
-                    else if (update is RunUpdate runUpdate)
-                    {
-                        run = runUpdate;
-                    }
                     else if (update is RequiredActionUpdate requiredActionUpdate)
                     {
                         if (factory.TryCallFunction(requiredActionUpdate.FunctionName, requiredActionUpdate.FunctionArguments, out var result))
@@ -494,6 +490,11 @@ namespace Azure.AI.Details.Common.CLI
                             DisplayAssistantPromptLabel();
                             toolOutputs.Add(new ToolOutput(requiredActionUpdate.ToolCallId, result));
                         }
+                    }
+
+                    if (update is RunUpdate runUpdate)
+                    {
+                        run = runUpdate;
                     }
 
                     if (run?.Status.IsTerminal == true)

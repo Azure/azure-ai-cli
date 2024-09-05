@@ -65,10 +65,6 @@ public class {ClassName}
                 {
                     callback(contentUpdate.Text);
                 }
-                else if (update is RunUpdate runUpdate)
-                {
-                    run = runUpdate;
-                }
                 else if (update is RequiredActionUpdate requiredActionUpdate)
                 {
                     if (_functionFactory.TryCallFunction(requiredActionUpdate.FunctionName, requiredActionUpdate.FunctionArguments, out var result))
@@ -77,6 +73,11 @@ public class {ClassName}
                         callback("\nAssistant: ");
                         toolOutputs.Add(new ToolOutput(requiredActionUpdate.ToolCallId, result));
                     }
+                }
+
+                if (update is RunUpdate runUpdate)
+                {
+                    run = runUpdate;
                 }
 
                 if (run?.Status.IsTerminal == true)
