@@ -103,11 +103,11 @@ namespace Azure.AI.Details.Common.CLI
 
         public static async Task<Dictionary<string, string>> ListAssistantsAsync(AssistantClient client)
         {
-            var order = ListOrder.OldestFirst;
-            var assistants = client.GetAssistantsAsync(order);
+            var options = new AssistantCollectionOptions() { Order = ListOrder.OldestFirst };
+            var assistants = client.GetAssistantsAsync(options);
 
             var list = new List<Assistant>();
-            await foreach (Assistant assistant in assistants)
+            await foreach (Assistant assistant in assistants.GetAllValuesAsync())
             {
                 list.Add(assistant);
             }
@@ -170,7 +170,7 @@ namespace Azure.AI.Details.Common.CLI
             var vectorStores = client.GetVectorStoresAsync();
 
             var list = new List<VectorStore>();
-            await foreach (VectorStore vectorStore in vectorStores)
+            await foreach (VectorStore vectorStore in vectorStores.GetAllValuesAsync())
             {
                 list.Add(vectorStore);
             }

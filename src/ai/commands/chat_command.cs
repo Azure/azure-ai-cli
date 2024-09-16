@@ -29,6 +29,7 @@ using OpenAI.Assistants;
 using OpenAI.Files;
 using OpenAI.VectorStores;
 using System.ClientModel.Primitives;
+using static Azure.AI.Details.Common.CLI.ConsoleGui.Window;
 
 #pragma warning disable AOAI001 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
 #pragma warning disable OPENAI001 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
@@ -421,7 +422,7 @@ namespace Azure.AI.Details.Common.CLI
             if (!_quiet)
             {
                 Console.ForegroundColor = ConsoleColor.Green;
-                Console.Write("assistant");
+                Console.Write("\rassistant");
                 Console.ForegroundColor = ConsoleColor.White;
                 Console.Write(": ");
                 Console.ForegroundColor = ColorHelpers.MapColor(ConsoleColor.Gray);
@@ -461,7 +462,7 @@ namespace Azure.AI.Details.Common.CLI
 
         public async Task GetAssistantsAPIResponseAsync(AssistantClient assistantClient, string assistantId, AssistantThread thread, RunCreationOptions options, HelperFunctionFactory factory, string userInput)
         {
-            await assistantClient.CreateMessageAsync(thread, [ userInput ]);
+            await assistantClient.CreateMessageAsync(thread, MessageRole.User, [ userInput ]);
             _ = CheckWriteChatHistoryOutputFileAsync(fileName => thread.SaveChatHistoryToFileAsync(assistantClient, fileName));
 
             DisplayAssistantPromptLabel();
@@ -481,10 +482,6 @@ namespace Azure.AI.Details.Common.CLI
                         contentComplete += contentUpdate.Text;
                         DisplayAssistantPromptTextStreaming(contentUpdate.Text);
                     }
-                    else if (update is RunUpdate runUpdate)
-                    {
-                        run = runUpdate;
-                    }
                     else if (update is RequiredActionUpdate requiredActionUpdate)
                     {
                         if (factory.TryCallFunction(requiredActionUpdate.FunctionName, requiredActionUpdate.FunctionArguments, out var result))
@@ -493,6 +490,11 @@ namespace Azure.AI.Details.Common.CLI
                             DisplayAssistantPromptLabel();
                             toolOutputs.Add(new ToolOutput(requiredActionUpdate.ToolCallId, result));
                         }
+                    }
+
+                    if (update is RunUpdate runUpdate)
+                    {
+                        run = runUpdate;
                     }
 
                     if (run?.Status.IsTerminal == true)
@@ -839,7 +841,8 @@ namespace Azure.AI.Details.Common.CLI
             var result = await client.GetThreadAsync(threadId);
             var thread = result.Value;
 
-            await foreach (var message in client.GetMessagesAsync(thread, ListOrder.OldestFirst))
+            var options = new MessageCollectionOptions() { Order = ListOrder.OldestFirst };
+            await foreach (var message in client.GetMessagesAsync(thread, options).GetAllValuesAsync())
             {
                 var content = string.Join("", message.Content.Select(c => c.Text));
                 var isUser = message.Role == MessageRole.User;
@@ -1767,7 +1770,7 @@ namespace Azure.AI.Details.Common.CLI
             }
             else if (store.FileCounts.Total == 1)
             {
-                var association = storeClient.GetFileAssociations(store).First();
+                var association = storeClient.GetFileAssociations(store).GetAllValues().First();
                 var file = fileClient.GetFile(association.FileId);
 
                 Console.Write("\n  File:");
@@ -1780,7 +1783,7 @@ namespace Azure.AI.Details.Common.CLI
 
                 var count = 0;
                 var associations = storeClient.GetFileAssociations(store);
-                foreach (var association in associations)
+                foreach (var association in associations.GetAllValues())
                 {
                     var file = fileClient.GetFile(association.FileId);
                     Console.WriteLine($"    {file.Value.Filename} ({file.Value.SizeInBytes} byte(s))");

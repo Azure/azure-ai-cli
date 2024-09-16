@@ -32,7 +32,8 @@ namespace Azure.AI.Details.Common.CLI
         public static async Task SaveChatHistoryToFileAsync(this AssistantThread thread, AssistantClient client, string fileName)
         {
             var chatMessages = new List<ChatMessage>();
-            await foreach (var message in client.GetMessagesAsync(thread, ListOrder.OldestFirst))
+            var options = new MessageCollectionOptions() { Order = ListOrder.OldestFirst };
+            await foreach (var message in client.GetMessagesAsync(thread, options).GetAllValuesAsync())
             {
                 var content = string.Join("", message.Content.Select(c => c.Text));
                 var isUser = message.Role == MessageRole.User;
