@@ -47,18 +47,6 @@ namespace Azure.AI.Details.Common.CLI.Extensions.HelperFunctions
             return true;
         }
 
-        [HelperFunctionDescription("List files; lists all files regardless of name; only in current directory")]
-        public static string FindAllFilesInCurrentDirectory()
-        {
-            return FindAllFilesMatchingPattern("*");
-        }
-
-        [HelperFunctionDescription("List files; lists all files regardless of name; searches current directory and all sub-directories")]
-        public static string FindAllFilesRecursively()
-        {
-            return FindAllFilesMatchingPattern("**/*");
-        }
-
         [HelperFunctionDescription("List files; lists all files matching pattern; searches current directory, and if pattern includes '**', all sub-directories")]
         public static string FindAllFilesMatchingPattern([HelperFunctionParameterDescription("The pattern to search for; use '**/*.ext' to search sub-directories")] string pattern)
         {
