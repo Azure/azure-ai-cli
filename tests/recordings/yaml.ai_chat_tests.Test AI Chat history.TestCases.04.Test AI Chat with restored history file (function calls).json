@@ -19,7 +19,7 @@
       "RequestBody": {
         "messages": [
           {
-            "content": "You are an AI assistant that helps people find information regarding Azure AI.",
+            "content": "You are a helpful AI assistant.",
             "role": "system"
           },
           {

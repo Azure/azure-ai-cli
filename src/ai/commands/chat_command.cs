@@ -1899,7 +1899,7 @@ namespace Azure.AI.Details.Common.CLI
             return !string.IsNullOrEmpty(s) && float.TryParse(s, out var parsed) ? parsed : defaultValue;
         }
 
-        public const string DefaultSystemPrompt = "You are an AI assistant that helps people find information regarding Azure AI.";
+        public const string DefaultSystemPrompt = "You are a helpful AI assistant.";
 
         private const float _defaultTemperature = 0.7f;
         private const float _defaultFrequencyPenalty = 0.0f;

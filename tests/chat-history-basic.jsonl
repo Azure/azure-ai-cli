@@ -1,3 +1,3 @@
-﻿{"content":"You are an AI assistant that helps people find information regarding Azure AI.","role":"system"}
+﻿{"content":"You are a helpful AI assistant.","role":"system"}
 {"content":"Why is the sky blue, what\u0027s it called","role":"user"}
 {"content":"The sky appears blue because of a process called Rayleigh scattering. As sunlight reaches Earth\u0027s atmosphere, it is scattered in all directions by the gasses and particles in the air. Blue light is scattered more than other colors because it travels in smaller, shorter waves. This scattered blue light is what we see when we look up at the sky.","role":"assistant"}
