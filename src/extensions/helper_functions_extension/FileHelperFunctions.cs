@@ -22,7 +22,7 @@ namespace Azure.AI.Details.Common.CLI.Extensions.HelperFunctions
         {
             var content = FileHelpers.FileExists(fileName)
                 ? FileHelpers.ReadAllText(fileName, new UTF8Encoding(false))
-                : string.Empty;
+                : $"File not found: {fileName}";
             return content;
         }
 
