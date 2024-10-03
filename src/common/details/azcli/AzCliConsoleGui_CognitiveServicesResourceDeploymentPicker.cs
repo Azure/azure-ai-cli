@@ -109,7 +109,9 @@ namespace Azure.AI.Details.Common.CLI
             if (deployableModel == null) return null;
 
             var modelName = deployableModel?.Name;
+            var skuName = deployableModel?.SkuName;
             Console.WriteLine($"\rModel: {modelName}");
+            Console.WriteLine($"Sku: {skuName}");
 
             var modelFormat = "OpenAI";
             var modelVersion = deployableModel?.Version;
@@ -147,7 +149,7 @@ namespace Azure.AI.Details.Common.CLI
             if (string.IsNullOrEmpty(deploymentName)) return null;
 
             Console.Write("*** CREATING ***");
-            var response = await AzCli.CreateCognitiveServicesDeployment(subscriptionId, groupName, resourceName, deploymentName, modelName, modelVersion, modelFormat, scaleCapacity);
+            var response = await AzCli.CreateCognitiveServicesDeployment(subscriptionId, groupName, resourceName, deploymentName, modelName, modelVersion, modelFormat, scaleCapacity, skuName);
 
             Console.Write("\r");
             if (string.IsNullOrEmpty(response.Output.StdOutput) && !string.IsNullOrEmpty(response.Output.StdError))
@@ -197,7 +199,7 @@ namespace Azure.AI.Details.Common.CLI
             else if (deployableModels.Count() == 1 && (!interactive || exactMatch))
             {
                 var model = deployableModels.First();
-                Console.WriteLine($"{model.Name} (version {model.Version})");
+                Console.WriteLine($"{model.Name} (version {model.Version}) ({model.SkuName}) ({model.UsageName})");
                 return model;
             }
             else if (!interactive)
@@ -208,9 +210,7 @@ namespace Azure.AI.Details.Common.CLI
                 return null;
             }
 
-            var choices = Program.Debug
-                ? deployableModels.Select(x => x.Name + " (version " + x.Version + ")" + $"{x.DefaultCapacity} capacity").ToArray()
-                : deployableModels.Select(x => x.Name + " (version " + x.Version + ")").ToArray();
+            var choices = deployableModels.Select(x => x.Name + " (version " + x.Version + ") (" + x.SkuName + ")").ToArray();
 
             var scanFor = deploymentExtra.ToLower() switch
             {
@@ -218,6 +218,7 @@ namespace Azure.AI.Details.Common.CLI
                 "embeddings" => "embedding",
                 _ => deploymentExtra.ToLower()
             };
+
             var select = Math.Max(0, Array.FindLastIndex(choices, x => x.Contains(scanFor)));
 
             var index = ListBoxPicker.PickIndexOf(choices, select);
@@ -231,33 +232,49 @@ namespace Azure.AI.Details.Common.CLI
             foreach (var deployableModel in deployableModels)
             {
                 Console.Write(prefix);
-                DisplayNameAndVersion(deployableModel);
+                DisplayNameAndVersionAndSku(deployableModel);
             }
             Console.WriteLine();
         }
 
-        private static void DisplayNameAndVersion(AzCli.CognitiveServicesModelInfo deployableModel)
+        private static void DisplayNameAndVersionAndSku(AzCli.CognitiveServicesModelInfo deployableModel)
         {
-            Console.WriteLine($"{deployableModel.Name}-{deployableModel.Version}");
+            Console.WriteLine($"{deployableModel.Name}-{deployableModel.Version}-{deployableModel.SkuName}");
         }
-
 
         private static bool ExactMatchModel(AzCli.CognitiveServicesModelInfo model, string modelFilter)
         {
-            var displayName = model.Name + "-" + model.Version;
+            var displayName = model.Name + "-" + model.Version + "-" + model.UsageName;
             return displayName.ToLower() == modelFilter.ToLower();
         }
 
         private static AzCli.CognitiveServicesModelInfo[] FilterModelsByUsage(AzCli.CognitiveServicesModelInfo[] models, AzCli.CognitiveServicesUsageInfo[] usage)
         {
-            models = models.GroupBy(x => x.Name + x.Version + x.Format).Select(x => x.First()).ToArray();
-            
+            // if (Program.Debug)
+            // {
+            //     Console.WriteLine($"\rModel: (found {models.Count()} models) (pre-grouping)\n");
+            //     foreach (var model in models)
+            //     {
+            //         Console.WriteLine($"{model.Name} (version {model.Version}) (sku {model.SkuName}) (usageName {model.UsageName}) capacity={model.DefaultCapacity}");
+            //     }
+            //     Console.WriteLine();
+            // }
+
+            // models = models.GroupBy(x => x.Name + x.Version + x.Format).Select(x => x.First()).ToArray();
+
             if (Program.Debug)
             {
                 Console.WriteLine($"\rModel: (found {models.Count()} models)\n");
                 foreach (var model in models)
                 {
-                    Console.WriteLine($"{model.Name} (version {model.Version}) capacity={model.DefaultCapacity}");
+                    Console.WriteLine($"{model.Name} (version {model.Version}) (sku {model.SkuName}) (usageName {model.UsageName}) capacity={model.DefaultCapacity}");
+                }
+                Console.WriteLine();
+
+                Console.WriteLine($"\rUsage: (found {usage.Count()} usage)\n");
+                foreach (var use in usage)
+                {
+                    Console.WriteLine($"{use.Name} current={use.Current} limit={use.Limit}");
                 }
                 Console.WriteLine();
             }
@@ -297,7 +314,9 @@ namespace Azure.AI.Details.Common.CLI
                     Format = model.Format,
                     DefaultCapacity = newDefault.ToString(),
                     ChatCompletionCapable = model.ChatCompletionCapable,
-                    EmbeddingsCapable = model.EmbeddingsCapable
+                    EmbeddingsCapable = model.EmbeddingsCapable,
+                    SkuName = model.SkuName,
+                    UsageName = model.UsageName
                 });
             }
 
@@ -327,7 +346,7 @@ namespace Azure.AI.Details.Common.CLI
                 Console.WriteLine($"\rModel: ({filteredKeep.Count()} models with remaining quota)\n");
                 foreach (var model in filteredKeep)
                 {
-                    Console.WriteLine($"{model.Name} (version {model.Version}) capacity={model.DefaultCapacity}");
+                    Console.WriteLine($"{model.Name} (version {model.Version}) (sku {model.SkuName}) (usageName {model.UsageName}) capacity={model.DefaultCapacity}");
                 }
                 Console.WriteLine();
             }
@@ -337,8 +356,10 @@ namespace Azure.AI.Details.Common.CLI
 
         private static AzCli.CognitiveServicesDeploymentInfo? ListBoxPickDeployment(AzCli.CognitiveServicesDeploymentInfo[] deployments, string p0, bool allowSkipDeployment = false, int select = 0)
         {
-            var list = deployments.Select(x => $"{x.Name} ({x.ModelName})").ToList();
-         
+            var list = deployments.Select(x => !string.IsNullOrEmpty(x.ModelName)
+                ? $"{x.Name} ({x.ModelName})"
+                : $"{x.Name}").ToList();
+
             var hasP0 = !string.IsNullOrEmpty(p0);
             if (hasP0) list.Insert(0, p0);
 

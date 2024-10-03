@@ -109,6 +109,8 @@ namespace Azure.AI.Details.Common.CLI
             public string DefaultCapacity { get; set; }
             public bool ChatCompletionCapable { get; set; }
             public bool EmbeddingsCapable { get; set; }
+            public string SkuName { get; set; }
+            public string UsageName { get; set; }
         }
 
         public struct CognitiveServicesUsageInfo
@@ -340,24 +342,38 @@ namespace Azure.AI.Details.Common.CLI
             var cmdPart = "cognitiveservices model list";
             var subPart = subscriptionId != null ? $"--subscription {subscriptionId}" : "";
 
-            var parsed = await ProcessHelpers.ParseShellCommandJsonArray("az", $"{cmdPart} --output json {subPart} -l {regionLocation} --query \"[].{{Name:model.name,Format:model.format,Version:model.version,DefaultCapacity:model.skus[0].capacity.default,ChatCompletionCapable:model.capabilities.chatCompletion,EmbeddingsCapable:model.capabilities.embeddings}}\"", GetUserAgentEnv());
+            var parsed = await ProcessHelpers.ParseShellCommandJsonArray("az", $"{cmdPart} --output json {subPart} -l {regionLocation} --query \"[].{{Name:model.name,Format:model.format,Version:model.version,ChatCompletionCapable:model.capabilities.chatCompletion,EmbeddingsCapable:model.capabilities.embeddings,Skus:model.skus}}\"", GetUserAgentEnv());
             var models = parsed.Payload;
 
             var x = new ParsedJsonProcessOutput<CognitiveServicesModelInfo[]>(parsed.Output);
-            x.Payload = new CognitiveServicesModelInfo[models.GetArrayLength()];
+            var payload = new List<CognitiveServicesModelInfo>();
 
-            var i = 0;
             foreach (var model in models.EnumerateArray())
             {
-                x.Payload[i].Name = model.GetPropertyStringOrEmpty("Name");
-                x.Payload[i].Format = model.GetPropertyStringOrEmpty("Format");
-                x.Payload[i].Version = model.GetPropertyStringOrEmpty("Version");
-                x.Payload[i].DefaultCapacity = model.GetPropertyStringOrEmpty("DefaultCapacity");
-                x.Payload[i].ChatCompletionCapable = model.GetPropertyStringOrEmpty("ChatCompletionCapable") == "true";
-                x.Payload[i].EmbeddingsCapable = model.GetPropertyStringOrEmpty("EmbeddingsCapable") == "true";
-                i++;
+                var name = model.GetPropertyStringOrEmpty("Name");
+                var format = model.GetPropertyStringOrEmpty("Format");
+                var version = model.GetPropertyStringOrEmpty("Version");
+                var chatCompletionsCapable = model.GetPropertyStringOrEmpty("ChatCompletionCapable") == "true";
+                var embeddingsCapable = model.GetPropertyStringOrEmpty("EmbeddingsCapable") == "true";
+
+                var skus = model.GetProperty("Skus").EnumerateArray();
+                foreach (var sku in skus)
+                {
+                    payload.Add(new CognitiveServicesModelInfo()
+                    {
+                        Name = name,
+                        Format = format,
+                        Version = version,
+                        ChatCompletionCapable = chatCompletionsCapable,
+                        EmbeddingsCapable = embeddingsCapable,
+                        SkuName = sku.GetPropertyStringOrEmpty("name"),
+                        UsageName = sku.GetPropertyStringOrEmpty("usageName"),
+                        DefaultCapacity = sku.GetPropertyElementOrNull("capacity")?.GetPropertyStringOrEmpty("default") ?? "50"
+                    });
+                }
             }
 
+            x.Payload = payload.ToArray();
             return x;
         }
 
@@ -426,12 +442,12 @@ namespace Azure.AI.Details.Common.CLI
             return x;
         }
 
-        public static async Task<ParsedJsonProcessOutput<CognitiveServicesDeploymentInfo>> CreateCognitiveServicesDeployment(string subscriptionId, string group, string resourceName, string deploymentName, string modelName, string modelVersion, string modelFormat, string scaleCapacity)
+        public static async Task<ParsedJsonProcessOutput<CognitiveServicesDeploymentInfo>> CreateCognitiveServicesDeployment(string subscriptionId, string group, string resourceName, string deploymentName, string modelName, string modelVersion, string modelFormat, string scaleCapacity, string skuName)
         {
             var cmdPart = "cognitiveservices account deployment create";
             var subPart = subscriptionId != null ? $"--subscription {subscriptionId}" : "";
 
-            var parsed = await ProcessHelpers.ParseShellCommandJsonObject("az", $"{cmdPart} --output json {subPart} -g {group} -n {resourceName} --deployment-name {deploymentName} --model-name {modelName} --model-version {modelVersion} --model-format {modelFormat} --sku-capacity {scaleCapacity} --sku-name \"Standard\"", GetUserAgentEnv());
+            var parsed = await ProcessHelpers.ParseShellCommandJsonObject("az", $"{cmdPart} --output json {subPart} -g {group} -n {resourceName} --deployment-name {deploymentName} --model-name {modelName} --model-version {modelVersion} --model-format {modelFormat} --sku-capacity {scaleCapacity} --sku-name \"{skuName}\"", GetUserAgentEnv());
             var resource = parsed.Payload;
 
             var x = new ParsedJsonProcessOutput<CognitiveServicesDeploymentInfo>(parsed.Output);

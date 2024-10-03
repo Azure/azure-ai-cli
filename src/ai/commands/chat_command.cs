@@ -1738,17 +1738,49 @@ namespace Azure.AI.Details.Common.CLI
 
             if (batchFiles.Count() > 0)
             {
-                Console.Write("\n  Processing vector store files ...");
-                var batchJob = await OpenAIAssistantHelpers.ProcessBatchFileJob(key, endpoint, store, batchFiles);
-
-                Console.WriteLine("\n");
-                Console.WriteLine($"    Batch job: {batchJob.BatchId}");
-                Console.WriteLine($"    File Completed/Total: {batchJob.FileCounts.Completed} out of {batchJob.FileCounts.Total}");
+                const int maxBatchSize = 50;
+                await ProcessBatchFileJobs(key, endpoint, store, batchFiles, maxBatchSize);
 
                 store = await OpenAIAssistantHelpers.GetAssistantVectorStoreAsync(key, endpoint, store.Id);
             }
 
             return store;
+        }
+
+        private static async Task ProcessBatchFileJobs(string key, string endpoint, VectorStore store, List<OpenAIFileInfo> batchFiles, int maxBatchSize)
+        {
+            var completed = 0;
+            var total = 0;
+
+            while (batchFiles.Count > 0)
+            {
+                Console.Write("\n  Processing vector store files ...");
+
+                var take = Math.Min(maxBatchSize, batchFiles.Count);
+                var thisBatch = batchFiles.Take(take).ToList();
+                batchFiles.RemoveRange(0, take);
+
+                var batchJob = await ProcessBatchFileJob(key, endpoint, store, thisBatch);
+                completed += batchJob.FileCounts.Completed;
+                total += batchJob.FileCounts.Total;
+            }
+
+            if (total > maxBatchSize)
+            {
+                Console.WriteLine("\n  Processing vector store files ... Done!\n");
+                Console.WriteLine($"    File Completed/Total: {completed} out of {total}\n");
+            }
+        }
+
+        private static async Task<VectorStoreBatchFileJob> ProcessBatchFileJob(string key, string endpoint, VectorStore store, List<OpenAIFileInfo> batchFiles)
+        {
+            var batchJob = await OpenAIAssistantHelpers.ProcessBatchFileJob(key, endpoint, store, batchFiles);
+
+            Console.WriteLine("\n");
+            Console.WriteLine($"    Batch job: {batchJob.BatchId}");
+            Console.WriteLine($"    File Completed/Total: {batchJob.FileCounts.Completed} out of {batchJob.FileCounts.Total}");
+
+            return batchJob;
         }
 
         private void PrintVectorStore(string key, string endpoint, VectorStore store)
