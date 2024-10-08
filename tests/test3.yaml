@@ -8,7 +8,6 @@
       name: robch-oai-eastus2
       chat-deployment-name: gpt-4-32k-0613
       embeddings-deployment-name: text-embedding-ada-002-2
-      evaluation-deployment-name: gpt-4-32k-0613
       interactive: false
 
 - name: test ai chat
@@ -1617,6 +1616,36 @@
         Tell me another joke
         exit
       tag: skip
+
+- area: ai dev new openai-realtime-chat (C#)
+  tests:
+
+  - class: dev new openai-realtime-chat (c#)
+    steps:
+    - name: generate template
+      command: ai dev new openai-realtime-chat --cs
+    - name: build template
+      bash: |
+        cd openai-realtime-chat-cs
+        dotnet build
+    # - name: run template
+    #   command: ai dev shell --bash "cd openai-realtime-chat-cs;./bin/Debug/net8.0/OpenAIRealtimeChat"
+    #   tag: skip
+
+- area: ai dev new openai-realtime-chat-with-functions (C#)
+  tests:
+
+  - class: dev new openai-realtime-chat-with-functions (c#)
+    steps:
+    - name: generate template
+      command: ai dev new openai-realtime-chat-with-functions --cs
+    - name: build template
+      bash: |
+        cd openai-realtime-chat-with-functions-cs
+        dotnet build
+    # - name: run template
+    #   command: ai dev shell --bash "cd openai-realtime-chat-with-functions-cs;./bin/Debug/net8.0/OpenAIRealtimeChatWithFunctions"
+    #   tag: skip
 
 - area: ai dev new phi3-onnx-chat-streaming (c#)
   tests:

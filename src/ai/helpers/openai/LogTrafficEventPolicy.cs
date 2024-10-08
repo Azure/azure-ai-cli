@@ -16,6 +16,7 @@ public class LogTrafficEventPolicy : TrafficEventPolicy
     private static void LogRequest(PipelineRequest request)
     {
         AI.TRACE_INFO($"===== REQUEST: {request.Method} {request.Uri}");
+        if (Program.Debug) Console.WriteLine($"===== REQUEST: {request.Method} {request.Uri}");
 
         // foreach ((string headerName, string headerValue) in request.Headers)
         // {
@@ -33,6 +34,7 @@ public class LogTrafficEventPolicy : TrafficEventPolicy
             if (!string.IsNullOrWhiteSpace(line))
             {
                 AI.TRACE_INFO($"===== REQUEST BODY: {line}");
+                if (Program.Debug) Console.WriteLine($"===== REQUEST BODY: {line}");
             }
         }
         catch
@@ -43,6 +45,7 @@ public class LogTrafficEventPolicy : TrafficEventPolicy
     private static void LogResponse(PipelineResponse response)
     {
         AI.TRACE_INFO($"===== RESPONSE: {response.Status} ({response.ReasonPhrase})");
+        if (Program.Debug) Console.WriteLine($"===== RESPONSE: {response.Status} ({response.ReasonPhrase})");
 
         var sb = new StringBuilder();
         foreach ((string headerName, string headerValue) in response.Headers)
@@ -53,12 +56,14 @@ public class LogTrafficEventPolicy : TrafficEventPolicy
         if (!string.IsNullOrWhiteSpace(headers))
         {
             AI.TRACE_INFO($"===== RESPONSE HEADERS: {headers}");
+            if (Program.Debug) Console.WriteLine($"===== RESPONSE HEADERS: {headers}");
         }
 
         try
         {
             var line = response.Content?.ToString()?.Replace("\n", "\\n")?.Replace("\r", "");
             AI.TRACE_INFO($"===== RESPONSE BODY: {line}");
+            if (Program.Debug) Console.WriteLine($"===== RESPONSE BODY: {line}");
         }
         catch
         {

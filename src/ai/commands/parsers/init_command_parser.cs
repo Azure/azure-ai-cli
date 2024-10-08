@@ -27,7 +27,7 @@ namespace Azure.AI.Details.Common.CLI
             ("init.github", false),
             ("init.openai.chat", false),
             ("init.openai.embeddings", false),
-            ("init.openai.evaluations", false),
+            ("init.openai.realtime", false),
             ("init.openai.deployments", false),
             ("init.openai", false),
             ("init.search", false),
@@ -59,7 +59,7 @@ namespace Azure.AI.Details.Common.CLI
                 case "init.openai":
                 case "init.openai.chat":
                 case "init.openai.embeddings":
-                case "init.openai.evaluations":
+                case "init.openai.realtime":
                 case "init.openai.deployments":
                 case "init.search":
                 case "init.speech":
@@ -103,11 +103,11 @@ namespace Azure.AI.Details.Common.CLI
 
                 new Any1ValueNamedValueTokenParser(null, "init.chat.model.deployment.name", "01010;00010"),
                 new Any1ValueNamedValueTokenParser(null, "init.embeddings.model.deployment.name", "01010"),
-                new Any1ValueNamedValueTokenParser(null, "init.evaluation.model.deployment.name", "01010"),
+                new Any1ValueNamedValueTokenParser(null, "init.realtime.model.deployment.name", "01010"),
 
                 new Any1ValueNamedValueTokenParser(null, "init.chat.model.name", "0110;0010"),
                 new Any1ValueNamedValueTokenParser(null, "init.embeddings.model.name", "0110"),
-                new Any1ValueNamedValueTokenParser(null, "init.evaluation.model.name", "0110"),
+                new Any1ValueNamedValueTokenParser(null, "init.realtime.model.name", "0110"),
 
                 new TrueFalseNamedValueTokenParser(null, "init.output.env.file", "0110"),
 

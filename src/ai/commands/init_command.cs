@@ -78,10 +78,10 @@ namespace Azure.AI.Details.Common.CLI
                 case "init.github": await DoInitRootGitHub(interactive); break;
 
                 case "init":
-                case "init.openai": await DoInitRootOpenAi(interactive, false, false, false, true, true, true); break;
+                case "init.openai": await DoInitRootOpenAi(interactive, false, false, false, true, false, true); break;
                 case "init.openai.chat": await DoInitRootOpenAi(interactive, false, false, true, true, true, true); break;
                 case "init.openai.embeddings": await DoInitRootOpenAi(interactive, true, true, false, false, true, true); break;
-                case "init.openai.evaluations": await DoInitRootOpenAi(interactive, true, true, true, true, false, false); break;
+                case "init.openai.realtime": await DoInitRootOpenAi(interactive, true, true, true, true, false, false); break;
                 case "init.openai.deployments": await DoInitRootOpenAi(interactive, false, true, false, true, false, true); break;
 
                 case "init.search": await DoInitRootSearch(interactive); break;
@@ -218,7 +218,6 @@ namespace Azure.AI.Details.Common.CLI
             // TODO: If there's a way to get the deployments, get them, and do this... Print correct stuff here... 
             // ConsoleHelpers.WriteLineWithHighlight($"    AZURE OPENAI DEPLOYMENT (CHAT): {{chat-deployment-name}}                `#e_;<== work in progress`");
             // ConsoleHelpers.WriteLineWithHighlight($"    AZURE OPENAI DEPLOYMENT (EMBEDDING): {{embedding-deployment-name}}    `#e_;<== work in progress`");
-            // ConsoleHelpers.WriteLineWithHighlight($"    AZURE OPENAI DEPLOYMENT (EVALUATION): {{evaluation-deployment-name}}    `#e_;<== work in progress`");
 
             Console.WriteLine();
             var label = "  Initialize";
@@ -530,15 +529,15 @@ namespace Azure.AI.Details.Common.CLI
         }
 #endif
 
-        private async Task DoInitRootOpenAi(bool interactive, bool skipChat = false, bool allowSkipChat = true, bool skipEmbeddings = false, bool allowSkipEmbeddings = true, bool skipEvaluations = false, bool allowSkipEvaluations = true)
+        private async Task DoInitRootOpenAi(bool interactive, bool skipChat = false, bool allowSkipChat = true, bool skipEmbeddings = false, bool allowSkipEmbeddings = true, bool skipRealTime = false, bool allowSkipRealTime = true)
         {
             // if (!interactive) ThrowInteractiveNotSupportedApplicationException(); // POST-IGNITE: TODO: Add back non-interactive mode support
 
             await DoInitSubscriptionId(interactive);
-            await DoInitOpenAi(interactive, skipChat, allowSkipChat, skipEmbeddings, allowSkipEmbeddings, skipEvaluations, allowSkipEvaluations);
+            await DoInitOpenAi(interactive, skipChat, allowSkipChat, skipEmbeddings, allowSkipEmbeddings, skipRealTime, allowSkipRealTime);
         }
 
-        private async Task DoInitOpenAi(bool interactive, bool skipChat = false, bool allowSkipChat = true, bool skipEmbeddings = false, bool allowSkipEmbeddings = true, bool skipEvaluations = false, bool allowSkipEvaluations = true)
+        private async Task DoInitOpenAi(bool interactive, bool skipChat = false, bool allowSkipChat = true, bool skipEmbeddings = false, bool allowSkipEmbeddings = true, bool skipRealTime = false, bool allowSkipRealTime = true)
         {
             var subscriptionId = SubscriptionToken.Data().GetOrDefault(_values, "");
             var regionFilter = _values.GetOrEmpty("init.service.resource.region.name");
@@ -550,13 +549,13 @@ namespace Azure.AI.Details.Common.CLI
 
             var chatDeploymentFilter = _values.GetOrEmpty("init.chat.model.deployment.name");
             var embeddingsDeploymentFilter = _values.GetOrEmpty("init.embeddings.model.deployment.name");
-            var evaluationsDeploymentFilter = _values.GetOrEmpty("init.evaluation.model.deployment.name");
+            var realtimeDeploymentFilter = _values.GetOrEmpty("init.realtime.model.deployment.name");
 
             var chatModelFilter = _values.GetOrEmpty("init.chat.model.name");
             var embeddingsModelFilter = _values.GetOrEmpty("init.embeddings.model.name");
-            var evaluationsModelFilter = _values.GetOrEmpty("init.evaluation.model.name");
+            var realtimeModelFilter = _values.GetOrEmpty("init.realtime.model.name");
             
-            var resource = await AzCliConsoleGui.PickOrCreateAndConfigCognitiveServicesOpenAiKindResource(_values, interactive, subscriptionId, regionFilter, groupFilter, resourceFilter, kind, sku, yes, skipChat, allowSkipChat, skipEmbeddings, allowSkipEmbeddings, skipEvaluations, allowSkipEvaluations, chatDeploymentFilter, embeddingsDeploymentFilter, evaluationsDeploymentFilter, chatModelFilter, embeddingsModelFilter, evaluationsModelFilter);
+            var resource = await AzCliConsoleGui.PickOrCreateAndConfigCognitiveServicesOpenAiKindResource(_values, interactive, subscriptionId, regionFilter, groupFilter, resourceFilter, kind, sku, yes, skipChat, allowSkipChat, skipEmbeddings, allowSkipEmbeddings, skipRealTime, allowSkipRealTime, chatDeploymentFilter, embeddingsDeploymentFilter, realtimeDeploymentFilter, chatModelFilter, embeddingsModelFilter, realtimeModelFilter);
             _values.Reset("service.openai.deployments.picked", "true");
 
             SubscriptionToken.Data().Set(_values, subscriptionId);
