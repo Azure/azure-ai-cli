@@ -59,7 +59,7 @@ namespace Azure.AI.Details.Common.CLI
             public string Key;
             public string ChatDeployment;
             public string EmbeddingsDeployment;
-            public string EvaluationDeployment;
+            public string RealTimeDeployment;
         }
 
         public struct CognitiveServicesSpeechResourceInfo

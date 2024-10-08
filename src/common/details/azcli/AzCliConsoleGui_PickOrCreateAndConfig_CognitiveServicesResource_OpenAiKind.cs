@@ -34,14 +34,14 @@ namespace Azure.AI.Details.Common.CLI
             bool allowSkipChat = true,
             bool skipEmbeddings = false,
             bool allowSkipEmbeddings = true,
-            bool skipEvaluations = false,
-            bool allowSkipEvaluations = true,
+            bool skipRealTime = false,
+            bool allowSkipRealTime = true,
             string chatDeploymentFilter = null,
             string embeddingsDeploymentFilter = null,
-            string evaluationsDeploymentFilter = null,
+            string realtimeDeploymentFilter = null,
             string chatModelFilter = null,
             string embeddingsModelFilter = null,
-            string evaluationsModelFilter = null)
+            string realtimeModelFilter = null)
         {
             kinds ??= "OpenAI;AIServices";
             var sectionHeader = "AZURE OPENAI RESOURCE";
@@ -49,7 +49,7 @@ namespace Azure.AI.Details.Common.CLI
             var regionLocation = !string.IsNullOrEmpty(regionFilter) ? await AzCliConsoleGui.PickRegionLocationAsync(interactive, regionFilter) : new AzCli.AccountRegionLocationInfo();
             var resource = await AzCliConsoleGui.PickOrCreateCognitiveResource(sectionHeader, interactive, subscriptionId, regionLocation.Name, groupFilter, resourceFilter, kinds, sku, yes);
 
-            var (chatDeployment, embeddingsDeployment, evaluationDeployment, keys) = await PickOrCreateAndConfigCognitiveServicesOpenAiKindResourceDeployments(
+            var (chatDeployment, embeddingsDeployment, realtimeDeployment, keys) = await PickOrCreateAndConfigCognitiveServicesOpenAiKindResourceDeployments(
                 values,
                 sectionHeader,
                 interactive,
@@ -63,10 +63,10 @@ namespace Azure.AI.Details.Common.CLI
                 allowSkipEmbeddings,
                 embeddingsDeploymentFilter,
                 embeddingsModelFilter,
-                skipEvaluations,
-                allowSkipEvaluations,
-                evaluationsDeploymentFilter,
-                evaluationsModelFilter);
+                skipRealTime,
+                allowSkipRealTime,
+                realtimeDeploymentFilter,
+                realtimeModelFilter);
 
             return new AzCli.CognitiveServicesResourceInfoEx
             {
@@ -79,7 +79,7 @@ namespace Azure.AI.Details.Common.CLI
                 Key = keys.Key1,
                 ChatDeployment = chatDeployment.HasValue ? chatDeployment.Value.Name : null,
                 EmbeddingsDeployment = embeddingsDeployment.HasValue ? embeddingsDeployment.Value.Name : null,
-                EvaluationDeployment = evaluationDeployment.HasValue ? evaluationDeployment.Value.Name : null
+                RealTimeDeployment = realtimeDeployment.HasValue ? realtimeDeployment.Value.Name : null
             };
         }
 
@@ -98,13 +98,13 @@ namespace Azure.AI.Details.Common.CLI
                 bool allowSkipEmbeddings = true,
                 string embeddingsDeploymentFilter = null,
                 string embeddingsModelFilter = null,
-                bool skipEvaluations = true,
-                bool allowSkipEvaluations = true,
-                string evaluationsDeploymentFilter = null,
-                string evaluationsModelFilter = null)
+                bool skipRealtime = true,
+                bool allowSkipRealTime = true,
+                string realtimeDeploymentFilter = null,
+                string realtimeModelFilter = null)
         {
             bool createdNew = false;
-            AzCli.CognitiveServicesDeploymentInfo? chatDeployment = null, embeddingsDeployment = null, evaluationDeployment = null;
+            AzCli.CognitiveServicesDeploymentInfo? chatDeployment = null, embeddingsDeployment = null, realtimeDeployment = null;
             var token = CancellationToken.None;
 
             (chatDeployment, createdNew) = !skipChat
@@ -119,24 +119,24 @@ namespace Azure.AI.Details.Common.CLI
                 (outcome, res,ex, timeTaken) => CreateInitDeploymentTelemetryEvent(values, InitStage.Embeddings, outcome, ex, timeTaken, res))
                 : (null, false);
 
-            (evaluationDeployment, createdNew) = !skipEvaluations
+            (realtimeDeployment, createdNew) = !skipRealtime
                 ? await Program.Telemetry.WrapAsync(
-                    () => PickOrCreateCognitiveServicesResourceDeployment(interactive, allowSkipEvaluations, "Evaluation", subscriptionId, resource.Group, resource.RegionLocation, resource.Name, evaluationsDeploymentFilter, evaluationsModelFilter),
-                    (outcome, res, ex, timeTaken) => CreateInitDeploymentTelemetryEvent(values, InitStage.Evaluation, outcome, ex, timeTaken, res))
+                    () => PickOrCreateCognitiveServicesResourceDeployment(interactive, allowSkipRealTime, "RealTime", subscriptionId, resource.Group, resource.RegionLocation, resource.Name, realtimeDeploymentFilter, realtimeModelFilter),
+                    (outcome, res, ex, timeTaken) => CreateInitDeploymentTelemetryEvent(values, InitStage.RealTime, outcome, ex, timeTaken, res))
                 : (null, false);
             
             var keys = await AzCliConsoleGui.LoadCognitiveServicesResourceKeys(sectionHeader, subscriptionId, resource);
          
             if (resource.Kind == "AIServices")
             {
-                ConfigSetHelpers.ConfigCognitiveServicesAIServicesKindResource(subscriptionId, resource.RegionLocation, resource.Endpoint, chatDeployment, embeddingsDeployment, evaluationDeployment, keys.Key1);
+                ConfigSetHelpers.ConfigCognitiveServicesAIServicesKindResource(subscriptionId, resource.RegionLocation, resource.Endpoint, chatDeployment, embeddingsDeployment, realtimeDeployment, keys.Key1);
             }
             else
             {
-                ConfigSetHelpers.ConfigOpenAiResource(subscriptionId, resource.RegionLocation, resource.Endpoint, chatDeployment, embeddingsDeployment, evaluationDeployment, keys.Key1);
+                ConfigSetHelpers.ConfigOpenAiResource(subscriptionId, resource.RegionLocation, resource.Endpoint, chatDeployment, embeddingsDeployment, realtimeDeployment, keys.Key1);
             }
          
-            return (chatDeployment, embeddingsDeployment, evaluationDeployment, keys);
+            return (chatDeployment, embeddingsDeployment, realtimeDeployment, keys);
         }
 
         private static ITelemetryEvent CreateInitDeploymentTelemetryEvent(INamedValues values, InitStage stage, Outcome outcome, Exception ex, TimeSpan duration, (AzCli.CognitiveServicesDeploymentInfo? deployment, bool createdNew) result) =>

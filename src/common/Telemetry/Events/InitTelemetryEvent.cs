@@ -42,10 +42,10 @@ namespace Azure.AI.Details.Common.CLI.Telemetry.Events
         Embeddings,
 
         /// <summary>
-        /// (Optional) The user has made a choice regarding an evaluation deployment. <see cref="InitTelemetryEvent.Selected">
+        /// (Optional) The user has made a choice regarding a realtime deployment. <see cref="InitTelemetryEvent.Selected">
         /// property to see what was chosen (e.g. new, existing, skip)
         /// </summary>
-        Evaluation,
+        RealTime,
 
         /// <summary>
         /// (Optional) Connections have been verified or new ones have been created

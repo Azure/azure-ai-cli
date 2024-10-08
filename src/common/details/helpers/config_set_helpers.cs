@@ -25,7 +25,7 @@ namespace Azure.AI.Details.Common.CLI
             actions.ForEach(x => x?.Invoke(maxLabelWidth));
         }
 
-        public static void ConfigCognitiveServicesAIServicesKindResource(string subscriptionId, string region, string endpoint, AzCli.CognitiveServicesDeploymentInfo? chatDeployment, AzCli.CognitiveServicesDeploymentInfo? embeddingsDeployment, AzCli.CognitiveServicesDeploymentInfo? evaluationDeployment, string key)
+        public static void ConfigCognitiveServicesAIServicesKindResource(string subscriptionId, string region, string endpoint, AzCli.CognitiveServicesDeploymentInfo? chatDeployment, AzCli.CognitiveServicesDeploymentInfo? embeddingsDeployment, AzCli.CognitiveServicesDeploymentInfo? realtimeDeployment, string key)
         {
             ConsoleHelpers.WriteLineWithHighlight($"\n`CONFIG AI SERVICES`");
             Console.WriteLine();
@@ -56,12 +56,12 @@ namespace Azure.AI.Details.Common.CLI
                 actions.Add(ConfigSetLambda("@search.embedding.model.name", embeddingsDeployment.Value.ModelName, "Model Name (embedding)", embeddingsDeployment.Value.ModelName, ref maxLabelWidth));
             }
 
-            actions.Add(ConfigSetLambda("@chat.evaluation.key", key, "Key (evaluation)", key.Substring(0, 4) + "****************************", ref maxLabelWidth));
-            actions.Add(ConfigSetLambda("@chat.evaluation.endpoint", endpoint, "Endpoint (evaluation)", endpoint, ref maxLabelWidth));
-            if (evaluationDeployment != null)
+            actions.Add(ConfigSetLambda("@chat.realtime.key", key, "Key (realtime)", key.Substring(0, 4) + "****************************", ref maxLabelWidth));
+            actions.Add(ConfigSetLambda("@chat.realtime.endpoint", endpoint, "Endpoint (realtime)", endpoint, ref maxLabelWidth));
+            if (realtimeDeployment != null)
             {
-                actions.Add(ConfigSetLambda("@chat.evaluation.model.deployment.name", evaluationDeployment.Value.Name, "Deployment (evaluation)", evaluationDeployment.Value.Name, ref maxLabelWidth));
-                actions.Add(ConfigSetLambda("@chat.evaluation.model.name", evaluationDeployment.Value.ModelName, "Model Name (evaluation)", evaluationDeployment.Value.ModelName, ref maxLabelWidth));
+                actions.Add(ConfigSetLambda("@chat.realtime.model.deployment.name", realtimeDeployment.Value.Name, "Deployment (realtime)", realtimeDeployment.Value.Name, ref maxLabelWidth));
+                actions.Add(ConfigSetLambda("@chat.realtime.model.name", realtimeDeployment.Value.ModelName, "Model Name (realtime)", realtimeDeployment.Value.ModelName, ref maxLabelWidth));
             }
 
             actions.Add(ConfigSetLambda("@speech.endpoint", endpoint, "Endpoint (speech)", endpoint, ref maxLabelWidth));
@@ -93,7 +93,7 @@ namespace Azure.AI.Details.Common.CLI
             actions.ForEach(x => x?.Invoke(maxLabelWidth));
         }
 
-        public static void ConfigOpenAiResource(string subscriptionId, string region, string endpoint, AzCli.CognitiveServicesDeploymentInfo? chatDeployment, AzCli.CognitiveServicesDeploymentInfo? embeddingsDeployment, AzCli.CognitiveServicesDeploymentInfo? evaluationDeployment, string key)
+        public static void ConfigOpenAiResource(string subscriptionId, string region, string endpoint, AzCli.CognitiveServicesDeploymentInfo? chatDeployment, AzCli.CognitiveServicesDeploymentInfo? embeddingsDeployment, AzCli.CognitiveServicesDeploymentInfo? realtimeDeployment, string key)
         {
             ConsoleHelpers.WriteLineWithHighlight($"\n`CONFIG AZURE OPENAI RESOURCE`");
             Console.WriteLine();
@@ -118,12 +118,12 @@ namespace Azure.AI.Details.Common.CLI
                 actions.Add(ConfigSetLambda("@search.embedding.model.name", embeddingsDeployment.Value.ModelName, "Model Name (embedding)", embeddingsDeployment.Value.ModelName, ref maxLabelWidth));
             }
 
-            actions.Add(ConfigSetLambda("@chat.evaluation.key", key, "Key (evaluation)", key.Substring(0, 4) + "****************************", ref maxLabelWidth));
-            actions.Add(ConfigSetLambda("@chat.evaluation.endpoint", endpoint, "Endpoint (evaluation)", endpoint, ref maxLabelWidth));
-            if (evaluationDeployment != null)
+            actions.Add(ConfigSetLambda("@chat.realtime.key", key, "Key (realtime)", key.Substring(0, 4) + "****************************", ref maxLabelWidth));
+            actions.Add(ConfigSetLambda("@chat.realtime.endpoint", endpoint, "Endpoint (realtime)", endpoint, ref maxLabelWidth));
+            if (realtimeDeployment != null)
             {
-                actions.Add(ConfigSetLambda("@chat.evaluation.model.deployment.name", evaluationDeployment.Value.Name, "Deployment (evaluation)", evaluationDeployment.Value.Name, ref maxLabelWidth));
-                actions.Add(ConfigSetLambda("@chat.evaluation.model.name", evaluationDeployment.Value.ModelName, "Model Name (evaluation)", evaluationDeployment.Value.ModelName, ref maxLabelWidth));
+                actions.Add(ConfigSetLambda("@chat.realtime.model.deployment.name", realtimeDeployment.Value.Name, "Deployment (realtime)", realtimeDeployment.Value.Name, ref maxLabelWidth));
+                actions.Add(ConfigSetLambda("@chat.realtime.model.name", realtimeDeployment.Value.ModelName, "Model Name (realtime)", realtimeDeployment.Value.ModelName, ref maxLabelWidth));
             }
 
             actions.Add(ConfigSetLambda("@chat.region", region, "Region", region, ref maxLabelWidth));

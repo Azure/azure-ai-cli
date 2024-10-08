@@ -42,11 +42,11 @@ namespace Azure.AI.Details.Common.CLI
                 env.Add("AZURE_OPENAI_ENDPOINT", ReadConfig(values, "chat.endpoint"));
 
                 env.Add("AZURE_OPENAI_CHAT_DEPLOYMENT", ReadConfig(values, "chat.deployment"));
-                env.Add("AZURE_OPENAI_EVALUATION_DEPLOYMENT", ReadConfig(values, "chat.evaluation.model.deployment.name") ?? ReadConfig(values, "chat.deployment"));
+                env.Add("AZURE_OPENAI_REALTIME_DEPLOYMENT", ReadConfig(values, "chat.realtime.model.deployment.name") ?? ReadConfig(values, "chat.deployment"));
                 env.Add("AZURE_OPENAI_EMBEDDING_DEPLOYMENT", ReadConfig(values, "search.embedding.model.deployment.name"));
 
                 env.Add("AZURE_OPENAI_CHAT_MODEL", ReadConfig(values, "chat.model"));
-                env.Add("AZURE_OPENAI_EVALUATION_MODEL", ReadConfig(values, "chat.evaluation.model.name") ?? ReadConfig(values, "chat.model"));
+                env.Add("AZURE_OPENAI_REALTIME_MODEL", ReadConfig(values, "chat.realtime.model.name") ?? ReadConfig(values, "chat.model"));
                 env.Add("AZURE_OPENAI_EMBEDDING_MODEL", ReadConfig(values, "search.embedding.model.name"));
             }
 

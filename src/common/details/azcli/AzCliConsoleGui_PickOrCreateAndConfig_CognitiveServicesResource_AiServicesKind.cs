@@ -26,7 +26,7 @@ namespace Azure.AI.Details.Common.CLI
             var regionLocation = !string.IsNullOrEmpty(regionFilter) ? await AzCliConsoleGui.PickRegionLocationAsync(interactive, regionFilter) : new AzCli.AccountRegionLocationInfo();
             var resource = await AzCliConsoleGui.PickOrCreateCognitiveResource(sectionHeader, interactive, subscriptionId, regionLocation.Name, groupFilter, resourceFilter, kinds, sku, yes);
 
-            var (chatDeployment, embeddingsDeployment, evaluationDeployment, keys) = await PickOrCreateAndConfigCognitiveServicesOpenAiKindResourceDeployments(values, sectionHeader, interactive, subscriptionId, resource);
+            var (chatDeployment, embeddingsDeployment, realtimeDeployment, keys) = await PickOrCreateAndConfigCognitiveServicesOpenAiKindResourceDeployments(values, sectionHeader, interactive, subscriptionId, resource);
 
             return new AzCli.CognitiveServicesResourceInfoEx
             {
@@ -39,7 +39,7 @@ namespace Azure.AI.Details.Common.CLI
                 Key = keys.Key1,
                 ChatDeployment = chatDeployment?.Name,
                 EmbeddingsDeployment = embeddingsDeployment?.Name,
-                EvaluationDeployment = evaluationDeployment?.Name
+                RealTimeDeployment = realtimeDeployment?.Name
             };
         }
     }
