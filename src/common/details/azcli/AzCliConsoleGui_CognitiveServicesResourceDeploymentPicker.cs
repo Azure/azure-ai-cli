@@ -45,11 +45,13 @@ namespace Azure.AI.Details.Common.CLI
 
             var lookForChatCompletionCapable = deploymentExtra.ToLower() == "chat" || deploymentExtra.ToLower() == "evaluation";
             var lookForEmbeddingCapable = deploymentExtra.ToLower() == "embeddings";
+            var lookForRealtimeCapable = deploymentExtra.ToLower() == "realtime";
 
             var deployments = response.Payload
                 .Where(x => MatchDeploymentFilter(x, deploymentFilter))
                 .Where(x => !lookForChatCompletionCapable || x.ChatCompletionCapable)
                 .Where(x => !lookForEmbeddingCapable || x.EmbeddingsCapable)
+                .Where(x => !lookForRealtimeCapable || x.RealtimeCapable)
                 .OrderBy(x => x.Name)
                 .ToList();
 
@@ -178,9 +180,11 @@ namespace Azure.AI.Details.Common.CLI
 
             var lookForChatCompletionCapable = deploymentExtra.ToLower() == "chat" || deploymentExtra.ToLower() == "evaluation";
             var lookForEmbeddingCapable = deploymentExtra.ToLower() == "embeddings";
+            var lookForRealtimeCapable = deploymentExtra.ToLower() == "realtime";
             var capableModels = models.Payload
                 .Where(x => !lookForChatCompletionCapable || x.ChatCompletionCapable)
                 .Where(x => !lookForEmbeddingCapable || x.EmbeddingsCapable)
+                .Where(x => !lookForRealtimeCapable || x.RealtimeCapable)
                 .ToArray();
 
             Console.Write("\rModel: ");

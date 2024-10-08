@@ -99,6 +99,7 @@ namespace Azure.AI.Details.Common.CLI
             public string ModelName { get; set; }
             public bool ChatCompletionCapable { get; set; }
             public bool EmbeddingsCapable { get; set; }
+            public bool RealtimeCapable { get; set; }
         }
 
         public struct CognitiveServicesModelInfo
@@ -109,6 +110,7 @@ namespace Azure.AI.Details.Common.CLI
             public string DefaultCapacity { get; set; }
             public bool ChatCompletionCapable { get; set; }
             public bool EmbeddingsCapable { get; set; }
+            public bool RealtimeCapable { get; set; }
             public string SkuName { get; set; }
             public string UsageName { get; set; }
         }
@@ -317,7 +319,7 @@ namespace Azure.AI.Details.Common.CLI
             var cmdPart = "cognitiveservices account deployment list";
             var subPart = subscriptionId != null ? $"--subscription {subscriptionId}" : "";
 
-            var parsed = await ProcessHelpers.ParseShellCommandJsonArray("az", $"{cmdPart} --output json {subPart}  -g {group} -n {resourceName} --query \"[].{{Name:name,Location: location,Group:resourceGroup,Endpoint:properties.endpoint,Model:properties.model.name,Format:properties.model.format,ChatCompletionCapable:properties.capabilities.chatCompletion,EmbeddingsCapable:properties.capabilities.embeddings}}\"", GetUserAgentEnv());
+            var parsed = await ProcessHelpers.ParseShellCommandJsonArray("az", $"{cmdPart} --output json {subPart}  -g {group} -n {resourceName} --query \"[].{{Name:name,Location: location,Group:resourceGroup,Endpoint:properties.endpoint,Model:properties.model.name,Format:properties.model.format,ChatCompletionCapable:properties.capabilities.chatCompletion,EmbeddingsCapable:properties.capabilities.embeddings,RealtimeCapable:properties.capabilities.realtime}}\"", GetUserAgentEnv());
             var deployments = parsed.Payload;
 
             var x = new ParsedJsonProcessOutput<CognitiveServicesDeploymentInfo[]>(parsed.Output);
@@ -331,6 +333,7 @@ namespace Azure.AI.Details.Common.CLI
                 x.Payload[i].ModelName = deployment.GetPropertyStringOrEmpty("Model");
                 x.Payload[i].ChatCompletionCapable = deployment.GetPropertyStringOrEmpty("ChatCompletionCapable") == "true";
                 x.Payload[i].EmbeddingsCapable = deployment.GetPropertyStringOrEmpty("EmbeddingsCapable") == "true";
+                x.Payload[i].RealtimeCapable = deployment.GetPropertyStringOrEmpty("RealtimeCapable") == "true";
                 i++;
             }
 
@@ -342,7 +345,7 @@ namespace Azure.AI.Details.Common.CLI
             var cmdPart = "cognitiveservices model list";
             var subPart = subscriptionId != null ? $"--subscription {subscriptionId}" : "";
 
-            var parsed = await ProcessHelpers.ParseShellCommandJsonArray("az", $"{cmdPart} --output json {subPart} -l {regionLocation} --query \"[].{{Name:model.name,Format:model.format,Version:model.version,ChatCompletionCapable:model.capabilities.chatCompletion,EmbeddingsCapable:model.capabilities.embeddings,Skus:model.skus}}\"", GetUserAgentEnv());
+            var parsed = await ProcessHelpers.ParseShellCommandJsonArray("az", $"{cmdPart} --output json {subPart} -l {regionLocation} --query \"[].{{Name:model.name,Format:model.format,Version:model.version,ChatCompletionCapable:model.capabilities.chatCompletion,EmbeddingsCapable:model.capabilities.embeddings,RealtimeCapable:model.capabilities.realtime,Skus:model.skus}}\"", GetUserAgentEnv());
             var models = parsed.Payload;
 
             var x = new ParsedJsonProcessOutput<CognitiveServicesModelInfo[]>(parsed.Output);
@@ -355,6 +358,7 @@ namespace Azure.AI.Details.Common.CLI
                 var version = model.GetPropertyStringOrEmpty("Version");
                 var chatCompletionsCapable = model.GetPropertyStringOrEmpty("ChatCompletionCapable") == "true";
                 var embeddingsCapable = model.GetPropertyStringOrEmpty("EmbeddingsCapable") == "true";
+                var realtimeCapable = model.GetPropertyStringOrEmpty("RealtimeCapable") == "true";
 
                 var skus = model.GetProperty("Skus").EnumerateArray();
                 foreach (var sku in skus)
@@ -366,6 +370,7 @@ namespace Azure.AI.Details.Common.CLI
                         Version = version,
                         ChatCompletionCapable = chatCompletionsCapable,
                         EmbeddingsCapable = embeddingsCapable,
+                        RealtimeCapable = realtimeCapable,
                         SkuName = sku.GetPropertyStringOrEmpty("name"),
                         UsageName = sku.GetPropertyStringOrEmpty("usageName"),
                         DefaultCapacity = sku.GetPropertyElementOrNull("capacity")?.GetPropertyStringOrEmpty("default") ?? "50"
@@ -457,7 +462,8 @@ namespace Azure.AI.Details.Common.CLI
                 ModelFormat = resource.GetPropertyStringOrEmpty("kind"),
                 ModelName = modelName,
                 ChatCompletionCapable = resource.GetPropertyElementOrNull("properties")?.GetPropertyElementOrNull("capabilities")?.GetPropertyBool("chatCompletion", false) ?? false,
-                EmbeddingsCapable = resource.GetPropertyElementOrNull("properties")?.GetPropertyElementOrNull("capabilities")?.GetPropertyBool("embeddings", false) ?? false
+                EmbeddingsCapable = resource.GetPropertyElementOrNull("properties")?.GetPropertyElementOrNull("capabilities")?.GetPropertyBool("embeddings", false) ?? false,
+                RealtimeCapable = resource.GetPropertyElementOrNull("properties")?.GetPropertyElementOrNull("capabilities")?.GetPropertyBool("realtime", false) ?? false
             };
 
             return x;
