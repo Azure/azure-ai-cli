@@ -8,7 +8,6 @@
       name: robch-oai-eastus2
       chat-deployment-name: gpt-4-32k-0613
       embeddings-deployment-name: text-embedding-ada-002-2
-      evaluation-deployment-name: gpt-4-32k-0613
       interactive: false
 
 - name: test ai chat
