@@ -28,6 +28,7 @@ using Azure.AI.OpenAI.Chat;
 using OpenAI.Assistants;
 using OpenAI.Files;
 using OpenAI.VectorStores;
+using Azure.AI.Details.Common.CLI.Extensions.Otel;
 using System.ClientModel.Primitives;
 using static Azure.AI.Details.Common.CLI.ConsoleGui.Window;
 
@@ -95,6 +96,8 @@ namespace Azure.AI.Details.Common.CLI
                 case "chat.assistant.file.upload": DoChatAssistantFileUpload().Wait(); break;
                 case "chat.assistant.file.list": DoChatAssistantFileList().Wait(); break;
                 case "chat.assistant.file.delete": DoChatAssistantFileDelete().Wait(); break;
+
+                case "chat.assistant.trace.get": DoChatAssistantTraceGet().Wait(); break;
 
                 default:
                     _values.AddThrowError("WARNING:", $"'{command.Replace('.', ' ')}' NOT YET IMPLEMENTED!!");
@@ -779,6 +782,20 @@ namespace Azure.AI.Details.Common.CLI
             var region = _values["service.config.region"];
             var endpoint = ConfigEndpointUriToken.Data().GetOrDefault(_values);
             var tokenValue = _values["service.config.token.value"];
+           
+            var filepathOutput = _values.GetOrDefault("chat.output.request.id", "");
+            var filepathAdd = _values.GetOrDefault("chat.output.add.request.id", "");
+            bool outputId = !string.IsNullOrEmpty(filepathOutput);
+            bool addId = !string.IsNullOrEmpty(filepathAdd);
+            var filepath = "";
+            if (outputId)
+            {
+                filepath = filepathOutput;
+            }
+            else if (addId)
+            {
+                filepath = filepathAdd;
+            }
 
             deployment = ConfigDeploymentToken.Data().GetOrDefault(_values);
 
@@ -799,6 +816,11 @@ namespace Azure.AI.Details.Common.CLI
             {
                 AzureOpenAIClientOptions options = new();
                 options.AddPolicy(new LogTrafficEventPolicy(), PipelinePosition.PerCall);
+                
+                if (outputId || addId)
+                {
+                    options.AddPolicy(new GetRequestIdLogTrafficEventPolicy(filepath, outputId, addId), PipelinePosition.PerCall);
+                }
 
                 return new AzureOpenAIClient(
                     new Uri(endpoint!),
@@ -1662,6 +1684,28 @@ namespace Azure.AI.Details.Common.CLI
             await OpenAIAssistantHelpers.DeleteAssistantFile(key, endpoint, id);
 
             if (!_quiet) Console.WriteLine($"{message} Done!");
+            return true;
+        }
+        
+        private async Task<bool> DoChatAssistantTraceGet() 
+        {
+            var requestId = _values["chat.trace.request.id"];
+            var dashboard = _values.GetOrDefault("chat.trace.dashboard", false);
+            var filePath = _values.GetOrDefault("chat.trace.output.file", "");
+            
+            if (string.IsNullOrEmpty(requestId))
+            {
+                _values.AddThrowError("ERROR:", $"Retrieving trace; requires request id.");
+            }
+            Console.WriteLine("Attempting to fetch trace data...");
+            var data = await OtelData.GetTrace(requestId);
+            Console.WriteLine(data);
+            if (!string.IsNullOrEmpty(filePath)) {
+                await OtelData.WriteDataToFile(data, filePath);
+            }
+            if (dashboard) {
+                await OtelData.ExportToDashboard(data);
+            }
             return true;
         }
 
