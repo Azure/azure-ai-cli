@@ -40,6 +40,30 @@ namespace Azure.AI.Details.Common.CLI.Extensions.HelperFunctions
             return true;
         }
 
+        [HelperFunctionDescription("Opens a text file for line editing; returns the file content as a string with line numbers")]
+        public static string OpenTextFileForLineEditing(string fileName)
+        {
+            return FileLineEditorHelpers.OpenFileForLineEditing(fileName);
+        }
+
+        [HelperFunctionDescription("Removes lines from a file previously opened for line editing")]
+        public static string RemoveLinesFromFile(string fileName, int firstLineToRemove, int lastLineToRemove)
+        {
+            return FileLineEditorHelpers.RemoveLinesFromFile(fileName, firstLineToRemove, lastLineToRemove);
+        }
+
+        [HelperFunctionDescription("Inserts lines before a line in a file previously opened for line editing")]
+        public static string InsertLinesIntoFileBeforeLine(string fileName, string text, int lineNumber)
+        {
+            return FileLineEditorHelpers.InsertLinesIntoFileBeforeOrAfterLine(fileName, text, lineNumber, true, false);
+        }
+
+        [HelperFunctionDescription("Inserts lines after a line in a file previously opened for line editing")]
+        public static string InsertLinesIntoFileAfterLine(string fileName, string text, int lineNumber)
+        {
+            return FileLineEditorHelpers.InsertLinesIntoFileBeforeOrAfterLine(fileName, text, lineNumber, false, true);
+        }
+
         [HelperFunctionDescription("Creates a directory if it doesn't already exist")]
         public static bool DirectoryCreate(string directoryName)
         {
