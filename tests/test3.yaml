@@ -1669,3 +1669,46 @@
         Tell me a joke
         exit
       tag: skip
+
+- area: line editing
+  tag: skip
+  steps:
+  - name: create file for use with line editing
+    command: ai chat
+    arguments:
+      built-in-functions: true
+      question: |
+        Create a text file named `test.md` with 25 quotes from famous people
+        Save them in a markdown table with column one author, two is the quote.
+        Be sure to include quotes from Einstein, Clinton, and Gandhi.
+        Put the quotes in order of quote author's last name.
+        Don't include a quote author more than once.
+  - name: move stuff around
+    command: ai chat
+    arguments:
+      built-in-functions: true
+      interactive: true
+      system-prompt: |
+        You will be making edits to a file called `test.md`test.md. It contains a single markdown table. 
+        The table must always have a header of `Author` and `Quote` with the 2nd line being the `|--|--|` type line.
+        The markdown table must always be valid markdown table.
+        No extraneous lines in the file.
+      question: |
+        In `test.md`, there is a markdown table of quotes.
+        Use line editing to remove all the quotes except the ones from Einstein and Clinton.
+    input: |
+      Put the Gandhi quote back in the file, above both Einstein and Clinton.
+      Move the Einstein one to the end of the file.
+      exit
+  - name: verify
+    command: ai chat
+    arguments:
+      built-in-functions: true
+      question: |
+        Read the contents of `test.md` and show it to me.
+    expect-regex: |
+      Gandhi
+      Clinton
+      Einstein
+    expect: There should only be three quotes in the markdown table, from Gandhi, Clinton, and Einstein.
+  

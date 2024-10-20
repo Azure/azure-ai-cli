@@ -1,0 +1,5 @@
+I want a new helper function that can run any external CLI it wants, like git, grep, ch, etc... it should capture the output both std and err and return that as a string. if there's a failure, return relevant information as a string instead so the caller can figure out what to do to fix it. 
+
+Some CLIs will have different parameters depending on if they're running on windows or linux. you should also make a function that returns if we're running on windows or linux. that way the caller of the previous helper function can do the right thing.
+
+You might want to make not in the helper function description in the first function that they should check if they're on windows or linux first before calling it. One key thing that's different, often, is that arguments have either `'` or `"` wrapping them.
