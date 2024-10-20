@@ -1693,7 +1693,6 @@
         The table must always have a header of `Author` and `Quote` with the 2nd line being the `|--|--|` type line.
         The markdown table must always be valid markdown table.
         No extraneous lines in the file.
-        Before each function call, tell me why you're making the function call.
       question: |
         In `test.md`, there is a markdown table of quotes.
         Use line editing to remove all the quotes except the ones from Einstein and Clinton.

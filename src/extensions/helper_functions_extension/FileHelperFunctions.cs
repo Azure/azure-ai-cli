@@ -39,6 +39,12 @@ namespace Azure.AI.Details.Common.CLI.Extensions.HelperFunctions
             return FileLineEditorHelpers.OpenFileForLineEditing(fileName);
         }
 
+        [HelperFunctionDescription("Updates a line in a file previously opened for line editing; line numbers must be original line numbers returned from OpenTextFileForLineEditing")]
+        public static string UpdateLineInFile(string fileName, int lineNumber, string newText)
+        {
+            return FileLineEditorHelpers.UpdateLineInFile(fileName, lineNumber, newText);
+        }
+
         [HelperFunctionDescription("Removes lines from a file previously opened for line editing; line numbers must be original line numbers returned from OpenTextFileForLineEditing")]
         public static string RemoveLinesFromFile(string fileName, int firstLineToRemove, int lastLineToRemove)
         {
