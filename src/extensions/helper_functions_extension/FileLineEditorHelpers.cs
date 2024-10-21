@@ -34,14 +34,21 @@ namespace Azure.AI.Details.Common.CLI.Extensions.HelperFunctions
         {
             if (!_lineEditableFiles.ContainsKey(fileName)) return $"File not opened for line editing: {fileName}; use OpenTextFileForLineEditing() first";
 
-            var linePairs = _lineEditableFiles[fileName];
-            var lineIndex = linePairs.FindIndex(x => x.Key == lineNumber);
-            if (lineIndex < 0) return $"Line number {lineNumber} not found in file {fileName}; re-open the file for line editing";
+            if (!newText.Contains('\n'))
+            {
+                var linePairs = _lineEditableFiles[fileName];
+                var lineIndex = linePairs.FindIndex(x => x.Key == lineNumber);
+                if (lineIndex < 0) return $"Line number {lineNumber} not found in file {fileName}; re-open the file for line editing";
 
-            linePairs[lineIndex] = new KeyValuePair<int, string?>(lineNumber, newText);
+                linePairs[lineIndex] = new KeyValuePair<int, string?>(lineNumber, newText);
 
-            UpdateFileContent(fileName, linePairs);
-            return $"{lineNumber}: {newText}";
+                UpdateFileContent(fileName, linePairs);
+                return $"{lineNumber}: {newText}";
+            }
+
+            var result = InsertLinesIntoFileBeforeOrAfterLine(fileName, newText, lineNumber, insertBefore: false, insertAfter: true);
+            RemoveLinesFromFile(fileName, lineNumber, lineNumber);
+            return result;
         }
 
         public static string MoveLineBlockBeforeOrAfterLine(string fileName, int firstLineNumberToMove, int lastLineNumberToMove, int insertBeforeOrAfterLineNumber, bool insertBefore, bool insertAfter)
