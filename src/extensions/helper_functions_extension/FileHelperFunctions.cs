@@ -33,11 +33,46 @@ namespace Azure.AI.Details.Common.CLI.Extensions.HelperFunctions
             return true;
         }
 
-        [HelperFunctionDescription("Appends text to a file; if the file does not exist, it is created")]
-        public static bool AppendTextToFile(string fileName, string text)
+        [HelperFunctionDescription("Opens a text file for line editing; returns the file content as a string with line numbers")]
+        public static string OpenTextFileForLineEditing(string fileName)
         {
-            FileHelpers.AppendAllText(fileName, text, new UTF8Encoding(false));
-            return true;
+            return FileLineEditorHelpers.OpenFileForLineEditing(fileName);
+        }
+
+        [HelperFunctionDescription("Updates a line in a file previously opened for line editing; line numbers must be original line numbers returned from OpenTextFileForLineEditing")]
+        public static string UpdateLineInFile(string fileName, int lineNumber, string newText)
+        {
+            return FileLineEditorHelpers.UpdateLineInFile(fileName, lineNumber, newText);
+        }
+
+        [HelperFunctionDescription("Removes lines from a file previously opened for line editing; line numbers must be original line numbers returned from OpenTextFileForLineEditing")]
+        public static string RemoveLinesFromFile(string fileName, int firstLineToRemove, int lastLineToRemove)
+        {
+            return FileLineEditorHelpers.RemoveLinesFromFile(fileName, firstLineToRemove, lastLineToRemove);
+        }
+
+        [HelperFunctionDescription("Inserts lines before a line in a file previously opened for line editing; line numbers must be original line numbers returned from OpenTextFileForLineEditing")]
+        public static string InsertLinesIntoFileBeforeLine(string fileName, string text, int lineNumber)
+        {
+            return FileLineEditorHelpers.InsertLinesIntoFileBeforeOrAfterLine(fileName, text, lineNumber, true, false);
+        }
+
+        [HelperFunctionDescription("Inserts lines after a line in a file previously opened for line editing; line numbers must be original line numbers returned from OpenTextFileForLineEditing")]
+        public static string InsertLinesIntoFileAfterLine(string fileName, string text, int lineNumber)
+        {
+            return FileLineEditorHelpers.InsertLinesIntoFileBeforeOrAfterLine(fileName, text, lineNumber, false, true);
+        }
+
+        [HelperFunctionDescription("Moves a block of lines before a line in a file previously opened for line editing; line numbers must be original line numbers returned from OpenTextFileForLineEditing")]
+        public static string MoveLinesBeforeLine(string fileName, int firstLineToMove, int lastLineToMove, int insertBeforeLineNumber)
+        {
+            return FileLineEditorHelpers.MoveLineBlockBeforeOrAfterLine(fileName, firstLineToMove, lastLineToMove, insertBeforeLineNumber, true, false);
+        }
+
+        [HelperFunctionDescription("Moves a block of lines after a line in a file previously opened for line editing; line numbers must be original line numbers returned from OpenTextFileForLineEditing")]
+        public static string MoveLinesAfterLine(string fileName, int firstLineToMove, int lastLineToMove, int insertAfterLineNumber)
+        {
+            return FileLineEditorHelpers.MoveLineBlockBeforeOrAfterLine(fileName, firstLineToMove, lastLineToMove, insertAfterLineNumber, false, true);
         }
 
         [HelperFunctionDescription("Creates a directory if it doesn't already exist")]
