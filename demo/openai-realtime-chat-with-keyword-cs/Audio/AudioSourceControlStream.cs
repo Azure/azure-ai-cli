@@ -6,18 +6,6 @@ public class AudioSourceControlStream : Stream, IDisposable
         _controller.AudioDataAvailable += (_, e) => CopyToBuffer(e);
     }
 
-    public override bool CanRead => true;
-
-    public override bool CanSeek => false;
-
-    public override bool CanWrite => false;
-
-    public override long Length => throw new NotImplementedException();
-
-    public override long Position { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
-
-    public override void Flush() => throw new NotImplementedException();
-
     public override int Read(byte[] buffer, int offset, int count)
     {
         int totalCount = count;
@@ -55,6 +43,22 @@ public class AudioSourceControlStream : Stream, IDisposable
         return totalCount;
     }
 
+    public override bool CanRead => true;
+    public override bool CanSeek => false;
+    public override bool CanWrite => false;
+
+    public override long Length => throw new NotImplementedException();
+    public override long Position { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+    public override void Flush() => throw new NotImplementedException();
+    public override long Seek(long offset, SeekOrigin origin) => throw new NotImplementedException();
+    public override void SetLength(long value) => throw new NotImplementedException();
+    public override void Write(byte[] buffer, int offset, int count) => throw new NotImplementedException();
+
+    protected override void Dispose(bool disposing)
+    {
+        base.Dispose(disposing);
+    }
+    
     private void CopyToBuffer(AudioDataAvailableEventArgs e)
     {
         lock (_bufferLock)
@@ -72,22 +76,12 @@ public class AudioSourceControlStream : Stream, IDisposable
         }
     }
 
-    public override long Seek(long offset, SeekOrigin origin) => throw new NotImplementedException();
-    public override void SetLength(long value) => throw new NotImplementedException();
-    public override void Write(byte[] buffer, int offset, int count) => throw new NotImplementedException();
-
-    protected override void Dispose(bool disposing)
-    {
-        base.Dispose(disposing);
-    }
-    
     private readonly AudioSourceController _controller;
 
     private const int SAMPLES_PER_SECOND = 24000;
     private const int BYTES_PER_SAMPLE = 2;
     private const int CHANNELS = 1;
 
-    // For simplicity, this is configured to use a static 10-second ring buffer.
     private readonly byte[] _buffer = new byte[BYTES_PER_SAMPLE * SAMPLES_PER_SECOND * CHANNELS * 10];
     private readonly object _bufferLock = new();
     private int _bufferReadPos = 0;

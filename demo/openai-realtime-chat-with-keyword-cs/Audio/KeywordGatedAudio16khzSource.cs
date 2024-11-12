@@ -29,6 +29,8 @@ public class KeywordGatedAudio16khzSource
 
     public async Task<bool> StartAsync()
     {
+        await StopAsync();
+
         lock (_syncLock)
         {
             if (_isRunning) throw new InvalidOperationException("The source is already running.");

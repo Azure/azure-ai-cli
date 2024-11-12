@@ -9,8 +9,8 @@ public class KeywordGatedAudio24KhzSource
         _keywordAudioSource.AudioDataAvailable += OnKeywordAudioDataAvailable;
     }
 
-    public event EventHandler<AudioDataAvailableEventArgs>? AudioDataAvailable;
     public event EventHandler? KeywordRecognized;
+    public event EventHandler<AudioDataAvailableEventArgs>? AudioDataAvailable;
 
     public void Start()
     {

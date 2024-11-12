@@ -46,11 +46,6 @@ public class AudioSourceController
 
     public void TransitionToKeywordArmed()
     {
-        if (State == AudioSourceState.KeywordArmed)
-        {
-            _keywordAudioSource.Stop();
-        }
-
         State = AudioSourceState.KeywordArmed;
 
         _keywordAudioSource.Start();
@@ -60,7 +55,42 @@ public class AudioSourceController
         UnMute();
     }
 
-    public bool IsMuted { get { return _isMuted; } }
+    public void ToggleKeywordState()
+    {
+        switch (State)
+        {
+            case AudioSourceState.Off:
+            case AudioSourceState.OpenMic:
+                TransitionToKeywordArmed();
+                break;
+
+            case AudioSourceState.KeywordArmed:
+                TransitionToOff();
+                break;
+        }
+    }
+
+    public void ToggleState()
+    {
+        switch (State)
+        {
+            case AudioSourceState.Off:
+            case AudioSourceState.KeywordArmed:
+                TransitionToOpenMic();
+                break;
+
+            case AudioSourceState.OpenMic:
+                if (IsMuted)
+                {
+                    UnMute();
+                }
+                else
+                {
+                    TransitionToOff();
+                }
+                break;
+        }
+    }
 
     public void ToggleMute()
     {
@@ -73,6 +103,8 @@ public class AudioSourceController
             Mute();
         }
     }
+
+    public bool IsMuted { get { return _isMuted; } }
 
     public void Mute()
     {

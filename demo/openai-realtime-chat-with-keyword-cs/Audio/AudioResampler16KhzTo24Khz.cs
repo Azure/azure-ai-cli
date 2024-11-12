@@ -27,16 +27,12 @@ public class AudioResampler16KhzTo24Khz : IDisposable
 
     public byte[] Resample(byte[] audioData)
     {
-        // Add the new audio data to the buffer
         _bufferedWaveProvider.AddSamples(audioData, 0, audioData.Length);
 
-        // Estimate the number of resampled bytes available
         int bytesAvailable = _resampler.WaveFormat.AverageBytesPerSecond * audioData.Length / _sourceFormat.AverageBytesPerSecond;
-
         byte[] resampledData = new byte[bytesAvailable];
 
         int bytesRead = _resampler.Read(resampledData, 0, resampledData.Length);
-
         if (bytesRead < resampledData.Length)
         {
             Array.Resize(ref resampledData, bytesRead);
@@ -47,7 +43,6 @@ public class AudioResampler16KhzTo24Khz : IDisposable
 
     public byte[] Flush()
     {
-        // Read any remaining data in the resampler
         using (var outputStream = new System.IO.MemoryStream())
         {
             byte[] buffer = new byte[4096];
