@@ -30,6 +30,9 @@ namespace Azure.AI.Details.Common.CLI
 
             if (endpointTypeIsInference)
             {
+                env.Add("OPENAI_API_KEY", ReadConfig(values, "chat.key"));
+                env.Add("OPENAI_BASE_URL", ReadConfig(values, "chat.endpoint"));
+                env.Add("OPENAI_MODEL_NAME", ReadConfig(values, "chat.model"));
                 env.Add("AZURE_AI_CHAT_API_KEY", ReadConfig(values, "chat.key"));
                 env.Add("AZURE_AI_CHAT_ENDPOINT", ReadConfig(values, "chat.endpoint"));
                 env.Add("AZURE_AI_CHAT_MODEL", ReadConfig(values, "chat.model"));
@@ -70,9 +73,10 @@ namespace Azure.AI.Details.Common.CLI
             env.Add("AZURE_CLIENT_ID", null);
             env.Add("AZURE_TENANT_ID", null);
             env.Add("AZURE_OPENAI_SYSTEM_PROMPT", null);
-            env.Add("OPENAI_API_KEY", null);
-            env.Add("OPENAI_MODEL_NAME", null);
-            env.Add("OPENAI_ORG_ID", null);
+            env.TryAdd("OPENAI_API_KEY", null);
+            env.TryAdd("OPENAI_BASE_URL", null);
+            env.TryAdd("OPENAI_MODEL_NAME", null);
+            env.TryAdd("OPENAI_ORG_ID", null);
 
             env.Add("AZURE_AI_INFERENCE_CHAT_API_KEY", null);
             env.Add("AZURE_AI_INFERENCE_CHAT_ENDPOINT", null);
