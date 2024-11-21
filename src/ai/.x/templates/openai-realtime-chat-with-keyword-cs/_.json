@@ -1,0 +1,10 @@
+{
+  "_LongName": "OpenAI Realtime Chat (w/ Keyword)",
+  "_ShortName": "openai-realtime-chat-with-keyword",
+  "_Language": "C#",
+  "ClassName": "OpenAIRealtimeConversationSessionHelperClass",
+  "AZURE_OPENAI_API_KEY": "<insert your OpenAI API key here>",
+  "AZURE_OPENAI_ENDPOINT": "<insert your OpenAI endpoint here>",
+  "AZURE_OPENAI_REALTIME_DEPLOYMENT": "<insert your OpenAI chat deployment name here>",
+  "AZURE_OPENAI_SYSTEM_PROMPT": "You are a helpful AI assistant."
+}

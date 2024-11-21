@@ -1647,6 +1647,21 @@
     #   command: ai dev shell --bash "cd openai-realtime-chat-with-functions-cs;./bin/Debug/net8.0/OpenAIRealtimeChatWithFunctions"
     #   tag: skip
 
+- area: ai dev new openai-realtime-chat-with-keyword (C#)
+  tests:
+
+  - class: dev new openai-realtime-chat-with-keyword (c#)
+    steps:
+    - name: generate template
+      command: ai dev new openai-realtime-chat-with-keyword --cs
+    - name: build template
+      bash: |
+        cd openai-realtime-chat-with-keyword-cs
+        dotnet build
+    # - name: run template
+    #   command: ai dev shell --bash "cd openai-realtime-chat-with-keyword-cs;./bin/Debug/net8.0/OpenAIRealtimeChatWithKeyword"
+    #   tag: skip
+
 - area: ai dev new phi3-onnx-chat-streaming (c#)
   tests:
 
