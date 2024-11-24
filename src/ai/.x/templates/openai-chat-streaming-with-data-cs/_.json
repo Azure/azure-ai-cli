@@ -11,5 +11,9 @@
   "AZURE_OPENAI_SYSTEM_PROMPT": "You are a helpful AI assistant.",
   "AZURE_AI_SEARCH_KEY": "<insert your search api key here>",
   "AZURE_AI_SEARCH_ENDPOINT": "<insert your search endpoint here>",
-  "AZURE_AI_SEARCH_INDEX_NAME": "<insert your search index name here>"
+  "AZURE_AI_SEARCH_INDEX_NAME": "<insert your search index name here>",
+
+  "_IS_OPENAI_CHAT_STREAMING_TEMPLATE": "true",
+  "_IS_WITH_FUNCTIONS_TEMPLATE": "false",
+  "_IS_WITH_DATA_TEMPLATE": "true"
 }
