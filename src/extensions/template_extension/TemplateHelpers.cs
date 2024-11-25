@@ -55,7 +55,7 @@ namespace Azure.AI.Details.Common.CLI.Extensions.Templates
             {
                 var trimmedLine = line.Trim('\n', '\r', ' ', '\t');
 
-                if (trimmedLine.StartsWith("{{if ") && trimmedLine.EndsWith("}}"))
+                if (trimmedLine.StartsWith("{{if ") && trimmedLine.EndsWith("}}") && !trimmedLine.EndsWith("{{endif}}"))
                 {
                     var condition = trimmedLine[5..^2].Trim();
                     var evaluated = evaluateCondition(condition);
@@ -123,13 +123,143 @@ namespace Azure.AI.Details.Common.CLI.Extensions.Templates
 
                 if (inTrueBranchNow.All(b => b))
                 {
+                    var updated = line.TrimEnd('\n', '\r');
+
                     var firstLine = output.Length == 0;
                     if (!firstLine) output.AppendLine();
-                    output.Append(interpolate(line.TrimEnd('\n', '\r')));
+
+                    var inlineIfPos = updated.IndexOf("{{if ");
+                    var inlineEndIfPos = updated.IndexOf("{{endif}}");
+                    var inlineIfEndIf = inlineIfPos >= 0 && inlineEndIfPos >= 0 && inlineIfPos < inlineEndIfPos;
+                    if (inlineIfEndIf)
+                    {
+                        updated = HandleInlineIf(updated, evaluateCondition, interpolate);
+                    }
+
+                    output.Append(interpolate(updated));
                 }
             }
 
             return output.ToString();
+        }
+
+        private static string HandleInlineIf(string line, Func<string, bool> evaluateCondition, Func<string, string> interpolate)
+        {
+            var output = new StringBuilder();
+
+            var inTrueBranchNow = new Stack<bool>();
+            inTrueBranchNow.Push(true);
+
+            var skipElseBranches = new Stack<bool>();
+            skipElseBranches.Push(true);
+
+            var chars = line.ToCharArray();
+            var position = 0;
+            while (position < chars.Length)
+            {
+                var cch = CountCharsToCheck(chars, position);
+                if (cch == 1)
+                {
+                    if (inTrueBranchNow.All(b => b))
+                    {
+                        output.Append(chars[position]);
+                    }
+                    position++;
+                    continue;
+                }
+
+                var check = new string(chars, position, cch);
+                position += cch;
+
+                if (check.StartsWith("{{if ") && check.EndsWith("}}"))
+                {
+                    var condition = check[5..^2].Trim();
+                    var evaluated = evaluateCondition(condition);
+                    inTrueBranchNow.Push(evaluated);
+                    skipElseBranches.Push(evaluated);
+                    continue;
+                }
+                else if (check.StartsWith("{{else if ") && check.EndsWith("}}"))
+                {
+                    if (inTrueBranchNow.Peek())
+                    {
+                        inTrueBranchNow.Pop();
+                        inTrueBranchNow.Push(false);
+                        // skipElseBranches.Peek() should already be true
+                        continue;
+                    }
+                    else if (skipElseBranches.Peek())
+                    {
+                        continue;
+                    }
+
+                    var condition = check[10..^2].Trim();
+                    var evaluated = evaluateCondition(condition);
+                    inTrueBranchNow.Pop();
+                    inTrueBranchNow.Push(evaluated);
+                    skipElseBranches.Pop();
+                    skipElseBranches.Push(evaluated);
+                    continue;
+                }
+                else if (check.StartsWith("{{else}}") && check.EndsWith("}}"))
+                {
+                    if (inTrueBranchNow.Peek())
+                    {
+                        inTrueBranchNow.Pop();
+                        inTrueBranchNow.Push(false);
+                        // skipElseBranches.Peek() should already be true
+                        continue;
+                    }
+                    else if (skipElseBranches.Peek())
+                    {
+                        continue;
+                    }
+
+                    inTrueBranchNow.Pop();
+                    inTrueBranchNow.Push(true);
+                    skipElseBranches.Pop();
+                    skipElseBranches.Push(true);
+                    continue;
+                }
+                else if (check.StartsWith("{{endif}}") && check.EndsWith("}}"))
+                {
+                    inTrueBranchNow.Pop();
+                    skipElseBranches.Pop();
+                    continue;
+                }
+                else if (inTrueBranchNow.All(b => b))
+                {
+                    output.Append(interpolate(check));
+                }
+            }
+
+            return output.ToString();
+        }
+
+        private static int CountCharsToCheck(char[] chars, int position)
+        {
+            if (chars[position] != '{') return 1;
+
+            var cch = 1;
+            var braces = 1;
+            for (var i = position + 1; i < chars.Length; i++)
+            {
+                if (chars[i] == '{')
+                {
+                    braces++;
+                }
+                else if (chars[i] == '}')
+                {
+                    braces--;
+                    if (braces == 0)
+                    {
+                        cch = i - position + 1;
+                        break;
+                    }
+                }
+            }
+
+            return cch;
         }
     }
 }

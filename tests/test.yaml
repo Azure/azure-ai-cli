@@ -105,8 +105,8 @@
       ^OpenAI +Chat +Webpage +\(w/ +Functions +\+ +Speech\) +openai-chat-webpage-with-speech-and-functions +TypeScript *\r?$\n
       ^OpenAI +Realtime +Chat +openai-realtime-chat +C# *\r?$\n
       ^OpenAI +Realtime +Chat \(w/ Functions\) +openai-realtime-chat-with-functions +C# *\r?$\n
-      ^Phi-3 Chat Completions \(w/ ONNX\) +phi3-onnx-chat-streaming +C# +\r?$\n
-      ^Phi-3 Chat Completions \(w/ ONNX \+ Functions\) +phi3-onnx-chat-streaming-with-functions +C# +\r?$\n
+      ^Phi-3 Chat Completions \(w/ ONNX\) +phi3-onnx-chat-streaming +C# *\r?$\n
+      ^Phi-3 Chat Completions \(w/ ONNX \+ Functions\) +phi3-onnx-chat-streaming-with-functions +C# *\r?$\n
       ^Semantic +Kernel +Chat +Completions +\(Streaming\) +sk-chat-streaming +C# *\r?$\n
       ^Semantic +Kernel +Chat +Completions +\(w/ +Data +\+ +AI +Search\) +sk-chat-streaming-with-data +C# *\r?$\n
       ^Semantic +Kernel +Chat +Completions +\(w/ +Functions\) +sk-chat-streaming-with-functions +C# *\r?$\n

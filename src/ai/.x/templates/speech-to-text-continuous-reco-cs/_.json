@@ -3,5 +3,9 @@
   "_ShortName": "speech-to-text-continuous-reco",
   "_Language": "C#",
   "AZURE_AI_SPEECH_KEY": "<insert your Speech Service API key here>",
-  "AZURE_AI_SPEECH_REGION": "<insert your Speech Service region here>"
+  "AZURE_AI_SPEECH_REGION": "<insert your Speech Service region here>",
+  "_IS_SPEECH_TO_TEXT_CONTINUOUS": true,
+  "_IS_SPEECH_TO_TEXT_WITH_FILE": false,
+  "_IS_SPEECH_TO_TEXT_WITH_KEYWORD": false,
+  "_IS_SPEECH_TO_TEXT_WITH_TRANSLATION": false
 }
