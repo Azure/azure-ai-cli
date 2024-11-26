@@ -1,7 +1,8 @@
 {
-  "_LongName": "Text-to-speech (w/ File output)",
-  "_ShortName": "text-to-speech-with-file",
-  "_Language": "C#",
-  "AZURE_AI_SPEECH_KEY": "<insert your Speech Service API key here>",
-  "AZURE_AI_SPEECH_REGION": "<insert your Speech Service region here>"
+    "_LongName": "Text-to-speech (w/ File output)",
+    "_ShortName": "text-to-speech-with-file",
+    "_Language": "C#",
+    "AZURE_AI_SPEECH_KEY": "<insert your Speech Service API key here>",
+    "AZURE_AI_SPEECH_REGION": "<insert your Speech Service region here>",
+    "_IS_TEXT_TO_SPEECH_WITH_FILE_TEMPLATE": true
 }

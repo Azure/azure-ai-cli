@@ -3,5 +3,7 @@
   "_ShortName": "phi3-onnx-chat-streaming",
   "_Language": "C#",
 
-  "ONNX_GENAI_MODEL_PLATFORM": "DIRECTML"
+  "ONNX_GENAI_MODEL_PLATFORM": "DIRECTML",
+  "_IS_PHI3_ONNX_CHAT_STREAMING_TEMPLATE": true,
+  "_IS_PHI3_ONNX_CHAT_FUNCTIONS_TEMPLATE": false
 }

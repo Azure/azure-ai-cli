@@ -100,9 +100,18 @@ namespace Azure.AI.Details.Common.CLI.Extensions.Templates
             var quiet = values.GetOrDefault("quiet", false);
             if (!quiet) Console.WriteLine($"{message}\n");
 
+            var addendum = string.Empty;
+            var addendumFileName = "DEV-NEW-DID-YOU-KNOW.md";
             var generated = ProcessTemplates(normalizedTemplateName, files, parameters, outputDirectory, values);
             foreach (var item in generated)
             {
+                if (item.EndsWith(addendumFileName))
+                {
+                    addendum = FileHelpers.ReadAllText(item, new UTF8Encoding(false));
+                    File.Delete(item);
+                    continue;
+                }
+
                 var file = item.Replace(outputDirectory, string.Empty).Trim('\\', '/');
                 if (!quiet) Console.WriteLine($"  {file}");
             }
@@ -137,6 +146,11 @@ namespace Azure.AI.Details.Common.CLI.Extensions.Templates
                     Console.WriteLine($"ERROR: chat failed with exit code {exitCode}");
                     return false;
                 }
+            }
+
+            if (!quiet && !string.IsNullOrEmpty(addendum))
+            {
+                ConsoleHelpers.WriteLineWithHighlight(addendum);
             }
 
             return true;

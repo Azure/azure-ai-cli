@@ -1647,6 +1647,21 @@
     #   command: ai dev shell --bash "cd openai-realtime-chat-with-functions-cs;./bin/Debug/net8.0/OpenAIRealtimeChatWithFunctions"
     #   tag: skip
 
+- area: ai dev new openai-realtime-chat-with-keyword (C#)
+  tests:
+
+  - class: dev new openai-realtime-chat-with-keyword (c#)
+    steps:
+    - name: generate template
+      command: ai dev new openai-realtime-chat-with-keyword --cs
+    - name: build template
+      bash: |
+        cd openai-realtime-chat-with-keyword-cs
+        dotnet build
+    # - name: run template
+    #   command: ai dev shell --bash "cd openai-realtime-chat-with-keyword-cs;./bin/Debug/net8.0/OpenAIRealtimeChatWithKeyword"
+    #   tag: skip
+
 - area: ai dev new phi3-onnx-chat-streaming (c#)
   tests:
 
@@ -1667,5 +1682,29 @@
       command: ai dev shell --bash "cd phi3-onnx-chat-streaming-cs;./bin/Debug/net8.0/Phi3ChatStreaming"
       input: |-
         Tell me a joke
+        exit
+      tag: skip
+
+- area: ai dev new phi3-onnx-chat-streaming-with-functions (c#)
+  tests:
+
+  - class: dev new phi3-onnx-chat-streaming-with-functions (c#)
+    steps:
+    - name: generate template
+      command: ai dev new phi3-onnx-chat-streaming-with-functions --cs
+    - name: build template
+      bash: |
+        cd phi3-onnx-chat-streaming-with-functions-cs
+        dotnet build
+    - name: get models
+      script: |
+        cd phi3-onnx-chat-streaming-with-functions-cs
+        ./get-phi3-mini-onnx.cmd
+      tag: skip
+    - name: run template
+      command: ai dev shell --bash "cd phi3-onnx-chat-streaming-with-functions-cs;./bin/Debug/net8.0/Phi3ChatStreaming"
+      input: |-
+        What is the date?
+        What is the time?
         exit
       tag: skip

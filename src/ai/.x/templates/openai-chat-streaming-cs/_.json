@@ -6,5 +6,9 @@
   "AZURE_OPENAI_API_KEY": "<insert your OpenAI API key here>",
   "AZURE_OPENAI_ENDPOINT": "<insert your OpenAI endpoint here>",
   "AZURE_OPENAI_CHAT_DEPLOYMENT": "<insert your OpenAI chat deployment name here>",
-  "AZURE_OPENAI_SYSTEM_PROMPT": "You are a helpful AI assistant."
+  "AZURE_OPENAI_SYSTEM_PROMPT": "You are a helpful AI assistant.",
+
+  "_IS_OPENAI_CHAT_STREAMING_TEMPLATE": "true",
+  "_IS_WITH_FUNCTIONS_TEMPLATE": "false",
+  "_IS_WITH_DATA_TEMPLATE": "false"
 }

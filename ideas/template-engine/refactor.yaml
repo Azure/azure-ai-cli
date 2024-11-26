@@ -1,0 +1,57 @@
+﻿- area: refactor templates
+  matrix:
+    foreach:
+
+    # OpenAI Assistants
+    # - { "dir1": "openai-asst-cs", "dir2": "openai-asst-streaming-cs",                  "file1": "OpenAIAssistants.csproj._", "file2": "OpenAIAssistantsStreaming.csproj._",                "file3": "OpenAIAssistants.csproj._", "dir3": "openai-asst-cs", "flag1": "!{_IS_OPENAI_ASST_STREAMING_TEMPLATE}", "flag2": "{_IS_OPENAI_ASST_STREAMING_TEMPLATE}" }
+    # - { "dir1": "openai-asst-cs", "dir2": "openai-asst-streaming-cs",                  "file1": "OpenAIAssistantsClass.cs",  "file2": "OpenAIAssistantsStreamingClass.cs",                 "file3": "OpenAIAssistantsClass.cs",  "dir3": "openai-asst-cs", "flag1": "!{_IS_OPENAI_ASST_STREAMING_TEMPLATE}", "flag2": "{_IS_OPENAI_ASST_STREAMING_TEMPLATE}" }
+    # - { "dir1": "openai-asst-cs", "dir2": "openai-asst-streaming-cs",                  "file1": "Program.cs",                "file2": "Program.cs",                                        "file3": "Program.cs",                "dir3": "openai-asst-cs", "flag1": "!{_IS_OPENAI_ASST_STREAMING_TEMPLATE}", "flag2": "{_IS_OPENAI_ASST_STREAMING_TEMPLATE}" }
+    # - { "dir1": "openai-asst-cs", "dir2": "openai-asst-streaming-with-code-cs",        "file1": "OpenAIAssistants.csproj._", "file2": "OpenAIAssistantsCodeInterpreterStreaming.csproj._", "file3": "OpenAIAssistants.csproj._", "dir3": "openai-asst-cs", "flag1": "!{_IS_OPENAI_ASST_STREAMING_TEMPLATE}", "flag2": "{_IS_OPENAI_ASST_CODE_INTERPRETER_TEMPLATE}" }
+    # - { "dir1": "openai-asst-cs", "dir2": "openai-asst-streaming-with-code-cs",        "file1": "OpenAIAssistantsClass.cs",  "file2": "OpenAIAssistantsCodeInterpreterStreamingClass.cs",  "file3": "OpenAIAssistantsClass.cs",  "dir3": "openai-asst-cs", "flag1": "!{_IS_OPENAI_ASST_STREAMING_TEMPLATE}", "flag2": "{_IS_OPENAI_ASST_CODE_INTERPRETER_TEMPLATE}" }
+    # - { "dir1": "openai-asst-cs", "dir2": "openai-asst-streaming-with-code-cs",        "file1": "Program.cs",                "file2": "Program.cs",                                        "file3": "Program.cs",                "dir3": "openai-asst-cs", "flag1": "!{_IS_OPENAI_ASST_STREAMING_TEMPLATE}", "flag2": "{_IS_OPENAI_ASST_CODE_INTERPRETER_TEMPLATE}" }
+    # - { "dir1": "openai-asst-cs", "dir2": "openai-asst-streaming-with-file-search-cs", "file1": "OpenAIAssistants.csproj._", "file2": "OpenAIAssistantsFileSearchStreaming.csproj._",      "file3": "OpenAIAssistants.csproj._", "dir3": "openai-asst-cs", "flag1": "!{_IS_OPENAI_ASST_STREAMING_TEMPLATE}", "flag2": "{_IS_OPENAI_ASST_FILE_SEARCH_TEMPLATE}" }
+    # - { "dir1": "openai-asst-cs", "dir2": "openai-asst-streaming-with-file-search-cs", "file1": "OpenAIAssistantsClass.cs",  "file2": "OpenAIAssistantsFileSearchStreamingClass.cs",       "file3": "OpenAIAssistantsClass.cs",  "dir3": "openai-asst-cs", "flag1": "!{_IS_OPENAI_ASST_STREAMING_TEMPLATE}", "flag2": "{_IS_OPENAI_ASST_FILE_SEARCH_TEMPLATE}" }
+    # - { "dir1": "openai-asst-cs", "dir2": "openai-asst-streaming-with-file-search-cs", "file1": "Program.cs",                "file2": "Program.cs",                                        "file3": "Program.cs",                "dir3": "openai-asst-cs", "flag1": "!{_IS_OPENAI_ASST_STREAMING_TEMPLATE}", "flag2": "{_IS_OPENAI_ASST_FILE_SEARCH_TEMPLATE}" }
+    # - { "dir1": "openai-asst-cs", "dir2": "openai-asst-streaming-with-functions-cs",   "file1": "OpenAIAssistants.csproj._", "file2": "OpenAIAssistantsFunctionsStreaming.csproj._",       "file3": "OpenAIAssistants.csproj._", "dir3": "openai-asst-cs", "flag1": "!{_IS_OPENAI_ASST_STREAMING_TEMPLATE}", "flag2": "{_IS_OPENAI_ASST_FUNCTIONS_TEMPLATE}" }
+    # - { "dir1": "openai-asst-cs", "dir2": "openai-asst-streaming-with-functions-cs",   "file1": "OpenAIAssistantsClass.cs",  "file2": "OpenAIAssistantsFunctionsStreamingClass.cs",        "file3": "OpenAIAssistantsClass.cs",  "dir3": "openai-asst-cs", "flag1": "!{_IS_OPENAI_ASST_STREAMING_TEMPLATE}", "flag2": "{_IS_OPENAI_ASST_FUNCTIONS_TEMPLATE}" }
+    # - { "dir1": "openai-asst-cs", "dir2": "openai-asst-streaming-with-functions-cs",   "file1": "Program.cs",                "file2": "Program.cs",                                        "file3": "Program.cs",                "dir3": "openai-asst-cs", "flag1": "!{_IS_OPENAI_ASST_STREAMING_TEMPLATE}", "flag2": "{_IS_OPENAI_ASST_FUNCTIONS_TEMPLATE}" }
+
+    # Phi3 Chat
+    - { "dir1": "phi3-onnx-chat-streaming-cs", "dir2": "phi3-onnx-chat-streaming-with-functions-cs", "file1": "get-phi3-mini-onnx.cmd",                    "file2": "get-phi3-mini-onnx.cmd",                    "file3": "get-phi3-mini-onnx.cmd",                    "dir3": "phi3-onnx-chat-cs", "flag1": "{_IS_PHI3_ONNX_CHAT_STREAMING_TEMPLATE}", "flag2": "{_IS_PHI3_ONNX_CHAT_FUNCTIONS_TEMPLATE}" }
+    - { "dir1": "phi3-onnx-chat-streaming-cs", "dir2": "phi3-onnx-chat-streaming-with-functions-cs", "file1": "OnnxGenAIChatCompletionsStreamingClass.cs", "file2": "OnnxGenAIChatCompletionsStreamingClass.cs", "file3": "OnnxGenAIChatCompletionsStreamingClass.cs", "dir3": "phi3-onnx-chat-cs", "flag1": "{_IS_PHI3_ONNX_CHAT_STREAMING_TEMPLATE}", "flag2": "{_IS_PHI3_ONNX_CHAT_FUNCTIONS_TEMPLATE}" }
+    - { "dir1": "phi3-onnx-chat-streaming-cs", "dir2": "phi3-onnx-chat-streaming-with-functions-cs", "file1": "Phi3ChatStreaming.csproj._",                "file2": "Phi3ChatStreaming.csproj._",                "file3": "Phi3ChatStreaming.csproj._",                "dir3": "phi3-onnx-chat-cs", "flag1": "{_IS_PHI3_ONNX_CHAT_STREAMING_TEMPLATE}", "flag2": "{_IS_PHI3_ONNX_CHAT_FUNCTIONS_TEMPLATE}" }
+    - { "dir1": "phi3-onnx-chat-streaming-cs", "dir2": "phi3-onnx-chat-streaming-with-functions-cs", "file1": "Program.cs",                                "file2": "Program.cs",                                "file3": "Program.cs",                                "dir3": "phi3-onnx-chat-cs", "flag1": "{_IS_PHI3_ONNX_CHAT_STREAMING_TEMPLATE}", "flag2": "{_IS_PHI3_ONNX_CHAT_FUNCTIONS_TEMPLATE}" }
+
+    # Speech to Text
+    # - { "dir1": "speech-to-text-continuous-reco-cs", "dir2": "speech-to-text-cs",                  "file1": "SpeechToTextContinuousReco.csproj._", "file2": "SpeechToText.csprj._",                "file3": "SpeechToText.csproj._",                "dir3": "speech-to-text-cs", "flag1": "{_IS_SPEECH_TO_TEXT_CONTINUOUS}", "flag2": "!{_IS_SPEECH_TO_TEXT_CONTINUOUS}" }
+    # - { "dir1": "speech-to-text-continuous-reco-cs", "dir2": "speech-to-text-cs",                  "file1": "Program.cs",                          "file2": "Program.cs",                          "file3": "Program.cs",                           "dir3": "speech-to-text-cs", "flag1": "{_IS_SPEECH_TO_TEXT_CONTINUOUS}", "flag2": "!{_IS_SPEECH_TO_TEXT_CONTINUOUS}" }
+    # - { "dir1": "speech-to-text-continuous-reco-cs", "dir2": "speech-to-text-with-file-cs",        "file1": "SpeechToTextContinuousReco.csproj._", "file2": "SpeechToTextWithFle.csproj._",        "file3": "SpeechToTextWithFile.csproj._",        "dir3": "speech-to-text-cs", "flag1": "{_IS_SPEECH_TO_TEXT_CONTINUOUS}", "flag2": "{_IS_SPEECH_TO_TEXT_WITH_FILE}" }
+    # - { "dir1": "speech-to-text-continuous-reco-cs", "dir2": "speech-to-text-with-file-cs",        "file1": "Program.cs",                          "file2": "Program.cs",                          "file3": "Program.cs",                           "dir3": "speech-to-text-cs", "flag1": "{_IS_SPEECH_TO_TEXT_CONTINUOUS}", "flag2": "{_IS_SPEECH_TO_TEXT_WITH_FILE}" }
+    # - { "dir1": "speech-to-text-continuous-reco-cs", "dir2": "speech-to-text-with-keyword-cs",     "file1": "SpeechToTextContinuousReco.csproj._", "file2": "SpeechToTextWithKyword.csproj._",     "file3": "SpeechToTextWithKeyword.csproj._",     "dir3": "speech-to-text-cs", "flag1": "{_IS_SPEECH_TO_TEXT_CONTINUOUS}", "flag2": "{_IS_SPEECH_TO_TEXT_WITH_KEYWORD}" }
+    # - { "dir1": "speech-to-text-continuous-reco-cs", "dir2": "speech-to-text-with-keyword-cs",     "file1": "Program.cs",                          "file2": "Program.cs",                          "file3": "Program.cs",                           "dir3": "speech-to-text-cs", "flag1": "{_IS_SPEECH_TO_TEXT_CONTINUOUS}", "flag2": "{_IS_SPEECH_TO_TEXT_WITH_KEYWORD}" }
+    # - { "dir1": "speech-to-text-continuous-reco-cs", "dir2": "speech-to-text-with-translation-cs", "file1": "SpeechToTextContinuousReco.csproj._", "file2": "SpeechToTextWithTanslation.csproj._", "file3": "SpeechToTextWithTranslation.csproj._", "dir3": "speech-to-text-cs", "flag1": "{_IS_SPEECH_TO_TEXT_CONTINUOUS}", "flag2": "{_IS_SPEECH_TO_TEXT_WITH_TRANSLATION}" }
+    # - { "dir1": "speech-to-text-continuous-reco-cs", "dir2": "speech-to-text-with-translation-cs", "file1": "Program.cs",                          "file2": "Program.cs",                          "file3": "Program.cs",                           "dir3": "speech-to-text-cs", "flag1": "{_IS_SPEECH_TO_TEXT_CONTINUOUS}", "flag2": "{_IS_SPEECH_TO_TEXT_WITH_TRANSLATION}" }
+
+    # Text to Speech
+    # - { "dir1": "text-to-speech-cs", "dir2": "text-to-speech-with-file-cs", "file1": "TextToSpeech.csproj._", "file2": "TextToSpeechWithFile.csproj._", "file3": "TextToSpeech.csproj._", "dir3": "text-to-speech-cs", "flag1": "!{_IS_TEXT_TO_SPEECH_WITH_FILE_TEMPLATE}", "flag2": "{_IS_TEXT_TO_SPEECH_WITH_FILE_TEMPLATE}" }
+    # - { "dir1": "text-to-speech-cs", "dir2": "text-to-speech-with-file-cs", "file1": "Program.cs",            "file2": "Program.cs",                    "file3": "Program.cs",            "dir3": "text-to-speech-cs", "flag1": "!{_IS_TEXT_TO_SPEECH_WITH_FILE_TEMPLATE}", "flag2": "{_IS_TEXT_TO_SPEECH_WITH_FILE_TEMPLATE}" }
+
+  tests:
+  - name: refactor
+    command: ai chat --built-in-functions --question @../../../../ideas/template-engine/template-refactoring.md --interactive
+    arguments:
+      var-dir1: "${{ matrix.dir1 }}"
+      var-dir2: "${{ matrix.dir2 }}"
+      var-file1: "${{ matrix.file1 }}"
+      var-file2: "${{ matrix.file2 }}"
+      var-dir3: "${{ matrix.dir3 }}"
+      var-file3: "${{ matrix.file3 }}"
+      var-flag1: "${{ matrix.flag1 }}"
+      var-flag2: "${{ matrix.flag2 }}"
+    workingDirectory: "c:/src/ai-cli/src/ai/.x/templates"
+    input: |
+      Did you forget anything? If there's anything unique about file2, be sure it's included in the common code conditionally.
+      Did you accidentally remove anything you shouldn't have?
+      Did you write everything to disk you needed to?
+      Are you done? if not, finish up.
+      exit
