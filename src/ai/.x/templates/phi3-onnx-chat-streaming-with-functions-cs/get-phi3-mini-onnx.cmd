@@ -1,3 +1,1 @@
-git lfs install
-git clone https://huggingface.co/microsoft/Phi-3-mini-4k-instruct-onnx
-git lfs checkout
+{{@include phi3-onnx-chat-cs/get-phi3-mini-onnx.cmd}}
