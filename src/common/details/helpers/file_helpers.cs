@@ -583,7 +583,7 @@ namespace Azure.AI.Details.Common.CLI
             return fileName == "-" || fileName == "stdout";
         }
 
-        public static string GetOutputDataFileName(string file, INamedValues? values = null)
+        public static string GetOutputDataFileName(string file, INamedValues? values = null, string? idValueName = null)
         {
             if (file.StartsWith("@")) return GetOutputConfigFileName(file, values);
             if (IsStandardOutputReference(file)) return file;
@@ -598,10 +598,31 @@ namespace Azure.AI.Details.Common.CLI
                 ? PathHelpers.Combine(outputDir, file) ?? file
                 : file;
 
+            outputFile = ReplaceFileNameValues(outputFile, values, idValueName);
             if (Program.Debug) Console.WriteLine($"DEBUG: Output DATA file '{file}'='{outputFile}'");
 
             return outputFile;
         }
+
+        public static string ReplaceFileNameValues(string fileName, INamedValues? values = null, string? idValueName = null)
+        {
+            var id = idValueName != null ? values?.GetOrEmpty(idValueName) : null;
+            if (id != null && fileName.Contains("{id}")) fileName = fileName.Replace("{id}", id);
+
+            var pid = Process.GetCurrentProcess().Id.ToString();
+            if (fileName.Contains("{pid}")) fileName = fileName.Replace("{pid}", pid);
+
+            var time = DateTime.Now.ToFileTime().ToString();
+            if (fileName.Contains("{time}")) fileName = fileName.Replace("{time}", time);
+
+            var runTime = values?.GetOrEmpty("x.run.time");
+            if (fileName.Contains("{run.time}")) fileName = fileName.Replace("{run.time}", runTime);
+
+            return values != null
+                ? fileName.ReplaceValues(values)
+                : fileName;
+        }
+
 
         public static Stream Create(string fileName)
         {
@@ -862,16 +883,6 @@ namespace Azure.AI.Details.Common.CLI
         public static void LogException(ICommandValues values, Exception ex)
         {
             var file = $"exception.{{run.time}}.{{pid}}.{{time}}.{Program.Name}.error.log";
-
-            var runTime = values.GetOrEmpty("x.run.time");
-            file = file.Replace("{run.time}", runTime);
-
-            var pid = Process.GetCurrentProcess().Id.ToString();
-            file = file.Replace("{pid}", pid);
-
-            var time = DateTime.Now.ToFileTime().ToString();
-            file = file.Replace("{time}", time);
-
             file = FileHelpers.GetOutputDataFileName(file, values);
             FileHelpers.WriteAllText(file, ex.ToString(), Encoding.UTF8);
         }

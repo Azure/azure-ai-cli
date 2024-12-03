@@ -196,20 +196,7 @@ namespace Azure.AI.Details.Common.CLI
         private string GetOutputAllFileName()
         {
             var file = _values.GetOrDefault("output.all.file.name", "output.{run.time}." + GetOutputAllFileType());
-
-            var id = _values.GetOrEmpty("audio.input.id");
-            if (file.Contains("{id}")) file = file.Replace("{id}", id);
-
-            var pid = Process.GetCurrentProcess().Id.ToString();
-            if (file.Contains("{pid}")) file = file.Replace("{pid}", pid);
-
-            var time = DateTime.Now.ToFileTime().ToString();
-            if (file.Contains("{time}")) file = file.Replace("{time}", time);
-
-            var runTime = _values.GetOrEmpty("x.run.time");
-            if (file.Contains("{run.time}")) file = file.Replace("{run.time}", runTime);
-
-            return file.ReplaceValues(_values);
+            return FileHelpers.GetOutputDataFileName(file, _values, "audio.input.id");
         }
 
         private string GetOutputAllFileType()
@@ -360,20 +347,7 @@ namespace Azure.AI.Details.Common.CLI
         private string GetOutputEachFileName()
         {
             var file = _values.GetOrDefault("output.each.file.name", "each.{run.time}." + GetOutputEachFileType());
-
-            var id = _values.GetOrEmpty("audio.input.id");
-            if (file.Contains("{id}")) file = file.Replace("{id}", id);
-
-            var pid = Process.GetCurrentProcess().Id.ToString();
-            if (file.Contains("{pid}")) file = file.Replace("{pid}", pid);
-
-            var time = DateTime.Now.ToFileTime().ToString();
-            if (file.Contains("{time}")) file = file.Replace("{time}", time);
-
-            var runTime = _values.GetOrEmpty("x.run.time");
-            if (file.Contains("{run.time}")) file = file.Replace("{run.time}", runTime);
-
-            return file.ReplaceValues(_values);
+            return FileHelpers.GetOutputDataFileName(file, _values, "audio.input.id");
         }
 
         private string GetOutputEachFileType()
