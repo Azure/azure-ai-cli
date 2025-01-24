@@ -1,0 +1,5 @@
+﻿fast-transcription-urls-downloaded.md
+--instructions
+take all of this information, and summarize it into a concise but complete set of instructions on how to use fast-transcription, with a good summary of what each of the REST API parameters do, how they're used, as well as other inputs/outputs to the REST API. We'll be giving these instructions to a 1 year out of college SDE later to have them implement some features in C#. Don't worry about any of the C# parts though... only focus on the REST API parts, inputs/outputs/headers/responses/endpoints/auth, etc. for inputs and outputs in json, include examples for each different parameterization. after having a table for all input parameters, also double check that you documented examples of how to use each
+--save-output
+fast-transcription-sde-instructions-for-rest-api.md
