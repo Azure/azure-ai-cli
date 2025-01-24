@@ -1,0 +1,4 @@
+﻿run
+curl --location "https://eastus2.api.cognitive.microsoft.com/speechtotext/transcriptions:transcribe?api-version=2024-05-15-preview" --header "Content-Type: multipart/form-data" --header "Accept: application/json" --header "Ocp-Apim-Subscription-Key: 1cf62c7ee8a24851bb71186b2ec4e449" --form "audio=@test.wav" --form "definition=\"{ \\\"locales\\\":[\\\"en-US\\\"] }\"" 
+--save-output
+fast-transcription-curl-example.md
