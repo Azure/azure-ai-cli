@@ -87,7 +87,8 @@ namespace Azure.AI.Details.Common.CLI
             ("speech.profile", true),
             ("speech.speaker.identify", true),
             ("speech.speaker.verify", true),
-            ("speech.speaker", true)
+            ("speech.speaker", true),
+            ("speech.transcribe", true)
         };
 
         private static readonly string[] _partialCommands = {
@@ -121,6 +122,7 @@ namespace Azure.AI.Details.Common.CLI
                 case "speech.csr": return CustomSpeechRecognitionCommandParser.GetCommandParsers(values);
                 case "speech.profile": return ProfileCommandParser.GetCommandParsers(values);
                 case "speech.speaker": return ProfileCommandParser.GetCommandParsers(values);
+                case "speech.transcribe": return TranscribeCommandParser.GetCommandParsers();
             }
 
             return null;
