@@ -1,0 +1,310 @@
+{
+    "durationMilliseconds": 19181,
+    "combinedPhrases": [
+        {
+            "text": "Good morning, Steve. Good morning, Katie. Have you heard about the new conversation transcription capability? No. Tell me more. It's the new feature that transcribes our discussion and lets us know who said what. That sounds interesting. I'm going to give this a try."
+        }
+    ],
+    "phrases": [
+        {
+            "speaker": 1,
+            "offsetMilliseconds": 1040,
+            "durationMilliseconds": 840,
+            "text": "Good morning, Steve.",
+            "words": [
+                {
+                    "text": "Good",
+                    "offsetMilliseconds": 1040,
+                    "durationMilliseconds": 120
+                },
+                {
+                    "text": "morning,",
+                    "offsetMilliseconds": 1160,
+                    "durationMilliseconds": 360
+                },
+                {
+                    "text": "Steve.",
+                    "offsetMilliseconds": 1520,
+                    "durationMilliseconds": 360
+                }
+            ],
+            "locale": "en-US",
+            "confidence": 0.91384333
+        },
+        {
+            "speaker": 2,
+            "offsetMilliseconds": 2640,
+            "durationMilliseconds": 720,
+            "text": "Good morning, Katie.",
+            "words": [
+                {
+                    "text": "Good",
+                    "offsetMilliseconds": 2640,
+                    "durationMilliseconds": 120
+                },
+                {
+                    "text": "morning,",
+                    "offsetMilliseconds": 2760,
+                    "durationMilliseconds": 240
+                },
+                {
+                    "text": "Katie.",
+                    "offsetMilliseconds": 3000,
+                    "durationMilliseconds": 360
+                }
+            ],
+            "locale": "en-US",
+            "confidence": 0.91384333
+        },
+        {
+            "speaker": 1,
+            "offsetMilliseconds": 4000,
+            "durationMilliseconds": 3360,
+            "text": "Have you heard about the new conversation transcription capability?",
+            "words": [
+                {
+                    "text": "Have",
+                    "offsetMilliseconds": 4000,
+                    "durationMilliseconds": 160
+                },
+                {
+                    "text": "you",
+                    "offsetMilliseconds": 4160,
+                    "durationMilliseconds": 80
+                },
+                {
+                    "text": "heard",
+                    "offsetMilliseconds": 4240,
+                    "durationMilliseconds": 280
+                },
+                {
+                    "text": "about",
+                    "offsetMilliseconds": 4520,
+                    "durationMilliseconds": 280
+                },
+                {
+                    "text": "the",
+                    "offsetMilliseconds": 4800,
+                    "durationMilliseconds": 80
+                },
+                {
+                    "text": "new",
+                    "offsetMilliseconds": 4880,
+                    "durationMilliseconds": 240
+                },
+                {
+                    "text": "conversation",
+                    "offsetMilliseconds": 5120,
+                    "durationMilliseconds": 800
+                },
+                {
+                    "text": "transcription",
+                    "offsetMilliseconds": 5920,
+                    "durationMilliseconds": 640
+                },
+                {
+                    "text": "capability?",
+                    "offsetMilliseconds": 6560,
+                    "durationMilliseconds": 800
+                }
+            ],
+            "locale": "en-US",
+            "confidence": 0.91384333
+        },
+        {
+            "speaker": 2,
+            "offsetMilliseconds": 8000,
+            "durationMilliseconds": 200,
+            "text": "No.",
+            "words": [
+                {
+                    "text": "No.",
+                    "offsetMilliseconds": 8000,
+                    "durationMilliseconds": 200
+                }
+            ],
+            "locale": "en-US",
+            "confidence": 0.91384333
+        },
+        {
+            "speaker": 2,
+            "offsetMilliseconds": 8200,
+            "durationMilliseconds": 760,
+            "text": "Tell me more.",
+            "words": [
+                {
+                    "text": "Tell",
+                    "offsetMilliseconds": 8200,
+                    "durationMilliseconds": 120
+                },
+                {
+                    "text": "me",
+                    "offsetMilliseconds": 8360,
+                    "durationMilliseconds": 120
+                },
+                {
+                    "text": "more.",
+                    "offsetMilliseconds": 8480,
+                    "durationMilliseconds": 480
+                }
+            ],
+            "locale": "en-US",
+            "confidence": 0.91384333
+        },
+        {
+            "speaker": 1,
+            "offsetMilliseconds": 9440,
+            "durationMilliseconds": 5280,
+            "text": "It's the new feature that transcribes our discussion and lets us know who said what.",
+            "words": [
+                {
+                    "text": "It's",
+                    "offsetMilliseconds": 9440,
+                    "durationMilliseconds": 320
+                },
+                {
+                    "text": "the",
+                    "offsetMilliseconds": 9760,
+                    "durationMilliseconds": 80
+                },
+                {
+                    "text": "new",
+                    "offsetMilliseconds": 9840,
+                    "durationMilliseconds": 240
+                },
+                {
+                    "text": "feature",
+                    "offsetMilliseconds": 10080,
+                    "durationMilliseconds": 640
+                },
+                {
+                    "text": "that",
+                    "offsetMilliseconds": 10720,
+                    "durationMilliseconds": 200
+                },
+                {
+                    "text": "transcribes",
+                    "offsetMilliseconds": 10920,
+                    "durationMilliseconds": 640
+                },
+                {
+                    "text": "our",
+                    "offsetMilliseconds": 11560,
+                    "durationMilliseconds": 200
+                },
+                {
+                    "text": "discussion",
+                    "offsetMilliseconds": 11760,
+                    "durationMilliseconds": 720
+                },
+                {
+                    "text": "and",
+                    "offsetMilliseconds": 12480,
+                    "durationMilliseconds": 160
+                },
+                {
+                    "text": "lets",
+                    "offsetMilliseconds": 12640,
+                    "durationMilliseconds": 200
+                },
+                {
+                    "text": "us",
+                    "offsetMilliseconds": 12840,
+                    "durationMilliseconds": 120
+                },
+                {
+                    "text": "know",
+                    "offsetMilliseconds": 12960,
+                    "durationMilliseconds": 240
+                },
+                {
+                    "text": "who",
+                    "offsetMilliseconds": 13200,
+                    "durationMilliseconds": 560
+                },
+                {
+                    "text": "said",
+                    "offsetMilliseconds": 13840,
+                    "durationMilliseconds": 280
+                },
+                {
+                    "text": "what.",
+                    "offsetMilliseconds": 14120,
+                    "durationMilliseconds": 600
+                }
+            ],
+            "locale": "en-US",
+            "confidence": 0.91384333
+        },
+        {
+            "speaker": 2,
+            "offsetMilliseconds": 15320,
+            "durationMilliseconds": 920,
+            "text": "That sounds interesting.",
+            "words": [
+                {
+                    "text": "That",
+                    "offsetMilliseconds": 15320,
+                    "durationMilliseconds": 120
+                },
+                {
+                    "text": "sounds",
+                    "offsetMilliseconds": 15440,
+                    "durationMilliseconds": 280
+                },
+                {
+                    "text": "interesting.",
+                    "offsetMilliseconds": 15720,
+                    "durationMilliseconds": 520
+                }
+            ],
+            "locale": "en-US",
+            "confidence": 0.91384333
+        },
+        {
+            "speaker": 2,
+            "offsetMilliseconds": 16640,
+            "durationMilliseconds": 960,
+            "text": "I'm going to give this a try.",
+            "words": [
+                {
+                    "text": "I'm",
+                    "offsetMilliseconds": 16640,
+                    "durationMilliseconds": 160
+                },
+                {
+                    "text": "going",
+                    "offsetMilliseconds": 16800,
+                    "durationMilliseconds": 160
+                },
+                {
+                    "text": "to",
+                    "offsetMilliseconds": 16960,
+                    "durationMilliseconds": 80
+                },
+                {
+                    "text": "give",
+                    "offsetMilliseconds": 17040,
+                    "durationMilliseconds": 120
+                },
+                {
+                    "text": "this",
+                    "offsetMilliseconds": 17160,
+                    "durationMilliseconds": 120
+                },
+                {
+                    "text": "a",
+                    "offsetMilliseconds": 17280,
+                    "durationMilliseconds": 40
+                },
+                {
+                    "text": "try.",
+                    "offsetMilliseconds": 17320,
+                    "durationMilliseconds": 280
+                }
+            ],
+            "locale": "en-US",
+            "confidence": 0.91384333
+        }
+    ]
+}
