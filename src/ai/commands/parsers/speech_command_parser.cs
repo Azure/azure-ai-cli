@@ -25,6 +25,7 @@ namespace Azure.AI.Details.Common.CLI
             ("speech.recognize", true),
             ("speech.synthesize", true),
             ("speech.intent", true),
+            ("speech.transcribe", true),
             ("speech.translate", true),
             ("speech.batch.list", true),
             ("speech.batch.download", true),
@@ -87,8 +88,7 @@ namespace Azure.AI.Details.Common.CLI
             ("speech.profile", true),
             ("speech.speaker.identify", true),
             ("speech.speaker.verify", true),
-            ("speech.speaker", true),
-            ("speech.transcribe", true)
+            ("speech.speaker", true)
         };
 
         private static readonly string[] _partialCommands = {
@@ -117,12 +117,12 @@ namespace Azure.AI.Details.Common.CLI
                 case "speech.recognize": return RecognizeCommandParser.GetCommandParsers();
                 case "speech.synthesize": return SynthesizeCommandParser.GetCommandParsers();
                 case "speech.intent": return IntentCommandParser.GetCommandParsers();
+                case "speech.transcribe": return TranscribeCommandParser.GetCommandParsers();
                 case "speech.translate": return TranslateCommandParser.GetCommandParsers();
                 case "speech.batch": return BatchCommandParser.GetCommandParsers(values);
                 case "speech.csr": return CustomSpeechRecognitionCommandParser.GetCommandParsers(values);
                 case "speech.profile": return ProfileCommandParser.GetCommandParsers(values);
                 case "speech.speaker": return ProfileCommandParser.GetCommandParsers(values);
-                case "speech.transcribe": return TranscribeCommandParser.GetCommandParsers();
             }
 
             return null;

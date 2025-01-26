@@ -333,3 +333,26 @@
             fi
         input: |-
           Hello world.
+
+- area: ai speech synthesize
+  tests:
+  - name: Hello world
+    command: ai speech synthesize --text "Hello world" --audio-output hello.wav
+    expect-regex: |
+      SYNTHESIS STARTED:
+      SYNTHESIS COMPLETED:
+
+- area: ai speech transcribe
+  tests:
+  - name: without diarization
+    parallelize: true
+    command: ai speech transcribe --file katiesteve_mono.wav --input-path ../tests
+    expect-regex: |
+      Good morning, Steve\. Good morning, Katie\.
+
+  - name: with diarization
+    command: ai speech transcribe --file katiesteve_mono.wav --input-path ../tests --diarization --max-speakers 2
+    parallelize: true
+    expect-regex: |
+      Speaker 1: Good morning, Steve.
+      Speaker 2: Good morning, Katie.

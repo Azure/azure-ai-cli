@@ -22,7 +22,7 @@ namespace Azure.AI.Details.Common.CLI
             request.Headers.Add("Ocp-Apim-Subscription-Key", GetSubscriptionKey());
 
             var content = new MultipartFormDataContent();
-            content.Add(new ByteArrayContent(File.ReadAllBytes(GetAudioFile())), "audio", Path.GetFileName(GetAudioFile()));
+            content.Add(new ByteArrayContent(FileHelpers.ReadAllBytes(GetAudioFile())), "audio", Path.GetFileName(GetAudioFile()));
             content.Add(new StringContent(GetDefinitionJson()), "definition");
 
             request.Content = content;
@@ -54,7 +54,9 @@ namespace Azure.AI.Details.Common.CLI
 
         private string GetAudioFile()
         {
-            return _values["audio.input.file"];
+            var file = _values["audio.input.file"];
+            var existing = FileHelpers.DemandFindFileInDataPath(file, _values, "audio input");
+            return existing;
         }
 
         private string GetDefinitionJson()
