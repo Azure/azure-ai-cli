@@ -86,6 +86,20 @@ namespace Azure.AI.Details.Common.CLI
             return downloaded;
         }
 
+        public static string GetWebRequestNoBodyAsString(HttpRequestMessage request)
+        {
+            StringBuilder sb = new StringBuilder();
+            sb.AppendLine($"{request.Method} {request.RequestUri} HTTP/1.1");
+            foreach (var header in request.Headers)
+            {
+                sb.AppendLine($"{header.Key}: {header.Value}");
+            }
+            sb.AppendLine($"Host: {request.RequestUri.Host}");
+            sb.AppendLine($"Connection: Keep-Alive");
+            sb.AppendLine();
+            return sb.ToString();
+        }
+
         public static string GetWebRequestNoBodyAsString(HttpWebRequest request)
         {
             StringBuilder sb = new StringBuilder();
@@ -120,6 +134,20 @@ namespace Azure.AI.Details.Common.CLI
             FileHelpers.AppendAllBytes(filename, payload);
 
             return payload;
+        }
+
+        public static byte[] WriteOutputRequest(HttpRequestMessage request, string fileName, MultipartFormDataContent content)
+        {
+            var requestText = GetWebRequestNoBodyAsString(request);
+            var requestTextAsBytes = Encoding.UTF8.GetBytes(requestText);
+            var contentBytes = content.ReadAsByteArrayAsync().Result;
+
+            var combined = new byte[requestTextAsBytes.Length + contentBytes.Length];
+            requestTextAsBytes.CopyTo(combined, 0);
+            contentBytes.CopyTo(combined, requestTextAsBytes.Length);
+
+            FileHelpers.WriteAllBytes(fileName, combined);
+            return combined;
         }
 
         public static HttpWebResponse GetWebResponse(HttpWebRequest request, string? payload = null)
@@ -224,6 +252,17 @@ namespace Azure.AI.Details.Common.CLI
 
             values.Reset("passed", passed ? "true" : "false");
             return passed;
+        }
+
+        public static string? ReadWriteJson(HttpResponseMessage response, INamedValues values, string domain, bool skipWrite = false)
+        {
+            if (response == null) return null;
+            
+            var stream = response.Content.ReadAsStream();
+            var isJson = response.Content.Headers.ContentType.MediaType.Contains("application/json");
+
+            var text = FileHelpers.ReadTextWriteIfJson(stream, isJson, values, domain, skipWrite);
+            return isJson ? text : null;
         }
 
         public static string? ReadWriteJson(WebResponse? response, INamedValues values, string domain, bool skipWrite = false)

@@ -48,8 +48,8 @@ namespace Azure.AI.Details.Common.CLI
             new Any1PinnedNamedValueTokenParser(null, "audio.input.microphone.geometry", "0001", "microphone", "audio.input.type"),
             new OptionalWithDefaultNamedValueTokenParser(null, "audio.input.microphone.device", "0010", "microphone", "audio.input.type"),
 
-            new AtFileOrListNamedValueTokenParser("--phrases", "grammar.phrase.list", "011"),
-            new Any1ValueNamedValueTokenParser(null, "grammar.recognition.factor.phrase", "0110"),
+            new OutputFileNameNamedValueTokenParser(null, "transcribe.output.json.file", "0110"),
+            new OutputFileNameNamedValueTokenParser(null, "transcribe.output.request.file", "0110"),
 
             new ConnectDisconnectNamedValueTokenParser(),
 

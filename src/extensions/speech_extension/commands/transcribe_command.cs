@@ -1,14 +1,31 @@
+using System.Text;
 using System.Text.Json;
+using System.Net;
+using System.Net.Http.Headers;
 
 namespace Azure.AI.Details.Common.CLI
 {
     public class TranscribeCommand : Command
     {
-        public TranscribeCommand(ICommandValues values) : base(values) { }
+        public TranscribeCommand(ICommandValues values) : base(values)
+        {
+            _quiet = _values.GetOrDefault("x.quiet", false);
+            _verbose = _values.GetOrDefault("x.verbose", false);
+        }
 
         public bool RunCommand()
         {
-            Transcribe();
+            try
+            {
+                Transcribe();
+            }
+            catch (WebException ex)
+            {
+                FileHelpers.LogException(_values, ex);
+                ConsoleHelpers.WriteLineError($"\n  ERROR: {ex.Message}");
+                JsonHelpers.PrintJson(HttpHelpers.ReadWriteJson(ex.Response, _values, "transcribe"));
+            }
+
             return _values.GetOrDefault("passed", true);
         }
 
@@ -16,36 +33,34 @@ namespace Azure.AI.Details.Common.CLI
         {
             StartCommand();
 
-            // Prepare the HTTP request for the REST API
-            var client = new HttpClient();
-            var request = new HttpRequestMessage(HttpMethod.Post, GetEndpointUrl());
-            request.Headers.Add("Ocp-Apim-Subscription-Key", GetSubscriptionKey());
-
             var content = new MultipartFormDataContent();
             content.Add(new ByteArrayContent(FileHelpers.ReadAllBytes(GetAudioFile())), "audio", Path.GetFileName(GetAudioFile()));
             content.Add(new StringContent(GetDefinitionJson()), "definition");
 
+            var request = CreateRequestMessage();
             request.Content = content;
 
-            var response = client.SendAsync(request).Result;
-            if (!response.IsSuccessStatusCode)
-            {
-                _values.AddThrowError("ERROR:", $"Transcription failed with status code {response.StatusCode}");
-            }
+            CheckWriteOutputRequest(request, content);
 
-            var jsonResponse = response.Content.ReadAsStringAsync().Result;
-            ProcessResponse(jsonResponse);
+            var client = new HttpClient();
+            var response = client.SendAsync(request).Result;
+            var json = ReadWritePrintJson(response);
+            ProcessResponse(json);
 
             StopCommand();
-            DisposeAfterStop();
             DeleteTemporaryFiles();
         }
 
-        private string GetEndpointUrl()
-        {
+        private HttpRequestMessage CreateRequestMessage()
+         {
             var region = _values["service.config.region"];
-            return $"https://{region}.api.cognitive.microsoft.com/speechtotext/transcriptions:transcribe?api-version=2024-11-15";
-        }
+            var url = $"https://{region}.api.cognitive.microsoft.com/speechtotext/transcriptions:transcribe?api-version=2024-11-15";
+
+            var request = new HttpRequestMessage(HttpMethod.Post, url);
+            request.Headers.Add("Ocp-Apim-Subscription-Key", GetSubscriptionKey());
+
+            return request;
+         }
 
         private string GetSubscriptionKey()
         {
@@ -78,6 +93,23 @@ namespace Azure.AI.Details.Common.CLI
             });
         }
 
+        private void CheckWriteOutputRequest(HttpRequestMessage request, MultipartFormDataContent content)
+        {
+            var output = _values.GetOrEmpty("transcribe.output.request.file");
+            if (!string.IsNullOrEmpty(output))
+            {
+                var fileName = FileHelpers.GetOutputDataFileName(output, _values);
+                HttpHelpers.WriteOutputRequest(request, fileName, content);
+            }
+        }
+
+        private string ReadWritePrintJson(HttpResponseMessage response)
+        {
+            var json = HttpHelpers.ReadWriteJson(response, _values, "transcribe");
+            if (!_quiet && _verbose) JsonHelpers.PrintJson(json);
+            return json;
+        }
+
         private void ProcessResponse(string jsonResponse)
         {
             if (Program.Debug) Console.WriteLine(jsonResponse);
@@ -100,10 +132,33 @@ namespace Azure.AI.Details.Common.CLI
                     }))
                 : transcription;
 
-            Console.WriteLine(withSpeakerInfo);
+            if (!_quiet) Console.WriteLine(withSpeakerInfo);
 
             _output!.EnsureOutputAll("transcription.result", withSpeakerInfo);
             _output!.CheckOutput();
+        }
+
+        private void StartCommand()
+        {
+            CheckPath();
+            CheckAudioInput();
+
+            _output = new OutputHelper(_values);
+            _output!.StartOutput();
+
+            var id = _values["audio.input.id"]!;
+            _output!.EnsureOutputAll("audio.input.id", id);
+            _output!.EnsureOutputEach("audio.input.id", id);
+            _output!.EnsureCacheProperty("audio.input.id", id);
+
+            var file = _values["audio.input.file"];
+            _output!.EnsureCacheProperty("audio.input.file", file);
+        }
+
+        private void StopCommand()
+        {
+            _output!.CheckOutput();
+            _output!.StopOutput();
         }
 
         private void CheckAudioInput()
@@ -137,18 +192,12 @@ namespace Azure.AI.Details.Common.CLI
             {
                 file = GetAudioInputFileFromId(id);
             }
-
-            _microphone = (input == "microphone" || string.IsNullOrEmpty(input));
         }
 
         private string GetIdFromAudioInputFile(string? input, string file)
         {
             string id;
-            if (input == "microphone" || string.IsNullOrEmpty(input))
-            {
-                id = "microphone";
-            }
-            else if (input == "file" && !string.IsNullOrEmpty(file))
+            if (input == "file" && !string.IsNullOrEmpty(file))
             {
                 var existing = FileHelpers.DemandFindFileInDataPath(file, _values, "audio input");
                 id = Path.GetFileNameWithoutExtension(existing);
@@ -165,11 +214,7 @@ namespace Azure.AI.Details.Common.CLI
         private string? GetAudioInputFromId(string id)
         {
             string input;
-            if (id == "microphone")
-            {
-                input = "microphone";
-            }
-            else if (FileHelpers.FileExistsInDataPath(id, _values) || FileHelpers.FileExistsInDataPath(id + ".wav", _values))
+            if (FileHelpers.FileExistsInDataPath(id, _values) || FileHelpers.FileExistsInDataPath(id + ".wav", _values))
             {
                 input = "file";
             }
@@ -207,50 +252,9 @@ namespace Azure.AI.Details.Common.CLI
             return file;
         }
 
-        private void StartCommand()
-        {
-            CheckPath();
-            CheckAudioInput();
-
-            _display = new DisplayHelper(_values);
-
-            _output = new OutputHelper(_values);
-            _output!.StartOutput();
-
-            var id = _values["audio.input.id"]!;
-            _output!.EnsureOutputAll("audio.input.id", id);
-            _output!.EnsureOutputEach("audio.input.id", id);
-            _output!.EnsureCacheProperty("audio.input.id", id);
-
-            var file = _values["audio.input.file"];
-            _output!.EnsureCacheProperty("audio.input.file", file);
-
-            _lock = new SpinLock();
-            _lock.StartLock();
-
-            _expectRecognized = 0;
-            _expectSessionStopped = 0;
-            _expectDisconnected = 0;
-        }
-
-        private void StopCommand()
-        {
-            _lock!.StopLock(5000);
-
-            _output!.CheckOutput();
-            _output!.StopOutput();
-        }
-
-        private bool _microphone = false;
-        private bool _connect = false;
-        private bool _disconnect = false;
-
-        private SpinLock? _lock = null;
-        private int _expectRecognized = 0;
-        private int _expectSessionStopped = 0;
-        private int _expectDisconnected = 0;
-
         OutputHelper? _output = null;
-        DisplayHelper? _display = null;
+
+        private bool _quiet = false;
+        private bool _verbose = false;
     }
 }
