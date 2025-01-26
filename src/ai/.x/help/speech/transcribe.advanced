@@ -36,6 +36,10 @@ USAGE: ai speech transcribe [...]
     --output-all-file FILENAME    (see: ai help speech transcribe output all file)
     --profanity OPTION            (see: ai help speech transcribe profanity)
 
+  CAPTIONS
+    --output-srt-file FILENAME    (see: ai help speech transcribe output srt file)
+    --output-vtt-file FILENAME    (see: ai help speech transcribe output vtt file)
+
   LOGGING                         (see: ai help speech transcribe log)
     --log FILENAME
 

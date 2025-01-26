@@ -136,6 +136,18 @@ namespace Azure.AI.Details.Common.CLI
 
             _output!.EnsureOutputAll("transcription.result", withSpeakerInfo);
             _output!.CheckOutput();
+                    
+            var srtFileName = _values.GetOrEmpty("output.srt.file.name");
+            if (!string.IsNullOrEmpty(srtFileName))
+            {
+                GenerateSrtFile(jsonResponse, srtFileName);
+            }
+
+            var vttFileName = _values.GetOrEmpty("output.vtt.file.name");
+            if (!string.IsNullOrEmpty(vttFileName))
+            {
+                GenerateVttFile(jsonResponse, vttFileName);
+            }
         }
 
         private void StartCommand()
@@ -252,6 +264,49 @@ namespace Azure.AI.Details.Common.CLI
             return file;
         }
 
+        private void GenerateSrtFile(string transcriptionJson, string srtFileName)
+        {
+            var json = JsonDocument.Parse(transcriptionJson);
+
+            var sb = new StringBuilder();
+            int sequence = 1;
+
+            foreach (var phrase in json.RootElement.GetProperty("phrases").EnumerateArray())
+            {
+                var startTime = TimeSpan.FromMilliseconds(phrase.GetProperty("offsetMilliseconds").GetInt32());
+                var duration = TimeSpan.FromMilliseconds(phrase.GetProperty("durationMilliseconds").GetInt32());
+                var endTime = startTime + duration;
+
+                sb.AppendLine($"{sequence}");
+                sb.AppendLine($"{startTime:hh\\:mm\\:ss\\,fff} --> {endTime:hh\\:mm\\:ss\\,fff}");
+                sb.AppendLine(phrase.GetProperty("text").GetString());
+                sb.AppendLine();
+
+                sequence++;
+            }
+
+            FileHelpers.WriteAllText(srtFileName, sb.ToString().Trim(), Encoding.UTF8);
+        }
+
+        private void GenerateVttFile(string transcriptionJson, string vttFileName)
+        {
+            var json = JsonDocument.Parse(transcriptionJson);
+
+            var sb = new StringBuilder("WEBVTT\n");
+
+            foreach (var phrase in json.RootElement.GetProperty("phrases").EnumerateArray())
+            {
+                var startTime = TimeSpan.FromMilliseconds(phrase.GetProperty("offsetMilliseconds").GetInt32());
+                var duration = TimeSpan.FromMilliseconds(phrase.GetProperty("durationMilliseconds").GetInt32());
+                var endTime = startTime + duration;
+
+                sb.AppendLine();
+                sb.AppendLine($"{startTime:hh\\:mm\\:ss\\.fff} --> {endTime:hh\\:mm\\:ss\\.fff}");
+                sb.AppendLine(phrase.GetProperty("text").GetString());
+            }
+
+            FileHelpers.WriteAllText(vttFileName, sb.ToString().Trim(), Encoding.UTF8);
+        }
         OutputHelper? _output = null;
 
         private bool _quiet = false;

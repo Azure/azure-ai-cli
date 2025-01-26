@@ -356,3 +356,34 @@
     expect-regex: |
       Speaker 1: Good morning, Steve.
       Speaker 2: Good morning, Katie.
+
+  - name: output SRT
+    command: ai speech transcribe --file katiesteve_mono.wav --input-path ../tests --output-srt-file -
+    expect-regex: |
+      Good morning, Steve\. Good morning, Katie\.
+      \r?$\n
+      1\r?$\n
+      00:00:\d+,\d+ --> 00:00:\d+,\d+\r?$\n
+      Good morning, Steve\.
+      \r?$\n
+      2\r?$\n
+      00:00:\d+,\d+ --> 00:00:\d+,\d+\r?$\n
+      Good morning, Katie\.\r?$\n
+      \r?$\n
+      3\r?$\n
+      00:00:\d+,\d+ --> 00:00:\d+,\d+\r?$\n
+
+  - name: output VTT
+    command: ai speech transcribe --file katiesteve_mono.wav --input-path ../tests --output-vtt-file -
+    expect-regex: |
+      Good morning, Steve\. Good morning, Katie\.
+      WEBVTT\r?$\n
+      \r?$\n
+      00:00:\d+\.\d+ --> 00:00:\d+\.\d+\r?$\n
+      Good morning, Steve\.\r?$\n
+      \r?$\n
+      00:00:\d+\.\d+ --> 00:00:\d+\.\d+\r?$\n
+      Good morning, Katie\.\r?$\n
+      \r?$\n
+      00:00:\d+\.\d+ --> 00:00:\d+\.\d+\r?$\n
+      

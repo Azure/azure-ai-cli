@@ -387,6 +387,9 @@ namespace Azure.AI.Details.Common.CLI
 
         private void OutputSrtFile()
         {
+            if (_outputResultCache == null) return;
+            if (_outputResultCache.Count == 0) return;
+
             var text = GetSrtFile() + Environment.NewLine;
             FileHelpers.WriteAllText(_outputSrtFileName!, text, Encoding.UTF8);
 
@@ -401,6 +404,9 @@ namespace Azure.AI.Details.Common.CLI
 
         private void OutputVttFile()
         { 
+            if (_outputResultCache == null) return;
+            if (_outputResultCache.Count == 0) return;
+
             var text = GetVttFile() + Environment.NewLine;
             FileHelpers.WriteAllText(_outputVttFileName!, text, Encoding.UTF8);
 

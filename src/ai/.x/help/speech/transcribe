@@ -21,6 +21,10 @@ USAGE: ai speech transcribe [...]
     --files PATTERN               (see: ai help speech transcribe files)
     --files @FILELIST.txt         (see: ai help speech transcribe files)
 
+  CAPTIONS
+    --output-srt-file FILENAME    (see: ai help speech transcribe output srt file)
+    --output-vtt-file FILENAME    (see: ai help speech transcribe output vtt file)
+
   ADVANCED
     --log FILENAME                (see: ai help speech transcribe log)
     --foreach in @ITEMS.txt       (see: ai help speech transcribe foreach)
