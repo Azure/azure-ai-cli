@@ -28,10 +28,12 @@ USAGE: ai speech transcribe [...]
     --id ID                       (see: ai help speech input id)
 
   OUTPUT                          (see: ai help speech transcribe output)
-    --output all [<item>]         (see: ai help speech transcribe output all)
-    --output each [<item>]        (see: ai help speech transcribe output each)
-    --output each file FILENAME   (see: ai help speech transcribe output each file)
-    --output all file FILENAME    (see: ai help speech transcribe output all file)
+    --output-request FILENAME     (see: ai help speech transcribe output request)
+    --output-json FILENAME        (see: ai help speech transcribe output json)
+    --output-all [<item>]         (see: ai help speech transcribe output all)
+    --output-each [<item>]        (see: ai help speech transcribe output each)
+    --output-each-file FILENAME   (see: ai help speech transcribe output each file)
+    --output-all-file FILENAME    (see: ai help speech transcribe output all file)
     --profanity OPTION            (see: ai help speech transcribe profanity)
 
   LOGGING                         (see: ai help speech transcribe log)
