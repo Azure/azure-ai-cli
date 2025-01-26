@@ -1,0 +1,31 @@
+TRANSCRIBE INPUT OVERVIEW
+
+@speech.include.the.transcribe.command
+
+  FROM FILE - SINGLE or MULTIPLE FILES
+
+    The `ai speech transcribe` command can transcribe audio stored in local or
+    remote audio files, in various audio container formats (e.g. mp3, ogg, wav).
+
+    To transcribe from a single audio file see: ai help speech transcribe file
+    To transcribe from a multiple audio files see: ai help speech transcribe files
+ 
+EXAMPLES
+
+  `EXAMPLE 1`: Transcribe speech from local WAV file, or remote MP3 file
+
+    ai speech transcribe --file hello.wav
+    ai speech transcribe --file http://crbn.us/hello.mp3
+
+  `EXAMPLE 2`: Transcribe speech in multiple files using wildcards
+
+    ai speech transcribe --files *.wav
+
+  `EXAMPLE 3`: Transcribe speech in audio file content piped thru STDIN
+
+    ai speech synthesize --text "Hello" --audio output - --quiet | ai speech transcribe --file -
+
+SEE ALSO
+
+  ai help speech transcribe examples
+  ai help speech transcribe

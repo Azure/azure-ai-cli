@@ -1,0 +1,29 @@
+TRANSCRIBE EXAMPLES
+
+  `INIT`: Automatically setup ai with REGION and KEY default values
+
+    ai init
+
+  `SETUP`: Manually setup ai with REGION and KEY default values
+
+    ai config speech @region --set westus2
+    ai config speech @key --set 436172626F6E20697320636F6F6C2121
+
+  `EXAMPLE 1`: Transcribe speech from local WAV file, or remote MP3 file
+
+    ai speech transcribe --file hello.wav
+    ai speech transcribe --file https://crbn.us/hello.mp3
+
+  `EXAMPLE 2`: Transcribe speech from multiple files using wildcards
+
+    ai speech transcribe --files *.wav
+
+  `EXAMPLE 3`: Transcribe speech in audio file content piped thru STDIN
+
+    ai speech synthesize --text "Hello" --audio output - --quiet | ai speech transcribe --file -
+
+ADDITIONAL TOPICS
+
+  ai help speech setup
+  ai help speech transcribe advanced
+  ai help speech transcribe

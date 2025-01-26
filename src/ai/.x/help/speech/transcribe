@@ -1,0 +1,34 @@
+TRANSCRIBE
+
+@speech.include.the.transcribe.command.long
+
+USAGE: ai speech transcribe [...]
+
+  CONNECTION
+    --key KEY                     (see: ai help speech transcribe key)
+    --region REGION               (see: ai help speech transcribe region)
+
+  DIARIZATION
+    --diarization                 (see: ai help speech transcribe diarization)
+    --max-speakers NUMBER
+
+  LANGUAGE                        (see: ai help speech transcribe language)
+    --language LANGUAGE
+    --languages LANG1;LANG2[;...]
+
+  INPUT                           (see: ai help speech transcribe input)
+    --file FILE                   (see: ai help speech transcribe file)
+    --files PATTERN               (see: ai help speech transcribe files)
+    --files @FILELIST.txt         (see: ai help speech transcribe files)
+
+  ADVANCED
+    --log FILENAME                (see: ai help speech transcribe log)
+    --foreach in @ITEMS.txt       (see: ai help speech transcribe foreach)
+    --threads NUMBER              (see: ai help speech transcribe threads)
+
+SEE ALSO
+
+  ai help speech setup
+  ai help speech transcribe advanced
+  ai help speech transcribe examples
+  ai help find topics speech transcribe

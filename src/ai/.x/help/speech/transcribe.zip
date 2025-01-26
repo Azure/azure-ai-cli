@@ -1,0 +1,25 @@
+TRANSCRIBE ZIP
+
+@speech.include.the.transcribe.command
+
+@speech.include.the.zip.option
+
+  NOTE: `--zip` does not package local input files (e.g. audio, models, etc.)
+
+USAGE: ai speech transcribe [...] --zip FILENAME
+
+EXAMPLES
+
+  ai speech transcribe --files *.wav --zip test1.zip
+  ai speech transcribe --files *.wav --log {id}.log --zip test2.zip
+  ai speech transcribe --foreach file;transcript in @items.txt --zip test3.zip
+
+  ai speech transcribe --files @URLs.txt --output zip output.zip --zip test4.zip
+  ai webjob --upload test4.zip --run
+
+SEE ALSO
+
+  ai help speech transcribe
+  ai help speech transcribe files
+  ai help speech transcribe foreach
+  ai help speech webjob setup

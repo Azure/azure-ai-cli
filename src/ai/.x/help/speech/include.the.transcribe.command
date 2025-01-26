@@ -1,0 +1,1 @@
+  The `ai speech transcribe` command transcribes non-streaming audio.
