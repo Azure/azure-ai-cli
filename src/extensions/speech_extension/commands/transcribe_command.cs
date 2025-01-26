@@ -89,7 +89,7 @@ namespace Azure.AI.Details.Common.CLI
                 .ToArray());
 
             var phrases = json.GetProperty("phrases").EnumerateArray();
-            var hasSpeakerInfo = phrases.Any(p => p.GetProperty("speaker").GetInt32() > 0);
+            var hasSpeakerInfo = phrases.Any(p => p.TryGetProperty("speaker", out var speaker) && speaker.GetInt32() > 0);
             var withSpeakerInfo = hasSpeakerInfo
                 ? string.Join("\n", phrases.Select(p => {
                     var speaker = p.GetProperty("speaker").GetInt32();
