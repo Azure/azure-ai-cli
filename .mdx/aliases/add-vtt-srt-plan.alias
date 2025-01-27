@@ -1,7 +1,0 @@
-﻿src\extensions\speech_extension\helpers\output_helper.cs
-tests\fast-transcription-steve-katie-example.json
-**\transcribe_*.cs
---instructions
-See how WebVTT and SRT are implemented for some commands? I want it to work with TranscribeCommand. Please write needed functions for me to add to TranscribeCommand class, and show me what mods to make to which other TranscribeCommand class methods
---save-output
-add-vtt-srt-plan.md
