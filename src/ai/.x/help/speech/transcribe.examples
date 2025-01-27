@@ -16,9 +16,33 @@ TRANSCRIBE EXAMPLES
 
   `EXAMPLE 2`: Transcribe speech from multiple files using wildcards
 
-    ai speech transcribe --files *.wav
+    ai speech transcribe --files *.wav --threads 4
 
-  `EXAMPLE 3`: Transcribe speech in audio file content piped thru STDIN
+  `EXAMPLE 3`: Transcribe speech with diariazation
+
+    ai speech transcribe --file meeting.wav --diarization --max-speakers 3
+
+  `EXAMPLE 4`: Transcribe speech, tagging all profanity, removing profanity, or replacing profanity with asterisks
+
+    ai speech transcribe --file profanity.wav --input-path ../tests/audio --profanity tags
+    ai speech transcribe --file profanity.wav --input-path ../tests/audio --profanity remove
+    ai speech transcribe --file profanity.wav --input-path ../tests/audio --profanity mask
+    ai speech transcribe --file profanity.wav --input-path ../tests/audio --foreach profanity in none;masked;tags;removed
+
+  `EXAMPLE 5`: Transcribe speech and save the JSON output to a file
+
+    ai speech transcribe --file meeting.wav --output-json-file meeting.json
+
+  `EXAMPLE 6`: Transcribe speech and output captioning in SRT or VTT format
+
+    ai speech transcribe --file meeting.wav --output-vtt-file meeting.vtt
+    ai speech transcribe --file meeting.wav --output-srt-file meeting.srt
+
+  `EXAMPLE 7`: Output the request payload
+
+    ai speech transcribe --file meeting.wav --output-request request.bin
+
+  `EXAMPLE 8`: Transcribe speech in audio file content piped thru STDIN
 
     ai speech synthesize --text "Hello" --audio output - --quiet | ai speech transcribe --file -
 
