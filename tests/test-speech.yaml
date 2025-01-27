@@ -464,3 +464,17 @@
       Saved: .*hello.alias
       Hello.
       Hello.
+
+  - name: zip request
+    command: ai speech transcribe --url https://crbn.us/hello.wav --zip transcribe-hello-wav.zip
+    parallelize: true
+    expect-regex: |
+      Zipping into transcribe-hello-wav.zip ...
+      Saving ai.dll ...
+      Completed
+
+  - name: with languages
+    command: ai speech transcribe --files ../tests/audio/de-de/howistheweather.wav;../tests/audio/es-es/howstheweather.wav --languages de-de;es-es
+    parallelize: true
+    expect: |
+      The output contains German and Spanish text that asks about the weather.

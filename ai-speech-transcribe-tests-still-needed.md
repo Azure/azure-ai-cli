@@ -5,12 +5,9 @@
 | --region           | Specifies the region for a speech resource              |
 | --key              | Specifies the subscription key for authentication       |
 | --foreach          | Repeats a specific command multiple times               |
-| --language         | Specifies a single spoken language                      |
-| --languages        | Auto-detect from a set of languages                     |
 | --log              | Specifies the file for additional logging information   |
 | --output all       | Aggregates specified items into an output file          |
 | --output each      | Aggregates specified items into an output file per event|
-| --zip              | Packages data and dependencies into a ZIP file          |
 
 ### Example Tests
 
@@ -50,30 +47,6 @@
       TRANSCRIPTION COMPLETED:
 ```
 
-#### Test for --language
-
-```yaml
-- area: ai speech transcribe language
-  tests:
-  - name: set and use language
-    command: ai speech transcribe --file hello.wav --language en-US
-    expect-regex: |
-      TRANSCRIPTION STARTED:
-      TRANSCRIPTION COMPLETED:
-```
-
-#### Test for --languages
-
-```yaml
-- area: ai speech transcribe languages
-  tests:
-  - name: auto-detect language
-    command: ai speech transcribe --file hello.wav --languages en-US;de-DE
-    expect-regex: |
-      TRANSCRIPTION STARTED:
-      TRANSCRIPTION COMPLETED:
-```
-
 #### Test for --log
 
 ```yaml
@@ -108,16 +81,5 @@
     expect-regex: |
       TRANSCRIPTION STARTED:
       TRANSCRIPTION COMPLETED:
-```
-
-#### Test for --zip
-
-```yaml
-- area: ai speech transcribe zip
-  tests:
-  - name: package into zip
-    command: ai speech transcribe --file hello.wav --zip config.zip
-    expect-regex: |
-      ZIP PACKAGE CREATED:
 ```
 
