@@ -4,7 +4,6 @@
 |--------------------|---------------------------------------------------------|
 | --region           | Specifies the region for a speech resource              |
 | --key              | Specifies the subscription key for authentication       |
-| --foreach          | Repeats a specific command multiple times               |
 | --log              | Specifies the file for additional logging information   |
 | --output all       | Aggregates specified items into an output file          |
 | --output each      | Aggregates specified items into an output file per event|
@@ -30,18 +29,6 @@
   tests:
   - name: set and use key
     command: ai speech transcribe --file hello.wav --key 436172626F6E20697320636F6F6C2121
-    expect-regex: |
-      TRANSCRIPTION STARTED:
-      TRANSCRIPTION COMPLETED:
-```
-
-#### Test for --foreach
-
-```yaml
-- area: ai speech transcribe foreach
-  tests:
-  - name: transcribe multiple files
-    command: ai speech transcribe --foreach file in @filelist.txt
     expect-regex: |
       TRANSCRIPTION STARTED:
       TRANSCRIPTION COMPLETED:

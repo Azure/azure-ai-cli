@@ -398,29 +398,14 @@
       Speaker 1: Good morning, Steve.
       Speaker 2: Good morning, Katie.
 
-  - name: profanity filtering none
-    command: ai speech transcribe --file profanity.wav --input-path ../tests/audio --profanity none
+  - name: foreach profanity
+    command: ai speech transcribe --file profanity.wav --input-path ../tests/audio --foreach profanity in none;masked;tags;removed
     parallelize: true
     expect-regex: |
       mother
-
-  - name: profanity filtering masked
-    command: ai speech transcribe --file profanity.wav --input-path ../tests/audio --profanity masked
-    parallelize: true
-    expect-regex: |
-      You [*]+.
-
-  - name: profanity filtering removed
-    command: ai speech transcribe --file profanity.wav --input-path ../tests/audio --profanity masked
-    parallelize: true
-    expect-regex: |
-      You .
-
-  - name: profanity filtering tags
-    command: ai speech transcribe --file profanity.wav --input-path ../tests/audio --profanity tags
-    parallelize: true
-    expect-regex: |
-      You <profanity>mother.*</profanity>.
+      You [*]+\.
+      You <profanity>mother.*</profanity>\.
+      You \.
 
   - name: output SRT
     command: ai speech transcribe --file katiesteve_mono.wav --input-path ../tests/audio --output-srt-file -
