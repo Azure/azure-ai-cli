@@ -337,13 +337,40 @@
 - area: ai speech synthesize
   tests:
   - name: Hello world
-    command: ai speech synthesize --text "Hello world" --audio-output hello.wav
+    command: ai speech synthesize --text "Hello world" --audio-output hello-world.wav
+    parallelize: true
     expect-regex: |
       SYNTHESIS STARTED:
       SYNTHESIS COMPLETED:
 
 - area: ai speech transcribe
   tests:
+  - name: with file
+    command: ai speech transcribe --file ../tests/audio/hello.wav
+    parallelize: true
+    expect-regex: |
+      Hello.
+
+  - name: with multiple files
+    command: ai speech transcribe --files ../tests/audio/hello.wav;../tests/audio/hello.wav
+    parallelize: true
+    expect-regex: |
+      Hello.
+      Hello.
+
+  - name: with url
+    command: ai speech transcribe --url https://crbn.us/hello.wav
+    parallelize: true
+    expect-regex: |
+      Hello.
+
+  - name: with multiple urls
+    command: ai speech transcribe --urls https://crbn.us/hello.wav;https://crbn.us/hello.wav
+    parallelize: true
+    expect-regex: |
+      Hello.
+      Hello.
+
   - name: without diarization
     parallelize: true
     command: ai speech transcribe --file katiesteve_mono.wav --input-path ../tests/audio

@@ -277,11 +277,16 @@ namespace Azure.AI.Details.Common.CLI
 
             foreach (var item in queue)
             {
-                var list = FileHelpers.FindFiles(files, item);
+                var list = FileHelpers.FindFiles(files, item, httpLinksOk: true);
                 foreach (var fileValue in list)
                 {
                     var values = CombineValuesWithNameValue(item, fileValueName, fileValue);
                     newQueue.Enqueue(values);
+                }
+
+                if (newQueue.Count == 0 && Program.Debug)
+                {
+                    Console.WriteLine($"No files found for {fileValueName} in {files}");
                 }
             }
 

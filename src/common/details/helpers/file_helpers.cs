@@ -86,15 +86,15 @@ namespace Azure.AI.Details.Common.CLI
             return Path.Combine(dirName, $"{Path.GetFileNameWithoutExtension(file.FullName)}{appendBeforeExtension}{file.Extension}{appendAfterExtension}");
         }
 
-        public static IEnumerable<string> FindFiles(string path, string pattern, INamedValues? values = null, bool checkOverrides = true, bool checkResources = true)
+        public static IEnumerable<string> FindFiles(string path, string pattern, INamedValues? values = null, bool checkOverrides = true, bool checkResources = true, bool httpLinksOk = false)
         {
             var combined = PathHelpers.Combine(path, pattern);
             return combined != null
-                ? FindFiles(combined, values, checkOverrides, checkResources)
+                ? FindFiles(combined, values, checkOverrides, checkResources, httpLinksOk)
                 : Enumerable.Empty<string>();
         }
 
-        public static IEnumerable<string> FindFiles(string fileNames, INamedValues? values = null, bool checkOverrides = true, bool checkResources = true)
+        public static IEnumerable<string> FindFiles(string fileNames, INamedValues? values = null, bool checkOverrides = true, bool checkResources = true, bool httpLinksOk = false)
         {
             var currentDir = Directory.GetCurrentDirectory();
             foreach (var item in fileNames.Split(new char[] { ';', '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries))
@@ -115,6 +115,13 @@ namespace Azure.AI.Details.Common.CLI
                     {
                         yield return resource;
                     }
+                }
+
+                var isHttpLink = item.StartsWith("http://") || item.StartsWith("https://");
+                if (isHttpLink && httpLinksOk)
+                {
+                    yield return item;
+                    continue;
                 }
 
                 if (IsResource(item) || IsOverride(item)) continue;
