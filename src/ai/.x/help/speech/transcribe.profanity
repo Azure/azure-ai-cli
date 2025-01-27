@@ -6,13 +6,19 @@ TRANSCRIBE PROFANITY
 
 USAGE: ai speech transcribe [...] --profanity OPTION
 
-  WHERE: OPTION is raw
-     OR: OPTION is masked
+  WHERE: OPTION is none
+     OR: OPTION is masked 
      OR: OPTION is removed
+     OR: OPTION is tags
+
+  Using none will disable profanity filtering.
+  Using masked will replace profanity with asterisks.
+  Using removed will remove all profanity from the result.
+  Using tags will add profanity tags.
 
 EXAMPLES
 
-  ai speech transcribe --file hello.wav --profanity raw
+  ai speech transcribe --file hello.wav --profanity none
   ai speech transcribe --file hello.wav --profanity masked
   ai speech transcribe --file hello.wav --profanity removed
 

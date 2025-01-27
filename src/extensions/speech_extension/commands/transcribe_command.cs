@@ -79,8 +79,8 @@ namespace Azure.AI.Details.Common.CLI
             var locales = _values.GetOrDefault("source.language.config", "en-US");
             var diarizationEnabled = _values.GetOrDefault("transcribe.diarization", false);
             var maxSpeakers = _values.GetOrDefault("transcribe.diarization.max.speakers", 1);
+            var profanityFilterMode = _values.GetOrDefault("transcribe.profanity.filter.mode", "masked");
             var channels = _values.GetOrDefault("audio.input.channels", "[]");
-            var profanityFilterMode = _values.GetOrDefault("service.output.config.profanity.option", "Masked");
 
             var diarization = diarizationEnabled ? new { maxSpeakers, enabled = true } : null;
 

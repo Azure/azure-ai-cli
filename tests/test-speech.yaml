@@ -346,19 +346,44 @@
   tests:
   - name: without diarization
     parallelize: true
-    command: ai speech transcribe --file katiesteve_mono.wav --input-path ../tests
+    command: ai speech transcribe --file katiesteve_mono.wav --input-path ../tests/audio
     expect-regex: |
       Good morning, Steve\. Good morning, Katie\.
 
   - name: with diarization
-    command: ai speech transcribe --file katiesteve_mono.wav --input-path ../tests --diarization --max-speakers 2
+    command: ai speech transcribe --file katiesteve_mono.wav --input-path ../tests/audio --diarization --max-speakers 2
     parallelize: true
     expect-regex: |
       Speaker 1: Good morning, Steve.
       Speaker 2: Good morning, Katie.
 
+  - name: profanity filtering none
+    command: ai speech transcribe --file profanity.wav --input-path ../tests/audio --profanity none
+    parallelize: true
+    expect-regex: |
+      mother
+
+  - name: profanity filtering masked
+    command: ai speech transcribe --file profanity.wav --input-path ../tests/audio --profanity masked
+    parallelize: true
+    expect-regex: |
+      You [*]+.
+
+  - name: profanity filtering removed
+    command: ai speech transcribe --file profanity.wav --input-path ../tests/audio --profanity masked
+    parallelize: true
+    expect-regex: |
+      You .
+
+  - name: profanity filtering tags
+    command: ai speech transcribe --file profanity.wav --input-path ../tests/audio --profanity tags
+    parallelize: true
+    expect-regex: |
+      You <profanity>mother.*</profanity>.
+
   - name: output SRT
-    command: ai speech transcribe --file katiesteve_mono.wav --input-path ../tests --output-srt-file -
+    command: ai speech transcribe --file katiesteve_mono.wav --input-path ../tests/audio --output-srt-file -
+    parallelize: true
     expect-regex: |
       Good morning, Steve\. Good morning, Katie\.
       \r?$\n
@@ -374,7 +399,8 @@
       00:00:\d+,\d+ --> 00:00:\d+,\d+\r?$\n
 
   - name: output VTT
-    command: ai speech transcribe --file katiesteve_mono.wav --input-path ../tests --output-vtt-file -
+    command: ai speech transcribe --file katiesteve_mono.wav --input-path ../tests/audio --output-vtt-file -
+    parallelize: true
     expect-regex: |
       Good morning, Steve\. Good morning, Katie\.
       WEBVTT\r?$\n

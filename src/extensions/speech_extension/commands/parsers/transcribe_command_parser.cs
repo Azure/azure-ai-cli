@@ -38,6 +38,7 @@ namespace Azure.AI.Details.Common.CLI
 
             new TrueFalseNamedValueTokenParser("--diarization", "transcribe.diarization", "01"),
             new Any1ValueNamedValueTokenParser("--max-speakers", "transcribe.diarization.max.speakers", "0001;0010"),
+            new RequiredValidValueNamedValueTokenParser("--profanity", "transcribe.profanity.filter.mode", "0100", "masked;none;tags;removed"),
 
             new Any1ValueNamedValueTokenParser("--id", "audio.input.id", "001"),
             new Any1PinnedNamedValueTokenParser("--url", "audio.input.file", "001", "file", "audio.input.type"),
