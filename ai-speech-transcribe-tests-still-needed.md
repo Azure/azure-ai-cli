@@ -10,9 +10,6 @@
 | --log              | Specifies the file for additional logging information   |
 | --output all       | Aggregates specified items into an output file          |
 | --output each      | Aggregates specified items into an output file per event|
-| --threads          | Specifies number of threads for parallel processing     |
-| --processes        | Specifies number of sub-processes for parallel processing|
-| --save             | Packages command line and config data into a file       |
 | --zip              | Packages data and dependencies into a ZIP file          |
 
 ### Example Tests
@@ -111,41 +108,6 @@
     expect-regex: |
       TRANSCRIPTION STARTED:
       TRANSCRIPTION COMPLETED:
-```
-
-#### Test for --threads
-
-```yaml
-- area: ai speech transcribe threads
-  tests:
-  - name: use multiple threads
-    command: ai speech transcribe --file hello.wav --threads 4
-    expect-regex: |
-      TRANSCRIPTION STARTED:
-      TRANSCRIPTION COMPLETED:
-```
-
-#### Test for --processes
-
-```yaml
-- area: ai speech transcribe processes
-  tests:
-  - name: use multiple processes
-    command: ai speech transcribe --file hello.wav --processes 4
-    expect-regex: |
-      TRANSCRIPTION STARTED:
-      TRANSCRIPTION COMPLETED:
-```
-
-#### Test for --save
-
-```yaml
-- area: ai speech transcribe save
-  tests:
-  - name: save configuration
-    command: ai speech transcribe --file hello.wav --save config.job
-    expect-regex: |
-      CONFIGURATION SAVED:
 ```
 
 #### Test for --zip

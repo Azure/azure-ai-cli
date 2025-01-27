@@ -371,6 +371,20 @@
       Hello.
       Hello.
 
+  - name: with multiple files (threads 2)
+    command: ai speech transcribe --files ../tests/audio/hello.wav;../tests/audio/hello.wav --threads 2
+    parallelize: true
+    expect-regex: |
+      Hello.
+      Hello.
+
+  - name: with multiple files (processes 2)
+    command: ai speech transcribe --files ../tests/audio/hello.wav;../tests/audio/hello.wav --processes 2
+    parallelize: true
+    expect-regex: |
+      Hello.
+      Hello.
+
   - name: without diarization
     parallelize: true
     command: ai speech transcribe --file katiesteve_mono.wav --input-path ../tests/audio
@@ -440,3 +454,13 @@
       \r?$\n
       00:00:\d+\.\d+ --> 00:00:\d+\.\d+\r?$\n
       
+  - name: save and run via @
+    bash: |
+      ai speech transcribe --file ../tests/audio/hello.wav --save hello.alias
+      ai speech transcribe @hello.alias
+      ai @hello.alias
+    parallelize: true
+    expect-regex: |
+      Saved: .*hello.alias
+      Hello.
+      Hello.
