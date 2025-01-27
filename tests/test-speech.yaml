@@ -438,6 +438,36 @@
       Good morning, Katie\.\r?$\n
       \r?$\n
       00:00:\d+\.\d+ --> 00:00:\d+\.\d+\r?$\n
+
+  - name: output request and json
+    parallelize: false # do NOT parallelize this test; due to file checks, we should run it serially
+    bash: |
+      if [ -f request.json ]; then
+        rm request.json
+      fi
+      if [ -f output.json ]; then
+        rm output.json
+      fi
+      ai speech transcribe --file katiesteve_mono.wav --input-path ../tests/audio --output-request-file request.json --output-json-file output.json
+      if [ !-f request.json ]; then
+        echo "request.json not found"
+        exit 1
+      fi
+      if [ !-f output.json ]; then
+        echo "output.json not found"
+        exit 1
+      fi
+
+  - name: output result text
+    parallelize: true
+    command: ai speech transcribe --output-text
+    arguments:
+      file: hello.wav
+      input-path: tests\audio
+      output-text: true
+      output-file: hello.json
+      output-file-type: json
+      output-overwrite: true
       
   - name: save and run via @
     bash: |

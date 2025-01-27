@@ -5,8 +5,6 @@
 | --region           | Specifies the region for a speech resource              |
 | --key              | Specifies the subscription key for authentication       |
 | --log              | Specifies the file for additional logging information   |
-| --output all       | Aggregates specified items into an output file          |
-| --output each      | Aggregates specified items into an output file per event|
 
 ### Example Tests
 
@@ -45,28 +43,3 @@
       TRANSCRIPTION STARTED:
       TRANSCRIPTION COMPLETED:
 ```
-
-#### Test for --output all
-
-```yaml
-- area: ai speech transcribe output all
-  tests:
-  - name: aggregate output
-    command: ai speech transcribe --file hello.wav --output all text --output all file output.tsv
-    expect-regex: |
-      TRANSCRIPTION STARTED:
-      TRANSCRIPTION COMPLETED:
-```
-
-#### Test for --output each
-
-```yaml
-- area: ai speech transcribe output each
-  tests:
-  - name: output each event
-    command: ai speech transcribe --file hello.wav --output each text --output each file output.tsv
-    expect-regex: |
-      TRANSCRIPTION STARTED:
-      TRANSCRIPTION COMPLETED:
-```
-

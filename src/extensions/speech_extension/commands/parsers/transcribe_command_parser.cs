@@ -54,6 +54,8 @@ namespace Azure.AI.Details.Common.CLI
 
             new OutputSrtVttRecognizerTokenParser(),
 
+            new TrueFalseNamedValueTokenParser("output.all.transcription.result.text", "10001"),
+
             new OutputAllRecognizerEventTokenParser(),
             new OutputEachRecognizerEventTokenParser()
         };

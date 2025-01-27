@@ -134,8 +134,7 @@ namespace Azure.AI.Details.Common.CLI
 
             if (!_quiet) Console.WriteLine(withSpeakerInfo);
 
-            _output!.EnsureOutputAll("transcription.result", withSpeakerInfo);
-            _output!.CheckOutput();
+            _output!.EnsureOutputAll("transcription.result.text", withSpeakerInfo);
                     
             var srtFileName = _values.GetOrEmpty("output.srt.file.name");
             if (!string.IsNullOrEmpty(srtFileName))
@@ -165,10 +164,15 @@ namespace Azure.AI.Details.Common.CLI
 
             var file = _values["audio.input.file"];
             _output!.EnsureCacheProperty("audio.input.file", file);
+
+            _lock = new SpinLock();
+            _lock.StartLock();
         }
 
         private void StopCommand()
         {
+            _lock!.StopLock(5000);
+
             _output!.CheckOutput();
             _output!.StopOutput();
         }
@@ -307,8 +311,10 @@ namespace Azure.AI.Details.Common.CLI
 
             FileHelpers.WriteAllText(vttFileName, sb.ToString().Trim(), Encoding.UTF8);
         }
+
         OutputHelper? _output = null;
 
+        private SpinLock? _lock = null;
         private bool _quiet = false;
         private bool _verbose = false;
     }
