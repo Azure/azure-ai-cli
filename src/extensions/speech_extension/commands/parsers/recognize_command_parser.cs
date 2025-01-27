@@ -28,7 +28,7 @@ namespace Azure.AI.Details.Common.CLI
 
         private static INamedValueTokenParser[] recognizeCommandParsers = {
 
-            new RequiredValidValueNamedValueTokenParser(null, "x.command", "11", "recognize"),
+            new RequiredValidValueNamedValueTokenParser(null, "x.command", "11", "recognize;speech.recognize"),
 
             new ExpectOutputTokenParser(),
             new DiagnosticLogTokenParser(),

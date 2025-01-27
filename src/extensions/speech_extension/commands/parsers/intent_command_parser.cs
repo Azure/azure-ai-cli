@@ -28,7 +28,7 @@ namespace Azure.AI.Details.Common.CLI
 
         private static INamedValueTokenParser[] intentCommandParsers = {
 
-            new RequiredValidValueNamedValueTokenParser(null, "x.command", "11", "intent"),
+            new RequiredValidValueNamedValueTokenParser(null, "x.command", "11", "intent;speech.intent"),
 
             new ExpectOutputTokenParser(),
             new DiagnosticLogTokenParser(),

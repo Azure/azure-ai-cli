@@ -58,7 +58,7 @@ namespace Azure.AI.Details.Common.CLI
 
         private static INamedValueTokenParser[] profileCommandParsers = {
 
-            new RequiredValidValueNamedValueTokenParser(null, "x.command", "11", "speaker"),
+            new RequiredValidValueNamedValueTokenParser(null, "x.command", "11", "speaker;speech.speaker"),
 
             new ExpectOutputTokenParser(),
             new DiagnosticLogTokenParser(),

@@ -52,7 +52,7 @@ namespace Azure.AI.Details.Common.CLI
         private static INamedValueTokenParser[] botCommandParsers =
          {
 
-            new RequiredValidValueNamedValueTokenParser(null, "x.command", "11", "recognize"),
+            new RequiredValidValueNamedValueTokenParser(null, "x.command", "11", "recognize;speech.recognize"),
 
             new ExpectOutputTokenParser(),
             new DiagnosticLogTokenParser(),
@@ -165,7 +165,7 @@ namespace Azure.AI.Details.Common.CLI
         private static INamedValueTokenParser[] ccCommandParsers =
          {
 
-            new RequiredValidValueNamedValueTokenParser(null, "x.command", "11", "recognize"),
+            new RequiredValidValueNamedValueTokenParser(null, "x.command", "11", "recognize;speech.recognize"),
 
             new ExpectOutputTokenParser(),
             new DiagnosticLogTokenParser(),

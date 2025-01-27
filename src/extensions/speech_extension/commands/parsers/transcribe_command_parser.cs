@@ -22,7 +22,7 @@ namespace Azure.AI.Details.Common.CLI
 
         private static INamedValueTokenParser[] transcribeCommandParsers = {
 
-            new RequiredValidValueNamedValueTokenParser(null, "x.command", "11", "transcribe"),
+            new RequiredValidValueNamedValueTokenParser(null, "x.command", "11", "transcribe;speech.transcribe"),
 
             new ExpectOutputTokenParser(),
             new DiagnosticLogTokenParser(),
@@ -43,6 +43,8 @@ namespace Azure.AI.Details.Common.CLI
             new Any1ValueNamedValueTokenParser("--id", "audio.input.id", "001"),
             new Any1PinnedNamedValueTokenParser("--url", "audio.input.file", "001", "file", "audio.input.type"),
             new ExpandFileNameNamedValueTokenParser("--urls", "audio.input.files", "001", "audio.input.file"),
+            new RequiredValidValueNamedValueTokenParser(null, "audio.input.type", "011", "file;files"),
+            new NamedValueTokenParser(null, "audio.input.file", "010", "1", null, "audio.input.file", "file", "audio.input.type"),
 
             new OutputFileNameNamedValueTokenParser(null, "transcribe.output.json.file", "0110"),
             new OutputFileNameNamedValueTokenParser(null, "transcribe.output.request.file", "0110"),
