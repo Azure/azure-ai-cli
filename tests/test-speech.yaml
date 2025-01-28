@@ -463,7 +463,7 @@
     command: ai speech transcribe --output-text
     arguments:
       file: hello.wav
-      input-path: tests\audio
+      input-path: ../tests/audio
       output-text: true
       output-file: hello.json
       output-file-type: json

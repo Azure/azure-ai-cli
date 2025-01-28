@@ -116,9 +116,11 @@ namespace Azure.AI.Details.Common.CLI
 
             var json = JsonSerializer.Deserialize<JsonElement>(jsonResponse);
 
-            var transcription = string.Join("\n", json
-                .GetProperty("combinedPhrases")
-                .EnumerateArray()
+            var combinedPhrases = json.TryGetProperty("combinedPhrases", out var jsonCombinedPhrases)
+                ? jsonCombinedPhrases.EnumerateArray().ToList()
+                : new List<JsonElement>();
+
+            var transcription = string.Join("\n", combinedPhrases
                 .Select(p => p.GetProperty("text").GetString())
                 .ToArray());
 

@@ -618,7 +618,8 @@ namespace Azure.AI.Details.Common.CLI
                 var fileNames = values.SaveAs(values.Names, Path.GetTempFileName());
                 var fileName = fileNames.Split(';').First();
 
-                var start = new ProcessStartInfo(Program.Exe, $"{values.GetCommand()} --nodefaults @{fileName}");
+                var programExe = OperatingSystem.IsWindows() ? Program.Exe : Program.Exe.Replace(".exe", "");
+                var start = new ProcessStartInfo(programExe, $"{values.GetCommand()} --nodefaults @{fileName}");
                 start.UseShellExecute = false;
 
                 var process = Process.Start(start)!;
