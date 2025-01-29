@@ -33,8 +33,12 @@ namespace Azure.AI.Details.Common.CLI
         {
             StartCommand();
 
+            var audioFile = GetAudioFile();
+            var audioStream = FileHelpers.Open(audioFile, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+            _disposeAfterStop.Add(audioStream);
+
             var content = new MultipartFormDataContent();
-            content.Add(new ByteArrayContent(FileHelpers.ReadAllBytes(GetAudioFile())), "audio", Path.GetFileName(GetAudioFile()));
+            content.Add(new StreamContent(audioStream), "audio", Path.GetFileName(audioFile));
             content.Add(new StringContent(GetDefinitionJson()), "definition");
 
             var request = CreateRequestMessage();
@@ -48,6 +52,7 @@ namespace Azure.AI.Details.Common.CLI
             ProcessResponse(json);
 
             StopCommand();
+            DisposeAfterStop();
             DeleteTemporaryFiles();
         }
 
@@ -78,7 +83,7 @@ namespace Azure.AI.Details.Common.CLI
         {
             var locales = _values.GetOrDefault("source.language.config", "en-US");
             var diarizationEnabled = _values.GetOrDefault("transcribe.diarization", false);
-            var maxSpeakers = _values.GetOrDefault("transcribe.diarization.max.speakers", 1);
+            var maxSpeakers = _values.GetOrDefault("transcribe.diarization.max.speakers", 2);
             var profanityFilterMode = _values.GetOrDefault("transcribe.profanity.filter.mode", "masked");
             var channels = _values.GetOrDefault("audio.input.channels", "[]");
 
@@ -177,6 +182,8 @@ namespace Azure.AI.Details.Common.CLI
 
             _output!.CheckOutput();
             _output!.StopOutput();
+
+            _stopEvent!.Set();
         }
 
         private void CheckAudioInput()

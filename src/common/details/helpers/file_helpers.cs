@@ -624,6 +624,13 @@ namespace Azure.AI.Details.Common.CLI
                 : File.Open(fileName, mode);
         }
 
+        public static Stream Open(string fileName, FileMode mode, FileAccess access, FileShare share)
+        {
+            return IsStandardOutputReference(fileName)
+                ? Console.OpenStandardOutput()
+                : File.Open(fileName, mode, access, share);
+        }
+
         public static void AppendAllText(string fileName, string text, Encoding encoding)
         {
             EnsureDirectoryForFileExists(fileName);

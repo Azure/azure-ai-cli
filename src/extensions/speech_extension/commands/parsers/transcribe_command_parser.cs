@@ -34,7 +34,7 @@ namespace Azure.AI.Details.Common.CLI
             new TrueFalseNamedValueTokenParser("service.config.content.logging.enabled", "00011;00110"),
 
             new Any1ValueNamedValueTokenParser("--languages", "source.language.config", "100;010"),
-            new Any1ValueNamedValueTokenParser("--channels", "audio.input.channels", "010"),
+            new Any1ValueNamedValueTokenParser("--channels", "audio.input.channels", "001"),
 
             new TrueFalseNamedValueTokenParser("--diarization", "transcribe.diarization", "01"),
             new Any1ValueNamedValueTokenParser("--max-speakers", "transcribe.diarization.max.speakers", "0001;0010"),
