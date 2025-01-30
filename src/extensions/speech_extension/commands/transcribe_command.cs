@@ -48,6 +48,8 @@ namespace Azure.AI.Details.Common.CLI
 
             var client = new HttpClient();
             var response = client.SendAsync(request).Result;
+            HttpHelpers.DemandResponseStatusCodeOk(response, $"Transcribing audio file {audioFile} ...");
+
             var json = ReadWritePrintJson(response);
             ProcessResponse(json);
 
@@ -58,14 +60,29 @@ namespace Azure.AI.Details.Common.CLI
 
         private HttpRequestMessage CreateRequestMessage()
          {
-            var region = _values["service.config.region"];
-            var url = $"https://{region}.api.cognitive.microsoft.com/speechtotext/transcriptions:transcribe?api-version=2024-11-15";
+            var url = GetTranscriptionTranscribeUrl();
 
             var request = new HttpRequestMessage(HttpMethod.Post, url);
             request.Headers.Add("Ocp-Apim-Subscription-Key", GetSubscriptionKey());
 
             return request;
          }
+
+        private string GetTranscriptionTranscribeUrl()
+        {
+            var region = _values["service.config.region"];
+
+            var defaultHost = $"https://{region}.api.cognitive.microsoft.com";
+            var host = _values.GetOrDefault("service.config.host", defaultHost);
+
+            var defaultEndpoint = $"{host.Trim('/')}/speechtotext/transcriptions:transcribe";
+            var endpoint = _values.GetOrDefault("transcription.api.endpoint", defaultEndpoint);
+            
+            var defaultVersion = "2024-11-15";
+            var version = _values.GetOrDefault("transcription.api.version", defaultVersion);
+
+            return $"{endpoint}?api-version={version}";
+        }
 
         private string GetSubscriptionKey()
         {

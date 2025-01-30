@@ -345,6 +345,43 @@
 
 - area: ai speech transcribe
   tests:
+  - name: remote server error 401 (via url)
+    command: ai speech transcribe --url https://httpstat.us/401
+    parallelize: true
+    expect-regex: |
+      ERROR: The remote server returned an error: \(401\) Unauthorized.
+
+  - name: http bad request (via language)
+    command: ai speech transcribe --file ../tests/audio/hello.wav --language zzz
+    parallelize: true
+    expect-regex: |
+      ERROR: Transcribing audio file
+      ../tests/audio/hello.wav
+      Status code: BadRequest
+      application/json
+      locale
+
+  - name:  http bad request (via endpoint)
+    command: ai speech transcribe --file ../tests/audio/hello.wav --endpoint https://httpstat.us/500
+    parallelize: true
+    expect-regex: |
+      ERROR: Transcribing audio file
+      Status code: InternalServerError
+
+  - name: http not found (via host)
+    command: ai speech transcribe --file ../tests/audio/hello.wav --host https://httpstat.us/
+    parallelize: true
+    expect-regex: |
+      ERROR: Transcribing audio file
+      Status code: NotFound
+
+  - name: http not found (via api-version)
+    command: ai speech transcribe --file ../tests/audio/hello.wav --api-version 2024-11-01
+    parallelize: true
+    expect-regex: |
+      ERROR: Transcribing audio file
+      Status code: NotFound
+
   - name: with file
     command: ai speech transcribe --file ../tests/audio/hello.wav
     parallelize: true

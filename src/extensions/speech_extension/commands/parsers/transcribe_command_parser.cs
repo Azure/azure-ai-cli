@@ -28,6 +28,9 @@ namespace Azure.AI.Details.Common.CLI
             new DiagnosticLogTokenParser(),
             new CommonNamedValueTokenParsers(),
 
+            new Any1ValueNamedValueTokenParser(null, "transcription.api.version", "011"),
+            new Any1ValueNamedValueTokenParser(null, "transcription.api.endpoint", "001"),
+
             new ExpandFileNameNamedValueTokenParser(),
 
             new SpeechConfigServiceConnectionTokenParser(),

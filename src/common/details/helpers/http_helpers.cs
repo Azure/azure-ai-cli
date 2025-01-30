@@ -332,5 +332,18 @@ namespace Azure.AI.Details.Common.CLI
             return null;
         }
 
+        public static void DemandResponseStatusCodeOk(HttpResponseMessage response, string message)
+        {
+            if (response.StatusCode != HttpStatusCode.OK)
+            {
+                var mimeType = response.Content?.Headers?.ContentType?.MediaType ?? "unknown type";
+
+                var contentStream = response.Content.ReadAsStream();
+                using StreamReader reader = new StreamReader(contentStream);
+
+                var responseContent = reader.ReadToEnd();
+                throw new Exception($"{message} Status code: {response.StatusCode}; {mimeType}; {responseContent}");
+            }
+        }
     }
 }
