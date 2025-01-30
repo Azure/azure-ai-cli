@@ -599,38 +599,30 @@ namespace Azure.AI.Details.Common.CLI
 
         private void CheckWriteChatAnswerOutputFile(string completeResponse)
         {
-            var outputAnswerFile = OutputChatAnswerFileToken.Data().GetOrDefault(_values);
-            if (!string.IsNullOrEmpty(outputAnswerFile))
+            if (!string.IsNullOrEmpty(_outputAnswerFile))
             {
-                var fileName = FileHelpers.GetOutputDataFileName(outputAnswerFile, _values);
-                FileHelpers.WriteAllText(fileName, completeResponse, Encoding.UTF8);
+                FileHelpers.WriteAllText(_outputAnswerFile, completeResponse, Encoding.UTF8);
             }
 
-            var outputAddAnswerFile = OutputAddChatAnswerFileToken.Data().GetOrDefault(_values);
-            if (!string.IsNullOrEmpty(outputAddAnswerFile))
+            if (!string.IsNullOrEmpty(_outputAddAnswerFile))
             {
-                var fileName = FileHelpers.GetOutputDataFileName(outputAddAnswerFile, _values);
-                FileHelpers.AppendAllText(fileName, "\n" + completeResponse, Encoding.UTF8);
+                FileHelpers.AppendAllText(_outputAddAnswerFile, "\n" + completeResponse, Encoding.UTF8);
             }
         }
 
         private async Task CheckWriteChatHistoryOutputFileAsync(Func<string, Task> saveChatHistoryToFile)
         {
-            var outputHistoryFile = OutputChatHistoryFileToken.Data().GetOrDefault(_values);
-            if (!string.IsNullOrEmpty(outputHistoryFile))
+            if (!string.IsNullOrEmpty(_outputChatHistoryFileName))
             {
-                var fileName = FileHelpers.GetOutputDataFileName(outputHistoryFile, _values);
-                await saveChatHistoryToFile(fileName);
+                await saveChatHistoryToFile(_outputChatHistoryFileName);
             }
         }
 
         private void CheckWriteChatHistoryOutputFile(Action<string> saveChatHistoryToFile)
         {
-            var outputHistoryFile = OutputChatHistoryFileToken.Data().GetOrDefault(_values);
-            if (!string.IsNullOrEmpty(outputHistoryFile))
+            if (!string.IsNullOrEmpty(_outputChatHistoryFileName))
             {
-                var fileName = FileHelpers.GetOutputDataFileName(outputHistoryFile, _values);
-                saveChatHistoryToFile(fileName);
+                saveChatHistoryToFile(_outputChatHistoryFileName);
             }
         }
 
@@ -1896,6 +1888,24 @@ namespace Azure.AI.Details.Common.CLI
             // _output!.EnsureOutputAll("chat.input.id", id);
             // _output!.EnsureOutputEach("chat.input.id", id);
 
+            var outputHistoryFile = OutputChatHistoryFileToken.Data().GetOrDefault(_values);
+            if (!string.IsNullOrEmpty(outputHistoryFile))
+            {
+                _outputChatHistoryFileName = FileHelpers.GetOutputDataFileName(outputHistoryFile, _values, "chat.input.id");
+            }
+
+            var outputAnswerFile = OutputChatAnswerFileToken.Data().GetOrDefault(_values);
+            if (!string.IsNullOrEmpty(outputAnswerFile))
+            {
+                _outputAnswerFile = FileHelpers.GetOutputDataFileName(outputAnswerFile, _values);
+            }
+
+            var outputAddAnswerFile = OutputAddChatAnswerFileToken.Data().GetOrDefault(_values);
+            if (!string.IsNullOrEmpty(outputAddAnswerFile))
+            {
+                _outputAddAnswerFile = FileHelpers.GetOutputDataFileName(outputAddAnswerFile, _values);
+            }
+
             _lock = new SpinLock();
             _lock.StartLock();
         }
@@ -1936,5 +1946,9 @@ namespace Azure.AI.Details.Common.CLI
         private const float _defaultTemperature = 0.7f;
         private const float _defaultFrequencyPenalty = 0.0f;
         private const float _defaultPresencePenalty = 0.0f;
+
+        private string? _outputAnswerFile;
+        private string? _outputAddAnswerFile;
+        private string? _outputChatHistoryFileName;
     }
 }

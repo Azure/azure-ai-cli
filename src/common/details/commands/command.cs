@@ -452,23 +452,6 @@ namespace Azure.AI.Details.Common.CLI
             return id;
         }
 
-        protected string ReplaceFileNameValues(string fileName, string idValueName)
-        {
-            var id = _values.GetOrEmpty(idValueName);
-            if (fileName.Contains("{id}")) fileName = fileName.Replace("{id}", id);
-
-            var pid = Process.GetCurrentProcess().Id.ToString();
-            if (fileName.Contains("{pid}")) fileName = fileName.Replace("{pid}", pid);
-
-            var time = DateTime.Now.ToFileTime().ToString();
-            if (fileName.Contains("{time}")) fileName = fileName.Replace("{time}", time);
-
-            var runTime = _values.GetOrEmpty("x.run.time");
-            if (fileName.Contains("{run.time}")) fileName = fileName.Replace("{run.time}", runTime);
-
-            return fileName.ReplaceValues(_values);
-        }
-
         protected void DisposeAfterStop()
         {
             try

@@ -491,7 +491,7 @@ namespace Azure.AI.Details.Common.CLI
             }
             else if (output == "file" && !string.IsNullOrEmpty(file))
             {
-                file = ReplaceFileNameValues(file, "synthesizer.input.id");
+                file = FileHelpers.GetOutputDataFileName(file, _values, "synthesizer.input.id");
                 audioConfig = AudioOutputHelpers.CreateAudioConfigForFile(file);
             }
             else

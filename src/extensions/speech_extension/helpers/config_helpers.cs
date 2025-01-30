@@ -138,22 +138,9 @@ namespace Azure.AI.Details.Common.CLI
             var log = values["diagnostics.config.log.file"];
             if (!string.IsNullOrEmpty(log))
             {
-                var id = values.GetOrEmpty("audio.input.id");
-                if (log.Contains("{id}")) log = log.Replace("{id}", id);
-
-                var pid = Process.GetCurrentProcess().Id.ToString();
-                if (log.Contains("{pid}")) log = log.Replace("{pid}", pid);
-
-                var time = DateTime.Now.ToFileTime().ToString();
-                if (log.Contains("{time}")) log = log.Replace("{time}", time);
-
-                var runTime = values.GetOrEmpty("x.run.time");
-                if (log.Contains("{run.time}")) log = log.Replace("{run.time}", runTime);
-
-                log = FileHelpers.GetOutputDataFileName(log, values);
+                log = FileHelpers.GetOutputDataFileName(log, values, "audio.input.id");
                 config.SetProperty(PropertyId.Speech_LogFilename, log);
             }
         }
-
     }
 }
