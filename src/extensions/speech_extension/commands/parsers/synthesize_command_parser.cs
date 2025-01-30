@@ -28,7 +28,7 @@ namespace Azure.AI.Details.Common.CLI
 
         private static INamedValueTokenParser[] synthesizeCommandParsers = {
 
-            new RequiredValidValueNamedValueTokenParser(null, "x.command", "11", "synthesize"),
+            new RequiredValidValueNamedValueTokenParser(null, "x.command", "11", "synthesize;speech.synthesize"),
 
             new ExpectOutputTokenParser(),
             new DiagnosticLogTokenParser(),

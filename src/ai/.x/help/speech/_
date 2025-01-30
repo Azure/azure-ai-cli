@@ -13,6 +13,8 @@ COMMANDS
   ai speech intent [...]          (see: ai help speech intent)
   ai speech translate [...]       (see: ai help speech translate)
 
+  ai speech transcribe [...]      (see: ai help speech transcribe)
+
   ai speech batch [...]           (see: ai help speech batch)
   ai speech csr [...]             (see: ai help speech csr)
 

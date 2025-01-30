@@ -1,0 +1,24 @@
+TRANSCRIBE OUTPUT REQUEST
+
+  The `--output-request` option writes the HTTP request into the file specified.
+
+  Use this option to inspect how the REST API operates.
+
+USAGE: ai speech transcribe [...] --output-request FILE.bin
+   OR: ai speech transcribe [...] @CONFIG-FILENAME
+
+  WHERE: FILE.bin is the file to store the HTTP request
+     OR: CONFIG-FILENAME is a single line text file in the following form:
+
+            transcribe.output.request.file=FILE.bin
+
+EXAMPLE
+
+  ai speech transcribe --file hello.wav --output-request request.bin
+
+SEE ALSO
+
+  spx help transcribe output
+  spx help transcribe output json
+  spx help transcribe
+  

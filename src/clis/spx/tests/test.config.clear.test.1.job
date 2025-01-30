@@ -1,4 +1,0 @@
-﻿x.command=run
-run.input.spx.command=config local transcribe @key --clear
-run.input.process=spx
-x.quiet=true

@@ -28,7 +28,7 @@ namespace Azure.AI.Details.Common.CLI
 
         private static INamedValueTokenParser[] translateCommandParsers = {
 
-            new RequiredValidValueNamedValueTokenParser(null, "x.command", "11", "translate"),
+            new RequiredValidValueNamedValueTokenParser(null, "x.command", "11", "translate;speech.translate"),
 
             new ExpectOutputTokenParser(),
             new DiagnosticLogTokenParser(),

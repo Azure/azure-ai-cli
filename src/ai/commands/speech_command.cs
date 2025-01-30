@@ -88,6 +88,10 @@ namespace Azure.AI.Details.Common.CLI
                     new ProfileCommand(_values).RunCommand();
                     break;
 
+                case "speech.transcribe":
+                    new TranscribeCommand(_values).RunCommand();
+                    break;
+
                 default:
                     _values.AddThrowError("WARNING:", $"'{command.Replace('.', ' ')}' NOT YET IMPLEMENTED!!");
                     break;

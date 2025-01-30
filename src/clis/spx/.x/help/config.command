@@ -10,7 +10,6 @@ USAGE: spx config [@FILE] --command COMMAND [...]
 
   WHERE: COMMAND is `recognize`
      OR: COMMAND is `synthesize`
-     OR: COMMAND is `transcribe`
      OR: COMMAND is `translate`
      OR: COMMAND is `speaker`
      OR: COMMAND is `profile`

@@ -58,7 +58,7 @@ namespace Azure.AI.Details.Common.CLI.TestFramework
         {
             lock (_testToExecutionMap)
             {
-                return _testToExecutionMap[testCase.Id];
+                return _testToExecutionMap.TryGetValue(testCase.Id, out var guid) ? guid : Guid.Empty;
             }
         }
 

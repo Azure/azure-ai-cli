@@ -1,0 +1,18 @@
+TRANSCRIBE OUTPUT SRT FILE
+
+@speech.include.the.transcribe.command
+
+  The `--output-srt-file` option indicates that transcription results should
+  be output in the SRT format, which provides captioning information for audio/video files.
+
+USAGE: ai speech transcribe [...] --output-srt-file FILENAME
+
+EXAMPLES
+
+  ai speech transcribe --file hello.wav --output-srt-file hello.srt
+
+SEE ALSO
+
+  ai help speech transcribe output
+  ai help speech transcribe
+ 

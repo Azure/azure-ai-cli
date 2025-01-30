@@ -157,48 +157,6 @@ namespace Azure.AI.Details.Common.CLI
             _lock!.ExitReaderLock();
         }
 
-        public void Transcribing(MeetingTranscriptionEventArgs e)
-        {
-            _lock!.EnterReaderLock();
-            OutputTranscribing(e);
-            _lock!.ExitReaderLock();
-        }
-
-        public void Transcribed(MeetingTranscriptionEventArgs e)
-        {
-            _lock!.EnterReaderLock();
-            OutputTranscribed(e);
-            _lock!.ExitReaderLock();
-        }
-
-        public void Canceled(MeetingTranscriptionCanceledEventArgs e)
-        {
-            _lock!.EnterReaderLock();
-            OutputCanceled(e);
-            _lock!.ExitReaderLock();
-        }
-
-        public void Transcribing(ConversationTranscriptionEventArgs e)
-        {
-            _lock!.EnterReaderLock();
-            OutputTranscribing(e);
-            _lock!.ExitReaderLock();
-        }
-
-        public void Transcribed(ConversationTranscriptionEventArgs e)
-        {
-            _lock!.EnterReaderLock();
-            OutputTranscribed(e);
-            _lock!.ExitReaderLock();
-        }
-
-        public void Canceled(ConversationTranscriptionCanceledEventArgs e)
-        {
-            _lock!.EnterReaderLock();
-            OutputCanceled(e);
-            _lock!.ExitReaderLock();
-        }
-
         public void Recognizing(TranslationRecognitionEventArgs e)
         {
             _lock!.EnterReaderLock();
@@ -302,16 +260,6 @@ namespace Azure.AI.Details.Common.CLI
             if (ShouldCacheOutputResult()) CacheOutputResult(result);
         }
 
-        private void EnsureCacheOutputResult(MeetingTranscriptionResult result)
-        {
-            if (ShouldCacheOutputResult()) CacheOutputResult(result);
-        }
-
-        private void EnsureCacheOutputResult(ConversationTranscriptionResult result)
-        {
-            if (ShouldCacheOutputResult()) CacheOutputResult(result);
-        }
-
         private void EnsureCacheOutputResult(TranslationRecognitionResult result)
         {
             if (ShouldCacheOutputResult()) CacheOutputResult(result);
@@ -335,18 +283,6 @@ namespace Azure.AI.Details.Common.CLI
         }
 
         private void CacheOutputResult(IntentRecognitionResult result)
-        {
-            EnsureInitOutputResultCache();
-            _outputResultCache!.Add(result);
-        }
-
-        private void CacheOutputResult(MeetingTranscriptionResult result)
-        {
-            EnsureInitOutputResultCache();
-            _outputResultCache!.Add(result);
-        }
-
-        private void CacheOutputResult(ConversationTranscriptionResult result)
         {
             EnsureInitOutputResultCache();
             _outputResultCache!.Add(result);
@@ -424,6 +360,9 @@ namespace Azure.AI.Details.Common.CLI
 
         private void OutputSrtFile()
         {
+            if (_outputResultCache == null) return;
+            if (_outputResultCache.Count == 0) return;
+
             var text = GetSrtFile() + Environment.NewLine;
             FileHelpers.WriteAllText(_outputSrtFileName!, text, Encoding.UTF8);
 
@@ -438,6 +377,9 @@ namespace Azure.AI.Details.Common.CLI
 
         private void OutputVttFile()
         { 
+            if (_outputResultCache == null) return;
+            if (_outputResultCache.Count == 0) return;
+
             var text = GetVttFile() + Environment.NewLine;
             FileHelpers.WriteAllText(_outputVttFileName!, text, Encoding.UTF8);
 
@@ -549,18 +491,12 @@ namespace Azure.AI.Details.Common.CLI
         {
             var resultSpeech = result as SpeechRecognitionResult;
             var resultTranslation = result as TranslationRecognitionResult;
-            var resultConversationTranscription = result as ConversationTranscriptionResult;
-            var resultMeetingTranscription = result as MeetingTranscriptionResult;
 
             var text = resultSpeech != null
                 ? resultSpeech.Properties.GetProperty(kind)
                 : resultTranslation != null
                     ? resultTranslation.Properties.GetProperty(kind)
-                    : resultConversationTranscription != null
-                        ? resultConversationTranscription.Properties.GetProperty(kind)
-                        : resultMeetingTranscription != null
-                            ? resultMeetingTranscription.Properties.GetProperty(kind)
-                            : "";
+                    : "";
 
             return !string.IsNullOrEmpty(text)
                 ? text
@@ -568,11 +504,7 @@ namespace Azure.AI.Details.Common.CLI
                     ? resultSpeech.Text
                     : resultTranslation != null
                         ? resultTranslation.Text
-                        : resultConversationTranscription != null
-                            ? resultConversationTranscription.Text
-                            : resultMeetingTranscription != null
-                                ? resultMeetingTranscription.Text
-                                : "";
+                        : "";
         }
 
         private void WriteBatchAudioFileSegmentResultsJsonProperty(Utf8JsonWriter writer, string arrayName)
@@ -591,18 +523,12 @@ namespace Azure.AI.Details.Common.CLI
 
             var resultSpeech = result as SpeechRecognitionResult;
             var resultTranslation = result as TranslationRecognitionResult;
-            var resultConversationTranscription = result as ConversationTranscriptionResult;
-            var resultMeetingTranscription = result as MeetingTranscriptionResult;
 
             return resultSpeech != null
                 ? WriteBatchAudioFileSegmentJsonObject(writer, resultSpeech)
                 : resultTranslation != null
                     ? WriteBatchAudioFileSegmentJsonObject(writer, resultTranslation)
-                    : resultConversationTranscription != null
-                        ? WriteBatchAudioFileSegmentJsonObject(writer, resultConversationTranscription)
-                        : resultMeetingTranscription != null
-                            ? WriteBatchAudioFileSegmentJsonObject(writer, resultMeetingTranscription)
-                            : false;
+                    : false;
         }
 
         private bool WriteBatchAudioFileSegmentJsonObject(Utf8JsonWriter writer, SpeechRecognitionResult result)
@@ -675,74 +601,6 @@ namespace Azure.AI.Details.Common.CLI
             return true;
         }
 
-        private bool WriteBatchAudioFileSegmentJsonObject(Utf8JsonWriter writer, ConversationTranscriptionResult result)
-        {
-            if (result.Reason == ResultReason.Canceled)
-            {
-                var cancelDetails = CancellationDetails.FromResult(result);
-                if (cancelDetails.Reason == CancellationReason.EndOfStream) return false;
-
-                writer.WriteStartObject();
-                writer.WriteString("ErrorDetails", cancelDetails.ErrorDetails);
-                writer.WriteString("ErrorCode", cancelDetails.ErrorCode.ToString());
-                writer.WriteEndObject();
-                return true;
-            }
-
-            var json = result.Properties.GetProperty(PropertyId.SpeechServiceResponse_JsonResult);
-            var parsed = !string.IsNullOrEmpty(json) ? JsonDocument.Parse(json) : null;
-
-            var status = parsed?.GetPropertyStringOrNull("RecognitionStatus") ?? result.Reason.ToString();
-            writer.WriteString("RecognitionStatus", status);
-
-            writer.WriteString("ChannelNumber", "0");
-            writer.WriteNull("SpeakerId");
-            writer.WriteNumber("Offset", result.OffsetInTicks);
-            writer.WriteNumber("Duration", (long)(result.Duration.TotalMilliseconds * 10000));
-            writer.WriteNumber("OffsetInSeconds", Math.Round(1.0 * result.OffsetInTicks / 10000 / 1000, 2));
-            writer.WriteNumber("DurationInSeconds", Math.Round(result.Duration.TotalSeconds, 2));
-
-            writer.WritePropertyName("NBest");
-            writer.WriteRawValue(parsed?.GetPropertyElementOrNull("NBest")?.GetRawText() ?? "[]");
-
-            writer.WriteEndObject();
-            return true;
-        }
-
-        private bool WriteBatchAudioFileSegmentJsonObject(Utf8JsonWriter writer, MeetingTranscriptionResult result)
-        {
-            if (result.Reason == ResultReason.Canceled)
-            {
-                var cancelDetails = CancellationDetails.FromResult(result);
-                if (cancelDetails.Reason == CancellationReason.EndOfStream) return false;
-
-                writer.WriteStartObject();
-                writer.WriteString("ErrorDetails", cancelDetails.ErrorDetails);
-                writer.WriteString("ErrorCode", cancelDetails.ErrorCode.ToString());
-                writer.WriteEndObject();
-                return true;
-            }
-
-            var json = result.Properties.GetProperty(PropertyId.SpeechServiceResponse_JsonResult);
-            var parsed = !string.IsNullOrEmpty(json) ? JsonDocument.Parse(json) : null;
-
-            var status = parsed?.GetPropertyStringOrNull("RecognitionStatus") ?? result.Reason.ToString();
-            writer.WriteString("RecognitionStatus", status);
-
-            writer.WriteString("ChannelNumber", "0");
-            writer.WriteNull("SpeakerId");
-            writer.WriteNumber("Offset", result.OffsetInTicks);
-            writer.WriteNumber("Duration", (long)(result.Duration.TotalMilliseconds * 10000));
-            writer.WriteNumber("OffsetInSeconds", Math.Round(1.0 * result.OffsetInTicks / 10000 / 1000, 2));
-            writer.WriteNumber("DurationInSeconds", Math.Round(result.Duration.TotalSeconds, 2));
-
-            writer.WritePropertyName("NBest");
-            writer.WriteRawValue(parsed?.GetPropertyElementOrNull("NBest")?.GetRawText() ?? "[]");
-
-            writer.WriteEndObject();
-            return true;
-        }
-
         private double GetBatchAudioLengthInSeconds()
         {
             double length = 0;
@@ -760,27 +618,17 @@ namespace Azure.AI.Details.Common.CLI
         {
             var resultSpeech = result as SpeechRecognitionResult;
             var resultTranslation = result as TranslationRecognitionResult;
-            var resultConversationTranscription = result as ConversationTranscriptionResult;
-            var resultMeetingTranscription = result as MeetingTranscriptionResult;
 
             offset = (resultSpeech != null
                 ? resultSpeech.OffsetInTicks
                 : resultTranslation != null
                     ? resultTranslation.OffsetInTicks
-                    : resultConversationTranscription != null
-                        ? resultConversationTranscription.OffsetInTicks
-                        : resultMeetingTranscription != null
-                            ? resultMeetingTranscription.OffsetInTicks
-                            : 0) / 10000 / 1000;
+                    : 0) / 10000 / 1000;
             duration = (resultSpeech != null
                 ? resultSpeech.Duration.TotalSeconds
                 : resultTranslation != null
                     ? resultTranslation.Duration.TotalSeconds
-                    : resultConversationTranscription != null
-                        ? resultConversationTranscription.Duration.TotalSeconds
-                        : resultMeetingTranscription != null
-                            ? resultMeetingTranscription.Duration.TotalSeconds
-                            : 0);
+                        : 0);
         }
 
         private bool ShouldOutputAll(string name)
@@ -1822,356 +1670,6 @@ namespace Azure.AI.Details.Common.CLI
                     if (valueOk) EnsureOutputEach($"{namePrefix}.{x}.entity", value!);
                 }
             }
-        }
-
-        private void OutputTranscribing(ConversationTranscriptionEventArgs e)
-        {
-            if (!_outputAll && !_outputEach) return;
-
-            var sessionid = e.SessionId;
-            var timestamp = this.CreateTimestamp();
-            EnsureCacheAll("recognizer.recognizing.sessionid", sessionid);
-            EnsureOutputEach("recognizer.recognizing.sessionid", sessionid);
-            EnsureCacheAll("recognizer.event.sessionid", sessionid);
-            EnsureOutputEach("recognizer.event.sessionid", sessionid);
-            EnsureCacheAll("event.sessionid", sessionid);
-            EnsureOutputEach("event.sessionid", sessionid);
-
-            EnsureCacheAll("recognizer.recognizing.timestamp", timestamp);
-            EnsureOutputEach("recognizer.recognizing.timestamp", timestamp);
-            EnsureCacheAll("recognizer.event.timestamp", timestamp);
-            EnsureOutputEach("recognizer.event.timestamp", timestamp);
-            EnsureCacheAll("event.timestamp", timestamp);
-            EnsureOutputEach("event.timestamp", timestamp);
-
-            EnsureOutputRecognizerProperties("recognizer.recognizing.recognizer");
-
-            var result = e.Result;
-            OutputResult("recognizer.recognizing.result", result, '\n');
-            OutputResult("result", result, '\n'); // Don't include this in global requests for results
-
-            var output = $"TRANSCRIBING";
-            EnsureCacheAll("recognizer.recognizing.events", output);
-            EnsureOutputEach("recognizer.recognizing.event", output);
-            EnsureCacheAll("recognizer.events", output);
-            EnsureOutputEach("recognizer.event", output);
-            EnsureCacheAll("events", output);
-            EnsureOutputEach("event", output);
-
-            FlushOutputEachCacheStage1();
-        }
-
-        private void OutputTranscribed(ConversationTranscriptionEventArgs e)
-        {
-            EnsureCacheOutputResult(e.Result);
-
-            if (!_outputAll && !_outputEach) return;
-
-            var sessionid = e.SessionId;
-            var timestamp = this.CreateTimestamp();
-            EnsureCacheAll("recognizer.recognized.sessionid", sessionid);
-            EnsureOutputEach("recognizer.recognized.sessionid", sessionid);
-            EnsureCacheAll("recognizer.event.sessionid", sessionid);
-            EnsureOutputEach("recognizer.event.sessionid", sessionid);
-            EnsureCacheAll("event.sessionid", sessionid);
-            EnsureOutputEach("event.sessionid", sessionid);
-
-            EnsureCacheAll("recognizer.recognized.timestamp", timestamp);
-            EnsureOutputEach("recognizer.recognized.timestamp", timestamp);
-            EnsureCacheAll("recognizer.event.timestamp", timestamp);
-            EnsureOutputEach("recognizer.event.timestamp", timestamp);
-            EnsureCacheAll("event.timestamp", timestamp);
-            EnsureOutputEach("event.timestamp", timestamp);
-
-            EnsureOutputRecognizerProperties("recognizer.recognized.recognizer");
-
-            var result = e.Result;
-            OutputResult("recognizer.recognized.result", result, ' ');
-            OutputResult("result", result, ' ');
-
-            var output = $"TRANSCRIBED";
-            EnsureCacheAll("recognizer.recognized.events", output);
-            EnsureOutputEach("recognizer.recognized.event", output);
-            EnsureCacheAll("recognizer.events", output);
-            EnsureOutputEach("recognizer.event", output);
-            EnsureCacheAll("events", output);
-            EnsureOutputEach("event", output);
-
-            FlushOutputEachCacheStage1();
-        }
-
-        private void OutputCanceled(ConversationTranscriptionCanceledEventArgs e)
-        {
-            EnsureCacheOutputResult(e.Result);
-
-            if (!_outputAll && !_outputEach) return;
-
-            var sessionid = e.SessionId;
-            var timestamp = this.CreateTimestamp();
-            EnsureCacheAll("recognizer.canceled.sessionid", sessionid);
-            EnsureOutputEach("recognizer.canceled.sessionid", sessionid);
-            EnsureCacheAll("recognizer.event.sessionid", sessionid);
-            EnsureOutputEach("recognizer.event.sessionid", sessionid);
-            EnsureCacheAll("event.sessionid", sessionid);
-            EnsureOutputEach("event.sessionid", sessionid);
-
-            EnsureCacheAll("recognizer.canceled.timestamp", timestamp);
-            EnsureOutputEach("recognizer.canceled.timestamp", timestamp);
-            EnsureCacheAll("recognizer.event.timestamp", timestamp);
-            EnsureOutputEach("recognizer.event.timestamp", timestamp);
-            EnsureCacheAll("event.timestamp", timestamp);
-            EnsureOutputEach("event.timestamp", timestamp);
-
-            var reason = e.Reason.ToString();
-            EnsureCacheAll("recognizer.canceled.reason", reason);
-            EnsureOutputEach("recognizer.canceled.reason", reason);
-
-            var code = (e.Reason == CancellationReason.Error) ? e.ErrorCode.ToString() : "0";
-            EnsureCacheAll("recognizer.canceled.error.code", code);
-            EnsureOutputEach("recognizer.canceled.error.code", code);
-            EnsureCacheAll("recognizer.canceled.error", code);
-            EnsureOutputEach("recognizer.canceled.error", code);
-
-            var details = (e.Reason == CancellationReason.Error) ? e.ErrorDetails : "";
-            EnsureCacheAll("recognizer.canceled.error.details", details);
-            EnsureOutputEach("recognizer.canceled.error.details", details);
-            EnsureCacheAll("recognizer.canceled.error", details);
-            EnsureOutputEach("recognizer.canceled.error", details);
-
-            EnsureOutputRecognizerProperties("recognizer.canceled.recognizer");
-
-            var result = e.Result;
-            OutputResult("recognizer.canceled.result", result, ' ');
-            OutputResult("result", result, ' ');
-
-            var output = $"CANCELED";
-            EnsureCacheAll("recognizer.session.events", output);
-            EnsureOutputEach("recognizer.session.event", output);
-            EnsureCacheAll("recognizer.canceled.events", output);
-            EnsureOutputEach("recognizer.canceled.event", output);
-            EnsureCacheAll("recognizer.events", output);
-            EnsureOutputEach("recognizer.event", output);
-            EnsureCacheAll("events", output);
-            EnsureOutputEach("event", output);
-
-            FlushOutputEachCacheStage1();
-        }
-
-        private void OutputResult(string namePrefix, ConversationTranscriptionResult result, char textSeparator)
-        {
-            var id = result.ResultId;
-            EnsureCacheAll(namePrefix + ".resultid", id);
-            EnsureOutputEach(namePrefix + ".resultid", id);
-
-            var reason = result.Reason.ToString();
-            EnsureCacheAll(namePrefix + ".reason", reason);
-            EnsureOutputEach(namePrefix + ".reason", reason);
-
-            var offset = result.OffsetInTicks.ToString();
-            EnsureCacheAll(namePrefix + ".offset", offset);
-            EnsureOutputEach(namePrefix + ".offset", offset);
-
-            var duration = (result.Duration.TotalMilliseconds * 10000).ToString();
-            EnsureCacheAll(namePrefix + ".duration", duration);
-            EnsureOutputEach(namePrefix + ".duration", duration);
-
-            var text = result.Text;
-            EnsureCacheAll(textSeparator, namePrefix + ".text", text);
-            EnsureOutputEach(namePrefix + ".text", text);
-
-            var itn = result.Properties.GetProperty("ITN");
-            EnsureCacheAll(textSeparator, namePrefix + ".itn.text", itn);
-            EnsureOutputEach(namePrefix + ".itn.text", itn);
-
-            var lexical = result.Properties.GetProperty("Lexical");
-            EnsureCacheAll(textSeparator, namePrefix + ".lexical.text", lexical);
-            EnsureOutputEach(namePrefix + ".lexical.text", lexical);
-
-            var latency = result.Properties.GetProperty(PropertyId.SpeechServiceResponse_RecognitionLatencyMs);
-            EnsureCacheAll(namePrefix + ".latency", latency);
-            EnsureOutputEach(namePrefix + ".latency", latency);
-
-            var json = result.Properties.GetProperty(PropertyId.SpeechServiceResponse_JsonResult);
-            EnsureCacheAll(namePrefix + ".json", json);
-            EnsureOutputEach(namePrefix + ".json", json);
-
-            EnsureOutputAllProperties(namePrefix, result.Properties);
-            EnsureOutputEachProperty(namePrefix, result.Properties);
-        }
-
-        private void OutputTranscribing(MeetingTranscriptionEventArgs e)
-        {
-            if (!_outputAll && !_outputEach) return;
-
-            var sessionid = e.SessionId;
-            var timestamp = this.CreateTimestamp();
-            EnsureCacheAll("recognizer.recognizing.sessionid", sessionid);
-            EnsureOutputEach("recognizer.recognizing.sessionid", sessionid);
-            EnsureCacheAll("recognizer.event.sessionid", sessionid);
-            EnsureOutputEach("recognizer.event.sessionid", sessionid);
-            EnsureCacheAll("event.sessionid", sessionid);
-            EnsureOutputEach("event.sessionid", sessionid);
-
-            EnsureCacheAll("recognizer.recognizing.timestamp", timestamp);
-            EnsureOutputEach("recognizer.recognizing.timestamp", timestamp);
-            EnsureCacheAll("recognizer.event.timestamp", timestamp);
-            EnsureOutputEach("recognizer.event.timestamp", timestamp);
-            EnsureCacheAll("event.timestamp", timestamp);
-            EnsureOutputEach("event.timestamp", timestamp);
-
-            EnsureOutputRecognizerProperties("recognizer.recognizing.recognizer");
-
-            var result = e.Result;
-            OutputResult("recognizer.recognizing.result", result, '\n');
-            OutputResult("result", result, '\n'); // Don't include this in global requests for results
-
-            var output = $"TRANSCRIBING";
-            EnsureCacheAll("recognizer.recognizing.events", output);
-            EnsureOutputEach("recognizer.recognizing.event", output);
-            EnsureCacheAll("recognizer.events", output);
-            EnsureOutputEach("recognizer.event", output);
-            EnsureCacheAll("events", output);
-            EnsureOutputEach("event", output);
-
-            FlushOutputEachCacheStage1();
-        }
-
-        private void OutputTranscribed(MeetingTranscriptionEventArgs e)
-        {
-            EnsureCacheOutputResult(e.Result);
-
-            if (!_outputAll && !_outputEach) return;
-
-            var sessionid = e.SessionId;
-            var timestamp = this.CreateTimestamp();
-            EnsureCacheAll("recognizer.recognized.sessionid", sessionid);
-            EnsureOutputEach("recognizer.recognized.sessionid", sessionid);
-            EnsureCacheAll("recognizer.event.sessionid", sessionid);
-            EnsureOutputEach("recognizer.event.sessionid", sessionid);
-            EnsureCacheAll("event.sessionid", sessionid);
-            EnsureOutputEach("event.sessionid", sessionid);
-
-            EnsureCacheAll("recognizer.recognized.timestamp", timestamp);
-            EnsureOutputEach("recognizer.recognized.timestamp", timestamp);
-            EnsureCacheAll("recognizer.event.timestamp", timestamp);
-            EnsureOutputEach("recognizer.event.timestamp", timestamp);
-            EnsureCacheAll("event.timestamp", timestamp);
-            EnsureOutputEach("event.timestamp", timestamp);
-
-            EnsureOutputRecognizerProperties("recognizer.recognized.recognizer");
-
-            var result = e.Result;
-            OutputResult("recognizer.recognized.result", result, ' ');
-            OutputResult("result", result, ' ');
-
-            var output = $"TRANSCRIBED";
-            EnsureCacheAll("recognizer.recognized.events", output);
-            EnsureOutputEach("recognizer.recognized.event", output);
-            EnsureCacheAll("recognizer.events", output);
-            EnsureOutputEach("recognizer.event", output);
-            EnsureCacheAll("events", output);
-            EnsureOutputEach("event", output);
-
-            FlushOutputEachCacheStage1();
-        }
-
-        private void OutputCanceled(MeetingTranscriptionCanceledEventArgs e)
-        {
-            EnsureCacheOutputResult(e.Result);
-
-            if (!_outputAll && !_outputEach) return;
-
-            var sessionid = e.SessionId;
-            var timestamp = this.CreateTimestamp();
-            EnsureCacheAll("recognizer.canceled.sessionid", sessionid);
-            EnsureOutputEach("recognizer.canceled.sessionid", sessionid);
-            EnsureCacheAll("recognizer.event.sessionid", sessionid);
-            EnsureOutputEach("recognizer.event.sessionid", sessionid);
-            EnsureCacheAll("event.sessionid", sessionid);
-            EnsureOutputEach("event.sessionid", sessionid);
-
-            EnsureCacheAll("recognizer.canceled.timestamp", timestamp);
-            EnsureOutputEach("recognizer.canceled.timestamp", timestamp);
-            EnsureCacheAll("recognizer.event.timestamp", timestamp);
-            EnsureOutputEach("recognizer.event.timestamp", timestamp);
-            EnsureCacheAll("event.timestamp", timestamp);
-            EnsureOutputEach("event.timestamp", timestamp);
-
-            var reason = e.Reason.ToString();
-            EnsureCacheAll("recognizer.canceled.reason", reason);
-            EnsureOutputEach("recognizer.canceled.reason", reason);
-
-            var code = (e.Reason == CancellationReason.Error) ? e.ErrorCode.ToString() : "0";
-            EnsureCacheAll("recognizer.canceled.error.code", code);
-            EnsureOutputEach("recognizer.canceled.error.code", code);
-            EnsureCacheAll("recognizer.canceled.error", code);
-            EnsureOutputEach("recognizer.canceled.error", code);
-
-            var details = (e.Reason == CancellationReason.Error) ? e.ErrorDetails : "";
-            EnsureCacheAll("recognizer.canceled.error.details", details);
-            EnsureOutputEach("recognizer.canceled.error.details", details);
-            EnsureCacheAll("recognizer.canceled.error", details);
-            EnsureOutputEach("recognizer.canceled.error", details);
-
-            EnsureOutputRecognizerProperties("recognizer.canceled.recognizer");
-
-            var result = e.Result;
-            OutputResult("recognizer.canceled.result", result, ' ');
-            OutputResult("result", result, ' ');
-
-            var output = $"CANCELED";
-            EnsureCacheAll("recognizer.session.events", output);
-            EnsureOutputEach("recognizer.session.event", output);
-            EnsureCacheAll("recognizer.canceled.events", output);
-            EnsureOutputEach("recognizer.canceled.event", output);
-            EnsureCacheAll("recognizer.events", output);
-            EnsureOutputEach("recognizer.event", output);
-            EnsureCacheAll("events", output);
-            EnsureOutputEach("event", output);
-
-            FlushOutputEachCacheStage1();
-        }
-
-        private void OutputResult(string namePrefix, MeetingTranscriptionResult result, char textSeparator)
-        {
-            var id = result.ResultId;
-            EnsureCacheAll(namePrefix + ".resultid", id);
-            EnsureOutputEach(namePrefix + ".resultid", id);
-
-            var reason = result.Reason.ToString();
-            EnsureCacheAll(namePrefix + ".reason", reason);
-            EnsureOutputEach(namePrefix + ".reason", reason);
-
-            var offset = result.OffsetInTicks.ToString();
-            EnsureCacheAll(namePrefix + ".offset", offset);
-            EnsureOutputEach(namePrefix + ".offset", offset);
-
-            var duration = (result.Duration.TotalMilliseconds * 10000).ToString();
-            EnsureCacheAll(namePrefix + ".duration", duration);
-            EnsureOutputEach(namePrefix + ".duration", duration);
-
-            var text = result.Text;
-            EnsureCacheAll(textSeparator, namePrefix + ".text", text);
-            EnsureOutputEach(namePrefix + ".text", text);
-
-            var itn = result.Properties.GetProperty("ITN");
-            EnsureCacheAll(textSeparator, namePrefix + ".itn.text", itn);
-            EnsureOutputEach(namePrefix + ".itn.text", itn);
-
-            var lexical = result.Properties.GetProperty("Lexical");
-            EnsureCacheAll(textSeparator, namePrefix + ".lexical.text", lexical);
-            EnsureOutputEach(namePrefix + ".lexical.text", lexical);
-
-            var latency = result.Properties.GetProperty(PropertyId.SpeechServiceResponse_RecognitionLatencyMs);
-            EnsureCacheAll(namePrefix + ".latency", latency);
-            EnsureOutputEach(namePrefix + ".latency", latency);
-
-            var json = result.Properties.GetProperty(PropertyId.SpeechServiceResponse_JsonResult);
-            EnsureCacheAll(namePrefix + ".json", json);
-            EnsureOutputEach(namePrefix + ".json", json);
-
-            EnsureOutputAllProperties(namePrefix, result.Properties);
-            EnsureOutputEachProperty(namePrefix, result.Properties);
         }
 
         private void OutputRecognizing(TranslationRecognitionEventArgs e)

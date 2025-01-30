@@ -333,3 +333,200 @@
             fi
         input: |-
           Hello world.
+
+- area: ai speech synthesize
+  tests:
+  - name: Hello world
+    command: ai speech synthesize --text "Hello world" --audio-output hello-world.wav
+    parallelize: true
+    expect-regex: |
+      SYNTHESIS STARTED:
+      SYNTHESIS COMPLETED:
+
+- area: ai speech transcribe
+  tests:
+  - name: remote server error 401 (via url)
+    command: ai speech transcribe --url https://httpstat.us/401
+    parallelize: true
+    expect-regex: |
+      ERROR: The remote server returned an error: \(401\) Unauthorized.
+
+  - name: http bad request (via language)
+    command: ai speech transcribe --file ../tests/audio/hello.wav --language zzz
+    parallelize: true
+    expect-regex: |
+      ERROR: Transcribing audio file
+      ../tests/audio/hello.wav
+      Status code: BadRequest
+      application/json
+      locale
+
+  - name:  http bad request (via endpoint)
+    command: ai speech transcribe --file ../tests/audio/hello.wav --endpoint https://httpstat.us/500
+    parallelize: true
+    expect-regex: |
+      ERROR: Transcribing audio file
+      Status code: InternalServerError
+
+  - name: http not found (via host)
+    command: ai speech transcribe --file ../tests/audio/hello.wav --host https://httpstat.us/
+    parallelize: true
+    expect-regex: |
+      ERROR: Transcribing audio file
+      Status code: NotFound
+
+  - name: http not found (via api-version)
+    command: ai speech transcribe --file ../tests/audio/hello.wav --api-version 2024-11-01
+    parallelize: true
+    expect-regex: |
+      ERROR: Transcribing audio file
+      Status code: NotFound
+
+  - name: with file
+    command: ai speech transcribe --file ../tests/audio/hello.wav
+    parallelize: true
+    expect-regex: |
+      Hello.
+
+  - name: with multiple files
+    command: ai speech transcribe --files ../tests/audio/hello.wav;../tests/audio/hello.wav
+    parallelize: true
+    expect-regex: |
+      Hello.
+      Hello.
+
+  - name: with url
+    command: ai speech transcribe --url https://crbn.us/hello.wav
+    parallelize: true
+    expect-regex: |
+      Hello.
+
+  - name: with multiple urls
+    command: ai speech transcribe --urls https://crbn.us/hello.wav;https://crbn.us/hello.wav
+    parallelize: true
+    expect-regex: |
+      Hello.
+      Hello.
+
+  - name: with multiple files (threads 2)
+    command: ai speech transcribe --files ../tests/audio/hello.wav;../tests/audio/hello.wav --threads 2
+    parallelize: true
+    expect-regex: |
+      Hello.
+      Hello.
+
+  - name: with multiple files (processes 2)
+    command: ai speech transcribe --files ../tests/audio/hello.wav;../tests/audio/hello.wav --processes 2
+    parallelize: true
+    expect-regex: |
+      Hello.
+      Hello.
+
+  - name: without diarization
+    parallelize: true
+    command: ai speech transcribe --file katiesteve_mono.wav --input-path ../tests/audio
+    expect-regex: |
+      Good morning, Steve\. Good morning, Katie\.
+
+  - name: with diarization
+    command: ai speech transcribe --file katiesteve_mono.wav --input-path ../tests/audio --diarization --max-speakers 2
+    parallelize: true
+    expect-regex: |
+      Speaker 1: Good morning, Steve.
+      Speaker 2: Good morning, Katie.
+
+  - name: foreach profanity
+    command: ai speech transcribe --file profanity.wav --input-path ../tests/audio --foreach profanity in none;masked;tags;removed
+    parallelize: true
+    expect-regex: |
+      mother
+      You [*]+\.
+      You <profanity>mother.*</profanity>\.
+      You \.
+
+  - name: output SRT
+    command: ai speech transcribe --file katiesteve_mono.wav --input-path ../tests/audio --output-srt-file -
+    parallelize: true
+    expect-regex: |
+      Good morning, Steve\. Good morning, Katie\.
+      \r?$\n
+      1\r?$\n
+      00:00:\d+,\d+ --> 00:00:\d+,\d+\r?$\n
+      Good morning, Steve\.
+      \r?$\n
+      2\r?$\n
+      00:00:\d+,\d+ --> 00:00:\d+,\d+\r?$\n
+      Good morning, Katie\.\r?$\n
+      \r?$\n
+      3\r?$\n
+      00:00:\d+,\d+ --> 00:00:\d+,\d+\r?$\n
+
+  - name: output VTT
+    command: ai speech transcribe --file katiesteve_mono.wav --input-path ../tests/audio --output-vtt-file -
+    parallelize: true
+    expect-regex: |
+      Good morning, Steve\. Good morning, Katie\.
+      WEBVTT\r?$\n
+      \r?$\n
+      00:00:\d+\.\d+ --> 00:00:\d+\.\d+\r?$\n
+      Good morning, Steve\.\r?$\n
+      \r?$\n
+      00:00:\d+\.\d+ --> 00:00:\d+\.\d+\r?$\n
+      Good morning, Katie\.\r?$\n
+      \r?$\n
+      00:00:\d+\.\d+ --> 00:00:\d+\.\d+\r?$\n
+
+  - name: output request and json
+    parallelize: false # do NOT parallelize this test; due to file checks, we should run it serially
+    bash: |
+      if [ -f request.json ]; then
+        rm request.json
+      fi
+      if [ -f output.json ]; then
+        rm output.json
+      fi
+      ai speech transcribe --file katiesteve_mono.wav --input-path ../tests/audio --output-request-file request.json --output-json-file output.json
+      if [ !-f request.json ]; then
+        echo "request.json not found"
+        exit 1
+      fi
+      if [ !-f output.json ]; then
+        echo "output.json not found"
+        exit 1
+      fi
+
+  - name: output result text
+    parallelize: true
+    command: ai speech transcribe --output-text
+    arguments:
+      file: hello.wav
+      input-path: ../tests/audio
+      output-text: true
+      output-file: hello.json
+      output-file-type: json
+      output-overwrite: true
+      
+  - name: save and run via @
+    bash: |
+      ai speech transcribe --file ../tests/audio/hello.wav --save hello.alias
+      ai speech transcribe @hello.alias
+      ai @hello.alias
+    parallelize: true
+    expect-regex: |
+      Saved: .*hello.alias
+      Hello.
+      Hello.
+
+  - name: zip request
+    command: ai speech transcribe --url https://crbn.us/hello.wav --zip transcribe-hello-wav.zip
+    parallelize: true
+    expect-regex: |
+      Zipping into transcribe-hello-wav.zip ...
+      Saving ai.dll ...
+      Completed
+
+  - name: with languages
+    command: ai speech transcribe --files ../tests/audio/de-de/howistheweather.wav;../tests/audio/es-es/howstheweather.wav --languages de-de;es-es
+    parallelize: true
+    expect: |
+      The output contains German and Spanish text that asks about the weather.

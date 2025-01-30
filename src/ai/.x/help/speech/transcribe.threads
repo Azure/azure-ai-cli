@@ -1,0 +1,28 @@
+TRANSCRIBE THREADS
+
+@speech.include.the.transcribe.command
+
+  The `--threads` option specifies a how many threads to use when 
+  parallelizing recognition tasks.
+
+  The `--ramp threads every` option can optionally be used to control
+  how quickly each new thread will be added to the thread pool. If this option
+  is not specified, the default will be 0 ms, and thus the maximum number of
+  threads will immediately be available to the pool.
+
+USAGE: ai speech transcribe [...] --threads NUMBER
+   OR: ai speech transcribe [...] --threads NUMBER --ramp threads every MILLISECONDS
+
+  WHERE: NUMBER represents the maximum number of threads to use/pool
+    AND: MILLISECONDS represents the number of milliseconds to wait before
+         ... adding each new thread
+
+EXAMPLES
+
+  ai speech transcribe --files @filelist.txt --threads 10
+  ai speech transcribe --files *.wav --threads 20 --ramp threads every 30000
+
+SEE ALSO
+
+  ai help speech transcribe
+  ai help speech transcribe processes

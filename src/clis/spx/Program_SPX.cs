@@ -39,11 +39,11 @@ namespace Azure.AI.Details.Common.CLI
         #endregion
 
         #region help command data
-        public const string HelpCommandTokens = "init;config;csr;batch;synthesize;recognize;dialog;intent;transcribe;translate;speaker;profile;webjob;run";
+        public const string HelpCommandTokens = "init;config;csr;batch;synthesize;recognize;dialog;intent;translate;speaker;profile;webjob;run";
         #endregion
 
         #region config command data
-        public static string ConfigScopeTokens = $"init;csr;batch;synthesize;recognize;dialog;intent;transcribe;translate;speaker;profile;webjob;run;*";
+        public static string ConfigScopeTokens = $"init;csr;batch;synthesize;recognize;dialog;intent;translate;speaker;profile;webjob;run;*";
         #endregion
 
         #region zip option data
@@ -76,7 +76,6 @@ namespace Azure.AI.Details.Common.CLI
                 "speaker" => (new ProfileCommand(values)).RunCommand(),
                 "profile" => (new ProfileCommand(values)).RunCommand(),
                 "intent" => (new IntentCommand(values)).RunCommand(),
-                "transcribe" => (new TranscribeConversationCommand(values)).RunCommand(),
                 "translate" => (new TranslateCommand(values)).RunCommand(),
                 "webjob" => (new WebJobCommand(values)).RunCommand(),
                 "run" => (new RunJobCommand(values)).RunCommand(),
@@ -102,7 +101,6 @@ namespace Azure.AI.Details.Common.CLI
                 "intent" => IntentCommandParser.ParseCommand(tokens, values),
                 "speaker" => ProfileCommandParser.ParseCommand(tokens, values),
                 "profile" => ProfileCommandParser.ParseCommand(tokens, values),
-                "transcribe" => TranscribeConversationCommandParser.ParseCommand(tokens, values),
                 "translate" => TranslateCommandParser.ParseCommand(tokens, values),
                 "webjob" => WebJobCommandParser.ParseCommand(tokens, values),
                 "run" => RunJobCommandParser.ParseCommand(tokens, values),
@@ -125,7 +123,6 @@ namespace Azure.AI.Details.Common.CLI
                 "intent" => IntentCommandParser.ParseCommandValues(tokens, values),
                 "speaker" => ProfileCommandParser.ParseCommandValues(tokens, values),
                 "profile" => ProfileCommandParser.ParseCommandValues(tokens, values),
-                "transcribe" => TranscribeConversationCommandParser.ParseCommandValues(tokens, values),
                 "translate" => TranslateCommandParser.ParseCommandValues(tokens, values),
                 "webjob" => WebJobCommandParser.ParseCommandValues(tokens, values),
                 "run" => RunJobCommandParser.ParseCommandValues(tokens, values),
