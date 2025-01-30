@@ -1,0 +1,63 @@
+TRANSCRIBE
+
+@speech.include.the.transcribe.command.long
+
+USAGE: ai speech transcribe [...]
+
+  CONNECTION
+    --key KEY                     (see: ai help speech transcribe key)
+    --region REGION               (see: ai help speech transcribe region)
+    --endpoint URI                (see: ai help speech transcribe endpoint)
+
+  DIARIZATION
+    --diarization                 (see: ai help speech transcribe diarization)
+    --max-speakers NUMBER
+
+  LANGUAGE
+    --language LANGUAGE           (see: ai help speech transcribe language)
+    --languages LANG1;LANG2       (see: ai help speech transcribe languages)
+
+  INPUT                           (see: ai help speech transcribe input)
+    --file FILE                   (see: ai help speech transcribe file)
+    --files PATTERN               (see: ai help speech transcribe files)
+    --files @FILELIST.txt         (see: ai help speech transcribe files)
+    --url URL                     (see: ai help speech transcribe url)
+    --urls URL                    (see: ai help speech transcribe urls)
+    --urls @URLLIST.txt           (see: ai help speech transcribe urls)
+    --id url URL                  (see: ai help speech input id)
+    --id ID                       (see: ai help speech input id)
+
+  OUTPUT                          (see: ai help speech transcribe output)
+    --output-request FILENAME     (see: ai help speech transcribe output request)
+    --output-json FILENAME        (see: ai help speech transcribe output json)
+    --profanity OPTION            (see: ai help speech transcribe profanity)
+
+  OUTPUT TEXT
+    --output-file FILENAME
+    --output-file-type json/tsv
+    --output-overwrite TRUE/FALSE
+    --output-text TRUE/FALSE
+
+  CAPTIONS
+    --output-srt-file FILENAME    (see: ai help speech transcribe output srt file)
+    --output-vtt-file FILENAME    (see: ai help speech transcribe output vtt file)
+
+  LOGGING                         (see: ai help speech transcribe log)
+    --log FILENAME
+
+  PARALLEL PROCESSING
+    --threads NUMBER              (see: ai help speech transcribe threads)
+    --processes NUMBER            (see: ai help speech transcribe processes)
+    --repeat NUMBER
+    --max NUMBER
+
+  ADVANCED
+    --foreach in @ITEMS.txt       (see: ai help speech transcribe foreach)
+    --save FILENAME               (see: ai help speech transcribe save)
+    --zip ZIPFILE                 (see: ai help speech transcribe zip)
+
+SEE ALSO
+
+  ai help speech setup
+  ai help speech transcribe examples
+  ai help find topics speech transcribe

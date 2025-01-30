@@ -1,0 +1,35 @@
+TRANSCRIBE LANGUAGE
+
+@speech.include.the.transcribe.command
+
+  The `--language` option specifies a single spoken LANGUAGE in
+  BCP-47 format. Speech streamed to the service will be forced to match
+  words and phrases in the specified LANGUAGE.
+
+  The `--languages` option auto detects the spoken language from
+  a set of languages, each specified in BCP-47 format. The service will
+  evaluate a portion of the streamed audio and attempt to determine the best
+  matching spoken language from those specified.
+
+  For a full list of supported languages, see https://aka.ms/speech/languages
+
+  If no language is specified, the default will be en-US.
+
+USAGE: ai speech transcribe [...] --language LANGUAGE
+   OR: ai speech transcribe [...] --languages LANGUAGE1;LANGUAGE2[;...]
+   OR: ai speech transcribe [...] --languages @LANGUAGES.txt
+   OR: ai speech transcribe [...] --language @LANGUAGE.txt
+
+  WHERE: LANGUAGE is a supported BCP-47 language tag (e.g. en-US)
+     OR: LANGUAGES.txt is a multi-line text file, with one LANGUAGE per line
+     OR: LANGUAGE.txt is a single line text file containing one LANGUAGE
+
+EXAMPLES
+
+  ai speech transcribe --language en-US --file english.wav
+  ai speech transcribe --language de-DE --file german.wav
+  ai speech transcribe --languages en-US;de-DE --files *.wav
+
+SEE ALSO
+
+  ai help speech transcribe

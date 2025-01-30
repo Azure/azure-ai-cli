@@ -1,0 +1,20 @@
+TRANSCRIBE OUTPUT VTT FILE
+
+@speech.include.the.transcribe.command
+
+  The `--output-vtt` option indicates that transcription results should
+  be output in the WEBVTT format, which provides captioning information for audio/video files.
+
+  More information on the format can be found at https://www.w3.org/TR/webvtt1/.
+
+USAGE: ai speech transcribe [...] --output-vtt-file FILENAME
+
+EXAMPLES
+
+  ai speech transcribe --file hello.wav --output-vtt-file hello.vtt
+
+SEE ALSO
+
+  ai help speech transcribe output
+  ai help speech transcribe
+ 

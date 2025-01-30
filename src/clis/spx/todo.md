@@ -227,9 +227,6 @@ These tests use continuous recognition, a push or pull stream, with compressed c
 ## custom speech
 * oliver - `spx csr dataset create` `--text` in examples doesn't exist (2751620, P2)
 
-## spx transcribe
-* wei - 8 channel issue on transcriber; should document that it's required to be 8 channels better (2751621, P2)
-
 ## security review with oliver
 * **oliver - need spx threat model (2751623, P1)**
 * **oliver - should run on windows with least privileges (2751625, P1)**

@@ -1,18 +1,53 @@
 TRANSCRIBE EXAMPLES
 
-  ai config speech @region --command transcribe --set centralus
-  ai config speech @key --command transcribe --region centralus --key PUT-YOUR-KEY-HERE
+  `INIT`: Automatically setup ai with REGION and KEY default values
 
-  ai speech transcribe --conversation id GUID --file 8-channel-audio.wav
+    ai init
 
-PREVIEW NOTE
+  `SETUP`: Manually setup ai with REGION and KEY default values
 
-  The Azure Conversational Transcription Service is currently in
-  PREVIEW. As a result, CTS does not support all regions or languages.
+    ai config speech @region --set westus2
+    ai config speech @key --set 436172626F6E20697320636F6F6C2121
 
-    Supported regions: centralus, eastasia
-    Supported languages: en-US, zh-CN
+  `EXAMPLE 1`: Transcribe speech from local WAV file, or remote MP3 file
+
+    ai speech transcribe --file hello.wav
+    ai speech transcribe --file https://crbn.us/hello.mp3
+
+  `EXAMPLE 2`: Transcribe speech from multiple files using wildcards
+
+    ai speech transcribe --files *.wav --threads 4
+
+  `EXAMPLE 3`: Transcribe speech with diariazation
+
+    ai speech transcribe --file meeting.wav --diarization --max-speakers 3
+
+  `EXAMPLE 4`: Transcribe speech, tagging all profanity, removing profanity, or replacing profanity with asterisks
+
+    ai speech transcribe --file profanity.wav --input-path ../tests/audio --profanity tags
+    ai speech transcribe --file profanity.wav --input-path ../tests/audio --profanity remove
+    ai speech transcribe --file profanity.wav --input-path ../tests/audio --profanity mask
+    ai speech transcribe --file profanity.wav --input-path ../tests/audio --foreach profanity in none;masked;tags;removed
+
+  `EXAMPLE 5`: Transcribe speech and save the JSON output to a file
+
+    ai speech transcribe --file meeting.wav --output-json-file meeting.json
+
+  `EXAMPLE 6`: Transcribe speech and output captioning in SRT or VTT format
+
+    ai speech transcribe --file meeting.wav --output-vtt-file meeting.vtt
+    ai speech transcribe --file meeting.wav --output-srt-file meeting.srt
+
+  `EXAMPLE 7`: Output the request payload
+
+    ai speech transcribe --file meeting.wav --output-request request.bin
+
+  `EXAMPLE 8`: Transcribe speech in audio file content piped thru STDIN
+
+    ai speech synthesize --text "Hello" --audio output - --quiet | ai speech transcribe --file -
 
 ADDITIONAL TOPICS
 
+  ai help speech setup
+  ai help speech transcribe advanced
   ai help speech transcribe

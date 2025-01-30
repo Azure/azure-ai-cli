@@ -1,0 +1,171 @@
+TRANSCRIBE OUTPUT EXAMPLES
+
+  ai speech transcribe [...] --output all audio id
+  ai speech transcribe [...] --output all sessionid
+  ai speech transcribe [...] --output all resultid
+  ai speech transcribe [...] --output all reason
+  ai speech transcribe [...] --output all text
+  ai speech transcribe [...] --output all itn text
+  ai speech transcribe [...] --output all lexical text
+  ai speech transcribe [...] --output all offset
+  ai speech transcribe [...] --output all duration
+  ai speech transcribe [...] --output all latency
+  ai speech transcribe [...] --output all json
+
+  ai speech transcribe [...] --output each audio id
+  ai speech transcribe [...] --output each sessionid
+  ai speech transcribe [...] --output each resultid
+  ai speech transcribe [...] --output each reason
+  ai speech transcribe [...] --output each text
+  ai speech transcribe [...] --output each itn text
+  ai speech transcribe [...] --output each lexical text
+  ai speech transcribe [...] --output each offset
+  ai speech transcribe [...] --output each duration
+  ai speech transcribe [...] --output each latency
+  ai speech transcribe [...] --output each json
+
+  ai speech transcribe [...] --output all result resultid
+  ai speech transcribe [...] --output all result reason
+  ai speech transcribe [...] --output all result text
+  ai speech transcribe [...] --output all result offset
+  ai speech transcribe [...] --output all result duration
+  ai speech transcribe [...] --output all result latency
+  ai speech transcribe [...] --output all result json
+
+  ai speech transcribe [...] --output each result resultid
+  ai speech transcribe [...] --output each result reason
+  ai speech transcribe [...] --output each result text
+  ai speech transcribe [...] --output each result offset
+  ai speech transcribe [...] --output each result duration
+  ai speech transcribe [...] --output each result latency
+  ai speech transcribe [...] --output each result json
+
+  ai speech transcribe [...] --output all events
+  ai speech transcribe [...] --output all event sessionid
+
+  ai speech transcribe [...] --output each event
+  ai speech transcribe [...] --output each event sessionid
+
+  ai speech transcribe [...] --output all connection events
+  ai speech transcribe [...] --output all connection event sessionid
+  ai speech transcribe [...] --output all connection connected events
+  ai speech transcribe [...] --output all connection connected sessionid
+  ai speech transcribe [...] --output all connection disconnected events
+  ai speech transcribe [...] --output all connection disconnected sessionid
+
+  ai speech transcribe [...] --output each connection event
+  ai speech transcribe [...] --output each connection event sessionid
+  ai speech transcribe [...] --output each connection connected event
+  ai speech transcribe [...] --output each connection connected sessionid
+  ai speech transcribe [...] --output each connection disconnected event
+  ai speech transcribe [...] --output each connection disconnected sessionid
+
+  ai speech transcribe [...] --output all recognizer events
+  ai speech transcribe [...] --output all recognizer event sessionid
+
+  ai speech transcribe [...] --output each recognizer event
+  ai speech transcribe [...] --output each recognizer event sessionid
+
+  ai speech transcribe [...] --output all recognizer session events
+  ai speech transcribe [...] --output all recognizer session event sessionid
+  ai speech transcribe [...] --output all recognizer session started events
+  ai speech transcribe [...] --output all recognizer session started sessionid
+  ai speech transcribe [...] --output all recognizer session stopped events
+  ai speech transcribe [...] --output all recognizer session stopped sessionid
+
+  ai speech transcribe [...] --output each recognizer session event
+  ai speech transcribe [...] --output each recognizer session event sessionid
+  ai speech transcribe [...] --output each recognizer session started event
+  ai speech transcribe [...] --output each recognizer session started sessionid
+  ai speech transcribe [...] --output each recognizer session stopped event
+  ai speech transcribe [...] --output each recognizer session stopped sessionid
+
+  ai speech transcribe [...] --output all connection message received events
+  ai speech transcribe [...] --output all connection message received binary message
+  ai speech transcribe [...] --output all connection message received binary message size
+  ai speech transcribe [...] --output all connection message received content type
+  ai speech transcribe [...] --output all connection message received is binary message
+  ai speech transcribe [...] --output all connection message received is text message
+  ai speech transcribe [...] --output all connection message received path
+  ai speech transcribe [...] --output all connection message received request id
+  ai speech transcribe [...] --output all connection message received text message
+
+  ai speech transcribe [...] --output each connection message received event
+  ai speech transcribe [...] --output each connection message received binary message
+  ai speech transcribe [...] --output each connection message received binary message size
+  ai speech transcribe [...] --output each connection message received content type
+  ai speech transcribe [...] --output each connection message received is binary message
+  ai speech transcribe [...] --output each connection message received is text message
+  ai speech transcribe [...] --output each connection message received path
+  ai speech transcribe [...] --output each connection message received request id
+  ai speech transcribe [...] --output each connection message received text message
+
+  ai speech transcribe [...] --output all recognizer canceled events
+  ai speech transcribe [...] --output all recognizer canceled error
+  ai speech transcribe [...] --output all recognizer canceled error code
+  ai speech transcribe [...] --output all recognizer canceled error details
+  ai speech transcribe [...] --output all recognizer canceled reason
+
+  ai speech transcribe [...] --output each recognizer canceled event
+  ai speech transcribe [...] --output each recognizer canceled error
+  ai speech transcribe [...] --output each recognizer canceled error code
+  ai speech transcribe [...] --output each recognizer canceled error details
+  ai speech transcribe [...] --output each recognizer canceled reason
+
+  ai speech transcribe [...] --output all recognizer recognized events
+  ai speech transcribe [...] --output all recognizer recognized sessionid
+  ai speech transcribe [...] --output all recognizer recognized result resultid
+  ai speech transcribe [...] --output all recognizer recognized result reason
+  ai speech transcribe [...] --output all recognizer recognized result text
+  ai speech transcribe [...] --output all recognizer recognized result itn text
+  ai speech transcribe [...] --output all recognizer recognized result lexical text
+  ai speech transcribe [...] --output all recognizer recognized result offset
+  ai speech transcribe [...] --output all recognizer recognized result duration
+  ai speech transcribe [...] --output all recognizer recognized result latency
+  ai speech transcribe [...] --output all recognizer recognized result json
+
+  ai speech transcribe [...] --output each recognizer recognized event
+  ai speech transcribe [...] --output each recognizer recognized sessionid
+  ai speech transcribe [...] --output each recognizer recognized result resultid
+  ai speech transcribe [...] --output each recognizer recognized result reason
+  ai speech transcribe [...] --output each recognizer recognized result text
+  ai speech transcribe [...] --output each recognizer recognized result itn text
+  ai speech transcribe [...] --output each recognizer recognized result lexical text
+  ai speech transcribe [...] --output each recognizer recognized result offset
+  ai speech transcribe [...] --output each recognizer recognized result duration
+  ai speech transcribe [...] --output each recognizer recognized result latency
+  ai speech transcribe [...] --output each recognizer recognized result json
+
+  ai speech transcribe [...] --output all recognizer recognizing events
+  ai speech transcribe [...] --output all recognizer recognizing sessionid
+  ai speech transcribe [...] --output all recognizer recognizing result resultid
+  ai speech transcribe [...] --output all recognizer recognizing result reason
+  ai speech transcribe [...] --output all recognizer recognizing result text
+  ai speech transcribe [...] --output all recognizer recognizing result offset
+  ai speech transcribe [...] --output all recognizer recognizing result duration
+  ai speech transcribe [...] --output all recognizer recognizing result latency
+  ai speech transcribe [...] --output all recognizer recognizing result json
+
+  ai speech transcribe [...] --output each recognizer recognizing event
+  ai speech transcribe [...] --output each recognizer recognizing sessionid
+  ai speech transcribe [...] --output each recognizer recognizing result resultid
+  ai speech transcribe [...] --output each recognizer recognizing result reason
+  ai speech transcribe [...] --output each recognizer recognizing result text
+  ai speech transcribe [...] --output each recognizer recognizing result offset
+  ai speech transcribe [...] --output each recognizer recognizing result duration
+  ai speech transcribe [...] --output each recognizer recognizing result latency
+  ai speech transcribe [...] --output each recognizer recognizing result json
+
+  ai speech transcribe [...] --output all file type json
+  ai speech transcribe [...] --output all file output.json
+
+  ai speech transcribe [...] --output each file type json
+  ai speech transcribe [...] --output each file output.json
+
+  ai speech transcribe [...] --output all file type tsv 
+  ai speech transcribe [...] --output all file output.tsv
+  ai speech transcribe [...] --output all tsv file has header false
+
+  ai speech transcribe [...] --output each file type tsv
+  ai speech transcribe [...] --output each file output.tsv
+  ai speech transcribe [...] --output each tsv file has header false

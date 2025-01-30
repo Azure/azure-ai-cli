@@ -1,0 +1,23 @@
+TRANSCRIBE SAVE
+
+@speech.include.the.transcribe.command
+
+@speech.include.the.save.option
+
+USAGE: ai speech transcribe [...] --save FILENAME
+
+EXAMPLES
+
+  ai speech transcribe --files *.wav --save test1.job
+  ai speech transcribe --files *.wav --log {id}.log --save test2.job
+  ai speech transcribe --files @URLs.txt --output zip output.zip --save test3.job
+
+  ai speech transcribe --foreach file;transcript in @items.txt --save test4.job
+  ai speech transcribe @test4.job
+
+SEE ALSO
+
+  ai help speech transcribe
+  ai help speech transcribe files
+  ai help speech transcribe foreach
+  ai help speech webjob setup

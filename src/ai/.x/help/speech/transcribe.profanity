@@ -1,0 +1,27 @@
+TRANSCRIBE PROFANITY
+
+@speech.include.the.transcribe.command
+
+  The `--profanity` controls how the service deals with spoken profanity.
+
+USAGE: ai speech transcribe [...] --profanity OPTION
+
+  WHERE: OPTION is none
+     OR: OPTION is masked 
+     OR: OPTION is removed
+     OR: OPTION is tags
+
+  Using none will disable profanity filtering.
+  Using masked will replace profanity with asterisks.
+  Using removed will remove all profanity from the result.
+  Using tags will add profanity tags.
+
+EXAMPLES
+
+  ai speech transcribe --file hello.wav --profanity none
+  ai speech transcribe --file hello.wav --profanity masked
+  ai speech transcribe --file hello.wav --profanity removed
+
+SEE ALSO
+
+  ai help speech transcribe
