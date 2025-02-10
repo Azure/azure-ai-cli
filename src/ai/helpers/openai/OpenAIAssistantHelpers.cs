@@ -103,11 +103,11 @@ namespace Azure.AI.Details.Common.CLI
 
         public static async Task<Dictionary<string, string>> ListAssistantsAsync(AssistantClient client)
         {
-            var options = new AssistantCollectionOptions() { Order = ListOrder.OldestFirst };
+            var options = new AssistantCollectionOptions() { Order = AssistantCollectionOrder.Ascending};
             var assistants = client.GetAssistantsAsync(options);
 
             var list = new List<Assistant>();
-            await foreach (Assistant assistant in assistants.GetAllValuesAsync())
+            await foreach (Assistant assistant in assistants)
             {
                 list.Add(assistant);
             }
@@ -118,7 +118,7 @@ namespace Azure.AI.Details.Common.CLI
         public static async Task<VectorStore> GetVectorStoreAsync(string key, string endpoint, string id)
         {
             var client = CreateOpenAIVectorStoreClient(key, endpoint);
-            return await client.GetVectorStoreAsync(id);
+            return client.GetVectorStore(id);
         }
 
         public static async Task<VectorStore> CreateAssistantVectorStoreAsync(string key, string endpoint, string name, List<string> fileIds)
@@ -129,11 +129,14 @@ namespace Azure.AI.Details.Common.CLI
 
         private static async Task<VectorStore> CreateAssistantVectorStoreAsync(VectorStoreClient client, string name, List<string> fileIds)
         {
-            var result = await client.CreateVectorStoreAsync(new VectorStoreCreationOptions()
+            var options = new VectorStoreCreationOptions() { Name = name };
+            foreach (var file in fileIds)
             {
-                Name = name,
-                FileIds = fileIds
-            });
+                options.FileIds.Add(file);
+            }
+
+            var result = await client.CreateVectorStoreAsync(true, options);
+
             return result.Value;
         }
 
@@ -145,8 +148,8 @@ namespace Azure.AI.Details.Common.CLI
 
         private static async Task<VectorStore> UpdateAssistantVectorStoreAsync(VectorStoreClient client, string id, string name)
         {
-            var store = await client.GetVectorStoreAsync(id);
-            var result = await client.ModifyVectorStoreAsync(store, new VectorStoreModificationOptions()
+            var store = client.GetVectorStore(id).Value;
+            var result = await client.ModifyVectorStoreAsync(store.Id, new VectorStoreModificationOptions()
             {
                 Name = name
             });
@@ -170,7 +173,7 @@ namespace Azure.AI.Details.Common.CLI
             var vectorStores = client.GetVectorStoresAsync();
 
             var list = new List<VectorStore>();
-            await foreach (VectorStore vectorStore in vectorStores.GetAllValuesAsync())
+            await foreach (VectorStore vectorStore in vectorStores)
             {
                 list.Add(vectorStore);
             }
@@ -186,7 +189,8 @@ namespace Azure.AI.Details.Common.CLI
 
         public static async Task<VectorStore> GetAssistantVectorStoreAsync(VectorStoreClient client, string id)
         {
-            var response = await client.GetVectorStoreAsync(id);
+            var response = client.GetVectorStore(id);
+            await Task.CompletedTask; // hack until GetVectorStoreAsync comes back
             return response.Value;
         }
 
@@ -222,7 +226,7 @@ namespace Azure.AI.Details.Common.CLI
         public static async Task<Dictionary<string, string>> ListAssistantFiles(string key, string endpoint)
         {
             var client = CreateOpenAIFileClient(key, endpoint);
-            var response = await client.GetFilesAsync(OpenAIFilePurpose.Assistants);
+            var response = await client.GetFilesAsync(FilePurpose.Assistants);
             var files = response.Value.ToList();
             return files.ToDictionary(f => f.Id, f => f.Filename);
         }
@@ -233,20 +237,20 @@ namespace Azure.AI.Details.Common.CLI
             var response = await client.DeleteFileAsync(id);
         }
 
-        public static async Task<IEnumerable<OpenAIFileInfo>> GetFilesAsync(FileClient fileClient, IEnumerable<string> fileIds, int parallelism = 10, Action<OpenAIFileInfo> callback = null)
+        public static async Task<IEnumerable<OpenAIFile>> GetFilesAsync(OpenAIFileClient fileClient, IEnumerable<string> fileIds, int parallelism = 10, Action<OpenAIFile> callback = null)
         {
             var list = fileIds.ToList();
 
             var throttler = new SemaphoreSlim(parallelism);
             var tasks = new List<Task>();
 
-            var foundFiles = new List<OpenAIFileInfo>();
+            var foundFiles = new List<OpenAIFile>();
             foreach (var file in list)
             {
                 tasks.Add(Task.Run(async () =>
                 {
                     var foundFile = await fileClient.GetFileAsync(file);
-                    foundFiles.Add(foundFile);
+                    foundFiles.Add(foundFile.Value);
 
                     if (callback != null)
                     {
@@ -260,14 +264,14 @@ namespace Azure.AI.Details.Common.CLI
             return foundFiles;
         }
 
-        public static async Task<IEnumerable<OpenAIFileInfo>> UploadFilesAsync(FileClient fileClient, IEnumerable<string> files, int parallelism = 10, Action<OpenAIFileInfo> callback = null)
+        public static async Task<IEnumerable<OpenAIFile>> UploadFilesAsync(OpenAIFileClient fileClient, IEnumerable<string> files, int parallelism = 10, Action<OpenAIFile> callback = null)
         {
             var list = files.ToList();
 
             var throttler = new SemaphoreSlim(parallelism);
             var tasks = new List<Task>();
 
-            var uploadedFiles = new List<OpenAIFileInfo>();
+            var uploadedFiles = new List<OpenAIFile>();
             foreach (var file in list)
             {
                 tasks.Add(Task.Run(async () =>
@@ -287,7 +291,7 @@ namespace Azure.AI.Details.Common.CLI
             return uploadedFiles;
         }
 
-        public static async Task<OpenAIFileInfo> UploadFileAsync(FileClient fileClient, SemaphoreSlim throttler, string file)
+        public static async Task<OpenAIFile> UploadFileAsync(OpenAIFileClient fileClient, SemaphoreSlim throttler, string file)
         {
             await throttler.WaitAsync();
             try
@@ -319,10 +323,10 @@ namespace Azure.AI.Details.Common.CLI
             return client.GetAssistantClient();
         }
 
-        public static FileClient CreateOpenAIFileClient(string key, string endpoint)
+        public static OpenAIFileClient CreateOpenAIFileClient(string key, string endpoint)
         {
             var client = CreateOpenAIClient(key, endpoint);
-            return client.GetFileClient();
+            return client.GetOpenAIFileClient();
         }
 
         public static VectorStoreClient CreateOpenAIVectorStoreClient(string key, string endpoint)
@@ -331,39 +335,12 @@ namespace Azure.AI.Details.Common.CLI
             return client.GetVectorStoreClient();
         }
 
-        public static async Task<VectorStoreBatchFileJob> ProcessBatchFileJob(string key, string endpoint, VectorStore store, IEnumerable<OpenAIFileInfo> uploaded)
+        public static async Task<VectorStoreBatchFileJob> ProcessBatchFileJob(string key, string endpoint, VectorStore store, IEnumerable<OpenAIFile> uploaded)
         {
             var client = CreateOpenAIVectorStoreClient(key, endpoint);
+            var fileIds = uploaded.Select(x => x.Id).ToList();
 
-            var batchJob = await client.CreateBatchFileJobAsync(store, uploaded);
-            var completed = false;
-            while (!completed)
-            {
-                Console.Write('.');
-                Thread.Sleep(250);
-
-                batchJob = await client.GetBatchFileJobAsync(batchJob);
-                var error = batchJob.Value.Status == VectorStoreBatchFileJobStatus.Failed;
-                if (error)
-                {
-                    var message = $"Batch job failed: {batchJob.Value.Status}";
-                    var jsonModel = batchJob.Value as IJsonModel<Assistant>;
-                    if (jsonModel != null)
-                    {
-                        using var stream = new MemoryStream();
-                        var writer = new Utf8JsonWriter(stream);
-                        jsonModel.Write(writer, ModelReaderWriterOptions.Json);
-                        writer.Flush();
-
-                        message += Encoding.UTF8.GetString(stream.ToArray());
-                    }
-
-                    throw new Exception(message);
-                }
-
-                completed = batchJob.Value.Status == VectorStoreBatchFileJobStatus.Completed;
-            }
-
+            var batchJob = await client.CreateBatchFileJobAsync(store.Id, fileIds, true);
             return batchJob.Value;
         }
 

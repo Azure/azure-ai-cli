@@ -462,13 +462,13 @@ namespace Azure.AI.Details.Common.CLI
 
         public async Task GetAssistantsAPIResponseAsync(AssistantClient assistantClient, string assistantId, AssistantThread thread, RunCreationOptions options, HelperFunctionFactory factory, string userInput)
         {
-            await assistantClient.CreateMessageAsync(thread, MessageRole.User, [ userInput ]);
+            await assistantClient.CreateMessageAsync(thread.Id, MessageRole.User, [ userInput ]);
             _ = CheckWriteChatHistoryOutputFileAsync(fileName => thread.SaveChatHistoryToFileAsync(assistantClient, fileName));
 
             DisplayAssistantPromptLabel();
 
             var assistant = await assistantClient.GetAssistantAsync(assistantId);
-            var stream = assistantClient.CreateRunStreamingAsync(thread, assistant.Value, options);
+            var stream = assistantClient.CreateRunStreamingAsync(thread.Id, assistant.Value.Id, options);
 
             string contentComplete = string.Empty;
             ThreadRun? run = null;
@@ -506,7 +506,7 @@ namespace Azure.AI.Details.Common.CLI
 
                 if (toolOutputs.Count > 0 && run != null)
                 {
-                    stream = assistantClient.SubmitToolOutputsToRunStreamingAsync(run, toolOutputs);
+                    stream = assistantClient.SubmitToolOutputsToRunStreamingAsync(thread.Id, run.Id, toolOutputs);
                     toolOutputs.Clear();
                 }
             }
@@ -669,7 +669,7 @@ namespace Azure.AI.Details.Common.CLI
 
             var options = new ChatCompletionOptions()
             {
-                MaxTokens = TryParse(maxTokens, null),
+                MaxOutputTokenCount = TryParse(maxTokens, null),
                 Temperature = TryParse(temperature, _defaultTemperature),
                 FrequencyPenalty = TryParse(frequencyPenalty, _defaultFrequencyPenalty),
                 PresencePenalty = TryParse(presencePenalty, _defaultPresencePenalty),
@@ -841,8 +841,8 @@ namespace Azure.AI.Details.Common.CLI
             var result = await client.GetThreadAsync(threadId);
             var thread = result.Value;
 
-            var options = new MessageCollectionOptions() { Order = ListOrder.OldestFirst };
-            await foreach (var message in client.GetMessagesAsync(thread, options).GetAllValuesAsync())
+            var options = new MessageCollectionOptions() { Order = MessageCollectionOrder.Ascending };
+            await foreach (var message in client.GetMessagesAsync(thread.Id, options))
             {
                 var content = string.Join("", message.Content.Select(c => c.Text));
                 var isUser = message.Role == MessageRole.User;
@@ -1222,7 +1222,7 @@ namespace Azure.AI.Details.Common.CLI
                 modifyOptions.DefaultTools.Add(new FileSearchToolDefinition());
 
                 var assistantClient = OpenAIAssistantHelpers.CreateOpenAIAssistantClient(key, endpoint);
-                var modified = await assistantClient.ModifyAssistantAsync(assistant, modifyOptions);
+                var modified = await assistantClient.ModifyAssistantAsync(assistant.Id, modifyOptions);
                 assistant = modified.Value;
 
                 Console.WriteLine();
@@ -1329,7 +1329,7 @@ namespace Azure.AI.Details.Common.CLI
                 modifyOptions.DefaultTools.Add(new FileSearchToolDefinition());
             }
 
-            var modified = await assistantClient.ModifyAssistantAsync(assistant, modifyOptions);
+            var modified = await assistantClient.ModifyAssistantAsync(assistant.Id, modifyOptions);
             assistant = modified.Value;
 
             if (!_quiet) Console.WriteLine($"{message} Done!\n");
@@ -1704,7 +1704,7 @@ namespace Azure.AI.Details.Common.CLI
 
         private async Task<VectorStore> UploadFilesToAssistantVectorStore(string key, string endpoint, List<string> fileIds, List<string> files, VectorStore store)
         {
-            var batchFiles = new List<OpenAIFileInfo>();
+            var batchFiles = new List<OpenAIFile>();
 
             if (fileIds.Count() > 0)
             {
@@ -1747,7 +1747,7 @@ namespace Azure.AI.Details.Common.CLI
             return store;
         }
 
-        private static async Task ProcessBatchFileJobs(string key, string endpoint, VectorStore store, List<OpenAIFileInfo> batchFiles, int maxBatchSize)
+        private static async Task ProcessBatchFileJobs(string key, string endpoint, VectorStore store, List<OpenAIFile> batchFiles, int maxBatchSize)
         {
             var completed = 0;
             var total = 0;
@@ -1772,7 +1772,7 @@ namespace Azure.AI.Details.Common.CLI
             }
         }
 
-        private static async Task<VectorStoreBatchFileJob> ProcessBatchFileJob(string key, string endpoint, VectorStore store, List<OpenAIFileInfo> batchFiles)
+        private static async Task<VectorStoreBatchFileJob> ProcessBatchFileJob(string key, string endpoint, VectorStore store, List<OpenAIFile> batchFiles)
         {
             var batchJob = await OpenAIAssistantHelpers.ProcessBatchFileJob(key, endpoint, store, batchFiles);
 
@@ -1802,7 +1802,7 @@ namespace Azure.AI.Details.Common.CLI
             }
             else if (store.FileCounts.Total == 1)
             {
-                var association = storeClient.GetFileAssociations(store).GetAllValues().First();
+                var association = storeClient.GetFileAssociations(store.Id).First();
                 var file = fileClient.GetFile(association.FileId);
 
                 Console.Write("\n  File:");
@@ -1814,8 +1814,8 @@ namespace Azure.AI.Details.Common.CLI
                 Console.WriteLine("\n  Files:\n");
 
                 var count = 0;
-                var associations = storeClient.GetFileAssociations(store);
-                foreach (var association in associations.GetAllValues())
+                var associations = storeClient.GetFileAssociations(store.Id);
+                foreach (var association in associations)
                 {
                     var file = fileClient.GetFile(association.FileId);
                     Console.WriteLine($"    {file.Value.Filename} ({file.Value.SizeInBytes} byte(s))");
