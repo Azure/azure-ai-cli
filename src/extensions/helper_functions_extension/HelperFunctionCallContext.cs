@@ -4,6 +4,8 @@
 //
 
 using OpenAI.Chat;
+using System.Buffers;
+using System.Diagnostics;
 using System.Text;
 
 namespace Azure.AI.Details.Common.CLI.Extensions.HelperFunctions
@@ -23,25 +25,8 @@ namespace Azure.AI.Details.Common.CLI.Extensions.HelperFunctions
 
             foreach (var update in streamingUpdate.ToolCallUpdates)
             {
-                if (!string.IsNullOrEmpty(update.Id))
-                {
-                    updated = true;
-                    _indexToToolCallId[update.Index] = update.Id;
-                }
-                if (!string.IsNullOrEmpty(update.FunctionName))
-                {
-                    updated = true;
-                    _indexToFunctionName[update.Index] = update.FunctionName;
-                }
-                if (!string.IsNullOrEmpty(update.FunctionArgumentsUpdate))
-                {
-                    updated = true;
-
-                    var needToAdd = !_indexToArguments.ContainsKey(update.Index);
-                    if (needToAdd) _indexToArguments[update.Index] = new StringBuilder();
-
-                    _indexToArguments[update.Index].Append(update.FunctionArgumentsUpdate);
-                }
+                _toolCallsBuilder.Append(update);
+                updated = true;
             }
 
             return updated;
@@ -49,29 +34,29 @@ namespace Azure.AI.Details.Common.CLI.Extensions.HelperFunctions
 
         public bool TryCallFunctions(string content, Action<string, string, string> callback)
         {
-            if (_indexToArguments.Count == 0) return false;
+            var toolCalls = _toolCallsBuilder.Build();
+            if (toolCalls.Count == 0) return false;
 
-            List<ChatToolCall> toolCalls = [];
-            foreach (var item in _indexToToolCallId)
+            // Create the assistant message with the tool calls.
+            var assistantMessage = new AssistantChatMessage(toolCalls);
+            // Then, if there is any textual content, add it as a content part.
+            if (!string.IsNullOrEmpty(content))
             {
-                toolCalls.Add(ChatToolCall.CreateFunctionToolCall(
-                    item.Value,
-                    _indexToFunctionName[item.Key],
-                    _indexToArguments[item.Key].ToString()));
+                assistantMessage.Content.Add(ChatMessageContentPart.CreateTextPart(content));
             }
+            _messages.Add(assistantMessage);
 
-            _messages.Add(new AssistantChatMessage(toolCalls, content));
-
+            // Process each tool call.
             foreach (var toolCall in toolCalls)
             {
                 var functionName = toolCall.FunctionName;
-                var functionArguments = toolCall.FunctionArguments;
+                var functionArguments = toolCall.FunctionArguments.ToString();
 
                 var ok = _functionFactory.TryCallFunction(functionName, functionArguments, out var result);
                 if (!ok) return false;
 
                 callback(functionName, functionArguments, result);
-                _messages.Add(ChatMessage.CreateToolChatMessage(toolCall.Id, result));
+                _messages.Add(new ToolChatMessage(toolCall.Id, result));
             }
 
             return true;
@@ -79,16 +64,125 @@ namespace Azure.AI.Details.Common.CLI.Extensions.HelperFunctions
 
         public void Clear()
         {
-            _indexToToolCallId.Clear();
-            _indexToFunctionName.Clear();
-            _indexToArguments.Clear();
+            _toolCallsBuilder = new();
         }
 
         private HelperFunctionFactory _functionFactory;
         private IList<ChatMessage> _messages;
+        private StreamingChatToolCallsBuilder _toolCallsBuilder = new();
+    }
 
-        private Dictionary<int, string> _indexToToolCallId = [];
-        private Dictionary<int, string> _indexToFunctionName = [];
-        private Dictionary<int, StringBuilder> _indexToArguments = [];
+    public class StreamingChatToolCallsBuilder
+    {
+        private readonly Dictionary<int, string> _indexToToolCallId = [];
+        private readonly Dictionary<int, string> _indexToFunctionName = [];
+        private readonly Dictionary<int, SequenceBuilder<byte>> _indexToFunctionArguments = [];
+
+        public void Append(StreamingChatToolCallUpdate toolCallUpdate)
+        {
+            // Keep track of which tool call ID belongs to this update index.
+            if (toolCallUpdate.ToolCallId != null)
+            {
+                _indexToToolCallId[toolCallUpdate.Index] = toolCallUpdate.ToolCallId;
+            }
+
+            // Keep track of which function name belongs to this update index.
+            if (toolCallUpdate.FunctionName != null)
+            {
+                _indexToFunctionName[toolCallUpdate.Index] = toolCallUpdate.FunctionName;
+            }
+
+            // Keep track of which function arguments belong to this update index,
+            // and accumulate the arguments as new updates arrive.
+            if (toolCallUpdate.FunctionArgumentsUpdate != null && !toolCallUpdate.FunctionArgumentsUpdate.ToMemory().IsEmpty)
+            {
+                if (!_indexToFunctionArguments.TryGetValue(toolCallUpdate.Index, out SequenceBuilder<byte> argumentsBuilder))
+                {
+                    argumentsBuilder = new SequenceBuilder<byte>();
+                    _indexToFunctionArguments[toolCallUpdate.Index] = argumentsBuilder;
+                }
+
+                argumentsBuilder.Append(toolCallUpdate.FunctionArgumentsUpdate);
+            }
+        }
+
+        public IReadOnlyList<ChatToolCall> Build()
+        {
+            List<ChatToolCall> toolCalls = [];
+
+            foreach ((int index, string toolCallId) in _indexToToolCallId)
+            {
+                ReadOnlySequence<byte> sequence = _indexToFunctionArguments[index].Build();
+
+                ChatToolCall toolCall = ChatToolCall.CreateFunctionToolCall(
+                    id: toolCallId,
+                    functionName: _indexToFunctionName[index],
+                    functionArguments: BinaryData.FromBytes(sequence.ToArray()));
+
+                toolCalls.Add(toolCall);
+            }
+
+            return toolCalls;
+        }
+    }
+
+    public class SequenceBuilder<T>
+    {
+        Segment? _first;
+        Segment? _last;
+
+        public void Append(ReadOnlyMemory<T> data)
+        {
+            if (_first == null)
+            {
+                Debug.Assert(_last == null);
+                _first = new Segment(data);
+                _last = _first;
+            }
+            else
+            {
+                _last = _last!.Append(data);
+            }
+        }
+
+        public ReadOnlySequence<T> Build()
+        {
+            if (_first == null)
+            {
+                Debug.Assert(_last == null);
+                return ReadOnlySequence<T>.Empty;
+            }
+
+            if (_first == _last)
+            {
+                Debug.Assert(_first.Next == null);
+                return new ReadOnlySequence<T>(_first.Memory);
+            }
+
+            return new ReadOnlySequence<T>(_first, 0, _last!, _last!.Memory.Length);
+        }
+
+        private sealed class Segment : ReadOnlySequenceSegment<T>
+        {
+            public Segment(ReadOnlyMemory<T> items) : this(items, 0)
+            {
+            }
+
+            private Segment(ReadOnlyMemory<T> items, long runningIndex)
+            {
+                Debug.Assert(runningIndex >= 0);
+                Memory = items;
+                RunningIndex = runningIndex;
+            }
+
+            public Segment Append(ReadOnlyMemory<T> items)
+            {
+                long runningIndex;
+                checked { runningIndex = RunningIndex + Memory.Length; }
+                Segment segment = new(items, runningIndex);
+                Next = segment;
+                return segment;
+            }
+        }
     }
 }

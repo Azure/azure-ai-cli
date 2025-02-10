@@ -670,10 +670,14 @@ namespace Azure.AI.Details.Common.CLI
             var options = new ChatCompletionOptions()
             {
                 MaxOutputTokenCount = TryParse(maxTokens, null),
-                Temperature = TryParse(temperature, _defaultTemperature),
                 FrequencyPenalty = TryParse(frequencyPenalty, _defaultFrequencyPenalty),
                 PresencePenalty = TryParse(presencePenalty, _defaultPresencePenalty),
             };
+
+            if (!string.IsNullOrEmpty(temperature) && float.TryParse(temperature, out var temperatureFloat))
+            {
+                options.Temperature = temperatureFloat;
+            }
 
             var stop = _values["chat.options.stop.sequence"];
             if (!string.IsNullOrEmpty(stop))
