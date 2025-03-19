@@ -1,0 +1,23 @@
+CHAT ASSISTANT GET
+
+  The `ai chat assistant trace get` command retrieves the trace data from a specific request.
+
+USAGE: ai chat assistant trace get [...]
+
+  GET
+    --request-id ID                          
+    --request-id ID --output-file FILEPATH   
+    --request-id ID --dashboard true         (Note: dashboard must be running to use this option)
+
+EXAMPLE
+
+  ai chat assistant get trace --request-id 25abac2c-9949-481f-83dd-db06d2993e85
+
+  ai tool dashboard start
+  ai chat assistant get trace --request-id 25abac2c-9949-481f-83dd-db06d2993e85 --dashboard true
+
+SEE ALSO
+
+  ai help chat examples
+  ai help chat assistant examples
+  ai help find topics chat assistant
