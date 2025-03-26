@@ -15,7 +15,7 @@ public static class WolframAlphaHelper
     [HelperFunctionDescription("Calls Wolfram Alpha to answer a calculus question")]
     public static async Task<string> AnswerCalculusQuestion(string question)
     {
-        string wolframAlphaApiKey = "JJVEU8-J2TE2U24G2";
+        string wolframAlphaApiKey = "Place-Holder";
         string requestUri = $"http://api.wolframalpha.com/v2/query?input={Uri.EscapeDataString(question)}&appid={wolframAlphaApiKey}";
 
         HttpResponseMessage response = await client.GetAsync(requestUri);
