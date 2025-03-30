@@ -15,7 +15,7 @@ async function main() {
   {{else}}
   const chat = new {ClassName}(OPENAI_MODEL_NAME, AZURE_OPENAI_SYSTEM_PROMPT, openai);
   {{endif}}
-  
+
   // Loop until the user types 'exit'
   while (true) {
 
