@@ -20,11 +20,15 @@ namespace Azure.AI.Details.Common.CLI
         {
             return ParseCommandValues("tool", GetCommandParsers(values), tokens, values);
         }
-
+        
         private static readonly (string name, bool valuesRequired)[] _commands =  {
-            ("tool", true)
+            ("tool.dashboard.start", false),
+            ("tool.dashboard.stop", false),
+            ("tool.dashboard", false),
+            ("tool", true),
+            
         };
-
+        
         private static readonly string[] _partialCommands = {
             "tool"
         };
@@ -32,6 +36,7 @@ namespace Azure.AI.Details.Common.CLI
         private static IEnumerable<INamedValueTokenParser> GetCommandParsers(ICommandValues values)
         {
             var commandName = values.GetCommand();
+
             foreach (var command in _commands)
             {
                 if (commandName == command.name)
@@ -72,6 +77,7 @@ namespace Azure.AI.Details.Common.CLI
             new CommonToolNamedValueTokenParsers()
 
         };
+
 
         #endregion
     }

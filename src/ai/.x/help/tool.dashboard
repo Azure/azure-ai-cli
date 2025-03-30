@@ -1,0 +1,11 @@
+TOOL DASHBOARD
+
+  The 'ai tool dashboard' command controls the .NET Aspire Dashboard docker container.
+  NOTE: Make sure Docker is running prior to using the command.
+
+USAGE: ai tool dashboard start
+       ai chat dashboard stop
+
+SEE ALSO
+
+  ai help chat assistant get trace 

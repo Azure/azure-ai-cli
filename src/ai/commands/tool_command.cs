@@ -15,7 +15,7 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Threading;
 using System.Threading.Tasks;
-
+using Azure.AI.Details.Common.CLI.Extensions.Otel;
 namespace Azure.AI.Details.Common.CLI
 {
     public class ToolCommand : Command
@@ -41,6 +41,15 @@ namespace Azure.AI.Details.Common.CLI
 
             return _values.GetOrDefault("passed", true);
         }
+        private void StartDashboard() 
+        {
+            Dashboard.StartDashboard();
+        }
+
+        private void StopDashboard() 
+        {
+            Dashboard.StopDashboard();
+        }
 
         private bool RunToolCommand()
         {
@@ -54,6 +63,8 @@ namespace Azure.AI.Details.Common.CLI
 
             switch (command)
             {
+                case "tool.dashboard.start": StartDashboard(); break;
+                case "tool.dashboard.stop": StopDashboard(); break;
                 default:
                     _values.AddThrowError("WARNING:", $"'{command.Replace('.', ' ')}' NOT YET IMPLEMENTED!!");
                     break;

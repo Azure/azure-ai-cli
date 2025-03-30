@@ -35,7 +35,7 @@ namespace Azure.AI.Details.Common.CLI
 
             var parsed = Program.DispatchParseCommand(tokens, values);
             if (parsed || values.DisplayHelpRequested()) return parsed;
-
+            
             switch (command.Split('.')[0])
             {
                 case "-?":
